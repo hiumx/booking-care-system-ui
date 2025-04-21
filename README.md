@@ -11,8 +11,6 @@ A modern, responsive UI for a medical booking system built with **React** and **
 - 💅 TailwindCSS (or your CSS framework)
 - 🔗 Axios (for API requests)
 - 📦 React Router (for routing)
-- 🔐 Environment Variables with `.env`
-
 ---
 
 ## 🚀 Getting Started
