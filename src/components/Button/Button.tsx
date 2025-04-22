@@ -6,7 +6,9 @@ type Props = {
 };
 
 const Button: React.FC<Props> = ({ title, onClick }) => (
-    <button className={styles.className} onClick={onClick}>{title}</button>
+    <button className={styles.className} onClick={onClick}>
+        {title}
+    </button>
 );
 
 export default Button;

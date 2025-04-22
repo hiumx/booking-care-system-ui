@@ -1,0 +1,16 @@
+// inside any component.scss or .module.scss
+
+@import '../_mixins.scss';
+
+.button {
+    @include button-style(#3498db, #fff);
+}
+
+.container {
+    @include flex-center;
+    height: 100vh;
+
+    @include respond-to(md) {
+        flex-direction: row;
+    }
+}
