@@ -11,6 +11,7 @@ A modern, responsive UI for a medical booking system built with **React** and **
 - 💅 TailwindCSS (or your CSS framework)
 - 🔗 Axios (for API requests)
 - 📦 React Router (for routing)
+
 ---
 
 ## 🚀 Getting Started
@@ -20,3 +21,4 @@ A modern, responsive UI for a medical booking system built with **React** and **
 ```bash
 git clone https://github.com/your-username/bookingcare-ui.git
 cd bookingcare-ui
+```
