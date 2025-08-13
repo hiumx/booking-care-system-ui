@@ -1,9 +1,11 @@
-interface AuthLayoutProps {}
+interface AuthLayoutProps {
+    title: string;
+}
 
-const AuthLayout: React.FC<AuthLayoutProps> = () => {
+const AuthLayout: React.FC<AuthLayoutProps> = ({ title }) => {
     return (
         <div>
-            <h1>Auth Layout</h1>
+            <h1>{title}</h1>
         </div>
     );
 };

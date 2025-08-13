@@ -1,9 +1,12 @@
-interface FooterProps {}
+interface FooterProps {
+    // Define any props if needed in the future
+    copyrightYear: number;
+}
 
-const Footer: React.FC<FooterProps> = () => {
+const Footer: React.FC<FooterProps> = ({ copyrightYear }) => {
     return (
         <div>
-            <footer>© 2025 BookingCare</footer>
+            <footer>© {copyrightYear} BookingCare</footer>
         </div>
     );
 };
