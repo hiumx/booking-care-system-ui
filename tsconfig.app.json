@@ -12,8 +12,25 @@
         "allowImportingTsExtensions": true,
         "isolatedModules": true,
         "moduleDetection": "force",
-        "noEmit": true,
+        "composite": true,
         "jsx": "react-jsx",
+
+        /* Path mapping */
+        "baseUrl": ".",
+        "paths": {
+            "~/*": ["src/*"],
+            "@/*": ["src/*"],
+            "@/components/*": ["src/components/*"],
+            "@/pages/*": ["src/pages/*"],
+            "@/layouts/*": ["src/layouts/*"],
+            "@/hooks/*": ["src/hooks/*"],
+            "@/services/*": ["src/services/*"],
+            "@/utils/*": ["src/utils/*"],
+            "@/types/*": ["src/types/*"],
+            "@/constants/*": ["src/constants/*"],
+            "@/store/*": ["src/store/*"],
+            "@/assets/*": ["src/assets/*"]
+        },
 
         /* Linting */
         "strict": true,

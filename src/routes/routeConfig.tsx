@@ -1,14 +1,14 @@
 // src/routes/routeConfig.tsx
-import Demo from '../pages/Demo';
-import Home from '../pages/Home';
+import Demo from '@/pages/Demo';
+import Home from '@/pages/Home';
 import { RouteObject } from 'react-router-dom';
 
 const routes: RouteObject[] = [
     {
         path: '/',
-        element: <Home />,
+        element: <Home title="Home Page" />,
         children: [
-            { path: '', element: <Home /> },
+            { path: '', element: <Home title="Home Page" /> },
             { path: 'about', element: <h1>About Page</h1> },
         ],
     },

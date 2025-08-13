@@ -1,6 +1,12 @@
-import DoctorAppointmentBookingCard from '../../components/DoctorAppointmentBookingCard';
+import DoctorAppointmentBookingCard from '@/components/DoctorAppointmentBookingCard';
+import type { ComponentType } from 'react';
 
-const COMPONENTS = [
+const COMPONENTS: Array<{
+    title: string;
+    description: string;
+    component: ComponentType<any>;
+    mockData: any;
+}> = [
     {
         title: 'Doctor Appointment Booking Card',
         description: 'A card component for booking doctor appointments.',
