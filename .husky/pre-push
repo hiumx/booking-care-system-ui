@@ -1,0 +1,24 @@
+#!/bin/sh
+# Pre-push hook to run full lint and type check
+
+echo "Running pre-push checks..."
+
+# Run TypeScript compilation check
+echo "Checking TypeScript compilation..."
+npx tsc --noEmit
+
+if [ $? -ne 0 ]; then
+    echo "TypeScript compilation failed. Push aborted."
+    exit 1
+fi
+
+# Run full ESLint check
+echo "Running ESLint on all files..."
+npm run lint
+
+if [ $? -ne 0 ]; then
+    echo "ESLint found errors. Push aborted."
+    exit 1
+fi
+
+echo "All pre-push checks passed!"
