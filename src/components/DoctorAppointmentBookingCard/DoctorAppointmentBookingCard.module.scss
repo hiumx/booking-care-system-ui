@@ -40,7 +40,7 @@
             .favIcon {
                 width: 32px;
                 height: 32px;
-                background: #FFF;
+                background: #fff;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -48,12 +48,12 @@
                 cursor: pointer;
 
                 i {
-                    color: #E3E6EC;
+                    color: #e3e6ec;
                 }
             }
 
             .isSelected i {
-                color: #E04F16;
+                color: #e04f16;
             }
 
             .badge {
@@ -64,7 +64,7 @@
             }
 
             .bgOrange {
-                background: #E04F16;
+                background: #e04f16;
             }
         }
     }
@@ -82,7 +82,7 @@
             text-decoration: none;
 
             &:hover {
-                color: #0E82FD;
+                color: #0e82fd;
             }
         }
     }

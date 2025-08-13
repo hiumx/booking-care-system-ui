@@ -26,5 +26,5 @@ export default [
             'prefer-const': 'error',
             'no-var': 'error',
         },
-    }
+    },
 ];

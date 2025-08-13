@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
 
-interface HeaderProps {}
+interface HeaderProps {
+    title: string;
+}
 
-const Header: React.FC<HeaderProps> = () => {
+const Header: React.FC<HeaderProps> = ({ title }) => {
     return (
         <div>
             <header>
-                <h1>BookingCare</h1>
+                <h1>{title}</h1>
                 <nav>
                     <Link to="/">Home</Link>
                     <Link to="/about">About</Link>

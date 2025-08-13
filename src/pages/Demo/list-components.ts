@@ -2,8 +2,8 @@ import DoctorAppointmentBookingCard from '../../components/DoctorAppointmentBook
 
 const COMPONENTS = [
     {
-        title: "Doctor Appointment Booking Card",
-        description: "A card component for booking doctor appointments.",
+        title: 'Doctor Appointment Booking Card',
+        description: 'A card component for booking doctor appointments.',
         component: DoctorAppointmentBookingCard,
         mockData: {
             name: 'Dr. Charles Scott',

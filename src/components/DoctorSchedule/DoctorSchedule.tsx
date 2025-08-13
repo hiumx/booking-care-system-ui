@@ -1,7 +1,9 @@
-interface DoctorScheduleProps {}
+interface DoctorScheduleProps {
+    doctorId?: string;
+}
 
-const DoctorSchedule: React.FC<DoctorScheduleProps> = () => {
-    return <div></div>;
+const DoctorSchedule: React.FC<DoctorScheduleProps> = ({ doctorId }) => {
+    return <div>Doctor ID: {doctorId}</div>;
 };
 
 export default DoctorSchedule;
