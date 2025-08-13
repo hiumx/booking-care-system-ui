@@ -9,6 +9,27 @@
         }
     ],
     "compilerOptions": {
-        "types": ["vitest", "vite/client"]
-    }
+        "types": ["vitest", "vite/client"],
+        "composite": true,
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "strict": true,
+        "baseUrl": ".",
+        "paths": {
+            "~/*": ["src/*"],
+            "@/*": ["src/*"],
+            "@/components/*": ["src/components/*"],
+            "@/pages/*": ["src/pages/*"],
+            "@/layouts/*": ["src/layouts/*"],
+            "@/hooks/*": ["src/hooks/*"],
+            "@/services/*": ["src/services/*"],
+            "@/utils/*": ["src/utils/*"],
+            "@/types/*": ["src/types/*"],
+            "@/constants/*": ["src/constants/*"],
+            "@/store/*": ["src/store/*"],
+            "@/assets/*": ["src/assets/*"]
+        }
+    },
+    "include": ["src"]
 }
