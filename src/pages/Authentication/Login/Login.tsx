@@ -216,7 +216,7 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                                                     </div>
                                                     <Link
                                                         to="/forgot-password"
-                                                        className="forgot-link"
+                                                        className={clsx(styles.forgotPassword)}
                                                     >
                                                         Quên mật khẩu?
                                                     </Link>
