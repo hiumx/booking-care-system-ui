@@ -8,13 +8,13 @@ import PatientAppointments from './PatientAppointments';
 // Mock user data
 const mockUserData = {
     id: 'PT254654',
-    fullName: 'Hendrita Hayes',
+    fullName: 'Nguyễn Văn An',
     email: 'hendrita.hayes@example.com',
     phoneNumber: '+1 234 567 8900',
     avatarUrl: './src/assets/img/doctor-grid/doctor-list-01.jpg',
-    gender: 'Female',
-    age: '32 years 03 Months',
-    role: 'patient' as const,
+    gender: 'Nữ',
+    age: '24/02/2003',
+    role: 'Bệnh nhân' as const,
     isActive: true,
     createdAt: '2023-01-15',
     updatedAt: '2024-01-15',

@@ -33,15 +33,17 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
                 </div>
                 <div className="pro-content">
                     <h3 className="title">
-                        <Link to="/doctor-profile">{doctor.name}</Link>
+                        <Link to="/doctor-profile" className={styles.textFullName}>
+                            {doctor.name}
+                        </Link>
                         {doctor.isVerified && <i className="isax isax-tick-circle5 verified"></i>}
                     </h3>
-                    <p className="speciality">{doctor.specialty}</p>
-                    <RatingStars rating={doctor.rating} />
+                    <p className="speciality">Chuyên khoa: {doctor.specialty}</p>
+                    <RatingStars rating={doctor.rating} numberOfReviews={doctor.numberOfReviews} />
                     <ul className="available-info">
                         <li>
                             <i className="isax isax-calendar5 me-1"></i>
-                            <span>Next Availability :</span> {doctor.nextAvailability}
+                            <span>Trình độ :</span> {doctor.level}
                         </li>
                         <li>
                             <i className="isax isax-location5 me-1"></i>
@@ -49,7 +51,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
                         </li>
                     </ul>
                     <div className="last-book">
-                        <p>Last Book on {doctor.lastBookDate}</p>
+                        <p>Kinh nghiệm {doctor.experience} năm</p>
                     </div>
                 </div>
             </div>
@@ -57,12 +59,12 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
                 <div className="row row-sm">
                     <div className="col-6">
                         <Link to="/doctor-profile" className="btn btn-md btn-light w-100">
-                            View Profile
+                            Xem chi tiết
                         </Link>
                     </div>
                     <div className="col-6">
                         <Link to="/booking" className="btn btn-md btn-outline-primary w-100">
-                            Book Now
+                            Đặt ngay
                         </Link>
                     </div>
                 </div>

@@ -14,14 +14,14 @@ const Favourite = () => {
     return (
         <>
             <div className="dashboard-header">
-                <h3>Favourites</h3>
+                <h3>Danh sách bác sĩ yêu thích</h3>
                 <ul className="header-list-btns">
                     <li>
                         <div className="input-block dash-search-input">
                             <input
                                 type="text"
                                 className="form-control"
-                                placeholder="Search"
+                                placeholder="Tìm kiếm"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -44,7 +44,7 @@ const Favourite = () => {
 
             <div className="col-md-12">
                 <div className="loader-item text-center mt-0">
-                    <button className="btn btn-outline-primary rounded-pill">Load More</button>
+                    <button className="btn btn-outline-primary rounded-pill">Xem thêm</button>
                 </div>
             </div>
         </>

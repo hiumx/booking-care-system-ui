@@ -4,22 +4,24 @@ export interface FavouriteDoctor {
     specialty: string;
     image: string;
     rating: number;
-    nextAvailability: string;
+    numberOfReviews: number;
+    level: string;
     location: string;
-    lastBookDate: string;
+    experience: string;
     isVerified: boolean;
 }
 
 export const mockFavouriteDoctors: FavouriteDoctor[] = [
     {
         id: '1',
-        name: 'Dr.Edalin Hendry',
-        specialty: 'MD - Cardiology',
+        name: 'Nguyễn Văn Biển',
+        specialty: 'Tâm Lý',
         image: './src/assets/img/doctor-grid/doctor-list-01.jpg',
         rating: 5.0,
-        nextAvailability: '23 Mar 2024',
-        location: 'Newyork, USA',
-        lastBookDate: '21 Jan 2023',
+        numberOfReviews: 35,
+        level: 'Tiến sĩ tâm lí học',
+        location: 'Bệnh viện Đà Nẵng',
+        experience: '15',
         isVerified: true,
     },
     {
@@ -28,9 +30,10 @@ export const mockFavouriteDoctors: FavouriteDoctor[] = [
         specialty: 'DO - Oncology',
         image: './src/assets/img/doctor-grid/doctor-list-02.jpg',
         rating: 4.0,
-        nextAvailability: '27 Mar 2024',
+        numberOfReviews: 35,
+        level: '27 Mar 2024',
         location: 'Los Angeles, USA',
-        lastBookDate: '18 Jan 2023',
+        experience: '16',
         isVerified: true,
     },
     {
@@ -39,9 +42,10 @@ export const mockFavouriteDoctors: FavouriteDoctor[] = [
         specialty: 'MD - Orthopedics',
         image: './src/assets/img/doctor-grid/doctor-list-03.jpg',
         rating: 5.0,
-        nextAvailability: '02 Apr 2024',
+        numberOfReviews: 35,
+        level: '02 Apr 2024',
         location: 'Dallas, USA',
-        lastBookDate: '28 Jan 2023',
+        experience: '17',
         isVerified: true,
     },
     {
@@ -50,9 +54,10 @@ export const mockFavouriteDoctors: FavouriteDoctor[] = [
         specialty: 'DO - Dermatology',
         image: './src/assets/img/doctor-grid/doctor-list-04.jpg',
         rating: 4.0,
-        nextAvailability: '11 Apr 2024',
+        numberOfReviews: 35,
+        level: '11 Apr 2024',
         location: 'Chicago, USA',
-        lastBookDate: '08 Feb 2023',
+        experience: '18',
         isVerified: true,
     },
     {
@@ -61,9 +66,10 @@ export const mockFavouriteDoctors: FavouriteDoctor[] = [
         specialty: 'MD - Neurology',
         image: './src/assets/img/doctor-grid/doctor-list-05.jpg',
         rating: 5.0,
-        nextAvailability: '18 Apr 2024',
+        numberOfReviews: 35,
+        level: '18 Apr 2024',
         location: 'Detroit, USA',
-        lastBookDate: '16 Feb 2023',
+        experience: '19',
         isVerified: true,
     },
     {
@@ -72,9 +78,10 @@ export const mockFavouriteDoctors: FavouriteDoctor[] = [
         specialty: 'MD - Pediatrics',
         image: './src/assets/img/doctor-grid/doctor-list-06.jpg',
         rating: 4.0,
-        nextAvailability: '10 May 2024',
+        numberOfReviews: 35,
+        level: '10 May 2024',
         location: 'Las Vegas, USA',
-        lastBookDate: '08 Mar 2023',
+        experience: '20',
         isVerified: true,
     },
     {
@@ -83,9 +90,10 @@ export const mockFavouriteDoctors: FavouriteDoctor[] = [
         specialty: 'DO - Anesthesiology',
         image: './src/assets/img/doctor-grid/doctor-list-07.jpg',
         rating: 5.0,
-        nextAvailability: '20 May 2024',
+        numberOfReviews: 35,
+        level: '20 May 2024',
         location: 'Denver, USA',
-        lastBookDate: '18 Mar 2023',
+        experience: '21',
         isVerified: true,
     },
     {
@@ -94,9 +102,10 @@ export const mockFavouriteDoctors: FavouriteDoctor[] = [
         specialty: 'DO - Endocrinology',
         image: './src/assets/img/doctor-grid/doctor-list-02.jpg',
         rating: 4.0,
-        nextAvailability: '24 May 2024',
+        numberOfReviews: 35,
+        level: '24 May 2024',
         location: 'Miami, USA',
-        lastBookDate: '21 Mar 2023',
+        experience: '22',
         isVerified: true,
     },
     {
@@ -105,9 +114,10 @@ export const mockFavouriteDoctors: FavouriteDoctor[] = [
         specialty: 'MD - Urology',
         image: './src/assets/img/doctor-grid/doctor-list-01.jpg',
         rating: 5.0,
-        nextAvailability: '13 Jun 2024',
+        numberOfReviews: 35,
+        level: '13 Jun 2024',
         location: 'San Jose, USA',
-        lastBookDate: '10 Apr 2023',
+        experience: '23',
         isVerified: true,
     },
 ];

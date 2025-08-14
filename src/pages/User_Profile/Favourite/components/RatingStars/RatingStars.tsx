@@ -1,8 +1,10 @@
 interface RatingStarsProps {
     rating: number;
+
+    numberOfReviews: number;
 }
 
-const RatingStars: React.FC<RatingStarsProps> = ({ rating }) => {
+const RatingStars: React.FC<RatingStarsProps> = ({ rating, numberOfReviews }) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
@@ -23,7 +25,8 @@ const RatingStars: React.FC<RatingStarsProps> = ({ rating }) => {
             ))}
 
             <span className="d-inline-block average-rating">
-                {rating % 1 === 0 ? rating.toFixed(1) : `(${Math.round(rating)})`}
+                &nbsp; {rating % 1 === 0 ? rating.toFixed(1) : `(${Math.round(rating)})`} (
+                {numberOfReviews} đánh giá)
             </span>
         </div>
     );
