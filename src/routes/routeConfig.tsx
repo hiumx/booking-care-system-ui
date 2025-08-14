@@ -2,6 +2,7 @@
 import Demo from '@/pages/Demo';
 import Home from '@/pages/Home';
 import { RouteObject } from 'react-router-dom';
+import Login from '@/pages/Authentication/Login';
 
 const routes: RouteObject[] = [
     {
@@ -15,6 +16,10 @@ const routes: RouteObject[] = [
     {
         path: '/demo',
         element: <Demo />,
+    },
+    {
+        path: '/login',
+        element: <Login />,
     },
     {
         path: '/dashboard',

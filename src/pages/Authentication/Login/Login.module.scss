@@ -1,0 +1,46 @@
+/* Login.module.scss */
+.loginRight {
+    padding: 24px !important;
+}
+
+.inputGroup {
+    position: relative;
+
+    .leftIcon {
+        position: absolute;
+        top: 50%;
+        left: 12px;
+        transform: translateY(-50%);
+        color: #465d7c;
+        pointer-events: none;
+        font-size: 16px;
+    }
+
+    input {
+        padding-left: 40px;
+        &:focus {
+            outline: none;
+            box-shadow: none;
+            border: 1px solid #4a90e2; // hoặc màu bạn muốn
+        }
+    }
+}
+
+.inlineBetween {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.passGroup {
+    position: relative;
+
+    .togglePassword {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #465d7c;
+    }
+}
