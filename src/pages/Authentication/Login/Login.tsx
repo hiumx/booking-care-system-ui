@@ -21,7 +21,7 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [method, setMethod] = useState<'email' | 'phone'>('email');
+    const [method, setMethod] = useState<'email' | 'phone'>('phone');
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -54,34 +54,42 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                                             styles.loginRight
                                         )}
                                     >
-                                        <div className="login-header">
-                                            <h3>
-                                                Đăng nhập <span>Doccure</span>
-                                            </h3>
+                                        <div className="text-center mb-4">
+                                            <h1 className={clsx('fw-bold mb-2', styles.title)}>
+                                                Đăng nhập tài khoản
+                                            </h1>
+                                            <p className={styles.subtitle}>
+                                                Trở lại với hành trình chăm sóc sức khỏe của bạn
+                                            </p>
                                         </div>
                                         <form onSubmit={handleSubmit}>
-                                            <div className="d-flex justify-content-end align-items-center">
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-link p-0 fs-14"
-                                                    onClick={() =>
-                                                        setMethod((prev) =>
-                                                            prev === 'email' ? 'phone' : 'email'
-                                                        )
-                                                    }
-                                                >
-                                                    {method === 'email' ? (
-                                                        <>
-                                                            <i className="feather-phone me-1"></i>
-                                                            Đăng nhập với số điện thoại?
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <i className="feather-mail me-1"></i>
-                                                            Đăng nhập với email?
-                                                        </>
-                                                    )}
-                                                </button>
+                                            <div className="d-flex justify-content-center mb-3">
+                                                <div className={styles.methodToggle}>
+                                                    <button
+                                                        type="button"
+                                                        className={clsx(
+                                                            styles.toggleBtn,
+                                                            method === 'phone' &&
+                                                                styles.toggleBtnActive
+                                                        )}
+                                                        onClick={() => setMethod('phone')}
+                                                    >
+                                                        <i className="feather-phone me-1"></i>
+                                                        Số điện thoại
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className={clsx(
+                                                            styles.toggleBtn,
+                                                            method === 'email' &&
+                                                                styles.toggleBtnActive
+                                                        )}
+                                                        onClick={() => setMethod('email')}
+                                                    >
+                                                        <i className="feather-mail me-1"></i>
+                                                        Email
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             {/* Email / Phone input */}

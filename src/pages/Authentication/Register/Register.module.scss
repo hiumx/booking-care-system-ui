@@ -1,0 +1,187 @@
+/* Register.module.scss */
+.registerRight {
+    padding: 24px !important;
+}
+
+.inputGroup {
+    position: relative;
+
+    .leftIcon {
+        position: absolute;
+        top: 50%;
+        left: 12px;
+        transform: translateY(-50%);
+        color: #465d7c;
+        pointer-events: none;
+        font-size: 16px;
+    }
+
+    input {
+        display: flex;
+        align-items: center;
+        &:focus {
+            outline: none;
+            box-shadow: none;
+            border: 1px solid #4a90e2;
+        }
+    }
+}
+
+.passGroup {
+    position: relative;
+
+    .togglePassword {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #465d7c;
+    }
+
+    // Ensure left icon sits over input and input has enough left padding
+    input {
+        padding-left: 40px;
+    }
+}
+
+// .stepper {
+//     display: flex;
+//     gap: 24px;
+//     margin-bottom: 24px;
+//     border-bottom: 1px solid #e9edf2;
+//     padding-bottom: 12px;
+// }
+
+// .step {
+//     font-weight: 600;
+//     color: #6b7a99;
+//     padding-bottom: 8px;
+// }
+
+// .active {
+//     color: #0e82fd;
+//     border-bottom: 2px solid #0e82fd;
+// }
+
+// .otpInputs {
+//     display: flex;
+//     justify-content: center;
+//     gap: 12px;
+// }
+
+// .otpInput {
+//     width: 56px;
+//     height: 56px;
+//     text-align: center;
+//     font-size: 24px;
+//     border: 1px solid #ced4da;
+//     border-radius: 8px;
+// }
+
+/* Modern progress bar for steps 1-3 */
+// .progressWrap {
+//     width: 100%;
+//     height: 8px;
+//     background: #eef2f7;
+//     border-radius: 999px;
+//     overflow: hidden;
+//     margin-bottom: 20px;
+// }
+
+// .progressBar {
+//     height: 100%;
+//     background-image: linear-gradient(90deg, #0e82fd, #06aed4);
+//     width: 0%;
+//     transition: width 300ms ease;
+// }
+
+/* Step 0 refined styles to match the mock */
+.title {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.subtitle {
+    color: #475569; /* slate-600 */
+    font-size: 18px;
+}
+
+.methodToggle {
+    display: inline-flex;
+    gap: 8px;
+    background: #f3f4f6; /* gray-100 */
+    padding: 5px;
+    border-radius: 12px;
+
+    .toggleBtn {
+        border: none;
+        background: transparent;
+        color: #475569;
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .toggleBtnActive {
+        background: #ffffff;
+        color: #0e82fd;
+        box-shadow:
+            0 1px 2px rgba(16, 24, 40, 0.04),
+            0 1px 3px rgba(16, 24, 40, 0.1);
+    }
+}
+
+.inputWrap {
+    position: relative;
+}
+
+.inputWrapPhone {
+    .bigInput {
+        padding-left: 75px; // space for flag + +84
+    }
+}
+
+.inputWrapEmail {
+    .bigInput {
+        padding-left: 44px; // space for mail icon
+    }
+}
+
+.flagPrefix {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: #64748b; /* slate-500 */
+}
+
+.bigInput {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb; /* gray-200 */
+    background: #ffffff;
+
+    &:focus {
+        outline: none !important;
+        box-shadow: none !important;
+        border: 1px solid #4a90e2 !important;
+    }
+}
+
+.submitBtn {
+    height: 37px;
+    border-radius: 44px;
+    font-weight: 500;
+
+    &:disabled {
+        background: #d1d5db !important; /* gray-300 */
+        color: #6b7280 !important; /* gray-500 */
+        border: none;
+    }
+}

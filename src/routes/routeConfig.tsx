@@ -3,6 +3,7 @@ import Demo from '@/pages/Demo';
 import Home from '@/pages/Home';
 import { RouteObject } from 'react-router-dom';
 import Login from '@/pages/Authentication/Login';
+import Register from '@/pages/Authentication/Register';
 
 const routes: RouteObject[] = [
     {
@@ -20,6 +21,10 @@ const routes: RouteObject[] = [
     {
         path: '/login',
         element: <Login />,
+    },
+    {
+        path: '/register',
+        element: <Register />,
     },
     {
         path: '/dashboard',
