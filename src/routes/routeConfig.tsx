@@ -4,6 +4,8 @@ import Home from '@/pages/Home';
 import { RouteObject } from 'react-router-dom';
 import Login from '@/pages/Authentication/Login';
 import Register from '@/pages/Authentication/Register';
+import ForgotPassword from '@/pages/Authentication/ForgotPassword';
+import ResetPassword from '@/pages/Authentication/ResetPassword';
 
 const routes: RouteObject[] = [
     {
@@ -25,6 +27,14 @@ const routes: RouteObject[] = [
     {
         path: '/register',
         element: <Register />,
+    },
+    {
+        path: '/forgot-password',
+        element: <ForgotPassword />,
+    },
+    {
+        path: '/reset-password',
+        element: <ResetPassword />,
     },
     {
         path: '/dashboard',

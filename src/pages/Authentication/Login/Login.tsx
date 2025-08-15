@@ -74,7 +74,7 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                                                         )}
                                                         onClick={() => setMethod('phone')}
                                                     >
-                                                        <i className="feather-phone me-1"></i>
+                                                        <i className="feather-phone me-2"></i>
                                                         Số điện thoại
                                                     </button>
                                                     <button
@@ -86,7 +86,7 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                                                         )}
                                                         onClick={() => setMethod('email')}
                                                     >
-                                                        <i className="feather-mail me-1"></i>
+                                                        <i className="feather-mail me-2"></i>
                                                         Email
                                                     </button>
                                                 </div>

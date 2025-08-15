@@ -17,6 +17,12 @@
     }
 
     input {
+        display: flex;
+        align-items: center;
+        height: 45px;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb; /* gray-200 */
+        background: #ffffff;
         padding-left: 40px;
         &:focus {
             outline: none;
@@ -71,10 +77,12 @@
     border-radius: 12px;
 
     .toggleBtn {
+        display: flex;
+        align-items: center;
         border: none;
         background: transparent;
         color: #475569;
-        padding: 10px 16px;
+        padding: 8px 16px;
         border-radius: 10px;
         font-weight: 600;
     }
@@ -96,5 +104,5 @@
 
 .subtitle {
     color: #475569; /* slate-600 */
-    font-size: 18px;
+    font-size: 17px;
 }

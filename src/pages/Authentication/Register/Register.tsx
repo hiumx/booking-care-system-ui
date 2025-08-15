@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { Check, Lock, User, Phone, Mail } from 'lucide-react';
+import { Check, Lock, User, Phone, Mail, CheckCircle } from 'lucide-react';
 import Select from 'react-select';
 import Banner from '@/assets/img/login-banner.png';
 import GoogleIcon from '@/assets/img/icons/google-icon.svg';
@@ -37,7 +37,63 @@ const Register: React.FC = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [passwordStrength, setPasswordStrength] = useState(0);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    // Password requirements validation
+    const passwordRequirements = useMemo(() => {
+        const hasMinLength = password.length >= 8;
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasLowercase = /[a-z]/.test(password);
+        const hasNumber = /\d/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+        return {
+            hasMinLength,
+            hasUppercase,
+            hasLowercase,
+            hasNumber,
+            hasSpecialChar,
+            allMet: hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar,
+        };
+    }, [password]);
+
+    // Password strength calculation
+    const passwordStrength = useMemo(() => {
+        if (!password) return { score: 0, label: '', color: '', width: 0 };
+
+        let score = 0;
+        if (passwordRequirements.hasMinLength) score += 20;
+        if (passwordRequirements.hasUppercase) score += 20;
+        if (passwordRequirements.hasLowercase) score += 20;
+        if (passwordRequirements.hasNumber) score += 20;
+        if (passwordRequirements.hasSpecialChar) score += 20;
+
+        if (score <= 20) return { score, label: 'Yếu', color: '#ef4444', width: 20 };
+        if (score <= 40) return { score, label: 'Trung bình', color: '#f59e0b', width: 40 };
+        if (score <= 60) return { score, label: 'Tốt', color: '#3b82f6', width: 60 };
+        if (score <= 80) return { score, label: 'Mạnh', color: '#10b981', width: 80 };
+        return { score, label: 'Rất mạnh', color: '#059669', width: 100 };
+    }, [password, passwordRequirements]);
+
+    const canCreatePassword = useMemo(() => {
+        const hasPassword = password.trim() !== '';
+        const hasConfirmPassword = confirmPassword.trim() !== '';
+        const passwordsMatch = password === confirmPassword;
+        const newPasswordValid = passwordRequirements.allMet;
+
+        return hasPassword && hasConfirmPassword && passwordsMatch && newPasswordValid;
+    }, [password, confirmPassword, passwordRequirements.allMet]);
+
+    const togglePasswordVisibility = (field: 'password' | 'confirm') => {
+        switch (field) {
+            case 'password':
+                setShowPassword(!showPassword);
+                break;
+
+            case 'confirm':
+                setShowConfirmPassword(!showConfirmPassword);
+                break;
+        }
+    };
 
     // Step 3: profile
     const [fullName, setFullName] = useState('');
@@ -58,10 +114,6 @@ const Register: React.FC = () => {
     const otpValue = useMemo(() => otp.join(''), [otp]);
     const canVerifyOtp = otpValue.length === OTP_LENGTH && /^\d{6}$/.test(otpValue);
 
-    const canCreatePassword = useMemo(() => {
-        return password.length >= 6 && password === confirmPassword && passwordStrength >= 2;
-    }, [password, confirmPassword, passwordStrength]);
-
     const canCompleteRegistration = useMemo(() => {
         return (
             fullName.trim().length >= 2 &&
@@ -72,16 +124,6 @@ const Register: React.FC = () => {
             profilePhone
         );
     }, [fullName, birthDate, gender, address, profileEmail, profilePhone]);
-
-    // Password strength calculation
-    useEffect(() => {
-        let strength = 0;
-        if (password.length >= 6) strength++;
-        if (/[A-Z]/.test(password)) strength++;
-        if (/[0-9]/.test(password)) strength++;
-        if (/[^A-Za-z0-9]/.test(password)) strength++;
-        setPasswordStrength(strength);
-    }, [password]);
 
     // Auto-fill email/phone based on registration method
     useEffect(() => {
@@ -156,40 +198,6 @@ const Register: React.FC = () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         setIsSubmitting(false);
         alert('Registration completed successfully!');
-    };
-
-    const getPasswordStrengthColor = () => {
-        switch (passwordStrength) {
-            case 0:
-                return '#ef4444';
-            case 1:
-                return '#f97316';
-            case 2:
-                return '#eab308';
-            case 3:
-                return '#22c55e';
-            case 4:
-                return '#16a34a';
-            default:
-                return '#d1d5db';
-        }
-    };
-
-    const getPasswordStrengthText = () => {
-        switch (passwordStrength) {
-            case 0:
-                return 'Rất yếu';
-            case 1:
-                return 'Yếu';
-            case 2:
-                return 'Trung bình';
-            case 3:
-                return 'Mạnh';
-            case 4:
-                return 'Rất mạnh';
-            default:
-                return '';
-        }
     };
 
     return (
@@ -332,7 +340,7 @@ const Register: React.FC = () => {
                                             <div>
                                                 {/* Method toggle */}
                                                 <div className="d-flex justify-content-center mb-3">
-                                                    <div className={styles.methodToggle}>
+                                                    <div className={clsx(styles.methodToggle)}>
                                                         <button
                                                             type="button"
                                                             className={clsx(
@@ -698,7 +706,10 @@ const Register: React.FC = () => {
                                                                         ? 'text'
                                                                         : 'password'
                                                                 }
-                                                                className="form-control"
+                                                                className={clsx(
+                                                                    'form-control',
+                                                                    styles.bigInput
+                                                                )}
                                                                 placeholder="Nhập mật khẩu"
                                                                 value={password}
                                                                 onChange={(e) =>
@@ -713,7 +724,9 @@ const Register: React.FC = () => {
                                                                         : 'Hiện mật khẩu'
                                                                 }
                                                                 onClick={() =>
-                                                                    setShowPassword((v) => !v)
+                                                                    togglePasswordVisibility(
+                                                                        'password'
+                                                                    )
                                                                 }
                                                                 className={clsx(
                                                                     showPassword
@@ -725,33 +738,32 @@ const Register: React.FC = () => {
                                                         </div>
 
                                                         {password && (
-                                                            <div className="mt-2 d-flex align-items-center gap-2">
-                                                                <div
-                                                                    className="flex-grow-1 rounded-pill overflow-hidden"
-                                                                    style={{
-                                                                        height: 8,
-                                                                        background: '#e5e7eb',
-                                                                    }}
-                                                                >
-                                                                    <div
-                                                                        className="h-100"
+                                                            <div className="mt-2">
+                                                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                                                    <small className="text-muted">
+                                                                        Độ mạnh mật khẩu:
+                                                                    </small>
+                                                                    <small
+                                                                        className="fw-medium"
                                                                         style={{
-                                                                            width: `${(passwordStrength / 4) * 100}%`,
-                                                                            background:
-                                                                                getPasswordStrengthColor(),
-                                                                            transition: 'width .3s',
+                                                                            color: passwordStrength.color,
+                                                                        }}
+                                                                    >
+                                                                        {passwordStrength.label}
+                                                                    </small>
+                                                                </div>
+                                                                <div className={styles.strengthBar}>
+                                                                    <div
+                                                                        className={
+                                                                            styles.strengthFill
+                                                                        }
+                                                                        style={{
+                                                                            width: `${passwordStrength.width}%`,
+                                                                            backgroundColor:
+                                                                                passwordStrength.color,
                                                                         }}
                                                                     />
                                                                 </div>
-                                                                <span
-                                                                    className="text-muted"
-                                                                    style={{
-                                                                        fontSize: 12,
-                                                                        color: getPasswordStrengthColor(),
-                                                                    }}
-                                                                >
-                                                                    {getPasswordStrengthText()}
-                                                                </span>
                                                             </div>
                                                         )}
                                                     </div>
@@ -777,10 +789,20 @@ const Register: React.FC = () => {
                                                             ></i>
                                                             <input
                                                                 id="reg-confirm"
-                                                                name="confirmPassword"
-                                                                type="text"
-                                                                className="form-control"
-                                                                placeholder="Nhập lại mật khẩu"
+                                                                type={
+                                                                    showConfirmPassword
+                                                                        ? 'text'
+                                                                        : 'password'
+                                                                }
+                                                                className={clsx(
+                                                                    'form-control',
+                                                                    styles.bigInput,
+                                                                    confirmPassword &&
+                                                                        confirmPassword === password
+                                                                        ? styles.borderSuccess
+                                                                        : ''
+                                                                )}
+                                                                placeholder="Nhập lại mật khẩu mới"
                                                                 value={confirmPassword}
                                                                 onChange={(e) =>
                                                                     setConfirmPassword(
@@ -788,41 +810,193 @@ const Register: React.FC = () => {
                                                                     )
                                                                 }
                                                             />
-
-                                                            {confirmPassword && (
-                                                                <div
-                                                                    className="position-absolute"
-                                                                    style={{
-                                                                        right: 12,
-                                                                        top: '50%',
-                                                                        transform:
-                                                                            'translateY(-50%)',
-                                                                    }}
-                                                                >
-                                                                    {password ===
-                                                                    confirmPassword ? (
-                                                                        <Check
-                                                                            size={18}
-                                                                            style={{
-                                                                                color: '#16a34a',
-                                                                            }}
-                                                                        />
-                                                                    ) : (
-                                                                        <div
-                                                                            style={{
-                                                                                width: 16,
-                                                                                height: 16,
-                                                                                borderRadius: 9999,
-                                                                                background:
-                                                                                    '#ef4444',
-                                                                            }}
-                                                                        />
-                                                                    )}
+                                                            <span
+                                                                role="button"
+                                                                aria-label={
+                                                                    showConfirmPassword
+                                                                        ? 'Ẩn mật khẩu'
+                                                                        : 'Hiện mật khẩu'
+                                                                }
+                                                                onClick={() =>
+                                                                    togglePasswordVisibility(
+                                                                        'confirm'
+                                                                    )
+                                                                }
+                                                                className={clsx(
+                                                                    showConfirmPassword
+                                                                        ? 'feather-eye'
+                                                                        : 'feather-eye-off',
+                                                                    styles.togglePassword
+                                                                )}
+                                                            />
+                                                        </div>
+                                                        {confirmPassword &&
+                                                            password === confirmPassword && (
+                                                                <div className="d-flex align-items-center mt-2 text-success">
+                                                                    <CheckCircle
+                                                                        size={16}
+                                                                        className="me-2"
+                                                                    />
+                                                                    <span>Mật khẩu trùng khớp</span>
                                                                 </div>
                                                             )}
+                                                    </div>
+                                                    {/* Password Requirements */}
+                                                    <div className="mb-3">
+                                                        <div className={styles.requirementsList}>
+                                                            <span
+                                                                className="mb-1"
+                                                                style={{ fontWeight: 600 }}
+                                                            >
+                                                                Yêu cầu mật khẩu:
+                                                            </span>
+                                                            <div className={styles.requirementItem}>
+                                                                <span
+                                                                    className={
+                                                                        styles.requirementIcon
+                                                                    }
+                                                                >
+                                                                    {passwordRequirements.hasMinLength ? (
+                                                                        <CheckCircle
+                                                                            size={16}
+                                                                            className="text-success"
+                                                                        />
+                                                                    ) : (
+                                                                        <CheckCircle
+                                                                            size={16}
+                                                                            className="text-muted"
+                                                                        />
+                                                                    )}
+                                                                </span>
+                                                                <span
+                                                                    className={clsx(
+                                                                        styles.requirementText,
+                                                                        passwordRequirements.hasMinLength
+                                                                            ? 'text-success'
+                                                                            : 'text-muted'
+                                                                    )}
+                                                                >
+                                                                    Ít nhất 8 ký tự
+                                                                </span>
+                                                            </div>
+                                                            <div className={styles.requirementItem}>
+                                                                <span
+                                                                    className={
+                                                                        styles.requirementIcon
+                                                                    }
+                                                                >
+                                                                    {passwordRequirements.hasUppercase ? (
+                                                                        <CheckCircle
+                                                                            size={16}
+                                                                            className="text-success"
+                                                                        />
+                                                                    ) : (
+                                                                        <CheckCircle
+                                                                            size={16}
+                                                                            className="text-muted"
+                                                                        />
+                                                                    )}
+                                                                </span>
+                                                                <span
+                                                                    className={clsx(
+                                                                        styles.requirementText,
+                                                                        passwordRequirements.hasUppercase
+                                                                            ? 'text-success'
+                                                                            : 'text-muted'
+                                                                    )}
+                                                                >
+                                                                    Một chữ hoa
+                                                                </span>
+                                                            </div>
+                                                            <div className={styles.requirementItem}>
+                                                                <span
+                                                                    className={
+                                                                        styles.requirementIcon
+                                                                    }
+                                                                >
+                                                                    {passwordRequirements.hasLowercase ? (
+                                                                        <CheckCircle
+                                                                            size={16}
+                                                                            className="text-success"
+                                                                        />
+                                                                    ) : (
+                                                                        <CheckCircle
+                                                                            size={16}
+                                                                            className="text-muted"
+                                                                        />
+                                                                    )}
+                                                                </span>
+                                                                <span
+                                                                    className={clsx(
+                                                                        styles.requirementText,
+                                                                        passwordRequirements.hasLowercase
+                                                                            ? 'text-success'
+                                                                            : 'text-muted'
+                                                                    )}
+                                                                >
+                                                                    Một chữ thường
+                                                                </span>
+                                                            </div>
+                                                            <div className={styles.requirementItem}>
+                                                                <span
+                                                                    className={
+                                                                        styles.requirementIcon
+                                                                    }
+                                                                >
+                                                                    {passwordRequirements.hasNumber ? (
+                                                                        <CheckCircle
+                                                                            size={16}
+                                                                            className="text-success"
+                                                                        />
+                                                                    ) : (
+                                                                        <CheckCircle
+                                                                            size={16}
+                                                                            className="text-muted"
+                                                                        />
+                                                                    )}
+                                                                </span>
+                                                                <span
+                                                                    className={clsx(
+                                                                        styles.requirementText,
+                                                                        passwordRequirements.hasNumber
+                                                                            ? 'text-success'
+                                                                            : 'text-muted'
+                                                                    )}
+                                                                >
+                                                                    Một số
+                                                                </span>
+                                                            </div>
+                                                            <div className={styles.requirementItem}>
+                                                                <span
+                                                                    className={
+                                                                        styles.requirementIcon
+                                                                    }
+                                                                >
+                                                                    {passwordRequirements.hasSpecialChar ? (
+                                                                        <CheckCircle
+                                                                            size={16}
+                                                                            className="text-success"
+                                                                        />
+                                                                    ) : (
+                                                                        <CheckCircle
+                                                                            size={16}
+                                                                            className="text-muted"
+                                                                        />
+                                                                    )}
+                                                                </span>
+                                                                <span
+                                                                    className={clsx(
+                                                                        styles.requirementText,
+                                                                        passwordRequirements.hasSpecialChar
+                                                                            ? 'text-success'
+                                                                            : 'text-muted'
+                                                                    )}
+                                                                >
+                                                                    Một ký tự đặc biệt
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </div>
-
                                                     <button
                                                         type="submit"
                                                         disabled={!canCreatePassword}
@@ -897,7 +1071,10 @@ const Register: React.FC = () => {
                                                                                 e.target.value
                                                                             )
                                                                         }
-                                                                        className="form-control rounded-3"
+                                                                        className={clsx(
+                                                                            'form-control rounded-3',
+                                                                            styles.inputCustom
+                                                                        )}
                                                                         style={{ paddingLeft: 48 }}
                                                                         placeholder="Nhập họ và tên đầy đủ"
                                                                         required
@@ -1016,18 +1193,13 @@ const Register: React.FC = () => {
                                                                         *
                                                                     </span>
                                                                 </label>
-                                                                <div className="position-relative">
-                                                                    <Phone
-                                                                        size={18}
-                                                                        className="position-absolute"
-                                                                        style={{
-                                                                            left: 12,
-                                                                            top: '50%',
-                                                                            transform:
-                                                                                'translateY(-50%)',
-                                                                            color: '#9ca3af',
-                                                                        }}
-                                                                    />
+                                                                <div className={styles.inputGroup}>
+                                                                    <i
+                                                                        className={clsx(
+                                                                            'feather-phone',
+                                                                            styles.leftIcon
+                                                                        )}
+                                                                    ></i>
                                                                     <input
                                                                         type="tel"
                                                                         value={profilePhone}
@@ -1036,7 +1208,10 @@ const Register: React.FC = () => {
                                                                                 e.target.value
                                                                             )
                                                                         }
-                                                                        className="form-control rounded-3"
+                                                                        className={clsx(
+                                                                            'form-control rounded-3',
+                                                                            styles.inputCustom
+                                                                        )}
                                                                         style={{ paddingLeft: 48 }}
                                                                         placeholder="Nhập số điện thoại"
                                                                         required
@@ -1073,7 +1248,10 @@ const Register: React.FC = () => {
                                                                                 e.target.value
                                                                             )
                                                                         }
-                                                                        className="form-control rounded-3"
+                                                                        className={clsx(
+                                                                            'form-control rounded-3',
+                                                                            styles.inputCustom
+                                                                        )}
                                                                         style={{
                                                                             paddingLeft: 16,
                                                                             paddingRight: 16,
@@ -1096,18 +1274,13 @@ const Register: React.FC = () => {
                                                                         *
                                                                     </span>
                                                                 </label>
-                                                                <div className="position-relative">
-                                                                    <Mail
-                                                                        size={18}
-                                                                        className="position-absolute"
-                                                                        style={{
-                                                                            left: 12,
-                                                                            top: '50%',
-                                                                            transform:
-                                                                                'translateY(-50%)',
-                                                                            color: '#9ca3af',
-                                                                        }}
-                                                                    />
+                                                                <div className={styles.inputGroup}>
+                                                                    <i
+                                                                        className={clsx(
+                                                                            'feather-mail',
+                                                                            styles.leftIcon
+                                                                        )}
+                                                                    ></i>
                                                                     <input
                                                                         type="email"
                                                                         value={profileEmail}
@@ -1116,7 +1289,10 @@ const Register: React.FC = () => {
                                                                                 e.target.value
                                                                             )
                                                                         }
-                                                                        className="form-control rounded-3"
+                                                                        className={clsx(
+                                                                            'form-control rounded-3',
+                                                                            styles.inputCustom
+                                                                        )}
                                                                         style={{ paddingLeft: 48 }}
                                                                         placeholder="Nhập địa chỉ email"
                                                                         required
@@ -1146,7 +1322,10 @@ const Register: React.FC = () => {
                                                                     onChange={(e) =>
                                                                         setAddress(e.target.value)
                                                                     }
-                                                                    className="form-control rounded-3"
+                                                                    className={clsx(
+                                                                        'form-control rounded-3',
+                                                                        styles.inputCustom
+                                                                    )}
                                                                     rows={2}
                                                                     placeholder="Nhập địa chỉ đầy đủ"
                                                                     required
