@@ -1,23 +1,20 @@
+import clsx from 'clsx';
 import MainLayout from '../../layouts/MainLayout';
-import ChatSidebar from './ChatSidebar';
-
-import ChatMessages from './ChatMessages';
-import './swiper.css';
-
+import ChatSidebar from './components/ChatSidebar';
+import ChatMessages from './components/ChatMessages';
+import styles from './Chat.module.scss';
 const Chat = () => {
     return (
         <MainLayout>
-            <div className="main-chat-blk">
+            <div className={clsx(styles.hideScrollbar, 'main-chat-blk')}>
                 <div className="main-wrapper">
-                    <div className="page-wrapper chat-page-wrapper">
+                    <div className={clsx(styles.chatPageWrapper, 'page-wrapper chat-page-wrapper')}>
                         <div className="container">
-                            <div className="content doctor-content">
+                            <div className={clsx(styles.content, 'content doctor-content')}>
                                 <div className="chat-sec">
-                                    {/* Sidebar group */}
                                     <div className="sidebar-group left-sidebar chat_sidebar">
                                         <ChatSidebar />
                                     </div>
-
                                     {/* Chat Messages */}
                                     <ChatMessages />
                                 </div>

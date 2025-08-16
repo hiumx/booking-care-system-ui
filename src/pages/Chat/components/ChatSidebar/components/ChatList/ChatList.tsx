@@ -1,4 +1,4 @@
-import { mockChatContacts, ChatContact } from '../../data/mockData';
+import { mockChatContacts, ChatContact } from '../../../../data/mockData';
 import styles from './ChatList.module.scss';
 
 import clsx from 'clsx';

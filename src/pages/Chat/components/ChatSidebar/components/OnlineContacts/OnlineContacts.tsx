@@ -1,4 +1,4 @@
-import { mockOnlineContacts } from '../../data/mockData';
+import { mockOnlineContacts } from '../../../../data/mockData';
 
 const OnlineContacts = () => {
     return (

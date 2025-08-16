@@ -1,4 +1,4 @@
-import { mockChatMessages, ChatMessage } from '../../data/mockData';
+import { mockChatMessages, ChatMessage } from '../../../../data/mockData';
 
 import MessageItem from './MessageItem';
 
