@@ -1,7 +1,7 @@
 import styles from './MessageItem.module.scss';
 import clsx from 'clsx';
 
-import { ChatMessage } from '../../data/mockData';
+import { ChatMessage } from '../../../../../data/mockData';
 
 interface MessageItemProps {
     message: ChatMessage;

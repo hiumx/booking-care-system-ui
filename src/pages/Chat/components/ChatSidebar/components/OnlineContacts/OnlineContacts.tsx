@@ -1,8 +1,11 @@
+import clsx from 'clsx';
+import styles from './OnlineContacts.module.scss';
+
 import { mockOnlineContacts } from '../../../../data/mockData';
 
 const OnlineContacts = () => {
     return (
-        <div className="top-online-contacts">
+        <div className={clsx(styles.topOnlineContacts, 'top-online-contacts')}>
             <div className="fav-title">
                 <h6>Đang online</h6>
                 <a href="javascript:void(0);">Xem tất cả</a>
