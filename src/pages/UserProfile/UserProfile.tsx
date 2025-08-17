@@ -11,7 +11,7 @@ const mockUserData = {
     fullName: 'Nguyễn Văn An',
     email: 'hendrita.hayes@example.com',
     phoneNumber: '+1 234 567 8900',
-    avatarUrl: './src/assets/img/doctor-grid/doctor-list-01.jpg',
+    avatarUrl: '/src/assets/img/doctor-grid/doctor-list-01.jpg',
     gender: 'Nữ',
     age: '24/02/2003',
     role: 'Bệnh nhân' as const,

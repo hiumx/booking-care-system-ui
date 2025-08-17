@@ -50,22 +50,22 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, title }) => {
             </div>
             <div className="breadcrumb-bg">
                 <img
-                    src="./src/assets/img/bg/breadcrumb-bg-01.png"
+                    src="/src/assets/img/bg/breadcrumb-bg-01.png"
                     alt="img"
                     className="breadcrumb-bg-01"
                 />
                 <img
-                    src="./src/assets/img/bg/breadcrumb-bg-02.png"
+                    src="/src/assets/img/bg/breadcrumb-bg-02.png"
                     alt="img"
                     className="breadcrumb-bg-02"
                 />
                 <img
-                    src="./src/assets/img/bg/breadcrumb-icon.png"
+                    src="/src/assets/img/bg/breadcrumb-icon.png"
                     alt="img"
                     className="breadcrumb-bg-03"
                 />
                 <img
-                    src="./src/assets/img/bg/breadcrumb-icon.png"
+                    src="/src/assets/img/bg/breadcrumb-icon.png"
                     alt="img"
                     className="breadcrumb-bg-04"
                 />
