@@ -1,36 +1,5 @@
 /* Login.module.scss */
-.loginRight {
-    padding: 24px !important;
-}
-
-.inputGroup {
-    position: relative;
-
-    .leftIcon {
-        position: absolute;
-        top: 50%;
-        left: 12px;
-        transform: translateY(-50%);
-        color: #465d7c;
-        pointer-events: none;
-        font-size: 16px;
-    }
-
-    input {
-        display: flex;
-        align-items: center;
-        height: 45px;
-        border-radius: 12px;
-        border: 1px solid #e5e7eb; /* gray-200 */
-        background: #ffffff;
-        padding-left: 40px;
-        &:focus {
-            outline: none;
-            box-shadow: none;
-            border: 1px solid #4a90e2; // hoặc màu bạn muốn
-        }
-    }
-}
+// Only keep specific styles that are not in AuthLayout
 
 .inlineBetween {
     display: flex;
@@ -38,7 +7,6 @@
     justify-content: space-between;
 
     .forgotPassword {
-        color: #3d3d3d;
         display: inline-block;
         font-size: 14px;
         font-weight: 500;
@@ -54,55 +22,4 @@
             transition: 0.7s;
         }
     }
-}
-
-.passGroup {
-    position: relative;
-
-    .togglePassword {
-        position: absolute;
-        top: 50%;
-        right: 12px;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: #465d7c;
-    }
-}
-
-.methodToggle {
-    display: inline-flex;
-    gap: 8px;
-    background: #f3f4f6; /* gray-100 */
-    padding: 5px;
-    border-radius: 12px;
-
-    .toggleBtn {
-        display: flex;
-        align-items: center;
-        border: none;
-        background: transparent;
-        color: #475569;
-        padding: 8px 16px;
-        border-radius: 10px;
-        font-weight: 600;
-    }
-
-    .toggleBtnActive {
-        background: #ffffff;
-        color: #0e82fd;
-        box-shadow:
-            0 1px 2px rgba(16, 24, 40, 0.04),
-            0 1px 3px rgba(16, 24, 40, 0.1);
-    }
-}
-
-/* Step 0 refined styles to match the mock */
-.title {
-    font-size: 20px;
-    font-weight: 800;
-}
-
-.subtitle {
-    color: #475569; /* slate-600 */
-    font-size: 17px;
 }
