@@ -1,7 +1,7 @@
 // src/routes/routeConfig.tsx
 import Demo from '@/pages/Demo';
 import Home from '@/pages/Home';
-import UserProfile from '@/pages/User_Profile';
+import UserProfile from '@/pages/UserProfile';
 import { RouteObject } from 'react-router-dom';
 import { PATHS } from './paths';
 
