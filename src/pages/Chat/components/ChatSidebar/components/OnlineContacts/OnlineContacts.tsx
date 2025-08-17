@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import styles from './OnlineContacts.module.scss';
 
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
 import { mockOnlineContacts } from '../../../../data/mockData';
 
 const OnlineContacts = () => {
@@ -10,19 +12,17 @@ const OnlineContacts = () => {
                 <h6>Đang online</h6>
                 <a href="javascript:void(0);">Xem tất cả</a>
             </div>
-            <div className="swiper-container">
-                <div className="swiper-wrapper">
-                    {mockOnlineContacts.map((contact) => (
-                        <div key={contact.id} className="swiper-slide">
-                            <div className="top-contacts-box">
-                                <div className={`profile-img ${contact.isOnline ? 'online' : ''}`}>
-                                    <img src={contact.avatar} alt={contact.name} />
-                                </div>
+            <Swiper spaceBetween={10} slidesPerView={5} className="online-contacts-swiper">
+                {mockOnlineContacts.map((contact) => (
+                    <SwiperSlide key={contact.id}>
+                        <div className="top-contacts-box">
+                            <div className={`profile-img ${contact.isOnline ? 'online' : ''}`}>
+                                <img src={contact.avatar} alt={contact.name} />
                             </div>
                         </div>
-                    ))}
-                </div>
-            </div>
+                    </SwiperSlide>
+                ))}
+            </Swiper>
         </div>
     );
 };

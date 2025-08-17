@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
 import styles from './ChatFooter.module.scss';
 
@@ -8,6 +8,25 @@ interface ChatFooterProps {
 
 const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
     const [message, setMessage] = useState('');
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [showEmoji, setShowEmoji] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowDropdown(false);
+            }
+        }
+        if (showDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showDropdown]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -23,98 +42,145 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
         setIsTyping(e.target.value.length > 0);
     };
 
+    // Emoji click handler
+    const handleEmojiClick = (emoji: string) => {
+        setMessage((prev) => prev + emoji);
+        setIsTyping(true);
+        setShowEmoji(false);
+    };
+
     return (
         <div className="chat-footer">
             <form onSubmit={handleSubmit}>
                 <div className="smile-foot">
                     <div className="chat-action-btns">
-                        <div className="chat-action-col">
+                        <div className="chat-action-col" ref={dropdownRef}>
                             <a
                                 className={clsx(styles.item, 'action-circle')}
                                 href="#"
-                                data-bs-toggle="dropdown"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setShowDropdown((prev) => !prev);
+                                }}
                             >
                                 <i className="fa-solid fa-ellipsis-vertical"></i>
                             </a>
-                            <div className="dropdown-menu dropdown-menu-end">
-                                <a href="#" className="dropdown-item">
-                                    <span>
-                                        <i className="fa-solid fa-file-lines"></i>
-                                    </span>
-                                    Tài liệu
-                                </a>
-                                <a href="#" className="dropdown-item">
-                                    <span>
-                                        <i className="fa-solid fa-camera"></i>
-                                    </span>
-                                    Camera
-                                </a>
-                                <a href="#" className="dropdown-item">
-                                    <span>
-                                        <i className="fa-solid fa-image"></i>
-                                    </span>
-                                    Thư viện
-                                </a>
-                                <a href="#" className="dropdown-item">
-                                    <span>
-                                        <i className="fa-solid fa-volume-high"></i>
-                                    </span>
-                                    Âm thanh
-                                </a>
-                                <a href="#" className="dropdown-item">
-                                    <span>
-                                        <i className="fa-solid fa-location-dot"></i>
-                                    </span>
-                                    Vị trí
-                                </a>
-                                <a href="#" className="dropdown-item">
-                                    <span>
-                                        <i className="fa-solid fa-user"></i>
-                                    </span>
-                                    Liên hệ
-                                </a>
-                            </div>
+                            {showDropdown && (
+                                <div
+                                    className={clsx(
+                                        'dropdown-menu dropdown-menu-end show',
+                                        styles.dropdownMenuUp
+                                    )}
+                                    style={{ display: 'block' }}
+                                >
+                                    <a href="#" className="dropdown-item">
+                                        <span>
+                                            <i className="fa-solid fa-file-lines"></i>
+                                        </span>
+                                        Tài liệu
+                                    </a>
+                                    <a href="#" className="dropdown-item">
+                                        <span>
+                                            <i className="fa-solid fa-camera"></i>
+                                        </span>
+                                        Camera
+                                    </a>
+                                    <a href="#" className="dropdown-item">
+                                        <span>
+                                            <i className="fa-solid fa-image"></i>
+                                        </span>
+                                        Thư viện
+                                    </a>
+                                    <a href="#" className="dropdown-item">
+                                        <span>
+                                            <i className="fa-solid fa-volume-high"></i>
+                                        </span>
+                                        Âm thanh
+                                    </a>
+                                    <a href="#" className="dropdown-item">
+                                        <span>
+                                            <i className="fa-solid fa-location-dot"></i>
+                                        </span>
+                                        Vị trí
+                                    </a>
+                                    <a href="#" className="dropdown-item">
+                                        <span>
+                                            <i className="fa-solid fa-user"></i>
+                                        </span>
+                                        Liên hệ
+                                    </a>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
                 <div className="smile-foot emoj-action-foot">
-                    <a href="#" className="action-circle">
+                    <a
+                        href="#"
+                        className="action-circle"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setShowEmoji((prev) => !prev);
+                        }}
+                    >
                         <i className="fa-regular fa-face-smile"></i>
                     </a>
-                    <div className="emoj-group-list-foot down-emoji-circle">
-                        <ul>
-                            <li>
-                                <a href="javascript:void(0);">
-                                    <img src="./src/assets/img/icons/emoj-icon-01.svg" alt="Icon" />
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);">
-                                    <img src="./src/assets/img/icons/emoj-icon-02.svg" alt="Icon" />
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);">
-                                    <img src="./src/assets/img/icons/emoj-icon-03.svg" alt="Icon" />
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);">
-                                    <img src="./src/assets/img/icons/emoj-icon-04.svg" alt="Icon" />
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);">
-                                    <img src="./src/assets/img/icons/emoj-icon-05.svg" alt="Icon" />
-                                </a>
-                            </li>
-                            <li className="add-emoj">
-                                <a href="javascript:void(0);">
-                                    <i className="fa-solid fa-plus"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                    {showEmoji && (
+                        <div
+                            className={clsx(
+                                styles.emojiVisible,
+                                'emoj-group-list-foot down-emoji-circle'
+                            )}
+                        >
+                            <ul>
+                                <li>
+                                    <a
+                                        href="javascript:void(0);"
+                                        onClick={() => handleEmojiClick('😀')}
+                                    >
+                                        😀
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="javascript:void(0);"
+                                        onClick={() => handleEmojiClick('😂')}
+                                    >
+                                        😂
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="javascript:void(0);"
+                                        onClick={() => handleEmojiClick('😍')}
+                                    >
+                                        😍
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="javascript:void(0);"
+                                        onClick={() => handleEmojiClick('👍')}
+                                    >
+                                        👍
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="javascript:void(0);"
+                                        onClick={() => handleEmojiClick('🥰')}
+                                    >
+                                        🥰
+                                    </a>
+                                </li>
+                                <li className="add-emoj">
+                                    <a href="javascript:void(0);">
+                                        <i className="fa-solid fa-plus"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    )}
                 </div>
                 <div className="smile-foot">
                     <a href="#" className="action-circle">

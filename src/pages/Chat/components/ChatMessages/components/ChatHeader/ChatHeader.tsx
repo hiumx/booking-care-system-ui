@@ -1,7 +1,27 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import clsx from 'clsx';
 
+import styles from './ChatHeader.module.scss';
 const ChatHeader = () => {
     const [showSearch, setShowSearch] = useState(false);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowDropdown(false);
+            }
+        }
+        if (showDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showDropdown]);
 
     return (
         <div className="chat-inner-header">
@@ -28,7 +48,10 @@ const ChatHeader = () => {
                     <ul className="list-inline">
                         <li className="list-inline-item">
                             <button
-                                className="btn btn-outline-light chat-search-btn"
+                                className={clsx(
+                                    styles.chatSearchBtn,
+                                    'btn btn-outline-light chat-search-btn'
+                                )}
                                 onClick={() => setShowSearch(!showSearch)}
                                 title="Tìm kiếm"
                             >
@@ -36,43 +59,51 @@ const ChatHeader = () => {
                             </button>
                         </li>
                         <li className="list-inline-item">
-                            <div className="dropdown">
+                            <div className="dropdown" ref={dropdownRef}>
                                 <button
-                                    className="btn btn-outline-light no-bg"
-                                    data-bs-toggle="dropdown"
+                                    className={clsx(styles.btnMenu, 'btn btn-outline-light no-bg')}
+                                    onClick={() => setShowDropdown((prev) => !prev)}
                                 >
                                     <i className="fa-solid fa-ellipsis-vertical"></i>
                                 </button>
-                                <div className="dropdown-menu dropdown-menu-end">
-                                    <a href="#" className="dropdown-item">
-                                        Đóng chat
-                                    </a>
-                                    <a href="#" className="dropdown-item">
-                                        Tắt thông báo
-                                    </a>
-                                    <a href="#" className="dropdown-item">
-                                        Tin nhắn biến mất
-                                    </a>
-                                    <a href="#" className="dropdown-item">
-                                        Xóa tin nhắn
-                                    </a>
-                                    <a href="#" className="dropdown-item">
-                                        Xóa chat
-                                    </a>
-                                    <a href="#" className="dropdown-item">
-                                        Báo cáo
-                                    </a>
-                                    <a href="#" className="dropdown-item">
-                                        Chặn
-                                    </a>
-                                </div>
+                                {showDropdown && (
+                                    <div
+                                        className={clsx(
+                                            styles.dropdownMenu,
+                                            'dropdown-menu dropdown-menu-end show'
+                                        )}
+                                        style={{ display: 'block' }}
+                                    >
+                                        <a href="#" className="dropdown-item">
+                                            Đóng chat
+                                        </a>
+                                        <a href="#" className="dropdown-item">
+                                            Tắt thông báo
+                                        </a>
+                                        <a href="#" className="dropdown-item">
+                                            Tin nhắn biến mất
+                                        </a>
+                                        <a href="#" className="dropdown-item">
+                                            Xóa tin nhắn
+                                        </a>
+                                        <a href="#" className="dropdown-item">
+                                            Xóa chat
+                                        </a>
+                                        <a href="#" className="dropdown-item">
+                                            Báo cáo
+                                        </a>
+                                        <a href="#" className="dropdown-item">
+                                            Chặn
+                                        </a>
+                                    </div>
+                                )}
                             </div>
                         </li>
                     </ul>
                 </div>
                 {/* Chat Search */}
                 {showSearch && (
-                    <div className="chat-search">
+                    <div className={clsx(styles.chatSearch, 'chat-search', 'visible-chat')}>
                         <form>
                             <span className="form-control-feedback">
                                 <i className="fa-solid fa-magnifying-glass"></i>

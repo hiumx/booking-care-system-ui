@@ -3,3 +3,18 @@
         text-decoration: none;
     }
 }
+
+.dropdownMenuUp {
+    position: absolute;
+    bottom: 64px !important;
+    left: 0 !important;
+    z-index: 100;
+    display: block;
+
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.emojiVisible {
+    display: block !important;
+}
