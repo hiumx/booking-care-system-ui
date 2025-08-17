@@ -9,24 +9,9 @@ export interface BreadcrumbItem {
 interface BreadcrumbProps {
     items: BreadcrumbItem[];
     title: string;
-    backgroundImages?: {
-        bg01?: string;
-        bg02?: string;
-        icon01?: string;
-        icon02?: string;
-    };
 }
 
-const Breadcrumb: React.FC<BreadcrumbProps> = ({
-    items,
-    title,
-    backgroundImages = {
-        bg01: './src/assets/img/bg/breadcrumb-bg-01.png',
-        bg02: './src/assets/img/bg/breadcrumb-bg-02.png',
-        icon01: './src/assets/img/bg/breadcrumb-icon.png',
-        icon02: './src/assets/img/bg/breadcrumb-icon.png',
-    },
-}) => {
+const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, title }) => {
     return (
         <div className="breadcrumb-bar">
             <div className="container">
@@ -64,10 +49,26 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
                 </div>
             </div>
             <div className="breadcrumb-bg">
-                <img src={backgroundImages.bg01} alt="img" className="breadcrumb-bg-01" />
-                <img src={backgroundImages.bg02} alt="img" className="breadcrumb-bg-02" />
-                <img src={backgroundImages.icon01} alt="img" className="breadcrumb-bg-03" />
-                <img src={backgroundImages.icon02} alt="img" className="breadcrumb-bg-04" />
+                <img
+                    src="./src/assets/img/bg/breadcrumb-bg-01.png"
+                    alt="img"
+                    className="breadcrumb-bg-01"
+                />
+                <img
+                    src="./src/assets/img/bg/breadcrumb-bg-02.png"
+                    alt="img"
+                    className="breadcrumb-bg-02"
+                />
+                <img
+                    src="./src/assets/img/bg/breadcrumb-icon.png"
+                    alt="img"
+                    className="breadcrumb-bg-03"
+                />
+                <img
+                    src="./src/assets/img/bg/breadcrumb-icon.png"
+                    alt="img"
+                    className="breadcrumb-bg-04"
+                />
             </div>
         </div>
     );
