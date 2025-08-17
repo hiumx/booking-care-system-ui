@@ -5,11 +5,11 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 
 export default [
-    { ignores: ['dist', 'node_modules', '.husky'] },
+    { ignores: ['dist', 'node_modules', '.husky', 'src/assets/**'] },
     js.configs.recommended,
     ...tseslint.configs.recommended,
     {
-        files: ['**/*.{ts,tsx}'],
+        files: ['src/**/*.{ts,tsx,js,jsx}'],
         languageOptions: {
             ecmaVersion: 2020,
             globals: globals.browser,

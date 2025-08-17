@@ -1,6 +1,7 @@
 // src/routes/routeConfig.tsx
 import Demo from '@/pages/Demo';
 import Home from '@/pages/Home';
+import UserProfile from '@/pages/User_Profile';
 import { RouteObject } from 'react-router-dom';
 import Login from '@/pages/Authentication/Login';
 
@@ -20,6 +21,10 @@ const routes: RouteObject[] = [
     {
         path: '/login',
         element: <Login />,
+    },
+    {
+        path: '/user-profile',
+        element: <UserProfile />,
     },
     {
         path: '/dashboard',
