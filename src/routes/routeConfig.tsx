@@ -1,6 +1,7 @@
 // src/routes/routeConfig.tsx
 import Demo from '@/pages/Demo';
 import Home from '@/pages/Home';
+import UserProfile from '@/pages/User_Profile';
 import { RouteObject } from 'react-router-dom';
 import DoctorProfile from '~/pages/DoctorProfile/DoctorProfile';
 
@@ -16,6 +17,10 @@ const routes: RouteObject[] = [
     {
         path: '/demo',
         element: <Demo />,
+    },
+    {
+        path: '/user-profile',
+        element: <UserProfile />,
     },
     {
         path: '/doctor-profile',
