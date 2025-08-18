@@ -37,6 +37,9 @@ h6,
 }
 
 .btn {
+    border-radius: 44px;
+    padding: 0.5rem 0.85rem;
+    font-size: 14px;
     transition: all 0.5s;
     font-weight: 500;
 }
@@ -53,4 +56,12 @@ h6,
 .btn.btn-md {
     padding: 0.35rem 0.85rem;
     font-size: 0.813rem;
+}
+
+a {
+    text-decoration: none;
+}
+
+.btn-link {
+    text-decoration: none;
 }

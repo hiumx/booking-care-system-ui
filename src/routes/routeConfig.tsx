@@ -3,6 +3,10 @@ import Demo from '@/pages/Demo';
 import Home from '@/pages/Home';
 import UserProfile from '@/pages/UserProfile';
 import { RouteObject } from 'react-router-dom';
+import Login from '@/pages/Authentication/Login';
+import Register from '@/pages/Authentication/Register';
+import ForgotPassword from '@/pages/Authentication/ForgotPassword';
+import ResetPassword from '@/pages/Authentication/ResetPassword';
 import { PATHS } from './paths';
 
 const routes: RouteObject[] = [
@@ -14,9 +18,27 @@ const routes: RouteObject[] = [
         path: PATHS.ABOUT,
         element: <h1>About Page</h1>,
     },
+
+    // Authentication paths
     {
         path: PATHS.DEMO,
         element: <Demo />,
+    },
+    {
+        path: PATHS.LOGIN,
+        element: <Login />,
+    },
+    {
+        path: PATHS.REGISTER,
+        element: <Register />,
+    },
+    {
+        path: PATHS.FORGOT_PASSWORD,
+        element: <ForgotPassword />,
+    },
+    {
+        path: PATHS.RESET_PASSWORD,
+        element: <ResetPassword />,
     },
     {
         path: PATHS.USER.ROOT,

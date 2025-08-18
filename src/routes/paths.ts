@@ -6,6 +6,12 @@ export const PATHS = {
     ABOUT: '/about',
     DEMO: '/demo',
 
+    // Authentication paths
+    LOGIN: '/login',
+    REGISTER: '/register',
+    FORGOT_PASSWORD: '/forgot-password',
+    RESET_PASSWORD: '/reset-password',
+
     USER: {
         ROOT: '/user',
         PROFILE: 'profile',
