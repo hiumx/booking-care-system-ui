@@ -3,12 +3,15 @@ import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
+import Select from '@/components/Select';
 import HospitalCard from './components/MedicalFacilityCard';
 import styles from './MedicalFacility.module.scss';
 
 import hospital01 from '@/assets/img/hospitals/hospital-01.svg';
 import hospital03 from '@/assets/img/hospitals/hospital-03.svg';
 import hospital05 from '@/assets/img/hospitals/hospital-05.svg';
+import browseCategorie from '@/assets/img/icons/browse-categorie.svg';
+import locationIcon from '@/assets/img/icons/location.svg';
 
 const MedicalFacility: React.FC = () => {
     const images = [hospital01, hospital03, hospital05];
@@ -155,30 +158,30 @@ const MedicalFacility: React.FC = () => {
         },
     ];
 
-    // State cho lọc và phân trang
-    const [location, setLocation] = useState('Vị trí');
-    const [type, setType] = useState('Tất cả');
+    // State for filtering and pagination
+    const [location, setLocation] = useState('');
+    const [type, setType] = useState('');
     const [search, setSearch] = useState('');
     const [visibleCount, setVisibleCount] = useState(5);
 
-    // Lọc dữ liệu
+    // Filter data
     const filteredData = facilities.filter((item) => {
         return (
-            (location === 'Vị trí' || item.location === location) &&
-            (type === 'Tất cả' || item.type === type) &&
+            (location === '' || item.location === location) &&
+            (type === '' || item.type === type) &&
             (search === '' || item.name.toLowerCase().includes(search.toLowerCase()))
         );
     });
 
-    // Dữ liệu hiển thị
+    // Displayed data
     const displayedData = filteredData.slice(0, visibleCount);
 
-    // Hàm load more
+    // Load more handler
     const handleLoadMore = () => {
         setVisibleCount((prev) => prev + 5);
     };
 
-    // Dữ liệu cho Breadcrumb
+    // Breadcrumb data
     const breadcrumbData = {
         items: [
             { label: 'Home', path: '/', isActive: false },
@@ -190,13 +193,12 @@ const MedicalFacility: React.FC = () => {
     return (
         <MainLayout>
             <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
-
             <div className="content doctor-content">
                 <div className="container">
                     {/* Show Result */}
                     <div className="card">
                         <div className="card-body">
-                            <div className="d-flex align-items-center justify-content-between flex-wrap result-wrap gap-3">
+                            <div className="d-flex align-items-center justify-content-between result-wrap">
                                 <h5>
                                     Hiển thị{' '}
                                     <span className={clsx(styles.resultCount)}>
@@ -204,28 +206,31 @@ const MedicalFacility: React.FC = () => {
                                     </span>{' '}
                                     cơ sở y tế cho bạn
                                 </h5>
-                                <div className="d-flex align-items-center flex-wrap gap-3">
-                                    <select
-                                        className="form-select w-auto"
+                                <div className="d-flex align-items-center gap-3">
+                                    <Select
+                                        title="Vị trí"
                                         value={location}
-                                        onChange={(e) => setLocation(e.target.value)}
-                                    >
-                                        <option>Vị trí</option>
-                                        <option>Hà Nội</option>
-                                        <option>TP. Hồ Chí Minh</option>
-                                        <option>Đà Nẵng</option>
-                                        <option>Hải Phòng</option>
-                                        <option>Cần Thơ</option>
-                                    </select>
-                                    <select
-                                        className="form-select w-auto"
+                                        onChange={setLocation}
+                                        items={[
+                                            { label: 'Hà Nội', value: 'Hà Nội' },
+                                            { label: 'TP. Hồ Chí Minh', value: 'TP. Hồ Chí Minh' },
+                                            { label: 'Đà Nẵng', value: 'Đà Nẵng' },
+                                            { label: 'Hải Phòng', value: 'Hải Phòng' },
+                                            { label: 'Cần Thơ', value: 'Cần Thơ' },
+                                        ]}
+                                        image={locationIcon}
+                                    />
+                                    <Select
+                                        title="Loại cơ sở y tế"
                                         value={type}
-                                        onChange={(e) => setType(e.target.value)}
-                                    >
-                                        <option>Tất cả</option>
-                                        <option>Bệnh viện</option>
-                                        <option>Phòng khám</option>
-                                    </select>
+                                        onChange={setType}
+                                        items={[
+                                            { label: 'Tất cả', value: 'Tất cả' },
+                                            { label: 'Bệnh viện', value: 'Bệnh viện' },
+                                            { label: 'Phòng khám', value: 'Phòng khám' },
+                                        ]}
+                                        image={browseCategorie}
+                                    />
                                     <div className="input-block dash-search-input">
                                         <input
                                             type="text"
@@ -243,8 +248,6 @@ const MedicalFacility: React.FC = () => {
                         </div>
                     </div>
                     {/* /Show Result */}
-
-                    {/* Danh sách cơ sở y tế */}
                     <div className="all-facilities">
                         <div className="row">
                             {displayedData.map((h, i) => (
