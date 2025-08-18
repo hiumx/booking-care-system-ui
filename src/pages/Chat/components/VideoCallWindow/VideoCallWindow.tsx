@@ -16,6 +16,13 @@ const VideoCallWindow = () => {
             window.dispatchEvent(evt);
         }
     };
+    // Calculate default width and height based on screen size
+    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
+    // Use 80% of screen width and 70% of screen height, with min values
+    const defaultWidth = Math.max(Math.floor(screenWidth * 0.8), 600);
+    const defaultHeight = Math.max(Math.floor(screenHeight * 0.7), 350);
+
     return isFullscreen ? (
         <div
             style={{
@@ -63,10 +70,10 @@ const VideoCallWindow = () => {
     ) : (
         <Rnd
             default={{
-                x: Math.max((window.innerWidth - 1100) / 2, 0),
+                x: Math.max((screenWidth - defaultWidth) / 2, 0),
                 y: 60,
-                width: 1100,
-                height: 700,
+                width: defaultWidth,
+                height: defaultHeight,
             }}
             minWidth={600}
             minHeight={350}
