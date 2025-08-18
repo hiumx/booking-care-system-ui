@@ -1,50 +1,58 @@
 // src/routes/routeConfig.tsx
 import Demo from '@/pages/Demo';
 import Home from '@/pages/Home';
+import UserProfile from '@/pages/UserProfile';
 import { RouteObject } from 'react-router-dom';
 import Login from '@/pages/Authentication/Login';
 import Register from '@/pages/Authentication/Register';
 import ForgotPassword from '@/pages/Authentication/ForgotPassword';
 import ResetPassword from '@/pages/Authentication/ResetPassword';
+import { PATHS } from './paths';
 
 const routes: RouteObject[] = [
     {
-        path: '/',
+        path: PATHS.HOME,
         element: <Home title="Home Page" />,
-        children: [
-            { path: '', element: <Home title="Home Page" /> },
-            { path: 'about', element: <h1>About Page</h1> },
-        ],
     },
     {
-        path: '/demo',
+        path: PATHS.ABOUT,
+        element: <h1>About Page</h1>,
+    },
+
+    // Authentication paths
+    {
+        path: PATHS.DEMO,
         element: <Demo />,
     },
     {
-        path: '/login',
+        path: PATHS.LOGIN,
         element: <Login />,
     },
     {
-        path: '/register',
+        path: PATHS.REGISTER,
         element: <Register />,
     },
     {
-        path: '/forgot-password',
+        path: PATHS.FORGOT_PASSWORD,
         element: <ForgotPassword />,
     },
     {
-        path: '/reset-password',
+        path: PATHS.RESET_PASSWORD,
         element: <ResetPassword />,
     },
     {
-        path: '/dashboard',
+        path: PATHS.USER.ROOT,
+        children: [{ path: PATHS.USER.PROFILE, element: <UserProfile /> }],
+    },
+    {
+        path: PATHS.DASHBOARD.ROOT,
         children: [
-            { path: '', element: <h1>Dashboard</h1> },
-            { path: 'settings', element: <h1>Setting</h1> },
+            { path: PATHS.DASHBOARD.ROOT, element: <h1>Dashboard</h1> },
+            { path: PATHS.DASHBOARD.SETTINGS, element: <h1>Setting</h1> },
         ],
     },
     {
-        path: '*',
+        path: PATHS.NOT_FOUND,
         element: <h1>404 - Page Not Found</h1>,
     },
 ];
