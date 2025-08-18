@@ -8,6 +8,7 @@ import Login from '@/pages/Authentication/Login';
 import Register from '@/pages/Authentication/Register';
 import ForgotPassword from '@/pages/Authentication/ForgotPassword';
 import ResetPassword from '@/pages/Authentication/ResetPassword';
+import MedicalFacility from '@/pages/MedicalFacility';
 import { PATHS } from './paths';
 
 const routes: RouteObject[] = [
@@ -18,6 +19,10 @@ const routes: RouteObject[] = [
     {
         path: PATHS.ABOUT,
         element: <h1>About Page</h1>,
+    },
+    {
+        path: PATHS.MEDICAL_FACILITY,
+        element: <MedicalFacility />,
     },
 
     // Authentication paths
