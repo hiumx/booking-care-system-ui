@@ -1,9 +1,14 @@
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import styles from '../DoctorProfile.module.scss';
+import Pagination from '@/components/Pagination';
 import experienceLogo1 from '@/assets/img/icons/experience-logo-01.svg';
 import clinicImg1 from '@/assets/img/clinic/clinic-11.jpg';
+import client13 from '@/assets/img/clients/client-13.jpg';
+import client14 from '@/assets/img/clients/client-14.jpg';
+import client15 from '@/assets/img/clients/client-15.jpg';
+import client16 from '@/assets/img/clients/client-16.jpg';
 
 const DoctorDetails = () => {
     const bioRef = useRef<HTMLDivElement>(null);
@@ -11,6 +16,7 @@ const DoctorDetails = () => {
     const specialityRef = useRef<HTMLDivElement>(null);
     const clinicRef = useRef<HTMLDivElement>(null);
     const hoursRef = useRef<HTMLDivElement>(null);
+    const reviewRef = useRef<HTMLDivElement>(null);
 
     const scrollToSection = (el: HTMLDivElement | null) => {
         el?.scrollIntoView({ behavior: 'smooth' });
@@ -27,6 +33,44 @@ const DoctorDetails = () => {
         { day: 'Sunday', time: '07:00 AM - 09:00 PM' },
     ];
 
+    const reviews = [
+        {
+            id: 1,
+            name: 'kadajsalamander',
+            avatar: client13,
+            rating: 5,
+            timeAgo: '2 days ago',
+            text: "Thank you for this informative article! I've had a couple of hit-and-miss experiences with freelancers in the past, and I realize now that I wasn't vetting them properly. Your checklist for choosing the right freelancer is going to be my go-to from now on.",
+            recommend: true,
+        },
+        {
+            id: 2,
+            name: 'Dane jose',
+            avatar: client14,
+            rating: 5,
+            timeAgo: '1 Months ago',
+            text: "As a freelancer myself, I find this article spot on! It's important for clients to understand what to look for in a freelancer and how to foster a good working relationship. The point about mutual respect and clear communication is key in my experience. Well done.",
+            recommend: true,
+        },
+        {
+            id: 3,
+            name: 'Dane jose',
+            avatar: client15,
+            rating: 5,
+            timeAgo: '15 days ago',
+            text: "Great article! I've bookmarked it for future reference. I'd love to read more about managing long-term relationships with freelancers, if you have any tips on that.",
+            recommend: true,
+            replies: [
+                {
+                    id: 1,
+                    name: 'Robert Hollenbeck',
+                    avatar: client16,
+                    text: 'Thank you for your comment and I will try to make another post on that topic.',
+                },
+            ],
+        },
+    ];
+
     const biographyText =
         'Bác sĩ giàu kinh nghiệm và đầy nhiệt huyết, luôn tận tâm chăm sóc bệnh nhân. Có kinh nghiệm trong nhiều môi trường y tế, đặc biệt am hiểu về chẩn đoán, chăm sóc ban đầu và y học cấp cứu. Thành thạo trong việc sử dụng công nghệ mới nhất để tối ưu hóa quá trình điều trị. Luôn cam kết mang đến sự quan tâm, chăm sóc cá nhân hóa và đầy nhân ái cho từng bệnh nhân...';
     const [expanded, setExpanded] = useState(false);
@@ -34,6 +78,11 @@ const DoctorDetails = () => {
     const isLongText = biographyText.length > limit;
     const displayText =
         expanded || !isLongText ? biographyText : biographyText.slice(0, limit) + '...';
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 2;
+    const totalPages = Math.ceil(reviews.length / pageSize);
+    const displayedReviews = reviews.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     return (
         <div className="doctors-detailed-info">
@@ -97,6 +146,18 @@ const DoctorDetails = () => {
                         }}
                     >
                         Lịch làm việc
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        to="#"
+                        className={styles.link}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            scrollToSection(reviewRef.current);
+                        }}
+                    >
+                        Đánh giá
                     </Link>
                 </li>
             </ul>
@@ -271,6 +332,106 @@ const DoctorDetails = () => {
                                 ))}
                             </ul>
                         </div>
+                    </div>
+                </div>
+
+                {/* Reviews Section */}
+                <div ref={reviewRef}>
+                    <div className="doc-information-details" id="review">
+                        <div className="detail-title">
+                            <h4>Đánh giá ({reviews.length})</h4>
+                        </div>
+                        {displayedReviews.map((review, index) => (
+                            <div
+                                key={review.id}
+                                className={`doc-review-card ${index === displayedReviews.length - 1 ? 'mb-0' : ''}`}
+                            >
+                                <div className="user-info-review">
+                                    <div className="reviewer-img">
+                                        <Link
+                                            to="#"
+                                            className={`${styles.link} avatar-img`}
+                                            onClick={(e) => e.preventDefault()}
+                                        >
+                                            <img src={review.avatar} alt={review.name} />
+                                        </Link>
+                                        <div className="review-star">
+                                            <Link
+                                                to="#"
+                                                className={styles.link}
+                                                onClick={(e) => e.preventDefault()}
+                                            >
+                                                {review.name}
+                                            </Link>
+                                            <div className="rating">
+                                                {Array.from({ length: 5 }).map((_, i) => (
+                                                    <i
+                                                        key={i}
+                                                        className={`fas fa-star ${i < (review.rating ?? 0) ? 'filled' : ''}`}
+                                                    ></i>
+                                                ))}
+                                                <span>
+                                                    {(review.rating ?? 0).toFixed(1)} |{' '}
+                                                    {review.timeAgo}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {review.recommend && (
+                                        <span className="thumb-icon">
+                                            <i className="fa-regular fa-thumbs-up"></i> Yes,
+                                            Recommend for Appointment
+                                        </span>
+                                    )}
+                                </div>
+                                <p>{review.text}</p>
+                                <Link
+                                    to="#"
+                                    className={`${styles.link} reply d-flex align-items-center`}
+                                    onClick={(e) => e.preventDefault()}
+                                >
+                                    <i className="fa-solid fa-reply me-2"></i>Reply
+                                </Link>
+                                {review.replies &&
+                                    review.replies.map((reply) => (
+                                        <div key={reply.id} className="replied-info">
+                                            <div className="user-info-review">
+                                                <div className="reviewer-img">
+                                                    <Link
+                                                        to="#"
+                                                        className={`${styles.link} avatar-img`}
+                                                        onClick={(e) => e.preventDefault()}
+                                                    >
+                                                        <img src={reply.avatar} alt={reply.name} />
+                                                    </Link>
+                                                    <div className="review-star">
+                                                        <Link
+                                                            to="#"
+                                                            className={styles.link}
+                                                            onClick={(e) => e.preventDefault()}
+                                                        >
+                                                            {reply.name}
+                                                        </Link>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p>{reply.text}</p>
+                                            <Link
+                                                to="#"
+                                                className={`${styles.link} reply d-flex align-items-center`}
+                                                onClick={(e) => e.preventDefault()}
+                                            >
+                                                <i className="fa-solid fa-reply me-2"></i>Reply
+                                            </Link>
+                                        </div>
+                                    ))}
+                            </div>
+                        ))}
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
                     </div>
                 </div>
             </div>
