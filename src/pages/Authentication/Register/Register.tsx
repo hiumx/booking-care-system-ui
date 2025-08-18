@@ -9,6 +9,7 @@ import AuthLayout from '@/layouts/AuthLayout';
 import clsx from 'clsx';
 import styles from './Register.module.scss';
 import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
+import { PATHS } from '~/routes/paths';
 
 type Step = 0 | 1 | 2 | 3;
 
@@ -462,7 +463,7 @@ const Register: React.FC = () => {
                     </div>
                     <div className="account-signup">
                         <p>
-                            Đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link>
+                            Đã có tài khoản? <Link to={PATHS.LOGIN}>Đăng nhập ngay</Link>
                         </p>
                     </div>
                 </div>

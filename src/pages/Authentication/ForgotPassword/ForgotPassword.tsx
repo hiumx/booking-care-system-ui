@@ -5,6 +5,7 @@ import AuthLayout from '@/layouts/AuthLayout';
 import { Mail } from 'lucide-react';
 import clsx from 'clsx';
 import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
+import { PATHS } from '~/routes/paths';
 
 interface ForgotPasswordProps {
     onSubmit?: (email: string, phone: string) => void;
@@ -149,7 +150,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                 </div>
                 <div className="account-signup">
                     <p>
-                        Đã nhớ mật khẩu? <Link to="/login">Đăng nhập ngay</Link>
+                        Đã nhớ mật khẩu? <Link to={PATHS.LOGIN}>Đăng nhập ngay</Link>
                     </p>
                 </div>
             </form>
