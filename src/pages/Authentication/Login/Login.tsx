@@ -6,6 +6,7 @@ import FacebookIcon from '@/assets/img/icons/facebook-icon.svg';
 import clsx from 'clsx';
 import styles from './Login.module.scss';
 import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
+import { PATHS } from '~/routes/paths';
 interface LoginProps {
     onSubmit?: (credentials: {
         method: 'email' | 'phone';
@@ -181,7 +182,7 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                 {/* Register link */}
                 <div className="account-signup">
                     <p>
-                        Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
+                        Chưa có tài khoản? <Link to={PATHS.REGISTER}>Đăng ký</Link>
                     </p>
                 </div>
             </form>
