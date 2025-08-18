@@ -27,3 +27,7 @@ dist-ssr
 .prettierignore
 .env
 .env.*
+
+# Plugins directory
+plugins/
+css/
