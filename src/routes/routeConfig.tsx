@@ -2,6 +2,7 @@
 import Demo from '@/pages/Demo';
 import Home from '@/pages/Home';
 import UserProfile from '@/pages/UserProfile';
+import ScreenManagement from '@/pages/ScreenManagement';
 import Chat from '@/pages/Chat';
 import { RouteObject } from 'react-router-dom';
 import Login from '@/pages/Authentication/Login';
@@ -13,7 +14,7 @@ import { PATHS } from './paths';
 const routes: RouteObject[] = [
     {
         path: PATHS.HOME,
-        element: <Home title="Home Page" />,
+        element: <Home />,
     },
     {
         path: PATHS.ABOUT,
@@ -40,6 +41,10 @@ const routes: RouteObject[] = [
     {
         path: PATHS.RESET_PASSWORD,
         element: <ResetPassword />,
+    },
+    {
+        path: PATHS.SCREEN_MANAGEMENT,
+        element: <ScreenManagement />,
     },
     {
         path: PATHS.USER.ROOT,
