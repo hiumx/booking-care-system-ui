@@ -51,7 +51,7 @@ const routes: RouteObject[] = [
         children: [{ path: PATHS.USER.PROFILE, element: <UserProfile /> }],
     },
     {
-        path: '/chat',
+        path: PATHS.CHAT,
         element: <Chat />,
     },
 
