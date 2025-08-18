@@ -2,6 +2,7 @@
  * Path constants for the application
  */
 export const PATHS = {
+    // General paths
     HOME: '/',
     ABOUT: '/about',
     DEMO: '/demo',
@@ -12,17 +13,23 @@ export const PATHS = {
     FORGOT_PASSWORD: '/forgot-password',
     RESET_PASSWORD: '/reset-password',
 
+    // Management paths
+    SCREEN_MANAGEMENT: '/screen-management',
+
+    // User paths
     USER: {
         ROOT: '/user',
         PROFILE: 'profile',
         SETTINGS: 'settings',
     },
 
+    // Dashboard paths
     DASHBOARD: {
         ROOT: '/dashboard',
         SETTINGS: 'settings',
     },
 
+    // Not Found path
     NOT_FOUND: '*',
 } as const;
 
