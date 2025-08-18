@@ -1,16 +1,12 @@
 import { Link } from 'react-router-dom';
 import MainLayout from '../../layouts/MainLayout';
+import { PATHS } from '~/routes/paths';
 
-interface HomeProps {
-    title: string;
-}
-
-const Home: React.FC<HomeProps> = ({ title }) => {
+const Home: React.FC = () => {
     return (
         <div>
             <MainLayout>
-                <h1>{title}</h1>
-                <Link to="/demo">Go to Demo</Link>
+                <Link to={PATHS.SCREEN_MANAGEMENT}>Go to Screen Management</Link>
             </MainLayout>
         </div>
     );
