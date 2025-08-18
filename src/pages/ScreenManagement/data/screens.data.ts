@@ -120,6 +120,17 @@ export const SCREENS_DATA: Screen[] = [
         icon: 'feather-search',
         tags: ['search', 'doctors', 'filter'],
     },
+    {
+        id: 'services',
+        name: 'Services',
+        path: '/services',
+        category: ScreenCategory.DOCTOR,
+        description: 'Search and filter doctors by specialty, location, etc.',
+        status: ScreenStatus.COMPLETED,
+        component: 'SearchResult',
+        icon: 'feather-search',
+        tags: ['search', 'doctors', 'filter'],
+    },
 
     // Dashboard Pages
     {
