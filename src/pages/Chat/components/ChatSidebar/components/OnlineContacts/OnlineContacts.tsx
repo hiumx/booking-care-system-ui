@@ -10,7 +10,6 @@ const OnlineContacts = () => {
         <div className={clsx(styles.topOnlineContacts, 'top-online-contacts')}>
             <div className="fav-title">
                 <h6>Đang online</h6>
-                <a href="javascript:void(0);">Xem tất cả</a>
             </div>
             <Swiper spaceBetween={10} slidesPerView={5} className="online-contacts-swiper">
                 {mockOnlineContacts.map((contact) => (

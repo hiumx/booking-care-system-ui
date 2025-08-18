@@ -13,7 +13,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
             contact.lastMessage.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const pinnedContacts = filteredContacts.filter((contact: ChatContact) => contact.isPinned);
+    // const pinnedContacts = filteredContacts.filter((contact: ChatContact) => contact.isPinned);
     const recentContacts = filteredContacts.filter((contact: ChatContact) => !contact.isPinned);
 
     const getMessageIcon = (messageType: string) => {
@@ -81,7 +81,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
 
     return (
         <>
-            {pinnedContacts.length > 0 && renderContactList(pinnedContacts, 'Tin nhắn ghim')}
+            {/* {pinnedContacts.length > 0 && renderContactList(pinnedContacts, 'Tin nhắn ghim')} */}
             {recentContacts.length > 0 && renderContactList(recentContacts, 'Tin nhắn gần đây')}
         </>
     );
