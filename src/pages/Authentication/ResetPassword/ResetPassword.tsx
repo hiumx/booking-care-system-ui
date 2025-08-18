@@ -6,20 +6,18 @@ import clsx from 'clsx';
 import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
 
 interface ResetPasswordProps {
-    onSubmit?: (currentPassword: string, newPassword: string) => void;
+    onSubmit?: (newPassword: string) => void;
 }
 
 const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
-    const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isHuman, setIsHuman] = useState(false);
     const [showCaptcha, setShowCaptcha] = useState(false);
 
     // Password visibility states
-    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -60,7 +58,6 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
     }, [newPassword, passwordRequirements]);
 
     const canSubmit = useMemo(() => {
-        const hasCurrentPassword = currentPassword.trim() !== '';
         const hasNewPassword = newPassword.trim() !== '';
         const hasConfirmPassword = confirmPassword.trim() !== '';
         const passwordsMatch = newPassword === confirmPassword;
@@ -68,27 +65,23 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
         const isCaptchaValid = isHuman;
 
         return (
-            hasCurrentPassword &&
             hasNewPassword &&
             hasConfirmPassword &&
             passwordsMatch &&
             newPasswordValid &&
             isCaptchaValid
         );
-    }, [currentPassword, newPassword, confirmPassword, passwordRequirements.allMet, isHuman]);
+    }, [newPassword, confirmPassword, passwordRequirements.allMet, isHuman]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (canSubmit && onSubmit) {
-            onSubmit(currentPassword, newPassword);
+            onSubmit(newPassword);
         }
     };
 
-    const togglePasswordVisibility = (field: 'current' | 'new' | 'confirm') => {
+    const togglePasswordVisibility = (field: 'new' | 'confirm') => {
         switch (field) {
-            case 'current':
-                setShowCurrentPassword(!showCurrentPassword);
-                break;
             case 'new':
                 setShowNewPassword(!showNewPassword);
                 break;
@@ -123,32 +116,6 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
             </div>
 
             <form onSubmit={handleSubmit}>
-                {/* Current Password */}
-                <div className="mb-3">
-                    <label className="form-label">Mật khẩu hiện tại</label>
-                    <div className={clsx(authStyles.inputGroup)}>
-                        <i className={clsx('feather-lock', authStyles.leftIcon)}></i>
-                        <input
-                            type={showCurrentPassword ? 'text' : 'password'}
-                            className={clsx('form-control')}
-                            placeholder="Nhập mật khẩu hiện tại"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            onFocus={() => setShowCaptcha(true)}
-                        />
-
-                        <span
-                            role="button"
-                            aria-label={showCurrentPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                            onClick={() => togglePasswordVisibility('current')}
-                            className={clsx(
-                                showCurrentPassword ? 'feather-eye' : 'feather-eye-off',
-                                authStyles.togglePassword
-                            )}
-                        />
-                    </div>
-                </div>
-
                 {/* New Password */}
                 <div className="mb-3">
                     <label className="form-label">Mật khẩu mới</label>
@@ -160,6 +127,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
                             placeholder="Nhập mật khẩu mới"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
+                            onFocus={() => setShowCaptcha(true)}
                         />
                         <span
                             role="button"

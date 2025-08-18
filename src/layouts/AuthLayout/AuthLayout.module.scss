@@ -110,31 +110,6 @@
     }
 }
 
-// Inline between styles
-.inlineBetween {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    .forgotPassword {
-        color: #3d3d3d;
-        display: inline-block;
-        font-size: 14px;
-        font-weight: 500;
-        color: #0e82fd;
-        -webkit-transition: 0.7s;
-        -ms-transition: 0.7s;
-        transition: 0.7s;
-
-        &:hover {
-            color: rgb(1.7777777778, 104.8888888889, 214.2222222222);
-            -webkit-transition: 0.7s;
-            -ms-transition: 0.7s;
-            transition: 0.7s;
-        }
-    }
-}
-
 // Password Strength Bar
 .strengthBar {
     width: 100%;

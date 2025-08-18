@@ -4,6 +4,7 @@ import Breadcrumb from '../../components/Breadcrumb';
 import Favourite from './Favourite';
 import ProfileSidebar from './ProfileSidebar';
 import PatientAppointments from './PatientAppointments';
+import SettingsContainer from './Setting/SettingsContainer/SettingsContainer';
 
 // Mock user data
 const mockUserData = {
@@ -117,6 +118,8 @@ const UserProfile = () => {
                 return <PatientAppointments />;
             case 'favourites':
                 return <Favourite />;
+            case 'settings':
+                return <SettingsContainer />;
             default:
                 return <Favourite />; // Default to favourites
         }
