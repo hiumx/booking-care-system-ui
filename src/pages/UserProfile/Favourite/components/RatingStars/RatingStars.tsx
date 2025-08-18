@@ -1,6 +1,5 @@
 interface RatingStarsProps {
     rating: number;
-
     numberOfReviews: number;
 }
 

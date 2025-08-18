@@ -49,44 +49,44 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                 <nav className="dashboard-menu">
                     <ul>
                         <li className={isActive('dashboard') ? 'active' : ''}>
-                            <Link to="/user-profile?tab=dashboard">
+                            <Link to="/user/profile?tab=dashboard">
                                 <i className="isax isax-category-2"></i>
                                 <span>Thông Tin Cá Nhân</span>
                             </Link>
                         </li>
                         <li className={isActive('appointments') ? 'active' : ''}>
-                            <Link to="/user-profile?tab=appointments">
+                            <Link to="/user/profile?tab=appointments">
                                 <i className="isax isax-calendar-1"></i>
                                 <span>Lịch Hẹn Của Tôi</span>
                             </Link>
                         </li>
                         <li className={isActive('favourites') ? 'active' : ''}>
-                            <Link to="/user-profile?tab=favourites">
+                            <Link to="/user/profile?tab=favourites">
                                 <i className="isax isax-star-1"></i>
                                 <span>Yêu Thích</span>
                             </Link>
                         </li>
                         <li className={isActive('dependent') ? 'active' : ''}>
-                            <Link to="/user-profile?tab=dependent">
+                            <Link to="/user/profile?tab=dependent">
                                 <i className="isax isax-user-octagon"></i>
                                 <span>Lịch Sử Khám Bệnh</span>
                             </Link>
                         </li>
 
                         <li className={isActive('wallet') ? 'active' : ''}>
-                            <Link to="/user-profile?tab=wallet">
+                            <Link to="/user/profile?tab=wallet">
                                 <i className="isax isax-wallet-2"></i>
                                 <span>Số dư tài khoản</span>
                             </Link>
                         </li>
                         <li className={isActive('invoices') ? 'active' : ''}>
-                            <Link to="/user-profile?tab=invoices">
+                            <Link to="/user/profile?tab=invoices">
                                 <i className="isax isax-document-text"></i>
                                 <span>Hóa đơn</span>
                             </Link>
                         </li>
                         <li className={isActive('chat') ? 'active' : ''}>
-                            <Link to="/user-profile?tab=chat">
+                            <Link to="/user/profile?tab=chat">
                                 <i className="isax isax-messages-1"></i>
                                 <span>Tin nhắn</span>
                                 <small className="unread-msg">7</small>
@@ -94,7 +94,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                         </li>
 
                         <li className={isActive('settings') ? 'active' : ''}>
-                            <Link to="/user-profile?tab=settings">
+                            <Link to="/user/profile?tab=settings">
                                 <i className="isax isax-setting-2"></i>
                                 <span>Cài đặt</span>
                             </Link>
