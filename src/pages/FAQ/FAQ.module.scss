@@ -1,0 +1,127 @@
+.faq {
+    min-height: 100vh;
+
+    // Accordion item card styles
+    & :global(.accordion-item) {
+        border-radius: 10px;
+        border: 1px solid #e6e8ee;
+        background: #f9f9f9;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+        transition:
+            box-shadow 220ms ease,
+            transform 220ms ease,
+            border-color 220ms ease;
+        margin: 0 0 24px;
+        overflow: hidden; // ensure inner elements respect rounded corners
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(16, 24, 40, 0.08);
+            border-color: rgba(16, 24, 40, 0.12);
+        }
+    }
+
+    // Normalize Bootstrap's first/last item tweaks to keep borders consistent
+    & :global(.accordion-item:first-of-type),
+    & :global(.accordion-item:last-of-type) {
+        border-radius: 10px !important;
+    }
+
+    // Restore top border that Bootstrap removes on subsequent items
+    & :global(.accordion-item:not(:first-of-type)) {
+        border-top: 1px solid var(--bs-accordion-border-color, rgba(16, 24, 40, 0.06)) !important;
+    }
+
+    // Header button behavior: keep transparent AND KEEP default caret (+/-)
+    & :global(.accordion-button) {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background-color: transparent !important;
+        color: #0f2a44;
+        border-radius: 0; // outer card controls rounding for symmetry
+        box-shadow: none !important;
+        padding: 3px 10px;
+        width: 100%;
+        box-sizing: border-box;
+
+        &:hover {
+            background-color: transparent !important;
+        }
+
+        &:focus {
+            box-shadow: none !important;
+        }
+
+        &:not(.collapsed) {
+            background-color: transparent !important;
+            color: #0f2a44;
+        }
+    }
+
+    // Smooth collapse animation
+    & :global(.accordion-collapse) {
+        overflow: hidden;
+        transition:
+            max-height 280ms ease,
+            opacity 220ms ease;
+        will-change: max-height, opacity;
+
+        &.collapse {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        &.show {
+            max-height: 800px;
+            opacity: 1;
+        }
+    }
+
+    & :global(.accordion-body) {
+        padding: 0 20px 16px 20px;
+    }
+
+    & :global(.accordion-content) {
+        opacity: 0;
+        transform: translateY(-4px);
+        transition:
+            opacity 220ms ease,
+            transform 220ms ease;
+    }
+
+    & :global(.accordion-collapse.show) :global(.accordion-content) {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    // Contact section styles
+    .contact-section {
+        margin-top: 80px;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        text-align: center;
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a365d;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #4a5568;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    }
+}
