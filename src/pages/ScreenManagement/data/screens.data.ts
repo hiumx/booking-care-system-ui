@@ -107,6 +107,17 @@ export const SCREENS_DATA: Screen[] = [
         icon: 'feather-calendar',
         tags: ['appointments', 'patient', 'booking'],
     },
+    {
+        id: 'patient-invoices',
+        name: 'Patient Invoices',
+        path: `${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=invoices`,
+        category: ScreenCategory.USER_PROFILE,
+        description: 'View and manage patient invoices',
+        status: ScreenStatus.COMPLETED,
+        component: 'Invoices',
+        icon: 'feather-calendar',
+        tags: ['invoices', 'patient', 'booking'],
+    },
 
     // Doctor Pages
     {
