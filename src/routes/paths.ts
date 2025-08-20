@@ -24,6 +24,12 @@ export const PATHS = {
         SETTINGS: 'settings',
     },
 
+    // Specialties paths
+    SPECIALTIES: {
+        ROOT: '/specialties',
+        PROFILE: 'profile',
+    },
+
     // Dashboard paths
     DASHBOARD: {
         ROOT: '/dashboard',

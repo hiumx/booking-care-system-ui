@@ -9,6 +9,7 @@ import Login from '@/pages/Authentication/Login';
 import Register from '@/pages/Authentication/Register';
 import ForgotPassword from '@/pages/Authentication/ForgotPassword';
 import ResetPassword from '@/pages/Authentication/ResetPassword';
+import SpecialtiesList from '@/pages/Specialties/SpecialtiesList';
 import { PATHS } from './paths';
 import FAQ from '@/pages/FAQ';
 
@@ -54,6 +55,11 @@ const routes: RouteObject[] = [
     {
         path: PATHS.USER.ROOT,
         children: [{ path: PATHS.USER.PROFILE, element: <UserProfile /> }],
+    },
+    {
+        path: PATHS.SPECIALTIES.ROOT,
+        element: <SpecialtiesList />,
+        // children: [{ path: PATHS.SPECIALTIES.PROFILE, element: <SpecialtiesProfile /> }],
     },
     {
         path: PATHS.CHAT,
