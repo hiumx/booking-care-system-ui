@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import styles from './Login.module.scss';
 import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
 import { PATHS } from '~/routes/paths';
+import Button from '~/components/Button';
 interface LoginProps {
     onSubmit?: (credentials: {
         method: 'email' | 'phone';
@@ -160,9 +161,7 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
 
                 {/* Submit */}
                 <div className="mb-3">
-                    <button className="btn btn-primary-gradient w-100" type="submit">
-                        Đăng nhập
-                    </button>
+                    <Button text="Đăng nhập" type="submit" className="w-100" />
                 </div>
 
                 {/* Social login */}
