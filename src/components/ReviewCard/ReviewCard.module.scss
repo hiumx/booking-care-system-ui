@@ -1,0 +1,75 @@
+// ReviewCard specific styles
+.reviewCard {
+    .replyButton {
+        color: #1e293b;
+        font-size: 16px;
+        margin-top: 8px;
+        padding: 4px 0;
+        transition: color 0.2s ease;
+        line-height: 1.5;
+        &:hover {
+            color: #0056b3;
+            text-decoration: none;
+        }
+
+        i {
+            font-size: 12px;
+        }
+    }
+
+    .repliesSection {
+        margin-top: 15px;
+        padding-left: 20px;
+        border-left: 2px solid #e9ecef;
+
+        .repliedInfo {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            .replyButton {
+                font-size: 13px;
+                margin-top: 6px;
+            }
+        }
+    }
+
+    .replyFormContainer {
+        margin-top: 12px;
+        animation: slideDown 0.3s ease-out;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .reviewCard {
+        .repliesSection {
+            padding-left: 15px;
+            border-left-width: 1px;
+
+            .repliedInfo {
+                padding: 8px;
+            }
+        }
+
+        .replyButton {
+            font-size: 13px;
+        }
+    }
+}

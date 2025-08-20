@@ -4,9 +4,11 @@ import clsx from 'clsx';
 import styles from '@/pages/Doctor/DoctorProfile/DoctorProfile.module.scss';
 import Pagination from '@/components/Pagination';
 import ReviewCard from '@/components/ReviewCard';
+import Button from '@/components/Button';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import DoctorAvailability from './components/DoctorAvailability';
+import WriteReview from './components/WriteReview';
 
 // Import images for DoctorProfileCard
 import doctorImg from '@/assets/img/doctors/doc-profile-02.jpg';
@@ -299,6 +301,8 @@ const DoctorProfile: React.FC = () => {
     const totalPages = Math.ceil(reviews.length / pageSize);
     const displayedReviews = reviews.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
+    const [showWriteReview, setShowWriteReview] = useState(false);
+
     // Calculate average rating
     const averageRating =
         reviews.length > 0
@@ -324,6 +328,26 @@ const DoctorProfile: React.FC = () => {
         prices.length > 0
             ? `${Math.min(...prices).toLocaleString('vi-VN')}đ - ${Math.max(...prices).toLocaleString('vi-VN')}đ`
             : 'N/A';
+
+    // Handle review submission
+    const handleSubmitReview = (reviewData: {
+        rating: number;
+        description: string;
+        termsAccepted: boolean;
+    }) => {
+        console.log('New review submitted:', reviewData);
+        // Trong thực tế, sẽ gọi API để submit review
+        alert('Đánh giá của bạn đã được gửi thành công!');
+        setShowWriteReview(false);
+    };
+
+    // Handle reply submission
+    const handleReplySubmission = (replyData: { reviewId: number; text: string }) => {
+        console.log('New reply submitted:', replyData);
+        // Trong thực tế, sẽ gọi API để submit reply
+        alert('Phản hồi của bạn đã được gửi thành công!');
+        // Có thể refresh reviews hoặc update state local
+    };
 
     const breadcrumbData = {
         items: [
@@ -725,11 +749,39 @@ const DoctorProfile: React.FC = () => {
                                     <DoctorAvailability />
                                 </div>
                             </div>
+                            {/* Write Review  */}
                             <div ref={reviewRef}>
                                 <div className="doc-information-details" id="review">
                                     <div className="detail-title">
                                         <h4>Đánh giá ({reviews.length})</h4>
                                     </div>
+
+                                    {/* Write Review Section */}
+                                    <div className="write-review-section mb-4">
+                                        {!showWriteReview ? (
+                                            <Button
+                                                text="Viết đánh giá"
+                                                type="button"
+                                                className="btn-primary"
+                                                onClick={() => setShowWriteReview(true)}
+                                            />
+                                        ) : (
+                                            <WriteReview
+                                                doctorName={`${mockDoctor.last_name} ${mockDoctor.first_name}`}
+                                                onSubmitReview={handleSubmitReview}
+                                            />
+                                        )}
+
+                                        {showWriteReview && (
+                                            <Button
+                                                text="Hủy"
+                                                type="button"
+                                                className={clsx('mt-2', styles.cancelButton)}
+                                                onClick={() => setShowWriteReview(false)}
+                                            />
+                                        )}
+                                    </div>
+
                                     {displayedReviews.map((review, index) => (
                                         <ReviewCard
                                             key={review.id}
@@ -749,6 +801,7 @@ const DoctorProfile: React.FC = () => {
                                                 })),
                                             }}
                                             isLast={index === displayedReviews.length - 1}
+                                            onReply={handleReplySubmission}
                                         />
                                     ))}
                                     <Pagination

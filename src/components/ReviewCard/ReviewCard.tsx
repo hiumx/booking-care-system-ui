@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import styles from '@/pages/Doctor/DoctorProfile/DoctorProfile.module.scss';
+import reviewStyles from './ReviewCard.module.scss';
+import ReplyForm from './components/ReplyForm';
 
 interface Reply {
     id: number;
@@ -26,6 +28,7 @@ interface ReviewCardProps {
     isLast?: boolean;
     showReplyLink?: boolean;
     maxTextLength?: number;
+    onReply?: (replyData: { reviewId: number; text: string }) => void;
 }
 
 const ReviewCard: React.FC<ReviewCardProps> = ({
@@ -33,7 +36,10 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
     isLast = false,
     showReplyLink = true,
     maxTextLength = 200,
+    onReply,
 }) => {
+    const [showReplyForm, setShowReplyForm] = useState<boolean>(false);
+    const [replyToReplyId, setReplyToReplyId] = useState<number | null>(null);
     // Handle missing or invalid rating
     const displayRating =
         review.rating && review.rating >= 0 && review.rating <= 5 ? review.rating : 0;
@@ -58,9 +64,36 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                 }
               : null;
 
+    // Handle reply submission
+    const handleReplySubmit = (replyData: { reviewId: number; text: string }) => {
+        if (onReply) {
+            onReply(replyData);
+        }
+        setShowReplyForm(false);
+        setReplyToReplyId(null);
+    };
+
+    // Handle reply to main review
+    const handleReplyToReview = () => {
+        setShowReplyForm(true);
+        setReplyToReplyId(null);
+    };
+
+    // Handle reply to a specific reply
+    const handleReplyToReply = (replyId: number) => {
+        setReplyToReplyId(replyId);
+        setShowReplyForm(true);
+    };
+
+    // Handle cancel reply
+    const handleCancelReply = () => {
+        setShowReplyForm(false);
+        setReplyToReplyId(null);
+    };
+
     return (
         <div
-            className={clsx('doc-review-card', { 'mb-0': isLast })}
+            className={clsx('doc-review-card', reviewStyles.reviewCard, { 'mb-0': isLast })}
             role="article"
             aria-label={`Review by ${review.name}`}
         >
@@ -129,17 +162,44 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
             {showReplyLink && (
                 <Link
                     to="#"
-                    className={clsx(styles.link, 'reply', 'd-flex', 'align-items-center')}
-                    onClick={(e) => e.preventDefault()}
+                    className={clsx(
+                        styles.link,
+                        'reply',
+                        'd-flex',
+                        'align-items-center',
+                        reviewStyles.replyButton
+                    )}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        handleReplyToReview();
+                    }}
                     aria-label="Reply to this review"
                 >
-                    <i className="fa-solid fa-reply me-2" aria-hidden="true"></i>Reply
+                    <i className="fa-solid fa-reply me-2" aria-hidden="true"></i>Phản hồi
                 </Link>
             )}
+
+            {/* Reply Form for main review */}
+            {showReplyForm && replyToReplyId === null && (
+                <div className={reviewStyles.replyFormContainer}>
+                    <ReplyForm
+                        reviewId={review.id}
+                        onSubmitReply={handleReplySubmit}
+                        onCancel={handleCancelReply}
+                        placeholder="Viết phản hồi cho đánh giá này..."
+                    />
+                </div>
+            )}
             {review.replies && review.replies.length > 0 && (
-                <div className="replies-section" aria-label="Replies to review">
+                <div
+                    className={clsx('replies-section', reviewStyles.repliesSection)}
+                    aria-label="Replies to review"
+                >
                     {review.replies.map((reply) => (
-                        <div key={reply.id} className="replied-info">
+                        <div
+                            key={reply.id}
+                            className={clsx('replied-info', reviewStyles.repliedInfo)}
+                        >
                             <div className="user-info-review">
                                 <div className="reviewer-img">
                                     <Link
@@ -176,14 +236,30 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                                         styles.link,
                                         'reply',
                                         'd-flex',
-                                        'align-items-center'
+                                        'align-items-center',
+                                        reviewStyles.replyButton
                                     )}
-                                    onClick={(e) => e.preventDefault()}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleReplyToReply(reply.id);
+                                    }}
                                     aria-label="Reply to this reply"
                                 >
                                     <i className="fa-solid fa-reply me-2" aria-hidden="true"></i>
-                                    Reply
+                                    Phản hồi
                                 </Link>
+                            )}
+
+                            {/* Reply Form for specific reply */}
+                            {showReplyForm && replyToReplyId === reply.id && (
+                                <div className={reviewStyles.replyFormContainer}>
+                                    <ReplyForm
+                                        reviewId={review.id}
+                                        onSubmitReply={handleReplySubmit}
+                                        onCancel={handleCancelReply}
+                                        placeholder={`Phản hồi cho ${reply.name}...`}
+                                    />
+                                </div>
                             )}
                         </div>
                     ))}
