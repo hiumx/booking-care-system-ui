@@ -5,7 +5,7 @@ import ChatMessages from './components/ChatMessages';
 import styles from './Chat.module.scss';
 const Chat = () => {
     return (
-        <MainLayout>
+        <MainLayout hasFooter={false}>
             <div className={clsx(styles.hideScrollbar, 'main-chat-blk')}>
                 <div className="main-wrapper">
                     <div className={clsx(styles.chatPageWrapper, 'page-wrapper chat-page-wrapper')}>
