@@ -7,6 +7,7 @@ export const PATHS = {
     ABOUT: '/about',
     DEMO: '/demo',
     FAQ: '/faq',
+    SUBSCRIPTION_PLANS: '/subscription-plans',
 
     // Authentication paths
     LOGIN: '/login',

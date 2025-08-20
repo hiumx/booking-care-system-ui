@@ -10,6 +10,7 @@ import Register from '@/pages/Authentication/Register';
 import ForgotPassword from '@/pages/Authentication/ForgotPassword';
 import ResetPassword from '@/pages/Authentication/ResetPassword';
 import SpecialtiesList from '@/pages/Specialties/SpecialtiesList';
+import SubscriptionPlans from '@/pages/SubscriptionPlans';
 import { PATHS } from './paths';
 import FAQ from '@/pages/FAQ';
 
@@ -25,6 +26,10 @@ const routes: RouteObject[] = [
     {
         path: PATHS.FAQ,
         element: <FAQ />,
+    },
+    {
+        path: PATHS.SUBSCRIPTION_PLANS,
+        element: <SubscriptionPlans />,
     },
 
     // Authentication paths
