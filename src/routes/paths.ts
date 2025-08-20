@@ -13,7 +13,7 @@ export const PATHS = {
     REGISTER: '/register',
     FORGOT_PASSWORD: '/forgot-password',
     RESET_PASSWORD: '/reset-password',
-
+    CHAT: '/chat',
     // Management paths
     SCREEN_MANAGEMENT: '/screen-management',
 
