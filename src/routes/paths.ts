@@ -6,7 +6,6 @@ export const PATHS = {
     HOME: '/',
     ABOUT: '/about',
     DEMO: '/demo',
-    MEDICAL_FACILITY: 'medical-facility',
 
     // Authentication paths
     LOGIN: '/login',
@@ -22,6 +21,12 @@ export const PATHS = {
         ROOT: '/user',
         PROFILE: 'profile',
         SETTINGS: 'settings',
+    },
+
+    // Medical Facility paths
+    MEDICAL_FACILITY: {
+        ROOT: '/medical-facility',
+        PROFILE: 'profile',
     },
 
     // Dashboard paths

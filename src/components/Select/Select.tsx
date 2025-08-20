@@ -6,6 +6,7 @@ import styles from './Select.module.scss';
 interface SelectItem {
     label: string;
     value: string;
+    disabled?: boolean;
 }
 
 interface SelectProps {
@@ -20,12 +21,16 @@ interface SelectProps {
 const Select: React.FC<SelectProps> = ({ title, items, value, onChange, className, image }) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    // Get the selected item's label or use the title as fallback
-    const selectedLabel = items.find((item) => item.value === value)?.label || title || 'Select';
+    // Get the selected item's label or use the title as fallback when value is empty
+    const selectedLabel = value
+        ? items.find((item) => item.value === value)?.label || title || 'Select'
+        : title || 'Select';
 
-    const handleItemClick = (value: string) => {
-        onChange(value);
-        setIsOpen(false); // Close dropdown after selection
+    const handleItemClick = (item: SelectItem) => {
+        if (!item.disabled) {
+            onChange(item.value);
+            setIsOpen(false); // Close dropdown after selection
+        }
     };
 
     return (
@@ -33,7 +38,9 @@ const Select: React.FC<SelectProps> = ({ title, items, value, onChange, classNam
             <div className={clsx(styles['categorie-dropdown'], { [styles.show]: isOpen })}>
                 <Link
                     to="#"
-                    className={clsx(styles['dropdown-toggle'], styles['customLink'])}
+                    className={clsx(styles['dropdown-toggle'], styles['customLink'], {
+                        [styles.placeholder]: !value,
+                    })}
                     onClick={(e) => {
                         e.preventDefault();
                         setIsOpen(!isOpen);
@@ -47,11 +54,16 @@ const Select: React.FC<SelectProps> = ({ title, items, value, onChange, classNam
                     {items.map((item, index) => (
                         <li key={index}>
                             <Link
-                                className={clsx(styles['dropdown-item'], styles['customLink'])}
+                                className={clsx(
+                                    styles['dropdown-item'],
+                                    styles['customLink'],
+                                    { [styles.disabled]: item.disabled },
+                                    { [styles.selected]: item.value === value }
+                                )}
                                 to="#"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    handleItemClick(item.value);
+                                    handleItemClick(item);
                                 }}
                             >
                                 {item.label}
