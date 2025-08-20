@@ -117,18 +117,6 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview })
                     </div>
                 </div>
 
-                {/* <div className="mb-3">
-                    <label className="mb-2">Tiêu đề đánh giá</label>
-                    <input
-                        className="form-control"
-                        type="text"
-                        placeholder="Nếu bạn có thể nói trong một câu, bạn sẽ nói gì?"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        maxLength={100}
-                    />
-                </div> */}
-
                 <div className="mb-3">
                     <label className="mb-2">Nội dung đánh giá</label>
                     <textarea
@@ -152,7 +140,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview })
 
                 <div className="mb-3">
                     <div className="terms-accept">
-                        <div className="custom-checkbox">
+                        <div className={clsx(styles.termsAccept, 'custom-checkbox')}>
                             <input
                                 type="checkbox"
                                 id="terms_accept"

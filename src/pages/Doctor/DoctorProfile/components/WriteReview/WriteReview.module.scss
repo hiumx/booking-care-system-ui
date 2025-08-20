@@ -130,6 +130,14 @@
     }
 }
 
+.termsAccept {
+    display: flex;
+    input {
+        margin-right: 8px;
+        cursor: pointer;
+    }
+}
+
 // Responsive
 @media (max-width: 768px) {
     .writeReview {
