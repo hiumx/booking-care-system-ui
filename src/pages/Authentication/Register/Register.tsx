@@ -10,6 +10,7 @@ import clsx from 'clsx';
 import styles from './Register.module.scss';
 import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
 import { PATHS } from '~/routes/paths';
+import Button from '~/components/Button';
 
 type Step = 0 | 1 | 2 | 3;
 
@@ -436,17 +437,12 @@ const Register: React.FC = () => {
                             </label>
                         </div>
 
-                        <button
+                        <Button
+                            text="Gửi mã OTP"
                             type="submit"
-                            disabled={!canSendOtp}
-                            className={clsx(
-                                'btn w-100 fw-bold',
-                                authStyles.submitBtn,
-                                canSendOtp ? 'btn-primary-gradient' : 'btn-secondary disabled'
-                            )}
-                        >
-                            Gửi mã OTP
-                        </button>
+                            isDisabled={!canSendOtp}
+                            className="w-100 fw-bold"
+                        />
                     </form>
                     {/* Social login */}
                     <div className="login-or">
@@ -775,18 +771,12 @@ const Register: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                        <button
+                        <Button
+                            text="Tạo mật khẩu"
                             type="submit"
-                            disabled={!canCreatePassword}
-                            className={clsx(
-                                'btn w-100 fw-medium',
-                                canCreatePassword
-                                    ? 'btn-primary-gradient'
-                                    : 'btn-secondary disabled'
-                            )}
-                        >
-                            Tạo mật khẩu
-                        </button>
+                            isDisabled={!canCreatePassword}
+                            className="w-100 fw-medium"
+                        />
                     </form>
                 </div>
             )}

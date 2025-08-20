@@ -4,6 +4,7 @@ import AuthLayout from '@/layouts/AuthLayout';
 import { CheckCircle, Shield } from 'lucide-react';
 import clsx from 'clsx';
 import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
+import Button from '~/components/Button';
 
 interface ResetPasswordProps {
     onSubmit?: (currentPassword: string, newPassword: string) => void;
@@ -363,17 +364,12 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
 
                 {/* Submit Button */}
                 <div className="mb-1 mt-3">
-                    <button
+                    <Button
+                        text="Đặt lại mật khẩu"
                         type="submit"
-                        disabled={!canSubmit}
-                        className={clsx(
-                            'btn w-100 fw-bold',
-                            authStyles.submitBtn,
-                            canSubmit ? 'btn-primary-gradient' : 'btn-secondary disabled'
-                        )}
-                    >
-                        Đặt lại mật khẩu
-                    </button>
+                        isDisabled={!canSubmit}
+                        className="w-100 fw-bold"
+                    />
                 </div>
             </form>
         </AuthLayout>
