@@ -14,9 +14,10 @@
         padding: 4px 0;
         transition: color 0.2s ease;
         line-height: 1.5;
+
         &:hover {
             color: #0056b3;
-            text-decoration: none;
+            font-weight: 400;
         }
 
         i {

@@ -1,13 +1,12 @@
 import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
-import styles from '@/pages/Doctor/DoctorProfile/DoctorProfile.module.scss';
+import styles from './DoctorProfile.module.scss';
 import Pagination from '@/components/Pagination';
-import ReviewCard from '@/components/ReviewCard';
+import ReviewCard from '~/pages/Doctor/DoctorProfile/components/ReviewCard';
 import Button from '@/components/Button';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
-import DoctorAvailability from './components/DoctorAvailability';
 import WriteReview from './components/WriteReview';
 
 // Import images for DoctorProfileCard
@@ -26,6 +25,7 @@ import clinicImg1 from '@/assets/img/clinic/clinic-11.jpg';
 
 // Icon CSS
 import '@/assets/css/feather.css';
+import DoctorAvailability from './components/DoctorAvailability';
 
 // Mock data for Doctor
 const mockDoctor = {
@@ -449,17 +449,17 @@ const DoctorProfile: React.FC = () => {
                                             </div>
                                             <ul className="sub-links">
                                                 <li>
-                                                    <Link to="#" className={styles.link}>
+                                                    <Link to="#">
                                                         <i className="feather-heart"></i>
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link to="#" className={styles.link}>
+                                                    <Link to="#">
                                                         <i className="feather-share-2"></i>
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link to="#" className={styles.link}>
+                                                    <Link to="#">
                                                         <i className="feather-link"></i>
                                                     </Link>
                                                 </li>
@@ -499,14 +499,14 @@ const DoctorProfile: React.FC = () => {
                                                 <span>{averageRating}</span>
                                                 <Link
                                                     to="#"
-                                                    className={`${styles.link} d-inline-block average-rating`}
+                                                    className="d-inline-block average-rating"
                                                 >
                                                     {reviews.length} Đánh giá
                                                 </Link>
                                             </div>
                                             <ul className="contact-doctors">
                                                 <li>
-                                                    <Link to="/chat-doctor" className={styles.link}>
+                                                    <Link to="/chat-doctor">
                                                         <span>
                                                             <img
                                                                 src={deviceMessageIcon}
@@ -517,7 +517,7 @@ const DoctorProfile: React.FC = () => {
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link to="/voice-call" className={styles.link}>
+                                                    <Link to="/voice-call">
                                                         <span className="bg-violet">
                                                             <i className="feather-phone-forwarded"></i>
                                                         </span>
@@ -525,7 +525,7 @@ const DoctorProfile: React.FC = () => {
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link to="/video-call" className={styles.link}>
+                                                    <Link to="/video-call">
                                                         <span className="bg-indigo">
                                                             <i className="fa-solid fa-video"></i>
                                                         </span>
@@ -557,7 +557,7 @@ const DoctorProfile: React.FC = () => {
                                         <span>Giá: {priceRange}</span> mỗi lượt khám
                                     </p>
                                     <div className="clinic-booking">
-                                        <Link className={`${styles.link} apt-btn`} to="/booking">
+                                        <Link className="apt-btn" to="/booking">
                                             Đặt lịch hẹn
                                         </Link>
                                     </div>
@@ -566,11 +566,10 @@ const DoctorProfile: React.FC = () => {
                         </div>
                     </div>
                     <div className="doctors-detailed-info">
-                        <ul className={clsx('information-title-list', styles['margin-distance'])}>
+                        <ul className={clsx('information-title-list', styles.marginLeftZero)}>
                             <li className="active">
                                 <Link
                                     to="#"
-                                    className={styles.link}
                                     onClick={(e) => {
                                         e.preventDefault();
                                         scrollToSection(bioRef.current);
@@ -582,7 +581,6 @@ const DoctorProfile: React.FC = () => {
                             <li>
                                 <Link
                                     to="#"
-                                    className={styles.link}
                                     onClick={(e) => {
                                         e.preventDefault();
                                         scrollToSection(expRef.current);
@@ -594,7 +592,6 @@ const DoctorProfile: React.FC = () => {
                             <li>
                                 <Link
                                     to="#"
-                                    className={styles.link}
                                     onClick={(e) => {
                                         e.preventDefault();
                                         scrollToSection(specialityRef.current);
@@ -606,7 +603,6 @@ const DoctorProfile: React.FC = () => {
                             <li>
                                 <Link
                                     to="#"
-                                    className={styles.link}
                                     onClick={(e) => {
                                         e.preventDefault();
                                         scrollToSection(clinicRef.current);
@@ -618,7 +614,6 @@ const DoctorProfile: React.FC = () => {
                             <li>
                                 <Link
                                     to="#"
-                                    className={styles.link}
                                     onClick={(e) => {
                                         e.preventDefault();
                                         scrollToSection(hoursRef.current);
@@ -630,7 +625,6 @@ const DoctorProfile: React.FC = () => {
                             <li>
                                 <Link
                                     to="#"
-                                    className={styles.link}
                                     onClick={(e) => {
                                         e.preventDefault();
                                         scrollToSection(reviewRef.current);
@@ -640,7 +634,7 @@ const DoctorProfile: React.FC = () => {
                                 </Link>
                             </li>
                         </ul>
-                        <div className="doc-information-details">
+                        <div>
                             <div ref={bioRef}>
                                 <div className="doc-information-details bio-detail" id="doc_bio">
                                     <div className="detail-title">
@@ -650,12 +644,7 @@ const DoctorProfile: React.FC = () => {
                                     {isLongText && (
                                         <Link
                                             to="#"
-                                            className={clsx(
-                                                'show-more',
-                                                'd-flex',
-                                                'align-items-center',
-                                                styles.link
-                                            )}
+                                            className="show-more d-flex align-items-center"
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 setExpanded((prev) => !prev);
@@ -708,13 +697,9 @@ const DoctorProfile: React.FC = () => {
                                     <div className="detail-title">
                                         <h4>Chuyên khoa</h4>
                                     </div>
-                                    <ul
-                                        className={clsx('special-links', styles['margin-distance'])}
-                                    >
+                                    <ul className={clsx('special-links', styles.marginLeftZero)}>
                                         <li>
-                                            <Link to="#" className={styles.link}>
-                                                {mockSpecialty.name}
-                                            </Link>
+                                            <Link to="#">{mockSpecialty.name}</Link>
                                         </li>
                                     </ul>
                                 </div>
@@ -793,7 +778,7 @@ const DoctorProfile: React.FC = () => {
                             </div>
                             {/* Write Review  */}
                             <div ref={reviewRef}>
-                                <div className="doc-information-details" id="review">
+                                <div id="review">
                                     <div className="detail-title">
                                         <h4>Đánh giá ({reviews.length})</h4>
                                     </div>

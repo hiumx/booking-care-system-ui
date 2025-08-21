@@ -1,7 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
+import styles from './Pagination.module.scss';
 
+/**
+ * Props for the Pagination component.
+ *
+ * @property {number} currentPage - The currently active page number (1-based index).
+ * @property {number} totalPages - The total number of pages available.
+ * @property {(page: number) => void} onPageChange - Callback function invoked when the page is changed. Receives the new page number as an argument.
+ * @property {boolean} [showPrevNext] - Optional. Whether to display "Previous" and "Next" navigation buttons. Defaults to false if not provided.
+ * @property {number} [maxVisiblePages] - Optional. The maximum number of page buttons to display at once. If not specified, all pages are shown.
+ */
 interface PaginationProps {
     currentPage: number;
     totalPages: number;
@@ -50,18 +60,20 @@ const Pagination: React.FC<PaginationProps> = ({
 
     return (
         <div className="pagination dashboard-pagination">
-            <ul>
+            <ul className={styles.paginationList}>
                 {showPrevNext && (
                     <li>
                         <Link
                             to="#"
-                            className={clsx('page-link prev-link', { disabled: currentPage === 1 })}
+                            className={clsx(styles.pageLink, styles.prevLink, 'prev-link', {
+                                [styles.disabled]: currentPage === 1,
+                            })}
                             onClick={(e) => {
                                 e.preventDefault();
                                 if (currentPage > 1) handlePageChange(currentPage - 1);
                             }}
                         >
-                            <span className="icon-container">
+                            <span className={styles.iconContainer}>
                                 <i className="fa-solid fa-chevron-left"></i>
                             </span>
                         </Link>
@@ -72,10 +84,10 @@ const Pagination: React.FC<PaginationProps> = ({
                     <li>
                         <Link
                             to="#"
-                            className="page-link"
+                            className={styles.pageLink}
                             onClick={(e) => {
-                                e.preventDefault();
                                 handlePageChange(1);
+                                e.preventDefault();
                             }}
                         >
                             1
@@ -84,7 +96,7 @@ const Pagination: React.FC<PaginationProps> = ({
                 )}
                 {currentPage > Math.floor(maxVisiblePages / 2) + 2 && (
                     <li>
-                        <span className="page-link ellipsis">...</span>
+                        <span className={clsx(styles.pageLink, styles.ellipsis)}>...</span>
                     </li>
                 )}
 
@@ -92,7 +104,9 @@ const Pagination: React.FC<PaginationProps> = ({
                     <li key={page}>
                         <Link
                             to="#"
-                            className={clsx('page-link', { active: currentPage === page })}
+                            className={clsx(styles.pageLink, {
+                                [styles.active]: currentPage === page,
+                            })}
                             onClick={(e) => {
                                 e.preventDefault();
                                 handlePageChange(page);
@@ -105,7 +119,7 @@ const Pagination: React.FC<PaginationProps> = ({
 
                 {currentPage < totalPages - Math.floor(maxVisiblePages / 2) && (
                     <li>
-                        <span className="page-link ellipsis">...</span>
+                        <span className={clsx(styles.pageLink, styles.ellipsis)}>...</span>
                     </li>
                 )}
                 {currentPage < totalPages - Math.floor(maxVisiblePages / 2) + 1 &&
@@ -113,7 +127,7 @@ const Pagination: React.FC<PaginationProps> = ({
                         <li>
                             <Link
                                 to="#"
-                                className="page-link"
+                                className={styles.pageLink}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     handlePageChange(totalPages);
@@ -128,15 +142,15 @@ const Pagination: React.FC<PaginationProps> = ({
                     <li>
                         <Link
                             to="#"
-                            className={clsx('page-link next-link', {
-                                disabled: currentPage === totalPages,
+                            className={clsx(styles.pageLink, styles.nextLink, {
+                                [styles.disabled]: currentPage === totalPages,
                             })}
                             onClick={(e) => {
                                 e.preventDefault();
                                 if (currentPage < totalPages) handlePageChange(currentPage + 1);
                             }}
                         >
-                            <span className="icon-container">
+                            <span className={styles.iconContainer}>
                                 <i className="fa-solid fa-chevron-right"></i>
                             </span>
                         </Link>

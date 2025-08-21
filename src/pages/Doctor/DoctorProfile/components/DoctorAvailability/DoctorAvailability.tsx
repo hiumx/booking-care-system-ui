@@ -5,7 +5,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { Popper } from '@mui/material';
-import styles from '../DoctorProfile.module.scss';
+import styles from './DoctorAvailability.module.scss';
 
 interface AppointmentTime {
     id: number;
@@ -322,31 +322,14 @@ const DoctorAvailability: React.FC = () => {
 
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <div
-                className={clsx(styles['tab-pane'], 'fade', 'show', 'active')}
-                id="general-availability"
-            >
-                <div className={clsx(styles['custom-card'], 'custom-card')}>
-                    <div className={clsx(styles['card-body'], 'card-body')}>
-                        <div
-                            className={clsx(
-                                styles['card-header'],
-                                'card-header',
-                                'd-flex',
-                                'justify-content-between',
-                                'align-items-center'
-                            )}
-                        >
-                            <h3 className={clsx(styles['header-title'], 'header-title')}>
-                                Chọn Khung Giờ Có Sẵn
-                            </h3>
-                            <div className={styles['date-picker']}>
+            <div className="tab-pane fade show active" id="general-availability">
+                <div className="custom-card">
+                    <div className="card-body">
+                        <div className="card-header d-flex justify-content-between align-items-center">
+                            <h3 className="header-title">Chọn Khung Giờ Có Sẵn</h3>
+                            <div className="date-picker">
                                 <i
-                                    className={clsx(
-                                        'isax',
-                                        'isax-calendar-tick',
-                                        styles['calendar-icon']
-                                    )}
+                                    className="isax isax-calendar-tick calendar-icon"
                                     onClick={() => setShowDatePicker(!showDatePicker)}
                                     ref={anchorRef}
                                 />
@@ -437,16 +420,14 @@ const DoctorAvailability: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className={clsx(styles['available-tab'], 'available-tab')}>
-                            <label className={clsx(styles['form-label'], 'form-label')}>
-                                Chọn ngày có sẵn
-                            </label>
-                            <ul className={clsx(styles.nav, 'nav')}>
+                        <div className="available-tab">
+                            <label className="form-label">Chọn ngày có sẵn</label>
+                            <ul className="nav">
                                 {next7Days.map((day) => (
                                     <li key={day.id}>
                                         <Link
                                             to="#"
-                                            className={clsx(styles['nav-link'], 'nav-link', {
+                                            className={clsx(styles.navLink, {
                                                 [styles.active]: activeTab === day.id,
                                             })}
                                             onClick={(e) => {
@@ -463,26 +444,29 @@ const DoctorAvailability: React.FC = () => {
                             </ul>
                         </div>
 
-                        <div className={clsx(styles['tab-content'], 'tab-content', 'pt-0')}>
+                        <div className="tab-content pt-0">
                             {next7Days.map((day) => (
                                 <div
                                     key={day.id}
-                                    className={clsx(styles['tab-pane'], 'tab-pane', {
+                                    className={clsx('tab-pane', {
                                         'active show': activeTab === day.id,
                                         fade: activeTab !== day.id,
                                     })}
                                     id={day.id}
                                 >
-                                    <div className={clsx(styles['slot-box'], 'slot-box')}>
-                                        <div className={clsx(styles['slot-header'], 'slot-header')}>
+                                    <div className="slot-box">
+                                        <div className="slot-header">
                                             <h5>
                                                 {getVietnameseDay(day.date)}, {day.date.getDate()}/
                                                 {day.date.getMonth() + 1}
                                             </h5>
                                         </div>
-                                        <div className={clsx(styles['slot-body'], 'slot-body')}>
+                                        <div className="slot-body">
                                             <ul
-                                                className={clsx(styles['time-slots'], 'time-slots')}
+                                                className={clsx(
+                                                    styles.paddingLeftZero,
+                                                    'time-slots'
+                                                )}
                                             >
                                                 {getSlotsForDate(day.date).length > 0 ? (
                                                     getSlotsForDate(day.date).map((slot, index) => (
