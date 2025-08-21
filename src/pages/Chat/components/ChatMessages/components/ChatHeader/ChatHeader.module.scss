@@ -1,0 +1,23 @@
+.dropdownMenu {
+    position: absolute;
+
+    inset: 0px 0px auto auto;
+    transform: translate(4px, 40px);
+}
+
+.chatSearchBtn {
+    padding: 4px 8px !important;
+    border-radius: 50% !important;
+    border: none !important;
+}
+.btnMenu {
+    width: 30px;
+    height: 30px;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    border: none !important;
+}
+.chatSearchBtn:hover,
+.btnMenu:hover {
+    border: none !important;
+}

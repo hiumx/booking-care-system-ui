@@ -18,7 +18,7 @@ export const PATHS = {
     REGISTER: '/register',
     FORGOT_PASSWORD: '/forgot-password',
     RESET_PASSWORD: '/reset-password',
-
+    CHAT: '/chat',
     // Management paths
     SCREEN_MANAGEMENT: '/screen-management',
 
@@ -27,6 +27,12 @@ export const PATHS = {
         ROOT: '/user',
         PROFILE: 'profile',
         SETTINGS: 'settings',
+    },
+
+    // Doctor paths
+    DOCTOR: {
+        ROOT: '/doctor',
+        PROFILE: 'profile',
     },
 
     // Dashboard paths

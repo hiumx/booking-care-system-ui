@@ -2,6 +2,7 @@ import React from 'react';
 import Banner from '@/assets/img/login-banner.png';
 import clsx from 'clsx';
 import styles from './AuthLayout.module.scss';
+import '@/styles/_auth.scss'; // Importing auth styles
 
 interface AuthLayoutProps {
     children: React.ReactNode;
