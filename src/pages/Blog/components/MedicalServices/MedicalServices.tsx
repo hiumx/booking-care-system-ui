@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './MedicalServices.module.scss';
+import { Link } from 'react-router-dom';
 
 const MedicalServices: React.FC = () => {
     const services = [
@@ -51,7 +52,7 @@ const MedicalServices: React.FC = () => {
 
             <div className={styles.servicesList}>
                 {services.map((service) => (
-                    <a key={service.id} href={service.href} className={styles.serviceItem}>
+                    <Link key={service.id} to={service.href} className={styles.serviceItem}>
                         <div className={styles.serviceIcon}>
                             <img src={service.image} alt={service.name} />
                         </div>
@@ -59,7 +60,7 @@ const MedicalServices: React.FC = () => {
                             <h3 className={styles.serviceName}>{service.name}</h3>
                             <p className={styles.serviceDescription}>{service.description}</p>
                         </div>
-                    </a>
+                    </Link>
                 ))}
             </div>
         </div>

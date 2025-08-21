@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './CommitmentSection.module.scss';
+import { Link } from 'react-router-dom';
 
 const CommitmentSection: React.FC = () => {
     const items = [
@@ -33,12 +34,12 @@ const CommitmentSection: React.FC = () => {
                 </div>
                 <div className={styles.itemsGrid}>
                     {items.map((i) => (
-                        <a key={i.id} href="#" className={styles.item}>
+                        <Link key={i.id} to="#" className={styles.item}>
                             <div className={styles.iconBox}>
                                 <img src={i.icon} alt={i.title} />
                             </div>
                             <div className={styles.itemTitle}>{i.title}</div>
-                        </a>
+                        </Link>
                     ))}
                 </div>
             </div>

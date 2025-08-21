@@ -6,6 +6,7 @@ import doc3 from '@/assets/img/doctors/doctor-03.jpg';
 import doc4 from '@/assets/img/doctors/doctor-04.jpg';
 import doc5 from '@/assets/img/doctors/doctor-05.jpg';
 import doc6 from '@/assets/img/doctors/doctor-06.jpg';
+import { Link } from 'react-router-dom';
 
 const ExpertTeam: React.FC = () => {
     const experts = [
@@ -61,7 +62,7 @@ const ExpertTeam: React.FC = () => {
                 <div className={styles.contentGrid}>
                     <div className={styles.expertsGrid}>
                         {experts.map((ex) => (
-                            <a key={ex.id} href={ex.href} className={styles.expertItem}>
+                            <Link key={ex.id} to={ex.href} className={styles.expertItem}>
                                 <div className={styles.avatarBox}>
                                     <img src={ex.image} alt={ex.name} />
                                 </div>
@@ -69,7 +70,7 @@ const ExpertTeam: React.FC = () => {
                                     <h3 className={styles.name}>{ex.name}</h3>
                                     <p className={styles.specialty}>{ex.specialty}</p>
                                 </div>
-                            </a>
+                            </Link>
                         ))}
                     </div>
 
@@ -79,12 +80,12 @@ const ExpertTeam: React.FC = () => {
                             sĩ đảm bảo nội dung chúng tôi cung cấp chính xác về mặt y khoa và cập
                             nhật những thông tin mới nhất.
                         </p>
-                        <a href="#" className={styles.commitCta}>
+                        <Link to="#" className={styles.commitCta}>
                             Đội ngũ chuyên gia
                             <span className={styles.ctaIcon} aria-hidden="true">
                                 →
                             </span>
-                        </a>
+                        </Link>
                     </aside>
                 </div>
             </div>

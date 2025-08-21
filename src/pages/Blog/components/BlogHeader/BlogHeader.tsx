@@ -180,8 +180,8 @@ const BlogHeader: React.FC = () => {
                             key={item.id}
                             className={`${styles.navItem} ${isMobileMenuOpen && openSubmenu === item.id ? styles.submenuOpen : ''}`}
                         >
-                            <a
-                                href={`#${item.id}`}
+                            <Link
+                                to={`#${item.id}`}
                                 className={styles.navLink}
                                 onClick={(e) => toggleSubmenu(item.id, e)}
                             >
@@ -190,15 +190,15 @@ const BlogHeader: React.FC = () => {
                                 <span className={styles.chevron} aria-hidden>
                                     <i className="fas fa-chevron-down"></i>
                                 </span>
-                            </a>
+                            </Link>
 
                             {item.children && (
                                 <div className={styles.dropdown}>
                                     <ul className={styles.dropdownList}>
                                         {item.children.map((child) => (
                                             <li key={child.id} className={styles.dropdownItem}>
-                                                <a
-                                                    href={child.href}
+                                                <Link
+                                                    to={child.href}
                                                     className={`${styles.dropdownLink} ${child.isMore ? styles.moreLink : ''}`}
                                                 >
                                                     <span>{child.label}</span>
@@ -210,7 +210,7 @@ const BlogHeader: React.FC = () => {
                                                             <i className="fas fa-arrow-right"></i>
                                                         </span>
                                                     )}
-                                                </a>
+                                                </Link>
                                             </li>
                                         ))}
                                     </ul>
