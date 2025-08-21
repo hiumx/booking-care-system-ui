@@ -24,6 +24,12 @@ export const PATHS = {
         SETTINGS: 'settings',
     },
 
+    // Medical Facility paths
+    MEDICAL_FACILITY: {
+        ROOT: '/medical-facility',
+        PROFILE: 'profile',
+    },
+
     // Dashboard paths
     DASHBOARD: {
         ROOT: '/dashboard',

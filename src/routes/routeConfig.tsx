@@ -56,6 +56,11 @@ const routes: RouteObject[] = [
         children: [{ path: PATHS.USER.PROFILE, element: <UserProfile /> }],
     },
     {
+        path: PATHS.MEDICAL_FACILITY.ROOT,
+        // element: <MedicalFacility />,
+        // children: [{ path: PATHS.MEDICAL_FACILITY.PROFILE, element: <MedicalFacilityProfile /> }],
+    },
+    {
         path: PATHS.CHAT,
         element: <Chat />,
     },
