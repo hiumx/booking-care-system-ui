@@ -4,7 +4,6 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import AuthLayout from '@/layouts/AuthLayout';
 import { Mail } from 'lucide-react';
 import clsx from 'clsx';
-import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
 import { PATHS } from '~/routes/paths';
 import Button from '~/components/Button';
 
@@ -42,12 +41,12 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         >
             <form onSubmit={handleSubmit}>
                 <div className="d-flex justify-content-center mb-3">
-                    <div className={authStyles.methodToggle}>
+                    <div className="method-toggle">
                         <button
                             type="button"
                             className={clsx(
-                                authStyles.toggleBtn,
-                                method === 'phone' && authStyles.toggleBtnActive
+                                'toggle-btn',
+                                method === 'phone' && 'toggle-btn-active'
                             )}
                             onClick={() => setMethod('phone')}
                         >
@@ -57,8 +56,8 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                         <button
                             type="button"
                             className={clsx(
-                                authStyles.toggleBtn,
-                                method === 'email' && authStyles.toggleBtnActive
+                                'toggle-btn',
+                                method === 'email' && 'toggle-btn-active'
                             )}
                             onClick={() => setMethod('email')}
                         >
@@ -73,13 +72,11 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                     </label>
                     <div
                         className={clsx(
-                            authStyles.inputGroup,
-                            method === 'phone'
-                                ? authStyles.inputWrapPhone
-                                : authStyles.inputWrapEmail
+                            'auth-input-group',
+                            method === 'phone' ? 'input-wrap-phone' : 'input-wrap-email'
                         )}
                     >
-                        <div className={authStyles.leftIcon}>
+                        <div className={'left-icon'}>
                             {method === 'phone' ? (
                                 <>
                                     <img

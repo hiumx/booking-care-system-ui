@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { CheckCircle } from 'lucide-react';
 import clsx from 'clsx';
-import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
+import '@/styles/_auth.scss';
 
 interface PasswordData {
     currentPassword: string;
@@ -105,14 +105,14 @@ const ChangePassword = () => {
     return (
         <form onSubmit={handleSubmit}>
             <div className="row">
-                <div className="col-md-6">
+                <div className="col-md-7">
                     {/* Current Password */}
                     <div className="mb-3">
                         <label className="form-label">
                             Mật khẩu hiện tại <span className="text-danger">*</span>
                         </label>
-                        <div className={clsx(authStyles.inputGroup)}>
-                            <i className={clsx('feather-lock', authStyles.leftIcon)}></i>
+                        <div className={clsx('auth-input-group')}>
+                            <i className={clsx('feather-lock', 'left-icon')}></i>
                             <input
                                 type={showCurrentPassword ? 'text' : 'password'}
                                 className="form-control"
@@ -128,7 +128,7 @@ const ChangePassword = () => {
                                 onClick={() => togglePasswordVisibility('current')}
                                 className={clsx(
                                     showCurrentPassword ? 'feather-eye' : 'feather-eye-off',
-                                    authStyles.togglePassword
+                                    'toggle-password'
                                 )}
                             />
                         </div>
@@ -139,8 +139,8 @@ const ChangePassword = () => {
                         <label className="form-label">
                             Mật khẩu mới <span className="text-danger">*</span>
                         </label>
-                        <div className={clsx(authStyles.inputGroup)}>
-                            <i className={clsx('feather-lock', authStyles.leftIcon)}></i>
+                        <div className={clsx('auth-input-group')}>
+                            <i className={clsx('feather-lock', 'left-icon')}></i>
                             <input
                                 type={showNewPassword ? 'text' : 'password'}
                                 className="form-control"
@@ -154,7 +154,7 @@ const ChangePassword = () => {
                                 onClick={() => togglePasswordVisibility('new')}
                                 className={clsx(
                                     showNewPassword ? 'feather-eye' : 'feather-eye-off',
-                                    authStyles.togglePassword
+                                    'toggle-password'
                                 )}
                             />
                         </div>
@@ -173,9 +173,9 @@ const ChangePassword = () => {
                                         {passwordStrength.label}
                                     </small>
                                 </div>
-                                <div className={authStyles.strengthBar}>
+                                <div className={'strength-bar'}>
                                     <div
-                                        className={authStyles.strengthFill}
+                                        className={'strength-fill'}
                                         style={{
                                             width: `${passwordStrength.width}%`,
                                             backgroundColor: passwordStrength.color,
@@ -191,15 +191,15 @@ const ChangePassword = () => {
                         <label className="form-label">
                             Xác nhận mật khẩu mới <span className="text-danger">*</span>
                         </label>
-                        <div className={clsx(authStyles.inputGroup)}>
-                            <i className={clsx('feather-lock', authStyles.leftIcon)}></i>
+                        <div className={clsx('auth-input-group')}>
+                            <i className={clsx('feather-lock', 'left-icon')}></i>
                             <input
                                 type={showConfirmPassword ? 'text' : 'password'}
                                 className={clsx(
                                     'form-control',
                                     passwordData.confirmPassword &&
                                         passwordData.confirmPassword === passwordData.newPassword
-                                        ? authStyles.borderSuccess
+                                        ? 'border-success'
                                         : ''
                                 )}
                                 placeholder="Nhập lại mật khẩu mới"
@@ -214,7 +214,7 @@ const ChangePassword = () => {
                                 onClick={() => togglePasswordVisibility('confirm')}
                                 className={clsx(
                                     showConfirmPassword ? 'feather-eye' : 'feather-eye-off',
-                                    authStyles.togglePassword
+                                    'toggle-password'
                                 )}
                             />
                         </div>
@@ -231,12 +231,12 @@ const ChangePassword = () => {
                 {/* Password Requirements */}
                 <div className="col-md-7">
                     <div className="mb-3">
-                        <div className={authStyles.requirementsList}>
+                        <div className={'requirements-list'}>
                             <span className="mb-1" style={{ fontWeight: 600 }}>
                                 Yêu cầu mật khẩu:
                             </span>
-                            <div className={authStyles.requirementItem}>
-                                <span className={authStyles.requirementIcon}>
+                            <div className={'requirement-item'}>
+                                <span className={'requirement-icon'}>
                                     {passwordRequirements.hasMinLength ? (
                                         <CheckCircle size={16} className="text-success" />
                                     ) : (
@@ -245,7 +245,7 @@ const ChangePassword = () => {
                                 </span>
                                 <span
                                     className={clsx(
-                                        authStyles.requirementText,
+                                        'requirement-text',
                                         passwordRequirements.hasMinLength
                                             ? 'text-success'
                                             : 'text-muted'
@@ -254,8 +254,8 @@ const ChangePassword = () => {
                                     Ít nhất 8 ký tự
                                 </span>
                             </div>
-                            <div className={authStyles.requirementItem}>
-                                <span className={authStyles.requirementIcon}>
+                            <div className={'requirement-item'}>
+                                <span className={'requirement-icon'}>
                                     {passwordRequirements.hasUppercase ? (
                                         <CheckCircle size={16} className="text-success" />
                                     ) : (
@@ -264,7 +264,7 @@ const ChangePassword = () => {
                                 </span>
                                 <span
                                     className={clsx(
-                                        authStyles.requirementText,
+                                        'requirement-text',
                                         passwordRequirements.hasUppercase
                                             ? 'text-success'
                                             : 'text-muted'
@@ -273,8 +273,8 @@ const ChangePassword = () => {
                                     Một chữ hoa
                                 </span>
                             </div>
-                            <div className={authStyles.requirementItem}>
-                                <span className={authStyles.requirementIcon}>
+                            <div className={'requirement-item'}>
+                                <span className={'requirement-icon'}>
                                     {passwordRequirements.hasLowercase ? (
                                         <CheckCircle size={16} className="text-success" />
                                     ) : (
@@ -283,7 +283,7 @@ const ChangePassword = () => {
                                 </span>
                                 <span
                                     className={clsx(
-                                        authStyles.requirementText,
+                                        'requirement-text',
                                         passwordRequirements.hasLowercase
                                             ? 'text-success'
                                             : 'text-muted'
@@ -292,8 +292,8 @@ const ChangePassword = () => {
                                     Một chữ thường
                                 </span>
                             </div>
-                            <div className={authStyles.requirementItem}>
-                                <span className={authStyles.requirementIcon}>
+                            <div className={'requirement-item'}>
+                                <span className={'requirement-icon'}>
                                     {passwordRequirements.hasNumber ? (
                                         <CheckCircle size={16} className="text-success" />
                                     ) : (
@@ -302,7 +302,7 @@ const ChangePassword = () => {
                                 </span>
                                 <span
                                     className={clsx(
-                                        authStyles.requirementText,
+                                        'requirement-text',
                                         passwordRequirements.hasNumber
                                             ? 'text-success'
                                             : 'text-muted'
@@ -311,8 +311,8 @@ const ChangePassword = () => {
                                     Một số
                                 </span>
                             </div>
-                            <div className={authStyles.requirementItem}>
-                                <span className={authStyles.requirementIcon}>
+                            <div className={'requirement-item'}>
+                                <span className={'requirement-icon'}>
                                     {passwordRequirements.hasSpecialChar ? (
                                         <CheckCircle size={16} className="text-success" />
                                     ) : (
@@ -321,7 +321,7 @@ const ChangePassword = () => {
                                 </span>
                                 <span
                                     className={clsx(
-                                        authStyles.requirementText,
+                                        'requirement-text',
                                         passwordRequirements.hasSpecialChar
                                             ? 'text-success'
                                             : 'text-muted'

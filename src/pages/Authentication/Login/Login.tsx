@@ -5,7 +5,6 @@ import GoogleIcon from '@/assets/img/icons/google-icon.svg';
 import FacebookIcon from '@/assets/img/icons/facebook-icon.svg';
 import clsx from 'clsx';
 import styles from './Login.module.scss';
-import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
 import { PATHS } from '~/routes/paths';
 import Button from '~/components/Button';
 interface LoginProps {
@@ -41,12 +40,12 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
         >
             <form onSubmit={handleSubmit}>
                 <div className="d-flex justify-content-center mb-3">
-                    <div className={authStyles.methodToggle}>
+                    <div className="method-toggle">
                         <button
                             type="button"
                             className={clsx(
-                                authStyles.toggleBtn,
-                                method === 'phone' && authStyles.toggleBtnActive
+                                'toggle-btn',
+                                method === 'phone' && 'toggle-btn-active'
                             )}
                             onClick={() => setMethod('phone')}
                         >
@@ -56,8 +55,8 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                         <button
                             type="button"
                             className={clsx(
-                                authStyles.toggleBtn,
-                                method === 'email' && authStyles.toggleBtnActive
+                                'toggle-btn',
+                                method === 'email' && 'toggle-btn-active'
                             )}
                             onClick={() => setMethod('email')}
                         >
@@ -74,8 +73,8 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                             <label className="form-label" htmlFor="email">
                                 Email
                             </label>
-                            <div className={authStyles.inputGroup}>
-                                <i className={clsx('feather-mail', authStyles.leftIcon)}></i>
+                            <div className="auth-input-group">
+                                <i className={clsx('feather-mail', 'left-icon')}></i>
                                 <input
                                     id="email"
                                     name="email"
@@ -92,8 +91,8 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                             <label className="form-label" htmlFor="phone">
                                 Số điện thoại
                             </label>
-                            <div className={authStyles.inputGroup}>
-                                <i className={clsx('feather-phone', authStyles.leftIcon)}></i>
+                            <div className="auth-input-group">
+                                <i className={clsx('feather-phone', 'left-icon')}></i>
                                 <input
                                     id="phone"
                                     name="phone"
@@ -116,8 +115,8 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                             Mật khẩu
                         </label>
                     </div>
-                    <div className={clsx(authStyles.inputGroup)}>
-                        <i className={clsx('feather-lock', authStyles.leftIcon)}></i>
+                    <div className={clsx('auth-input-group')}>
+                        <i className={clsx('feather-lock', 'left-icon')}></i>
                         <input
                             id="password"
                             name="password"
@@ -133,7 +132,7 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                             onClick={() => setShowPassword((v) => !v)}
                             className={clsx(
                                 showPassword ? 'feather-eye' : 'feather-eye-off',
-                                authStyles.togglePassword
+                                'toggle-password'
                             )}
                         />
                     </div>

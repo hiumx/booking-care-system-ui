@@ -8,7 +8,6 @@ import FacebookIcon from '@/assets/img/icons/facebook-icon.svg';
 import AuthLayout from '@/layouts/AuthLayout';
 import clsx from 'clsx';
 import styles from './Register.module.scss';
-import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
 import { PATHS } from '~/routes/paths';
 import Button from '~/components/Button';
 
@@ -312,12 +311,12 @@ const Register: React.FC = () => {
                 <div>
                     {/* Method toggle */}
                     <div className="d-flex justify-content-center mb-3">
-                        <div className={clsx(authStyles.methodToggle)}>
+                        <div className={clsx('method-toggle')}>
                             <button
                                 type="button"
                                 className={clsx(
-                                    authStyles.toggleBtn,
-                                    method === 'phone' && authStyles.toggleBtnActive
+                                    'toggle-btn',
+                                    method === 'phone' && 'toggle-btn-active'
                                 )}
                                 onClick={() => setMethod('phone')}
                             >
@@ -327,8 +326,8 @@ const Register: React.FC = () => {
                             <button
                                 type="button"
                                 className={clsx(
-                                    authStyles.toggleBtn,
-                                    method === 'email' && authStyles.toggleBtnActive
+                                    'toggle-btn',
+                                    method === 'email' && 'toggle-btn-active'
                                 )}
                                 onClick={() => setMethod('email')}
                             >
@@ -345,13 +344,11 @@ const Register: React.FC = () => {
                             </label>
                             <div
                                 className={clsx(
-                                    authStyles.inputGroup,
-                                    method === 'phone'
-                                        ? authStyles.inputWrapPhone
-                                        : authStyles.inputWrapEmail
+                                    'auth-input-group',
+                                    method === 'phone' ? 'input-wrap-phone' : 'input-wrap-email'
                                 )}
                             >
-                                <div className={authStyles.leftIcon}>
+                                <div className={'left-icon'}>
                                     {method === 'phone' ? (
                                         <>
                                             <img
@@ -581,8 +578,8 @@ const Register: React.FC = () => {
                             <label className="form-label" htmlFor="reg-password">
                                 Mật khẩu
                             </label>
-                            <div className={clsx(authStyles.inputGroup)}>
-                                <i className={clsx('feather-lock', authStyles.leftIcon)}></i>
+                            <div className={clsx('auth-input-group')}>
+                                <i className={clsx('feather-lock', 'left-icon')}></i>
                                 <input
                                     id="reg-password"
                                     name="password"
@@ -598,7 +595,7 @@ const Register: React.FC = () => {
                                     onClick={() => togglePasswordVisibility('password')}
                                     className={clsx(
                                         showPassword ? 'feather-eye' : 'feather-eye-off',
-                                        authStyles.togglePassword
+                                        'toggle-password'
                                     )}
                                 />
                             </div>
@@ -616,9 +613,9 @@ const Register: React.FC = () => {
                                             {passwordStrength.label}
                                         </small>
                                     </div>
-                                    <div className={authStyles.strengthBar}>
+                                    <div className={'strength-bar'}>
                                         <div
-                                            className={authStyles.strengthFill}
+                                            className={'strength-fill'}
                                             style={{
                                                 width: `${passwordStrength.width}%`,
                                                 backgroundColor: passwordStrength.color,
@@ -633,16 +630,15 @@ const Register: React.FC = () => {
                             <label className="form-label" htmlFor="reg-confirm">
                                 Xác nhận mật khẩu
                             </label>
-                            <div className={clsx(authStyles.inputGroup)}>
-                                <i className={clsx('feather-lock', authStyles.leftIcon)}></i>
+                            <div className={clsx('auth-input-group')}>
+                                <i className={clsx('feather-lock', 'left-icon')}></i>
                                 <input
                                     id="reg-confirm"
                                     type={showConfirmPassword ? 'text' : 'password'}
                                     className={clsx(
                                         'form-control',
-
                                         confirmPassword && confirmPassword === password
-                                            ? authStyles.borderSuccess
+                                            ? 'border-success'
                                             : ''
                                     )}
                                     placeholder="Nhập lại mật khẩu mới"
@@ -657,7 +653,7 @@ const Register: React.FC = () => {
                                     onClick={() => togglePasswordVisibility('confirm')}
                                     className={clsx(
                                         showConfirmPassword ? 'feather-eye' : 'feather-eye-off',
-                                        authStyles.togglePassword
+                                        'toggle-password'
                                     )}
                                 />
                             </div>
@@ -670,12 +666,12 @@ const Register: React.FC = () => {
                         </div>
                         {/* Password Requirements */}
                         <div className="mb-3">
-                            <div className={authStyles.requirementsList}>
+                            <div className={'requirements-list'}>
                                 <span className="mb-1" style={{ fontWeight: 600 }}>
                                     Yêu cầu mật khẩu:
                                 </span>
-                                <div className={authStyles.requirementItem}>
-                                    <span className={authStyles.requirementIcon}>
+                                <div className={'requirement-item'}>
+                                    <span className={'requirement-icon'}>
                                         {passwordRequirements.hasMinLength ? (
                                             <CheckCircle size={16} className="text-success" />
                                         ) : (
@@ -684,7 +680,7 @@ const Register: React.FC = () => {
                                     </span>
                                     <span
                                         className={clsx(
-                                            authStyles.requirementText,
+                                            'requirement-text',
                                             passwordRequirements.hasMinLength
                                                 ? 'text-success'
                                                 : 'text-muted'
@@ -693,8 +689,8 @@ const Register: React.FC = () => {
                                         Ít nhất 8 ký tự
                                     </span>
                                 </div>
-                                <div className={authStyles.requirementItem}>
-                                    <span className={authStyles.requirementIcon}>
+                                <div className={'requirement-item'}>
+                                    <span className={'requirement-icon'}>
                                         {passwordRequirements.hasUppercase ? (
                                             <CheckCircle size={16} className="text-success" />
                                         ) : (
@@ -703,7 +699,7 @@ const Register: React.FC = () => {
                                     </span>
                                     <span
                                         className={clsx(
-                                            authStyles.requirementText,
+                                            'requirement-text',
                                             passwordRequirements.hasUppercase
                                                 ? 'text-success'
                                                 : 'text-muted'
@@ -712,8 +708,8 @@ const Register: React.FC = () => {
                                         Một chữ hoa
                                     </span>
                                 </div>
-                                <div className={authStyles.requirementItem}>
-                                    <span className={authStyles.requirementIcon}>
+                                <div className={'requirement-item'}>
+                                    <span className={'requirement-icon'}>
                                         {passwordRequirements.hasLowercase ? (
                                             <CheckCircle size={16} className="text-success" />
                                         ) : (
@@ -722,7 +718,7 @@ const Register: React.FC = () => {
                                     </span>
                                     <span
                                         className={clsx(
-                                            authStyles.requirementText,
+                                            'requirement-text',
                                             passwordRequirements.hasLowercase
                                                 ? 'text-success'
                                                 : 'text-muted'
@@ -731,8 +727,8 @@ const Register: React.FC = () => {
                                         Một chữ thường
                                     </span>
                                 </div>
-                                <div className={authStyles.requirementItem}>
-                                    <span className={authStyles.requirementIcon}>
+                                <div className={'requirement-item'}>
+                                    <span className={'requirement-icon'}>
                                         {passwordRequirements.hasNumber ? (
                                             <CheckCircle size={16} className="text-success" />
                                         ) : (
@@ -741,7 +737,7 @@ const Register: React.FC = () => {
                                     </span>
                                     <span
                                         className={clsx(
-                                            authStyles.requirementText,
+                                            'requirement-text',
                                             passwordRequirements.hasNumber
                                                 ? 'text-success'
                                                 : 'text-muted'
@@ -750,8 +746,8 @@ const Register: React.FC = () => {
                                         Một số
                                     </span>
                                 </div>
-                                <div className={authStyles.requirementItem}>
-                                    <span className={authStyles.requirementIcon}>
+                                <div className={'requirement-item'}>
+                                    <span className={'requirement-icon'}>
                                         {passwordRequirements.hasSpecialChar ? (
                                             <CheckCircle size={16} className="text-success" />
                                         ) : (
@@ -760,7 +756,7 @@ const Register: React.FC = () => {
                                     </span>
                                     <span
                                         className={clsx(
-                                            authStyles.requirementText,
+                                            'requirement-text',
                                             passwordRequirements.hasSpecialChar
                                                 ? 'text-success'
                                                 : 'text-muted'
@@ -810,8 +806,8 @@ const Register: React.FC = () => {
                                     <label className="form-label">
                                         Họ và tên <span className="text-danger">*</span>
                                     </label>
-                                    <div className={authStyles.inputGroup}>
-                                        <User size={18} className={authStyles.leftIcon} />
+                                    <div className={'auth-input-group'}>
+                                        <User size={18} className={'left-icon'} />
                                         <input
                                             type="text"
                                             value={fullName}
@@ -911,10 +907,8 @@ const Register: React.FC = () => {
                                     <label className="form-label">
                                         Số điện thoại <span className="text-danger">*</span>
                                     </label>
-                                    <div className={authStyles.inputGroup}>
-                                        <i
-                                            className={clsx('feather-phone', authStyles.leftIcon)}
-                                        ></i>
+                                    <div className={'auth-input-group'}>
+                                        <i className={clsx('feather-phone', 'left-icon')}></i>
                                         <input
                                             type="tel"
                                             value={profilePhone}
@@ -964,10 +958,8 @@ const Register: React.FC = () => {
                                     <label className="form-label">
                                         Email <span className="text-danger">*</span>
                                     </label>
-                                    <div className={authStyles.inputGroup}>
-                                        <i
-                                            className={clsx('feather-mail', authStyles.leftIcon)}
-                                        ></i>
+                                    <div className={'auth-input-group'}>
+                                        <i className={clsx('feather-mail', 'left-icon')}></i>
                                         <input
                                             type="email"
                                             value={profileEmail}
