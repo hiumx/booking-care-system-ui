@@ -1,0 +1,35 @@
+.blogContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 40px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.mainContent {
+    display: grid;
+    margin-bottom: 40px;
+    grid-template-columns: 300px 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.sidebar {
+    position: sticky;
+    top: 20px;
+}
+
+.content {
+    min-height: 600px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .mainContent {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .sidebar {
+        position: static;
+    }
+}

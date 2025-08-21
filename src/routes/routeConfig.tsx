@@ -10,6 +10,11 @@ import ForgotPassword from '@/pages/Authentication/ForgotPassword';
 import ResetPassword from '@/pages/Authentication/ResetPassword';
 import { PATHS } from './paths';
 import FAQ from '@/pages/FAQ';
+import Blog from '@/pages/Blog';
+import BlogDetail from '@/pages/BlogDetail';
+import MedicalTerms from '@/pages/MedicalTerms';
+import CategoryArticles from '~/pages/CategoryBlogs';
+import CategoryArticlesDemo from '~/pages/CategoryBlogsDemo';
 
 const routes: RouteObject[] = [
     {
@@ -23,6 +28,26 @@ const routes: RouteObject[] = [
     {
         path: PATHS.FAQ,
         element: <FAQ />,
+    },
+    {
+        path: PATHS.BLOG,
+        element: <Blog />,
+    },
+    {
+        path: PATHS.BLOG_DETAIL,
+        element: <BlogDetail />,
+    },
+    {
+        path: PATHS.MEDICAL_TERMS,
+        element: <MedicalTerms />,
+    },
+    {
+        path: PATHS.CATEGORY_ARTICLES,
+        element: <CategoryArticles />,
+    },
+    {
+        path: PATHS.CATEGORY_ARTICLES_DEMO,
+        element: <CategoryArticlesDemo />,
     },
 
     // Authentication paths
