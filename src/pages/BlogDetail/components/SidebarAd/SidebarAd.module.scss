@@ -1,0 +1,16 @@
+.sidebar {
+    position: sticky;
+    top: 150px;
+    height: max-content;
+}
+.banner {
+    width: 100%;
+    border-radius: 12px;
+}
+
+@media (max-width: 992px) {
+    .sidebar {
+        position: static;
+        display: none;
+    }
+}

@@ -1,0 +1,35 @@
+.toc {
+    background: #f1f8ff;
+    border: 1px solid #dbeafe;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    display: inline-block;
+    width: fit-content;
+    max-width: 100%;
+
+    .tocTitle {
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    ul {
+        display: inline-block;
+        margin: 0;
+        padding-left: 0;
+        list-style: none;
+
+        li {
+            margin: 10px 0;
+
+            a {
+                color: #0ea5e9;
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+}
