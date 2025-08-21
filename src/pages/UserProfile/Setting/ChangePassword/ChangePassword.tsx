@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { CheckCircle } from 'lucide-react';
 import clsx from 'clsx';
 import '@/styles/_auth.scss';
+import Input from '~/components/Input';
+import Button from '~/components/Button';
 
 interface PasswordData {
     currentPassword: string;
@@ -108,56 +110,40 @@ const ChangePassword = () => {
                 <div className="col-md-7">
                     {/* Current Password */}
                     <div className="mb-3">
-                        <label className="form-label">
-                            Mật khẩu hiện tại <span className="text-danger">*</span>
-                        </label>
-                        <div className={clsx('auth-input-group')}>
-                            <i className={clsx('feather-lock', 'left-icon')}></i>
-                            <input
-                                type={showCurrentPassword ? 'text' : 'password'}
-                                className="form-control"
-                                placeholder="Nhập mật khẩu hiện tại"
-                                value={passwordData.currentPassword}
-                                onChange={(e) =>
-                                    handleInputChange('currentPassword', e.target.value)
-                                }
-                            />
-                            <span
-                                role="button"
-                                aria-label={showCurrentPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                                onClick={() => togglePasswordVisibility('current')}
-                                className={clsx(
-                                    showCurrentPassword ? 'feather-eye' : 'feather-eye-off',
-                                    'toggle-password'
-                                )}
-                            />
-                        </div>
+                        <Input
+                            label={
+                                <>
+                                    Mật khẩu hiện tại <span className="text-danger">*</span>
+                                </>
+                            }
+                            type="password"
+                            placeholder="Nhập mật khẩu hiện tại"
+                            leftIcon={<i className="feather-lock" />}
+                            value={passwordData.currentPassword}
+                            onChange={(e) => handleInputChange('currentPassword', e.target.value)}
+                            showPasswordToggle
+                            isPasswordVisible={showCurrentPassword}
+                            onTogglePassword={() => togglePasswordVisibility('current')}
+                        />
                     </div>
 
                     {/* New Password */}
                     <div className="mb-3">
-                        <label className="form-label">
-                            Mật khẩu mới <span className="text-danger">*</span>
-                        </label>
-                        <div className={clsx('auth-input-group')}>
-                            <i className={clsx('feather-lock', 'left-icon')}></i>
-                            <input
-                                type={showNewPassword ? 'text' : 'password'}
-                                className="form-control"
-                                placeholder="Nhập mật khẩu mới"
-                                value={passwordData.newPassword}
-                                onChange={(e) => handleInputChange('newPassword', e.target.value)}
-                            />
-                            <span
-                                role="button"
-                                aria-label={showNewPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                                onClick={() => togglePasswordVisibility('new')}
-                                className={clsx(
-                                    showNewPassword ? 'feather-eye' : 'feather-eye-off',
-                                    'toggle-password'
-                                )}
-                            />
-                        </div>
+                        <Input
+                            label={
+                                <>
+                                    Mật khẩu mới <span className="text-danger">*</span>
+                                </>
+                            }
+                            type="password"
+                            placeholder="Nhập mật khẩu mới"
+                            leftIcon={<i className="feather-lock" />}
+                            value={passwordData.newPassword}
+                            onChange={(e) => handleInputChange('newPassword', e.target.value)}
+                            showPasswordToggle
+                            isPasswordVisible={showNewPassword}
+                            onTogglePassword={() => togglePasswordVisibility('new')}
+                        />
 
                         {/* Password Strength Indicator */}
                         {passwordData.newPassword && (
@@ -188,36 +174,27 @@ const ChangePassword = () => {
 
                     {/* Confirm Password */}
                     <div className="mb-3">
-                        <label className="form-label">
-                            Xác nhận mật khẩu mới <span className="text-danger">*</span>
-                        </label>
-                        <div className={clsx('auth-input-group')}>
-                            <i className={clsx('feather-lock', 'left-icon')}></i>
-                            <input
-                                type={showConfirmPassword ? 'text' : 'password'}
-                                className={clsx(
-                                    'form-control',
-                                    passwordData.confirmPassword &&
-                                        passwordData.confirmPassword === passwordData.newPassword
-                                        ? 'border-success'
-                                        : ''
-                                )}
-                                placeholder="Nhập lại mật khẩu mới"
-                                value={passwordData.confirmPassword}
-                                onChange={(e) =>
-                                    handleInputChange('confirmPassword', e.target.value)
-                                }
-                            />
-                            <span
-                                role="button"
-                                aria-label={showConfirmPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                                onClick={() => togglePasswordVisibility('confirm')}
-                                className={clsx(
-                                    showConfirmPassword ? 'feather-eye' : 'feather-eye-off',
-                                    'toggle-password'
-                                )}
-                            />
-                        </div>
+                        <Input
+                            label={
+                                <>
+                                    Xác nhận mật khẩu mới <span className="text-danger">*</span>
+                                </>
+                            }
+                            type="password"
+                            placeholder="Nhập lại mật khẩu mới"
+                            leftIcon={<i className="feather-lock" />}
+                            value={passwordData.confirmPassword}
+                            onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                            className={clsx(
+                                passwordData.confirmPassword &&
+                                    passwordData.confirmPassword === passwordData.newPassword
+                                    ? 'border-success'
+                                    : ''
+                            )}
+                            showPasswordToggle
+                            isPasswordVisible={showConfirmPassword}
+                            onTogglePassword={() => togglePasswordVisibility('confirm')}
+                        />
                         {passwordData.confirmPassword &&
                             passwordData.newPassword === passwordData.confirmPassword && (
                                 <div className="d-flex align-items-center mt-2 text-success">
@@ -339,16 +316,12 @@ const ChangePassword = () => {
                 <a href="#" className="btn btn-md btn-light rounded-pill">
                     Hủy
                 </a>
-                <button
+                <Button
+                    text="Thay đổi mật khẩu"
                     type="submit"
-                    className={clsx(
-                        'btn btn-md rounded-pill',
-                        canSubmit ? 'btn-primary-gradient' : 'btn-secondary disabled'
-                    )}
-                    disabled={!canSubmit}
-                >
-                    Thay đổi mật khẩu
-                </button>
+                    className={clsx('btn-md rounded-pill', !canSubmit && 'disabled')}
+                    isDisabled={!canSubmit}
+                />
             </div>
         </form>
     );

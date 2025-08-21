@@ -2,6 +2,8 @@ import { useState } from 'react';
 import Select from 'react-select';
 import settingStyles from '@/pages/UserProfile/Setting/Setting.module.scss';
 import clsx from 'clsx';
+import Button from '~/components/Button';
+import Input from '~/components/Input';
 
 interface ProfileData {
     firstName: string;
@@ -102,12 +104,13 @@ const Profile = () => {
                 <div className={clsx('row', settingStyles.input)}>
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
-                            <label className="form-label">
-                                Họ <span className="text-danger">*</span>
-                            </label>
-                            <input
+                            <Input
+                                label={
+                                    <>
+                                        Họ <span className="text-danger">*</span>
+                                    </>
+                                }
                                 type="text"
-                                className={clsx('form-control')}
                                 value={profileData.firstName}
                                 onChange={(e) => handleInputChange('firstName', e.target.value)}
                             />
@@ -115,12 +118,13 @@ const Profile = () => {
                     </div>
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
-                            <label className="form-label">
-                                Tên <span className="text-danger">*</span>
-                            </label>
-                            <input
+                            <Input
+                                label={
+                                    <>
+                                        Tên <span className="text-danger">*</span>
+                                    </>
+                                }
                                 type="text"
-                                className="form-control"
                                 value={profileData.lastName}
                                 onChange={(e) => handleInputChange('lastName', e.target.value)}
                             />
@@ -166,12 +170,13 @@ const Profile = () => {
                     </div>
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
-                            <label className="form-label">
-                                Số điện thoại <span className="text-danger">*</span>
-                            </label>
-                            <input
+                            <Input
+                                label={
+                                    <>
+                                        Số điện thoại <span className="text-danger">*</span>
+                                    </>
+                                }
                                 type="text"
-                                className="form-control"
                                 value={profileData.phoneNumber}
                                 onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
                             />
@@ -179,12 +184,13 @@ const Profile = () => {
                     </div>
                     <div className="col-lg-6 col-md-6">
                         <div className="mb-3">
-                            <label className="form-label">
-                                Email <span className="text-danger">*</span>
-                            </label>
-                            <input
+                            <Input
+                                label={
+                                    <>
+                                        Email <span className="text-danger">*</span>
+                                    </>
+                                }
                                 type="email"
-                                className="form-control"
                                 value={profileData.email}
                                 onChange={(e) => handleInputChange('email', e.target.value)}
                             />
@@ -193,12 +199,13 @@ const Profile = () => {
 
                     <div className="col-lg-12">
                         <div className="mb-3">
-                            <label className="form-label">
-                                Địa chỉ <span className="text-danger">*</span>
-                            </label>
-                            <input
+                            <Input
+                                label={
+                                    <>
+                                        Địa chỉ <span className="text-danger">*</span>
+                                    </>
+                                }
                                 type="text"
-                                className="form-control"
                                 value={profileData.address}
                                 onChange={(e) => handleInputChange('address', e.target.value)}
                             />
@@ -211,9 +218,7 @@ const Profile = () => {
                 <a href="#" className="btn btn-md btn-light rounded-pill">
                     Hủy
                 </a>
-                <button type="submit" className="btn btn-md btn-primary-gradient rounded-pill">
-                    Lưu thay đổi
-                </button>
+                <Button text="Lưu thay đổi" type="submit" className="btn-md rounded-pill" />
             </div>
         </form>
     );

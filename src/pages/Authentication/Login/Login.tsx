@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import styles from './Login.module.scss';
 import { PATHS } from '~/routes/paths';
 import Button from '~/components/Button';
+import Input from '~/components/Input';
 interface LoginProps {
     onSubmit?: (credentials: {
         method: 'email' | 'phone';
@@ -69,73 +70,47 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                 {/* Email / Phone input */}
                 <div className="mb-3">
                     {method === 'email' ? (
-                        <>
-                            <label className="form-label" htmlFor="email">
-                                Email
-                            </label>
-                            <div className="auth-input-group">
-                                <i className={clsx('feather-mail', 'left-icon')}></i>
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    placeholder="Nhập địa chỉ email"
-                                    className="form-control"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </div>
-                        </>
+                        <Input
+                            id="email"
+                            name="email"
+                            label="Email"
+                            type="email"
+                            placeholder="Nhập địa chỉ email"
+                            leftIcon={<i className="feather-mail" />}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            wrapVariant="email"
+                        />
                     ) : (
-                        <>
-                            <label className="form-label" htmlFor="phone">
-                                Số điện thoại
-                            </label>
-                            <div className="auth-input-group">
-                                <i className={clsx('feather-phone', 'left-icon')}></i>
-                                <input
-                                    id="phone"
-                                    name="phone"
-                                    type="tel"
-                                    inputMode="tel"
-                                    placeholder="Nhập số điện thoại"
-                                    className="form-control"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                />
-                            </div>
-                        </>
+                        <Input
+                            id="phone"
+                            name="phone"
+                            label="Số điện thoại"
+                            type="tel"
+                            inputMode="tel"
+                            placeholder="Nhập số điện thoại"
+                            leftIcon={<i className="feather-phone" />}
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                        />
                     )}
                 </div>
 
                 {/* Password input */}
                 <div className="mb-3">
-                    <div>
-                        <label className="form-label" htmlFor="password">
-                            Mật khẩu
-                        </label>
-                    </div>
-                    <div className={clsx('auth-input-group')}>
-                        <i className={clsx('feather-lock', 'left-icon')}></i>
-                        <input
-                            id="password"
-                            name="password"
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="Nhập mật khẩu"
-                            className="form-control"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <span
-                            role="button"
-                            aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                            onClick={() => setShowPassword((v) => !v)}
-                            className={clsx(
-                                showPassword ? 'feather-eye' : 'feather-eye-off',
-                                'toggle-password'
-                            )}
-                        />
-                    </div>
+                    <Input
+                        id="password"
+                        name="password"
+                        label="Mật khẩu"
+                        type="password"
+                        placeholder="Nhập mật khẩu"
+                        leftIcon={<i className="feather-lock" />}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        showPasswordToggle
+                        isPasswordVisible={showPassword}
+                        onTogglePassword={(v) => setShowPassword(v)}
+                    />
                 </div>
 
                 {/* Remember me & Forgot password */}

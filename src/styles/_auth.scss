@@ -33,12 +33,18 @@
         border-radius: 12px;
         border: 1px solid #e5e7eb; /* gray-200 */
         background: #ffffff;
-        padding-left: 40px;
+        padding-left: 16px;
 
         &:focus {
             outline: none;
             box-shadow: none;
             border: 1px solid #4a90e2; // hoặc màu bạn muốn
+        }
+    }
+
+    &.has-left-icon {
+        input {
+            padding-left: 40px;
         }
     }
 }
@@ -71,15 +77,15 @@
     }
 }
 
-// (maps to .inputWrapPhone)
-.input-wrap-phone {
+// (maps to .inputWrapPhone) - increase specificity to override .has-left-icon
+.auth-input-group.input-wrap-phone {
     input {
         padding-left: 75px; // space for flag + +84
     }
 }
 
-// (maps to .inputWrapEmail)
-.input-wrap-email {
+// (maps to .inputWrapEmail) - increase specificity to override .has-left-icon
+.auth-input-group.input-wrap-email {
     input {
         padding-left: 44px; // space for mail icon
     }
