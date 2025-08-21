@@ -9,6 +9,7 @@ import Login from '@/pages/Authentication/Login';
 import Register from '@/pages/Authentication/Register';
 import ForgotPassword from '@/pages/Authentication/ForgotPassword';
 import ResetPassword from '@/pages/Authentication/ResetPassword';
+import MedicalFacility from '@/pages/MedicalFacility/MedicalFacilityList';
 import { PATHS } from './paths';
 import FAQ from '@/pages/FAQ';
 
@@ -54,6 +55,11 @@ const routes: RouteObject[] = [
     {
         path: PATHS.USER.ROOT,
         children: [{ path: PATHS.USER.PROFILE, element: <UserProfile /> }],
+    },
+    {
+        path: PATHS.MEDICAL_FACILITY.ROOT,
+        element: <MedicalFacility />,
+        // children: [{ path: PATHS.MEDICAL_FACILITY.PROFILE, element: <MedicalFacilityProfile /> }],
     },
     {
         path: PATHS.CHAT,
