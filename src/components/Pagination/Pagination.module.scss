@@ -1,0 +1,52 @@
+.iconContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pageLink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    min-width: 44px;
+    min-height: 44px;
+
+    span {
+        width: 100%;
+    }
+
+    &.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    &.prevLink,
+    &.nextLink {
+        font-size: 14px;
+    }
+
+    &.disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    &.ellipsis {
+        padding: 8px;
+        cursor: default;
+    }
+}
+
+.paginationList {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    gap: 5px;
+    align-items: center;
+}

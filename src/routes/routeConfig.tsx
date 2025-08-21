@@ -9,6 +9,7 @@ import Login from '@/pages/Authentication/Login';
 import Register from '@/pages/Authentication/Register';
 import ForgotPassword from '@/pages/Authentication/ForgotPassword';
 import ResetPassword from '@/pages/Authentication/ResetPassword';
+import DoctorProfile from '@/pages/Doctor/DoctorProfile';
 import { PATHS } from './paths';
 import FAQ from '@/pages/FAQ';
 
@@ -60,6 +61,10 @@ const routes: RouteObject[] = [
         element: <Chat />,
     },
 
+    {
+        path: PATHS.DOCTOR.ROOT,
+        children: [{ path: PATHS.DOCTOR.PROFILE, element: <DoctorProfile /> }],
+    },
     {
         path: PATHS.DASHBOARD.ROOT,
         children: [

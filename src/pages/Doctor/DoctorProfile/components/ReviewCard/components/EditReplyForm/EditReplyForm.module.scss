@@ -1,0 +1,112 @@
+.editReplyForm {
+    margin-top: 10px;
+    background: #f8f9fa;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    padding: 15px;
+    animation: slideDown 0.3s ease-out;
+
+    .form {
+        .textareaSection {
+            margin-bottom: 15px;
+
+            .textarea {
+                width: 100%;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 8px 10px;
+                font-size: 13px;
+                line-height: 1.4;
+                resize: vertical;
+                min-height: 60px;
+                font-family: inherit;
+
+                &:focus {
+                    outline: none;
+                    border-color: #007bff;
+                    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+                }
+
+                &::placeholder {
+                    color: #999;
+                }
+            }
+
+            .charCounter {
+                text-align: right;
+                margin-top: 5px;
+
+                span {
+                    font-size: 11px;
+                    color: #666;
+
+                    &.warning {
+                        color: #e74c3c;
+                    }
+                }
+            }
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+
+            .cancelButton {
+                background: #6c757d !important;
+                border-color: #6c757d !important;
+                font-size: 12px !important;
+                padding: 6px 12px !important;
+                min-width: auto !important;
+
+                &:hover {
+                    background: #5a6268 !important;
+                    border-color: #545b62 !important;
+                }
+            }
+
+            .saveButton {
+                background: #28a745 !important;
+                border-color: #28a745 !important;
+                font-size: 12px !important;
+                padding: 6px 12px !important;
+                min-width: auto !important;
+
+                &:hover {
+                    background: #218838 !important;
+                    border-color: #1e7e34 !important;
+                }
+            }
+        }
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+    .editReplyForm {
+        padding: 12px;
+
+        .form .actions {
+            flex-direction: column;
+            gap: 6px;
+
+            .cancelButton,
+            .saveButton {
+                width: 100%;
+                font-size: 11px !important;
+                padding: 8px 12px !important;
+            }
+        }
+    }
+}
