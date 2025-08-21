@@ -46,8 +46,8 @@ const SubscriptionPlans: React.FC = () => {
             billing_cycles: ['MONTHLY', 'QUARTERLY', 'YEARLY'],
             features: [
                 'Hiển thị thông tin cơ sở y tế và dịch vụ cơ bản trên nền tảng',
-                'Quản lý tối đa 5 bác sĩ',
-                'Quản lý tối đa 3 chuyên khoa',
+                'Quản lý tối đa 12 bác sĩ',
+                'Quản lý tối đa 4 chuyên khoa',
                 'Hỗ trợ quản lý lịch hẹn trực tuyến',
                 'Gửi nhắc nhở tự động cho bệnh nhân (Email/SMS cơ bản)',
                 'Tư vấn y tế từ xa giới hạn 20 lượt/tháng',
@@ -65,7 +65,7 @@ const SubscriptionPlans: React.FC = () => {
             billing_cycles: ['MONTHLY', 'QUARTERLY', 'YEARLY'],
             features: [
                 'Bao gồm toàn bộ tính năng của gói Cơ bản',
-                'Quản lý tối đa 20 bác sĩ',
+                'Quản lý tối đa 30 bác sĩ',
                 'Quản lý tối đa 10 chuyên khoa',
                 'Hiển thị ưu tiên trong kết quả tìm kiếm',
                 'Tư vấn y tế từ xa không giới hạn',
