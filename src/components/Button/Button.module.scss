@@ -1,16 +1,7 @@
 // inside any component.scss or .module.scss
 
-@import '../_mixins.scss';
-
-.button {
-    @include button-style(#3498db, #fff);
-}
-
-.container {
-    @include flex-center;
-    height: 100vh;
-
-    @include respond-to(md) {
-        flex-direction: row;
-    }
+.button:disabled {
+    background: #d1d5db !important; // gray-300
+    color: #6b7280 !important; // gray-300
+    border: none;
 }

@@ -6,6 +6,7 @@ import { Mail } from 'lucide-react';
 import clsx from 'clsx';
 import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
 import { PATHS } from '~/routes/paths';
+import Button from '~/components/Button';
 
 interface ForgotPasswordProps {
     onSubmit?: (email: string, phone: string) => void;
@@ -136,17 +137,12 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                     </div>
                 )}
                 <div className="mb-3 mt-3">
-                    <button
+                    <Button
+                        text="Đặt lại mật khẩu"
                         type="submit"
-                        disabled={!canSend}
-                        className={clsx(
-                            'btn w-100 fw-bold',
-                            authStyles.submitBtn,
-                            canSend ? 'btn-primary-gradient' : 'btn-secondary disabled'
-                        )}
-                    >
-                        Xác nhận
-                    </button>
+                        isDisabled={!canSend}
+                        className="w-100 fw-bold"
+                    />
                 </div>
                 <div className="account-signup">
                     <p>

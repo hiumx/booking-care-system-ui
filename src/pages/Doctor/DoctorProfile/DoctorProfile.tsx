@@ -4,9 +4,11 @@ import clsx from 'clsx';
 import styles from '@/pages/Doctor/DoctorProfile/DoctorProfile.module.scss';
 import Pagination from '@/components/Pagination';
 import ReviewCard from '@/components/ReviewCard';
+import Button from '@/components/Button';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import DoctorAvailability from './components/DoctorAvailability';
+import WriteReview from './components/WriteReview';
 
 // Import images for DoctorProfileCard
 import doctorImg from '@/assets/img/doctors/doc-profile-02.jpg';
@@ -247,6 +249,7 @@ const reviews = Array.from({ length: 150 }, (_, index) => {
         created_at: new Date(Date.now() - index * 86400000).toISOString(),
         updated_at: new Date(Date.now() - index * 86400000).toISOString(),
         timeAgo: `${(index % 30) + 1} days ago`,
+        userId: baseReview.user.id, // Add userId for edit/delete permission check
         user: {
             ...baseReview.user,
             id: 100 + index + 1,
@@ -262,6 +265,7 @@ const reviews = Array.from({ length: 150 }, (_, index) => {
             id: reply.id + index,
             patient_id: 100 + index + 2,
             recommend: false,
+            userId: reply.user.id, // Add userId for edit/delete permission
             user: {
                 ...reply.user,
                 id: 100 + index + 2,
@@ -299,6 +303,8 @@ const DoctorProfile: React.FC = () => {
     const totalPages = Math.ceil(reviews.length / pageSize);
     const displayedReviews = reviews.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
+    const [showWriteReview, setShowWriteReview] = useState(false);
+
     // Calculate average rating
     const averageRating =
         reviews.length > 0
@@ -324,6 +330,66 @@ const DoctorProfile: React.FC = () => {
         prices.length > 0
             ? `${Math.min(...prices).toLocaleString('vi-VN')}đ - ${Math.max(...prices).toLocaleString('vi-VN')}đ`
             : 'N/A';
+
+    // Handle review submission
+    const handleSubmitReview = (reviewData: {
+        rating: number;
+        description: string;
+        termsAccepted: boolean;
+    }) => {
+        console.log('New review submitted:', reviewData);
+        // Trong thực tế, sẽ gọi API để submit review
+        alert('Đánh giá của bạn đã được gửi thành công!');
+        setShowWriteReview(false);
+    };
+
+    // Handle reply submission
+    const handleReplySubmission = (replyData: { reviewId: number; text: string }) => {
+        console.log('New reply submitted:', replyData);
+        // Trong thực tế, sẽ gọi API để submit reply
+        alert('Phản hồi của bạn đã được gửi thành công!');
+        // Có thể refresh reviews hoặc update state local
+    };
+
+    // Handle edit review
+    const handleEditReview = (reviewData: {
+        reviewId: number;
+        rating: number;
+        description: string;
+        recommend?: boolean;
+    }) => {
+        console.log('Review edited:', reviewData);
+        // Trong thực tế, sẽ gọi API để update review
+        alert('Đánh giá của bạn đã được cập nhật thành công!');
+        // Có thể refresh reviews hoặc update state local
+    };
+
+    // Handle delete review
+    const handleDeleteReview = (reviewId: number) => {
+        console.log('Review deleted:', reviewId);
+        // Trong thực tế, sẽ gọi API để delete review
+        alert('Đánh giá đã được xóa thành công!');
+        // Có thể refresh reviews hoặc update state local
+    };
+
+    // Handle edit reply
+    const handleEditReply = (replyData: { replyId: number; text: string }) => {
+        console.log('Reply edited:', replyData);
+        // Trong thực tế, sẽ gọi API để update reply
+        alert('Phản hồi đã được cập nhật thành công!');
+        // Có thể refresh reviews hoặc update state local
+    };
+
+    // Handle delete reply
+    const handleDeleteReply = (replyId: number) => {
+        console.log('Reply deleted:', replyId);
+        // Trong thực tế, sẽ gọi API để delete reply
+        alert('Phản hồi đã được xóa thành công!');
+        // Có thể refresh reviews hoặc update state local
+    };
+
+    // Mock current user ID for demo purposes
+    const currentUserId = 101; // Giả sử user hiện tại có ID là 101
 
     const breadcrumbData = {
         items: [
@@ -725,11 +791,39 @@ const DoctorProfile: React.FC = () => {
                                     <DoctorAvailability />
                                 </div>
                             </div>
+                            {/* Write Review  */}
                             <div ref={reviewRef}>
                                 <div className="doc-information-details" id="review">
                                     <div className="detail-title">
                                         <h4>Đánh giá ({reviews.length})</h4>
                                     </div>
+
+                                    {/* Write Review Section */}
+                                    <div className="write-review-section mb-4">
+                                        {!showWriteReview ? (
+                                            <Button
+                                                text="Viết đánh giá"
+                                                type="button"
+                                                className="btn-primary"
+                                                onClick={() => setShowWriteReview(true)}
+                                            />
+                                        ) : (
+                                            <WriteReview
+                                                doctorName={`${mockDoctor.last_name} ${mockDoctor.first_name}`}
+                                                onSubmitReview={handleSubmitReview}
+                                            />
+                                        )}
+
+                                        {showWriteReview && (
+                                            <Button
+                                                text="Hủy"
+                                                type="button"
+                                                className={clsx('mt-2', styles.cancelButton)}
+                                                onClick={() => setShowWriteReview(false)}
+                                            />
+                                        )}
+                                    </div>
+
                                     {displayedReviews.map((review, index) => (
                                         <ReviewCard
                                             key={review.id}
@@ -741,14 +835,25 @@ const DoctorProfile: React.FC = () => {
                                                 timeAgo: review.timeAgo, // Fixed: Changed from timesworth to timeAgo
                                                 text: review.comment,
                                                 recommend: review.recommend,
+                                                userId: review.userId,
+                                                isEditable: true, // Mock: reviews can be edited within 24h
                                                 replies: review.replies?.map((reply) => ({
                                                     id: reply.id,
                                                     name: `${reply.user.first_name} ${reply.user.last_name}`,
                                                     avatar: reply.user.avatar_url,
                                                     text: reply.comment,
+                                                    userId: reply.userId, // Add userId for edit/delete permission
                                                 })),
                                             }}
                                             isLast={index === displayedReviews.length - 1}
+                                            onReply={handleReplySubmission}
+                                            canEdit={true}
+                                            canDelete={true}
+                                            currentUserId={currentUserId}
+                                            onEdit={handleEditReview}
+                                            onDelete={handleDeleteReview}
+                                            onEditReply={handleEditReply}
+                                            onDeleteReply={handleDeleteReply}
                                         />
                                     ))}
                                     <Pagination

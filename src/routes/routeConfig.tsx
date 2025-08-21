@@ -3,6 +3,7 @@ import Demo from '@/pages/Demo';
 import Home from '@/pages/Home';
 import UserProfile from '@/pages/UserProfile';
 import ScreenManagement from '@/pages/ScreenManagement';
+import Chat from '@/pages/Chat';
 import { RouteObject } from 'react-router-dom';
 import Login from '@/pages/Authentication/Login';
 import Register from '@/pages/Authentication/Register';
@@ -55,6 +56,11 @@ const routes: RouteObject[] = [
         path: PATHS.USER.ROOT,
         children: [{ path: PATHS.USER.PROFILE, element: <UserProfile /> }],
     },
+    {
+        path: PATHS.CHAT,
+        element: <Chat />,
+    },
+
     {
         path: PATHS.DOCTOR.ROOT,
         children: [{ path: PATHS.DOCTOR.PROFILE, element: <DoctorProfile /> }],

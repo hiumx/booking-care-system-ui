@@ -180,3 +180,28 @@
 .margin-distance {
     padding-left: 0;
 }
+
+// Custom styles for cancel button (red button)
+.cancelButton {
+    background-image: none !important;
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+
+    &:hover {
+        background-color: #c82333 !important;
+        border-color: #bd2130 !important;
+        color: #fff !important;
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5) !important;
+    }
+
+    &:active {
+        background-color: #bd2130 !important;
+        border-color: #b21f2d !important;
+    }
+    &::before {
+        background: none !important;
+    }
+}
