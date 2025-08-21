@@ -14,6 +14,11 @@
         max-width: 1200px;
         margin: 0 auto;
 
+        .logoImg {
+            width: 200px; // smaller logo for mobile
+            height: auto;
+        }
+
         .menuBtn {
             display: none;
             background: transparent;
@@ -82,6 +87,7 @@
                     border: none;
                     cursor: pointer;
                     font-size: 18px;
+
                     &:hover {
                         background: #f8f9fa;
                     }
@@ -315,6 +321,7 @@
                         .navLink .chevron {
                             transform: rotate(180deg);
                         }
+
                         > .dropdown {
                             display: block; // expanded
                         }

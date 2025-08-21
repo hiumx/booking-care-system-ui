@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './BlogHeader.module.scss';
+import { Link } from 'react-router-dom';
+import { PATHS } from '~/routes/paths';
+import clsx from 'clsx';
 
 const BlogHeader: React.FC = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -104,8 +107,14 @@ const BlogHeader: React.FC = () => {
                     <i className={isMobileMenuOpen ? 'fas fa-times' : 'fas fa-bars'}></i>
                 </button>
 
-                <div className={styles.logoSection}>
-                    <h1 className={styles.logo}>YouMed</h1>
+                <div className="navbar-header">
+                    <Link to={PATHS.HOME} className="navbar-brand logo">
+                        <img
+                            src="/src/assets/img/logo.svg"
+                            className={clsx(styles.logoImg, 'img-fluid')}
+                            alt="Logo"
+                        />
+                    </Link>
                 </div>
 
                 <div className={styles.searchSection}>
