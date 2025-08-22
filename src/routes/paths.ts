@@ -13,6 +13,7 @@ export const PATHS = {
     CATEGORY_ARTICLES: '/category/:categorySlug',
     CATEGORY_ARTICLES_DEMO: '/category-demo',
     SUBSCRIPTION_PLANS: '/subscription-plans',
+    ABOUT_US: '/about-us',
 
     // Authentication paths
     LOGIN: '/login',

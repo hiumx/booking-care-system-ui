@@ -1,0 +1,62 @@
+// Ensure the default container acts as positioning context
+:global(.testimonial-slider) {
+    position: relative;
+}
+
+// Navigation Buttons - Common Styles
+.swiperNavBtn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #e6e8ee;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 3;
+
+    svg {
+        width: 20px;
+        height: 20px;
+        color: #646466;
+        transition: color 0.3s ease;
+    }
+
+    &:hover {
+        background: #0e82fd;
+        svg {
+            color: #fff;
+        }
+    }
+}
+
+// Position specific buttons — align to grid inner padding (0 60px)
+.swiperNavPrev {
+    left: 0px;
+}
+.swiperNavNext {
+    right: 0px;
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .swiperNavBtn {
+        width: 36px;
+        height: 36px;
+        svg {
+            width: 18px;
+            height: 18px;
+        }
+    }
+    .swiperNavPrev {
+        left: 20px;
+    }
+    .swiperNavNext {
+        right: 20px;
+    }
+}

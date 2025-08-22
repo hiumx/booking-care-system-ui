@@ -12,6 +12,7 @@ import ResetPassword from '@/pages/Authentication/ResetPassword';
 import DoctorProfile from '@/pages/Doctor/DoctorProfile';
 import SpecialtiesList from '@/pages/Specialties/SpecialtiesList';
 import SubscriptionPlans from '@/pages/SubscriptionPlans';
+import MedicalFacility from '@/pages/MedicalFacility/MedicalFacilityList';
 import { PATHS } from './paths';
 import FAQ from '@/pages/FAQ';
 import Blog from '@/pages/Blog';
@@ -20,6 +21,7 @@ import MedicalTerms from '@/pages/MedicalTerms';
 import CategoryArticles from '~/pages/CategoryBlogs';
 import CategoryArticlesDemo from '~/pages/CategoryBlogsDemo';
 import MedicalFacilityProfile from '@/pages/MedicalFacility/MedicalFacilityProfile';
+import AboutUs from '@/pages/AboutUs/AboutUs';
 
 const routes: RouteObject[] = [
     {
@@ -58,6 +60,10 @@ const routes: RouteObject[] = [
         path: PATHS.SUBSCRIPTION_PLANS,
         element: <SubscriptionPlans />,
     },
+    {
+        path: PATHS.ABOUT_US,
+        element: <AboutUs />,
+    },
 
     // Authentication paths
     {
@@ -90,13 +96,20 @@ const routes: RouteObject[] = [
     },
     {
         path: PATHS.MEDICAL_FACILITY.ROOT,
-        // element: <MedicalFacility />,
-        children: [{ path: PATHS.MEDICAL_FACILITY.DETAIL, element: <MedicalFacilityProfile /> }],
+        children: [
+            { index: true, element: <MedicalFacility /> },
+            { path: PATHS.MEDICAL_FACILITY.DETAIL, element: <MedicalFacilityProfile /> },
+        ],
     },
     {
         path: PATHS.SPECIALTIES.ROOT,
         element: <SpecialtiesList />,
         // children: [{ path: PATHS.SPECIALTIES.PROFILE, element: <SpecialtiesProfile /> }],
+    },
+    {
+        path: PATHS.MEDICAL_FACILITY.ROOT,
+        element: <MedicalFacility />,
+        // children: [{ path: PATHS.MEDICAL_FACILITY.PROFILE, element: <MedicalFacilityProfile /> }],
     },
     {
         path: PATHS.CHAT,
