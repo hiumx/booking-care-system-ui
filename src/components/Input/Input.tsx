@@ -2,6 +2,22 @@ import React, { useMemo, useState } from 'react';
 import clsx from 'clsx';
 import '@/styles/_auth.scss';
 
+/**
+ * Props for the Input component.
+ *
+ * @property {string} [id] - The unique identifier for the input element.
+ * @property {string} [name] - The name attribute for the input element.
+ * @property {React.ReactNode} [label] - The label to display alongside the input.
+ * @property {React.ReactNode} [leftIcon] - An icon to display on the left side of the input.
+ * @property {React.ReactNode} [leftContent] - Custom content to display on the left side of the input.
+ * @property {'phone' | 'email'} [wrapVariant] - The variant of the input wrapper, e.g., for phone or email styling.
+ * @property {boolean} [showPasswordToggle] - Whether to show a toggle button for password visibility.
+ * @property {boolean} [isPasswordVisible] - Whether the password is currently visible.
+ * @property {(visible: boolean) => void} [onTogglePassword] - Callback when the password visibility is toggled.
+ * @property {string} [wrapperClassName] - Additional class name(s) for the input wrapper.
+ *
+ * Inherits all standard input attributes from React.InputHTMLAttributes<HTMLInputElement>.
+ */
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     id?: string;
     name?: string;
