@@ -18,7 +18,7 @@ import '@/styles/_auth.scss';
  *
  * Inherits all standard input attributes from React.InputHTMLAttributes<HTMLInputElement>.
  */
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     id?: string;
     name?: string;
     label?: React.ReactNode;
