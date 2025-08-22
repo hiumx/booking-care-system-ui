@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import InvoiceModal from './InvoiceModal';
+import Pagination from '../../../components/Pagination/Pagination';
 import clsx from 'clsx';
 
 import styles from './Invoices.module.scss';
@@ -40,6 +41,14 @@ const invoiceData = [
         bookedOn: '15 Feb 2024',
         amount: '$480',
     },
+
+    {
+        id: '#INV1221',
+        doctor: { name: 'HaNoi', img: '/src/assets/img/doctors/doctor-thumb-01.jpg' },
+        appointmentDate: '18 Feb 2024',
+        bookedOn: '15 Feb 2024',
+        amount: '$420',
+    },
 ];
 
 const Invoices: React.FC = () => {
@@ -48,6 +57,15 @@ const Invoices: React.FC = () => {
         undefined
     );
     const [isClosing, setIsClosing] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5; // Số hóa đơn hiển thị mỗi trang
+
+    // Tính toán dữ liệu cho trang hiện tại
+    const totalPages = Math.ceil(invoiceData.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentInvoices = invoiceData.slice(startIndex, endIndex);
+
     const handleOpenModal = (invoice: (typeof invoiceData)[0]) => {
         setSelectedInvoice(invoice);
         setShowModal(true);
@@ -62,6 +80,10 @@ const Invoices: React.FC = () => {
             setIsClosing(false);
             setSelectedInvoice(undefined);
         }
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
     };
 
     return (
@@ -94,7 +116,7 @@ const Invoices: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {invoiceData.map((item) => (
+                            {currentInvoices.map((item) => (
                                 <tr key={item.id}>
                                     <td>
                                         <a
@@ -148,40 +170,13 @@ const Invoices: React.FC = () => {
             </div>
 
             {/* Pagination */}
-            <div className="pagination dashboard-pagination">
-                <ul>
-                    <li>
-                        <a href="#" className="page-link prev">
-                            Trước
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" className="page-link">
-                            1
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" className="page-link active">
-                            2
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" className="page-link">
-                            3
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" className="page-link">
-                            4
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" className="page-link next">
-                            Sau
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                showPrevNext={true}
+                maxVisiblePages={5}
+            />
 
             {/* Modal View Invoice */}
             <InvoiceModal

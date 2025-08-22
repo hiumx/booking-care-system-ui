@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import clsx from 'clsx';
+import Button from '../../../../components/Button';
 
 import styles from './InvoiceModal.module.scss';
 
@@ -24,6 +25,67 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
     isClosing,
     onAnimationEnd,
 }) => {
+    const scrollPositionRef = useRef<number>(0);
+
+    // Prevent body scroll when modal is open
+    useEffect(() => {
+        if (show && !isClosing) {
+            // Save current scroll position with fallbacks
+            scrollPositionRef.current =
+                window.pageYOffset ||
+                document.documentElement.scrollTop ||
+                document.body.scrollTop ||
+                0;
+
+            // Add class and set styles to prevent scroll
+            document.body.classList.add('modalOpen');
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollPositionRef.current}px`;
+            document.body.style.width = '100%';
+            document.body.style.left = '0';
+            document.body.style.overflow = 'hidden';
+        } else if (!show && !isClosing) {
+            // Modal is completely closed, restore scroll
+            const timer = setTimeout(() => {
+                // Remove class and styles
+                document.body.classList.remove('modalOpen');
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                document.body.style.left = '';
+                document.body.style.overflow = '';
+
+                // Restore scroll position
+                try {
+                    window.scrollTo({
+                        top: scrollPositionRef.current,
+                        behavior: 'instant',
+                    });
+                } catch (e) {
+                    // Fallback for older browsers
+                    console.log(e);
+                    window.scrollTo(0, scrollPositionRef.current);
+                }
+
+                // Additional fallback
+                document.documentElement.scrollTop = scrollPositionRef.current;
+                document.body.scrollTop = scrollPositionRef.current;
+            }, 100); // Slightly longer delay to ensure modal is fully closed
+
+            return () => clearTimeout(timer);
+        }
+
+        // Cleanup on unmount
+        return () => {
+            document.body.classList.remove('modalOpen');
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            document.body.style.left = '';
+            document.body.style.overflow = '';
+        };
+    }, [show, isClosing]);
+
     if ((!show && !isClosing) || !invoice) return null;
     return (
         <>
@@ -43,9 +105,12 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                         : undefined
                 }
             >
-                <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
+                <div
+                    className={clsx('modal-dialog modal-dialog-centered', styles.responsiveModal)}
+                    role="document"
+                >
+                    <div className={clsx('modal-content', styles.modalContent)}>
+                        <div className={clsx('modal-header')}>
                             <h3 className="modal-title">Xem Hoá Đơn</h3>
                             <button
                                 type="button"
@@ -56,26 +121,35 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                 <i className="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                        <div className="modal-body pb-0">
-                            <div className="prescribe-download">
+                        <div className={clsx('modal-body pb-0')}>
+                            <div className={clsx(styles.prescribeDownload, 'prescribe-download')}>
                                 <h5>{invoice.bookedOn}</h5>
                                 <ul>
                                     <li>
-                                        <button className="print-link btn btn-link">
+                                        <button
+                                            className="print-link btn btn-link"
+                                            type="button"
+                                            onClick={() => window.print()}
+                                            title="In hóa đơn"
+                                        >
                                             <i className="isax isax-printer"></i>
                                         </button>
                                     </li>
                                     <li>
-                                        <a
-                                            href="#"
-                                            className="btn btn-md btn-primary-gradient rounded-pill"
-                                        >
-                                            Tải xuống
-                                        </a>
+                                        <Button
+                                            text="Tải xuống"
+                                            type="button"
+                                            className="btn-md rounded-pill"
+                                        />
                                     </li>
                                 </ul>
                             </div>
-                            <div className="view-prescribe invoice-content mb-0">
+                            <div
+                                className={clsx(
+                                    'view-prescribe invoice-content mb-0',
+                                    styles.invoiceContent
+                                )}
+                            >
                                 <div className="invoice-item">
                                     <div className="row">
                                         <div className="col-md-6">
@@ -95,7 +169,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                 {/* Invoice Item */}
                                 <div className="invoice-item">
                                     <div className="row">
-                                        <div className="col-md-4">
+                                        <div className="col-md-4 col-sm-6">
                                             <div className="invoice-info">
                                                 <h6 className="customer-text">Thanh Toán Từ</h6>
                                                 <p className="invoice-details invoice-details-two">
@@ -105,7 +179,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="col-md-4">
+                                        <div className="col-md-4 col-sm-6">
                                             <div className="invoice-info">
                                                 <h6 className="customer-text">Thanh Toán Cho</h6>
                                                 <p className="invoice-details invoice-details-two">
@@ -117,7 +191,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="col-md-4">
+                                        <div className="col-md-4 col-12">
                                             <div className="invoice-info invoice-info2">
                                                 <h6
                                                     className={clsx(
@@ -150,7 +224,12 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                         <div className="col-md-12">
                                             <h6>Chi Tiết Hoá Đơn</h6>
                                             <div className="invoice-table">
-                                                <div className="table-responsive">
+                                                <div
+                                                    className={clsx(
+                                                        styles.tableResponsive,
+                                                        'table-responsive'
+                                                    )}
+                                                >
                                                     <table className="table table-bordered">
                                                         <thead>
                                                             <tr>
@@ -229,9 +308,8 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
             </div>
             {/* Overlay to close modal when clicking outside */}
             <div
-                className="modal-backdrop fade show modal-animate"
+                className={clsx('modal-backdrop fade show modal-animate', styles.modalBackdrop)}
                 onClick={onClose}
-                style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1040 }}
             />
         </>
     );
