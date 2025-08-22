@@ -1,0 +1,23 @@
+// Match FAQ page header behavior and keep icon only
+:global(.faq-section-inner) {
+    :global(.accordion-button) {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background-color: transparent !important;
+        color: #0f2a44;
+        border-radius: 0;
+        box-shadow: none !important;
+        padding: 3px 10px;
+        width: 100%;
+        box-sizing: border-box;
+
+        &:hover {
+            background-color: transparent !important;
+        }
+        &:focus {
+            box-shadow: none !important;
+        }
+    }
+    /* Force active header to keep transparent background (override Bootstrap) */
+}

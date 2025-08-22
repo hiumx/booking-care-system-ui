@@ -18,8 +18,9 @@ import FAQ from '@/pages/FAQ';
 import Blog from '@/pages/Blog';
 import BlogDetail from '@/pages/BlogDetail';
 import MedicalTerms from '@/pages/MedicalTerms';
-import CategoryArticles from '~/pages/CategoryBlogs';
-import CategoryArticlesDemo from '~/pages/CategoryBlogsDemo';
+import CategoryArticles from '@/pages/CategoryBlogs';
+import CategoryArticlesDemo from '@/pages/CategoryBlogsDemo';
+import AboutUs from '@/pages/AboutUs/AboutUs';
 
 const routes: RouteObject[] = [
     {
@@ -57,6 +58,10 @@ const routes: RouteObject[] = [
     {
         path: PATHS.SUBSCRIPTION_PLANS,
         element: <SubscriptionPlans />,
+    },
+    {
+        path: PATHS.ABOUT_US,
+        element: <AboutUs />,
     },
 
     // Authentication paths
