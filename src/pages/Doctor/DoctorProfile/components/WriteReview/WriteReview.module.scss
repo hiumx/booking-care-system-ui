@@ -1,0 +1,166 @@
+.writeReview {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #e3e6ed;
+    border-radius: 8px;
+    background: #fff;
+
+    h4 {
+        margin-bottom: 20px;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .mb-3 {
+        margin-bottom: 1rem !important;
+    }
+
+    label {
+        font-weight: 500;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .form-control {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px 12px;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+
+        &:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        &::placeholder {
+            color: #999;
+        }
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .text-muted {
+        font-size: 12px;
+        color: #6c757d !important;
+    }
+
+    hr {
+        margin: 20px 0;
+        border: none;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .custom-checkbox {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+
+        input[type='checkbox'] {
+            margin: 0;
+            margin-top: 2px;
+        }
+
+        label {
+            font-size: 14px;
+            line-height: 1.4;
+            cursor: pointer;
+
+            a {
+                color: #007bff;
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+
+    .submit-section {
+        text-align: right;
+
+        .submit-btn {
+            min-width: 120px;
+        }
+    }
+}
+
+.starRating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    gap: 2px;
+    margin-bottom: 10px;
+
+    .starInput {
+        display: none;
+    }
+
+    .starLabel {
+        cursor: pointer;
+        font-size: 20px;
+        color: #ddd;
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: #ffc107;
+        }
+
+        .fa-star {
+            transition: color 0.2s ease;
+
+            &.active {
+                color: #ffc107;
+            }
+        }
+    }
+
+    // Hover effect for rating
+    .starLabel:hover,
+    .starLabel:hover ~ .starLabel {
+        .fa-star {
+            color: #ffc107;
+        }
+    }
+}
+
+.termsAccept {
+    display: flex;
+    input {
+        margin-right: 8px;
+        cursor: pointer;
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .writeReview {
+        padding: 15px;
+        margin-bottom: 20px;
+
+        h4 {
+            font-size: 16px;
+        }
+
+        .starRating {
+            .starLabel {
+                font-size: 18px;
+            }
+        }
+
+        .submit-section {
+            text-align: center;
+
+            .submit-btn {
+                width: 100%;
+                min-width: auto;
+            }
+        }
+    }
+}

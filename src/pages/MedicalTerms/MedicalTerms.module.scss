@@ -1,0 +1,453 @@
+.medicalTerms {
+    background: #fff;
+    min-height: 100vh;
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 40px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 32px 0;
+
+            .title {
+                font-size: 28px;
+                font-weight: 700;
+                color: #333;
+                margin: 0 0 12px 0;
+                line-height: 1.2;
+            }
+
+            .subtitle {
+                font-size: 16px;
+                color: #666;
+                margin: 0;
+                line-height: 1.5;
+            }
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 24px;
+            border: 1px solid #e9ecef;
+
+            .tab {
+                flex: 1;
+                padding: 10px 16px;
+                border: none;
+                background: transparent;
+                color: #666;
+                font-weight: 600;
+                font-size: 14px;
+                cursor: pointer;
+                border-radius: 6px;
+                transition: all 0.3s ease;
+
+                &.active {
+                    background: #007bff;
+                    color: white;
+                }
+
+                &:hover:not(.active) {
+                    background: #e9ecef;
+                    color: #333;
+                }
+            }
+        }
+
+        .searchSection {
+            margin-bottom: 24px;
+
+            .searchForm {
+                .searchBar {
+                    display: flex;
+                    border: 1px solid #e9ecef;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    transition: border-color 0.3s ease;
+
+                    &:focus-within {
+                        border-color: #007bff;
+                    }
+
+                    .searchInput {
+                        flex: 1;
+                        padding: 12px 16px;
+                        border: none;
+                        outline: none;
+                        font-size: 14px;
+                        background: white;
+
+                        &::placeholder {
+                            color: #999;
+                        }
+                    }
+
+                    .searchBtn {
+                        padding: 12px 16px;
+                        background: white;
+                        color: #9ca3af;
+                        border: none;
+                        cursor: pointer;
+                        font-size: 14px;
+                        transition: background-color 0.3s ease;
+                        &:hover {
+                            background: #f8f9fa;
+                        }
+                    }
+                }
+            }
+        }
+
+        .alphabetFilter {
+            margin-bottom: 32px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+
+            .alphabetLabel {
+                font-size: 14px;
+                font-weight: 600;
+                color: #374151;
+                margin-bottom: 12px;
+                text-align: center;
+            }
+
+            .letterGrid {
+                display: grid;
+                grid-template-columns: repeat(11, 1fr);
+                gap: 6px;
+
+                .letterBtn {
+                    padding: 8px 4px;
+                    border: 1px solid #e9ecef;
+                    background: white;
+                    color: #666;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 600;
+                    transition: all 0.3s ease;
+                    min-height: 36px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+
+                    &:hover {
+                        background: #007bff;
+                        color: white;
+                        border-color: #007bff;
+                    }
+
+                    &.active {
+                        background: #007bff;
+                        color: white;
+                        border-color: #007bff;
+                    }
+
+                    &.disabled {
+                        background: #f5f5f5;
+                        color: #999;
+                        border-color: #ddd;
+                        cursor: not-allowed;
+                        opacity: 0.6;
+
+                        &:hover {
+                            background: #f5f5f5;
+                            color: #999;
+                            border-color: #ddd;
+                        }
+                    }
+
+                    &:nth-child(28) {
+                        grid-column: span 2;
+                    }
+                }
+            }
+        }
+
+        .content {
+            .letterSection {
+                margin-bottom: 40px;
+                scroll-margin-top: 80px;
+
+                .letterTitle {
+                    font-size: 24px;
+                    font-weight: 700;
+                    color: #333;
+                    margin: 0 0 16px 0;
+                    padding: 12px 0;
+                    border-bottom: 2px solid #007bff;
+                    position: relative;
+                }
+
+                .termsGrid {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 16px;
+                    margin-bottom: 16px;
+
+                    .termCard {
+                        background: white;
+                        border: none;
+                        border-radius: 0;
+                        padding: 4px 0;
+                        transition: all 0.3s ease;
+
+                        .termName {
+                            font-size: 14px;
+                            font-weight: 500;
+                            color: #333;
+                            margin: 0 0 4px 0;
+                            line-height: 1.4;
+                            transition: color 0.3s ease;
+                            cursor: pointer;
+                            display: inline-block;
+
+                            &:hover {
+                                color: #007bff;
+                                text-decoration: underline;
+                            }
+
+                            &.hovered {
+                                color: #007bff;
+                                text-decoration: underline;
+                            }
+                        }
+
+                        .termTranslation {
+                            font-size: 14px;
+                            color: #666;
+                            margin: 0;
+                            font-style: italic;
+                            line-height: 1.4;
+                            display: inline-block;
+                            cursor: pointer;
+                        }
+
+                        .termDescription {
+                            font-size: 12px;
+                            color: #666;
+                            margin: 0;
+                            line-height: 1.5;
+                        }
+                    }
+                }
+
+                .backToTop {
+                    text-align: right;
+                    margin-top: 12px;
+
+                    .backToTopBtn {
+                        background: transparent;
+                        border: none;
+                        color: #999;
+                        padding: 4px 8px;
+                        border-radius: 0;
+                        cursor: pointer;
+                        font-size: 12px;
+                        font-weight: 400;
+                        transition: color 0.3s ease;
+
+                        &:hover {
+                            background: transparent;
+                            color: #666;
+                            border-color: transparent;
+                        }
+                    }
+                }
+            }
+
+            .noResults {
+                text-align: center;
+                padding: 40px 20px;
+                color: #666;
+                font-size: 16px;
+            }
+        }
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1000px) {
+    .medicalTerms {
+        .container {
+            padding: 12px;
+
+            .content {
+                .letterSection {
+                    .termsGrid {
+                        grid-template-columns: repeat(3, 1fr);
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .medicalTerms {
+        .container {
+            padding: 12px;
+
+            .header {
+                margin-bottom: 24px;
+                padding: 24px 0;
+
+                .title {
+                    font-size: 24px;
+                }
+
+                .subtitle {
+                    font-size: 14px;
+                }
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+                gap: 4px;
+
+                .tab {
+                    min-width: calc(50% - 4px);
+                    padding: 8px 12px;
+                    font-size: 13px;
+                }
+            }
+
+            .searchSection {
+                .searchForm {
+                    .searchBar {
+                        .searchInput {
+                            padding: 10px 12px;
+                            font-size: 13px;
+                        }
+
+                        .searchBtn {
+                            padding: 10px 12px;
+                            font-size: 13px;
+                        }
+                    }
+                }
+            }
+
+            .alphabetFilter {
+                padding: 16px;
+
+                .letterGrid {
+                    grid-template-columns: repeat(7, 1fr);
+                    gap: 4px;
+
+                    .letterBtn {
+                        padding: 6px 4px;
+                        font-size: 13px;
+                        min-height: 32px;
+                    }
+                }
+            }
+
+            .content {
+                .letterSection {
+                    margin-bottom: 32px;
+
+                    .letterTitle {
+                        font-size: 20px;
+                        margin-bottom: 12px;
+                    }
+
+                    .termsGrid {
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 12px;
+
+                        .termCard {
+                            padding: 4px 0;
+
+                            .termName {
+                                font-size: 13px;
+                            }
+
+                            .termTranslation {
+                                font-size: 11px;
+                            }
+
+                            .termDescription {
+                                font-size: 11px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .medicalTerms {
+        .container {
+            .header {
+                .title {
+                    font-size: 20px;
+                }
+
+                .subtitle {
+                    font-size: 13px;
+                }
+            }
+
+            .tabs {
+                .tab {
+                    min-width: 100%;
+                    margin-bottom: 4px;
+                }
+            }
+
+            .alphabetFilter {
+                .letterGrid {
+                    grid-template-columns: repeat(4, 1fr);
+
+                    .letterBtn {
+                        padding: 6px 2px;
+                        font-size: 12px;
+                        min-height: 28px;
+                    }
+                }
+            }
+
+            .content {
+                .letterSection {
+                    .letterTitle {
+                        font-size: 18px;
+                    }
+
+                    .termsGrid {
+                        grid-template-columns: 1fr;
+                        gap: 16px;
+
+                        .termCard {
+                            padding: 6px 0;
+
+                            .termName {
+                                font-size: 14px;
+                            }
+
+                            .termTranslation {
+                                font-size: 12px;
+                            }
+
+                            .termDescription {
+                                font-size: 12px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

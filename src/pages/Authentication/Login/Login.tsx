@@ -5,9 +5,9 @@ import GoogleIcon from '@/assets/img/icons/google-icon.svg';
 import FacebookIcon from '@/assets/img/icons/facebook-icon.svg';
 import clsx from 'clsx';
 import styles from './Login.module.scss';
-import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
 import { PATHS } from '~/routes/paths';
 import Button from '~/components/Button';
+import Input from '~/components/Input';
 interface LoginProps {
     onSubmit?: (credentials: {
         method: 'email' | 'phone';
@@ -41,12 +41,12 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
         >
             <form onSubmit={handleSubmit}>
                 <div className="d-flex justify-content-center mb-3">
-                    <div className={authStyles.methodToggle}>
+                    <div className="method-toggle">
                         <button
                             type="button"
                             className={clsx(
-                                authStyles.toggleBtn,
-                                method === 'phone' && authStyles.toggleBtnActive
+                                'toggle-btn',
+                                method === 'phone' && 'toggle-btn-active'
                             )}
                             onClick={() => setMethod('phone')}
                         >
@@ -56,8 +56,8 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                         <button
                             type="button"
                             className={clsx(
-                                authStyles.toggleBtn,
-                                method === 'email' && authStyles.toggleBtnActive
+                                'toggle-btn',
+                                method === 'email' && 'toggle-btn-active'
                             )}
                             onClick={() => setMethod('email')}
                         >
@@ -70,73 +70,47 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                 {/* Email / Phone input */}
                 <div className="mb-3">
                     {method === 'email' ? (
-                        <>
-                            <label className="form-label" htmlFor="email">
-                                Email
-                            </label>
-                            <div className={authStyles.inputGroup}>
-                                <i className={clsx('feather-mail', authStyles.leftIcon)}></i>
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    placeholder="Nhập địa chỉ email"
-                                    className="form-control"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </div>
-                        </>
+                        <Input
+                            id="email"
+                            name="email"
+                            label="Email"
+                            type="email"
+                            placeholder="Nhập địa chỉ email"
+                            leftIcon={<i className="feather-mail" />}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            wrapVariant="email"
+                        />
                     ) : (
-                        <>
-                            <label className="form-label" htmlFor="phone">
-                                Số điện thoại
-                            </label>
-                            <div className={authStyles.inputGroup}>
-                                <i className={clsx('feather-phone', authStyles.leftIcon)}></i>
-                                <input
-                                    id="phone"
-                                    name="phone"
-                                    type="tel"
-                                    inputMode="tel"
-                                    placeholder="Nhập số điện thoại"
-                                    className="form-control"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                />
-                            </div>
-                        </>
+                        <Input
+                            id="phone"
+                            name="phone"
+                            label="Số điện thoại"
+                            type="tel"
+                            inputMode="tel"
+                            placeholder="Nhập số điện thoại"
+                            leftIcon={<i className="feather-phone" />}
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                        />
                     )}
                 </div>
 
                 {/* Password input */}
                 <div className="mb-3">
-                    <div>
-                        <label className="form-label" htmlFor="password">
-                            Mật khẩu
-                        </label>
-                    </div>
-                    <div className={clsx(authStyles.inputGroup)}>
-                        <i className={clsx('feather-lock', authStyles.leftIcon)}></i>
-                        <input
-                            id="password"
-                            name="password"
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="Nhập mật khẩu"
-                            className="form-control"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <span
-                            role="button"
-                            aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                            onClick={() => setShowPassword((v) => !v)}
-                            className={clsx(
-                                showPassword ? 'feather-eye' : 'feather-eye-off',
-                                authStyles.togglePassword
-                            )}
-                        />
-                    </div>
+                    <Input
+                        id="password"
+                        name="password"
+                        label="Mật khẩu"
+                        type="password"
+                        placeholder="Nhập mật khẩu"
+                        leftIcon={<i className="feather-lock" />}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        showPasswordToggle
+                        isPasswordVisible={showPassword}
+                        onTogglePassword={(v) => setShowPassword(v)}
+                    />
                 </div>
 
                 {/* Remember me & Forgot password */}
