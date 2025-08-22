@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import SubscriptionPlanCard from '@/pages/SubscriptionPlans/components/SubscriptionPlanCard';
+import SubscriptionPlanCard from './components';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import AOS from 'aos';
@@ -111,7 +111,7 @@ const SubscriptionPlans: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="row justify-content-center align-items-center">
+                    <div className="row justify-content-center">
                         {plans
                             .filter((plan) => plan.status === 'ACTIVE')
                             .map((plan) => (

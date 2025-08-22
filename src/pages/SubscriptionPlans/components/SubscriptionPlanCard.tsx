@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
+import styles from './SubscriptionPlanCard.module.scss';
 
 import priceIcon1 from '@/assets/img/icons/price-icon1.svg';
 import priceIcon2 from '@/assets/img/icons/price-icon2.svg';
@@ -42,8 +43,8 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan }) => 
 
     return (
         <div className="col-lg-4 col-sm-12" data-aos="fade-up">
-            <div className={clsx('card pricing-card', { active: plan.isPopular })}>
-                <div className="card-body">
+            <div className={clsx(styles.card, 'card pricing-card', { active: plan.isPopular })}>
+                <div className={clsx(styles.cardBody, 'card-body')}>
                     <div className="pricing-header">
                         <div className="pricing-header-info flex items-center">
                             <div className="pricing-icon">
