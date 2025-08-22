@@ -12,6 +12,7 @@ import ResetPassword from '@/pages/Authentication/ResetPassword';
 import DoctorProfile from '@/pages/Doctor/DoctorProfile';
 import SpecialtiesList from '@/pages/Specialties/SpecialtiesList';
 import SubscriptionPlans from '@/pages/SubscriptionPlans';
+import MedicalFacility from '@/pages/MedicalFacility/MedicalFacilityList';
 import { PATHS } from './paths';
 import FAQ from '@/pages/FAQ';
 import Blog from '@/pages/Blog';
@@ -91,6 +92,11 @@ const routes: RouteObject[] = [
         path: PATHS.SPECIALTIES.ROOT,
         element: <SpecialtiesList />,
         // children: [{ path: PATHS.SPECIALTIES.PROFILE, element: <SpecialtiesProfile /> }],
+    },
+    {
+        path: PATHS.MEDICAL_FACILITY.ROOT,
+        element: <MedicalFacility />,
+        // children: [{ path: PATHS.MEDICAL_FACILITY.PROFILE, element: <MedicalFacilityProfile /> }],
     },
     {
         path: PATHS.CHAT,
