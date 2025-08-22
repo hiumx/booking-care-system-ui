@@ -82,22 +82,6 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
             ? `${review.text.slice(0, maxTextLength)}...`
             : review.text;
 
-    // Recommendation logic
-    const recommendStatus =
-        review.recommend === true
-            ? {
-                  icon: 'fa-thumbs-up',
-                  text: 'Đề xuất đặt lịch hẹn',
-                  className: 'recommend-positive thumb-icon',
-              }
-            : review.recommend === false
-              ? {
-                    icon: 'fa-thumbs-down',
-                    text: 'Không đề xuất đặt lịch hẹn',
-                    className: 'recommend-negative',
-                }
-              : null;
-
     // Handle reply submission
     const handleReplySubmit = (replyData: { reviewId: number; text: string }) => {
         if (onReply) {
@@ -110,7 +94,9 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
     // Handle reply to main review
     const handleReplyToReview = () => {
         setShowReplyForm(true);
+
         setReplyToReplyId(null);
+        setShowEditForm(false);
     };
 
     // Handle reply to a specific reply
@@ -171,6 +157,8 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
     // Reply edit/delete handlers
     const handleEditReply = (replyId: number) => {
         setEditingReplyId(replyId);
+
+        setShowReplyForm(false);
     };
 
     const handleSaveReply = (replyId: number, newText: string) => {
@@ -257,19 +245,6 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                         </div>
                     </div>
                 </div>
-                {recommendStatus && (
-                    <span
-                        className={clsx('recommend-icon', recommendStatus.className)}
-                        role="note"
-                        aria-label={recommendStatus.text}
-                    >
-                        <i
-                            className={clsx('fa-regular', recommendStatus.icon)}
-                            aria-hidden="true"
-                        ></i>{' '}
-                        {recommendStatus.text}
-                    </span>
-                )}
             </div>
             <p>{truncatedText}</p>
 

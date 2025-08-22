@@ -10,6 +10,9 @@ import Register from '@/pages/Authentication/Register';
 import ForgotPassword from '@/pages/Authentication/ForgotPassword';
 import ResetPassword from '@/pages/Authentication/ResetPassword';
 import DoctorProfile from '@/pages/Doctor/DoctorProfile';
+import SpecialtiesList from '@/pages/Specialties/SpecialtiesList';
+import SubscriptionPlans from '@/pages/SubscriptionPlans';
+import MedicalFacility from '@/pages/MedicalFacility/MedicalFacilityList';
 import { PATHS } from './paths';
 import FAQ from '@/pages/FAQ';
 import Blog from '@/pages/Blog';
@@ -53,6 +56,10 @@ const routes: RouteObject[] = [
         element: <CategoryArticlesDemo />,
     },
     {
+        path: PATHS.SUBSCRIPTION_PLANS,
+        element: <SubscriptionPlans />,
+    },
+    {
         path: PATHS.ABOUT_US,
         element: <AboutUs />,
     },
@@ -85,6 +92,16 @@ const routes: RouteObject[] = [
     {
         path: PATHS.USER.ROOT,
         children: [{ path: PATHS.USER.PROFILE, element: <UserProfile /> }],
+    },
+    {
+        path: PATHS.SPECIALTIES.ROOT,
+        element: <SpecialtiesList />,
+        // children: [{ path: PATHS.SPECIALTIES.PROFILE, element: <SpecialtiesProfile /> }],
+    },
+    {
+        path: PATHS.MEDICAL_FACILITY.ROOT,
+        element: <MedicalFacility />,
+        // children: [{ path: PATHS.MEDICAL_FACILITY.PROFILE, element: <MedicalFacilityProfile /> }],
     },
     {
         path: PATHS.CHAT,

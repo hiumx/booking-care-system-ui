@@ -12,6 +12,7 @@ export const PATHS = {
     MEDICAL_TERMS: '/medical-terms',
     CATEGORY_ARTICLES: '/category/:categorySlug',
     CATEGORY_ARTICLES_DEMO: '/category-demo',
+    SUBSCRIPTION_PLANS: '/subscription-plans',
     ABOUT_US: '/about-us',
 
     // Authentication paths
@@ -33,6 +34,18 @@ export const PATHS = {
     // Doctor paths
     DOCTOR: {
         ROOT: '/doctor',
+        PROFILE: 'profile',
+    },
+
+    // Specialties paths
+    SPECIALTIES: {
+        ROOT: '/specialties',
+        PROFILE: 'profile',
+    },
+
+    // Medical Facility paths
+    MEDICAL_FACILITY: {
+        ROOT: '/medical-facility',
         PROFILE: 'profile',
     },
 
