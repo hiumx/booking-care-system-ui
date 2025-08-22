@@ -1,0 +1,136 @@
+.featuredVideos {
+    margin-bottom: 40px;
+
+    .title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #333;
+        margin: 0 0 20px 0;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 320px; // enlarge main video, shrink sidebar
+        gap: 20px;
+    }
+
+    .mainVideo {
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        overflow: hidden;
+        .videoFrame {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; // 16:9
+
+            iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: 0;
+                display: block;
+            }
+        }
+
+        .videoHeading {
+            display: block;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            background: #f8fafc;
+            border-top: 1px solid #e9ecef;
+
+            &:hover {
+                color: #0d6efd;
+            }
+        }
+    }
+
+    .sideList {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        max-height: 520px;
+        overflow: auto;
+
+        /* custom scrollbar */
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: #cfd8e3;
+            border-radius: 8px;
+        }
+        &::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+    }
+
+    .sideCard {
+        flex: 0 0 auto; // prevent shrinking when container scrolls
+        display: block;
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+        transition: none;
+
+        .thumbBox {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                transition: transform 0.25s ease; // zoom image only
+            }
+        }
+
+        .sideTitle {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            margin: 10px 12px 12px 12px;
+            line-height: 1.4;
+            transition: color 0.2s ease;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        &:hover .sideTitle {
+            color: #0d6efd;
+        }
+
+        // zoom image on hover instead of lifting card
+        &:hover .thumbBox img {
+            transform: scale(1.06);
+        }
+
+        &.active {
+            border-color: #0d6efd;
+        }
+    }
+}
+
+@media (max-width: 1024px) {
+    .featuredVideos {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+}

@@ -1,0 +1,334 @@
+.medicalDictionary {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e9ecef;
+
+    .title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #333;
+        margin: 0 0 20px 0;
+        text-align: center;
+    }
+
+    .tabs {
+        display: flex;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 4px;
+        margin-bottom: 25px;
+
+        .tab {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+
+            &.active {
+                background: #007bff;
+                color: white;
+            }
+
+            &:hover:not(.active) {
+                background: #e9ecef;
+                color: #333;
+            }
+        }
+    }
+
+    .searchSection {
+        margin-bottom: 25px;
+
+        .searchBar {
+            display: flex;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+
+            &:focus-within {
+                border-color: #007bff;
+            }
+
+            .searchInput {
+                flex: 1;
+                padding: 12px 16px;
+                border: none;
+                outline: none;
+                font-size: 16px;
+
+                &::placeholder {
+                    color: #999;
+                }
+            }
+
+            .searchBtn {
+                padding: 12px 16px;
+                background: white;
+                color: #9ca3af;
+                border: none;
+                cursor: pointer;
+                font-size: 18px;
+                transition: background-color 0.3s;
+                &:hover {
+                    background: #f8f9fa;
+                }
+            }
+        }
+    }
+
+    .alphabetFilter {
+        display: grid;
+        grid-template-columns: repeat(14, 1fr);
+        gap: 8px;
+        margin-bottom: 30px;
+
+        .alphabetLabel {
+            grid-column: 1 / -1;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 2px;
+        }
+
+        .letterBtn {
+            padding: 8px 4px;
+            border: 1px solid #e9ecef;
+            background: white;
+            color: #666;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+
+            &:hover {
+                background: #007bff;
+                color: white;
+                border-color: #007bff;
+                text-decoration: none;
+            }
+
+            &:nth-child(28) {
+                grid-column: span 2;
+            }
+        }
+    }
+
+    .contentCards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+
+        .medicineCard {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+            transition: box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            height: 100%;
+
+            .imageLink {
+                display: block;
+                overflow: hidden;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
+
+                &:hover {
+                    .medicineImage {
+                        transform: scale(1.05);
+                    }
+                }
+            }
+
+            .medicineImage {
+                width: 100%;
+                aspect-ratio: 16 / 9;
+                height: auto;
+                object-fit: cover;
+                object-position: center;
+                display: block;
+                transition: transform 0.3s ease;
+            }
+
+            .medicineContent {
+                padding: 15px;
+                display: flex;
+                flex-direction: column;
+                height: auto;
+
+                .medicineTitle {
+                    font-size: 16px;
+                    font-weight: 700;
+                    color: #333;
+                    margin: 0 0 8px 0;
+                    line-height: 1.4;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    flex-grow: 1;
+                    transition: color 0.3s ease;
+                    text-decoration: none;
+
+                    &:hover {
+                        color: #007bff;
+                    }
+                }
+
+                .medicineName {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #666;
+                    margin: 0 0 10px 0;
+                    line-height: 1.3;
+                }
+
+                .medicineMeta {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 8px;
+                    font-size: 12px;
+                    color: #666;
+                    margin-top: auto;
+                    line-height: 1.4;
+
+                    .medicineMetaText {
+                        display: inline;
+                        white-space: normal;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        max-width: 100%;
+                        word-wrap: break-word;
+                    }
+
+                    .medicineSource {
+                        font-weight: 600;
+                        color: #333;
+                        text-decoration: none;
+                        transition: color 0.3s ease;
+                        margin-right: 8px;
+
+                        &:hover {
+                            color: #007bff;
+                        }
+                    }
+
+                    .metaSeparator {
+                        color: black;
+                        user-select: none;
+                        margin-right: 8px;
+                    }
+
+                    .medicineDate {
+                        color: #666;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .medicalDictionary {
+        .contentCards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .medicalDictionary {
+        padding: 20px;
+
+        .title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            flex-wrap: wrap;
+
+            .tab {
+                min-width: 120px;
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+        }
+
+        .searchSection {
+            .searchBar {
+                .searchInput {
+                    padding: 10px 12px;
+                    font-size: 14px;
+                }
+            }
+        }
+
+        .alphabetFilter {
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+
+            .letterBtn {
+                padding: 6px 2px;
+                font-size: 12px;
+            }
+        }
+
+        .contentCards {
+            grid-template-columns: 1fr;
+            gap: 15px;
+
+            .medicineCard {
+                .medicineContent {
+                    padding: 16px;
+
+                    .medicineTitle {
+                        font-size: 17px;
+                    }
+
+                    .medicineName {
+                        font-size: 15px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .medicalDictionary {
+        .contentCards {
+            .medicineCard {
+                .medicineContent {
+                    padding: 14px;
+
+                    .medicineTitle {
+                        font-size: 16px;
+                    }
+
+                    .medicineName {
+                        font-size: 14px;
+                    }
+                }
+            }
+        }
+    }
+}

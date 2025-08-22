@@ -9,8 +9,15 @@ import Login from '@/pages/Authentication/Login';
 import Register from '@/pages/Authentication/Register';
 import ForgotPassword from '@/pages/Authentication/ForgotPassword';
 import ResetPassword from '@/pages/Authentication/ResetPassword';
+import DoctorProfile from '@/pages/Doctor/DoctorProfile';
 import { PATHS } from './paths';
 import FAQ from '@/pages/FAQ';
+import Blog from '@/pages/Blog';
+import BlogDetail from '@/pages/BlogDetail';
+import MedicalTerms from '@/pages/MedicalTerms';
+import CategoryArticles from '~/pages/CategoryBlogs';
+import CategoryArticlesDemo from '~/pages/CategoryBlogsDemo';
+import MedicalFacilityProfile from '@/pages/MedicalFacility/MedicalFacilityProfile';
 
 const routes: RouteObject[] = [
     {
@@ -24,6 +31,26 @@ const routes: RouteObject[] = [
     {
         path: PATHS.FAQ,
         element: <FAQ />,
+    },
+    {
+        path: PATHS.BLOG,
+        element: <Blog />,
+    },
+    {
+        path: PATHS.BLOG_DETAIL,
+        element: <BlogDetail />,
+    },
+    {
+        path: PATHS.MEDICAL_TERMS,
+        element: <MedicalTerms />,
+    },
+    {
+        path: PATHS.CATEGORY_ARTICLES,
+        element: <CategoryArticles />,
+    },
+    {
+        path: PATHS.CATEGORY_ARTICLES_DEMO,
+        element: <CategoryArticlesDemo />,
     },
 
     // Authentication paths
@@ -58,13 +85,17 @@ const routes: RouteObject[] = [
     {
         path: PATHS.MEDICAL_FACILITY.ROOT,
         // element: <MedicalFacility />,
-        // children: [{ path: PATHS.MEDICAL_FACILITY.PROFILE, element: <MedicalFacilityProfile /> }],
+        children: [{ path: PATHS.MEDICAL_FACILITY.PROFILE, element: <MedicalFacilityProfile /> }],
     },
     {
         path: PATHS.CHAT,
         element: <Chat />,
     },
 
+    {
+        path: PATHS.DOCTOR.ROOT,
+        children: [{ path: PATHS.DOCTOR.PROFILE, element: <DoctorProfile /> }],
+    },
     {
         path: PATHS.DASHBOARD.ROOT,
         children: [
