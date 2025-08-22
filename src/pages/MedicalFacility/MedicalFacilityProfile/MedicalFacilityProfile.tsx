@@ -4,15 +4,12 @@ import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import clsx from 'clsx';
 import styles from './MedicalFacilityProfile.module.scss';
+import Overview from './components/Overview';
+import LocationTab from './components/Location';
+import BusinessHours from './components/BusinessHours';
+import ReviewCard from '@/components/ReviewCard';
+import Pagination from '@/components/Pagination';
 
-// Định nghĩa BreadcrumbItem trong file này để tránh lỗi TS2614
-interface BreadcrumbItem {
-    label: string;
-    path?: string;
-    isActive?: boolean;
-}
-
-// Nhập ảnh
 import medicalImg1 from '@/assets/img/medical-img1.jpg';
 import patientImg from '@/assets/img/patients/patient.jpg';
 import patientImg1 from '@/assets/img/patients/patient1.jpg';
@@ -22,7 +19,12 @@ import featureImg2 from '@/assets/img/features/feature-02.jpg';
 import featureImg3 from '@/assets/img/features/feature-03.jpg';
 import featureImg4 from '@/assets/img/features/feature-04.jpg';
 
-// Giao diện dựa trên schema cơ sở dữ liệu
+interface BreadcrumbItem {
+    label: string;
+    path?: string;
+    isActive?: boolean;
+}
+
 interface Clinic {
     id: number;
     account_id: number;
@@ -78,7 +80,8 @@ interface BusinessHour {
     time: string;
 }
 
-// Dữ liệu giả lập khớp với schema cơ sở dữ liệu, nội dung bằng tiếng Việt
+// Updated mock data in MedicalFacilityProfile.tsx
+
 const mockClinic: Clinic = {
     id: 1,
     account_id: 1,
@@ -87,7 +90,7 @@ const mockClinic: Clinic = {
     phone: '320-795-8815',
     email: 'lienhe@medlife.com',
     description:
-        'Phòng khám Medlife cung cấp dịch vụ y tế chất lượng cao, với đội ngũ bác sĩ giàu kinh nghiệm và trang thiết bị hiện đại. Chúng tôi cam kết mang lại sự chăm sóc tốt nhất cho bệnh nhân, từ khám bệnh định kỳ đến điều trị chuyên sâu.',
+        'Phòng khám Medlife là một cơ sở y tế hàng đầu tại khu vực, được thành lập từ năm 2005 với sứ mệnh mang đến dịch vụ chăm sóc sức khỏe toàn diện, chất lượng cao và thân thiện với bệnh nhân. Chúng tôi tự hào sở hữu đội ngũ bác sĩ và nhân viên y tế giàu kinh nghiệm, được đào tạo tại các trường đại học y khoa uy tín trong và ngoài nước. Với hơn 15 năm hoạt động, Medlife đã phục vụ hàng ngàn bệnh nhân, từ các trường hợp khám sức khỏe định kỳ đến điều trị các bệnh lý phức tạp. Phòng khám được trang bị hệ thống máy móc hiện đại nhập khẩu từ các quốc gia tiên tiến như Mỹ, Đức và Nhật Bản, bao gồm máy siêu âm 4D, máy chụp CT, MRI, và các thiết bị xét nghiệm tự động hóa cao. Chúng tôi cam kết tuân thủ nghiêm ngặt các tiêu chuẩn vệ sinh và an toàn y tế theo quy định của Bộ Y tế, đảm bảo môi trường khám chữa bệnh sạch sẽ, thoải mái và an toàn tuyệt đối cho mọi bệnh nhân. Tại Medlife, chúng tôi không chỉ tập trung vào việc điều trị bệnh mà còn nhấn mạnh vào công tác phòng ngừa, giáo dục sức khỏe cộng đồng thông qua các chương trình hội thảo, tư vấn miễn phí và các chiến dịch nâng cao nhận thức về lối sống lành mạnh. Dịch vụ của chúng tôi bao gồm khám ngoại trú, nội trú ngắn ngày, tiêm chủng, kiểm tra sức khỏe doanh nghiệp, và hỗ trợ tư vấn trực tuyến 24/7. Chúng tôi luôn đặt bệnh nhân làm trung tâm, lắng nghe và đồng hành cùng bạn trong mọi giai đoạn sức khỏe. Với phương châm "Sức khỏe là vàng", Medlife không ngừng cải tiến để mang đến trải nghiệm tốt nhất, giúp bạn và gia đình sống khỏe mạnh hơn mỗi ngày. Ngoài ra, phòng khám còn hợp tác chặt chẽ với các bệnh viện lớn trong khu vực để chuyển tuyến kịp thời các ca bệnh nặng, đảm bảo sự liên tục trong chăm sóc. Chúng tôi cũng đầu tư vào nghiên cứu y khoa, tham gia các dự án cộng đồng như khám bệnh miễn phí cho người nghèo, hỗ trợ y tế vùng sâu vùng xa, và các chương trình đào tạo nâng cao năng lực cho nhân viên y tế địa phương. Medlife không chỉ là nơi chữa bệnh mà còn là người bạn đồng hành đáng tin cậy trong hành trình chăm sóc sức khỏe của bạn.',
     background_url: medicalImg1,
     avatar_url: medicalImg1,
     status: 'ACTIVE',
@@ -98,7 +101,7 @@ const mockClinic: Clinic = {
 const mockSpecialties: Specialty[] = [
     {
         id: 1,
-        name: 'Dược phẩm',
+        name: 'Nội khoa',
         image_url: medicalImg1,
         status: 'ACTIVE',
         created_at: '2023-01-01T00:00:00Z',
@@ -106,7 +109,71 @@ const mockSpecialties: Specialty[] = [
     },
     {
         id: 2,
-        name: 'Thiết bị phẫu thuật',
+        name: 'Ngoại khoa',
+        image_url: medicalImg1,
+        status: 'ACTIVE',
+        created_at: '2023-01-01T00:00:00Z',
+        updated_at: '2023-01-01T00:00:00Z',
+    },
+    {
+        id: 3,
+        name: 'Sản phụ khoa',
+        image_url: medicalImg1,
+        status: 'ACTIVE',
+        created_at: '2023-01-01T00:00:00Z',
+        updated_at: '2023-01-01T00:00:00Z',
+    },
+    {
+        id: 4,
+        name: 'Nhi khoa',
+        image_url: medicalImg1,
+        status: 'ACTIVE',
+        created_at: '2023-01-01T00:00:00Z',
+        updated_at: '2023-01-01T00:00:00Z',
+    },
+    {
+        id: 5,
+        name: 'Tai mũi họng',
+        image_url: medicalImg1,
+        status: 'ACTIVE',
+        created_at: '2023-01-01T00:00:00Z',
+        updated_at: '2023-01-01T00:00:00Z',
+    },
+    {
+        id: 6,
+        name: 'Răng hàm mặt',
+        image_url: medicalImg1,
+        status: 'ACTIVE',
+        created_at: '2023-01-01T00:00:00Z',
+        updated_at: '2023-01-01T00:00:00Z',
+    },
+    {
+        id: 7,
+        name: 'Da liễu',
+        image_url: medicalImg1,
+        status: 'ACTIVE',
+        created_at: '2023-01-01T00:00:00Z',
+        updated_at: '2023-01-01T00:00:00Z',
+    },
+    {
+        id: 8,
+        name: 'Tâm thần',
+        image_url: medicalImg1,
+        status: 'ACTIVE',
+        created_at: '2023-01-01T00:00:00Z',
+        updated_at: '2023-01-01T00:00:00Z',
+    },
+    {
+        id: 9,
+        name: 'Chẩn đoán hình ảnh',
+        image_url: medicalImg1,
+        status: 'ACTIVE',
+        created_at: '2023-01-01T00:00:00Z',
+        updated_at: '2023-01-01T00:00:00Z',
+    },
+    {
+        id: 10,
+        name: 'Phục hồi chức năng',
         image_url: medicalImg1,
         status: 'ACTIVE',
         created_at: '2023-01-01T00:00:00Z',
@@ -191,551 +258,56 @@ const mockLocation: Location = {
     ],
 };
 
-// FacilityWidget Component
-const FacilityWidget: React.FC<{ clinic: Clinic }> = ({ clinic }) => {
-    const averageRating = 4.0; // Giả lập; tính trung bình từ đánh giá trong ứng dụng thực
-    const reviewCount = 17; // Giả lập
-
-    return (
-        <div className="card">
-            <div className="card-body">
-                <div className="doctor-widget">
-                    <div className="doc-info-left">
-                        <div className="doctor-img1">
-                            <Link to={`/facility/${clinic.id}`}>
-                                <img
-                                    src={clinic.avatar_url}
-                                    className="img-fluid"
-                                    alt="Hình ảnh cơ sở y tế"
-                                />
-                            </Link>
-                        </div>
-                        <div className="doc-info-cont">
-                            <h4 className="doc-name mb-2">
-                                <Link to={`/facility/${clinic.id}`}>{clinic.name}</Link>
-                            </h4>
-                            <div className="rating mb-2">
-                                <span className={clsx('badge badge-primary', styles.customMargin)}>
-                                    {averageRating}
-                                </span>
-                                {Array.from({ length: 5 }).map((_, index) => (
-                                    <i
-                                        key={index}
-                                        className={`fas fa-star ${index < Math.floor(averageRating) ? 'filled' : ''}`}
-                                    ></i>
-                                ))}
-                                <span className="d-inline-block average-rating">
-                                    ({reviewCount})
-                                </span>
-                            </div>
-                            <div className="clinic-details">
-                                <div className="clini-infos pt-3">
-                                    <p className="doc-location mb-2">
-                                        <i className="isax isax-call-calling5 me-1"></i>{' '}
-                                        {clinic.phone || 'Không có'}
-                                    </p>
-                                    <p className="doc-location mb-2">
-                                        <i className="isax isax-sms me-1"></i>{' '}
-                                        {clinic.email || 'Không có'}
-                                    </p>
-                                    <p className="doc-location mb-2 text-ellipse">
-                                        <i className="isax isax-location5 me-1"></i>{' '}
-                                        {clinic.address}
-                                    </p>
-                                    <p className="doc-location mb-2">
-                                        <i className="isax isax-arrow-right-3 me-1"></i> Mở cửa lúc
-                                        08:00 Sáng
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="doc-info-right d-flex align-items-center justify-content-center">
-                        <div className="clinic-booking">
-                            <Link className="btn btn-outline-primary" to="/chat">
-                                Gửi Tin Nhắn
-                            </Link>
-                            <a
-                                className="btn btn-primary"
-                                href="#"
-                                data-bs-toggle="modal"
-                                data-bs-target="#voice_call"
-                            >
-                                Gọi Ngay
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Overview Component
-const Overview: React.FC<{ clinic: Clinic; specialties: Specialty[] }> = ({
-    clinic,
-    specialties,
-}) => {
-    return (
-        <div className="row">
-            <div className="col-md-12">
-                <div className="widget about-widget">
-                    <h4 className="widget-title">Giới Thiệu</h4>
-                    <p>{clinic.description}</p>
-                </div>
-                <div className="widget specialties-widget mb-0">
-                    <h4 className="widget-title">Chuyên Khoa</h4>
-                    <div className="experience-box">
-                        <ul className="experience-list">
-                            {specialties.length > 0 ? (
-                                specialties.map((specialty) => (
-                                    <li key={specialty.id}>
-                                        <div className="experience-user">
-                                            <div className="before-circle"></div>
-                                        </div>
-                                        <div className="experience-content">
-                                            <div className="timeline-content">
-                                                <h6 className="exp-title">{specialty.name}</h6>
-                                            </div>
-                                        </div>
-                                    </li>
-                                ))
-                            ) : (
-                                <li>
-                                    <div className="experience-content">
-                                        <div className="timeline-content">
-                                            <p>Không có chuyên khoa nào được liệt kê.</p>
-                                        </div>
-                                    </div>
-                                </li>
-                            )}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Locations Component
-const Locations: React.FC<{ location: Location }> = ({ location }) => {
-    return (
-        <div className="location-list">
-            <div className="row">
-                <div className="col-md-6">
-                    <div className="clinic-content">
-                        <h4 className="clinic-name">
-                            <a href="#">{location.name}</a>
-                        </h4>
-                        <div className="rating">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                                <i
-                                    key={i}
-                                    className={clsx(
-                                        'fas fa-star',
-                                        i < location.rating && 'filled',
-                                        styles.customPadding
-                                    )}
-                                ></i>
-                            ))}
-                            <span className="d-inline-block average-rating">
-                                ({location.rating})
-                            </span>
-                        </div>
-                        <div className="clinic-details mb-0">
-                            <h5 className="clinic-direction">
-                                <i className="isax isax-location5"></i> {location.address} <br />
-                                <a href="javascript:void(0);">Chỉ Đường</a>
-                            </h5>
-                            <ul>
-                                {location.images.map((img, i) => (
-                                    <li key={i}>
-                                        <a href={img} data-fancybox="gallery2">
-                                            <img src={img} alt="Hình ảnh cơ sở" />
-                                        </a>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-md-6">
-                    <div className="clinic-timing">
-                        {location.timings.map((timing, i) => (
-                            <div key={i}>
-                                <p className="timings-days">
-                                    <span>{timing.days}</span>
-                                </p>
-                                <p className="timings-times">
-                                    {timing.times.map((time, j) => (
-                                        <span key={j}>{time}</span>
-                                    ))}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Reviews Component
-const Reviews: React.FC<{ reviews: Review[]; clinicName: string }> = ({ reviews, clinicName }) => {
-    const [rating, setRating] = useState(0);
-    const [title, setTitle] = useState('');
-    const [comment, setComment] = useState('');
-    const [accepted, setAccepted] = useState(false);
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log('Đánh giá mới:', { rating, title, comment, recommend: true });
-    };
-
-    return (
-        <>
-            <div className="widget review-listing">
-                <ul className="comments-list">
-                    {reviews
-                        .filter((r) => !r.parent_review_id)
-                        .map((review) => (
-                            <li key={review.id}>
-                                <div className="comment">
-                                    <img
-                                        className="avatar avatar-sm rounded-circle"
-                                        alt="Hình ảnh bệnh nhân"
-                                        src={review.patient.avatar_url}
-                                    />
-                                    <div className="comment-body">
-                                        <div className="meta-data">
-                                            <span className="comment-author">
-                                                {review.patient.first_name}{' '}
-                                                {review.patient.last_name}
-                                            </span>
-                                            <span className="comment-date">
-                                                Đánh giá vào{' '}
-                                                {new Date(review.created_at).toLocaleDateString(
-                                                    'vi-VN'
-                                                )}
-                                            </span>
-                                            <div className="review-count rating">
-                                                {Array.from({ length: 5 }).map((_, i) => (
-                                                    <i
-                                                        key={i}
-                                                        className={`fas fa-star ${i < review.rating ? 'filled' : ''}`}
-                                                    ></i>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <p className="recommended">
-                                            <i className="far fa-thumbs-up"></i>{' '}
-                                            {review.recommend
-                                                ? 'Tôi khuyên dùng'
-                                                : 'Tôi không khuyên dùng'}
-                                        </p>
-                                        <p className="comment-content">{review.comment}</p>
-                                        <div className="comment-reply">
-                                            <a className="comment-btn" href="#">
-                                                <i className="fas fa-reply"></i> Trả lời
-                                            </a>
-                                            <p className="recommend-btn">
-                                                <span>Khuyên dùng?</span>
-                                                <a href="#" className="like-btn">
-                                                    <i className="far fa-thumbs-up"></i> Có
-                                                </a>
-                                                <a href="#" className="dislike-btn">
-                                                    <i className="far fa-thumbs-down"></i> Không
-                                                </a>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <ul className="comments-reply">
-                                    {reviews
-                                        .filter((r) => r.parent_review_id === review.id)
-                                        .map((reply) => (
-                                            <li key={reply.id}>
-                                                <div className="comment">
-                                                    <img
-                                                        className="avatar avatar-sm rounded-circle"
-                                                        alt="Hình ảnh bệnh nhân"
-                                                        src={reply.patient.avatar_url}
-                                                    />
-                                                    <div className="comment-body">
-                                                        <div className="meta-data">
-                                                            <span className="comment-author">
-                                                                {reply.patient.first_name}{' '}
-                                                                {reply.patient.last_name}
-                                                            </span>
-                                                            <span className="comment-date">
-                                                                Trả lời vào{' '}
-                                                                {new Date(
-                                                                    reply.created_at
-                                                                ).toLocaleDateString('vi-VN')}
-                                                            </span>
-                                                            <div className="review-count rating">
-                                                                {Array.from({ length: 5 }).map(
-                                                                    (_, i) => (
-                                                                        <i
-                                                                            key={i}
-                                                                            className={`fas fa-star ${i < reply.rating ? 'filled' : ''}`}
-                                                                        ></i>
-                                                                    )
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <p className="comment-content">
-                                                            {reply.comment}
-                                                        </p>
-                                                        <div className="comment-reply">
-                                                            <a className="comment-btn" href="#">
-                                                                <i className="fas fa-reply"></i> Trả
-                                                                lời
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        ))}
-                                </ul>
-                            </li>
-                        ))}
-                </ul>
-                <div className="all-feedback text-center">
-                    <a href="#" className="btn btn-primary btn-sm">
-                        Xem tất cả đánh giá <strong>(167)</strong>
-                    </a>
-                </div>
-            </div>
-            <div className="write-review">
-                <h4>
-                    Viết đánh giá cho <strong>{clinicName}</strong>
-                </h4>
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                        <label className="mb-2">Đánh giá</label>
-                        <div className="star-rating">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                                <React.Fragment key={i}>
-                                    <input
-                                        id={`star-${5 - i}`}
-                                        type="radio"
-                                        name="rating"
-                                        value={5 - i}
-                                        onChange={() => setRating(5 - i)}
-                                    />
-                                    <label htmlFor={`star-${5 - i}`} title={`${5 - i} sao`}>
-                                        <i
-                                            className={`active fa fa-star ${rating >= 5 - i ? 'filled' : ''}`}
-                                        ></i>
-                                    </label>
-                                </React.Fragment>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="mb-3">
-                        <label className="mb-2">Tiêu đề đánh giá</label>
-                        <input
-                            className="form-control"
-                            type="text"
-                            placeholder="Bạn sẽ nói gì trong một câu?"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label className="mb-2">Nội dung đánh giá</label>
-                        <textarea
-                            className="form-control"
-                            maxLength={100}
-                            value={comment}
-                            onChange={(e) => setComment(e.target.value)}
-                        ></textarea>
-                        <div className="d-flex justify-content-between mt-3">
-                            <small className="text-muted">
-                                <span>{100 - comment.length}</span> ký tự còn lại
-                            </small>
-                        </div>
-                    </div>
-                    <hr />
-                    <div className="mb-3">
-                        <div className="terms-accept">
-                            <div className="custom-checkbox">
-                                <input
-                                    type="checkbox"
-                                    id="terms_accept"
-                                    checked={accepted}
-                                    onChange={() => setAccepted(!accepted)}
-                                />
-                                <label htmlFor="terms_accept">
-                                    Tôi đã đọc và đồng ý với{' '}
-                                    <a href="/terms-condition">Điều khoản & Điều kiện</a>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="submit-section">
-                        <button
-                            type="submit"
-                            className="btn btn-primary submit-btn"
-                            disabled={!accepted}
-                        >
-                            Thêm Đánh Giá
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </>
-    );
-};
-
-// BusinessHours Component
-const BusinessHours: React.FC<{ businessHours: BusinessHour[] }> = ({ businessHours }) => {
-    return (
-        <div className="row">
-            <div className="col-md-6 offset-md-3">
-                <div className="widget business-widget">
-                    <div className="widget-content">
-                        <div className="listing-hours">
-                            <div className="listing-day current">
-                                <div className="day">
-                                    Hôm nay{' '}
-                                    <span>
-                                        {new Date().toLocaleDateString('vi-VN', {
-                                            day: 'numeric',
-                                            month: 'short',
-                                            year: 'numeric',
-                                        })}
-                                    </span>
-                                </div>
-                                <div className="time-items">
-                                    <span className="open-status">
-                                        <span className="badge bg-success-light">Đang Mở</span>
-                                    </span>
-                                    <span className="time">07:00 Sáng - 09:00 Tối</span>
-                                </div>
-                            </div>
-                            {businessHours.map((hour, index) => (
-                                <div
-                                    className={`listing-day ${hour.time === 'Đóng cửa' ? 'closed' : ''}`}
-                                    key={index}
-                                >
-                                    <div className="day">{hour.day}</div>
-                                    <div className="time-items">
-                                        <span className="time">
-                                            {hour.time === 'Đóng cửa' ? (
-                                                <span className="badge bg-danger-light">
-                                                    Đóng cửa
-                                                </span>
-                                            ) : (
-                                                hour.time
-                                            )}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// FacilityTabs Component
-const FacilityTabs: React.FC<{
-    clinic: Clinic;
-    specialties: Specialty[];
-    location: Location;
-    reviews: Review[];
-    businessHours: BusinessHour[];
-}> = ({ clinic, specialties, location, reviews, businessHours }) => {
-    const [activeTab, setActiveTab] = useState('overview');
-
-    return (
-        <div className="card">
-            <div className="card-body pt-0">
-                <nav className="user-tabs mb-4">
-                    <ul className="nav nav-tabs nav-tabs-bottom nav-justified">
-                        <li className="nav-item">
-                            <a
-                                className={`nav-link ${activeTab === 'overview' ? 'active' : ''}`}
-                                href="#doc_overview"
-                                onClick={() => setActiveTab('overview')}
-                            >
-                                Tổng Quan
-                            </a>
-                        </li>
-                        <li className="nav-item">
-                            <a
-                                className={`nav-link ${activeTab === 'locations' ? 'active' : ''}`}
-                                href="#doc_locations"
-                                onClick={() => setActiveTab('locations')}
-                            >
-                                Địa Điểm
-                            </a>
-                        </li>
-                        <li className="nav-item">
-                            <a
-                                className={`nav-link ${activeTab === 'reviews' ? 'active' : ''}`}
-                                href="#doc_reviews"
-                                onClick={() => setActiveTab('reviews')}
-                            >
-                                Đánh Giá
-                            </a>
-                        </li>
-                        <li className="nav-item">
-                            <a
-                                className={`nav-link ${activeTab === 'business_hours' ? 'active' : ''}`}
-                                href="#doc_business_hours"
-                                onClick={() => setActiveTab('business_hours')}
-                            >
-                                Giờ Làm Việc
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <div className="tab-content pt-0">
-                    <div
-                        className={`tab-pane fade ${activeTab === 'overview' ? 'show active' : ''}`}
-                        id="doc_overview"
-                    >
-                        <Overview clinic={clinic} specialties={specialties} />
-                    </div>
-                    <div
-                        className={`tab-pane fade ${activeTab === 'locations' ? 'show active' : ''}`}
-                        id="doc_locations"
-                    >
-                        <Locations location={location} />
-                    </div>
-                    <div
-                        className={`tab-pane fade ${activeTab === 'reviews' ? 'show active' : ''}`}
-                        id="doc_reviews"
-                    >
-                        <Reviews reviews={reviews} clinicName={clinic.name} />
-                    </div>
-                    <div
-                        className={`tab-pane fade ${activeTab === 'business_hours' ? 'show active' : ''}`}
-                        id="doc_business_hours"
-                    >
-                        <BusinessHours businessHours={businessHours} />
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Main Component
 const MedicalFacilityProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [clinic, setClinic] = useState<Clinic | null>(null);
     const [specialties, setSpecialties] = useState<Specialty[]>([]);
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('overview');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const pageSize = 2;
+    const totalPages = Math.ceil(reviews.filter((r) => !r.parent_review_id).length / pageSize);
+    const displayedReviews = reviews
+        .filter((r) => !r.parent_review_id)
+        .slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+    // Mock current user ID for edit/delete permissions
+    const currentUserId = 1;
+
+    // Mock handlers for review actions
+    const handleReplySubmission = (replyData: { reviewId: number; text: string }) => {
+        console.log('New reply submitted:', replyData);
+        alert('Phản hồi của bạn đã được gửi thành công!');
+    };
+
+    const handleEditReview = (reviewData: {
+        reviewId: number;
+        rating: number;
+        description: string;
+        recommend?: boolean;
+    }) => {
+        console.log('Review edited:', reviewData);
+        alert('Đánh giá của bạn đã được cập nhật thành công!');
+    };
+
+    const handleDeleteReview = (reviewId: number) => {
+        console.log('Review deleted:', reviewId);
+        alert('Đánh giá đã được xóa thành công!');
+    };
+
+    const handleEditReply = (replyData: { replyId: number; text: string }) => {
+        console.log('Reply edited:', replyData);
+        alert('Phản hồi đã được cập nhật thành công!');
+    };
+
+    const handleDeleteReply = (replyId: number) => {
+        console.log('Reply deleted:', replyId);
+        alert('Phản hồi đã được xóa thành công!');
+    };
 
     useEffect(() => {
-        // Giả lập gọi API với dữ liệu giả
         setClinic(mockClinic);
         setSpecialties(mockSpecialties);
         setReviews(mockReviews);
@@ -761,25 +333,250 @@ const MedicalFacilityProfile: React.FC = () => {
     const breadcrumbData: { items: BreadcrumbItem[]; title: string } = {
         items: [
             { label: 'Trang Chủ', path: '/', isActive: false },
-            { label: 'Cơ Sở Y Tế', path: '/facilities', isActive: false },
+            { label: 'Cơ Sở Y Tế', path: '/medical-facility', isActive: false },
             { label: clinic.name, isActive: true },
         ],
         title: clinic.name,
     };
+
+    const averageRating = 4.0;
+    const reviewCount = 17;
 
     return (
         <MainLayout>
             <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
             <div className="content">
                 <div className="container">
-                    <FacilityWidget clinic={clinic} />
-                    <FacilityTabs
-                        clinic={clinic}
-                        specialties={specialties}
-                        location={mockLocation}
-                        reviews={reviews}
-                        businessHours={mockBusinessHours}
-                    />
+                    <div className="card">
+                        <div className="card-body">
+                            <div className="doctor-widget">
+                                <div className="doc-info-left">
+                                    <div className="doctor-img1">
+                                        <Link to={`/facility/${clinic.id}`}>
+                                            <img
+                                                src={clinic.avatar_url}
+                                                className="img-fluid"
+                                                alt="Hình ảnh cơ sở y tế"
+                                            />
+                                        </Link>
+                                    </div>
+                                    <div className="doc-info-cont">
+                                        <h4 className="doc-name mb-2">
+                                            <Link to={`/facility/${clinic.id}`}>{clinic.name}</Link>
+                                        </h4>
+                                        <div className="rating mb-2">
+                                            <span
+                                                className={clsx(
+                                                    'badge badge-primary',
+                                                    styles.customMargin
+                                                )}
+                                            >
+                                                {averageRating}
+                                            </span>
+                                            {Array.from({ length: 5 }).map((_, index) => (
+                                                <i
+                                                    key={index}
+                                                    className={clsx(
+                                                        'fas fa-star',
+                                                        index < Math.floor(averageRating) &&
+                                                            'filled',
+                                                        styles.customPadding
+                                                    )}
+                                                ></i>
+                                            ))}
+                                            <span className="d-inline-block average-rating">
+                                                ({reviewCount})
+                                            </span>
+                                        </div>
+                                        <div className="clinic-details">
+                                            <div className="clini-infos pt-3">
+                                                <p className="doc-location mb-2">
+                                                    <i className="isax isax-call-calling5 me-1"></i>{' '}
+                                                    {clinic.phone || 'Không có'}
+                                                </p>
+                                                <p className="doc-location mb-2">
+                                                    <i className="isax isax-sms me-1"></i>{' '}
+                                                    {clinic.email || 'Không có'}
+                                                </p>
+                                                <p className="doc-location mb-2 text-ellipse">
+                                                    <i className="isax isax-location5 me-1"></i>{' '}
+                                                    {clinic.address}
+                                                </p>
+                                                <p className="doc-location mb-2">
+                                                    <i className="isax isax-arrow-right-3 me-1"></i>{' '}
+                                                    Mở cửa lúc 08:00 Sáng
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="doc-info-right d-flex align-items-center justify-content-center">
+                                    <div className="clinic-booking">
+                                        <Link className="btn btn-outline-primary" to="/chat">
+                                            Gửi Tin Nhắn
+                                        </Link>
+
+                                        <Link
+                                            className="btn btn-primary"
+                                            to="#"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#voice_call"
+                                        >
+                                            Gọi Ngay
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="card">
+                        <div className="card-body pt-0">
+                            <nav className="user-tabs mb-4">
+                                <ul className="nav nav-tabs nav-tabs-bottom nav-justified">
+                                    <li className="nav-item">
+                                        <a
+                                            className={clsx('nav-link', {
+                                                active: activeTab === 'overview',
+                                            })}
+                                            href="#doc_overview"
+                                            data-bs-toggle="tab"
+                                            onClick={() => setActiveTab('overview')}
+                                        >
+                                            Tổng Quan
+                                        </a>
+                                    </li>
+                                    <li className="nav-item">
+                                        <a
+                                            className={clsx('nav-link', {
+                                                active: activeTab === 'locations',
+                                            })}
+                                            href="#doc_locations"
+                                            data-bs-toggle="tab"
+                                            onClick={() => setActiveTab('locations')}
+                                        >
+                                            Địa Điểm
+                                        </a>
+                                    </li>
+                                    <li className="nav-item">
+                                        <a
+                                            className={clsx('nav-link', {
+                                                active: activeTab === 'reviews',
+                                            })}
+                                            href="#doc_reviews"
+                                            data-bs-toggle="tab"
+                                            onClick={() => setActiveTab('reviews')}
+                                        >
+                                            Đánh Giá
+                                        </a>
+                                    </li>
+                                    <li className="nav-item">
+                                        <a
+                                            className={clsx('nav-link', {
+                                                active: activeTab === 'business_hours',
+                                            })}
+                                            href="#doc_business_hours"
+                                            data-bs-toggle="tab"
+                                            onClick={() => setActiveTab('business_hours')}
+                                        >
+                                            Giờ Làm Việc
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <div className="tab-content pt-0">
+                                {activeTab === 'overview' && (
+                                    <Overview
+                                        clinic={clinic}
+                                        specialties={specialties}
+                                        isActive={activeTab === 'overview'}
+                                    />
+                                )}
+                                {activeTab === 'locations' && (
+                                    <LocationTab
+                                        location={mockLocation}
+                                        isActive={activeTab === 'locations'}
+                                    />
+                                )}
+                                {activeTab === 'reviews' && (
+                                    <div
+                                        className={clsx('tab-pane fade', {
+                                            'show active': activeTab === 'reviews',
+                                        })}
+                                        id="doc_reviews"
+                                    >
+                                        <div className="detail-title">
+                                            <h4>Đánh giá ({reviews.length})</h4>
+                                        </div>
+                                        {reviews.length === 0 ? (
+                                            <p>Không có đánh giá nào để hiển thị.</p>
+                                        ) : (
+                                            <div className="widget review-listing">
+                                                {displayedReviews.map((review, index) => (
+                                                    <ReviewCard
+                                                        key={review.id}
+                                                        review={{
+                                                            id: review.id,
+                                                            name: `${review.patient.first_name} ${review.patient.last_name}`,
+                                                            avatar: review.patient.avatar_url,
+                                                            rating: review.rating,
+                                                            timeAgo: `${Math.round(
+                                                                (Date.now() -
+                                                                    new Date(
+                                                                        review.created_at
+                                                                    ).getTime()) /
+                                                                    (1000 * 60 * 60 * 24)
+                                                            )} days ago`,
+                                                            text: review.comment || '',
+                                                            recommend: review.recommend,
+                                                            userId: review.patient_id,
+                                                            isEditable: false,
+                                                            replies: reviews
+                                                                .filter(
+                                                                    (r) =>
+                                                                        r.parent_review_id ===
+                                                                        review.id
+                                                                )
+                                                                .map((reply) => ({
+                                                                    id: reply.id,
+                                                                    name: `${reply.patient.first_name} ${reply.patient.last_name}`,
+                                                                    avatar: reply.patient
+                                                                        .avatar_url,
+                                                                    text: reply.comment || '',
+                                                                    userId: reply.patient_id,
+                                                                })),
+                                                        }}
+                                                        isLast={
+                                                            index === displayedReviews.length - 1
+                                                        }
+                                                        onReply={handleReplySubmission}
+                                                        canEdit={false}
+                                                        canDelete={false}
+                                                        currentUserId={currentUserId}
+                                                        onEdit={handleEditReview}
+                                                        onDelete={handleDeleteReview}
+                                                        onEditReply={handleEditReply}
+                                                        onDeleteReply={handleDeleteReply}
+                                                    />
+                                                ))}
+                                                <Pagination
+                                                    currentPage={currentPage}
+                                                    totalPages={totalPages}
+                                                    onPageChange={setCurrentPage}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                {activeTab === 'business_hours' && (
+                                    <BusinessHours
+                                        businessHours={mockBusinessHours}
+                                        isActive={activeTab === 'business_hours'}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </MainLayout>
