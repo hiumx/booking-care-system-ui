@@ -12,6 +12,7 @@ export const PATHS = {
     MEDICAL_TERMS: '/medical-terms',
     CATEGORY_ARTICLES: '/category/:categorySlug',
     CATEGORY_ARTICLES_DEMO: '/category-demo',
+    ABOUT_US: '/about-us',
 
     // Authentication paths
     LOGIN: '/login',
