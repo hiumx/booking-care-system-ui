@@ -1,0 +1,222 @@
+.editReviewForm {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .header {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
+
+        h4 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+        }
+    }
+
+    .form {
+        .label {
+            display: block;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+
+            .required {
+                color: #e74c3c;
+                margin-left: 2px;
+            }
+        }
+
+        .ratingSection {
+            margin-bottom: 20px;
+
+            .stars {
+                display: flex;
+                gap: 4px;
+                margin-bottom: 5px;
+
+                .star {
+                    font-size: 20px;
+                    color: #ddd;
+                    cursor: pointer;
+                    transition: color 0.2s ease;
+
+                    // Base state
+                    &.far {
+                        color: #ddd !important;
+                    }
+
+                    // Active/filled state
+                    &.fas {
+                        color: #ffc107 !important;
+                    }
+
+                    &:hover {
+                        color: #ffc107 !important;
+                    }
+
+                    &:focus {
+                        outline: none;
+                        color: #ffc107 !important;
+                    }
+
+                    // Specific FontAwesome overrides
+                    &.fa-star {
+                        &.fas {
+                            color: #ffc107 !important;
+                        }
+                        &.far {
+                            color: #ddd !important;
+                        }
+
+                        &:hover {
+                            color: #ffc107 !important;
+                        }
+                    }
+                }
+            }
+
+            .ratingText {
+                font-size: 12px;
+                color: #666;
+            }
+        }
+
+        .descriptionSection {
+            margin-bottom: 20px;
+
+            .textarea {
+                width: 100%;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 10px;
+                font-size: 14px;
+                line-height: 1.5;
+                resize: vertical;
+                min-height: 100px;
+                font-family: inherit;
+
+                &:focus {
+                    outline: none;
+                    border-color: #007bff;
+                    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+                }
+
+                &::placeholder {
+                    color: #999;
+                }
+            }
+
+            .charCounter {
+                text-align: right;
+                margin-top: 5px;
+
+                span {
+                    font-size: 12px;
+                    color: #666;
+
+                    &.warning {
+                        color: #e74c3c;
+                    }
+                }
+            }
+        }
+
+        .recommendSection {
+            margin-bottom: 25px;
+
+            .recommendOptions {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 10px;
+
+                .radioOption {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    cursor: pointer;
+                    padding: 8px 12px;
+                    border: 1px solid #e5e5e5;
+                    border-radius: 4px;
+                    transition: all 0.2s ease;
+
+                    &:hover {
+                        background-color: #f8f9fa;
+                        border-color: #007bff;
+                    }
+
+                    input[type='radio'] {
+                        margin: 0;
+                    }
+
+                    i {
+                        font-size: 16px;
+
+                        &.fa-thumbs-up {
+                            color: #28a745;
+                        }
+
+                        &.fa-thumbs-down {
+                            color: #dc3545;
+                        }
+                    }
+                }
+            }
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+
+            .cancelButton {
+                background: #6c757d !important;
+                border-color: #6c757d !important;
+
+                &:hover {
+                    background: #5a6268 !important;
+                    border-color: #545b62 !important;
+                }
+                &::before {
+                    background: #5a6268 !important;
+                    border-color: #545b62 !important;
+                }
+            }
+
+            .submitButton {
+                min-width: 140px;
+            }
+        }
+    }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+    .editReviewForm {
+        padding: 15px;
+
+        .form .actions {
+            flex-direction: column;
+
+            .cancelButton,
+            .submitButton {
+                width: 100%;
+            }
+        }
+
+        .form .recommendSection .recommendOptions {
+            .radioOption {
+                padding: 12px;
+            }
+        }
+    }
+}

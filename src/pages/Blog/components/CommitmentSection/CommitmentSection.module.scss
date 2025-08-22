@@ -1,0 +1,149 @@
+.commitmentSection {
+    margin-bottom: 40px;
+
+    .title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #333;
+        margin: 0 0 20px 0;
+    }
+
+    .card {
+        background-color: #1a76e3;
+        color: #fff;
+        border-radius: 20px;
+        padding: 36px 32px;
+        display: grid;
+        grid-template-columns: minmax(420px, 2fr) minmax(0, 3fr); // left column always ~2x an item
+        gap: 24px;
+        align-items: center;
+    }
+
+    .headingBlock {
+        grid-column: 1 / span 1;
+        display: grid;
+        grid-template-columns: 1fr;
+        align-items: start;
+        gap: 16px;
+        max-width: 980px;
+    }
+
+    .leadText {
+        font-size: 20px;
+        line-height: 1.25;
+        font-weight: 700;
+        margin: 0;
+        color: #fff;
+    }
+
+    .cta {
+        align-self: start;
+        background: #0d47a1;
+        color: #fff;
+        border-radius: 14px;
+        padding: 14px 24px;
+        text-decoration: none;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.2s ease;
+        width: max-content; // shrink to content
+        min-width: 220px; // keep a sensible min width
+        cursor: pointer; // behave like a button
+    }
+
+    .ctaIcon {
+        display: inline-block;
+        transition: transform 0.2s ease;
+    }
+    .cta:hover .ctaIcon {
+        transform: translateX(4px);
+    }
+
+    .itemsGrid {
+        grid-column: 2 / -1;
+        display: grid;
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(180px, 1fr)
+        ); // auto-expand/shrink with item count
+        gap: 20px;
+        align-items: center;
+    }
+
+    .item {
+        text-align: center;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .iconBox {
+        width: 130px;
+        height: 130px;
+        margin: 0 auto 10px auto;
+        // background: rgba(255, 255, 255, 0.12);
+        // border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        //box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.25s ease;
+        }
+    }
+    // .item:hover .iconBox img {
+    //     transform: scale(1.06);
+    // }
+
+    .itemTitle {
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+}
+
+@media (max-width: 1024px) {
+    .commitmentSection {
+        .card {
+            grid-template-columns: 1fr;
+        }
+        .headingBlock {
+            grid-column: 1 / -1;
+        }
+        .headingBlock {
+            grid-template-columns: 1fr;
+        }
+        .itemsGrid {
+            grid-column: 1 / -1;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+        .leadText {
+            font-size: 24px;
+        }
+        .item {
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .iconBox {
+            width: 72px;
+            height: 72px;
+            margin: 0;
+        }
+        .ctaIcon {
+            transform: rotate(90deg);
+        }
+        .cta:hover .ctaIcon {
+            transform: translateY(4px) rotate(90deg);
+        }
+    }
+}

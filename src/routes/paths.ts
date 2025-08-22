@@ -7,13 +7,20 @@ export const PATHS = {
     ABOUT: '/about',
     DEMO: '/demo',
     FAQ: '/faq',
+    BLOG: '/blog',
+    BLOG_DETAIL: '/blog/:slug',
+    MEDICAL_TERMS: '/medical-terms',
+    CATEGORY_ARTICLES: '/category/:categorySlug',
+    CATEGORY_ARTICLES_DEMO: '/category-demo',
+    SUBSCRIPTION_PLANS: '/subscription-plans',
+    ABOUT_US: '/about-us',
 
     // Authentication paths
     LOGIN: '/login',
     REGISTER: '/register',
     FORGOT_PASSWORD: '/forgot-password',
     RESET_PASSWORD: '/reset-password',
-
+    CHAT: '/chat',
     // Management paths
     SCREEN_MANAGEMENT: '/screen-management',
 
@@ -22,6 +29,24 @@ export const PATHS = {
         ROOT: '/user',
         PROFILE: 'profile',
         SETTINGS: 'settings',
+    },
+
+    // Doctor paths
+    DOCTOR: {
+        ROOT: '/doctor',
+        PROFILE: 'profile',
+    },
+
+    // Specialties paths
+    SPECIALTIES: {
+        ROOT: '/specialties',
+        PROFILE: 'profile',
+    },
+
+    // Medical Facility paths
+    MEDICAL_FACILITY: {
+        ROOT: '/medical-facility',
+        PROFILE: 'profile',
     },
 
     // Dashboard paths
