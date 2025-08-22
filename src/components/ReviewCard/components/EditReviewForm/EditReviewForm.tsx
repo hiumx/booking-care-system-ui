@@ -139,42 +139,6 @@ const EditReviewForm: React.FC<EditReviewFormProps> = ({ review, onSubmitEdit, o
                     </div>
                 </div>
 
-                {/* Recommendation Section */}
-                <div className={styles.recommendSection}>
-                    <label className={styles.label}>Bạn có đề xuất bác sĩ này không?</label>
-                    <div className={styles.recommendOptions}>
-                        <label className={styles.radioOption}>
-                            <input
-                                type="radio"
-                                name="recommend"
-                                checked={recommend === true}
-                                onChange={() => setRecommend(true)}
-                            />
-                            <i className="fa-regular fa-thumbs-up"></i>
-                            Có, tôi đề xuất
-                        </label>
-                        <label className={styles.radioOption}>
-                            <input
-                                type="radio"
-                                name="recommend"
-                                checked={recommend === false}
-                                onChange={() => setRecommend(false)}
-                            />
-                            <i className="fa-regular fa-thumbs-down"></i>
-                            Không đề xuất
-                        </label>
-                        <label className={styles.radioOption}>
-                            <input
-                                type="radio"
-                                name="recommend"
-                                checked={recommend === undefined}
-                                onChange={() => setRecommend(undefined)}
-                            />
-                            Chưa có ý kiến
-                        </label>
-                    </div>
-                </div>
-
                 {/* Action Buttons */}
                 <div className={styles.actions}>
                     <Button
