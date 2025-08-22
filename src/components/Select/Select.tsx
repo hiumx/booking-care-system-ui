@@ -34,11 +34,11 @@ const Select: React.FC<SelectProps> = ({ title, items, value, onChange, classNam
     };
 
     return (
-        <div className={clsx(styles['browse-categorie'], className)}>
-            <div className={clsx(styles['categorie-dropdown'], { [styles.show]: isOpen })}>
+        <div className={clsx(styles['browseCategorie'], className)}>
+            <div className={clsx(styles['categorieDropdown'], { [styles.show]: isOpen })}>
                 <Link
                     to="#"
-                    className={clsx(styles['dropdown-toggle'], styles['customLink'], {
+                    className={clsx(styles['dropdownToggle'], styles['customLink'], {
                         [styles.placeholder]: !value,
                     })}
                     onClick={(e) => {
@@ -50,12 +50,12 @@ const Select: React.FC<SelectProps> = ({ title, items, value, onChange, classNam
                     {image && <img src={image} alt="Category Icon" />}
                     {selectedLabel}
                 </Link>
-                <ul className={styles['dropdown-menu']}>
+                <ul className={styles['dropdownMenu']}>
                     {items.map((item, index) => (
                         <li key={index}>
                             <Link
                                 className={clsx(
-                                    styles['dropdown-item'],
+                                    styles['dropdownItem'],
                                     styles['customLink'],
                                     { [styles.disabled]: item.disabled },
                                     { [styles.selected]: item.value === value }

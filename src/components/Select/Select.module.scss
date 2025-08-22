@@ -1,8 +1,8 @@
-.browse-categorie {
-    .categorie-dropdown {
+.browseCategorie {
+    .categorieDropdown {
         position: relative; // làm gốc cho dropdown
 
-        .dropdown-toggle {
+        .dropdownToggle {
             font-size: 14px;
             font-weight: 500;
             color: #012047;
@@ -47,7 +47,7 @@
             }
         }
 
-        &.show .dropdown-menu {
+        &.show .dropdownMenu {
             visibility: visible;
             opacity: 1;
             margin-top: 0;
@@ -57,7 +57,7 @@
             -ms-transform: translateY(0);
         }
 
-        .dropdown-menu {
+        .dropdownMenu {
             position: absolute; // nổi lên trên cùng
             top: 100%; // hiển thị ngay dưới dropdown-toggle
             left: 0; // canh trái
@@ -79,7 +79,7 @@
             background: #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
-            .dropdown-item {
+            .dropdownItem {
                 font-size: 14px;
                 font-weight: 500;
                 border-bottom: 1px solid #e3e3e3;
