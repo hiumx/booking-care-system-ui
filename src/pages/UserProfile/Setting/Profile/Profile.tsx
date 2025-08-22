@@ -105,11 +105,8 @@ const Profile = () => {
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
                             <Input
-                                label={
-                                    <>
-                                        Họ <span className="text-danger">*</span>
-                                    </>
-                                }
+                                label="Họ"
+                                isRequired
                                 type="text"
                                 value={profileData.firstName}
                                 onChange={(e) => handleInputChange('firstName', e.target.value)}
@@ -119,11 +116,8 @@ const Profile = () => {
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
                             <Input
-                                label={
-                                    <>
-                                        Tên <span className="text-danger">*</span>
-                                    </>
-                                }
+                                label="Tên"
+                                isRequired
                                 type="text"
                                 value={profileData.lastName}
                                 onChange={(e) => handleInputChange('lastName', e.target.value)}
@@ -171,11 +165,8 @@ const Profile = () => {
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
                             <Input
-                                label={
-                                    <>
-                                        Số điện thoại <span className="text-danger">*</span>
-                                    </>
-                                }
+                                label="Số điện thoại"
+                                isRequired
                                 type="text"
                                 value={profileData.phoneNumber}
                                 onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
@@ -185,11 +176,8 @@ const Profile = () => {
                     <div className="col-lg-6 col-md-6">
                         <div className="mb-3">
                             <Input
-                                label={
-                                    <>
-                                        Email <span className="text-danger">*</span>
-                                    </>
-                                }
+                                label="Email"
+                                isRequired
                                 type="email"
                                 value={profileData.email}
                                 onChange={(e) => handleInputChange('email', e.target.value)}
@@ -200,11 +188,8 @@ const Profile = () => {
                     <div className="col-lg-12">
                         <div className="mb-3">
                             <Input
-                                label={
-                                    <>
-                                        Địa chỉ <span className="text-danger">*</span>
-                                    </>
-                                }
+                                label="Địa chỉ"
+                                isRequired
                                 type="text"
                                 value={profileData.address}
                                 onChange={(e) => handleInputChange('address', e.target.value)}
