@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import styles from './DoctorProfile.module.scss';
 import Pagination from '@/components/Pagination';
-import ReviewCard from '~/pages/Doctor/DoctorProfile/components/ReviewCard';
+import ReviewCard from '@/components/ReviewCard';
 import Button from '@/components/Button';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
