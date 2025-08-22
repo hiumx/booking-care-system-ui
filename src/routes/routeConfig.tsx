@@ -9,10 +9,16 @@ import Login from '@/pages/Authentication/Login';
 import Register from '@/pages/Authentication/Register';
 import ForgotPassword from '@/pages/Authentication/ForgotPassword';
 import ResetPassword from '@/pages/Authentication/ResetPassword';
+import DoctorProfile from '@/pages/Doctor/DoctorProfile';
 import SpecialtiesList from '@/pages/Specialties/SpecialtiesList';
 import SubscriptionPlans from '@/pages/SubscriptionPlans';
 import { PATHS } from './paths';
 import FAQ from '@/pages/FAQ';
+import Blog from '@/pages/Blog';
+import BlogDetail from '@/pages/BlogDetail';
+import MedicalTerms from '@/pages/MedicalTerms';
+import CategoryArticles from '~/pages/CategoryBlogs';
+import CategoryArticlesDemo from '~/pages/CategoryBlogsDemo';
 
 const routes: RouteObject[] = [
     {
@@ -26,6 +32,26 @@ const routes: RouteObject[] = [
     {
         path: PATHS.FAQ,
         element: <FAQ />,
+    },
+    {
+        path: PATHS.BLOG,
+        element: <Blog />,
+    },
+    {
+        path: PATHS.BLOG_DETAIL,
+        element: <BlogDetail />,
+    },
+    {
+        path: PATHS.MEDICAL_TERMS,
+        element: <MedicalTerms />,
+    },
+    {
+        path: PATHS.CATEGORY_ARTICLES,
+        element: <CategoryArticles />,
+    },
+    {
+        path: PATHS.CATEGORY_ARTICLES_DEMO,
+        element: <CategoryArticlesDemo />,
     },
     {
         path: PATHS.SUBSCRIPTION_PLANS,
@@ -71,6 +97,10 @@ const routes: RouteObject[] = [
         element: <Chat />,
     },
 
+    {
+        path: PATHS.DOCTOR.ROOT,
+        children: [{ path: PATHS.DOCTOR.PROFILE, element: <DoctorProfile /> }],
+    },
     {
         path: PATHS.DASHBOARD.ROOT,
         children: [

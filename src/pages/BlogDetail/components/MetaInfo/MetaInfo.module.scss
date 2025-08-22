@@ -1,0 +1,35 @@
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.authorLink {
+    display: inline-flex;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.metaText {
+    .author {
+        font-weight: 600;
+    }
+    .author a {
+        color: #0d6efd;
+        text-decoration: none;
+    }
+    .authorLabel {
+        color: #64748b;
+        font-size: 14px;
+    }
+    .date {
+        color: #64748b;
+        font-size: 14px;
+    }
+}
