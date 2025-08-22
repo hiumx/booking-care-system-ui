@@ -773,11 +773,8 @@ const Register: React.FC = () => {
                                 {/* Full Name */}
                                 <div className="mb-3">
                                     <Input
-                                        label={
-                                            <>
-                                                Họ và tên <span className="text-danger">*</span>
-                                            </>
-                                        }
+                                        label="Họ và tên"
+                                        isRequired
                                         type="text"
                                         leftIcon={<User size={18} />}
                                         value={fullName}
@@ -871,11 +868,8 @@ const Register: React.FC = () => {
                                 {/* Phone */}
                                 <div className="mb-3">
                                     <Input
-                                        label={
-                                            <>
-                                                Số điện thoại <span className="text-danger">*</span>
-                                            </>
-                                        }
+                                        label="Số điện thoại"
+                                        isRequired
                                         type="tel"
                                         leftIcon={<i className="feather-phone" />}
                                         value={profilePhone}
@@ -922,11 +916,8 @@ const Register: React.FC = () => {
                                 {/* Email */}
                                 <div className="mb-3">
                                     <Input
-                                        label={
-                                            <>
-                                                Email <span className="text-danger">*</span>
-                                            </>
-                                        }
+                                        label="Email"
+                                        isRequired
                                         type="email"
                                         leftIcon={<i className="feather-mail" />}
                                         value={profileEmail}

@@ -111,11 +111,8 @@ const ChangePassword = () => {
                     {/* Current Password */}
                     <div className="mb-3">
                         <Input
-                            label={
-                                <>
-                                    Mật khẩu hiện tại <span className="text-danger">*</span>
-                                </>
-                            }
+                            label="Mật khẩu hiện tại"
+                            isRequired
                             type="password"
                             placeholder="Nhập mật khẩu hiện tại"
                             leftIcon={<i className="feather-lock" />}
@@ -130,11 +127,8 @@ const ChangePassword = () => {
                     {/* New Password */}
                     <div className="mb-3">
                         <Input
-                            label={
-                                <>
-                                    Mật khẩu mới <span className="text-danger">*</span>
-                                </>
-                            }
+                            label="Mật khẩu mới"
+                            isRequired
                             type="password"
                             placeholder="Nhập mật khẩu mới"
                             leftIcon={<i className="feather-lock" />}
@@ -175,11 +169,8 @@ const ChangePassword = () => {
                     {/* Confirm Password */}
                     <div className="mb-3">
                         <Input
-                            label={
-                                <>
-                                    Xác nhận mật khẩu mới <span className="text-danger">*</span>
-                                </>
-                            }
+                            label="Xác nhận mật khẩu mới"
+                            isRequired
                             type="password"
                             placeholder="Nhập lại mật khẩu mới"
                             leftIcon={<i className="feather-lock" />}
