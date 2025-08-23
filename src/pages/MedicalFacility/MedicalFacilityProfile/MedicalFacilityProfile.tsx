@@ -9,6 +9,7 @@ import LocationTab from './components/Location';
 import BusinessHours from './components/BusinessHours';
 import ReviewCard from '@/components/ReviewCard';
 import Pagination from '@/components/Pagination';
+import Button from '@/components/Button'; // Import the Button component
 
 import medicalImg1 from '@/assets/img/medical-img1.jpg';
 import patientImg from '@/assets/img/patients/patient.jpg';
@@ -79,8 +80,6 @@ interface BusinessHour {
     day: string;
     time: string;
 }
-
-// Updated mock data in MedicalFacilityProfile.tsx
 
 const mockClinic: Clinic = {
     id: 1,
@@ -412,18 +411,28 @@ const MedicalFacilityProfile: React.FC = () => {
                                 </div>
                                 <div className="doc-info-right d-flex align-items-center justify-content-center">
                                     <div className="clinic-booking">
-                                        <Link className="btn btn-outline-primary" to="/chat">
-                                            Gửi Tin Nhắn
-                                        </Link>
-
-                                        <Link
-                                            className="btn btn-primary"
-                                            to="#"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#voice_call"
-                                        >
-                                            Gọi Ngay
-                                        </Link>
+                                        <Button
+                                            text="Gửi Tin Nhắn"
+                                            type="button"
+                                            className={styles.customBtn}
+                                            onClick={() => (window.location.href = '/chat')}
+                                        />
+                                        <Button
+                                            text="Gọi Ngay"
+                                            type="button"
+                                            className={styles.customBtn}
+                                            onClick={() => {
+                                                const modal = document.querySelector('#voice_call');
+                                                if (modal instanceof HTMLElement) {
+                                                    modal.setAttribute('data-bs-toggle', 'modal');
+                                                    modal.setAttribute(
+                                                        'data-bs-target',
+                                                        '#voice_call'
+                                                    );
+                                                    modal.click(); // Trigger modal programmatically
+                                                }
+                                            }}
+                                        />
                                     </div>
                                 </div>
                             </div>
