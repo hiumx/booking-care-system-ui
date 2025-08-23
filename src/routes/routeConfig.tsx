@@ -21,6 +21,7 @@ import MedicalTerms from '@/pages/MedicalTerms';
 import CategoryArticles from '@/pages/CategoryBlogs';
 import CategoryArticlesDemo from '@/pages/CategoryBlogsDemo';
 import AboutUs from '@/pages/AboutUs/AboutUs';
+import ContactUs from '~/pages/ContactUs';
 
 const routes: RouteObject[] = [
     {
@@ -62,6 +63,10 @@ const routes: RouteObject[] = [
     {
         path: PATHS.ABOUT_US,
         element: <AboutUs />,
+    },
+    {
+        path: PATHS.CONTACT_US,
+        element: <ContactUs />,
     },
 
     // Authentication paths
