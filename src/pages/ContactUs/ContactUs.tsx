@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import Select from 'react-select';
 import MainLayout from '../../layouts/MainLayout';
 import Breadcrumb from '~/components/Breadcrumb';
 import Input from '~/components/Input';
 import Button from '~/components/Button';
+import Select from '~/components/Select';
 import { PATHS } from '~/routes/paths';
 import styles from './ContactUs.module.scss';
 import clsx from 'clsx';
@@ -21,14 +21,14 @@ const ContactUs: React.FC = () => {
     });
 
     const facilityTypeOptions = [
-        { value: 'clinic', label: 'Phòng khám' },
-        { value: 'hospital', label: 'Bệnh viện' },
-        { value: 'other', label: 'Khác' },
+        { label: 'Phòng khám', value: 'clinic' },
+        { label: 'Bệnh viện', value: 'hospital' },
+        { label: 'Khác', value: 'other' },
     ];
 
     const consultationPackageOptions = [
-        { value: 'advanced', label: 'NÂNG CAO' },
-        { value: 'premium', label: 'CAO CẤP' },
+        { label: 'NÂNG CAO', value: 'advanced' },
+        { label: 'CAO CẤP', value: 'premium' },
     ];
 
     const handleInputChange = (field: string, value: string) => {
@@ -187,66 +187,15 @@ const ContactUs: React.FC = () => {
                                                             <span className="text-danger">*</span>
                                                         </label>
                                                         <Select
-                                                            options={facilityTypeOptions}
-                                                            value={
-                                                                formData.facilityType
-                                                                    ? facilityTypeOptions.find(
-                                                                          (option) =>
-                                                                              option.value ===
-                                                                              formData.facilityType
-                                                                      )
-                                                                    : null
-                                                            }
-                                                            onChange={(selected) =>
+                                                            title="Chọn loại hình cơ sở y tế"
+                                                            items={facilityTypeOptions}
+                                                            value={formData.facilityType}
+                                                            onChange={(value) =>
                                                                 handleInputChange(
                                                                     'facilityType',
-                                                                    selected?.value || ''
+                                                                    value
                                                                 )
                                                             }
-                                                            placeholder="Chọn loại hình cơ sở y tế"
-                                                            className="react-select-container"
-                                                            classNamePrefix="react-select"
-                                                            styles={{
-                                                                control: (base) => ({
-                                                                    ...base,
-                                                                    borderRadius: '8px',
-                                                                    borderColor: '#e5e7eb',
-                                                                    boxShadow: 'none',
-                                                                    '&:hover': {
-                                                                        borderColor: '#d1d5db',
-                                                                    },
-                                                                }),
-                                                                option: (base, state) => ({
-                                                                    ...base,
-                                                                    backgroundColor: state.isFocused
-                                                                        ? '#f3f4f6'
-                                                                        : 'white',
-                                                                    color: state.isFocused
-                                                                        ? '#374151'
-                                                                        : '#4b5563',
-                                                                    '&:active': {
-                                                                        backgroundColor: '#e5e7eb',
-                                                                    },
-                                                                }),
-                                                                singleValue: (base) => ({
-                                                                    ...base,
-                                                                    color: '#374151',
-                                                                }),
-                                                                placeholder: (base) => ({
-                                                                    ...base,
-                                                                    color: '#9ca3af',
-                                                                }),
-                                                                menu: (base) => ({
-                                                                    ...base,
-                                                                    zIndex: 9999,
-                                                                    boxShadow:
-                                                                        '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-                                                                }),
-                                                                menuList: (base) => ({
-                                                                    ...base,
-                                                                    padding: '8px 0',
-                                                                }),
-                                                            }}
                                                         />
                                                     </div>
                                                 </div>
@@ -257,66 +206,15 @@ const ContactUs: React.FC = () => {
                                                             <span className="text-danger">*</span>
                                                         </label>
                                                         <Select
-                                                            options={consultationPackageOptions}
-                                                            value={
-                                                                formData.consultationPackage
-                                                                    ? consultationPackageOptions.find(
-                                                                          (option) =>
-                                                                              option.value ===
-                                                                              formData.consultationPackage
-                                                                      )
-                                                                    : null
-                                                            }
-                                                            onChange={(selected) =>
+                                                            title="Chọn gói muốn tư vấn"
+                                                            items={consultationPackageOptions}
+                                                            value={formData.consultationPackage}
+                                                            onChange={(value) =>
                                                                 handleInputChange(
                                                                     'consultationPackage',
-                                                                    selected?.value || ''
+                                                                    value
                                                                 )
                                                             }
-                                                            placeholder="Chọn gói muốn tư vấn"
-                                                            className="react-select-container"
-                                                            classNamePrefix="react-select"
-                                                            styles={{
-                                                                control: (base) => ({
-                                                                    ...base,
-                                                                    borderRadius: '8px',
-                                                                    borderColor: '#e5e7eb',
-                                                                    boxShadow: 'none',
-                                                                    '&:hover': {
-                                                                        borderColor: '#d1d5db',
-                                                                    },
-                                                                }),
-                                                                option: (base, state) => ({
-                                                                    ...base,
-                                                                    backgroundColor: state.isFocused
-                                                                        ? '#f3f4f6'
-                                                                        : 'white',
-                                                                    color: state.isFocused
-                                                                        ? '#374151'
-                                                                        : '#4b5563',
-                                                                    '&:active': {
-                                                                        backgroundColor: '#e5e7eb',
-                                                                    },
-                                                                }),
-                                                                singleValue: (base) => ({
-                                                                    ...base,
-                                                                    color: '#374151',
-                                                                }),
-                                                                placeholder: (base) => ({
-                                                                    ...base,
-                                                                    color: '#9ca3af',
-                                                                }),
-                                                                menu: (base) => ({
-                                                                    ...base,
-                                                                    zIndex: 9999,
-                                                                    boxShadow:
-                                                                        '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-                                                                }),
-                                                                menuList: (base) => ({
-                                                                    ...base,
-                                                                    padding: '8px 0',
-                                                                }),
-                                                            }}
                                                         />
                                                     </div>
                                                 </div>
