@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useParams } from 'react-router-dom';
-import BlogHeader from '~/pages/Blog/components/BlogHeader';
-import Breadcrumb from '~/pages/BlogDetail/components/Breadcrumb';
-import BlogCard from '~/components/BLogCard';
+import BlogHeader from '@/pages/Blog/components/BlogHeader';
+import Breadcrumb from '@/pages/BlogDetail/components/Breadcrumb';
+import BlogCard from '@/components/BLogCard';
 import styles from './CategoryBlogs.module.scss';
 
 interface Article {
