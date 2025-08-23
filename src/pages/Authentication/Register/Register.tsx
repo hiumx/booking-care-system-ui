@@ -8,9 +8,9 @@ import FacebookIcon from '@/assets/img/icons/facebook-icon.svg';
 import AuthLayout from '@/layouts/AuthLayout';
 import clsx from 'clsx';
 import styles from './Register.module.scss';
-import { PATHS } from '~/routes/paths';
-import Button from '~/components/Button';
-import Input from '~/components/Input';
+import { PATHS } from '@/routes/paths';
+import Button from '@/components/Button';
+import Input from '@/components/Input';
 
 type Step = 0 | 1 | 2 | 3;
 

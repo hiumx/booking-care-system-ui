@@ -2,8 +2,8 @@ import { useState, useMemo } from 'react';
 import { CheckCircle } from 'lucide-react';
 import clsx from 'clsx';
 import '@/styles/_auth.scss';
-import Input from '~/components/Input';
-import Button from '~/components/Button';
+import Input from '@/components/Input';
+import Button from '@/components/Button';
 
 interface PasswordData {
     currentPassword: string;

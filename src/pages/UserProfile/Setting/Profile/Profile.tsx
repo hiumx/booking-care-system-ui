@@ -2,8 +2,8 @@ import { useState } from 'react';
 import Select from 'react-select';
 import settingStyles from '@/pages/UserProfile/Setting/Setting.module.scss';
 import clsx from 'clsx';
-import Button from '~/components/Button';
-import Input from '~/components/Input';
+import Button from '@/components/Button';
+import Input from '@/components/Input';
 
 interface ProfileData {
     firstName: string;

@@ -21,7 +21,7 @@ import MedicalTerms from '@/pages/MedicalTerms';
 import CategoryArticles from '@/pages/CategoryBlogs';
 import CategoryArticlesDemo from '@/pages/CategoryBlogsDemo';
 import AboutUs from '@/pages/AboutUs/AboutUs';
-import ContactUs from '~/pages/ContactUs';
+import ContactUs from '@/pages/ContactUs';
 
 const routes: RouteObject[] = [
     {

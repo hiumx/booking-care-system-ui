@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import BlogHeader from '~/pages/Blog/components/BlogHeader';
-import Breadcrumb from '~/pages/BlogDetail/components/Breadcrumb';
+import BlogHeader from '@/pages/Blog/components/BlogHeader';
+import Breadcrumb from '@/pages/BlogDetail/components/Breadcrumb';
 import styles from './MedicalTerms.module.scss';
 
 interface MedicalTerm {

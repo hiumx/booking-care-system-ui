@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { PATHS } from '~/routes/paths';
+import { PATHS } from '@/routes/paths';
 
 const Header: React.FC = () => {
     return (
