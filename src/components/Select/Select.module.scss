@@ -9,8 +9,8 @@
             min-width: 190px;
             padding: 10px 10px;
             margin-right: 0;
-            background: #e6e8ee;
-            border: 0;
+            background: #fff;
+            border: 1px solid #e3e3e3;
             border-radius: 5px;
             position: relative;
             display: flex;
@@ -72,9 +72,9 @@
             -ms-transition: all 0.2s ease;
             transition: all 0.2s ease;
             display: block;
-            transform: translateY(40px);
-            -webkit-transform: translateY(40px);
-            -ms-transform: translateY(40px);
+            transform: translateY(0px);
+            -webkit-transform: translateY(0px);
+            -ms-transform: translateY(0px);
             background: #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
