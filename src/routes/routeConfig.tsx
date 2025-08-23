@@ -21,6 +21,7 @@ import MedicalTerms from '@/pages/MedicalTerms';
 import CategoryArticles from '@/pages/CategoryBlogs';
 import CategoryArticlesDemo from '@/pages/CategoryBlogsDemo';
 import AboutUs from '@/pages/AboutUs/AboutUs';
+import DoctorList from '@/pages/Doctor/DoctorList';
 
 const routes: RouteObject[] = [
     {
@@ -110,7 +111,10 @@ const routes: RouteObject[] = [
 
     {
         path: PATHS.DOCTOR.ROOT,
-        children: [{ path: PATHS.DOCTOR.PROFILE, element: <DoctorProfile /> }],
+        children: [
+            { path: PATHS.DOCTOR.PROFILE, element: <DoctorProfile /> },
+            { path: PATHS.DOCTOR.LIST, element: <DoctorList /> },
+        ],
     },
     {
         path: PATHS.DASHBOARD.ROOT,

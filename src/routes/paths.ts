@@ -35,6 +35,7 @@ export const PATHS = {
     DOCTOR: {
         ROOT: '/doctor',
         PROFILE: 'profile',
+        LIST: 'list',
     },
 
     // Specialties paths
