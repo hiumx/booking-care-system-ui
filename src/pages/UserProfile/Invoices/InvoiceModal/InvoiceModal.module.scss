@@ -63,6 +63,10 @@
     }
     .prescribeDownload {
         height: 68px !important;
+
+        ul {
+            margin-bottom: 0;
+        }
     }
     // Small phones (up to 767px)
     @media (max-width: 767px) {
