@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import MainLayout from '../../layouts/MainLayout';
-import Breadcrumb from '~/components/Breadcrumb';
-import Input from '~/components/Input';
-import Button from '~/components/Button';
-import Select from '~/components/Select';
-import { PATHS } from '~/routes/paths';
+import MainLayout from '@/layouts/MainLayout';
+import Breadcrumb from '@/components/Breadcrumb';
+import Input from '@/components/Input';
+import Button from '@/components/Button';
+import Select from '@/components/Select';
+import { PATHS } from '@/routes/paths';
 import styles from './ContactUs.module.scss';
 import clsx from 'clsx';
 
