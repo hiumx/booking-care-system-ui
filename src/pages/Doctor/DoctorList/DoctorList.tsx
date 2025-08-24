@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import SideBar from './components/SideBar';
-import DoctorCard from './components/DoctorCard';
+import DoctorAppointmentBookingCard from '@/components/DoctorAppointmentBookingCard';
+import Pagination from '@/components/Pagination';
+import Select from '@/components/Select'; // Import the Select component
+import browseCategorie from '@/assets/img/icons/browse-categorie.svg'; // Import icon for Select component
 
 // Import images
 import docProfile01 from '@/assets/img/doctor-grid/doctor-grid-01.jpg';
@@ -17,167 +20,264 @@ import docProfile11 from '@/assets/img/doctor-grid/doctor-grid-11.jpg';
 import docProfile12 from '@/assets/img/doctor-grid/doctor-grid-12.jpg';
 
 interface Doctor {
-    id: string;
+    doctorId: string;
     name: string;
     specialty: string;
+    position: string;
     location: string;
     consultationTime: string;
     consultationFee: number;
     rating: number;
     available: boolean;
-    image: string; // Imported image module
-    specialtyColor: string;
+    image: string;
+    bookCounts: number;
+    yearsOfExperience: number;
+    isFavorite: boolean;
+    likeCounts: number;
+    dislikeCounts: number;
 }
 
 const mockDoctors: Doctor[] = [
     {
-        id: '1',
-        name: 'Dr. Michael Brown',
-        specialty: 'Psychologist',
-        location: 'Minneapolis, MN',
-        consultationTime: '30 Min',
-        consultationFee: 650,
+        doctorId: '1',
+        name: 'BS. Nguyễn Văn Minh',
+        specialty: 'Tâm lý học',
+        position: 'Bác sĩ Tâm lý Cao cấp',
+        location: 'Quận 1, TP. Hồ Chí Minh',
+        consultationTime: '09:00',
+        consultationFee: 650000,
         rating: 5.0,
         available: true,
         image: docProfile01,
-        specialtyColor: 'indigo',
+        bookCounts: 25,
+        yearsOfExperience: 15,
+        isFavorite: false,
+        likeCounts: 20,
+        dislikeCounts: 1,
     },
     {
-        id: '2',
-        name: 'Dr. Nicholas Tello',
-        specialty: 'Pediatrician',
-        location: 'Ogden, IA',
-        consultationTime: '60 Min',
-        consultationFee: 400,
+        doctorId: '2',
+        name: 'BS. Trần Thị Hồng',
+        specialty: 'Nhi khoa',
+        position: 'Chuyên gia Nhi khoa',
+        location: 'Quận 3, TP. Hồ Chí Minh',
+        consultationTime: '10:30',
+        consultationFee: 400000,
         rating: 4.6,
         available: true,
         image: docProfile02,
-        specialtyColor: 'pink',
+        bookCounts: 30,
+        yearsOfExperience: 8,
+        isFavorite: true,
+        likeCounts: 15,
+        dislikeCounts: 2,
     },
     {
-        id: '3',
-        name: 'Dr. Harold Bryant',
-        specialty: 'Neurologist',
-        location: 'Winona, MS',
-        consultationTime: '30 Min',
-        consultationFee: 500,
+        doctorId: '3',
+        name: 'BS. Lê Quang Vinh',
+        specialty: 'Thần kinh',
+        position: 'Trưởng khoa Thần kinh',
+        location: 'Quận 7, TP. Hồ Chí Minh',
+        consultationTime: '11:00',
+        consultationFee: 500000,
         rating: 4.8,
         available: true,
         image: docProfile03,
-        specialtyColor: 'teal',
+        bookCounts: 18,
+        yearsOfExperience: 12,
+        isFavorite: false,
+        likeCounts: 22,
+        dislikeCounts: 0,
     },
     {
-        id: '4',
-        name: 'Dr. Sandra Jones',
-        specialty: 'Cardiologist',
-        location: 'Beckley, WV',
-        consultationTime: '30 Min',
-        consultationFee: 550,
+        doctorId: '4',
+        name: 'BS. Phạm Thị Lan',
+        specialty: 'Tim mạch',
+        position: 'Bác sĩ Tim mạch Cao cấp',
+        location: 'Quận 5, TP. Hồ Chí Minh',
+        consultationTime: '14:00',
+        consultationFee: 550000,
         rating: 4.8,
         available: true,
         image: docProfile04,
-        specialtyColor: 'info',
+        bookCounts: 40,
+        yearsOfExperience: 10,
+        isFavorite: true,
+        likeCounts: 25,
+        dislikeCounts: 3,
     },
     {
-        id: '5',
-        name: 'Dr. Charles Scott',
-        specialty: 'Neurologist',
-        location: 'Hamshire, TX',
-        consultationTime: '30 Min',
-        consultationFee: 600,
+        doctorId: '5',
+        name: 'BS. Hoàng Văn Hùng',
+        specialty: 'Thần kinh',
+        position: 'Tư vấn Thần kinh',
+        location: 'Quận Bình Thạnh, TP. Hồ Chí Minh',
+        consultationTime: '15:30',
+        consultationFee: 600000,
         rating: 4.2,
         available: true,
         image: docProfile05,
-        specialtyColor: 'teal',
+        bookCounts: 12,
+        yearsOfExperience: 7,
+        isFavorite: false,
+        likeCounts: 10,
+        dislikeCounts: 5,
     },
     {
-        id: '6',
-        name: 'Dr. Robert Thomas',
-        specialty: 'Cardiologist',
-        location: 'Oakland, CA',
-        consultationTime: '30 Min',
-        consultationFee: 450,
+        doctorId: '6',
+        name: 'BS. Nguyễn Thành Đạt',
+        specialty: 'Tim mạch',
+        position: 'Chuyên gia Tim mạch',
+        location: 'Quận 10, TP. Hồ Chí Minh',
+        consultationTime: '08:00',
+        consultationFee: 450000,
         rating: 4.2,
         available: true,
         image: docProfile06,
-        specialtyColor: 'info',
+        bookCounts: 35,
+        yearsOfExperience: 9,
+        isFavorite: false,
+        likeCounts: 18,
+        dislikeCounts: 2,
     },
     {
-        id: '7',
-        name: 'Dr. Margaret Koller',
-        specialty: 'Psychologist',
-        location: 'Killeen, TX',
-        consultationTime: '30 Min',
-        consultationFee: 450,
+        doctorId: '7',
+        name: 'BS. Võ Thị Mai',
+        specialty: 'Tâm lý học',
+        position: 'Bác sĩ Tâm lý Lâm sàng',
+        location: 'Quận Phú Nhuận, TP. Hồ Chí Minh',
+        consultationTime: '13:00',
+        consultationFee: 450000,
         rating: 4.7,
         available: true,
         image: docProfile07,
-        specialtyColor: 'indigo',
+        bookCounts: 28,
+        yearsOfExperience: 14,
+        isFavorite: true,
+        likeCounts: 30,
+        dislikeCounts: 1,
     },
     {
-        id: '8',
-        name: 'Dr. Cath Busick',
-        specialty: 'Pediatrician',
-        location: 'Schenectady, NY',
-        consultationTime: '30 Min',
-        consultationFee: 750,
+        doctorId: '8',
+        name: 'BS. Đặng Thị Thu',
+        specialty: 'Nhi khoa',
+        position: 'Tư vấn Nhi khoa',
+        location: 'Quận Gò Vấp, TP. Hồ Chí Minh',
+        consultationTime: 'Không có lịch',
+        consultationFee: 750000,
         rating: 4.7,
         available: false,
         image: docProfile08,
-        specialtyColor: 'pink',
+        bookCounts: 22,
+        yearsOfExperience: 11,
+        isFavorite: false,
+        likeCounts: 19,
+        dislikeCounts: 4,
     },
     {
-        id: '9',
-        name: 'Dr. Travis Barton',
-        specialty: 'Psychologist',
-        location: 'Metairie, LA',
-        consultationTime: '60 Min',
-        consultationFee: 480,
+        doctorId: '9',
+        name: 'BS. Trần Văn Long',
+        specialty: 'Tâm lý học',
+        position: 'Bác sĩ Tâm lý Cao cấp',
+        location: 'Quận Tân Bình, TP. Hồ Chí Minh',
+        consultationTime: '16:00',
+        consultationFee: 480000,
         rating: 4.9,
         available: true,
         image: docProfile09,
-        specialtyColor: 'indigo',
+        bookCounts: 15,
+        yearsOfExperience: 13,
+        isFavorite: false,
+        likeCounts: 21,
+        dislikeCounts: 0,
     },
     {
-        id: '10',
-        name: 'Dr. Daisy Malcolm',
-        specialty: 'Gastroenterology',
-        location: 'Lexington, KY',
-        consultationTime: '60 Min',
-        consultationFee: 520,
+        doctorId: '10',
+        name: 'BS. Nguyễn Thị Hương',
+        specialty: 'Tiêu hóa',
+        position: 'Chuyên gia Tiêu hóa',
+        location: 'Quận 2, TP. Hồ Chí Minh',
+        consultationTime: '09:30',
+        consultationFee: 520000,
         rating: 5.0,
         available: true,
         image: docProfile10,
-        specialtyColor: 'danger',
+        bookCounts: 33,
+        yearsOfExperience: 16,
+        isFavorite: true,
+        likeCounts: 28,
+        dislikeCounts: 1,
     },
     {
-        id: '11',
-        name: 'Dr. Tyrone Patrick',
-        specialty: 'Cardiologist',
-        location: 'Clark Fork, ID',
-        consultationTime: '30 Min',
-        consultationFee: 360,
+        doctorId: '11',
+        name: 'BS. Lê Văn Tâm',
+        specialty: 'Tim mạch',
+        position: 'Tư vấn Tim mạch',
+        location: 'Quận Thủ Đức, TP. Hồ Chí Minh',
+        consultationTime: 'Không có lịch',
+        consultationFee: 360000,
         rating: 4.4,
         available: false,
         image: docProfile11,
-        specialtyColor: 'info',
+        bookCounts: 10,
+        yearsOfExperience: 6,
+        isFavorite: false,
+        likeCounts: 12,
+        dislikeCounts: 3,
     },
     {
-        id: '12',
-        name: 'Dr. Ann Bell',
-        specialty: 'Pediatrician',
-        location: 'Minneapolis, MN',
-        consultationTime: '30 Min',
-        consultationFee: 630,
+        doctorId: '12',
+        name: 'BS. Hồ Thị Ngọc',
+        specialty: 'Nhi khoa',
+        position: 'Chuyên gia Nhi khoa',
+        location: 'Quận 1, TP. Hồ Chí Minh',
+        consultationTime: 'Không có lịch',
+        consultationFee: 630000,
         rating: 4.2,
         available: false,
         image: docProfile12,
-        specialtyColor: 'pink',
+        bookCounts: 17,
+        yearsOfExperience: 8,
+        isFavorite: false,
+        likeCounts: 14,
+        dislikeCounts: 2,
     },
 ];
 
 const DoctorList: React.FC = () => {
-    const [sortOption, setSortOption] = useState('Price (Low to High)');
+    const [sortOption, setSortOption] = useState(''); // Default to empty for no sorting
+    const [currentPage, setCurrentPage] = useState(1); // State for current page
+    const doctorsPerPage = 6; // Number of doctors to display per page
+    const patientId = '1'; // Sample patientId; replace with actual user context
+
+    // Define sort options for the Select component
+    const sortOptions = [
+        { label: 'Giá từ thấp đến cao', value: 'low-to-high' },
+        { label: 'Giá từ cao đến thấp', value: 'high-to-low' },
+    ];
+
+    // Calculate total pages based on the number of doctors
+    const totalPages = Math.ceil(mockDoctors.length / doctorsPerPage);
+
+    // Sort doctors based on the selected sort option
+    const sortedDoctors = [...mockDoctors].sort((a, b) => {
+        if (sortOption === 'low-to-high') {
+            return a.consultationFee - b.consultationFee;
+        } else if (sortOption === 'high-to-low') {
+            return b.consultationFee - a.consultationFee;
+        }
+        return 0; // No sorting if sortOption is empty
+    });
+
+    // Get doctors for the current page
+    const indexOfLastDoctor = currentPage * doctorsPerPage;
+    const indexOfFirstDoctor = indexOfLastDoctor - doctorsPerPage;
+    const currentDoctors = sortedDoctors.slice(indexOfFirstDoctor, indexOfLastDoctor);
+
+    // Handle page change
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
     return (
         <div className="content mt-5">
@@ -185,93 +285,72 @@ const DoctorList: React.FC = () => {
                 <div className="row">
                     <SideBar />
                     <div className="col-xl-9">
-                        <div className="row align-items-center">
-                            <div className="col-md-6">
-                                <div className="mb-4">
-                                    <h3>
-                                        Showing{' '}
+                        <div className="card">
+                            <div className="card-body">
+                                <div className="d-flex align-items-center justify-content-between result-wrap">
+                                    <h5>
+                                        Hiển thị{' '}
                                         <span className="text-secondary">{mockDoctors.length}</span>{' '}
-                                        Doctors For You
-                                    </h3>
-                                </div>
-                            </div>
-                            <div className="col-md-6">
-                                <div className="d-flex align-items-center justify-content-end mb-4">
-                                    <div className="doctor-filter-availability me-2">
-                                        <p>Availability</p>
-                                        <div className="status-toggle status-tog">
-                                            <input
-                                                type="checkbox"
-                                                id="status_6"
-                                                className="check"
-                                            />
-                                            <label htmlFor="status_6" className="checktoggle">
-                                                checkbox
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div className="dropdown header-dropdown me-2">
+                                        Bác sĩ Dành Cho Bạn
+                                    </h5>
+                                    <div className="d-flex align-items-center gap-3">
+                                        <Select
+                                            title="Sắp xếp theo"
+                                            value={sortOption}
+                                            onChange={setSortOption}
+                                            items={sortOptions}
+                                            image={browseCategorie}
+                                        />
                                         <a
-                                            className="dropdown-toggle sort-dropdown"
-                                            data-bs-toggle="dropdown"
-                                            href="javascript:void(0);"
-                                            aria-expanded="false"
+                                            href="doctor-grid.html"
+                                            className="btn btn-sm head-icon active me-2"
                                         >
-                                            <span>Sort By</span>
-                                            {sortOption}
+                                            <i className="isax isax-grid-7"></i>
                                         </a>
-                                        <div className="dropdown-menu dropdown-menu-end">
-                                            <a
-                                                href="javascript:void(0);"
-                                                className="dropdown-item"
-                                                onClick={() => setSortOption('Price (Low to High)')}
-                                            >
-                                                Price (Low to High)
-                                            </a>
-                                            <a
-                                                href="javascript:void(0);"
-                                                className="dropdown-item"
-                                                onClick={() => setSortOption('Price (High to Low)')}
-                                            >
-                                                Price (High to Low)
-                                            </a>
-                                        </div>
+                                        <a
+                                            href="search-2.html"
+                                            className="btn btn-sm head-icon me-2"
+                                        >
+                                            <i className="isax isax-row-vertical"></i>
+                                        </a>
+                                        <a href="map-list.html" className="btn btn-sm head-icon">
+                                            <i className="isax isax-location"></i>
+                                        </a>
                                     </div>
-                                    <a
-                                        href="doctor-grid.html"
-                                        className="btn btn-sm head-icon active me-2"
-                                    >
-                                        <i className="isax isax-grid-7"></i>
-                                    </a>
-                                    <a href="search-2.html" className="btn btn-sm head-icon me-2">
-                                        <i className="isax isax-row-vertical"></i>
-                                    </a>
-                                    <a href="map-list.html" className="btn btn-sm head-icon">
-                                        <i className="isax isax-location"></i>
-                                    </a>
                                 </div>
                             </div>
                         </div>
                         <div className="row">
-                            {mockDoctors
-                                .sort((a, b) =>
-                                    sortOption === 'Price (Low to High)'
-                                        ? a.consultationFee - b.consultationFee
-                                        : b.consultationFee - a.consultationFee
-                                )
-                                .map((doctor) => (
-                                    <DoctorCard key={doctor.id} doctor={doctor} />
-                                ))}
+                            {currentDoctors.map((doctor) => (
+                                <DoctorAppointmentBookingCard
+                                    key={doctor.doctorId}
+                                    doctorId={doctor.doctorId}
+                                    patientId={patientId}
+                                    name={doctor.name}
+                                    specialty={doctor.specialty}
+                                    position={doctor.position}
+                                    bookCounts={doctor.bookCounts}
+                                    rating={doctor.rating}
+                                    location={doctor.location}
+                                    yearsOfExperience={doctor.yearsOfExperience}
+                                    fees={doctor.consultationFee}
+                                    isFavorite={doctor.isFavorite}
+                                    likeCounts={doctor.likeCounts}
+                                    dislikeCounts={doctor.dislikeCounts}
+                                    nextAvailableTime={
+                                        doctor.available ? doctor.consultationTime : 'Không có lịch'
+                                    }
+                                    image={doctor.image}
+                                />
+                            ))}
                             <div className="col-md-12">
-                                <div className="text-center mb-4">
-                                    <a
-                                        href="login.html"
-                                        className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
-                                    >
-                                        <i className="isax isax-d-cube-scan5 me-2"></i>
-                                        Load More 425 Doctors
-                                    </a>
-                                </div>
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    showPrevNext={true}
+                                    maxVisiblePages={5}
+                                />
                             </div>
                         </div>
                     </div>

@@ -3,8 +3,8 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import AuthLayout from '@/layouts/AuthLayout';
 import { CheckCircle, Shield } from 'lucide-react';
 import clsx from 'clsx';
-import Button from '~/components/Button';
-import Input from '~/components/Input';
+import Button from '@/components/Button';
+import Input from '@/components/Input';
 
 interface ResetPasswordProps {
     onSubmit?: (currentPassword: string, newPassword: string) => void;

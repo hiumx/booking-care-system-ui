@@ -5,9 +5,9 @@ import GoogleIcon from '@/assets/img/icons/google-icon.svg';
 import FacebookIcon from '@/assets/img/icons/facebook-icon.svg';
 import clsx from 'clsx';
 import styles from './Login.module.scss';
-import { PATHS } from '~/routes/paths';
-import Button from '~/components/Button';
-import Input from '~/components/Input';
+import { PATHS } from '@/routes/paths';
+import Button from '@/components/Button';
+import Input from '@/components/Input';
 interface LoginProps {
     onSubmit?: (credentials: {
         method: 'email' | 'phone';
