@@ -12,17 +12,13 @@
         color: #333;
     }
 
-    .mb-3 {
-        margin-bottom: 1rem !important;
-    }
-
     label {
         font-weight: 500;
         color: #333;
         font-size: 14px;
     }
 
-    .form-control {
+    .formControl {
         border: 1px solid #ddd;
         border-radius: 4px;
         padding: 10px 12px;
@@ -40,14 +36,9 @@
         }
     }
 
-    textarea.form-control {
+    textarea.formControl {
         resize: vertical;
         min-height: 100px;
-    }
-
-    .text-muted {
-        font-size: 12px;
-        color: #6c757d !important;
     }
 
     hr {
@@ -56,7 +47,7 @@
         border-top: 1px solid #e9ecef;
     }
 
-    .custom-checkbox {
+    .customCheckbox {
         display: flex;
         align-items: flex-start;
         gap: 8px;
@@ -82,10 +73,10 @@
         }
     }
 
-    .submit-section {
-        text-align: right;
+    .submitSection {
+        text-align: left;
 
-        .submit-btn {
+        .submitBtn {
             min-width: 120px;
         }
     }
@@ -93,8 +84,8 @@
 
 .starRating {
     display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-start;
+    flex-direction: row;
+    justify-content: flex-end;
     gap: 2px;
     margin-bottom: 10px;
 
@@ -112,7 +103,7 @@
             color: #ffc107;
         }
 
-        .fa-star {
+        .faStar {
             transition: color 0.2s ease;
 
             &.active {
@@ -124,7 +115,7 @@
     // Hover effect for rating
     .starLabel:hover,
     .starLabel:hover ~ .starLabel {
-        .fa-star {
+        .faStar {
             color: #ffc107;
         }
     }
@@ -154,10 +145,10 @@
             }
         }
 
-        .submit-section {
+        .submitSection {
             text-align: center;
 
-            .submit-btn {
+            .submitBtn {
                 width: 100%;
                 min-width: auto;
             }
