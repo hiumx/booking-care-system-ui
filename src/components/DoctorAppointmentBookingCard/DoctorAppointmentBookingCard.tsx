@@ -65,7 +65,7 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
     return (
         <div className="col-lg-12">
             <div className={styles.card}>
-                <div className="d-md-flex align-items-center">
+                <div className={clsx(styles.cardContainer, 'd-md-flex align-items-stretch')}>
                     <div className={styles.cardImg}>
                         <Link to={`/doctor-profile/${doctorId}`}>
                             <img
@@ -171,13 +171,15 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                         {nextAvailableTime || 'Không có lịch'}
                                     </p>
                                 </div>
-                                <Link
-                                    to={`/booking/${doctorId}`}
-                                    className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
-                                >
-                                    <i className="isax isax-calendar-1 me-2"></i>
-                                    Đặt lịch khám
-                                </Link>
+                                <div className={styles.bookingButtonContainer}>
+                                    <Link
+                                        to={`/booking/${doctorId}`}
+                                        className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
+                                    >
+                                        <i className="isax isax-calendar-1 me-2"></i>
+                                        Đặt lịch khám
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>

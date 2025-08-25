@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import SideBar from './components/SideBar';
 import DoctorAppointmentBookingCard from '@/components/DoctorAppointmentBookingCard';
 import Pagination from '@/components/Pagination';
-import Select from '@/components/Select'; // Import the Select component
-import browseCategorie from '@/assets/img/icons/browse-categorie.svg'; // Import icon for Select component
+import Select from '@/components/Select';
+import styles from './DoctorList.module.scss';
+import MainLayout from '@/layouts/MainLayout';
+import Breadcrumb from '@/components/Breadcrumb';
+import SearchResult from '@/pages/Doctor/SearchResult';
+import browseCategorie from '@/assets/img/icons/browse-categorie.svg';
 
 // Import images
 import docProfile01 from '@/assets/img/doctor-grid/doctor-grid-01.jpg';
@@ -244,119 +249,129 @@ const mockDoctors: Doctor[] = [
     },
 ];
 
-const DoctorList: React.FC = () => {
-    const [sortOption, setSortOption] = useState(''); // Default to empty for no sorting
-    const [currentPage, setCurrentPage] = useState(1); // State for current page
-    const doctorsPerPage = 6; // Number of doctors to display per page
-    const patientId = '1'; // Sample patientId; replace with actual user context
+const breadcrumbData = {
+    title: 'Danh sách bác sĩ',
+    items: [
+        { label: 'Trang chủ', path: '/', isActive: false },
+        { label: 'Danh sách bác sĩ', isActive: true },
+    ],
+};
 
-    // Define sort options for the Select component
+const DoctorList: React.FC = () => {
+    const [sortOption, setSortOption] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const doctorsPerPage = 6;
+    const patientId = '1';
+
     const sortOptions = [
         { label: 'Giá từ thấp đến cao', value: 'low-to-high' },
         { label: 'Giá từ cao đến thấp', value: 'high-to-low' },
     ];
 
-    // Calculate total pages based on the number of doctors
     const totalPages = Math.ceil(mockDoctors.length / doctorsPerPage);
 
-    // Sort doctors based on the selected sort option
     const sortedDoctors = [...mockDoctors].sort((a, b) => {
         if (sortOption === 'low-to-high') {
             return a.consultationFee - b.consultationFee;
         } else if (sortOption === 'high-to-low') {
             return b.consultationFee - a.consultationFee;
         }
-        return 0; // No sorting if sortOption is empty
+        return 0;
     });
 
-    // Get doctors for the current page
     const indexOfLastDoctor = currentPage * doctorsPerPage;
     const indexOfFirstDoctor = indexOfLastDoctor - doctorsPerPage;
     const currentDoctors = sortedDoctors.slice(indexOfFirstDoctor, indexOfLastDoctor);
 
-    // Handle page change
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
 
     return (
-        <div className="content mt-5">
-            <div className="container">
-                <div className="row">
-                    <SideBar />
-                    <div className="col-xl-9">
-                        <div className="card">
-                            <div className="card-body">
-                                <div className="d-flex align-items-center justify-content-between result-wrap">
-                                    <h5>
-                                        Hiển thị{' '}
-                                        <span className="text-secondary">{mockDoctors.length}</span>{' '}
-                                        Bác sĩ Dành Cho Bạn
-                                    </h5>
-                                    <div className="d-flex align-items-center gap-3">
-                                        <Select
-                                            title="Sắp xếp theo"
-                                            value={sortOption}
-                                            onChange={setSortOption}
-                                            items={sortOptions}
-                                            image={browseCategorie}
-                                        />
-                                        <a
-                                            href="doctor-grid.html"
-                                            className="btn btn-sm head-icon active me-2"
-                                        >
-                                            <i className="isax isax-grid-7"></i>
-                                        </a>
-                                        <a
-                                            href="search-2.html"
-                                            className="btn btn-sm head-icon me-2"
-                                        >
-                                            <i className="isax isax-row-vertical"></i>
-                                        </a>
-                                        <a href="map-list.html" className="btn btn-sm head-icon">
-                                            <i className="isax isax-location"></i>
-                                        </a>
+        <MainLayout>
+            <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
+            <SearchResult />
+            <div className="content mt-5">
+                <div className="container">
+                    <div className="row">
+                        <SideBar />
+                        <div className="col-xl-9">
+                            <div className="card">
+                                <div className="card-body">
+                                    <div
+                                        className={`${styles.filterContainer} d-flex align-items-center justify-content-between result-wrap`}
+                                    >
+                                        <h5 className={styles.h5Custom}>
+                                            Hiển thị{' '}
+                                            <span className="text-secondary">
+                                                {mockDoctors.length}
+                                            </span>{' '}
+                                            Bác sĩ Dành Cho Bạn
+                                        </h5>
+                                        <div className="d-flex align-items-center gap-3">
+                                            <Select
+                                                title="Sắp xếp theo"
+                                                value={sortOption}
+                                                onChange={setSortOption}
+                                                items={sortOptions}
+                                                image={browseCategorie}
+                                            />
+                                            <Link
+                                                to="/doctor-grid"
+                                                className={`${styles.headIcon} ${styles.active}`}
+                                            >
+                                                <i className="isax isax-grid-7"></i>
+                                            </Link>
+                                            <Link to="/search-2" className={`${styles.headIcon}`}>
+                                                <i className="isax isax-row-vertical"></i>
+                                            </Link>
+                                            <Link to="/map-list" className={`${styles.headIcon}`}>
+                                                <i className="isax isax-location"></i>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="row">
-                            {currentDoctors.map((doctor) => (
-                                <DoctorAppointmentBookingCard
-                                    key={doctor.doctorId}
-                                    doctorId={doctor.doctorId}
-                                    patientId={patientId}
-                                    name={doctor.name}
-                                    specialty={doctor.specialty}
-                                    position={doctor.position}
-                                    bookCounts={doctor.bookCounts}
-                                    rating={doctor.rating}
-                                    location={doctor.location}
-                                    yearsOfExperience={doctor.yearsOfExperience}
-                                    fees={doctor.consultationFee}
-                                    isFavorite={doctor.isFavorite}
-                                    likeCounts={doctor.likeCounts}
-                                    dislikeCounts={doctor.dislikeCounts}
-                                    nextAvailableTime={
-                                        doctor.available ? doctor.consultationTime : 'Không có lịch'
-                                    }
-                                    image={doctor.image}
-                                />
-                            ))}
-                            <div className="col-md-12">
-                                <Pagination
-                                    currentPage={currentPage}
-                                    totalPages={totalPages}
-                                    onPageChange={handlePageChange}
-                                    showPrevNext={true}
-                                    maxVisiblePages={5}
-                                />
+                            <div className="row">
+                                {currentDoctors.map((doctor) => (
+                                    <DoctorAppointmentBookingCard
+                                        key={doctor.doctorId}
+                                        doctorId={doctor.doctorId}
+                                        patientId={patientId}
+                                        name={doctor.name}
+                                        specialty={doctor.specialty}
+                                        position={doctor.position}
+                                        bookCounts={doctor.bookCounts}
+                                        rating={doctor.rating}
+                                        location={doctor.location}
+                                        yearsOfExperience={doctor.yearsOfExperience}
+                                        fees={doctor.consultationFee}
+                                        isFavorite={doctor.isFavorite}
+                                        likeCounts={doctor.likeCounts}
+                                        dislikeCounts={doctor.dislikeCounts}
+                                        nextAvailableTime={
+                                            doctor.available
+                                                ? doctor.consultationTime
+                                                : 'Không có lịch'
+                                        }
+                                        image={doctor.image}
+                                    />
+                                ))}
+                                <div className="col-md-12">
+                                    <Pagination
+                                        currentPage={currentPage}
+                                        totalPages={totalPages}
+                                        onPageChange={handlePageChange}
+                                        showPrevNext={true}
+                                        maxVisiblePages={5}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </MainLayout>
     );
 };
 
