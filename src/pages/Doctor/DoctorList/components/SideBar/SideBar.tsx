@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import styles from './SideBar.module.scss';
@@ -22,31 +22,36 @@ const mockFilterData: FilterSection[] = [
         title: 'Chuyên khoa',
         options: [
             { id: 'checkebox-sm2', label: 'Tiết niệu', count: 21 },
-            { id: 'checkebox-sm3', label: 'Tâm thần học', count: 21 },
-            { id: 'checkebox-sm4', label: 'Tim mạch', count: 21 },
-            { id: 'checkebox-sm5', label: 'Nhi khoa', count: 21 },
-            { id: 'checkebox-sm6', label: 'Tiết niệu', count: 21 },
-            { id: 'checkebox-sm7', label: 'Thần kinh', count: 21 },
-            { id: 'checkebox-sm8', label: 'Phổi', count: 21 },
-            { id: 'checkebox-sm9', label: 'Chỉnh hình', count: 21 },
-            { id: 'checkebox-sm10', label: 'Nội tiết', count: 21 },
+            { id: 'checkebox-sm3', label: 'Tâm thần học', count: 15 },
+            { id: 'checkebox-sm4', label: 'Tim mạch', count: 30 },
+            { id: 'checkebox-sm5', label: 'Nhi khoa', count: 25 },
+            { id: 'checkebox-sm6', label: 'Tiêu hóa', count: 18 },
+            { id: 'checkebox-sm7', label: 'Thần kinh', count: 12 },
+            { id: 'checkebox-sm8', label: 'Phổi', count: 20 },
+            { id: 'checkebox-sm9', label: 'Chỉnh hình', count: 10 },
+            { id: 'checkebox-sm10', label: 'Nội tiết', count: 14 },
+            { id: 'checkebox-sm11', label: 'Da liễu', count: 22 },
+            { id: 'checkebox-sm12', label: 'Mắt', count: 17 },
+            { id: 'checkebox-sm13', label: 'Tai mũi họng', count: 19 },
         ],
         hasViewMore: true,
     },
     {
         title: 'Giới tính',
         options: [
-            { id: 'checkebox-sm11', label: 'Nam', count: 21 },
-            { id: 'checkebox-sm12', label: 'Nữ', count: 21 },
+            { id: 'checkebox-sm14', label: 'Nam', count: 50 },
+            { id: 'checkebox-sm15', label: 'Nữ', count: 45 },
+            { id: 'checkebox-sm16', label: 'Khác', count: 5 },
         ],
     },
     {
         title: 'Lịch trống',
         options: [
-            { id: 'checkebox-sm13', label: 'Hôm nay' },
-            { id: 'checkebox-sm14', label: 'Ngày mai' },
-            { id: 'checkebox-sm15', label: 'Trong 7 ngày tới' },
-            { id: 'checkebox-sm16', label: 'Trong 30 ngày tới' },
+            { id: 'checkebox-sm17', label: 'Hôm nay' },
+            { id: 'checkebox-sm18', label: 'Ngày mai' },
+            { id: 'checkebox-sm19', label: 'Trong 7 ngày tới' },
+            { id: 'checkebox-sm20', label: 'Trong 30 ngày tới' },
+            { id: 'checkebox-sm21', label: 'Cuối tuần này' },
         ],
         hasViewMore: true,
     },
@@ -57,51 +62,80 @@ const mockFilterData: FilterSection[] = [
     {
         title: 'Kinh nghiệm',
         options: [
-            { id: 'checkebox-sm21', label: 'Trên 2 năm' },
-            { id: 'checkebox-sm22', label: 'Trên 5 năm' },
-            { id: 'checkebox-sm23', label: 'Trên 7 năm' },
-            { id: 'checkebox-sm24', label: 'Trên 10 năm' },
+            { id: 'checkebox-sm22', label: 'Dưới 2 năm' },
+            { id: 'checkebox-sm23', label: 'Trên 2 năm' },
+            { id: 'checkebox-sm24', label: 'Trên 5 năm' },
+            { id: 'checkebox-sm25', label: 'Trên 7 năm' },
+            { id: 'checkebox-sm26', label: 'Trên 10 năm' },
+            { id: 'checkebox-sm27', label: 'Trên 15 năm' },
         ],
         hasViewMore: true,
     },
     {
         title: 'Phòng khám',
         options: [
-            { id: 'checkebox-sm25', label: 'Phòng khám Nha khoa Nụ Cười Rạng Rỡ' },
-            { id: 'checkebox-sm26', label: 'Phòng khám Chăm sóc Gia đình' },
-            { id: 'checkebox-sm27', label: 'Phòng khám Sức khỏe Nhanh' },
-            { id: 'checkebox-sm28', label: 'Phòng khám Phục hồi Chức năng' },
-            { id: 'checkebox-sm29', label: 'Phòng khám Sức khỏe Phụ nữ Hoa Sen' },
+            { id: 'checkebox-sm28', label: 'Phòng khám Nha khoa Nụ Cười Rạng Rỡ' },
+            { id: 'checkebox-sm29', label: 'Phòng khám Chăm sóc Gia đình' },
+            { id: 'checkebox-sm30', label: 'Phòng khám Sức khỏe Nhanh' },
+            { id: 'checkebox-sm31', label: 'Phòng khám Phục hồi Chức năng' },
+            { id: 'checkebox-sm32', label: 'Phòng khám Sức khỏe Phụ nữ Hoa Sen' },
+            { id: 'checkebox-sm33', label: 'Phòng khám Đa khoa Quốc tế' },
+            { id: 'checkebox-sm34', label: 'Phòng khám Tâm lý Tâm An' },
         ],
         hasViewMore: true,
     },
     {
         title: 'Loại tư vấn',
         options: [
-            { id: 'checkebox-sm30', label: 'Gọi thoại' },
-            { id: 'checkebox-sm31', label: 'Gọi video' },
-            { id: 'checkebox-sm32', label: 'Tư vấn tức thì' },
-            { id: 'checkebox-sm33', label: 'Chat' },
+            { id: 'checkebox-sm35', label: 'Gọi thoại' },
+            { id: 'checkebox-sm36', label: 'Gọi video' },
+            { id: 'checkebox-sm37', label: 'Tư vấn tức thì' },
+            { id: 'checkebox-sm38', label: 'Chat' },
+            { id: 'checkebox-sm39', label: 'Tư vấn tại chỗ' },
         ],
     },
     {
         title: 'Ngôn ngữ',
         options: [
-            { id: 'checkebox-sm34', label: 'Tiếng Anh' },
-            { id: 'checkebox-sm35', label: 'Tiếng Pháp' },
-            { id: 'checkebox-sm36', label: 'Tiếng Tây Ban Nha' },
-            { id: 'checkebox-sm37', label: 'Tiếng Đức' },
+            { id: 'checkebox-sm40', label: 'Tiếng Anh' },
+            { id: 'checkebox-sm41', label: 'Tiếng Pháp' },
+            { id: 'checkebox-sm42', label: 'Tiếng Tây Ban Nha' },
+            { id: 'checkebox-sm43', label: 'Tiếng Đức' },
+            { id: 'checkebox-sm44', label: 'Tiếng Nhật' },
+            { id: 'checkebox-sm45', label: 'Tiếng Hàn' },
         ],
+        hasViewMore: true,
     },
     {
         title: 'Đánh giá',
         options: [
-            { id: 'checkebox-sm38', label: '5 Sao' },
-            { id: 'checkebox-sm39', label: '4 Sao' },
-            { id: 'checkebox-sm40', label: '3 Sao' },
-            { id: 'checkebox-sm41', label: '2 Sao' },
-            { id: 'checkebox-sm42', label: '1 Sao' },
+            { id: 'checkebox-sm46', label: '5 Sao' },
+            { id: 'checkebox-sm47', label: '4 Sao' },
+            { id: 'checkebox-sm48', label: '3 Sao' },
+            { id: 'checkebox-sm49', label: '2 Sao' },
+            { id: 'checkebox-sm50', label: '1 Sao' },
         ],
+    },
+    {
+        title: 'Khu vực',
+        options: [
+            { id: 'checkebox-sm51', label: 'Hà Nội', count: 30 },
+            { id: 'checkebox-sm52', label: 'TP. Hồ Chí Minh', count: 35 },
+            { id: 'checkebox-sm53', label: 'Đà Nẵng', count: 15 },
+            { id: 'checkebox-sm54', label: 'Cần Thơ', count: 10 },
+            { id: 'checkebox-sm55', label: 'Hải Phòng', count: 12 },
+        ],
+        hasViewMore: true,
+    },
+    {
+        title: 'Loại hình dịch vụ',
+        options: [
+            { id: 'checkebox-sm56', label: 'Khám bệnh định kỳ' },
+            { id: 'checkebox-sm57', label: 'Tư vấn sức khỏe' },
+            { id: 'checkebox-sm58', label: 'Chăm sóc tại nhà' },
+            { id: 'checkebox-sm59', label: 'Xét nghiệm y khoa' },
+        ],
+        hasViewMore: true,
     },
 ];
 
@@ -148,7 +182,6 @@ const PrettoSlider = styled(Slider)({
     },
 });
 
-// Hàm định dạng số tiền theo VND
 const formatVND = (value: number): string => {
     return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
@@ -174,13 +207,26 @@ const SideBar: React.FC = () => {
         mockFilterData.reduce(
             (acc, section) => {
                 section.options.forEach((option) => {
-                    acc[option.id] = false; // Mặc định không chọn bất kỳ input nào
+                    acc[option.id] = false;
                 });
                 return acc;
             },
             {} as { [key: string]: boolean }
         )
     );
+
+    // Lọc dữ liệu theo từ khóa tìm kiếm
+    const filteredSections = useMemo(() => {
+        if (!searchTerm) return mockFilterData;
+        return mockFilterData
+            .map((section) => ({
+                ...section,
+                options: section.options.filter((option) =>
+                    option.label.toLowerCase().includes(searchTerm.toLowerCase())
+                ),
+            }))
+            .filter((section) => section.options.length > 0); // Chỉ giữ section có options
+    }, [searchTerm]);
 
     const toggleSection = (sectionTitle: string): void => {
         setExpandedSections((prev) => ({
@@ -234,7 +280,10 @@ const SideBar: React.FC = () => {
                         <h4>Bộ lọc</h4>
                         <Link
                             to="#"
-                            className="text-secondary text-decoration-underline"
+                            className={clsx(
+                                'text-decoration-underline',
+                                styles.textSecondaryCustom
+                            )}
                             onClick={handleClearAll}
                         >
                             Xóa tất cả
@@ -247,16 +296,19 @@ const SideBar: React.FC = () => {
                                 className="form-control"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Tìm kiếm..."
+                                placeholder="Tìm chuyên khoa, phòng khám..."
                             />
                             <span>
                                 <i className="isax isax-search-normal-1"></i>
                             </span>
                         </div>
                     </div>
+                    {filteredSections.length === 0 && searchTerm && (
+                        <p className="text-center mt-3">Không tìm thấy kết quả phù hợp</p>
+                    )}
                 </div>
                 <div className="card-body p-0">
-                    {mockFilterData.map((section, index) => (
+                    {filteredSections.map((section, index) => (
                         <div className="accordion-item border-bottom" key={section.title}>
                             <div className="accordion-header" id={`heading${index + 1}`}>
                                 <div
@@ -312,7 +364,7 @@ const SideBar: React.FC = () => {
                                     ) : (
                                         <>
                                             {(section.title === 'Đánh giá'
-                                                ? section.options // luôn hiển thị toàn bộ đánh giá
+                                                ? section.options
                                                 : section.options.slice(
                                                       0,
                                                       viewMoreSections[section.title]
@@ -398,9 +450,9 @@ const SideBar: React.FC = () => {
                                                                 to="#"
                                                                 className={clsx(
                                                                     `viewall-button-${index + 1}`,
-                                                                    'text-secondary',
                                                                     'text-decoration-underline',
-                                                                    styles.viewAllLink
+                                                                    styles.viewAllLink,
+                                                                    styles.textSecondaryCustom
                                                                 )}
                                                                 onClick={() =>
                                                                     toggleViewMore(section.title)

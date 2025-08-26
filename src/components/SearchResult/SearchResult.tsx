@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Calendar from '@/components/Calendar';
+import clsx from 'clsx';
+import styles from './SearchResult.module.scss';
 
 const SearchResult: React.FC = () => {
     const placeholders = [
@@ -72,19 +74,33 @@ const SearchResult: React.FC = () => {
         : false;
 
     return (
-        <div className="bg-primary-gradient rounded-pill doctors-search-box">
-            <div className="search-box-one rounded-pill">
-                <form action="https://doccure.dreamstechnologies.com/html/template/search-2.html">
+        <div
+            className={clsx(
+                'bg-primary-gradient doctors-search-box',
+                styles.doctorsSearchBoxCustom,
+                styles.roundedPillCustom
+            )}
+        >
+            <div className={clsx('search-box-one', styles.roundedPillCustom)}>
+                <form action="#">
                     <div className="search-input search-line">
                         <i className="isax isax-hospital5 bficon"></i>
                         <div className="mb-0">
-                            <input type="text" className="form-control" placeholder={currentText} />
+                            <input
+                                type="text"
+                                className={clsx('form-control', styles.formControlCustom)}
+                                placeholder={currentText}
+                            />
                         </div>
                     </div>
                     <div className="search-input search-map-line">
                         <i className="isax isax-location5"></i>
                         <div className="mb-0">
-                            <input type="text" className="form-control" placeholder="Location" />
+                            <input
+                                type="text"
+                                className={clsx('form-control', styles.formControlCustom)}
+                                placeholder="Địa điểm"
+                            />
                         </div>
                     </div>
                     <div className="search-input search-calendar-line">
@@ -116,16 +132,19 @@ const SearchResult: React.FC = () => {
                                 anchorEl={dateInputRef.current}
                                 open={showDatePicker}
                                 onClose={() => setShowDatePicker(false)}
-                                isTodaySelected={isTodaySelected} // Pass the isTodaySelected prop
+                                isTodaySelected={isTodaySelected}
                             />
                         </div>
                     </div>
                     <div className="form-search-btn">
                         <button
-                            className="btn btn-primary d-inline-flex align-items-center rounded-pill"
+                            className={clsx(
+                                'btn btn-primary d-inline-flex align-items-center rounded-pill',
+                                styles.btnNoWrap
+                            )}
                             type="submit"
                         >
-                            <i className="isax isax-search-normal-15 me-2"></i>Search
+                            <i className="isax isax-search-normal-15 me-2"></i>Tìm kiếm
                         </button>
                     </div>
                 </form>

@@ -99,12 +99,22 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                 to="#"
                                 className={clsx(
                                     styles.doctorSpecialty,
-                                    'text-teal',
+                                    'text-black',
                                     'fw-medium',
                                     'fs-14'
                                 )}
                             >
-                                Chuyên khoa: {specialty || 'Không xác định'}
+                                Chuyên khoa:{' '}
+                                <span
+                                    className={clsx(
+                                        styles.doctorSpecialty,
+                                        'text-teal',
+                                        'fw-medium',
+                                        'fs-14'
+                                    )}
+                                >
+                                    {specialty || 'Không xác định'}
+                                </span>
                             </Link>
                         </div>
                         <div className="p-3">
