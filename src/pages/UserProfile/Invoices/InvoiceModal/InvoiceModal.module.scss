@@ -35,32 +35,13 @@
     width: 800px !important;
     height: 550px !important;
     max-height: 550px !important;
-    .modal-content {
+    .modalContent {
         height: 100% !important;
         max-height: 100% !important;
         overflow: hidden !important;
         display: flex !important;
-
-        // .modalHeader {
-        //     flex-shrink: 0 !important;
-        //     border-bottom: 1px solid #dee2e6 !important;
-        // }
-
-        // .modalBody {
-        //     flex: 1 !important;
-        //     overflow-y: auto !important;
-        //     padding: 1rem !important;
-        //     min-height: 0 !important;
-
-        //     // Hide scrollbar
-        //     scrollbar-width: none !important;
-        //     -ms-overflow-style: none !important;
-
-        //     &::-webkit-scrollbar {
-        //         display: none !important;
-        //     }
-        // }
     }
+
     .prescribeDownload {
         height: 68px !important;
 
@@ -72,9 +53,15 @@
     @media (max-width: 767px) {
         max-width: 95vw !important;
         width: 95vw !important;
-        height: 85vh !important;
-        max-height: 85vh !important;
-        margin-top: 50px !important;
+        height: 550px !important;
+        max-height: 550px !important;
+        .modalContent {
+            overflow: auto !important;
+            padding: 1rem !important;
+        }
+        .prescribeDownload {
+            display: flex;
+        }
     }
 
     // Small laptops and tablets (768px - 1023px)
@@ -128,17 +115,17 @@
 // Responsive invoice content
 .invoiceContent {
     @media (max-width: 767px) {
-        .invoice-info {
+        .invoiceInfo {
             margin-bottom: 1.5rem;
         }
 
-        .invoice-details {
+        .invoiceDetails {
             font-size: 0.875rem;
             line-height: 1.4;
         }
 
-        .invoice-logo img {
-            max-width: 120px;
+        .invoiceLogo img {
+            display: none;
         }
     }
 }
@@ -146,9 +133,6 @@
 // Prevent body scroll when modal is open
 :global(.modalOpen) {
     overflow: hidden !important;
-
-    // For mobile devices that ignore overflow:hidden on body
-    position: fixed !important;
     width: 100% !important;
     height: 100% !important;
 }

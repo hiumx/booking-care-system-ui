@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import Button from '../../../../components/Button';
 
@@ -25,51 +25,16 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
     isClosing,
     onAnimationEnd,
 }) => {
-    const scrollPositionRef = useRef<number>(0);
-
     // Prevent body scroll when modal is open
     useEffect(() => {
         if (show && !isClosing) {
-            // Save current scroll position with fallbacks
-            scrollPositionRef.current =
-                window.pageYOffset ||
-                document.documentElement.scrollTop ||
-                document.body.scrollTop ||
-                0;
-
             // Add class and set styles to prevent scroll
             document.body.classList.add('modalOpen');
-            document.body.style.position = 'fixed';
-            document.body.style.top = `-${scrollPositionRef.current}px`;
-            document.body.style.width = '100%';
-            document.body.style.left = '0';
-            document.body.style.overflow = 'hidden';
         } else if (!show && !isClosing) {
             // Modal is completely closed, restore scroll
             const timer = setTimeout(() => {
                 // Remove class and styles
                 document.body.classList.remove('modalOpen');
-                document.body.style.position = '';
-                document.body.style.top = '';
-                document.body.style.width = '';
-                document.body.style.left = '';
-                document.body.style.overflow = '';
-
-                // Restore scroll position
-                try {
-                    window.scrollTo({
-                        top: scrollPositionRef.current,
-                        behavior: 'instant',
-                    });
-                } catch (e) {
-                    // Fallback for older browsers
-                    console.log(e);
-                    window.scrollTo(0, scrollPositionRef.current);
-                }
-
-                // Additional fallback
-                document.documentElement.scrollTop = scrollPositionRef.current;
-                document.body.scrollTop = scrollPositionRef.current;
             }, 100); // Slightly longer delay to ensure modal is fully closed
 
             return () => clearTimeout(timer);
@@ -78,10 +43,6 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
         // Cleanup on unmount
         return () => {
             document.body.classList.remove('modalOpen');
-            document.body.style.position = '';
-            document.body.style.top = '';
-            document.body.style.width = '';
-            document.body.style.left = '';
             document.body.style.overflow = '';
         };
     }, [show, isClosing]);
@@ -126,16 +87,6 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                 <h5>{invoice.bookedOn}</h5>
                                 <ul>
                                     <li>
-                                        <button
-                                            className="print-link btn btn-link"
-                                            type="button"
-                                            onClick={() => window.print()}
-                                            title="In hóa đơn"
-                                        >
-                                            <i className="isax isax-printer"></i>
-                                        </button>
-                                    </li>
-                                    <li>
                                         <Button
                                             text="Tải xuống"
                                             type="button"
@@ -153,12 +104,19 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                 <div className="invoice-item">
                                     <div className="row">
                                         <div className="col-md-6">
-                                            <div className="invoice-logo">
+                                            <div
+                                                className={clsx(styles.invoiceLogo, 'invoice-logo')}
+                                            >
                                                 <img src="/src/assets/img/logo.svg" alt="logo" />
                                             </div>
                                         </div>
                                         <div className="col-md-6">
-                                            <p className="invoice-details">
+                                            <p
+                                                className={clsx(
+                                                    styles.invoiceDetails,
+                                                    'invoice-details'
+                                                )}
+                                            >
                                                 Hoá Đơn Số : <span>{invoice.id}</span>
                                                 <br />
                                                 Ban Hành: <span>{invoice.bookedOn}</span>
@@ -170,9 +128,16 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                 <div className="invoice-item">
                                     <div className="row">
                                         <div className="col-md-4 col-sm-6">
-                                            <div className="invoice-info">
+                                            <div
+                                                className={clsx(styles.invoiceInfo, 'invoice-info')}
+                                            >
                                                 <h6 className="customer-text">Thanh Toán Từ</h6>
-                                                <p className="invoice-details invoice-details-two">
+                                                <p
+                                                    className={clsx(
+                                                        styles.invoiceDetails,
+                                                        'invoice-details invoice-details-two'
+                                                    )}
+                                                >
                                                     {invoice.doctor.name} <br />
                                                     806 Twin Willow Lane, <br />
                                                     Newyork, USA <br />
@@ -180,9 +145,16 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                             </div>
                                         </div>
                                         <div className="col-md-4 col-sm-6">
-                                            <div className="invoice-info">
+                                            <div
+                                                className={clsx(styles.invoiceInfo, 'invoice-info')}
+                                            >
                                                 <h6 className="customer-text">Thanh Toán Cho</h6>
-                                                <p className="invoice-details invoice-details-two">
+                                                <p
+                                                    className={clsx(
+                                                        styles.invoiceDetails,
+                                                        'invoice-details invoice-details-two'
+                                                    )}
+                                                >
                                                     Richard Wilson <br />
                                                     299 Star Trek Drive
                                                     <br />
@@ -192,7 +164,12 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                             </div>
                                         </div>
                                         <div className="col-md-4 col-12">
-                                            <div className="invoice-info invoice-info2">
+                                            <div
+                                                className={clsx(
+                                                    styles.invoiceInfo,
+                                                    'invoice-info2'
+                                                )}
+                                            >
                                                 <h6
                                                     className={clsx(
                                                         styles.paymentMethodText,
