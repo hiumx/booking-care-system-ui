@@ -1,10 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { Popper } from '@mui/material';
+import Calendar from '@/components/Calendar';
 import styles from './DoctorAvailability.module.scss';
 
 interface AppointmentTime {
@@ -22,7 +19,7 @@ interface DoctorScheduleTime {
 }
 
 const DoctorAvailability: React.FC = () => {
-    // Lấy ngày hiện tại (08:11 AM +07, Wednesday, August 20, 2025)
+    // Lấy ngày hiện tại
     const today = new Date();
     const [activeTab, setActiveTab] = useState('day1'); // Mặc định bắt đầu từ ngày mai
     const [startDate, setStartDate] = useState(
@@ -320,179 +317,112 @@ const DoctorAvailability: React.FC = () => {
         }
     };
 
+    // Check if today's date is selected
+    const isTodaySelected = activeDay
+        ? activeDay.getDate() === today.getDate() &&
+          activeDay.getMonth() === today.getMonth() &&
+          activeDay.getFullYear() === today.getFullYear()
+        : false;
+
     return (
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <div className="tab-pane fade show active" id="general-availability">
-                <div className="custom-card">
-                    <div className="card-body">
-                        <div className="card-header d-flex justify-content-between align-items-center">
-                            <h3 className="header-title">Chọn Khung Giờ Có Sẵn</h3>
-                            <div className="date-picker">
-                                <i
-                                    className="isax isax-calendar-tick calendar-icon"
-                                    onClick={() => setShowDatePicker(!showDatePicker)}
-                                    ref={anchorRef}
-                                />
-                                <Popper
-                                    open={showDatePicker}
-                                    anchorEl={anchorRef.current}
-                                    placement="bottom-end"
-                                    sx={{
-                                        zIndex: 10000,
-                                    }}
-                                >
-                                    <DateCalendar
-                                        value={activeDay}
-                                        onChange={handleDateChange}
-                                        minDate={
-                                            new Date(
-                                                today.getFullYear(),
-                                                today.getMonth(),
-                                                today.getDate() + 1
-                                            )
-                                        }
-                                        maxDate={
-                                            new Date(
-                                                today.getFullYear(),
-                                                today.getMonth(),
-                                                today.getDate() + 30
-                                            )
-                                        }
-                                        sx={{
-                                            background: '#ffffff',
-                                            border: '1px solid #e0e0e0',
-                                            borderRadius: '8px',
-                                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                                            padding: '10px',
-                                            width: '300px',
-                                            fontFamily: "'Inter', sans-serif",
-                                            '& .MuiTypography-root': {
-                                                fontFamily: "'Inter', sans-serif",
-                                                fontSize: '16px',
-                                                fontWeight: 500,
-                                                color: '#333',
-                                            },
-                                            '& .MuiPickersCalendarHeader-root': {
-                                                background: '#f1f3f5',
-                                                padding: '10px',
-                                            },
-                                            '& .MuiPickersArrowSwitcher-button': {
-                                                background: 'none',
-                                                border: 'none',
-                                                padding: '8px',
-                                                borderRadius: '4px',
-                                                '&:hover': {
-                                                    background: '#e9ecef',
-                                                },
-                                                '&.Mui-disabled': {
-                                                    color: '#ccc',
-                                                },
-                                            },
-                                            '& .MuiDayCalendar-weekDayLabel': {
-                                                fontSize: '12px',
-                                                fontWeight: 500,
-                                                color: '#666',
-                                                textTransform: 'uppercase',
-                                            },
-                                            '& .MuiPickersDay-root': {
-                                                fontFamily: "'Inter', sans-serif",
-                                                fontSize: '14px',
-                                                color: '#333',
-                                                borderRadius: '4px',
-                                                '&:hover': {
-                                                    background: '#e9ecef',
-                                                },
-                                                '&.Mui-selected': {
-                                                    background: '#007bff !important',
-                                                    color: '#ffffff',
-                                                },
-                                                '&.MuiPickersDay-today': {
-                                                    background: '#e6f0fa',
-                                                    color: '#007bff',
-                                                },
-                                                '&.Mui-disabled': {
-                                                    color: '#ccc',
-                                                },
-                                            },
-                                        }}
-                                    />
-                                </Popper>
-                            </div>
+        <div className="tab-pane fade show active" id="general-availability">
+            <div className="custom-card">
+                <div className="card-body">
+                    <div className="card-header d-flex justify-content-between align-items-center">
+                        <h3 className="header-title">Chọn Khung Giờ Có Sẵn</h3>
+                        <div className="date-picker">
+                            <i
+                                className="isax isax-calendar-tick calendar-icon"
+                                onClick={() => setShowDatePicker(!showDatePicker)}
+                                ref={anchorRef}
+                            />
+                            <Calendar
+                                value={activeDay}
+                                onChange={handleDateChange}
+                                minDate={
+                                    new Date(
+                                        today.getFullYear(),
+                                        today.getMonth(),
+                                        today.getDate() + 1
+                                    )
+                                }
+                                maxDate={
+                                    new Date(
+                                        today.getFullYear(),
+                                        today.getMonth(),
+                                        today.getDate() + 30
+                                    )
+                                }
+                                anchorEl={anchorRef.current}
+                                open={showDatePicker}
+                                onClose={() => setShowDatePicker(false)}
+                                isTodaySelected={isTodaySelected} // Pass the isTodaySelected prop
+                            />
                         </div>
+                    </div>
 
-                        <div className="available-tab">
-                            <label className="form-label">Chọn ngày có sẵn</label>
-                            <ul className="nav">
-                                {next7Days.map((day) => (
-                                    <li key={day.id}>
-                                        <Link
-                                            to="#"
-                                            className={clsx(styles.navLink, {
-                                                [styles.active]: activeTab === day.id,
-                                            })}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setActiveTab(day.id);
-                                            }}
-                                            data-bs-toggle="tab"
-                                            data-bs-target={`#${day.id}`}
-                                        >
-                                            {getVietnameseDay(day.date)}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        <div className="tab-content pt-0">
+                    <div className="available-tab">
+                        <label className="form-label">Chọn ngày có sẵn</label>
+                        <ul className="nav">
                             {next7Days.map((day) => (
-                                <div
-                                    key={day.id}
-                                    className={clsx('tab-pane', {
-                                        'active show': activeTab === day.id,
-                                        fade: activeTab !== day.id,
-                                    })}
-                                    id={day.id}
-                                >
-                                    <div className="slot-box">
-                                        <div className="slot-header">
-                                            <h5>
-                                                {getVietnameseDay(day.date)}, {day.date.getDate()}/
-                                                {day.date.getMonth() + 1}
-                                            </h5>
-                                        </div>
-                                        <div className="slot-body">
-                                            <ul
-                                                className={clsx(
-                                                    styles.paddingLeftZero,
-                                                    'time-slots'
-                                                )}
-                                            >
-                                                {getSlotsForDate(day.date).length > 0 ? (
-                                                    getSlotsForDate(day.date).map((slot, index) => (
-                                                        <li key={index}>
-                                                            <i
-                                                                className={clsx(
-                                                                    'isax',
-                                                                    'isax-clock'
-                                                                )}
-                                                            />{' '}
-                                                            {slot}
-                                                        </li>
-                                                    ))
-                                                ) : (
-                                                    <p>Không có lịch trống!</p>
-                                                )}
-                                            </ul>
-                                        </div>
+                                <li key={day.id}>
+                                    <Link
+                                        to="#"
+                                        className={clsx(styles.navLink, {
+                                            [styles.active]: activeTab === day.id,
+                                        })}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setActiveTab(day.id);
+                                        }}
+                                        data-bs-toggle="tab"
+                                        data-bs-target={`#${day.id}`}
+                                    >
+                                        {getVietnameseDay(day.date)}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div className="tab-content pt-0">
+                        {next7Days.map((day) => (
+                            <div
+                                key={day.id}
+                                className={clsx('tab-pane', {
+                                    'active show': activeTab === day.id,
+                                    fade: activeTab !== day.id,
+                                })}
+                                id={day.id}
+                            >
+                                <div className="slot-box">
+                                    <div className="slot-header">
+                                        <h5>
+                                            {getVietnameseDay(day.date)}, {day.date.getDate()}/
+                                            {day.date.getMonth() + 1}
+                                        </h5>
+                                    </div>
+                                    <div className="slot-body">
+                                        <ul className={clsx(styles.paddingLeftZero, 'time-slots')}>
+                                            {getSlotsForDate(day.date).length > 0 ? (
+                                                getSlotsForDate(day.date).map((slot, index) => (
+                                                    <li key={index}>
+                                                        <i className={clsx('isax', 'isax-clock')} />{' '}
+                                                        {slot}
+                                                    </li>
+                                                ))
+                                            ) : (
+                                                <p>Không có lịch trống!</p>
+                                            )}
+                                        </ul>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
-        </LocalizationProvider>
+        </div>
     );
 };
 

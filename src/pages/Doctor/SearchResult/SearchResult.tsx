@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import Calendar from '@/components/Calendar';
 
 const SearchResult: React.FC = () => {
     const placeholders = [
@@ -14,7 +15,11 @@ const SearchResult: React.FC = () => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [charIndex, setCharIndex] = useState(0);
     const [typingSpeed, setTypingSpeed] = useState(100);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const dateInputRef = useRef<HTMLInputElement>(null);
 
+    // Typing animation effect
     useEffect(() => {
         const handleTyping = () => {
             const currentPlaceholder = placeholders[currentIndex];
@@ -45,6 +50,27 @@ const SearchResult: React.FC = () => {
         return () => clearTimeout(timer);
     }, [charIndex, isDeleting, currentIndex, typingSpeed, placeholders]);
 
+    // Handle date selection
+    const handleDateChange = (value: Date | null) => {
+        if (!value || isNaN(value.getTime())) return; // Ignore invalid dates
+        setSelectedDate(value);
+        setShowDatePicker(false);
+    };
+
+    // Format date for display
+    const formatDate = (date: Date | null) => {
+        if (!date) return '';
+        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    };
+
+    // Check if today's date is selected
+    const today = new Date();
+    const isTodaySelected = selectedDate
+        ? selectedDate.getDate() === today.getDate() &&
+          selectedDate.getMonth() === today.getMonth() &&
+          selectedDate.getFullYear() === today.getFullYear()
+        : false;
+
     return (
         <div className="bg-primary-gradient rounded-pill doctors-search-box">
             <div className="search-box-one rounded-pill">
@@ -62,12 +88,35 @@ const SearchResult: React.FC = () => {
                         </div>
                     </div>
                     <div className="search-input search-calendar-line">
-                        <i className="isax isax-calendar-tick5"></i>
+                        <i
+                            className="isax isax-calendar-tick5"
+                            onClick={() => setShowDatePicker(!showDatePicker)}
+                        ></i>
                         <div className="mb-0">
                             <input
                                 type="text"
                                 className="form-control datetimepicker"
                                 placeholder="Date"
+                                value={formatDate(selectedDate)}
+                                onClick={() => setShowDatePicker(!showDatePicker)}
+                                ref={dateInputRef}
+                                readOnly
+                            />
+                            <Calendar
+                                value={selectedDate}
+                                onChange={handleDateChange}
+                                minDate={new Date()}
+                                maxDate={
+                                    new Date(
+                                        today.getFullYear(),
+                                        today.getMonth(),
+                                        today.getDate() + 30
+                                    )
+                                }
+                                anchorEl={dateInputRef.current}
+                                open={showDatePicker}
+                                onClose={() => setShowDatePicker(false)}
+                                isTodaySelected={isTodaySelected} // Pass the isTodaySelected prop
                             />
                         </div>
                     </div>
