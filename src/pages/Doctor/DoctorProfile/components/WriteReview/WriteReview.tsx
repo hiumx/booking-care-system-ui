@@ -107,7 +107,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview })
                                     className={styles.starLabel}
                                 >
                                     <i
-                                        className={clsx('fa fa-star', {
+                                        className={clsx('fa fa-star', styles.faStar, {
                                             [styles.active]: getStarClass(starValue) === 'active',
                                         })}
                                     ></i>
@@ -122,7 +122,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview })
                     <textarea
                         id="review_desc"
                         maxLength={maxChars}
-                        className="form-control"
+                        className={clsx(styles.formControl, 'form-control')}
                         rows={4}
                         placeholder="Chia sẻ trải nghiệm của bạn với bác sĩ..."
                         value={description}
@@ -140,7 +140,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview })
 
                 <div className="mb-3">
                     <div className="terms-accept">
-                        <div className={clsx(styles.termsAccept, 'custom-checkbox')}>
+                        <div className={clsx(styles.termsAccept, styles.customCheckbox)}>
                             <input
                                 type="checkbox"
                                 id="terms_accept"
@@ -157,8 +157,8 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview })
                     </div>
                 </div>
 
-                <div className="submit-section">
-                    <Button text="Thêm đánh giá" type="submit" className="submit-btn" />
+                <div className={styles.submitSection}>
+                    <Button text="Thêm đánh giá" type="submit" className={styles.submitBtn} />
                 </div>
             </form>
             {/* /Write Review Form */}
