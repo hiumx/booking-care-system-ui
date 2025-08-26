@@ -122,7 +122,10 @@ const Invoices: React.FC = () => {
                                         <a
                                             href="#"
                                             className="link-primary"
-                                            onClick={() => handleOpenModal(item)}
+                                            onClick={(event) => {
+                                                event.preventDefault();
+                                                handleOpenModal(item);
+                                            }}
                                         >
                                             {item.id}
                                         </a>
