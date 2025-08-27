@@ -10,6 +10,7 @@
         /* Bundler mode */
         "moduleResolution": "bundler",
         "allowImportingTsExtensions": true,
+        "noEmit": true,
         "isolatedModules": true,
         "moduleDetection": "force",
         "composite": true,
@@ -18,7 +19,6 @@
         /* Path mapping */
         "baseUrl": ".",
         "paths": {
-            "~/*": ["src/*"],
             "@/*": ["src/*"],
             "@/components/*": ["src/components/*"],
             "@/pages/*": ["src/pages/*"],

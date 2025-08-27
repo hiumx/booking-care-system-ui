@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
-import MainLayout from '../../layouts/MainLayout';
-import Breadcrumb from '../../components/Breadcrumb';
+import MainLayout from '@/layouts/MainLayout';
+import Breadcrumb from '@/components/Breadcrumb';
 import Favourite from './Favourite';
 import ProfileSidebar from './ProfileSidebar';
 import PatientAppointments from './PatientAppointments';

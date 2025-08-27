@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './FeaturedCategories.module.scss';
-import BlogCard from '~/components/BLogCard';
+import BlogCard from '@/components/BLogCard';
 
 const FeaturedCategories: React.FC = () => {
     const navigate = useNavigate();

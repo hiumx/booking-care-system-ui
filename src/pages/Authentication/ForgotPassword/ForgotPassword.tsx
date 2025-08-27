@@ -4,9 +4,9 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import AuthLayout from '@/layouts/AuthLayout';
 import { Mail } from 'lucide-react';
 import clsx from 'clsx';
-import { PATHS } from '~/routes/paths';
-import Button from '~/components/Button';
-import Input from '~/components/Input';
+import { PATHS } from '@/routes/paths';
+import Button from '@/components/Button';
+import Input from '@/components/Input';
 
 interface ForgotPasswordProps {
     onSubmit?: (email: string, phone: string) => void;

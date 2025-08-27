@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import MainLayout from '../../layouts/MainLayout';
+import MainLayout from '@/layouts/MainLayout';
 import ChatSidebar from './components/ChatSidebar';
 import ChatMessages from './components/ChatMessages';
 import styles from './Chat.module.scss';

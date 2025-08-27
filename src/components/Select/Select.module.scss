@@ -1,6 +1,6 @@
 .browseCategorie {
     .categorieDropdown {
-        position: relative; // làm gốc cho dropdown
+        position: relative;
 
         .dropdownToggle {
             font-size: 14px;
@@ -9,8 +9,8 @@
             min-width: 190px;
             padding: 10px 10px;
             margin-right: 0;
-            background: #e6e8ee;
-            border: 0;
+            background: #fff;
+            border: 1px solid #e3e3e3;
             border-radius: 5px;
             position: relative;
             display: flex;
@@ -58,24 +58,23 @@
         }
 
         .dropdownMenu {
-            position: absolute; // nổi lên trên cùng
-            top: 100%; // hiển thị ngay dưới dropdown-toggle
-            left: 0; // canh trái
-            z-index: 9999; // đảm bảo nổi lên trên tất cả
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 9999;
             border-radius: 5px;
             margin: 0;
             padding: 0;
-            min-width: 190px;
+            width: 100%;
             visibility: hidden;
             opacity: 0;
-            top: 100%;
             -webkit-transition: all 0.2s ease;
             -ms-transition: all 0.2s ease;
             transition: all 0.2s ease;
             display: block;
-            transform: translateY(40px);
-            -webkit-transform: translateY(40px);
-            -ms-transform: translateY(40px);
+            transform: translateY(0px);
+            -webkit-transform: translateY(0px);
+            -ms-transform: translateY(0px);
             background: #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
@@ -86,6 +85,7 @@
                 margin: 0;
                 padding: 10px 15px;
                 display: block;
+                width: 100%; // Đặt chiều rộng bằng 100% so với .dropdownMenu
 
                 img {
                     margin-right: 10px;

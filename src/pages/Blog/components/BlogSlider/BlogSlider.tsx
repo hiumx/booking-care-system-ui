@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './BlogSlider.module.scss';
-import BlogSlider from '~/components/BlogSlider';
+import BlogSlider from '@/components/BlogSlider';
 
 const BlogSlide: React.FC = () => {
     const articles = [

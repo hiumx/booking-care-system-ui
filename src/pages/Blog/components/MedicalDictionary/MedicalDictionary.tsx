@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { PATHS } from '~/routes/paths';
+import { PATHS } from '@/routes/paths';
 import styles from './MedicalDictionary.module.scss';
-import BlogCard from '~/components/BLogCard';
+import BlogCard from '@/components/BLogCard';
 
 const MedicalDictionary: React.FC = () => {
     const [activeTab, setActiveTab] = useState('thuoc');
