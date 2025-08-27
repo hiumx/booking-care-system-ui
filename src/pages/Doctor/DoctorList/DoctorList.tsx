@@ -7,8 +7,8 @@ import Select from '@/components/Select';
 import styles from './DoctorList.module.scss';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
-import SearchResult from '@/components/SearchResult';
 import browseCategorie from '@/assets/img/icons/browse-categorie.svg';
+import SearchInput from '@/components/SearchInput';
 
 // Import images
 import docProfile01 from '@/assets/img/doctor-grid/doctor-grid-01.jpg';
@@ -766,7 +766,7 @@ const DoctorList: React.FC = () => {
     return (
         <MainLayout>
             <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
-            <SearchResult />
+            <SearchInput />
             <div className="content mt-5">
                 <div className="container">
                     <div className="row">

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Calendar from '@/components/Calendar';
 import clsx from 'clsx';
-import styles from './SearchResult.module.scss';
+import styles from './SearchInput.module.scss';
 
-const SearchResult: React.FC = () => {
+const SearchInput: React.FC = () => {
     const placeholders = [
         'Tìm kiếm theo cơ sở y tế',
         'Tìm kiếm theo bác sĩ',
@@ -153,4 +153,4 @@ const SearchResult: React.FC = () => {
     );
 };
 
-export default SearchResult;
+export default SearchInput;
