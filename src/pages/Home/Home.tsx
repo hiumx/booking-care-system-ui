@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import MainLayout from '../../layouts/MainLayout';
-import { PATHS } from '~/routes/paths';
+import { PATHS } from '@/routes/paths';
 
 const Home: React.FC = () => {
     return (

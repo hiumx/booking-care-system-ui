@@ -14,6 +14,7 @@ export const PATHS = {
     CATEGORY_ARTICLES_DEMO: '/category-demo',
     SUBSCRIPTION_PLANS: '/subscription-plans',
     ABOUT_US: '/about-us',
+    CONTACT_US: '/contact-us',
 
     // Authentication paths
     LOGIN: '/login',

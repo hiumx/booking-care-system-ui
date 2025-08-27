@@ -8,16 +8,20 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 12px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
     text-decoration: none;
     color: #333;
     border: 1px solid #ddd;
     border-radius: 50%;
-    min-width: 44px;
-    min-height: 44px;
+    font-size: 14px;
 
     span {
         width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     &.active {
@@ -38,7 +42,7 @@
     }
 
     &.ellipsis {
-        padding: 8px;
+        padding: 0;
         cursor: default;
     }
 }

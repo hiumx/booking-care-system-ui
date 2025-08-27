@@ -6,7 +6,7 @@ import {
     getScreensByCategory,
     searchScreens,
     getScreenStats,
-} from '~/pages/ScreenManagement/data/screens.data';
+} from '@/pages/ScreenManagement/data/screens.data';
 import { ScreenCategory, ScreenStatus, ScreenFilter } from '@/types/screen.types';
 import clsx from 'clsx';
 import styles from './ScreenManagement.module.scss';

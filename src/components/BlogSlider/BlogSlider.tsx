@@ -1,5 +1,5 @@
 import React from 'react';
-import BlogCard, { BlogCardProps } from '~/components/BLogCard';
+import BlogCard, { BlogCardProps } from '@/components/BLogCard';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';

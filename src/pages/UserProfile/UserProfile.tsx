@@ -1,10 +1,11 @@
 import { useLocation } from 'react-router-dom';
-import MainLayout from '../../layouts/MainLayout';
-import Breadcrumb from '../../components/Breadcrumb';
+import MainLayout from '@/layouts/MainLayout';
+import Breadcrumb from '@/components/Breadcrumb';
 import Favourite from './Favourite';
 import ProfileSidebar from './ProfileSidebar';
 import PatientAppointments from './PatientAppointments';
 import SettingsContainer from './Setting/SettingsContainer/SettingsContainer';
+import Invoices from './Invoices';
 
 // Mock user data
 const mockUserData = {
@@ -120,6 +121,8 @@ const UserProfile = () => {
                 return <Favourite />;
             case 'settings':
                 return <SettingsContainer />;
+            case 'invoices':
+                return <Invoices />;
             default:
                 return <Favourite />; // Default to favourites
         }

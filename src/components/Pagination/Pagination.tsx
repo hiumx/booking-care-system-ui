@@ -5,12 +5,11 @@ import styles from './Pagination.module.scss';
 
 /**
  * Props for the Pagination component.
- *
  * @property {number} currentPage - The currently active page number (1-based index).
  * @property {number} totalPages - The total number of pages available.
- * @property {(page: number) => void} onPageChange - Callback function invoked when the page is changed. Receives the new page number as an argument.
- * @property {boolean} [showPrevNext] - Optional. Whether to display "Previous" and "Next" navigation buttons. Defaults to false if not provided.
- * @property {number} [maxVisiblePages] - Optional. The maximum number of page buttons to display at once. If not specified, all pages are shown.
+ * @property {(page: number) => void} onPageChange - Callback function invoked when the page is changed.
+ * @property {boolean} [showPrevNext] - Optional. Whether to display "Previous" and "Next" navigation buttons.
+ * @property {number} [maxVisiblePages] - Optional. The maximum number of page buttons to display at once.
  */
 interface PaginationProps {
     currentPage: number;
@@ -27,26 +26,26 @@ const Pagination: React.FC<PaginationProps> = ({
     showPrevNext = true,
     maxVisiblePages = 10,
 }) => {
-    // Ensure totalPages doesn't exceed maxVisiblePages
-    const adjustedTotalPages = Math.min(totalPages, maxVisiblePages);
+    if (totalPages <= 1) return null;
 
-    if (adjustedTotalPages <= 1) return null;
+    // Adjust maxVisiblePages to not exceed totalPages
+    const adjustedMaxVisiblePages = Math.min(maxVisiblePages, totalPages);
 
     // Calculate page range
     const getPageRange = () => {
-        const range = [];
-        const halfVisible = Math.floor(maxVisiblePages / 2);
+        if (totalPages <= adjustedMaxVisiblePages) {
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
+        }
+
+        const halfVisible = Math.floor(adjustedMaxVisiblePages / 2);
         let startPage = Math.max(1, currentPage - halfVisible);
-        const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        const endPage = Math.min(totalPages, startPage + adjustedMaxVisiblePages - 1);
 
-        if (endPage - startPage + 1 < maxVisiblePages) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        if (endPage - startPage + 1 < adjustedMaxVisiblePages) {
+            startPage = Math.max(1, endPage - adjustedMaxVisiblePages + 1);
         }
 
-        for (let i = startPage; i <= endPage; i++) {
-            range.push(i);
-        }
-        return range;
+        return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
     };
 
     const pages = getPageRange();
@@ -80,25 +79,27 @@ const Pagination: React.FC<PaginationProps> = ({
                     </li>
                 )}
 
-                {currentPage > Math.floor(maxVisiblePages / 2) + 1 && (
-                    <li>
-                        <Link
-                            to="#"
-                            className={styles.pageLink}
-                            onClick={(e) => {
-                                handlePageChange(1);
-                                e.preventDefault();
-                            }}
-                        >
-                            1
-                        </Link>
-                    </li>
-                )}
-                {currentPage > Math.floor(maxVisiblePages / 2) + 2 && (
-                    <li>
-                        <span className={clsx(styles.pageLink, styles.ellipsis)}>...</span>
-                    </li>
-                )}
+                {totalPages > adjustedMaxVisiblePages &&
+                    currentPage > Math.floor(adjustedMaxVisiblePages / 2) + 1 && (
+                        <li>
+                            <Link
+                                to="#"
+                                className={styles.pageLink}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    handlePageChange(1);
+                                }}
+                            >
+                                1
+                            </Link>
+                        </li>
+                    )}
+                {totalPages > adjustedMaxVisiblePages &&
+                    currentPage > Math.floor(adjustedMaxVisiblePages / 2) + 2 && (
+                        <li>
+                            <span className={clsx(styles.pageLink, styles.ellipsis)}>...</span>
+                        </li>
+                    )}
 
                 {pages.map((page) => (
                     <li key={page}>
@@ -117,13 +118,14 @@ const Pagination: React.FC<PaginationProps> = ({
                     </li>
                 ))}
 
-                {currentPage < totalPages - Math.floor(maxVisiblePages / 2) && (
-                    <li>
-                        <span className={clsx(styles.pageLink, styles.ellipsis)}>...</span>
-                    </li>
-                )}
-                {currentPage < totalPages - Math.floor(maxVisiblePages / 2) + 1 &&
-                    totalPages > 1 && (
+                {totalPages > adjustedMaxVisiblePages &&
+                    currentPage < totalPages - Math.floor(adjustedMaxVisiblePages / 2) && (
+                        <li>
+                            <span className={clsx(styles.pageLink, styles.ellipsis)}>...</span>
+                        </li>
+                    )}
+                {totalPages > adjustedMaxVisiblePages &&
+                    currentPage < totalPages - Math.floor(adjustedMaxVisiblePages / 2) + 1 && (
                         <li>
                             <Link
                                 to="#"
