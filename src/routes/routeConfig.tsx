@@ -18,8 +18,9 @@ import FAQ from '@/pages/FAQ';
 import Blog from '@/pages/Blog';
 import BlogDetail from '@/pages/BlogDetail';
 import MedicalTerms from '@/pages/MedicalTerms';
-import CategoryArticles from '@/pages/CategoryBlogs';
-import CategoryArticlesDemo from '@/pages/CategoryBlogsDemo';
+import CategoryArticles from '~/pages/CategoryBlogs';
+import CategoryArticlesDemo from '~/pages/CategoryBlogsDemo';
+import MedicalFacilityProfile from '@/pages/MedicalFacility/MedicalFacilityProfile';
 import AboutUs from '@/pages/AboutUs/AboutUs';
 import DoctorList from '@/pages/Doctor/DoctorList';
 import ContactUs from '@/pages/ContactUs';
@@ -98,6 +99,13 @@ const routes: RouteObject[] = [
     {
         path: PATHS.USER.ROOT,
         children: [{ path: PATHS.USER.PROFILE, element: <UserProfile /> }],
+    },
+    {
+        path: PATHS.MEDICAL_FACILITY.ROOT,
+        children: [
+            { index: true, element: <MedicalFacility /> },
+            { path: PATHS.MEDICAL_FACILITY.DETAIL, element: <MedicalFacilityProfile /> },
+        ],
     },
     {
         path: PATHS.SPECIALTIES.ROOT,
