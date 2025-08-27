@@ -1,0 +1,35 @@
+.h5Custom {
+    margin-bottom: 0;
+}
+
+.headIcon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid #e6e8ee;
+    border-radius: 5px;
+    font-size: 16px;
+    color: black;
+
+    &:hover,
+    &.active {
+        background: #0e82fd;
+        color: #fff;
+        border-color: #fff;
+    }
+}
+
+.filterContainer {
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+.spanCustom {
+    color: #822bd4;
+}

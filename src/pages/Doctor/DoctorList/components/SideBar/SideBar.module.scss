@@ -1,0 +1,72 @@
+:root {
+    --circle-size: 25px;
+    --font-size-sm: 12px;
+    --font-size-md: 15px;
+    --font-size-lg: 16px;
+    --color-secondary: #6c757d;
+    --color-text: #465d7c;
+    --color-badge-bg: #e3e6ec;
+    --transition-duration: 0.3s;
+}
+
+.iconCircle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--circle-size);
+    height: var(--circle-size);
+    border: 2px solid var(--color-secondary);
+    color: var(--color-secondary);
+    border-radius: 50%;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: transform var(--transition-duration) ease;
+}
+
+.iconCircle.fa-chevron-up {
+    transform: rotate(180deg);
+}
+
+.h6Custom {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+}
+
+.filterBadgeCustom {
+    width: var(--circle-size);
+    height: var(--circle-size);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-badge-bg);
+    font-size: var(--font-size-sm);
+}
+
+.labelCustom {
+    font-size: var(--font-size-md);
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.accordionCollapse {
+    transition:
+        max-height var(--transition-duration) ease,
+        opacity var(--transition-duration) ease;
+}
+
+.viewAllLink {
+    transition: color var(--transition-duration) ease;
+}
+
+.viewAllLink:hover {
+    color: #0e82fd;
+}
+
+.textSecondaryCustom {
+    color: #822bd4;
+
+    &:hover {
+        color: #822bd4;
+    }
+}

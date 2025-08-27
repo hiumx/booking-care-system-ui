@@ -1,4 +1,4 @@
-@use '../../styles/variables' as *;
+@use '../../../../../styles/variables' as *;
 
 .card {
     border: 1px solid $border-primary-color;
@@ -14,20 +14,47 @@
         font-size: 15px;
     }
 
+    .cardContainer {
+        display: flex;
+        align-items: stretch;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+
     .cardImg {
         width: 300px;
         position: relative;
+        border-radius: 10px 0 0 10px;
+        overflow: hidden;
+
+        @media (max-width: 768px) {
+            width: 100%;
+            border-radius: 10px 10px 0 0;
+            height: auto;
+        }
 
         img {
-            transition: 0.5s all;
-            border-radius: 10px 10px 0 10px;
             width: 100%;
             height: 100%;
+            object-fit: cover;
+            vertical-align: middle;
+            border-radius: 10px 0 0 10px;
+            transition: 0.5s all;
+
+            @media (max-width: 768px) {
+                height: auto;
+                border-radius: 10px 10px 0 0;
+            }
         }
 
         &:hover {
-            transition: 0.5s all;
-            overflow: hidden;
+            img {
+                transform: scale(1.14);
+                transition: 0.5s all;
+            }
         }
 
         .gridOverlayItem {
@@ -36,6 +63,7 @@
             left: 0;
             right: 0;
             padding: 0 20px;
+            z-index: 1;
 
             .favIcon {
                 width: 32px;
@@ -84,6 +112,13 @@
             &:hover {
                 color: #0e82fd;
             }
+        }
+    }
+
+    .bookingButtonContainer {
+        @media (max-width: 576px) {
+            display: flex;
+            width: 100%;
         }
     }
 }
