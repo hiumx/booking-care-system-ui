@@ -1,58 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import Calendar from '@/components/Calendar';
 import clsx from 'clsx';
 import styles from './SearchInput.module.scss';
 
 const SearchInput: React.FC = () => {
-    const placeholders = [
-        'Tìm kiếm theo cơ sở y tế',
-        'Tìm kiếm theo bác sĩ',
-        'Tìm kiếm theo chuyên khoa',
-        'Tìm kiếm theo gói khám',
-        'Tìm kiếm theo dịch vụ',
-    ];
-
-    const [currentText, setCurrentText] = useState('');
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [charIndex, setCharIndex] = useState(0);
-    const [typingSpeed, setTypingSpeed] = useState(100);
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
     const dateInputRef = useRef<HTMLInputElement>(null);
-
-    // Typing animation effect
-    useEffect(() => {
-        const handleTyping = () => {
-            const currentPlaceholder = placeholders[currentIndex];
-
-            if (!isDeleting && charIndex < currentPlaceholder.length) {
-                // Typing forward
-                setCurrentText((prev) => prev + currentPlaceholder[charIndex]);
-                setCharIndex((prev) => prev + 1);
-                setTypingSpeed(100);
-            } else if (isDeleting && charIndex > 0) {
-                // Deleting backward
-                setCurrentText((prev) => prev.slice(0, -1));
-                setCharIndex((prev) => prev - 1);
-                setTypingSpeed(50);
-            } else if (!isDeleting && charIndex === currentPlaceholder.length) {
-                // Pause at end of typing
-                setTypingSpeed(1000);
-                setIsDeleting(true);
-            } else if (isDeleting && charIndex === 0) {
-                // Move to next placeholder
-                setIsDeleting(false);
-                setCurrentIndex((prev) => (prev + 1) % placeholders.length);
-                setTypingSpeed(100);
-            }
-        };
-
-        const timer = setTimeout(handleTyping, typingSpeed);
-        return () => clearTimeout(timer);
-    }, [charIndex, isDeleting, currentIndex, typingSpeed, placeholders]);
-
-    console.log('Re-render');
 
     // Handle date selection
     const handleDateChange = (value: Date | null) => {
@@ -91,7 +45,7 @@ const SearchInput: React.FC = () => {
                             <input
                                 type="text"
                                 className={clsx('form-control', styles.formControlCustom)}
-                                placeholder={currentText}
+                                placeholder="Triệu chứng, bác sĩ, chuyên khoa, ..."
                             />
                         </div>
                     </div>

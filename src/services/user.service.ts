@@ -1,6 +1,6 @@
 // src/services/user.service.ts
 import axios from 'axios';
-import { User, UserLogin, UserRegister, UserResponse } from '../types/user.type.tsx';
+import { User, UserLogin, UserRegister, UserResponse } from '../types/user.type.js';
 
 const API_URL = 'https://your-api-domain.com/api/users';
 
