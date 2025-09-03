@@ -24,6 +24,7 @@ import MedicalFacilityProfile from '@/pages/MedicalFacility/MedicalFacilityProfi
 import AboutUs from '@/pages/AboutUs/AboutUs';
 import DoctorList from '@/pages/Doctor/DoctorList';
 import ContactUs from '@/pages/ContactUs';
+import Booking from '@/pages/Booking/Booking';
 
 const routes: RouteObject[] = [
     {
@@ -121,13 +122,16 @@ const routes: RouteObject[] = [
         path: PATHS.CHAT,
         element: <Chat />,
     },
-
     {
         path: PATHS.DOCTOR.ROOT,
         children: [
             { path: PATHS.DOCTOR.PROFILE, element: <DoctorProfile /> },
             { path: PATHS.DOCTOR.LIST, element: <DoctorList /> },
         ],
+    },
+    {
+        path: PATHS.BOOKING.ROOT,
+        element: <Booking />,
     },
     {
         path: PATHS.DASHBOARD.ROOT,

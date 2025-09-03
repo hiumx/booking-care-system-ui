@@ -52,6 +52,8 @@ const SearchInput: React.FC = () => {
         return () => clearTimeout(timer);
     }, [charIndex, isDeleting, currentIndex, typingSpeed, placeholders]);
 
+    console.log('Re-render');
+
     // Handle date selection
     const handleDateChange = (value: Date | null) => {
         if (!value || isNaN(value.getTime())) return; // Ignore invalid dates
