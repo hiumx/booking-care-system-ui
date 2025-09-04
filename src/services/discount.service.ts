@@ -64,7 +64,7 @@ export class DiscountService {
     /**
      * Get a single discount by ID
      */
-    static async getDiscountById(id: number): Promise<DiscountResponse> {
+    static async getDiscountById(id: string): Promise<DiscountResponse> {
         try {
             const response: any = await axiosInstance.get(`${DISCOUNT_ENDPOINTS.BASE}/${id}`);
 
@@ -287,7 +287,7 @@ export class DiscountService {
      * Bulk delete discounts
      */
     static async bulkDeleteDiscounts(
-        discountIds: number[]
+        discountIds: string[]
     ): Promise<{ success: boolean; message: string; deletedCount: number }> {
         try {
             const response: any = await axiosInstance.delete(`${DISCOUNT_ENDPOINTS.BULK}/delete`, {
@@ -312,9 +312,9 @@ export class DiscountService {
      * Get active discounts for a specific context
      */
     static async getActiveDiscounts(context: {
-        clinicId: number;
-        specialtyId?: number;
-        doctorId?: number;
+        clinicId: string;
+        specialtyId?: string;
+        doctorId?: string;
     }): Promise<Discount[]> {
         try {
             const queryParams: DiscountQueryParams = {
@@ -327,7 +327,7 @@ export class DiscountService {
             };
 
             const result = await this.getDiscounts(queryParams);
-            return result.data;
+            return result.data.discounts;
         } catch (error) {
             console.error('Failed to fetch active discounts:', error);
             return [];

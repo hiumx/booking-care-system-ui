@@ -51,6 +51,12 @@ export const PATHS = {
         PROFILE: 'profile',
     },
 
+    // Booking
+    BOOKING: {
+        ROOT: '/booking',
+        DOCTOR: ':doctorId',
+    },
+
     // Dashboard paths
     DASHBOARD: {
         ROOT: '/dashboard',

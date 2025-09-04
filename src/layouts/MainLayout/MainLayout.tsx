@@ -2,8 +2,8 @@
 import { ReactNode } from 'react';
 import { Outlet } from 'react-router-dom';
 
-import Footer from './components/Footer';
-import Header from './components/Header';
+import MainFooter from '../components/MainFooter';
+import MainHeader from '../components/MainHeader';
 import styles from './MainLayout.module.scss';
 
 interface MainLayoutProps {
@@ -14,9 +14,9 @@ interface MainLayoutProps {
 const MainLayout: React.FC<MainLayoutProps> = ({ children, hasFooter = true }) => {
     return (
         <div className={styles.mainLayout}>
-            <Header />
+            <MainHeader />
             <main className={styles.contentContainer}>{children || <Outlet />}</main>
-            {hasFooter && <Footer />}
+            {hasFooter && <MainFooter />}
         </div>
     );
 };
