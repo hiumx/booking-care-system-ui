@@ -74,15 +74,13 @@ export const fetchDiscounts = createAsyncThunk(
     'discount/fetchDiscounts',
     async (params?: DiscountQueryParams) => {
         const response = await DiscountService.getDiscounts(params);
-        console.log('RESPONSE: ', response);
-
         return response;
     }
 );
 
 export const fetchDiscountById = createAsyncThunk(
     'discount/fetchDiscountById',
-    async (id: number) => {
+    async (id: string) => {
         const response = await DiscountService.getDiscountById(id);
         return response.data;
     }
@@ -170,7 +168,7 @@ export const bulkDeleteDiscounts = createAsyncThunk(
 
 export const fetchActiveDiscounts = createAsyncThunk(
     'discount/fetchActiveDiscounts',
-    async (context: { clinicId: number; specialtyId?: number; doctorId?: number }) => {
+    async (context: { clinicId: string; specialtyId?: string; doctorId?: string }) => {
         const discounts = await DiscountService.getActiveDiscounts(context);
         return discounts;
     }
@@ -265,9 +263,7 @@ const discountSlice = createSlice({
             .addCase(fetchDiscounts.fulfilled, (state, action) => {
                 state.loading.discounts = false;
                 state.discounts = action.payload.data.discounts;
-                console.log('ACTION: ', action.payload.data.discounts);
-
-                state.pagination = action.payload.pagination;
+                // state.pagination = action.payload.pagination;
             })
             .addCase(fetchDiscounts.rejected, (state, action) => {
                 state.loading.discounts = false;
