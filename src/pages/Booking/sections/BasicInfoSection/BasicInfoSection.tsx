@@ -1,14 +1,21 @@
-const BasicInfoSection: React.FC = () => {
+import BookingAction from '../../components/BookingAction/BookingAction';
+
+interface BasicInfoSectionProps {
+    nextStep: () => void;
+    prevStep: () => void;
+}
+
+const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep }) => {
     return (
-        <fieldset>
+        <fieldset className="d-block">
             <div className="card booking-card mb-0">
-                <div className="card-header">
+                <div className="card-header pt-3">
                     <div className="booking-header pb-0">
                         <div className="card mb-0">
                             <div className="card-body">
                                 <div className="d-flex align-items-center flex-wrap rpw-gap-2 mb-4 flex-wrap row-gap-2">
                                     <span className="avatar avatar-xxxl avatar-rounded me-2 flex-shrink-0">
-                                        <img src="assets/img/clients/client-15.jpg" alt="" />
+                                        <img src="/src/assets/img/clients/client-15.jpg" alt="" />
                                     </span>
                                     <div>
                                         <h4 className="mb-1">
@@ -87,14 +94,6 @@ const BasicInfoSection: React.FC = () => {
                                 </div>
                                 <div className="col-lg-4 col-md-6">
                                     <div className="mb-3">
-                                        <label className="form-label">Select Patient</label>
-                                        <select className="select">
-                                            <option>Andrew Fletcher</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div className="col-lg-4 col-md-6">
-                                    <div className="mb-3">
                                         <label className="form-label">Symptoms</label>
                                         <input type="text" className="form-control" />
                                     </div>
@@ -115,24 +114,11 @@ const BasicInfoSection: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <div className="card-footer">
-                    <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between">
-                        <a
-                            href="javascript:void(0);"
-                            className="btn btn-md btn-dark prev_btns inline-flex align-items-center rounded-pill"
-                        >
-                            <i className="isax isax-arrow-left-2 me-1"></i>
-                            Back
-                        </a>
-                        <a
-                            href="javascript:void(0);"
-                            className="btn btn-md btn-primary-gradient next_btns inline-flex align-items-center rounded-pill"
-                        >
-                            Select Payment
-                            <i className="isax isax-arrow-right-3 ms-1"></i>
-                        </a>
-                    </div>
-                </div>
+                <BookingAction
+                    nextStepTitle="Select Payment"
+                    nextStep={nextStep}
+                    prevStep={prevStep}
+                />
             </div>
         </fieldset>
     );

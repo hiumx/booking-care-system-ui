@@ -4,9 +4,14 @@ import { mockSlotCategories } from '../../data/mock';
 import SlotCategory from './components/SlotCategory';
 import styles from './DateTimeSection.module.scss';
 import clsx from 'clsx';
-import BookingFooter from '../../components/BookingFooter/BookingFooter';
+import BookingAction from '../../components/BookingAction/BookingAction';
 
-const DateTimeSection: React.FC = () => {
+interface DateTimeSectionProps {
+    nextStep: () => void;
+    prevStep: () => void;
+}
+
+const DateTimeSection: React.FC<DateTimeSectionProps> = ({ nextStep, prevStep }) => {
     const [date, setDate] = useState<Date | null>(new Date());
     const [slotChecked, setSlotChecked] = useState<Array<number>>([]);
 
@@ -14,18 +19,16 @@ const DateTimeSection: React.FC = () => {
         setSlotChecked([...slotChecked, idx]);
     };
 
-    console.log('Selected slot:', slotChecked);
-
     return (
         <fieldset id="first">
             <div className="card booking-card mb-0">
-                <div className="card-header">
+                <div className="card-header pt-3">
                     <div className="booking-header pb-0">
                         <div className="card mb-0">
                             <div className="card-body">
                                 <div className="d-flex align-items-center flex-wrap rpw-gap-2 mb-4 flex-wrap row-gap-2">
                                     <span className="avatar avatar-xxxl avatar-rounded me-2 flex-shrink-0">
-                                        <img src="./src/assets/img/clients/client-15.jpg" alt="" />
+                                        <img src="/src/assets/img/clients/client-15.jpg" alt="" />
                                     </span>
                                     <div>
                                         <h4 className="mb-1">
@@ -106,7 +109,11 @@ const DateTimeSection: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <BookingFooter nextStepTitle="Add Basic Information" />
+                <BookingAction
+                    nextStepTitle="Add Basic Information"
+                    nextStep={nextStep}
+                    prevStep={prevStep}
+                />
             </div>
         </fieldset>
     );

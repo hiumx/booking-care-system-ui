@@ -7,9 +7,9 @@ export interface Discount {
     code: string;
     name: string;
     description?: string;
-    clinicId: number;
-    specialtyId?: number;
-    doctorId?: number;
+    clinicId: string;
+    specialtyId?: string;
+    doctorId?: string;
     applicableTo: DiscountApplicableTo;
     amount: number;
     discountType: DiscountType;
@@ -27,9 +27,9 @@ export interface CreateDiscountRequest {
     code: string;
     name: string;
     description?: string;
-    clinicId: number;
-    specialtyId?: number;
-    doctorId?: number;
+    clinicId: string;
+    specialtyId?: string;
+    doctorId?: string;
     applicableTo: DiscountApplicableTo;
     amount: number;
     discountType: DiscountType;
@@ -45,9 +45,9 @@ export interface UpdateDiscountRequest extends Partial<CreateDiscountRequest> {
 
 // Query parameters for filtering discounts
 export interface DiscountFilters {
-    clinicId?: number;
-    specialtyId?: number;
-    doctorId?: number;
+    clinicId?: string;
+    specialtyId?: string;
+    doctorId?: string;
     applicableTo?: DiscountApplicableTo;
     discountType?: DiscountType;
     status?: DiscountStatus;
@@ -104,9 +104,9 @@ export interface DiscountValidationResult {
 export interface ApplyDiscountRequest {
     code: string;
     originalAmount: number;
-    clinicId: number;
-    specialtyId?: number;
-    doctorId?: number;
+    clinicId: string;
+    specialtyId?: string;
+    doctorId?: string;
 }
 
 // Discount usage statistics

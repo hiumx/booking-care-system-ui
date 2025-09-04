@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import styles from './DoctorAppointmentBookingCard.module.scss';
 import { useState } from 'react';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { buildPath, PATHS } from '@/routes/paths';
 
 interface DoctorAppointmentBookingCardProps {
     doctorId: string; // Từ doctors.id
@@ -183,7 +184,7 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                 </div>
                                 <div className={styles.bookingButtonContainer}>
                                     <Link
-                                        to={`/booking/${doctorId}`}
+                                        to={buildPath(PATHS.BOOKING.ROOT, doctorId)}
                                         className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
                                     >
                                         <i className="isax isax-calendar-1 me-2"></i>

@@ -1,14 +1,21 @@
-const PaymentSection: React.FC = () => {
+import BookingAction from '../../components/BookingAction/BookingAction';
+
+interface PaymentSectionProps {
+    nextStep: () => void;
+    prevStep: () => void;
+}
+
+const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) => {
     return (
-        <fieldset>
+        <fieldset className="d-block">
             <div className="card booking-card mb-0">
-                <div className="card-header">
+                <div className="card-header pt-3">
                     <div className="booking-header pb-0">
                         <div className="card mb-0">
                             <div className="card-body">
                                 <div className="d-flex align-items-center flex-wrap rpw-gap-2 flex-wrap row-gap-2">
                                     <span className="avatar avatar-xxxl avatar-rounded me-2 flex-shrink-0">
-                                        <img src="assets/img/clients/client-15.jpg" alt="" />
+                                        <img src="/src/assets/img/clients/client-15.jpg" alt="" />
                                     </span>
                                     <div>
                                         <h4 className="mb-1">
@@ -50,7 +57,7 @@ const PaymentSection: React.FC = () => {
                                                     role="tab"
                                                 >
                                                     <img
-                                                        src="assets/img/icons/payment-icon-05.svg"
+                                                        src="/src/assets/img/icons/payment-icon-05.svg"
                                                         className="me-2"
                                                         alt=""
                                                     />
@@ -67,7 +74,7 @@ const PaymentSection: React.FC = () => {
                                                     role="tab"
                                                 >
                                                     <img
-                                                        src="assets/img/icons/payment-icon-06.svg"
+                                                        src="/src/assets/img/icons/payment-icon-06.svg"
                                                         className="me-2"
                                                         alt=""
                                                     />
@@ -84,7 +91,7 @@ const PaymentSection: React.FC = () => {
                                                     role="tab"
                                                 >
                                                     <img
-                                                        src="assets/img/icons/payment-icon-07.svg"
+                                                        src="/src/assets/img/icons/payment-icon-07.svg"
                                                         className="me-2"
                                                         alt=""
                                                     />
@@ -264,24 +271,11 @@ const PaymentSection: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <div className="card-footer">
-                    <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between">
-                        <a
-                            href="javascript:void(0);"
-                            className="btn btn-md btn-dark prev_btns inline-flex align-items-center rounded-pill"
-                        >
-                            <i className="isax isax-arrow-left-2 me-1"></i>
-                            Back
-                        </a>
-                        <a
-                            href="javascript:void(0);"
-                            className="btn btn-md btn-primary-gradient next_btns inline-flex align-items-center rounded-pill"
-                        >
-                            Confirm & Pay
-                            <i className="isax isax-arrow-right-3 ms-1"></i>
-                        </a>
-                    </div>
-                </div>
+                <BookingAction
+                    nextStepTitle="Confirm & Pay"
+                    nextStep={nextStep}
+                    prevStep={prevStep}
+                />
             </div>
         </fieldset>
     );

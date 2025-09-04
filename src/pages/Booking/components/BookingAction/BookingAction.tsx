@@ -1,28 +1,30 @@
-interface BookingFooterProps {
+interface BookingActionProps {
     nextStepTitle: string;
+    prevStep: () => void;
+    nextStep: () => void;
 }
 
-const BookingFooter: React.FC<BookingFooterProps> = ({ nextStepTitle }) => {
+const BookingAction: React.FC<BookingActionProps> = ({ nextStepTitle, prevStep, nextStep }) => {
     return (
         <div className="card-footer">
             <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between">
-                <a
-                    href="javascript:void(0);"
+                <button
                     className="btn btn-md btn-dark prev_btns inline-flex align-items-center rounded-pill"
+                    onClick={prevStep}
                 >
                     <i className="isax isax-arrow-left-2 me-1"></i>
                     Back
-                </a>
-                <a
-                    onClick={() => console.log('Next step clicked')}
+                </button>
+                <button
+                    onClick={nextStep}
                     className="btn btn-md btn-primary-gradient next_btns inline-flex align-items-center rounded-pill"
                 >
                     {nextStepTitle}
                     <i className="isax isax-arrow-right-3 ms-1"></i>
-                </a>
+                </button>
             </div>
         </div>
     );
 };
 
-export default BookingFooter;
+export default BookingAction;

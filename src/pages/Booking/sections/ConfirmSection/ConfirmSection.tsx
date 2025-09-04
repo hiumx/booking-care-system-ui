@@ -1,13 +1,21 @@
-const ConfirmSection: React.FC = () => {
+import { Link } from 'react-router-dom';
+import styles from './ConfirmSection.module.scss';
+import { buildPath, PATHS } from '@/routes/paths';
+
+interface ConfirmSectionProps {
+    handleGoBack: () => void;
+}
+
+const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
     return (
-        <fieldset>
+        <fieldset className="d-block">
             <div className="card booking-card">
                 <div className="card-body booking-body pb-1">
                     <div className="row">
                         <div className="col-lg-8 d-flex">
                             <div className="flex-fill">
                                 <div className="card ">
-                                    <div className="card-header">
+                                    <div className="card-header pt-3">
                                         <h5 className="d-flex align-items-center flex-wrap rpw-gap-2">
                                             <i className="isax isax-tick-circle5 text-success me-2"></i>
                                             Booking Confirmed
@@ -15,7 +23,10 @@ const ConfirmSection: React.FC = () => {
                                     </div>
                                     <div className="card-header d-flex align-items-center flex-wrap rpw-gap-2">
                                         <span className="avatar avatar-lg avatar-rounded me-2 flex-shrink-0">
-                                            <img src="assets/img/clients/client-16.jpg" alt="" />
+                                            <img
+                                                src="/src/assets/img/clients/client-16.jpg"
+                                                alt="patient-avatar"
+                                            />
                                         </span>
                                         <p className="mb-0">
                                             Your Booking has been Confirmed with{' '}
@@ -118,7 +129,10 @@ const ConfirmSection: React.FC = () => {
                                         <h6 className="fs-14 mb-2">Booking Number</h6>
                                         <span className="booking-id-badge mb-3">DCRA12565</span>
                                         <span className="d-block mb-3">
-                                            <img src="assets/img/icons/payment-qr.svg" alt="" />
+                                            <img
+                                                src="/src/assets/img/icons/payment-qr.svg"
+                                                alt=""
+                                            />
                                         </span>
                                         <p>
                                             Scan this QR Code to Download the details of Appointment
@@ -131,12 +145,12 @@ const ConfirmSection: React.FC = () => {
                                         >
                                             Add To Calendar
                                         </a>
-                                        <a
-                                            href="doctor-grid.html"
+                                        <Link
+                                            to={buildPath(PATHS.DOCTOR.ROOT, PATHS.DOCTOR.LIST)}
                                             className="btn w-100 btn-md btn-primary-gradient next_btns inline-flex align-items-center rounded-pill"
                                         >
                                             Start New Booking
-                                        </a>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
@@ -145,10 +159,10 @@ const ConfirmSection: React.FC = () => {
                 </div>
             </div>
             <div>
-                <a href="booking.html" className="">
+                <div onClick={handleGoBack} className={styles.backToBookings}>
                     <i className="isax isax-arrow-left-2 me-1"></i>
                     Back to Bookings
-                </a>
+                </div>
             </div>
         </fieldset>
     );

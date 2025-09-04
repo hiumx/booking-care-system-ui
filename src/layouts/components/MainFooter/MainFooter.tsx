@@ -1,4 +1,4 @@
-const Footer: React.FC = () => {
+const MainFooter: React.FC = () => {
     return (
         <footer className="footer inner-footer">
             <div className="footer-top">
@@ -235,4 +235,4 @@ const Footer: React.FC = () => {
     );
 };
 
-export default Footer;
+export default MainFooter;

@@ -131,7 +131,7 @@ const routes: RouteObject[] = [
     },
     {
         path: PATHS.BOOKING.ROOT,
-        element: <Booking />,
+        children: [{ path: PATHS.BOOKING.DOCTOR, element: <Booking /> }],
     },
     {
         path: PATHS.DASHBOARD.ROOT,
