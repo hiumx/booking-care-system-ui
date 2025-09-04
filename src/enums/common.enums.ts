@@ -5,12 +5,12 @@ export enum Status {
     /**
      * The entity is active.
      */
-    ACTIVE = 'ACTIVE',
+    ACTIVE,
 
     /**
      * The entity is inactive.
      */
-    INACTIVE = 'INACTIVE',
+    INACTIVE,
 }
 
 /**
@@ -20,15 +20,15 @@ export enum Gender {
     /**
      * Male gender.
      */
-    MALE = 'MALE',
+    MALE,
 
     /**
      * Female gender.
      */
-    FEMALE = 'FEMALE',
+    FEMALE,
 
     /**
      * Other or unspecified gender.
      */
-    OTHER = 'OTHER',
+    OTHER,
 }

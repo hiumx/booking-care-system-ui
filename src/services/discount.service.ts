@@ -48,7 +48,6 @@ export class DiscountService {
             return {
                 success: response.success ?? true,
                 data: response.data || response,
-                pagination: response.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 },
                 message: response.message,
             };
         } catch (error: any) {
@@ -260,7 +259,7 @@ export class DiscountService {
      * Bulk update discount status
      */
     static async bulkUpdateStatus(
-        discountIds: number[],
+        discountIds: string[],
         status: DiscountStatus
     ): Promise<{ success: boolean; message: string; updatedCount: number }> {
         try {
@@ -361,7 +360,7 @@ export class DiscountService {
                 return {
                     available: false,
                     discount,
-                    message: `Discount is ${discount.status.toLowerCase()}`,
+                    message: `Discount is ${discount.status.toString().toLowerCase()}`,
                 };
             }
 

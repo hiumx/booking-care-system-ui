@@ -5,17 +5,17 @@ export enum DiscountApplicableTo {
     /**
      * The discount is applicable to all entities.
      */
-    ALL = 'ALL',
+    ALL,
 
     /**
      * The discount is applicable to a specific specialty.
      */
-    SPECIALTY = 'SPECIALTY',
+    SPECIALTY,
 
     /**
      * The discount is applicable to a specific doctor.
      */
-    DOCTOR = 'DOCTOR',
+    DOCTOR,
 }
 
 /**
@@ -25,17 +25,17 @@ export enum DiscountStatus {
     /**
      * The discount is currently active and can be used.
      */
-    ACTIVE = 'ACTIVE',
+    ACTIVE,
 
     /**
      * The discount is currently inactive and cannot be used.
      */
-    INACTIVE = 'INACTIVE',
+    INACTIVE,
 
     /**
      * The discount has expired and is no longer valid.
      */
-    EXPIRED = 'EXPIRED',
+    EXPIRED,
 }
 
 /**
@@ -45,10 +45,10 @@ export enum DiscountType {
     /**
      * A fixed amount discount, which subtracts a specific monetary value from the total.
      */
-    FIXED_AMOUNT = 'FIXED_AMOUNT',
+    FIXED_AMOUNT,
 
     /**
      * A percentage discount, which subtracts a percentage of the total amount.
      */
-    PERCENTAGE = 'PERCENTAGE',
+    PERCENTAGE,
 }

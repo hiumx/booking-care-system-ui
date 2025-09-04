@@ -15,7 +15,7 @@ export interface Discount {
     discountType: DiscountType;
     startDate: string; // ISO date string
     endDate: string; // ISO date string
-    maxUses?: number;
+    maxUses: number;
     usesCount: number;
     status: DiscountStatus;
     createdAt: string;
@@ -79,12 +79,6 @@ export interface DiscountListResponse {
         totalCount: number;
         pageNumber: number;
         pageSize: number;
-        totalPages: number;
-    };
-    pagination: {
-        page: number;
-        limit: number;
-        total: number;
         totalPages: number;
     };
     message?: string;
