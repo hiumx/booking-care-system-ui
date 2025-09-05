@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { UserLogin } from '../../types/user.type.tsx';
+import { UserLogin } from '../../types/user.type';
 
 const LoginForm = () => {
     const { login } = useAuth();

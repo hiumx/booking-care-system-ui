@@ -1,0 +1,23 @@
+.doctorsSearchBoxCustom {
+    max-width: 845px;
+
+    @media (max-width: 768px) {
+        margin: 0 10px;
+    }
+}
+
+.formControlCustom {
+    box-shadow: none !important;
+}
+
+.roundedPillCustom {
+    border-radius: 50rem;
+
+    @media (max-width: 768px) {
+        border-radius: 0.625rem;
+    }
+}
+
+.btnNoWrap {
+    white-space: nowrap;
+}

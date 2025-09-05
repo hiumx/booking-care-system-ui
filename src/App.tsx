@@ -1,11 +1,14 @@
 import AppRoutes from './routes/AppRoutes';
 import { BrowserRouter } from 'react-router-dom';
+import ReduxProvider from './store/ReduxProvider';
 
 function App() {
     return (
-        <BrowserRouter>
-            <AppRoutes />
-        </BrowserRouter>
+        <ReduxProvider>
+            <BrowserRouter>
+                <AppRoutes />
+            </BrowserRouter>
+        </ReduxProvider>
     );
 }
 

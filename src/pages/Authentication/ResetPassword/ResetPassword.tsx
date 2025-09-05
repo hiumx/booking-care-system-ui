@@ -3,7 +3,8 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import AuthLayout from '@/layouts/AuthLayout';
 import { CheckCircle, Shield } from 'lucide-react';
 import clsx from 'clsx';
-import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
+import Button from '@/components/Button';
+import Input from '@/components/Input';
 
 interface ResetPasswordProps {
     onSubmit?: (currentPassword: string, newPassword: string) => void;
@@ -125,52 +126,33 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
             <form onSubmit={handleSubmit}>
                 {/* Current Password */}
                 <div className="mb-3">
-                    <label className="form-label">Mật khẩu hiện tại</label>
-                    <div className={clsx(authStyles.inputGroup)}>
-                        <i className={clsx('feather-lock', authStyles.leftIcon)}></i>
-                        <input
-                            type={showCurrentPassword ? 'text' : 'password'}
-                            className={clsx('form-control')}
-                            placeholder="Nhập mật khẩu hiện tại"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            onFocus={() => setShowCaptcha(true)}
-                        />
-
-                        <span
-                            role="button"
-                            aria-label={showCurrentPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                            onClick={() => togglePasswordVisibility('current')}
-                            className={clsx(
-                                showCurrentPassword ? 'feather-eye' : 'feather-eye-off',
-                                authStyles.togglePassword
-                            )}
-                        />
-                    </div>
+                    <Input
+                        label="Mật khẩu hiện tại"
+                        type="password"
+                        placeholder="Nhập mật khẩu hiện tại"
+                        leftIcon={<i className="feather-lock" />}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        onFocus={() => setShowCaptcha(true)}
+                        showPasswordToggle
+                        isPasswordVisible={showCurrentPassword}
+                        onTogglePassword={() => togglePasswordVisibility('current')}
+                    />
                 </div>
 
                 {/* New Password */}
                 <div className="mb-3">
-                    <label className="form-label">Mật khẩu mới</label>
-                    <div className={clsx(authStyles.inputGroup)}>
-                        <i className={clsx('feather-lock', authStyles.leftIcon)}></i>
-                        <input
-                            type={showNewPassword ? 'text' : 'password'}
-                            className={clsx('form-control')}
-                            placeholder="Nhập mật khẩu mới"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                        />
-                        <span
-                            role="button"
-                            aria-label={showNewPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                            onClick={() => togglePasswordVisibility('new')}
-                            className={clsx(
-                                showNewPassword ? 'feather-eye' : 'feather-eye-off',
-                                authStyles.togglePassword
-                            )}
-                        />
-                    </div>
+                    <Input
+                        label="Mật khẩu mới"
+                        type="password"
+                        placeholder="Nhập mật khẩu mới"
+                        leftIcon={<i className="feather-lock" />}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        showPasswordToggle
+                        isPasswordVisible={showNewPassword}
+                        onTogglePassword={() => togglePasswordVisibility('new')}
+                    />
 
                     {/* Password Strength Indicator */}
                     {newPassword && (
@@ -186,9 +168,9 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
                                     {passwordStrength.label}
                                 </small>
                             </div>
-                            <div className={authStyles.strengthBar}>
+                            <div className={'strength-bar'}>
                                 <div
-                                    className={authStyles.strengthFill}
+                                    className={'strength-fill'}
                                     style={{
                                         width: `${passwordStrength.width}%`,
                                         backgroundColor: passwordStrength.color,
@@ -201,47 +183,32 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
 
                 {/* Confirm Password */}
                 <div className="mb-3">
-                    <label className="form-label">Xác nhận mật khẩu mới</label>
-                    <div className={clsx(authStyles.inputGroup)}>
-                        <i className={clsx('feather-lock', authStyles.leftIcon)}></i>
-                        <input
-                            type={showConfirmPassword ? 'text' : 'password'}
-                            className={clsx(
-                                'form-control',
-                                confirmPassword && confirmPassword === newPassword
-                                    ? authStyles.borderSuccess
-                                    : ''
-                            )}
-                            placeholder="Nhập lại mật khẩu mới"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                        />
-                        <span
-                            role="button"
-                            aria-label={showConfirmPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                            onClick={() => togglePasswordVisibility('confirm')}
-                            className={clsx(
-                                showConfirmPassword ? 'feather-eye' : 'feather-eye-off',
-                                authStyles.togglePassword
-                            )}
-                        />
-                    </div>
-                    {confirmPassword && newPassword === confirmPassword && (
-                        <div className="d-flex align-items-center mt-2 text-success">
-                            <CheckCircle size={16} className="me-2" />
-                            <span>Mật khẩu trùng khớp</span>
-                        </div>
-                    )}
+                    <Input
+                        label="Xác nhận mật khẩu mới"
+                        type="password"
+                        placeholder="Nhập lại mật khẩu mới"
+                        leftIcon={<i className="feather-lock" />}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className={clsx(
+                            confirmPassword && confirmPassword === newPassword
+                                ? 'border-success'
+                                : ''
+                        )}
+                        showPasswordToggle
+                        isPasswordVisible={showConfirmPassword}
+                        onTogglePassword={() => togglePasswordVisibility('confirm')}
+                    />
                 </div>
 
                 {/* Password Requirements */}
                 <div className="mb-3">
-                    <div className={authStyles.requirementsList}>
+                    <div className={'requirements-list'}>
                         <span className="mb-1" style={{ fontWeight: 600 }}>
                             Yêu cầu mật khẩu:
                         </span>
-                        <div className={authStyles.requirementItem}>
-                            <span className={authStyles.requirementIcon}>
+                        <div className={'requirement-item'}>
+                            <span className={'requirement-icon'}>
                                 {passwordRequirements.hasMinLength ? (
                                     <CheckCircle size={16} className="text-success" />
                                 ) : (
@@ -250,7 +217,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
                             </span>
                             <span
                                 className={clsx(
-                                    authStyles.requirementText,
+                                    'requirement-text',
                                     passwordRequirements.hasMinLength
                                         ? 'text-success'
                                         : 'text-muted'
@@ -259,8 +226,8 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
                                 Ít nhất 8 ký tự
                             </span>
                         </div>
-                        <div className={authStyles.requirementItem}>
-                            <span className={authStyles.requirementIcon}>
+                        <div className={'requirement-item'}>
+                            <span className={'requirement-icon'}>
                                 {passwordRequirements.hasUppercase ? (
                                     <CheckCircle size={16} className="text-success" />
                                 ) : (
@@ -269,7 +236,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
                             </span>
                             <span
                                 className={clsx(
-                                    authStyles.requirementText,
+                                    'requirement-text',
                                     passwordRequirements.hasUppercase
                                         ? 'text-success'
                                         : 'text-muted'
@@ -278,8 +245,8 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
                                 Một chữ hoa
                             </span>
                         </div>
-                        <div className={authStyles.requirementItem}>
-                            <span className={authStyles.requirementIcon}>
+                        <div className={'requirement-item'}>
+                            <span className={'requirement-icon'}>
                                 {passwordRequirements.hasLowercase ? (
                                     <CheckCircle size={16} className="text-success" />
                                 ) : (
@@ -288,7 +255,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
                             </span>
                             <span
                                 className={clsx(
-                                    authStyles.requirementText,
+                                    'requirement-text',
                                     passwordRequirements.hasLowercase
                                         ? 'text-success'
                                         : 'text-muted'
@@ -297,8 +264,8 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
                                 Một chữ thường
                             </span>
                         </div>
-                        <div className={authStyles.requirementItem}>
-                            <span className={authStyles.requirementIcon}>
+                        <div className={'requirement-item'}>
+                            <span className={'requirement-icon'}>
                                 {passwordRequirements.hasNumber ? (
                                     <CheckCircle size={16} className="text-success" />
                                 ) : (
@@ -307,15 +274,15 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
                             </span>
                             <span
                                 className={clsx(
-                                    authStyles.requirementText,
+                                    'requirement-text',
                                     passwordRequirements.hasNumber ? 'text-success' : 'text-muted'
                                 )}
                             >
                                 Một số
                             </span>
                         </div>
-                        <div className={authStyles.requirementItem}>
-                            <span className={authStyles.requirementIcon}>
+                        <div className={'requirement-item'}>
+                            <span className={'requirement-icon'}>
                                 {passwordRequirements.hasSpecialChar ? (
                                     <CheckCircle size={16} className="text-success" />
                                 ) : (
@@ -324,7 +291,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
                             </span>
                             <span
                                 className={clsx(
-                                    authStyles.requirementText,
+                                    'requirement-text',
                                     passwordRequirements.hasSpecialChar
                                         ? 'text-success'
                                         : 'text-muted'
@@ -363,17 +330,12 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
 
                 {/* Submit Button */}
                 <div className="mb-1 mt-3">
-                    <button
+                    <Button
+                        text="Đặt lại mật khẩu"
                         type="submit"
-                        disabled={!canSubmit}
-                        className={clsx(
-                            'btn w-100 fw-bold',
-                            authStyles.submitBtn,
-                            canSubmit ? 'btn-primary-gradient' : 'btn-secondary disabled'
-                        )}
-                    >
-                        Đặt lại mật khẩu
-                    </button>
+                        isDisabled={!canSubmit}
+                        className="w-100 fw-bold"
+                    />
                 </div>
             </form>
         </AuthLayout>

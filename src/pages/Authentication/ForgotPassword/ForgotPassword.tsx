@@ -4,8 +4,9 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import AuthLayout from '@/layouts/AuthLayout';
 import { Mail } from 'lucide-react';
 import clsx from 'clsx';
-import authStyles from '@/layouts/AuthLayout/AuthLayout.module.scss';
-import { PATHS } from '~/routes/paths';
+import { PATHS } from '@/routes/paths';
+import Button from '@/components/Button';
+import Input from '@/components/Input';
 
 interface ForgotPasswordProps {
     onSubmit?: (email: string, phone: string) => void;
@@ -41,12 +42,12 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         >
             <form onSubmit={handleSubmit}>
                 <div className="d-flex justify-content-center mb-3">
-                    <div className={authStyles.methodToggle}>
+                    <div className="method-toggle">
                         <button
                             type="button"
                             className={clsx(
-                                authStyles.toggleBtn,
-                                method === 'phone' && authStyles.toggleBtnActive
+                                'toggle-btn',
+                                method === 'phone' && 'toggle-btn-active'
                             )}
                             onClick={() => setMethod('phone')}
                         >
@@ -56,8 +57,8 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                         <button
                             type="button"
                             className={clsx(
-                                authStyles.toggleBtn,
-                                method === 'email' && authStyles.toggleBtnActive
+                                'toggle-btn',
+                                method === 'email' && 'toggle-btn-active'
                             )}
                             onClick={() => setMethod('email')}
                         >
@@ -67,19 +68,12 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                     </div>
                 </div>
                 <div className="mb-3">
-                    <label className="form-label">
-                        {method === 'phone' ? 'Số điện thoại' : 'Địa chỉ email'}
-                    </label>
-                    <div
-                        className={clsx(
-                            authStyles.inputGroup,
-                            method === 'phone'
-                                ? authStyles.inputWrapPhone
-                                : authStyles.inputWrapEmail
-                        )}
-                    >
-                        <div className={authStyles.leftIcon}>
-                            {method === 'phone' ? (
+                    {method === 'phone' ? (
+                        <Input
+                            label="Số điện thoại"
+                            type="tel"
+                            placeholder="Nhập số điện thoại"
+                            leftContent={
                                 <>
                                     <img
                                         src="https://flagcdn.com/w20/vn.png"
@@ -91,25 +85,24 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                                         +84
                                     </span>
                                 </>
-                            ) : (
-                                <Mail size={18} className="text-muted" />
-                            )}
-                        </div>
-                        <input
-                            type={method === 'phone' ? 'tel' : 'email'}
-                            className={clsx('form-control')}
-                            placeholder={
-                                method === 'phone' ? 'Nhập số điện thoại' : 'Nhập địa chỉ email'
                             }
-                            value={method === 'phone' ? phone : email}
-                            onChange={(e) =>
-                                method === 'phone'
-                                    ? setPhone(e.target.value)
-                                    : setEmail(e.target.value)
-                            }
+                            wrapVariant="phone"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
                             onFocus={() => setShowCaptcha(true)}
                         />
-                    </div>
+                    ) : (
+                        <Input
+                            label="Địa chỉ email"
+                            type="email"
+                            placeholder="Nhập địa chỉ email"
+                            leftIcon={<Mail size={18} className="text-muted" />}
+                            wrapVariant="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            onFocus={() => setShowCaptcha(true)}
+                        />
+                    )}
                 </div>
                 {/* Captcha */}
                 {showCaptcha && (
@@ -136,17 +129,12 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                     </div>
                 )}
                 <div className="mb-3 mt-3">
-                    <button
+                    <Button
+                        text="Đặt lại mật khẩu"
                         type="submit"
-                        disabled={!canSend}
-                        className={clsx(
-                            'btn w-100 fw-bold',
-                            authStyles.submitBtn,
-                            canSend ? 'btn-primary-gradient' : 'btn-secondary disabled'
-                        )}
-                    >
-                        Xác nhận
-                    </button>
+                        isDisabled={!canSend}
+                        className="w-100 fw-bold"
+                    />
                 </div>
                 <div className="account-signup">
                     <p>

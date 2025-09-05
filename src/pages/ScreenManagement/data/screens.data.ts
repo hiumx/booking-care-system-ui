@@ -88,13 +88,24 @@ export const SCREENS_DATA: Screen[] = [
     {
         id: 'user-favourite',
         name: 'Favourite Doctors',
-        path: `${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}/favourite`,
+        path: `${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=favourites`,
         category: ScreenCategory.USER_PROFILE,
         description: "List of user's favourite doctors",
         status: ScreenStatus.COMPLETED,
         component: 'Favourite',
         icon: 'feather-heart',
         tags: ['favourite', 'doctors', 'bookmarks'],
+    },
+    {
+        id: 'user-chat',
+        name: 'Chat Doctors',
+        path: PATHS.CHAT,
+        category: ScreenCategory.USER_PROFILE,
+        description: 'Chat interface for users to communicate with doctors',
+        status: ScreenStatus.COMPLETED,
+        component: 'Chat',
+        icon: 'feather-heart',
+        tags: ['Chat', 'doctors', 'bookmarks'],
     },
     {
         id: 'patient-appointments',
@@ -106,6 +117,17 @@ export const SCREENS_DATA: Screen[] = [
         component: 'PatientAppointments',
         icon: 'feather-calendar',
         tags: ['appointments', 'patient', 'booking'],
+    },
+    {
+        id: 'patient-invoices',
+        name: 'Patient Invoices',
+        path: `${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=invoices`,
+        category: ScreenCategory.USER_PROFILE,
+        description: 'View and manage patient invoices',
+        status: ScreenStatus.COMPLETED,
+        component: 'Invoices',
+        icon: 'feather-calendar',
+        tags: ['invoices', 'patient', 'booking'],
     },
 
     // Doctor Pages
