@@ -1,6 +1,6 @@
 // src/hooks/useAuth.ts
-import { useState, useEffect } from 'react';
-import { User, UserLogin, UserRegister } from '../types/user.type.ts';
+import { useState, useEffect, useCallback } from 'react';
+import { User, UserLogin, UserRegister } from '../types/user.type';
 import { userService } from '../services/user.service';
 
 export const useAuth = () => {
@@ -34,11 +34,11 @@ export const useAuth = () => {
         localStorage.setItem('token', res.token);
     };
 
-    // const logout = useCallback(() => {
-    //     setToken(null);
-    //     setUser(null);
-    //     localStorage.removeItem("token");
-    // }, []);
+    const logout = useCallback(() => {
+        setToken(null);
+        setUser(null);
+        localStorage.removeItem('token');
+    }, []);
 
     return {
         user,
