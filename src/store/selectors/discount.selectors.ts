@@ -1,7 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../index';
 import { Discount } from '../../types/discount.types';
-import { DiscountStatus } from '../../enums/discount.enums';
+import { DiscountStatus, DiscountType } from '../../enums/discount.enums';
 
 // Base selectors
 export const selectDiscountState = (state: RootState) => state.discount;
@@ -78,19 +78,19 @@ export const selectValidDiscounts = createSelector([selectDiscounts], (discounts
 });
 
 export const selectDiscountsByType = createSelector(
-    [selectDiscounts, (_, discountType: 'PERCENTAGE' | 'FIXED_AMOUNT') => discountType],
+    [selectDiscounts, (_, discountType: DiscountType) => discountType],
     (discounts, discountType) =>
         discounts.filter((discount) => discount.discountType === discountType)
 );
 
 export const selectDiscountsByClinic = createSelector(
-    [selectDiscounts, (_, clinicId: number) => clinicId],
+    [selectDiscounts, (_, clinicId: string) => clinicId],
     (discounts, clinicId) =>
         discounts.filter((discount) => !discount.clinicId || discount.clinicId === clinicId)
 );
 
 export const selectDiscountsBySpecialty = createSelector(
-    [selectDiscounts, (_, specialtyId: number) => specialtyId],
+    [selectDiscounts, (_, specialtyId: string) => specialtyId],
     (discounts, specialtyId) =>
         discounts.filter(
             (discount) => !discount.specialtyId || discount.specialtyId === specialtyId
@@ -98,7 +98,7 @@ export const selectDiscountsBySpecialty = createSelector(
 );
 
 export const selectDiscountsByDoctor = createSelector(
-    [selectDiscounts, (_, doctorId: number) => doctorId],
+    [selectDiscounts, (_, doctorId: string) => doctorId],
     (discounts, doctorId) =>
         discounts.filter((discount) => !discount.doctorId || discount.doctorId === doctorId)
 );
@@ -109,9 +109,9 @@ export const selectAvailableDiscountsForContext = createSelector(
         (
             _,
             context: {
-                clinicId: number;
-                specialtyId?: number;
-                doctorId?: number;
+                clinicId: string;
+                specialtyId?: string;
+                doctorId?: string;
             }
         ) => context,
     ],
@@ -148,7 +148,7 @@ export const selectAvailableDiscountsForContext = createSelector(
 
 export const selectHighValueDiscounts = createSelector([selectValidDiscounts], (discounts) =>
     discounts.filter((discount) => {
-        if (discount.discountType === 'PERCENTAGE') {
+        if (discount.discountType === DiscountType.PERCENTAGE) {
             return discount.amount >= 10; // 10% or more
         } else {
             return discount.amount >= 50000; // 50,000 VND or more
@@ -163,7 +163,7 @@ export const selectDiscountByCode = createSelector(
 );
 
 export const selectDiscountById = createSelector(
-    [selectDiscounts, (_, id: number) => id],
+    [selectDiscounts, (_, id: string) => id],
     (discounts, id) => discounts.find((discount) => discount.id === id)
 );
 
@@ -206,8 +206,10 @@ export const selectDiscountStatsCalculated = createSelector([selectDiscounts], (
             const end = new Date(d.endDate);
             return now >= start && now <= end;
         }).length,
-        percentageDiscounts: discounts.filter((d) => d.discountType === 'PERCENTAGE').length,
-        fixedAmountDiscounts: discounts.filter((d) => d.discountType === 'FIXED_AMOUNT').length,
+        percentageDiscounts: discounts.filter((d) => d.discountType === DiscountType.PERCENTAGE)
+            .length,
+        fixedAmountDiscounts: discounts.filter((d) => d.discountType === DiscountType.FIXED_AMOUNT)
+            .length,
         averageDiscountValue:
             discounts.length > 0
                 ? discounts.reduce((sum, d) => sum + d.amount, 0) / discounts.length
