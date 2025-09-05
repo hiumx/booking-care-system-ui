@@ -1,7 +1,7 @@
 // src/routes/routeConfig.tsx
 import Demo from '@/pages/Demo';
 import Home from '@/pages/Home';
-import ServiceSection from '~/pages/Services';
+import ServiceSection from '@/pages/Services';
 import UserProfile from '@/pages/UserProfile';
 import ScreenManagement from '@/pages/ScreenManagement';
 import Chat from '@/pages/Chat';
