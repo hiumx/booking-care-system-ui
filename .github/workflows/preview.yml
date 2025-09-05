@@ -7,6 +7,39 @@ on:
         branches: [develop]
 
 jobs:
+    # Quality checks for PRs
+    pr-checks:
+        runs-on: ubuntu-latest
+        if: github.event_name == 'pull_request'
+        
+        steps:
+            - name: ⬇️ Checkout code
+              uses: actions/checkout@v4
+
+            - name: 🔧 Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 18
+                  cache: 'npm'
+
+            - name: 📦 Install dependencies
+              run: npm ci
+
+            - name: 🔍 Run linting
+              run: npm run lint
+
+            - name: 📝 Check formatting
+              run: npm run format:check
+
+            - name: 🧪 Run type checking
+              run: npx tsc --noEmit
+
+            - name: ✅ Run tests
+              run: npm test --if-present
+
+            - name: 🏗️ Test build
+              run: npm run build
+
     preview:
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/develop'
@@ -50,86 +83,3 @@ jobs:
                   echo "🔍 Preview build completed!"
                   echo "📁 Preview files ready for deployment"
                   echo "🌐 This could be deployed to a staging environment"
-
-    # Quality checks for PRs
-    pr-checks:
-        runs-on: ubuntu-latest
-        if: github.event_name == 'pull_request'
-        
-        steps:
-            - name: ⬇️ Checkout code
-              uses: actions/checkout@v4
-
-            - name: 🔧 Set up Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 18
-                  cache: 'npm'
-
-            - name: 📦 Install dependencies
-              run: npm ci
-
-            - name: 🔍 Run linting
-              run: npm run lint
-
-            - name: 📝 Check formatting
-              run: npm run format:check
-
-            - name: 🧪 Run type checking
-              run: npx tsc --noEmit
-
-            - name: ✅ Run tests
-              run: npm test --if-present
-
-            - name: 🏗️ Test build
-              run: npm run build
-
-            - name: 📝 PR Status Comment
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const { data: comments } = await github.rest.issues.listComments({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          issue_number: context.issue.number,
-                      });
-                      
-                      const botComment = comments.find(comment => 
-                          comment.user.type === 'Bot' && 
-                          comment.body.includes('Quality Checks')
-                      );
-                      
-                      const body = `
-                      ## ✅ Quality Checks Passed
-                      
-                      - ✅ Linting passed
-                      - ✅ Formatting is correct
-                      - ✅ TypeScript compilation successful
-                      - ✅ Build completed successfully
-                      
-                      **Ready for review!** 🚀
-                      
-                      <details>
-                      <summary>Build Details</summary>
-                      
-                      - **Node.js**: 18
-                      - **Commit**: ${context.sha.substr(0, 7)}
-                      - **Branch**: ${context.ref.replace('refs/heads/', '')}
-                      </details>
-                      `;
-                      
-                      if (botComment) {
-                          await github.rest.issues.updateComment({
-                              owner: context.repo.owner,
-                              repo: context.repo.repo,
-                              comment_id: botComment.id,
-                              body
-                          });
-                      } else {
-                          await github.rest.issues.createComment({
-                              owner: context.repo.owner,
-                              repo: context.repo.repo,
-                              issue_number: context.issue.number,
-                              body
-                          });
-                      }
