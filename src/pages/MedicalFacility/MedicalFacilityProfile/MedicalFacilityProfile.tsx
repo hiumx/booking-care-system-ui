@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import clsx from 'clsx';
 // no route params used for this UI-only section yet
 import Breadcrumb from '@/components/Breadcrumb';
 import styles from './MedicalFacilityProfile.module.scss';
@@ -13,6 +14,8 @@ import medicalImg1 from '@/assets/img/medical-img1.jpg';
 import patientImg from '@/assets/img/patients/patient.jpg';
 import patientImg1 from '@/assets/img/patients/patient1.jpg';
 import patientImg2 from '@/assets/img/patients/patient2.jpg';
+import specialityIcon from '@/assets/img/specialities/speciality-icon-01.svg';
+import specialityImg from '@/assets/img/specialities/speciality-01.jpg';
 import reactLogo from '@/assets/react.svg';
 import MainLayout from '@/layouts/MainLayout';
 
@@ -241,7 +244,7 @@ const MedicalFacilityProfile: React.FC = () => {
                     <div className={styles.contentGrid}>
                         {/* LEFT: main content */}
                         <div className={styles.mainContent}>
-                            <div id="gioi-thieu" className={styles.sectionBlock}>
+                            <div className={styles.sectionBlock}>
                                 <h3 className={styles.sectionTitle}>Mô tả</h3>
                                 <p>
                                     Phòng khám MedFit là phòng khám y học chuyên sâu về giảm cân,
@@ -253,7 +256,7 @@ const MedicalFacilityProfile: React.FC = () => {
                             </div>
                             {/* Các dịch vụ */}
                             <div id="services" className={styles.sectionBlock}>
-                                <h3 className={styles.sectionTitle}>Các dịch vụ</h3>
+                                <h3 className={styles.sectionTitle}>Dịch vụ</h3>
                                 <Swiper
                                     modules={[Navigation, Pagination, Autoplay]}
                                     spaceBetween={16}
@@ -282,6 +285,59 @@ const MedicalFacilityProfile: React.FC = () => {
                                                     {service.name}
                                                 </div>
                                             </a>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            </div>
+                            {/* Các chuyên khoa */}
+                            <div id="services" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Chuyên khoa</h3>
+                                <Swiper
+                                    modules={[Navigation, Pagination, Autoplay]}
+                                    spaceBetween={16}
+                                    slidesPerView={'auto'}
+                                    navigation
+                                    pagination={{ clickable: true }}
+                                    autoplay={{ delay: 2500, disableOnInteraction: false }}
+                                    watchOverflow
+                                    className={styles.serviceSwiper}
+                                    breakpoints={{
+                                        0: { spaceBetween: 12 },
+                                        480: { spaceBetween: 12 },
+                                        768: { spaceBetween: 14 },
+                                        1024: { spaceBetween: 16 },
+                                    }}
+                                >
+                                    {services.map((service) => (
+                                        <SwiperSlide key={service.id}>
+                                            <div className={clsx('spaciality-item')}>
+                                                <div className={clsx('spaciality-img')}>
+                                                    <img
+                                                        src={specialityImg}
+                                                        alt="img"
+                                                        className={styles.specialityImgEl}
+                                                    />
+                                                    <span
+                                                        className={clsx(
+                                                            'spaciality-icon',
+                                                            styles.specialityIcon
+                                                        )}
+                                                    >
+                                                        <img src={specialityIcon} alt="img" />
+                                                    </span>
+                                                </div>
+                                                <h6 className={styles.specialityTitle}>
+                                                    <a
+                                                        href="doctor-grid.html"
+                                                        className={styles.specialityTitleLink}
+                                                    >
+                                                        Cardiology
+                                                    </a>
+                                                </h6>
+                                                <p className={clsx('mb-0', styles.specialityMeta)}>
+                                                    254 Doctors
+                                                </p>
+                                            </div>
                                         </SwiperSlide>
                                     ))}
                                 </Swiper>
