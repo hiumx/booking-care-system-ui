@@ -14,6 +14,7 @@ import {
 const Home: React.FC = () => {
     const listSpecialtyItems = LIST_SPECIALTIES.map((specialty) => (
         <SpecialtyCarouselItem
+            key={specialty.id}
             imageSrc={specialty.image}
             iconSrc={specialty.icon}
             title={specialty.name}

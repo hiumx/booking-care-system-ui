@@ -126,8 +126,8 @@ const ClinicCaroulselItem: React.FC<ClinicCaroulselItemProps> = ({
                     {/* Specialties */}
                     <div className={styles.specialtiesSection}>
                         <div className={styles.specialtiesContainer}>
-                            {specialties.slice(0, 3).map((specialty, index) => (
-                                <span key={index} className={styles.specialtyTag}>
+                            {specialties.slice(0, 3).map((specialty) => (
+                                <span key={specialty} className={styles.specialtyTag}>
                                     {specialty}
                                 </span>
                             ))}

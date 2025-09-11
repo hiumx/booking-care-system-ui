@@ -56,8 +56,8 @@ const Carousel: FC<CarouselProps> = ({
                 onSwiper={(swiper) => (swiperRef.current = swiper)}
                 breakpoints={breakpoints as any}
             >
-                {slides.map((content, index) => (
-                    <SwiperSlide key={index}>{content}</SwiperSlide>
+                {slides.map((content) => (
+                    <SwiperSlide key={content?.toString()}>{content}</SwiperSlide>
                 ))}
             </Swiper>
 
