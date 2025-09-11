@@ -16,8 +16,6 @@ export interface ClinicCaroulselItemProps {
         priceRange: string;
         availableSlots: number;
     };
-    onBookNow?: (clinicId: string) => void;
-    onViewDetails?: (clinicId: string) => void;
 }
 
 const ClinicCaroulselItem: React.FC<ClinicCaroulselItemProps> = ({

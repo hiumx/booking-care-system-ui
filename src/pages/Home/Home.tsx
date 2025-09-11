@@ -37,8 +37,6 @@ const Home: React.FC = () => {
                 priceRange: clinic.priceRange || '$100-300',
                 availableSlots: clinic.availableSlots || 0,
             }}
-            onBookNow={(clinicId) => console.log(`Booking clinic: ${clinicId}`)}
-            onViewDetails={(clinicId) => console.log(`Viewing details for: ${clinicId}`)}
         />
     ));
     return (
