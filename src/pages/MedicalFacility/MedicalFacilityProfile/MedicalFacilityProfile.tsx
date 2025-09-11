@@ -3,7 +3,12 @@ import React, { useEffect, useState } from 'react';
 import Breadcrumb from '@/components/Breadcrumb';
 import styles from './MedicalFacilityProfile.module.scss';
 import Button from '@/components/Button'; // Import the Button component
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import medicalImg1 from '@/assets/img/medical-img1.jpg';
 import patientImg from '@/assets/img/patients/patient.jpg';
 import patientImg1 from '@/assets/img/patients/patient1.jpg';
@@ -67,6 +72,17 @@ const MedicalFacilityProfile: React.FC = () => {
             };
         }
     }, [isLightboxOpen]);
+
+    // Mock services
+    const services = [
+        { id: 1, name: 'Khám tổng quát', img: patientImg },
+        { id: 2, name: 'Tư vấn dinh dưỡng ', img: patientImg1 },
+        { id: 3, name: 'Điều trị da liễu', img: patientImg2 },
+        { id: 4, name: 'Huấn luyện cá nhân', img: medicalImg1 },
+        { id: 4, name: 'Huấn luyện cá nhân', img: medicalImg1 },
+        { id: 4, name: 'Huấn luyện cá nhân', img: medicalImg1 },
+        { id: 4, name: 'Huấn luyện cá nhân', img: medicalImg1 },
+    ];
 
     return (
         <MainLayout>
@@ -216,6 +232,153 @@ const MedicalFacilityProfile: React.FC = () => {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+            {/* Content Section: left details, right sticky sidebar */}
+            <section className={styles.content}>
+                <div className={styles.container}>
+                    <div className={styles.contentGrid}>
+                        {/* LEFT: main content */}
+                        <div className={styles.mainContent}>
+                            <div id="gioi-thieu" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Mô tả</h3>
+                                <p>
+                                    Phòng khám MedFit là phòng khám y học chuyên sâu về giảm cân,
+                                    giảm béo và giảm mỡ, được thành lập bởi đội ngũ bác sĩ và chuyên
+                                    gia vận động, tâm lý. MedFit tiên phong cung cấp các giải pháp
+                                    giúp thon gọn và kiến tạo đường nét cơ thể dựa trên nền tảng y
+                                    học chứng cứ.
+                                </p>
+                            </div>
+                            {/* Các dịch vụ */}
+                            <div id="services" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Các dịch vụ</h3>
+                                <Swiper
+                                    modules={[Navigation, Pagination, Autoplay]}
+                                    spaceBetween={16}
+                                    slidesPerView={'auto'}
+                                    navigation
+                                    pagination={{ clickable: true }}
+                                    autoplay={{ delay: 2500, disableOnInteraction: false }}
+                                    watchOverflow
+                                    className={styles.serviceSwiper}
+                                    breakpoints={{
+                                        0: { spaceBetween: 12 },
+                                        480: { spaceBetween: 12 },
+                                        768: { spaceBetween: 14 },
+                                        1024: { spaceBetween: 16 },
+                                    }}
+                                >
+                                    {services.map((service) => (
+                                        <SwiperSlide key={service.id}>
+                                            <a href="#" className={styles.serviceCard}>
+                                                <img
+                                                    src={service.img}
+                                                    alt={service.name}
+                                                    className={styles.serviceImg}
+                                                />
+                                                <div className={styles.serviceName}>
+                                                    {service.name}
+                                                </div>
+                                            </a>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            </div>
+                            <div className={styles.tabs}>
+                                <a href="#gioi-thieu" className={styles.tabItem}>
+                                    Giới thiệu
+                                </a>
+                                <a href="#chuyen-khoa" className={styles.tabItem}>
+                                    Chuyên khoa
+                                </a>
+                                <a href="#huong-dan" className={styles.tabItem}>
+                                    Hướng dẫn đi khám
+                                </a>
+                                <a href="#faq" className={styles.tabItem}>
+                                    Câu hỏi thường gặp
+                                </a>
+                            </div>
+
+                            <div id="gioi-thieu" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Giới thiệu</h3>
+                                <p>
+                                    Phòng khám MedFit là phòng khám y học chuyên sâu về giảm cân,
+                                    giảm béo và giảm mỡ, được thành lập bởi đội ngũ bác sĩ và chuyên
+                                    gia vận động, tâm lý. MedFit tiên phong cung cấp các giải pháp
+                                    giúp thon gọn và kiến tạo đường nét cơ thể dựa trên nền tảng y
+                                    học chứng cứ.
+                                </p>
+                            </div>
+
+                            <div id="chuyen-khoa" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Chuyên khoa</h3>
+                                <ul className={styles.bulletList}>
+                                    <li>Dinh dưỡng - Tiết chế</li>
+                                    <li>Nội tiết</li>
+                                    <li>Da liễu thẩm mỹ</li>
+                                    <li>Huấn luyện viên cá nhân</li>
+                                </ul>
+                            </div>
+
+                            <div id="huong-dan" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Hướng dẫn đi khám</h3>
+                                <ol className={styles.numberList}>
+                                    <li>
+                                        Đặt lịch trước qua tổng đài 19002115 hoặc nút "Đặt khám
+                                        ngay".
+                                    </li>
+                                    <li>
+                                        Đến đúng giờ hẹn, mang theo giấy tờ tùy thân và kết quả cũ
+                                        (nếu có).
+                                    </li>
+                                    <li>
+                                        Thanh toán tại quầy lễ tân hoặc qua ví điện tử được hỗ trợ.
+                                    </li>
+                                </ol>
+                            </div>
+
+                            <div id="faq" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Câu hỏi thường gặp</h3>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Tôi có thể hủy lịch hẹn không?</div>
+                                    <div className={styles.a}>
+                                        Có, vui lòng liên hệ tổng đài tối thiểu 24 giờ trước giờ
+                                        khám.
+                                    </div>
+                                </div>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Có hỗ trợ bảo hiểm y tế không?</div>
+                                    <div className={styles.a}>
+                                        Hiện phòng khám hỗ trợ xuất hóa đơn để bạn tự quyết toán với
+                                        bảo hiểm.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* RIGHT: sticky sidebar with map and ad banner */}
+                        <aside
+                            className={styles.sidebar}
+                            aria-label="Thông tin vị trí và quảng cáo"
+                        >
+                            <div className={styles.mapCard}>
+                                <div className={styles.mapHeader}>Bản đồ</div>
+                                <div className={styles.mapBody}>
+                                    <iframe
+                                        title="Bản đồ Phòng khám MedFit"
+                                        src="https://www.google.com/maps?q=462/9+Nguyen+Tri+Phuong,+Ho+Chi+Minh&output=embed"
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    ></iframe>
+                                </div>
+                            </div>
+                            <div className={styles.adCard}>
+                                <div className={styles.adBadge}>Ads</div>
+                                <img src={medicalImg1} alt="Quảng cáo" />
+                            </div>
+                        </aside>
                     </div>
                 </div>
             </section>
