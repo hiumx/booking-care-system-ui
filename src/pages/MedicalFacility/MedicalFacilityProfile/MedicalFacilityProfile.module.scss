@@ -1,23 +1,425 @@
-.customPadding {
-    padding-right: 3px;
+/* Hero Section Styles for MedicalFacilityProfile */
+
+:root {
+    --main-image-height: 420px; /* Fixed height for main image */
+    --small-image-size: 134px; /* Fixed size for all small images */
+    --image-gap: 10px; /* Gap between images */
 }
 
-.customMargin {
-    margin-right: 5px;
+.hero {
+    padding: 24px 0 32px;
+    background: #fff;
 }
 
-.customBtn {
-    background-color: #fff;
-    border: 2px solid #0e82fd;
-    color: #0e82fd;
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 1px;
+.container {
+    max-width: 1380px;
+    margin: 0 auto;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 380px 1fr; /* Right gallery slightly larger */
+    gap: 24px;
+    align-items: stretch; /* Ensure both columns have equal height */
+}
+
+.card {
+    background: #ffffff;
+    border: 1px solid #e6e9ef;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.cardHeader {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+
+.cardContent {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.titleSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    text-transform: capitalize;
+    margin-top: 20px;
+    flex-shrink: 0;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+}
+
+.logo {
+    width: 88px;
+    height: 90px;
+    object-fit: contain;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.iconBtn {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f5f7fa;
+    border: none;
+    cursor: pointer;
+    color: black;
+}
+
+.title {
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 700;
+    color: #10b4f0; /* Blue title */
+    margin: 0 0 8px;
+    flex-shrink: 0;
+}
+
+.verified {
+    color: #0ea5e9;
+    margin-left: 6px;
+    font-size: 15px;
+}
+
+.ratingRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    flex-shrink: 0;
+}
+
+.ratingText {
+    color: #f59e0b;
+    font-size: 16px;
+}
+
+.stars {
+    color: #f59e0b;
+    display: inline-flex;
+    font-size: 16px;
+    gap: 2px;
+}
+
+.starWrap {
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+}
+
+.starWrap > i {
+    color: #e2e8f0; /* base empty star color */
+}
+
+.starFill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.starFill > i {
+    color: #f59e0b; /* filled color */
+}
+
+.reviewCount {
+    color: #0c1a2a;
+    font-size: 14px;
+    text-decoration: underline;
+}
+
+.divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 26px 0;
+    flex-shrink: 0;
+}
+
+.infoItem {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    color: #0c1a2a;
+    flex-shrink: 0;
+}
+
+.infoLabel {
+    color: #64748b;
+    font-weight: 600;
+    margin-right: 8px;
+    flex-shrink: 0;
+    min-width: 120px;
+}
+
+.infoItem h5 {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.4;
+    color: #0c1a2a;
+    font-weight: 400;
+    flex: 1;
+    word-spacing: normal;
+    letter-spacing: normal;
+}
+
+.ctaWrap {
     width: 100%;
-    padding: 8px 16px;
-    border-radius: 44px;
-    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.gallery {
+    border-radius: 7px;
+    overflow: hidden;
+    position: relative;
+}
+
+.galleryGrid {
+    width: 100%;
+    height: calc(
+        var(--main-image-height) + var(--small-image-size) + var(--image-gap)
+    ); /* Total height = main + bottom row + gap */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: var(--main-image-height) var(--small-image-size); /* 2 rows: main height, then small image height */
+    grid-gap: var(--image-gap);
+    gap: var(--image-gap);
+}
+
+.mainLarge {
+    grid-column: 1 / span 3; /* spans 3 columns */
+    grid-row: 1; /* first row */
+    width: 100%;
+    height: var(--main-image-height);
+    object-fit: cover;
+    border-radius: 7px;
+}
+
+.sideStack {
+    grid-column: 4; /* 4th column */
+    grid-row: 1; /* first row */
+    display: flex;
+    flex-direction: column;
+    gap: var(--image-gap);
+    height: var(--main-image-height); /* Same height as main image */
+}
+
+.sideItem {
+    width: 100%;
+    height: var(--small-image-size); /* Fixed height for each side image */
+    object-fit: cover;
+    border-radius: 7px;
+}
+
+.bottomRow {
+    grid-column: 1 / span 4; /* spans all 4 columns */
+    grid-row: 2; /* second row */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--image-gap);
+}
+
+.thumb,
+.leftThumb {
+    width: 100%;
+    height: var(--small-image-size); /* Same size as side images */
+    object-fit: cover;
+    border-radius: 7px;
+}
+
+.thumbOverlay {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(13, 23, 38, 0.45);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    border-radius: 7px;
+    font-size: 18px;
+    text-decoration: underline; /* underline remainingCount */
+    transition:
+        background 0.25s ease,
+        transform 0.25s ease;
+}
+
+/* Zoom image on hover and darken overlay */
+.thumbOverlay img {
+    transition: transform 0.35s ease;
+}
+
+.thumbOverlay:hover img {
+    transform: scale(1.06);
+}
+
+.thumbOverlay:hover .overlay {
+    background: rgba(13, 23, 38, 0.55);
+}
+
+/* Lightbox styles */
+.lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.lightboxContent {
+    background: #fff;
+    width: min(1200px, 96vw);
+    max-height: 90vh;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.lightboxHeader {
+    position: sticky;
+    top: 0;
+    padding: 14px 18px;
+    background: linear-gradient(90deg, #0ea5e9 0%, #22c1c3 100%);
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(2, 44, 74, 0.12);
+}
+
+.lightboxTitle {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.4;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 70%;
+}
+
+.lightboxClose {
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px; /* fontawesome icon size */
+    line-height: 1;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        transform 0.1s ease;
+    position: relative;
+    margin-left: auto; /* push to the right edge */
+}
+
+.lightboxClose:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.lightboxClose:active {
+    transform: scale(0.96);
+}
+
+/* remove custom X since we use fontawesome */
+
+.lightboxGrid {
+    margin-top: 20px;
+    padding: 12px;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.lightboxImg {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.lightboxBadge {
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    color: #fff;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+@media (max-width: 1024px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    .galleryGrid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto; /* Main, side, bottom */
+    }
+    .mainLarge {
+        grid-column: 1;
+        grid-row: 1;
+        height: 300px;
+    }
+    .sideStack {
+        grid-column: 1;
+        grid-row: 2;
+        height: auto;
+        flex-direction: row; /* Horizontal on mobile */
+    }
+    .sideItem {
+        height: 120px;
+    }
+    .bottomRow {
+        grid-column: 1;
+        grid-row: 3;
+    }
+    .thumb,
+    .leftThumb {
+        height: 120px;
+    }
 }
