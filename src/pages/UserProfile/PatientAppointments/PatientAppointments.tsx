@@ -274,42 +274,34 @@ const PatientAppointments: React.FC = () => {
     // Appointment action handlers
     const handleViewDoctorProfile = (appointment: Appointment) => {
         console.log('View doctor profile:', appointment);
-        // TODO: Implement navigation to doctor profile
     };
 
     const handleView = (appointment: Appointment) => {
         console.log('View appointment:', appointment);
-        // TODO: Implement view appointment details
     };
 
     const handleMessage = (appointment: Appointment) => {
         console.log('Message doctor:', appointment);
-        // TODO: Implement messaging functionality
     };
 
     const handleCancel = (appointment: Appointment) => {
         console.log('Cancel appointment:', appointment);
-        // TODO: Implement cancel appointment
     };
 
     const handleAttend = (appointment: Appointment) => {
         console.log('Attend appointment:', appointment);
-        // TODO: Implement attend appointment
     };
 
     const handleReschedule = (appointment: Appointment) => {
         console.log('Reschedule appointment:', appointment);
-        // TODO: Implement reschedule appointment
     };
 
     const handleBookAgain = (appointment: Appointment) => {
         console.log('Book again:', appointment);
-        // TODO: Implement book again
     };
 
     const handleViewDetails = (appointment: Appointment) => {
         console.log('View details:', appointment);
-        // TODO: Implement view appointment details
     };
 
     const handleAddReview = (appointment: Appointment) => {
@@ -324,7 +316,7 @@ const PatientAppointments: React.FC = () => {
 
     const handleSubmitReview = (rating: number, comment: string) => {
         console.log('Add review:', { appointment: selectedAppointmentForReview, rating, comment });
-        // TODO: Implement API call to submit review
+
         // Example API call:
         // reviewService.submitReview({
         //     appointmentId: selectedAppointmentForReview?.id,
@@ -338,18 +330,15 @@ const PatientAppointments: React.FC = () => {
     };
     const handleListView = () => {
         console.log('Switch to list view');
-        // TODO: Implement list view
     };
 
     const handleGridView = () => {
         console.log('Switch to grid view');
-        // TODO: Implement grid view
     };
 
     const handleFilterApply = () => {
         console.log('Apply filters:', filterState);
         setIsFilterOpen(false);
-        // TODO: Implement filter logic
     };
 
     return (
@@ -419,13 +408,17 @@ const PatientAppointments: React.FC = () => {
                     ) : (
                         <div className={clsx(styles.noAppointments)}>
                             <p>
-                                Không tìm thấy lịch hẹn{' '}
-                                {activeTab === 'upcoming'
-                                    ? 'sắp tới'
-                                    : activeTab === 'cancelled'
-                                      ? 'đã huỷ'
-                                      : 'đã hoàn thành'}
-                                .
+                                {(() => {
+                                    let appointmentTypeText = '';
+                                    if (activeTab === 'upcoming') {
+                                        appointmentTypeText = 'sắp tới';
+                                    } else if (activeTab === 'cancelled') {
+                                        appointmentTypeText = 'đã huỷ';
+                                    } else {
+                                        appointmentTypeText = 'đã hoàn thành';
+                                    }
+                                    return <>Không tìm thấy lịch hẹn {appointmentTypeText}.</>;
+                                })()}
                             </p>
                         </div>
                     )}
