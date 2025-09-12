@@ -415,11 +415,6 @@ const PatientAppointments: React.FC = () => {
         setSelectedAppointmentForDetail(null);
     };
 
-    const handleStartSession = (appointment: Appointment) => {
-        console.log('Start session:', appointment);
-        // Implement start session logic
-    };
-
     // If showing appointment detail, render detail view
     if (showAppointmentDetail && selectedAppointmentForDetail) {
         return (
@@ -428,7 +423,6 @@ const PatientAppointments: React.FC = () => {
                 onBack={handleBackFromDetail}
                 onMessage={handleMessage}
                 onCancel={handleCancel}
-                onStartSession={handleStartSession}
                 onViewDoctorProfile={handleViewDoctorProfile}
             />
         );

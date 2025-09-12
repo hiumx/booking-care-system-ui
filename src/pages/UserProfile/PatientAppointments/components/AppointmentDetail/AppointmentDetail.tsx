@@ -8,7 +8,6 @@ interface AppointmentDetailProps {
     onBack: () => void;
     onMessage: (appointment: Appointment) => void;
     onCancel: (appointment: Appointment) => void;
-    onStartSession: (appointment: Appointment) => void;
     onViewDoctorProfile: (appointment: Appointment) => void;
 }
 
@@ -36,16 +35,16 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     const getAppointmentTypeIcon = (callType: string) => {
         switch (callType.toLowerCase()) {
             case 'cuộc gọi video':
-                return <i className="isax isax-video5 text-green"></i>;
+                return <i className="isax isax-video5 text-green" aria-hidden="true"></i>;
             case 'cuộc gọi âm thanh':
-                return <i className="isax isax-call5 text-green"></i>;
+                return <i className="isax isax-call5 text-green" aria-hidden="true"></i>;
             case 'chat':
-                return <i className="isax isax-messages-25 text-green"></i>;
+                return <i className="isax isax-messages-25 text-green" aria-hidden="true"></i>;
             case 'direct visit':
             case 'khám trực tiếp':
-                return <i className="isax isax-hospital5 text-green"></i>;
+                return <i className="isax isax-hospital5 text-green" aria-hidden="true"></i>;
             default:
-                return <i className="isax isax-hospital5 text-green"></i>;
+                return <i className="isax isax-hospital5 text-green" aria-hidden="true"></i>;
         }
     };
 
@@ -62,8 +61,13 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
             {/* Dashboard Header */}
             <div className={styles.dashboardHeader}>
                 <div className={styles.headerBack}>
-                    <button onClick={onBack} className={styles.backArrow}>
-                        <i className="fa-solid fa-arrow-left"></i>
+                    <button
+                        onClick={onBack}
+                        className={styles.backArrow}
+                        type="button"
+                        aria-label="Quay lại danh sách lịch hẹn"
+                    >
+                        <i className="fa-solid fa-arrow-left" aria-hidden="true"></i>
                     </button>
                     <h3>Chi tiết lịch hẹn</h3>
                 </div>
@@ -75,26 +79,43 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     <ul>
                         <li>
                             <div className={styles.patientInformation}>
-                                <button onClick={() => onViewDoctorProfile(appointment)}>
-                                    <img src={appointment.doctorImage} alt="Doctor Image" />
+                                <button
+                                    onClick={() => onViewDoctorProfile(appointment)}
+                                    type="button"
+                                    aria-label={`Xem thông tin ${appointment.doctorName}`}
+                                >
+                                    <img
+                                        src={appointment.doctorImage}
+                                        alt={`Ảnh đại diện của ${appointment.doctorName}`}
+                                    />
                                 </button>
                                 <div className={styles.patientInfo}>
                                     <p>{appointment.appointmentNumber}</p>
                                     <h6>
-                                        <button onClick={() => onViewDoctorProfile(appointment)}>
+                                        <button
+                                            onClick={() => onViewDoctorProfile(appointment)}
+                                            type="button"
+                                            aria-label={`Xem thông tin chi tiết của ${appointment.doctorName}`}
+                                        >
                                             {appointment.doctorName}
                                         </button>
                                     </h6>
                                     <div className={styles.mailInfoPatient}>
                                         <ul>
                                             <li>
-                                                <i className="isax isax-sms5"></i>
+                                                <i
+                                                    className="isax isax-sms5"
+                                                    aria-hidden="true"
+                                                ></i>
                                                 <a href={`mailto:${appointment.email}`}>
                                                     {appointment.email}
                                                 </a>
                                             </li>
                                             <li>
-                                                <i className="isax isax-call5"></i>
+                                                <i
+                                                    className="isax isax-call5"
+                                                    aria-hidden="true"
+                                                ></i>
                                                 {appointment.phone}
                                             </li>
                                         </ul>
@@ -105,8 +126,13 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                                         <button
                                             className={styles.cancelReasonButton}
                                             onClick={handleShowCancelReason}
+                                            type="button"
+                                            aria-label="Xem lý do hủy lịch hẹn"
                                         >
-                                            <i className="isax isax-info-circle"></i>
+                                            <i
+                                                className="isax isax-info-circle"
+                                                aria-hidden="true"
+                                            ></i>
                                             Xem lý do hủy
                                         </button>
                                     </div>
@@ -138,13 +164,24 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                             </div>
                             <ul>
                                 <li>
-                                    <button onClick={() => onMessage(appointment)}>
-                                        <i className="isax isax-messages-25"></i>
+                                    <button
+                                        onClick={() => onMessage(appointment)}
+                                        type="button"
+                                        aria-label="Gửi tin nhắn cho bác sĩ"
+                                    >
+                                        <i className="isax isax-messages-25" aria-hidden="true"></i>
                                     </button>
                                 </li>
                                 <li>
-                                    <button onClick={() => onCancel(appointment)}>
-                                        <i className="isax isax-close-circle5"></i>
+                                    <button
+                                        onClick={() => onCancel(appointment)}
+                                        type="button"
+                                        aria-label="Hủy lịch hẹn"
+                                    >
+                                        <i
+                                            className="isax isax-close-circle5"
+                                            aria-hidden="true"
+                                        ></i>
                                     </button>
                                 </li>
                             </ul>
