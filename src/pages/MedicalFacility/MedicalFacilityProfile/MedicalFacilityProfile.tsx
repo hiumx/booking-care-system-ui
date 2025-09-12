@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 // no route params used for this UI-only section yet
 import Breadcrumb from '@/components/Breadcrumb';
@@ -76,6 +76,48 @@ const MedicalFacilityProfile: React.FC = () => {
         }
     }, [isLightboxOpen]);
 
+    // Show map CTA and hide header when reaching tabs
+    const tabsRef = useRef<HTMLDivElement | null>(null);
+    const adPaginationRef = useRef<HTMLDivElement | null>(null);
+    const [showMapCta, setShowMapCta] = useState(false);
+    const [showHeader, setShowHeader] = useState(true);
+    const [hasReachedTabs, setHasReachedTabs] = useState(false);
+
+    useEffect(() => {
+        const handle = () => {
+            if (!tabsRef.current) return;
+            const tabsTop = window.scrollY + tabsRef.current.getBoundingClientRect().top;
+            const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+            const shouldShowMapCta = scrollY + 10 >= tabsTop;
+            setShowMapCta(shouldShowMapCta);
+
+            // Track if user has reached tabs
+            if (shouldShowMapCta && !hasReachedTabs) {
+                setHasReachedTabs(true);
+            }
+
+            // Show header logic:
+            // 1. If haven't reached tabs yet: show when scrollY < tabsTop - 10
+            // 2. If have reached tabs: only show when back to top (scrollY <= 0)
+            if (!hasReachedTabs) {
+                setShowHeader(scrollY < tabsTop - 10);
+            } else {
+                setShowHeader(scrollY <= 0);
+                // Reset state when back to top
+                if (scrollY <= 0) {
+                    setHasReachedTabs(false);
+                }
+            }
+        };
+        handle();
+        window.addEventListener('scroll', handle, { passive: true });
+        window.addEventListener('resize', handle);
+        return () => {
+            window.removeEventListener('scroll', handle as any);
+            window.removeEventListener('resize', handle as any);
+        };
+    }, [hasReachedTabs]);
+
     // Mock services
     const services = [
         { id: 1, name: 'Khám tổng quát', img: patientImg },
@@ -87,8 +129,17 @@ const MedicalFacilityProfile: React.FC = () => {
         { id: 4, name: 'Huấn luyện cá nhân', img: medicalImg1 },
     ];
 
+    // Mock ads
+    const ads = [
+        { id: 1, img: medicalImg1, title: 'Quảng cáo 1' },
+        { id: 2, img: patientImg, title: 'Quảng cáo 2' },
+        { id: 3, img: patientImg1, title: 'Quảng cáo 3' },
+        { id: 4, img: patientImg2, title: 'Quảng cáo 4' },
+        { id: 5, img: medicalImg1, title: 'Quảng cáo 5' },
+    ];
+
     return (
-        <MainLayout>
+        <MainLayout hasHeader={showHeader}>
             <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
             {/* Hero Section */}
             <section className={styles.hero}>
@@ -342,7 +393,8 @@ const MedicalFacilityProfile: React.FC = () => {
                                     ))}
                                 </Swiper>
                             </div>
-                            <div className={styles.tabs}>
+                            {/* Sticky tabs are above, now add floating CTA on map */}
+                            <div className={styles.tabs} ref={tabsRef}>
                                 <a href="#gioi-thieu" className={styles.tabItem}>
                                     Giới thiệu
                                 </a>
@@ -412,6 +464,108 @@ const MedicalFacilityProfile: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
+                            <div id="faq" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Câu hỏi thường gặp</h3>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Tôi có thể hủy lịch hẹn không?</div>
+                                    <div className={styles.a}>
+                                        Có, vui lòng liên hệ tổng đài tối thiểu 24 giờ trước giờ
+                                        khám.
+                                    </div>
+                                </div>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Có hỗ trợ bảo hiểm y tế không?</div>
+                                    <div className={styles.a}>
+                                        Hiện phòng khám hỗ trợ xuất hóa đơn để bạn tự quyết toán với
+                                        bảo hiểm.
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="faq" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Câu hỏi thường gặp</h3>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Tôi có thể hủy lịch hẹn không?</div>
+                                    <div className={styles.a}>
+                                        Có, vui lòng liên hệ tổng đài tối thiểu 24 giờ trước giờ
+                                        khám.
+                                    </div>
+                                </div>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Có hỗ trợ bảo hiểm y tế không?</div>
+                                    <div className={styles.a}>
+                                        Hiện phòng khám hỗ trợ xuất hóa đơn để bạn tự quyết toán với
+                                        bảo hiểm.
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="faq" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Câu hỏi thường gặp</h3>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Tôi có thể hủy lịch hẹn không?</div>
+                                    <div className={styles.a}>
+                                        Có, vui lòng liên hệ tổng đài tối thiểu 24 giờ trước giờ
+                                        khám.
+                                    </div>
+                                </div>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Có hỗ trợ bảo hiểm y tế không?</div>
+                                    <div className={styles.a}>
+                                        Hiện phòng khám hỗ trợ xuất hóa đơn để bạn tự quyết toán với
+                                        bảo hiểm.
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="faq" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Câu hỏi thường gặp</h3>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Tôi có thể hủy lịch hẹn không?</div>
+                                    <div className={styles.a}>
+                                        Có, vui lòng liên hệ tổng đài tối thiểu 24 giờ trước giờ
+                                        khám.
+                                    </div>
+                                </div>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Có hỗ trợ bảo hiểm y tế không?</div>
+                                    <div className={styles.a}>
+                                        Hiện phòng khám hỗ trợ xuất hóa đơn để bạn tự quyết toán với
+                                        bảo hiểm.
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="faq" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Câu hỏi thường gặp</h3>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Tôi có thể hủy lịch hẹn không?</div>
+                                    <div className={styles.a}>
+                                        Có, vui lòng liên hệ tổng đài tối thiểu 24 giờ trước giờ
+                                        khám.
+                                    </div>
+                                </div>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Có hỗ trợ bảo hiểm y tế không?</div>
+                                    <div className={styles.a}>
+                                        Hiện phòng khám hỗ trợ xuất hóa đơn để bạn tự quyết toán với
+                                        bảo hiểm.
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="faq" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Câu hỏi thường gặp</h3>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Tôi có thể hủy lịch hẹn không?</div>
+                                    <div className={styles.a}>
+                                        Có, vui lòng liên hệ tổng đài tối thiểu 24 giờ trước giờ
+                                        khám.
+                                    </div>
+                                </div>
+                                <div className={styles.qaItem}>
+                                    <div className={styles.q}>Có hỗ trợ bảo hiểm y tế không?</div>
+                                    <div className={styles.a}>
+                                        Hiện phòng khám hỗ trợ xuất hóa đơn để bạn tự quyết toán với
+                                        bảo hiểm.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         {/* RIGHT: sticky sidebar with map and ad banner */}
@@ -419,8 +573,14 @@ const MedicalFacilityProfile: React.FC = () => {
                             className={styles.sidebar}
                             aria-label="Thông tin vị trí và quảng cáo"
                         >
+                            <div className={clsx(styles.mapCtaBar, showMapCta && styles.visible)}>
+                                <Button
+                                    className={clsx(styles.mapBookBtn)}
+                                    text="Đặt khám ngay"
+                                    type="button"
+                                />
+                            </div>
                             <div className={styles.mapCard}>
-                                <div className={styles.mapHeader}>Bản đồ</div>
                                 <div className={styles.mapBody}>
                                     <iframe
                                         title="Bản đồ Phòng khám MedFit"
@@ -432,7 +592,29 @@ const MedicalFacilityProfile: React.FC = () => {
                             </div>
                             <div className={styles.adCard}>
                                 <div className={styles.adBadge}>Ads</div>
-                                <img src={medicalImg1} alt="Quảng cáo" />
+                                <Swiper
+                                    modules={[Pagination, Autoplay]}
+                                    spaceBetween={0}
+                                    slidesPerView={1}
+                                    pagination={{
+                                        clickable: true,
+                                        el: `.${styles.adPagination}`,
+                                    }}
+                                    autoplay={{ delay: 3000, disableOnInteraction: false }}
+                                    loop={true}
+                                    className={styles.adSwiper}
+                                >
+                                    {ads.map((ad) => (
+                                        <SwiperSlide key={ad.id}>
+                                            <img
+                                                src={ad.img}
+                                                alt={ad.title}
+                                                className={styles.adImg}
+                                            />
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                                <div ref={adPaginationRef} className={styles.adPagination}></div>
                             </div>
                         </aside>
                     </div>

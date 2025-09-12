@@ -435,6 +435,23 @@
     }
 }
 
+/* Global floating CTA aligned with sticky tabs/header */
+.floatingBookBtn {
+    position: fixed;
+    right: 24px;
+    top: 10px; /* align with header actions */
+    background: linear-gradient(90deg, #0ea5e9 0%, #22c1c3 100%);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 12px 22px;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(2, 44, 74, 0.2);
+    z-index: 1000003; /* above header actions */
+}
+
 /* Content section below hero */
 .content {
     background: #fff;
@@ -446,7 +463,7 @@
 
         .contentGrid {
             display: grid;
-            grid-template-columns: 1fr 360px; /* left content, right sidebar */
+            grid-template-columns: 1fr 310px; /* left content, right sidebar */
             gap: 24px;
             align-items: start;
         }
@@ -463,6 +480,13 @@
             gap: 20px;
             border-bottom: 1px solid #e5e7eb;
             margin-bottom: 18px;
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 9999999;
+            padding-top: 6px;
+            height: 60px; /* Match button height for alignment */
+            align-items: center;
 
             .tabItem {
                 display: inline-block;
@@ -479,6 +503,11 @@
 
         .sectionBlock {
             margin: 16px 0;
+
+            /* Thêm không gian cho pagination ở các section có swiper */
+            &:has(.serviceSwiper) {
+                padding-bottom: 20px;
+            }
         }
 
         .sectionTitle {
@@ -522,13 +551,41 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+            transition: padding-top 0.2s ease;
+
+            /* Button positioned in reserved space above sidebar */
+            .mapCtaBar {
+                position: absolute;
+                top: -20px;
+                left: 0;
+                right: 0;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+                pointer-events: none;
+                z-index: 2;
+                background: transparent;
+            }
+
+            .mapCtaBar.visible {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            /* Add padding when button is visible */
+            &:has(.mapCtaBar.visible) {
+                padding-top: 40px;
+            }
 
             .mapCard,
             .adCard {
-                background: #ffffff;
-                border: 1px solid #e6e9ef;
-                border-radius: 10px;
-                overflow: hidden;
+                border-radius: 15px;
+                overflow: visible; /* allow floating button to appear above */
+                position: sticky; /* pin card inside sidebar */
+                z-index: 1000001;
             }
 
             .mapHeader {
@@ -539,30 +596,128 @@
             }
 
             .mapBody {
+                position: relative;
                 iframe {
                     width: 100%;
-                    height: 260px;
+                    height: 430px;
+                    border-radius: 15px;
                     border: 0;
+                }
+            }
+
+            .mapBookBtn {
+                background: #0ea5e9;
+                color: #fff;
+                border: none;
+                border-radius: 999px;
+                font-weight: 700;
+                font-size: 16px;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(2, 44, 74, 0.18);
+                transition:
+                    background 0.2s ease,
+                    transform 0.1s ease;
+            }
+            .mapBookBtn:hover {
+                background: #0284c7;
+            }
+            .mapBookBtn:active {
+                transform: translateY(1px);
+            }
+            .mapBookBtnTop {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                transform: none;
+                background: #0ea5e9;
+                color: #fff;
+                border: none;
+                border-radius: 999px;
+                padding: 12px 22px;
+                font-weight: 700;
+                font-size: 16px;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(2, 44, 74, 0.18);
+                transition:
+                    background 0.2s ease,
+                    transform 0.1s ease;
+                z-index: 1000002; /* above map overlay and header */
+
+                &:hover {
+                    background: #0284c7;
+                }
+                &:active {
+                    transform: translateY(1px);
                 }
             }
 
             .adCard {
                 position: relative;
-                img {
+                overflow: visible;
+                padding-bottom: 30px; /* Tạo không gian cho pagination */
+
+                .adSwiper {
                     width: 100%;
                     height: 180px;
+                    overflow: hidden;
+
+                    :global(.swiper-slide) {
+                        height: 100%;
+                    }
+                }
+
+                .adImg {
+                    width: 100%;
+                    height: 160px;
+                    border-radius: 15px;
                     object-fit: cover;
                     display: block;
                 }
+
                 .adBadge {
                     position: absolute;
                     top: 10px;
-                    left: 10px;
+                    right: 10px;
                     background: rgba(13, 23, 38, 0.72);
                     color: #fff;
                     border-radius: 999px;
                     padding: 2px 8px;
                     font-size: 12px;
+                    z-index: 2;
+                }
+
+                /* Hide navigation buttons, only show pagination */
+                :global(.swiper-button-prev),
+                :global(.swiper-button-next) {
+                    display: none !important;
+                }
+
+                /* Custom pagination - đặt ngoài adSwiper để không bị overflow: hidden */
+                .adPagination {
+                    position: absolute !important;
+                    top: 80% !important;
+                    left: 50% !important;
+                    transform: translateX(-50%) !important;
+                    display: flex !important;
+                    justify-content: center !important;
+                    gap: 8px !important;
+                    z-index: 2 !important;
+                    width: auto !important;
+                    height: auto !important;
+                }
+
+                .adPagination :global(.swiper-pagination-bullet) {
+                    background: #cbd5e1 !important;
+                    opacity: 1 !important;
+                    width: 6px !important;
+                    height: 6px !important;
+                    border-radius: 50% !important;
+                    margin: 0 !important;
+                    cursor: pointer !important;
+                }
+
+                .adPagination :global(.swiper-pagination-bullet-active) {
+                    background: #0ea5e9 !important;
                 }
             }
         }
