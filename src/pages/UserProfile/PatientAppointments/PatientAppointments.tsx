@@ -8,6 +8,7 @@ import DateRangePicker from './components/DateRangePicker';
 import AppointmentFilters from './components/AppointmentFilters';
 import AppointmentCard from './components/AppointmentCard';
 import AddReviewModal from './components/AddReviewModal';
+import AppointmentDetail from './components/AppointmentDetail';
 import { Appointment, AppointmentStatus, FilterState } from './components/AppointmentTypes';
 import styles from './PatientAppointments.module.scss';
 
@@ -23,6 +24,10 @@ const createAppointment = ({
     email,
     phone,
     status,
+    consultationFees,
+    clinicLocation,
+    location,
+    cancelReason,
 }: {
     id: string;
     number: string;
@@ -33,6 +38,10 @@ const createAppointment = ({
     email: string;
     phone: string;
     status: AppointmentStatus;
+    consultationFees?: number;
+    clinicLocation?: string;
+    location?: string;
+    cancelReason?: string;
 }): Appointment => ({
     id,
     appointmentNumber: number,
@@ -44,6 +53,10 @@ const createAppointment = ({
     email,
     phone,
     status,
+    consultationFees,
+    clinicLocation,
+    location,
+    cancelReason,
 });
 
 // Mock data
@@ -58,6 +71,9 @@ const mockAppointments: Appointment[] = [
         email: 'doctor@example.com',
         phone: '+84 504 368 6874',
         status: 'upcoming',
+        consultationFees: 200,
+        clinicLocation: 'Phòng khám Nha khoa Adrian',
+        location: 'Hà Nội, Việt Nam',
     }),
     createAppointment({
         id: '2',
@@ -69,6 +85,9 @@ const mockAppointments: Appointment[] = [
         email: 'smith@example.com',
         phone: '+84 832 891 8403',
         status: 'upcoming',
+        consultationFees: 150,
+        clinicLocation: 'Phòng khám Tim mạch',
+        location: 'TP.HCM, Việt Nam',
     }),
     createAppointment({
         id: '3',
@@ -80,6 +99,11 @@ const mockAppointments: Appointment[] = [
         email: 'doctor@example.com',
         phone: '+84 504 368 6874',
         status: 'cancelled',
+        consultationFees: 200,
+        clinicLocation: 'Phòng khám Nha khoa Adrian',
+        location: 'Hà Nội, Việt Nam',
+        cancelReason:
+            'Bệnh nhân không thể tham gia cuộc hẹn do có việc đột xuất. Đã liên hệ để sắp xếp lại lịch hẹn mới.',
     }),
     createAppointment({
         id: '4',
@@ -91,6 +115,11 @@ const mockAppointments: Appointment[] = [
         email: 'johnson@example.com',
         phone: '+84 832 891 8403',
         status: 'cancelled',
+        consultationFees: 150,
+        clinicLocation: 'Phòng khám Tim mạch',
+        location: 'TP.HCM, Việt Nam',
+        cancelReason:
+            'Bác sĩ phải hủy lịch hẹn do có ca cấp cứu khẩn cấp. Bệnh nhân sẽ được liên hệ để sắp xếp lịch hẹn mới trong thời gian sớm nhất.',
     }),
     createAppointment({
         id: '5',
@@ -102,6 +131,9 @@ const mockAppointments: Appointment[] = [
         email: 'brown@example.com',
         phone: '+84 504 368 6874',
         status: 'completed',
+        consultationFees: 180,
+        clinicLocation: 'Phòng khám Da liễu',
+        location: 'Đà Nẵng, Việt Nam',
     }),
     createAppointment({
         id: '6',
@@ -113,6 +145,9 @@ const mockAppointments: Appointment[] = [
         email: 'wilson@example.com',
         phone: '+84 832 891 8403',
         status: 'completed',
+        consultationFees: 120,
+        clinicLocation: 'Phòng khám Nhi khoa',
+        location: 'Cần Thơ, Việt Nam',
     }),
 ];
 
@@ -128,6 +163,9 @@ const PatientAppointments: React.FC = () => {
     const [selectedAppointmentForReview, setSelectedAppointmentForReview] =
         useState<Appointment | null>(null);
     const [dateRange, setDateRange] = useState('');
+    const [selectedAppointmentForDetail, setSelectedAppointmentForDetail] =
+        useState<Appointment | null>(null);
+    const [showAppointmentDetail, setShowAppointmentDetail] = useState(false);
 
     // Filter states
     const [filterState, setFilterState] = useState<FilterState>({
@@ -302,7 +340,8 @@ const PatientAppointments: React.FC = () => {
 
     // Appointment action handlers
     const handleViewDoctorProfile = (appointment: Appointment) => {
-        console.log('View doctor profile:', appointment);
+        setSelectedAppointmentForDetail(appointment);
+        setShowAppointmentDetail(true);
     };
 
     const handleView = (appointment: Appointment) => {
@@ -330,7 +369,8 @@ const PatientAppointments: React.FC = () => {
     };
 
     const handleViewDetails = (appointment: Appointment) => {
-        console.log('View details:', appointment);
+        setSelectedAppointmentForDetail(appointment);
+        setShowAppointmentDetail(true);
     };
 
     const handleAddReview = (appointment: Appointment) => {
@@ -369,6 +409,30 @@ const PatientAppointments: React.FC = () => {
         console.log('Apply filters:', filterState);
         setIsFilterOpen(false);
     };
+
+    const handleBackFromDetail = () => {
+        setShowAppointmentDetail(false);
+        setSelectedAppointmentForDetail(null);
+    };
+
+    const handleStartSession = (appointment: Appointment) => {
+        console.log('Start session:', appointment);
+        // Implement start session logic
+    };
+
+    // If showing appointment detail, render detail view
+    if (showAppointmentDetail && selectedAppointmentForDetail) {
+        return (
+            <AppointmentDetail
+                appointment={selectedAppointmentForDetail}
+                onBack={handleBackFromDetail}
+                onMessage={handleMessage}
+                onCancel={handleCancel}
+                onStartSession={handleStartSession}
+                onViewDoctorProfile={handleViewDoctorProfile}
+            />
+        );
+    }
 
     return (
         <div className={styles.appointmentsContainer}>

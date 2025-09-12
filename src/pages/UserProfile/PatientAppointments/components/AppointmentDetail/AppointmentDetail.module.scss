@@ -1,0 +1,420 @@
+// Appointment Detail Styles
+.appointmentDetailContainer {
+    .dashboardHeader {
+        margin-bottom: 20px;
+
+        .headerBack {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            .backArrow {
+                background: none;
+                border: none;
+                color: #007bff;
+                font-size: 18px;
+                cursor: pointer;
+                padding: 8px;
+                border-radius: 50%;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background-color: #f8f9fa;
+                    color: #0056b3;
+                }
+            }
+
+            h3 {
+                margin: 0;
+                font-size: 24px;
+                font-weight: 600;
+                color: #333;
+            }
+        }
+    }
+
+    .appointmentDetailsWrap {
+        .appointmentWrap {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+
+                li {
+                    padding: 20px;
+                    border-bottom: 1px solid #f0f0f0;
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                }
+            }
+
+            &.appointmentDetailCard {
+                .patientInformation {
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+
+                    button {
+                        background: none;
+                        border: none;
+                        padding: 0;
+                        cursor: pointer;
+
+                        img {
+                            width: 60px;
+                            height: 60px;
+                            border-radius: 50%;
+                            object-fit: cover;
+                            border: 3px solid #e9ecef;
+                            transition: all 0.3s ease;
+
+                            &:hover {
+                                border-color: #007bff;
+                                transform: scale(1.05);
+                            }
+                        }
+                    }
+
+                    .patientInfo {
+                        flex: 1;
+
+                        p {
+                            margin: 0 0 5px 0;
+                            font-size: 14px;
+                            color: #666;
+                            font-weight: 500;
+                        }
+
+                        h6 {
+                            margin: 0 0 10px 0;
+                            font-size: 18px;
+                            font-weight: 600;
+
+                            button {
+                                color: #333;
+                                text-decoration: none;
+                                background: none;
+                                border: none;
+                                cursor: pointer;
+                                font-size: inherit;
+                                font-weight: inherit;
+
+                                &:hover {
+                                    color: #007bff;
+                                }
+                            }
+                        }
+
+                        .mailInfoPatient {
+                            ul {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 5px;
+
+                                li {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    padding: 0;
+                                    border: none;
+                                    font-size: 14px;
+                                    color: #666;
+
+                                    i {
+                                        color: #007bff;
+                                        width: 16px;
+                                    }
+
+                                    a {
+                                        color: #666;
+                                        text-decoration: none;
+
+                                        &:hover {
+                                            color: #007bff;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    .cancelReasonSection {
+                        display: flex;
+                        align-items: center;
+                        margin-left: auto;
+
+                        .cancelReasonButton {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 8px;
+                            padding: 10px 16px;
+                            background: #fff3cd;
+                            border: 1px solid #ffeaa7;
+                            border-radius: 8px;
+                            color: #856404;
+                            font-size: 14px;
+                            font-weight: 500;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            white-space: nowrap;
+
+                            i {
+                                font-size: 16px;
+                            }
+
+                            &:hover {
+                                background: #ffeaa7;
+                                border-color: #fdcb6e;
+                                color: #6c5ce7;
+                                transform: translateY(-1px);
+                                box-shadow: 0 2px 8px rgba(253, 203, 110, 0.3);
+                            }
+                        }
+                    }
+                }
+
+                .appointmentInfo {
+                    .personInfo {
+                        p {
+                            margin: 0 0 10px 0;
+                            font-size: 14px;
+                            color: #666;
+                            font-weight: 500;
+                        }
+
+                        .appointmentTypes {
+                            list-style: none;
+                            padding: 0;
+                            margin: 0;
+
+                            li {
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                padding: 8px 12px;
+                                background: #f8f9fa;
+                                border-radius: 6px;
+                                font-size: 14px;
+                                color: #333;
+                                border: none;
+
+                                i {
+                                    font-size: 16px;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .appointmentAction {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    flex-wrap: wrap;
+                    gap: 15px;
+
+                    .detailBadgeInfo {
+                        .badge {
+                            padding: 6px 12px;
+                            font-size: 12px;
+                            font-weight: 500;
+                            border-radius: 20px;
+
+                            &.bg-secondary {
+                                background-color: #6c757d !important;
+                                color: white;
+                            }
+
+                            &.bg-success {
+                                background-color: #28a745 !important;
+                                color: white;
+                            }
+
+                            &.bg-danger {
+                                background-color: #dc3545 !important;
+                                color: white;
+                            }
+                        }
+                    }
+
+                    .consultFees {
+                        h6 {
+                            margin: 0;
+                            font-size: 16px;
+                            font-weight: 600;
+                            color: #333;
+                        }
+                    }
+
+                    ul {
+                        display: flex;
+                        gap: 10px;
+                        margin: 0;
+
+                        li {
+                            padding: 0;
+                            border: none;
+
+                            button {
+                                background: none;
+                                border: none;
+                                color: #666;
+                                font-size: 18px;
+                                cursor: pointer;
+                                padding: 8px;
+                                border-radius: 50%;
+                                transition: all 0.3s ease;
+
+                                &:hover {
+                                    background-color: #f8f9fa;
+                                    color: #007bff;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .detailCardBottomInfo {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 20px;
+                    background: #f8f9fa;
+                    padding: 20px;
+                    margin: 0;
+
+                    li {
+                        padding: 0;
+                        border: none;
+
+                        h6 {
+                            margin: 0 0 5px 0;
+                            font-size: 14px;
+                            color: #666;
+                            font-weight: 500;
+                        }
+
+                        span {
+                            font-size: 16px;
+                            color: #333;
+                            font-weight: 500;
+                        }
+
+                        .startBtn {
+                            grid-column: 1 / -1;
+                            text-align: center;
+                            margin-top: 10px;
+
+                            .btn {
+                                padding: 12px 30px;
+                                font-size: 16px;
+                                font-weight: 600;
+                                border-radius: 25px;
+                                border: none;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+
+                                &.btn-primary-gradient {
+                                    background: linear-gradient(135deg, #007bff, #0056b3);
+                                    color: white;
+
+                                    &:hover {
+                                        background: linear-gradient(135deg, #0056b3, #004085);
+                                        transform: translateY(-2px);
+                                        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .recentAppointments {
+            .headText {
+                margin: 0 0 20px 0;
+                font-size: 20px;
+                font-weight: 600;
+                color: #333;
+            }
+
+            .appointmentWrap {
+                .noRecentAppointments {
+                    text-align: center;
+                    padding: 40px 20px;
+                    color: #666;
+
+                    p {
+                        margin: 0;
+                        font-size: 16px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+    .appointmentDetailContainer {
+        .appointmentDetailsWrap {
+            .appointmentWrap {
+                &.appointmentDetailCard {
+                    .patientInformation {
+                        flex-direction: column;
+                        text-align: center;
+                        gap: 10px;
+
+                        .patientInfo {
+                            .mailInfoPatient {
+                                ul {
+                                    align-items: center;
+                                }
+                            }
+                        }
+
+                        .cancelReasonSection {
+                            margin-left: 0;
+                            margin-top: 10px;
+                            justify-content: center;
+                        }
+                    }
+
+                    .appointmentAction {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 10px;
+
+                        ul {
+                            align-self: flex-end;
+                        }
+                    }
+
+                    .detailCardBottomInfo {
+                        grid-template-columns: 1fr;
+                        gap: 15px;
+
+                        li {
+                            .startBtn {
+                                grid-column: 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Icon colors
+.text-green {
+    color: #28a745 !important;
+}

@@ -18,7 +18,6 @@ interface AppointmentActionsProps {
 
 const AppointmentActions: React.FC<AppointmentActionsProps> = ({
     appointment,
-    onView,
     onMessage,
     onCancel,
     onAttend,
@@ -38,16 +37,6 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({
                     <>
                         <li className="appointment-action">
                             <ul>
-                                <li>
-                                    <button
-                                        type="button"
-                                        className={clsx(styles.btnIcon)}
-                                        aria-label="Xem chi tiết cuộc hẹn"
-                                        onClick={() => onView?.(appointment)}
-                                    >
-                                        <i className="isax isax-eye4"></i>
-                                    </button>
-                                </li>
                                 <li>
                                     <button
                                         type="button"

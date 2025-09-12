@@ -11,6 +11,12 @@ export interface Appointment {
     email: string;
     phone: string;
     status: AppointmentStatus;
+    // Additional fields for appointment detail
+    consultationFees?: number;
+    clinicLocation?: string;
+    location?: string;
+    appointmentType?: string;
+    cancelReason?: string;
 }
 
 export interface FilterState {
