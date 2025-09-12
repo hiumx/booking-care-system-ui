@@ -1,0 +1,13 @@
+.root {
+    :global(.fs-5) {
+        font-size: 0.3125rem !important;
+    }
+    h3 a {
+        color: #012047;
+        text-decoration: none;
+
+        &:hover {
+            color: #0e82fd;
+        }
+    }
+}
