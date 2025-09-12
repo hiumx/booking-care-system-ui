@@ -198,7 +198,7 @@ const AddReviewModal: React.FC<AddReviewModalProps> = ({ isOpen, onClose, onSubm
                                                 rows={3}
                                                 value={comment}
                                                 onChange={(e) => setComment(e.target.value)}
-                                                placeholder="Share your experience..."
+                                                placeholder="Chia sẻ cảm nghĩ của bạn..."
                                                 required
                                             />
                                         </div>

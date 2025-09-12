@@ -12,79 +12,108 @@ import { Appointment, AppointmentStatus, FilterState } from './components/Appoin
 import styles from './PatientAppointments.module.scss';
 
 // Mock data
+// Factory function để tạo appointment
+const createAppointment = ({
+    id,
+    number,
+    doctorName,
+    doctorImage,
+    dateTime,
+    callType,
+    email,
+    phone,
+    status,
+}: {
+    id: string;
+    number: string;
+    doctorName: string;
+    doctorImage: string;
+    dateTime: string;
+    callType: string;
+    email: string;
+    phone: string;
+    status: AppointmentStatus;
+}): Appointment => ({
+    id,
+    appointmentNumber: number,
+    doctorName,
+    doctorImage,
+    dateTime,
+    visitType: 'Khám tổng quát', // luôn cố định
+    callType,
+    email,
+    phone,
+    status,
+});
+
+// Mock data
 const mockAppointments: Appointment[] = [
-    {
+    createAppointment({
         id: '1',
-        appointmentNumber: '#Apt0001',
+        number: '#Apt0001',
         doctorName: 'Bác sĩ Edalin',
         doctorImage: '/src/assets/img/doctors/doctor-thumb-21.jpg',
         dateTime: '11/11/2024 10:45',
-        visitType: 'Khám tổng quát',
         callType: 'Cuộc gọi video',
         email: 'doctor@example.com',
         phone: '+84 504 368 6874',
         status: 'upcoming',
-    },
-    {
+    }),
+    createAppointment({
         id: '2',
-        appointmentNumber: '#Apt0002',
+        number: '#Apt0002',
         doctorName: 'Bác sĩ Smith',
         doctorImage: '/src/assets/img/doctors/doctor-thumb-13.jpg',
         dateTime: '05/11/2024 11:50',
-        visitType: 'Khám tổng quát',
         callType: 'Cuộc gọi âm thanh',
         email: 'smith@example.com',
         phone: '+84 832 891 8403',
         status: 'upcoming',
-    },
-    {
+    }),
+    createAppointment({
         id: '3',
-        appointmentNumber: '#Apt00011',
+        number: '#Apt00011',
         doctorName: 'Bác sĩ Edalin',
         doctorImage: '/src/assets/img/doctors/doctor-thumb-21.jpg',
         dateTime: '11/11/2024 10:45',
-        visitType: 'Khám tổng quát',
         callType: 'Cuộc gọi video',
         email: 'doctor@example.com',
         phone: '+84 504 368 6874',
         status: 'cancelled',
-    },
-    {
+    }),
+    createAppointment({
         id: '4',
-        appointmentNumber: '#Apt0004',
+        number: '#Apt0004',
         doctorName: 'Bác sĩ Johnson',
         doctorImage: '/src/assets/img/doctors/doctor-thumb-13.jpg',
         dateTime: '05/11/2024 11:50',
-        visitType: 'Khám tổng quát',
         callType: 'Cuộc gọi âm thanh',
         email: 'johnson@example.com',
         phone: '+84 832 891 8403',
         status: 'cancelled',
-    },
-    {
+    }),
+    createAppointment({
         id: '5',
-        appointmentNumber: '#Apt0005',
+        number: '#Apt0005',
         doctorName: 'Bác sĩ Brown',
         doctorImage: '/src/assets/img/doctors/doctor-thumb-21.jpg',
         dateTime: '11/11/2024 10:45',
-        visitType: 'Khám tổng quát',
         callType: 'Cuộc gọi video',
         email: 'brown@example.com',
         phone: '+84 504 368 6874',
         status: 'completed',
-    },
-    {
+    }),
+    createAppointment({
         id: '6',
-        appointmentNumber: '#Apt0006',
+        number: '#Apt0006',
         doctorName: 'Bác sĩ Wilson',
         doctorImage: '/src/assets/img/doctors/doctor-thumb-13.jpg',
         dateTime: '05/11/2024 11:50',
-        visitType: 'Khám tổng quát',
         callType: 'Cuộc gọi âm thanh',
         email: 'wilson@example.com',
         phone: '+84 832 891 8403',
         status: 'completed',
-    },
+    }),
 ];
 
 const PatientAppointments: React.FC = () => {
