@@ -6,7 +6,26 @@ import patientImg1 from '@/assets/img/patients/patient1.jpg';
 import patientImg2 from '@/assets/img/patients/patient2.jpg';
 import Button from '@/components/Button';
 
+// Hook to detect mobile screen size
+const useIsMobile = () => {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkIsMobile = () => {
+            setIsMobile(window.innerWidth <= 576);
+        };
+
+        checkIsMobile();
+        window.addEventListener('resize', checkIsMobile);
+        return () => window.removeEventListener('resize', checkIsMobile);
+    }, []);
+
+    return isMobile;
+};
+
 const HeroSection: React.FC = () => {
+    const isMobile = useIsMobile();
+
     // Mock gallery images (replace with API data later)
     const mockImages: string[] = [
         medicalImg1,
@@ -152,60 +171,68 @@ const HeroSection: React.FC = () => {
                                     alt="MedFit banner"
                                     className={styles.mainLarge}
                                 />
-                                {/* Right side: two stacked images */}
-                                <div className={styles.sideStack}>
-                                    <img
-                                        src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2Ffb51587e-7c38-4380-a151-fe0778ef42c1-2.png&w=640&q=75"
-                                        alt="Clinic"
-                                        className={styles.sideItem}
-                                    />
-                                    <img
-                                        src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F12237528-6ab8-4858-9b8f-5301cf8edd0b-3.png&w=640&q=75"
-                                        alt="Consult"
-                                        className={styles.sideItem}
-                                    />
-                                    <img
-                                        src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F3a1707fe-17e1-46af-870d-6f11135963d9-5.png&w=640&q=75"
-                                        alt="Procedure"
-                                        className={styles.sideItem}
-                                    />
-                                </div>
-                                {/* Bottom row: four images, last with overlay */}
-                                <div className={styles.bottomRow}>
-                                    <img
-                                        src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F3a1707fe-17e1-46af-870d-6f11135963d9-5.png&w=640&q=75"
-                                        alt="Ảnh 1"
-                                        className={styles.thumb}
-                                    />
-                                    <img
-                                        src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F3a1707fe-17e1-46af-870d-6f11135963d9-5.png&w=640&q=75"
-                                        alt="Ảnh 2"
-                                        className={styles.thumb}
-                                    />
-                                    <img
-                                        src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F3a1707fe-17e1-46af-870d-6f11135963d9-5.png&w=640&q=75"
-                                        alt="Ảnh 3"
-                                        className={styles.thumb}
-                                    />
-                                    <div
-                                        className={styles.thumbOverlay}
-                                        onClick={() => setIsLightboxOpen(true)}
-                                        role="button"
-                                        tabIndex={0}
-                                        aria-label="Xem thêm hình ảnh"
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' || e.key === ' ')
-                                                setIsLightboxOpen(true);
-                                        }}
-                                    >
-                                        <img
-                                            src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F3a1707fe-17e1-46af-870d-6f11135963d9-5.png&w=640&q=75"
-                                            alt="Xem thêm"
-                                            className={styles.thumb}
-                                        />
-                                        <div className={styles.overlay}>+{remainingCount} hình</div>
-                                    </div>
-                                </div>
+
+                                {/* Only show side images and bottom row on desktop/tablet */}
+                                {!isMobile && (
+                                    <>
+                                        {/* Right side: two stacked images */}
+                                        <div className={styles.sideStack}>
+                                            <img
+                                                src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2Ffb51587e-7c38-4380-a151-fe0778ef42c1-2.png&w=640&q=75"
+                                                alt="Clinic"
+                                                className={styles.sideItem}
+                                            />
+                                            <img
+                                                src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F12237528-6ab8-4858-9b8f-5301cf8edd0b-3.png&w=640&q=75"
+                                                alt="Consult"
+                                                className={styles.sideItem}
+                                            />
+                                            <img
+                                                src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F3a1707fe-17e1-46af-870d-6f11135963d9-5.png&w=640&q=75"
+                                                alt="Procedure"
+                                                className={styles.sideItem}
+                                            />
+                                        </div>
+                                        {/* Bottom row: four images, last with overlay */}
+                                        <div className={styles.bottomRow}>
+                                            <img
+                                                src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F3a1707fe-17e1-46af-870d-6f11135963d9-5.png&w=640&q=75"
+                                                alt="Ảnh 1"
+                                                className={styles.thumb}
+                                            />
+                                            <img
+                                                src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F3a1707fe-17e1-46af-870d-6f11135963d9-5.png&w=640&q=75"
+                                                alt="Ảnh 2"
+                                                className={styles.thumb}
+                                            />
+                                            <img
+                                                src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F3a1707fe-17e1-46af-870d-6f11135963d9-5.png&w=640&q=75"
+                                                alt="Ảnh 3"
+                                                className={styles.thumb}
+                                            />
+                                            <div
+                                                className={styles.thumbOverlay}
+                                                onClick={() => setIsLightboxOpen(true)}
+                                                role="button"
+                                                tabIndex={0}
+                                                aria-label="Xem thêm hình ảnh"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ')
+                                                        setIsLightboxOpen(true);
+                                                }}
+                                            >
+                                                <img
+                                                    src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F3a1707fe-17e1-46af-870d-6f11135963d9-5.png&w=640&q=75"
+                                                    alt="Xem thêm"
+                                                    className={styles.thumb}
+                                                />
+                                                <div className={styles.overlay}>
+                                                    +{remainingCount} hình
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

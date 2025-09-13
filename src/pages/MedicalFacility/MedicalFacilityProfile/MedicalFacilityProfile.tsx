@@ -14,6 +14,20 @@ import patientImg1 from '@/assets/img/patients/patient1.jpg';
 import patientImg2 from '@/assets/img/patients/patient2.jpg';
 import specialityIcon from '@/assets/img/specialities/speciality-icon-01.svg';
 import specialityImg from '@/assets/img/specialities/speciality-01.jpg';
+import specialityIcon1 from '@/assets/img/specialities/speciality-icon-02.svg';
+import specialityImg1 from '@/assets/img/specialities/speciality-02.jpg';
+import specialityIcon3 from '@/assets/img/specialities/speciality-icon-03.svg';
+import specialityImg3 from '@/assets/img/specialities/speciality-03.jpg';
+import specialityIcon4 from '@/assets/img/specialities/speciality-icon-04.svg';
+import specialityImg4 from '@/assets/img/specialities/speciality-04.jpg';
+import specialityIcon5 from '@/assets/img/specialities/speciality-icon-05.svg';
+import specialityImg5 from '@/assets/img/specialities/speciality-05.jpg';
+import specialityIcon6 from '@/assets/img/specialities/speciality-icon-06.svg';
+import specialityImg6 from '@/assets/img/specialities/speciality-06.jpg';
+import specialityIcon7 from '@/assets/img/specialities/speciality-icon-07.svg';
+import specialityImg7 from '@/assets/img/specialities/speciality-07.jpg';
+import specialityIcon8 from '@/assets/img/specialities/speciality-icon-08.svg';
+import specialityImg8 from '@/assets/img/specialities/speciality-08.jpg';
 import MainLayout from '@/layouts/MainLayout';
 import TestimonialSection from '@/components/TestimonialSection';
 import HeroSection from './components/HeroSection';
@@ -87,18 +101,46 @@ const MedicalFacilityProfile: React.FC = () => {
         { id: 2, name: 'Tư vấn dinh dưỡng ', img: patientImg1 },
         { id: 3, name: 'Điều trị da liễu', img: patientImg2 },
         { id: 4, name: 'Huấn luyện cá nhân', img: medicalImg1 },
-        { id: 4, name: 'Huấn luyện cá nhân', img: medicalImg1 },
-        { id: 4, name: 'Huấn luyện cá nhân', img: medicalImg1 },
-        { id: 4, name: 'Huấn luyện cá nhân', img: medicalImg1 },
+        { id: 5, name: 'Xét nghiệm máu', img: patientImg },
+        { id: 6, name: 'Siêu âm', img: patientImg1 },
+        { id: 7, name: 'Chụp X-quang', img: patientImg2 },
+    ];
+
+    // Mock specialties
+    const specialties = [
+        { id: 1, name: 'Tim mạch', icon: specialityIcon, img: specialityImg, doctorCount: 12 },
+        { id: 2, name: 'Nội tiết', icon: specialityIcon1, img: specialityImg1, doctorCount: 8 },
+        { id: 3, name: 'Da liễu', icon: specialityIcon3, img: specialityImg3, doctorCount: 15 },
+        { id: 4, name: 'Tiêu hóa', icon: specialityIcon4, img: specialityImg4, doctorCount: 10 },
+        { id: 5, name: 'Thần kinh', icon: specialityIcon5, img: specialityImg5, doctorCount: 6 },
+        { id: 6, name: 'Nhi khoa', icon: specialityIcon6, img: specialityImg6, doctorCount: 20 },
+        {
+            id: 7,
+            name: 'Sản phụ khoa',
+            icon: specialityIcon7,
+            img: specialityImg7,
+            doctorCount: 14,
+        },
+        { id: 8, name: 'Mắt', icon: specialityIcon8, img: specialityImg8, doctorCount: 9 },
     ];
 
     // Mock ads
     const ads = [
-        { id: 1, img: medicalImg1, title: 'Quảng cáo 1' },
-        { id: 2, img: patientImg, title: 'Quảng cáo 2' },
-        { id: 3, img: patientImg1, title: 'Quảng cáo 3' },
-        { id: 4, img: patientImg2, title: 'Quảng cáo 4' },
-        { id: 5, img: medicalImg1, title: 'Quảng cáo 5' },
+        {
+            id: 1,
+            img: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2Fbd0ca6dd-5a16-410a-bcbf-9087e6155fb7-1.png&w=750&q=75',
+            title: 'Quảng cáo 1',
+        },
+        {
+            id: 2,
+            img: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F92564f73-574c-4d93-b4e9-ac27e71f8397-2.png&w=750&q=75',
+            title: 'Quảng cáo 2',
+        },
+        {
+            id: 3,
+            img: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F2553f503-06ce-4d2b-8584-ef778e0d7f81-3.png&w=750&q=75',
+            title: 'Quảng cáo 3',
+        },
     ];
 
     // Mock FAQs
@@ -140,7 +182,7 @@ const MedicalFacilityProfile: React.FC = () => {
             a: 'Phần lớn liệu trình là xâm lấn tối thiểu hoặc không xâm lấn, bạn có thể sinh hoạt bình thường ngay sau điều trị.',
         },
     ];
-    const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+    const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
     return (
         <MainLayout hasHeader={showHeader}>
@@ -195,55 +237,87 @@ const MedicalFacilityProfile: React.FC = () => {
                             {/* Các chuyên khoa */}
                             <div className={styles.sectionBlock}>
                                 <h3 className={styles.sectionTitle}>Chuyên khoa</h3>
-                                <Swiper
-                                    modules={[Navigation, Pagination, Autoplay]}
-                                    spaceBetween={16}
-                                    slidesPerView={'auto'}
-                                    navigation
-                                    pagination={{ clickable: true }}
-                                    autoplay={{ delay: 2500, disableOnInteraction: false }}
-                                    watchOverflow
-                                    className={styles.serviceSwiper}
-                                    breakpoints={{
-                                        0: { spaceBetween: 12 },
-                                        480: { spaceBetween: 12 },
-                                        768: { spaceBetween: 14 },
-                                        1024: { spaceBetween: 16 },
-                                    }}
-                                >
-                                    {services.map((service) => (
-                                        <SwiperSlide key={service.id}>
-                                            <div className={clsx('spaciality-item')}>
-                                                <div className={clsx('spaciality-img')}>
-                                                    <img
-                                                        src={specialityImg}
-                                                        alt="img"
-                                                        className={styles.specialityImgEl}
-                                                    />
-                                                    <span
+
+                                {/* Desktop Slider */}
+                                <div className={styles.desktopSlider}>
+                                    <Swiper
+                                        modules={[Navigation, Pagination, Autoplay]}
+                                        spaceBetween={16}
+                                        slidesPerView={'auto'}
+                                        navigation
+                                        pagination={{ clickable: true }}
+                                        autoplay={{ delay: 2500, disableOnInteraction: false }}
+                                        watchOverflow
+                                        className={styles.serviceSwiper}
+                                        breakpoints={{
+                                            0: { spaceBetween: 12 },
+                                            480: { spaceBetween: 12 },
+                                            768: { spaceBetween: 14 },
+                                            1024: { spaceBetween: 16 },
+                                        }}
+                                    >
+                                        {specialties.map((specialty) => (
+                                            <SwiperSlide key={specialty.id}>
+                                                <a href="#" className={clsx('spaciality-item')}>
+                                                    <div className={clsx('spaciality-img')}>
+                                                        <img
+                                                            src={specialty.img}
+                                                            alt={specialty.name}
+                                                            className={styles.specialityImgEl}
+                                                        />
+                                                        <span
+                                                            className={clsx(
+                                                                'spaciality-icon',
+                                                                styles.specialityIcon
+                                                            )}
+                                                        >
+                                                            <img src={specialty.icon} alt="icon" />
+                                                        </span>
+                                                    </div>
+                                                    <h6 className={styles.specialityTitle}>
+                                                        <a
+                                                            href="doctor-grid.html"
+                                                            className={styles.specialityTitleLink}
+                                                        >
+                                                            {specialty.name}
+                                                        </a>
+                                                    </h6>
+                                                    <p
                                                         className={clsx(
-                                                            'spaciality-icon',
-                                                            styles.specialityIcon
+                                                            'mb-0',
+                                                            styles.specialityMeta
                                                         )}
                                                     >
-                                                        <img src={specialityIcon} alt="img" />
-                                                    </span>
-                                                </div>
-                                                <h6 className={styles.specialityTitle}>
-                                                    <a
-                                                        href="doctor-grid.html"
-                                                        className={styles.specialityTitleLink}
-                                                    >
-                                                        Cardiology
-                                                    </a>
+                                                        {specialty.doctorCount} Bác sĩ
+                                                    </p>
+                                                </a>
+                                            </SwiperSlide>
+                                        ))}
+                                    </Swiper>
+                                </div>
+
+                                {/* Mobile Simple List */}
+                                <div className={styles.mobileSpecialtyList}>
+                                    {specialties.map((specialty) => (
+                                        <a
+                                            key={specialty.id}
+                                            href="#"
+                                            className={styles.specialtyItem}
+                                        >
+                                            <div className={styles.specialtyIcon}>
+                                                <img src={specialty.icon} alt="icon" />
+                                            </div>
+                                            <div className={styles.specialtyText}>
+                                                <h6 className={styles.specialtyTitle}>
+                                                    {specialty.name}
                                                 </h6>
-                                                <p className={clsx('mb-0', styles.specialityMeta)}>
-                                                    254 Doctors
+                                                <p className={styles.specialtyMeta}>
+                                                    {specialty.doctorCount} Bác sĩ
                                                 </p>
                                             </div>
-                                        </SwiperSlide>
+                                        </a>
                                     ))}
-                                </Swiper>
+                                </div>
                             </div>
                             {/* Sticky tabs are above, now add floating CTA on map */}
                             <div className={styles.tabs} ref={tabsRef}>

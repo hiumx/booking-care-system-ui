@@ -445,27 +445,32 @@
 
             .grid {
                 grid-template-columns: 1fr;
-                gap: 16px;
+                gap: 20px;
+            }
+
+            .card {
+                padding: 20px;
+                border-radius: 12px;
             }
 
             .gallery {
                 .galleryGrid {
-                    grid-template-columns: 1fr;
-                    grid-template-rows: auto;
-                    gap: 0;
+                    display: block !important; /* Change from grid to block on mobile */
+                    height: auto !important;
                 }
 
                 .mainLarge {
-                    grid-column: 1;
-                    grid-row: 1;
-                    height: 200px;
-                    border-radius: 8px;
+                    display: block !important;
+                    width: 100% !important;
+                    height: 250px !important;
+                    border-radius: 12px;
+                    object-fit: cover;
                 }
 
-                /* Hide side images and bottom row on mobile */
+                /* Completely hide side images and bottom row on mobile */
                 .sideStack,
                 .bottomRow {
-                    display: none;
+                    display: none !important;
                 }
             }
         }
@@ -527,18 +532,20 @@
         .container {
             .grid {
                 grid-template-columns: 1fr;
-                gap: 20px;
+                gap: 24px;
             }
 
             .gallery {
                 .galleryGrid {
                     grid-template-columns: 2fr 1fr;
                     grid-template-rows: auto;
-                    gap: 10px;
+                    gap: 12px;
                 }
 
                 .mainLarge {
-                    height: 300px;
+                    height: 320px;
+                    border-radius: 12px;
+                    object-fit: cover;
                 }
 
                 .sideStack {
@@ -548,7 +555,9 @@
                     }
 
                     .sideItem {
-                        height: 145px;
+                        height: 154px;
+                        border-radius: 8px;
+                        object-fit: cover;
                     }
                 }
 
