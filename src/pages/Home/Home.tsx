@@ -89,7 +89,7 @@ const Home: React.FC = () => {
                     desc="Meet Our Best Specialists"
                     items={listDoctorItems}
                     breakpoints={CAROUSEL_DOCTORS_BREAKPOINTS}
-                    viewAllTarget={buildPath(PATHS.DOCTOR.ROOT, PATHS.DOCTOR.LIST)}
+                    viewAllTarget={PATHS.DOCTOR.ROOT}
                     viewAllText="View All Doctors"
                 />
             </MainLayout>
