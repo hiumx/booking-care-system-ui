@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { X, Search } from 'lucide-react';
 import ModalItem from './components/ModalItem';
@@ -21,6 +21,20 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onApply, items, title }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+    // Thêm useEffect để xử lý cuộn trang
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden'; // Ngăn cuộn trang
+        } else {
+            document.body.style.overflow = ''; // Khôi phục cuộn
+        }
+
+        // Cleanup khi component unmount hoặc isOpen thay đổi
+        return () => {
+            document.body.style.overflow = ''; // Đảm bảo khôi phục khi component bị hủy
+        };
+    }, [isOpen]);
 
     const handleItemToggle = (itemId: string) => {
         setSelectedItems((prev) =>
