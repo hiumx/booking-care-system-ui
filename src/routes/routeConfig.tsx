@@ -125,13 +125,13 @@ const routes: RouteObject[] = [
     {
         path: PATHS.DOCTOR.ROOT,
         children: [
+            { path: PATHS.DOCTOR.ROOT, element: <DoctorList />, index: true },
             { path: PATHS.DOCTOR.PROFILE, element: <DoctorProfile /> },
-            { path: PATHS.DOCTOR.LIST, element: <DoctorList /> },
         ],
     },
     {
         path: PATHS.BOOKING.ROOT,
-        children: [{ path: PATHS.BOOKING.DOCTOR, element: <Booking /> }],
+        element: <Booking />,
     },
     {
         path: PATHS.DASHBOARD.ROOT,

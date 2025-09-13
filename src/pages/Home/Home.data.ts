@@ -108,6 +108,24 @@ export const CAROUSEL_CLINICS_BREAKPOINTS = {
     },
 };
 
+export const CAROUSEL_DOCTORS_BREAKPOINTS = {
+    1204: {
+        slidesPerView: 4,
+    },
+    1000: {
+        slidesPerView: 3,
+    },
+    768: {
+        slidesPerView: 2, // tablets
+    },
+    480: {
+        slidesPerView: 2, // mobile
+    },
+    0: {
+        slidesPerView: 1, // small mobile
+    },
+};
+
 export type Clinic = {
     id: number;
     name: string;
@@ -195,5 +213,110 @@ export const LIST_CLINICS: Clinic[] = [
         specialties: ['Nhi khoa', 'Tiêm chủng', 'Khám tổng quát'],
         priceRange: '350.000 - 1.800.000 VNĐ',
         availableSlots: 9,
+    },
+];
+
+// -----------------------------
+// Doctor mock data
+// -----------------------------
+export type Doctor = {
+    id: number;
+    name: string;
+    image: string;
+    specialty: string;
+    location: string;
+    rating: number;
+    consultationTime: string;
+    fee: number;
+    available: boolean;
+    profileLink: string;
+    bookingLink: string;
+    specialtiesLink: string;
+};
+
+export const LIST_DOCTORS: Doctor[] = [
+    {
+        id: 1,
+        name: 'Dr. John Smith',
+        image: '/src/assets/img/doctors/doctor-01.jpg',
+        specialty: 'Cardiologist',
+        location: 'New York, USA',
+        rating: 4.9,
+        consultationTime: '30 Min',
+        fee: 650,
+        available: true,
+        profileLink: '/doctor/1',
+        bookingLink: '/booking/1',
+        specialtiesLink: '/specialties/cardiology',
+    },
+    {
+        id: 2,
+        name: 'Dr. Sarah Johnson',
+        image: '/src/assets/img/doctors/doctor-02.jpg',
+        specialty: 'Orthopedic Surgeon',
+        location: 'Los Angeles, USA',
+        rating: 4.7,
+        consultationTime: '45 Min',
+        fee: 550,
+        available: true,
+        profileLink: '/doctor/2',
+        bookingLink: '/booking/2',
+        specialtiesLink: '/specialties/orthopedics',
+    },
+    {
+        id: 3,
+        name: 'Dr. Michael Brown',
+        image: '/src/assets/img/doctors/doctor-03.jpg',
+        specialty: 'Neurologist',
+        location: 'Chicago, USA',
+        rating: 4.8,
+        consultationTime: '30 Min',
+        fee: 500,
+        available: true,
+        profileLink: '/doctor/3',
+        bookingLink: '/booking/3',
+        specialtiesLink: '/specialties/neurology',
+    },
+    {
+        id: 4,
+        name: 'Dr. Emily Davis',
+        image: '/src/assets/img/doctors/doctor-04.jpg',
+        specialty: 'Pediatrician',
+        location: 'Houston, USA',
+        rating: 4.6,
+        consultationTime: '60 Min',
+        fee: 400,
+        available: false,
+        profileLink: '/doctor/4',
+        bookingLink: '/booking/4',
+        specialtiesLink: '/specialties/pediatrics',
+    },
+    {
+        id: 5,
+        name: 'Dr. James Wilson',
+        image: '/src/assets/img/doctors/doctor-05.jpg',
+        specialty: 'Psychiatrist',
+        location: 'Boston, USA',
+        rating: 4.5,
+        consultationTime: '30 Min',
+        fee: 600,
+        available: true,
+        profileLink: '/doctor/5',
+        bookingLink: '/booking/5',
+        specialtiesLink: '/specialties/psychiatry',
+    },
+    {
+        id: 6,
+        name: 'Dr. Sophia Martinez',
+        image: '/src/assets/img/doctors/doctor-06.jpg',
+        specialty: 'Endocrinologist',
+        location: 'San Francisco, USA',
+        rating: 4.9,
+        consultationTime: '45 Min',
+        fee: 700,
+        available: true,
+        profileLink: '/doctor/6',
+        bookingLink: '/booking/6',
+        specialtiesLink: '/specialties/endocrinology',
     },
 ];
