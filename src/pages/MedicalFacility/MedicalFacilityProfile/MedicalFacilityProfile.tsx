@@ -1,24 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import MainLayout from '@/layouts/MainLayout';
-import Breadcrumb from '@/components/Breadcrumb';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import clsx from 'clsx';
+import Breadcrumb from '@/components/Breadcrumb';
 import styles from './MedicalFacilityProfile.module.scss';
-import Overview from './components/Overview';
-import LocationTab from './components/Location';
-import BusinessHours from './components/BusinessHours';
-import ReviewCard from '@/components/ReviewCard';
-import Pagination from '@/components/Pagination';
-import Button from '@/components/Button'; // Import the Button component
-
+import Button from '@/components/Button';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import medicalImg1 from '@/assets/img/medical-img1.jpg';
 import patientImg from '@/assets/img/patients/patient.jpg';
 import patientImg1 from '@/assets/img/patients/patient1.jpg';
 import patientImg2 from '@/assets/img/patients/patient2.jpg';
-import featureImg1 from '@/assets/img/features/feature-01.jpg';
-import featureImg2 from '@/assets/img/features/feature-02.jpg';
-import featureImg3 from '@/assets/img/features/feature-03.jpg';
-import featureImg4 from '@/assets/img/features/feature-04.jpg';
+import specialityIcon from '@/assets/img/specialities/speciality-icon-01.svg';
+import specialityImg from '@/assets/img/specialities/speciality-01.jpg';
+import specialityIcon1 from '@/assets/img/specialities/speciality-icon-02.svg';
+import specialityImg1 from '@/assets/img/specialities/speciality-02.jpg';
+import specialityIcon3 from '@/assets/img/specialities/speciality-icon-03.svg';
+import specialityImg3 from '@/assets/img/specialities/speciality-03.jpg';
+import specialityIcon4 from '@/assets/img/specialities/speciality-icon-04.svg';
+import specialityImg4 from '@/assets/img/specialities/speciality-04.jpg';
+import specialityIcon5 from '@/assets/img/specialities/speciality-icon-05.svg';
+import specialityImg5 from '@/assets/img/specialities/speciality-05.jpg';
+import specialityIcon6 from '@/assets/img/specialities/speciality-icon-06.svg';
+import specialityImg6 from '@/assets/img/specialities/speciality-06.jpg';
+import specialityIcon7 from '@/assets/img/specialities/speciality-icon-07.svg';
+import specialityImg7 from '@/assets/img/specialities/speciality-07.jpg';
+import specialityIcon8 from '@/assets/img/specialities/speciality-icon-08.svg';
+import specialityImg8 from '@/assets/img/specialities/speciality-08.jpg';
+import MainLayout from '@/layouts/MainLayout';
+import TestimonialSection from '@/components/TestimonialSection';
+import HeroSection from './components/HeroSection';
 
 interface BreadcrumbItem {
     label: string;
@@ -26,568 +39,569 @@ interface BreadcrumbItem {
     isActive?: boolean;
 }
 
-interface Clinic {
-    id: number;
-    account_id: number;
-    name: string;
-    address: string;
-    phone: string | null;
-    email: string;
-    description: string;
-    background_url: string;
-    avatar_url: string;
-    status: 'ACTIVE' | 'INACTIVE';
-    created_at: string;
-    updated_at: string;
-}
-
-interface Specialty {
-    id: number;
-    name: string;
-    image_url: string;
-    status: 'ACTIVE' | 'INACTIVE';
-    created_at: string;
-    updated_at: string;
-}
-
-interface Review {
-    id: number;
-    patient_id: number;
-    doctor_id: number;
-    appointment_id: number | null;
-    rating: number;
-    comment: string | null;
-    parent_review_id: number | null;
-    recommend: boolean;
-    created_at: string;
-    updated_at: string;
-    patient: {
-        first_name: string;
-        last_name: string;
-        avatar_url: string;
-    };
-}
-
-interface Location {
-    name: string;
-    address: string;
-    rating: number;
-    images: string[];
-    timings: { days: string; times: string[] }[];
-}
-
-interface BusinessHour {
-    day: string;
-    time: string;
-}
-
-const mockClinic: Clinic = {
-    id: 1,
-    account_id: 1,
-    name: 'Phòng Khám Medlife',
-    address: '96 Đường Hồng Hạc, Cyrus, MN 56323',
-    phone: '320-795-8815',
-    email: 'lienhe@medlife.com',
-    description:
-        'Phòng khám Medlife là một cơ sở y tế hàng đầu tại khu vực, được thành lập từ năm 2005 với sứ mệnh mang đến dịch vụ chăm sóc sức khỏe toàn diện, chất lượng cao và thân thiện với bệnh nhân. Chúng tôi tự hào sở hữu đội ngũ bác sĩ và nhân viên y tế giàu kinh nghiệm, được đào tạo tại các trường đại học y khoa uy tín trong và ngoài nước. Với hơn 15 năm hoạt động, Medlife đã phục vụ hàng ngàn bệnh nhân, từ các trường hợp khám sức khỏe định kỳ đến điều trị các bệnh lý phức tạp. Phòng khám được trang bị hệ thống máy móc hiện đại nhập khẩu từ các quốc gia tiên tiến như Mỹ, Đức và Nhật Bản, bao gồm máy siêu âm 4D, máy chụp CT, MRI, và các thiết bị xét nghiệm tự động hóa cao. Chúng tôi cam kết tuân thủ nghiêm ngặt các tiêu chuẩn vệ sinh và an toàn y tế theo quy định của Bộ Y tế, đảm bảo môi trường khám chữa bệnh sạch sẽ, thoải mái và an toàn tuyệt đối cho mọi bệnh nhân. Tại Medlife, chúng tôi không chỉ tập trung vào việc điều trị bệnh mà còn nhấn mạnh vào công tác phòng ngừa, giáo dục sức khỏe cộng đồng thông qua các chương trình hội thảo, tư vấn miễn phí và các chiến dịch nâng cao nhận thức về lối sống lành mạnh. Dịch vụ của chúng tôi bao gồm khám ngoại trú, nội trú ngắn ngày, tiêm chủng, kiểm tra sức khỏe doanh nghiệp, và hỗ trợ tư vấn trực tuyến 24/7. Chúng tôi luôn đặt bệnh nhân làm trung tâm, lắng nghe và đồng hành cùng bạn trong mọi giai đoạn sức khỏe. Với phương châm "Sức khỏe là vàng", Medlife không ngừng cải tiến để mang đến trải nghiệm tốt nhất, giúp bạn và gia đình sống khỏe mạnh hơn mỗi ngày. Ngoài ra, phòng khám còn hợp tác chặt chẽ với các bệnh viện lớn trong khu vực để chuyển tuyến kịp thời các ca bệnh nặng, đảm bảo sự liên tục trong chăm sóc. Chúng tôi cũng đầu tư vào nghiên cứu y khoa, tham gia các dự án cộng đồng như khám bệnh miễn phí cho người nghèo, hỗ trợ y tế vùng sâu vùng xa, và các chương trình đào tạo nâng cao năng lực cho nhân viên y tế địa phương. Medlife không chỉ là nơi chữa bệnh mà còn là người bạn đồng hành đáng tin cậy trong hành trình chăm sóc sức khỏe của bạn.',
-    background_url: medicalImg1,
-    avatar_url: medicalImg1,
-    status: 'ACTIVE',
-    created_at: '2023-01-01T00:00:00Z',
-    updated_at: '2023-01-01T00:00:00Z',
-};
-
-const mockSpecialties: Specialty[] = [
-    {
-        id: 1,
-        name: 'Nội khoa',
-        image_url: medicalImg1,
-        status: 'ACTIVE',
-        created_at: '2023-01-01T00:00:00Z',
-        updated_at: '2023-01-01T00:00:00Z',
-    },
-    {
-        id: 2,
-        name: 'Ngoại khoa',
-        image_url: medicalImg1,
-        status: 'ACTIVE',
-        created_at: '2023-01-01T00:00:00Z',
-        updated_at: '2023-01-01T00:00:00Z',
-    },
-    {
-        id: 3,
-        name: 'Sản phụ khoa',
-        image_url: medicalImg1,
-        status: 'ACTIVE',
-        created_at: '2023-01-01T00:00:00Z',
-        updated_at: '2023-01-01T00:00:00Z',
-    },
-    {
-        id: 4,
-        name: 'Nhi khoa',
-        image_url: medicalImg1,
-        status: 'ACTIVE',
-        created_at: '2023-01-01T00:00:00Z',
-        updated_at: '2023-01-01T00:00:00Z',
-    },
-    {
-        id: 5,
-        name: 'Tai mũi họng',
-        image_url: medicalImg1,
-        status: 'ACTIVE',
-        created_at: '2023-01-01T00:00:00Z',
-        updated_at: '2023-01-01T00:00:00Z',
-    },
-    {
-        id: 6,
-        name: 'Răng hàm mặt',
-        image_url: medicalImg1,
-        status: 'ACTIVE',
-        created_at: '2023-01-01T00:00:00Z',
-        updated_at: '2023-01-01T00:00:00Z',
-    },
-    {
-        id: 7,
-        name: 'Da liễu',
-        image_url: medicalImg1,
-        status: 'ACTIVE',
-        created_at: '2023-01-01T00:00:00Z',
-        updated_at: '2023-01-01T00:00:00Z',
-    },
-    {
-        id: 8,
-        name: 'Tâm thần',
-        image_url: medicalImg1,
-        status: 'ACTIVE',
-        created_at: '2023-01-01T00:00:00Z',
-        updated_at: '2023-01-01T00:00:00Z',
-    },
-    {
-        id: 9,
-        name: 'Chẩn đoán hình ảnh',
-        image_url: medicalImg1,
-        status: 'ACTIVE',
-        created_at: '2023-01-01T00:00:00Z',
-        updated_at: '2023-01-01T00:00:00Z',
-    },
-    {
-        id: 10,
-        name: 'Phục hồi chức năng',
-        image_url: medicalImg1,
-        status: 'ACTIVE',
-        created_at: '2023-01-01T00:00:00Z',
-        updated_at: '2023-01-01T00:00:00Z',
-    },
-];
-
-const mockReviews: Review[] = [
-    {
-        id: 1,
-        patient_id: 1,
-        doctor_id: 1,
-        appointment_id: 1,
-        rating: 4,
-        comment:
-            'Dịch vụ tại phòng khám rất tốt, bác sĩ thân thiện và chuyên nghiệp. Tôi rất hài lòng với trải nghiệm khám bệnh tại đây.',
-        parent_review_id: null,
-        recommend: true,
-        created_at: '2025-08-19T10:00:00Z',
-        updated_at: '2025-08-19T10:00:00Z',
-        patient: {
-            first_name: 'Anh',
-            last_name: 'Nguyễn',
-            avatar_url: patientImg,
-        },
-    },
-    {
-        id: 2,
-        patient_id: 2,
-        doctor_id: 1,
-        appointment_id: 2,
-        rating: 4,
-        comment:
-            'Bác sĩ tư vấn rất nhiệt tình, nhưng thời gian chờ hơi lâu. Nhìn chung, tôi vẫn hài lòng với dịch vụ.',
-        parent_review_id: 1,
-        recommend: true,
-        created_at: '2025-08-18T10:00:00Z',
-        updated_at: '2025-08-18T10:00:00Z',
-        patient: {
-            first_name: 'Mai',
-            last_name: 'Trần',
-            avatar_url: patientImg1,
-        },
-    },
-    {
-        id: 3,
-        patient_id: 3,
-        doctor_id: 1,
-        appointment_id: 3,
-        rating: 4,
-        comment: 'Phòng khám sạch sẽ, nhân viên nhiệt tình. Tôi sẽ quay lại trong tương lai.',
-        parent_review_id: null,
-        recommend: true,
-        created_at: '2025-08-17T10:00:00Z',
-        updated_at: '2025-08-17T10:00:00Z',
-        patient: {
-            first_name: 'Hùng',
-            last_name: 'Lê',
-            avatar_url: patientImg2,
-        },
-    },
-];
-
-const mockBusinessHours: BusinessHour[] = [
-    { day: 'Thứ Hai', time: '07:00 Sáng - 09:00 Tối' },
-    { day: 'Thứ Ba', time: '07:00 Sáng - 09:00 Tối' },
-    { day: 'Thứ Tư', time: '07:00 Sáng - 09:00 Tối' },
-    { day: 'Thứ Năm', time: '07:00 Sáng - 09:00 Tối' },
-    { day: 'Thứ Sáu', time: '07:00 Sáng - 09:00 Tối' },
-    { day: 'Thứ Bảy', time: '07:00 Sáng - 09:00 Tối' },
-    { day: 'Chủ Nhật', time: 'Đóng cửa' },
-];
-
-const mockLocation: Location = {
-    name: mockClinic.name,
-    address: mockClinic.address,
-    rating: 4,
-    images: [featureImg1, featureImg2, featureImg3, featureImg4],
-    timings: [
-        { days: 'Thứ Hai - Thứ Bảy', times: ['10:00 Sáng - 2:00 Chiều', '4:00 Chiều - 9:00 Tối'] },
-        { days: 'Chủ Nhật', times: ['10:00 Sáng - 2:00 Chiều'] },
-    ],
-};
-
 const MedicalFacilityProfile: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
-    const [clinic, setClinic] = useState<Clinic | null>(null);
-    const [specialties, setSpecialties] = useState<Specialty[]>([]);
-    const [reviews, setReviews] = useState<Review[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('overview');
-    const [currentPage, setCurrentPage] = useState(1);
-
-    const pageSize = 2;
-    const totalPages = Math.ceil(reviews.filter((r) => !r.parent_review_id).length / pageSize);
-    const displayedReviews = reviews
-        .filter((r) => !r.parent_review_id)
-        .slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
-    // Mock current user ID for edit/delete permissions
-    const currentUserId = 1;
-
-    // Mock handlers for review actions
-    const handleReplySubmission = (replyData: { reviewId: number; text: string }) => {
-        console.log('New reply submitted:', replyData);
-        alert('Phản hồi của bạn đã được gửi thành công!');
-    };
-
-    const handleEditReview = (reviewData: {
-        reviewId: number;
-        rating: number;
-        description: string;
-        recommend?: boolean;
-    }) => {
-        console.log('Review edited:', reviewData);
-        alert('Đánh giá của bạn đã được cập nhật thành công!');
-    };
-
-    const handleDeleteReview = (reviewId: number) => {
-        console.log('Review deleted:', reviewId);
-        alert('Đánh giá đã được xóa thành công!');
-    };
-
-    const handleEditReply = (replyData: { replyId: number; text: string }) => {
-        console.log('Reply edited:', replyData);
-        alert('Phản hồi đã được cập nhật thành công!');
-    };
-
-    const handleDeleteReply = (replyId: number) => {
-        console.log('Reply deleted:', replyId);
-        alert('Phản hồi đã được xóa thành công!');
-    };
-
-    useEffect(() => {
-        setClinic(mockClinic);
-        setSpecialties(mockSpecialties);
-        setReviews(mockReviews);
-        setLoading(false);
-    }, [id]);
-
-    if (loading) {
-        return (
-            <MainLayout>
-                <div>Đang tải...</div>
-            </MainLayout>
-        );
-    }
-
-    if (!clinic) {
-        return (
-            <MainLayout>
-                <div>Không tìm thấy cơ sở y tế</div>
-            </MainLayout>
-        );
-    }
+    // const { id } = useParams<{ id: string }>();
 
     const breadcrumbData: { items: BreadcrumbItem[]; title: string } = {
         items: [
             { label: 'Trang Chủ', path: '/', isActive: false },
             { label: 'Cơ Sở Y Tế', path: '/medical-facility', isActive: false },
-            { label: clinic.name, isActive: true },
+            { label: 'Vinmec Medical Center', isActive: true },
         ],
-        title: clinic.name,
+        title: 'Vinmec Medical Center',
     };
 
-    const averageRating = 4.0;
-    const reviewCount = 17;
+    // Show map CTA and hide header when reaching tabs
+    const tabsRef = useRef<HTMLDivElement | null>(null);
+    const adPaginationRef = useRef<HTMLDivElement | null>(null);
+    const [showMapCta, setShowMapCta] = useState(false);
+    const [showHeader, setShowHeader] = useState(true);
+    const [hasReachedTabs, setHasReachedTabs] = useState(false);
+    const [activeTab, setActiveTab] = useState<'gioi-thieu' | 'bang-gia' | 'huong-dan' | 'faq'>();
+
+    useEffect(() => {
+        const handle = () => {
+            if (!tabsRef.current) return;
+            const tabsTop = window.scrollY + tabsRef.current.getBoundingClientRect().top;
+            const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+            const shouldShowMapCta = scrollY + 10 >= tabsTop;
+            setShowMapCta(shouldShowMapCta);
+
+            // Track if user has reached tabs
+            if (shouldShowMapCta && !hasReachedTabs) {
+                setHasReachedTabs(true);
+            }
+
+            // Show header logic:
+            // 1. If haven't reached tabs yet: show when scrollY < tabsTop - 10
+            // 2. If have reached tabs: only show when back to top (scrollY <= 0)
+            if (!hasReachedTabs) {
+                setShowHeader(scrollY < tabsTop - 10);
+            } else {
+                setShowHeader(scrollY <= 0);
+                // Reset state when back to top
+                if (scrollY <= 0) {
+                    setHasReachedTabs(false);
+                }
+            }
+
+            // Do not auto-change active tab by scroll; only via user click
+        };
+        handle();
+        window.addEventListener('scroll', handle, { passive: true });
+        window.addEventListener('resize', handle);
+        return () => {
+            window.removeEventListener('scroll', handle as any);
+            window.removeEventListener('resize', handle as any);
+        };
+    }, [hasReachedTabs]);
+
+    // Mock services
+    const services = [
+        { id: 1, name: 'Khám tổng quát', img: patientImg },
+        { id: 2, name: 'Tư vấn dinh dưỡng ', img: patientImg1 },
+        { id: 3, name: 'Điều trị da liễu', img: patientImg2 },
+        { id: 4, name: 'Huấn luyện cá nhân', img: medicalImg1 },
+        { id: 5, name: 'Xét nghiệm máu', img: patientImg },
+        { id: 6, name: 'Siêu âm', img: patientImg1 },
+        { id: 7, name: 'Chụp X-quang', img: patientImg2 },
+    ];
+
+    // Mock specialties
+    const specialties = [
+        { id: 1, name: 'Tim mạch', icon: specialityIcon, img: specialityImg, doctorCount: 12 },
+        { id: 2, name: 'Nội tiết', icon: specialityIcon1, img: specialityImg1, doctorCount: 8 },
+        { id: 3, name: 'Da liễu', icon: specialityIcon3, img: specialityImg3, doctorCount: 15 },
+        { id: 4, name: 'Tiêu hóa', icon: specialityIcon4, img: specialityImg4, doctorCount: 10 },
+        { id: 5, name: 'Thần kinh', icon: specialityIcon5, img: specialityImg5, doctorCount: 6 },
+        { id: 6, name: 'Nhi khoa', icon: specialityIcon6, img: specialityImg6, doctorCount: 20 },
+        {
+            id: 7,
+            name: 'Sản phụ khoa',
+            icon: specialityIcon7,
+            img: specialityImg7,
+            doctorCount: 14,
+        },
+        { id: 8, name: 'Mắt', icon: specialityIcon8, img: specialityImg8, doctorCount: 9 },
+    ];
+
+    // Mock ads
+    const ads = [
+        {
+            id: 1,
+            img: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2Fbd0ca6dd-5a16-410a-bcbf-9087e6155fb7-1.png&w=750&q=75',
+            title: 'Quảng cáo 1',
+        },
+        {
+            id: 2,
+            img: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F92564f73-574c-4d93-b4e9-ac27e71f8397-2.png&w=750&q=75',
+            title: 'Quảng cáo 2',
+        },
+        {
+            id: 3,
+            img: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F2553f503-06ce-4d2b-8584-ef778e0d7f81-3.png&w=750&q=75',
+            title: 'Quảng cáo 3',
+        },
+    ];
+
+    // Mock FAQs
+    const faqs: Array<{ q: string; a: string }> = [
+        {
+            q: 'MedFit có những chuyên khoa và dịch vụ khám, điều trị nào?',
+            a: 'MedFit cung cấp ba chuyên khoa chính: Nội tiết, Dinh dưỡng và Thẩm mỹ da. Dịch vụ đa dạng gồm giảm cân, giảm mỡ từng vùng bằng công nghệ nội khoa không xâm lấn, trẻ hóa da, tạo đường nét cơ thể kết hợp y khoa và thiết bị chuẩn y khoa.',
+        },
+        {
+            q: 'Có cần đặt lịch hẹn trước khi đến khám không?',
+            a: 'Bạn nên đặt lịch trước qua tổng đài 19002115 hoặc nút "Đặt khám ngay" để chủ động thời gian và giảm thời gian chờ.',
+        },
+        {
+            q: 'MedFit có hỗ trợ khám ngoài giờ hoặc cuối tuần không?',
+            a: 'Phòng khám hoạt động Thứ 2 – Chủ nhật: 08:00 – 19:00. Vui lòng đặt lịch trước để được phục vụ tốt nhất.',
+        },
+        {
+            q: 'Khi đi khám cần mang theo giấy tờ gì?',
+            a: 'Vui lòng mang giấy tờ tùy thân và các kết quả khám/chẩn đoán trước đó (nếu có) để bác sĩ tham khảo.',
+        },
+        {
+            q: 'MedFit có chỗ giữ xe hơi và xe máy không?',
+            a: 'Có. Khu vực gửi xe được bố trí ngay trong khuôn viên phòng khám, có nhân sự hỗ trợ.',
+        },
+        {
+            q: 'MedFit có áp dụng bảo hiểm y tế hoặc bảo hiểm tư nhân không?',
+            a: 'Phòng khám hỗ trợ xuất hóa đơn để bạn tự quyết toán với bảo hiểm y tế hoặc bảo hiểm tư nhân theo chính sách của bạn.',
+        },
+        {
+            q: 'Chi phí khám và điều trị tại MedFit là bao nhiêu?',
+            a: 'Chi phí phụ thuộc vào gói dịch vụ và phác đồ điều trị. Vui lòng liên hệ phòng khám để được tư vấn chi tiết.',
+        },
+        {
+            q: 'Thời gian nhận kết quả khám, xét nghiệm mất bao lâu?',
+            a: 'Tùy dịch vụ, hầu hết kết quả cơ bản có trong ngày; các xét nghiệm chuyên sâu có thể cần thêm thời gian xử lý.',
+        },
+        {
+            q: 'Các phương pháp điều trị giảm mỡ và trẻ hóa tại MedFit có cần nghỉ dưỡng không?',
+            a: 'Phần lớn liệu trình là xâm lấn tối thiểu hoặc không xâm lấn, bạn có thể sinh hoạt bình thường ngay sau điều trị.',
+        },
+    ];
+    const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
     return (
-        <MainLayout>
+        <MainLayout hasHeader={showHeader}>
             <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
-            <div className="content">
-                <div className="container">
-                    <div className="card">
-                        <div className="card-body">
-                            <div className="doctor-widget">
-                                <div className="doc-info-left">
-                                    <div className="doctor-img1">
-                                        <Link to={`/facility/${clinic.id}`}>
-                                            <img
-                                                src={clinic.avatar_url}
-                                                className="img-fluid"
-                                                alt="Hình ảnh cơ sở y tế"
-                                            />
-                                        </Link>
-                                    </div>
-                                    <div className="doc-info-cont">
-                                        <h4 className="doc-name mb-2">
-                                            <Link to={`/facility/${clinic.id}`}>{clinic.name}</Link>
-                                        </h4>
-                                        <div className="rating mb-2">
-                                            <span
-                                                className={clsx(
-                                                    'badge badge-primary',
-                                                    styles.customMargin
-                                                )}
-                                            >
-                                                {averageRating}
-                                            </span>
-                                            {Array.from({ length: 5 }).map((_, index) => (
-                                                <i
-                                                    key={index}
-                                                    className={clsx(
-                                                        'fas fa-star',
-                                                        index < Math.floor(averageRating) &&
-                                                            'filled',
-                                                        styles.customPadding
-                                                    )}
-                                                ></i>
-                                            ))}
-                                            <span className="d-inline-block average-rating">
-                                                ({reviewCount})
-                                            </span>
-                                        </div>
-                                        <div className="clinic-details">
-                                            <div className="clini-infos pt-3">
-                                                <p className="doc-location mb-2">
-                                                    <i className="isax isax-call-calling5 me-1"></i>{' '}
-                                                    {clinic.phone || 'Không có'}
-                                                </p>
-                                                <p className="doc-location mb-2">
-                                                    <i className="isax isax-sms me-1"></i>{' '}
-                                                    {clinic.email || 'Không có'}
-                                                </p>
-                                                <p className="doc-location mb-2 text-ellipse">
-                                                    <i className="isax isax-location5 me-1"></i>{' '}
-                                                    {clinic.address}
-                                                </p>
-                                                <p className="doc-location mb-2">
-                                                    <i className="isax isax-arrow-right-3 me-1"></i>{' '}
-                                                    Mở cửa lúc 08:00 Sáng
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="doc-info-right d-flex align-items-center justify-content-center">
-                                    <div className="clinic-booking">
-                                        <Button
-                                            text="Gửi Tin Nhắn"
-                                            type="button"
-                                            className={styles.customBtn}
-                                            onClick={() => (window.location.href = '/chat')}
-                                        />
-                                        <Button
-                                            text="Gọi Ngay"
-                                            type="button"
-                                            className={styles.customBtn}
-                                            onClick={() => {
-                                                const modal = document.querySelector('#voice_call');
-                                                if (modal instanceof HTMLElement) {
-                                                    modal.setAttribute('data-bs-toggle', 'modal');
-                                                    modal.setAttribute(
-                                                        'data-bs-target',
-                                                        '#voice_call'
-                                                    );
-                                                    modal.click(); // Trigger modal programmatically
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                </div>
+            {/* Hero Section */}
+            <HeroSection />
+            {/* Content Section: left details, right sticky sidebar */}
+            <section className={styles.content}>
+                <div className={styles.container}>
+                    <div className={styles.contentGrid}>
+                        {/* LEFT: main content */}
+                        <div className={styles.mainContent}>
+                            <div className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Mô tả</h3>
+                                <p>
+                                    Phòng khám MedFit là phòng khám y học chuyên sâu về giảm cân,
+                                    giảm béo và giảm mỡ, được thành lập bởi đội ngũ bác sĩ và chuyên
+                                    gia vận động, tâm lý. MedFit tiên phong cung cấp các giải pháp
+                                    giúp thon gọn và kiến tạo đường nét cơ thể dựa trên nền tảng y
+                                    học chứng cứ.
+                                </p>
                             </div>
-                        </div>
-                    </div>
-
-                    <div className="card">
-                        <div className="card-body pt-0">
-                            <nav className="user-tabs mb-4">
-                                <ul className="nav nav-tabs nav-tabs-bottom nav-justified">
-                                    <li className="nav-item">
-                                        <a
-                                            className={clsx('nav-link', {
-                                                active: activeTab === 'overview',
-                                            })}
-                                            href="#doc_overview"
-                                            data-bs-toggle="tab"
-                                            onClick={() => setActiveTab('overview')}
-                                        >
-                                            Tổng Quan
-                                        </a>
-                                    </li>
-                                    <li className="nav-item">
-                                        <a
-                                            className={clsx('nav-link', {
-                                                active: activeTab === 'locations',
-                                            })}
-                                            href="#doc_locations"
-                                            data-bs-toggle="tab"
-                                            onClick={() => setActiveTab('locations')}
-                                        >
-                                            Địa Điểm
-                                        </a>
-                                    </li>
-                                    <li className="nav-item">
-                                        <a
-                                            className={clsx('nav-link', {
-                                                active: activeTab === 'reviews',
-                                            })}
-                                            href="#doc_reviews"
-                                            data-bs-toggle="tab"
-                                            onClick={() => setActiveTab('reviews')}
-                                        >
-                                            Đánh Giá
-                                        </a>
-                                    </li>
-                                    <li className="nav-item">
-                                        <a
-                                            className={clsx('nav-link', {
-                                                active: activeTab === 'business_hours',
-                                            })}
-                                            href="#doc_business_hours"
-                                            data-bs-toggle="tab"
-                                            onClick={() => setActiveTab('business_hours')}
-                                        >
-                                            Giờ Làm Việc
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                            <div className="tab-content pt-0">
-                                {activeTab === 'overview' && (
-                                    <Overview
-                                        clinic={clinic}
-                                        specialties={specialties}
-                                        isActive={activeTab === 'overview'}
-                                    />
-                                )}
-                                {activeTab === 'locations' && (
-                                    <LocationTab
-                                        location={mockLocation}
-                                        isActive={activeTab === 'locations'}
-                                    />
-                                )}
-                                {activeTab === 'reviews' && (
-                                    <div
-                                        className={clsx('tab-pane fade', {
-                                            'show active': activeTab === 'reviews',
-                                        })}
-                                        id="doc_reviews"
-                                    >
-                                        <div className="detail-title">
-                                            <h4>Đánh giá ({reviews.length})</h4>
-                                        </div>
-                                        {reviews.length === 0 ? (
-                                            <p>Không có đánh giá nào để hiển thị.</p>
-                                        ) : (
-                                            <div className="widget review-listing">
-                                                {displayedReviews.map((review, index) => (
-                                                    <ReviewCard
-                                                        key={review.id}
-                                                        review={{
-                                                            id: review.id,
-                                                            name: `${review.patient.first_name} ${review.patient.last_name}`,
-                                                            avatar: review.patient.avatar_url,
-                                                            rating: review.rating,
-                                                            timeAgo: `${Math.round(
-                                                                (Date.now() -
-                                                                    new Date(
-                                                                        review.created_at
-                                                                    ).getTime()) /
-                                                                    (1000 * 60 * 60 * 24)
-                                                            )} days ago`,
-                                                            text: review.comment || '',
-                                                            recommend: review.recommend,
-                                                            userId: review.patient_id,
-                                                            isEditable: false,
-                                                            replies: reviews
-                                                                .filter(
-                                                                    (r) =>
-                                                                        r.parent_review_id ===
-                                                                        review.id
-                                                                )
-                                                                .map((reply) => ({
-                                                                    id: reply.id,
-                                                                    name: `${reply.patient.first_name} ${reply.patient.last_name}`,
-                                                                    avatar: reply.patient
-                                                                        .avatar_url,
-                                                                    text: reply.comment || '',
-                                                                    userId: reply.patient_id,
-                                                                })),
-                                                        }}
-                                                        isLast={
-                                                            index === displayedReviews.length - 1
-                                                        }
-                                                        onReply={handleReplySubmission}
-                                                        canEdit={false}
-                                                        canDelete={false}
-                                                        currentUserId={currentUserId}
-                                                        onEdit={handleEditReview}
-                                                        onDelete={handleDeleteReview}
-                                                        onEditReply={handleEditReply}
-                                                        onDeleteReply={handleDeleteReply}
-                                                    />
-                                                ))}
-                                                <Pagination
-                                                    currentPage={currentPage}
-                                                    totalPages={totalPages}
-                                                    onPageChange={setCurrentPage}
+                            {/* Các dịch vụ */}
+                            <div className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Dịch vụ</h3>
+                                <Swiper
+                                    modules={[Navigation, Pagination, Autoplay]}
+                                    spaceBetween={16}
+                                    slidesPerView={'auto'}
+                                    navigation
+                                    pagination={{ clickable: true }}
+                                    autoplay={{ delay: 2500, disableOnInteraction: false }}
+                                    watchOverflow
+                                    className={styles.serviceSwiper}
+                                >
+                                    {services.map((service) => (
+                                        <SwiperSlide key={service.id}>
+                                            <Link to="/doctor/list" className={styles.serviceCard}>
+                                                <img
+                                                    src={service.img}
+                                                    alt={service.name}
+                                                    className={styles.serviceImg}
                                                 />
+                                                <div className={styles.serviceName}>
+                                                    {service.name}
+                                                </div>
+                                            </Link>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            </div>
+                            {/* Các chuyên khoa */}
+                            <div className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Chuyên khoa</h3>
+
+                                {/* Desktop Slider */}
+                                <div className={styles.desktopSlider}>
+                                    <Swiper
+                                        modules={[Navigation, Pagination, Autoplay]}
+                                        spaceBetween={16}
+                                        slidesPerView={'auto'}
+                                        navigation
+                                        pagination={{ clickable: true }}
+                                        autoplay={{ delay: 2500, disableOnInteraction: false }}
+                                        watchOverflow
+                                        className={styles.serviceSwiper}
+                                        breakpoints={{
+                                            0: { spaceBetween: 12 },
+                                            480: { spaceBetween: 12 },
+                                            768: { spaceBetween: 14 },
+                                            1024: { spaceBetween: 16 },
+                                        }}
+                                    >
+                                        {specialties.map((specialty) => (
+                                            <SwiperSlide key={specialty.id}>
+                                                <Link
+                                                    to="/doctor/list"
+                                                    className={clsx('spaciality-item')}
+                                                >
+                                                    <div className={clsx('spaciality-img')}>
+                                                        <img
+                                                            src={specialty.img}
+                                                            alt={specialty.name}
+                                                            className={styles.specialityImgEl}
+                                                        />
+                                                        <span
+                                                            className={clsx(
+                                                                'spaciality-icon',
+                                                                styles.specialityIcon
+                                                            )}
+                                                        >
+                                                            <img src={specialty.icon} alt="icon" />
+                                                        </span>
+                                                    </div>
+                                                    <h6 className={styles.specialityTitle}>
+                                                        <Link
+                                                            to="/doctor/list"
+                                                            className={styles.specialityTitleLink}
+                                                        >
+                                                            {specialty.name}
+                                                        </Link>
+                                                    </h6>
+                                                    <p
+                                                        className={clsx(
+                                                            'mb-0',
+                                                            styles.specialityMeta
+                                                        )}
+                                                    >
+                                                        {specialty.doctorCount} Bác sĩ
+                                                    </p>
+                                                </Link>
+                                            </SwiperSlide>
+                                        ))}
+                                    </Swiper>
+                                </div>
+
+                                {/* Mobile Simple List */}
+                                <div className={styles.mobileSpecialtyList}>
+                                    {specialties.map((specialty) => (
+                                        <Link
+                                            key={specialty.id}
+                                            to="/doctor/list"
+                                            className={styles.specialtyItem}
+                                        >
+                                            <div className={styles.specialtyIcon}>
+                                                <img src={specialty.icon} alt="icon" />
                                             </div>
-                                        )}
+                                            <div className={styles.specialtyText}>
+                                                <h6 className={styles.specialtyTitle}>
+                                                    {specialty.name}
+                                                </h6>
+                                                <p className={styles.specialtyMeta}>
+                                                    {specialty.doctorCount} Bác sĩ
+                                                </p>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                            {/* Sticky tabs are above, now add floating CTA on map */}
+                            <div className={styles.tabs} ref={tabsRef}>
+                                <a
+                                    href="#gioi-thieu"
+                                    onClick={() => setActiveTab('gioi-thieu')}
+                                    className={clsx(
+                                        styles.tabItem,
+                                        activeTab === 'gioi-thieu' && styles.tabActive
+                                    )}
+                                >
+                                    Giới thiệu
+                                </a>
+                                <a
+                                    href="#bang-gia"
+                                    onClick={() => setActiveTab('bang-gia')}
+                                    className={clsx(
+                                        styles.tabItem,
+                                        activeTab === 'bang-gia' && styles.tabActive
+                                    )}
+                                >
+                                    Bảng giá
+                                </a>
+                                <a
+                                    href="#huong-dan"
+                                    onClick={() => setActiveTab('huong-dan')}
+                                    className={clsx(
+                                        styles.tabItem,
+                                        activeTab === 'huong-dan' && styles.tabActive
+                                    )}
+                                >
+                                    Hướng dẫn đi khám
+                                </a>
+                                <a
+                                    href="#faq"
+                                    onClick={() => setActiveTab('faq')}
+                                    className={clsx(
+                                        styles.tabItem,
+                                        activeTab === 'faq' && styles.tabActive
+                                    )}
+                                >
+                                    Câu hỏi thường gặp
+                                </a>
+                            </div>
+
+                            <div id="gioi-thieu" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Giới thiệu</h3>
+                                <p>
+                                    Phòng khám điều trị béo phì chuyên sâu chuẩn y khoa MedFit là
+                                    địa chỉ tiên phong tại TP.HCM trong điều trị thừa cân, béo phì
+                                    theo mô hình giảm cân đa mô thức, ứng dụng các phương pháp không
+                                    xâm lấn dựa trên nền tảng y học chứng cứ. Với đội ngũ bác sĩ
+                                    giàu kinh nghiệm trong các lĩnh vực Nội tiết, Dinh dưỡng, Nội
+                                    khoa, Da liễu, chuyên gia dinh dưỡng và huấn luyện viên, MedFit
+                                    mang đến giải pháp giảm cân an toàn, hiệu quả và cá nhân hóa
+                                    theo tình trạng sức khỏe từng người.
+                                </p>
+                                <p>
+                                    Trong bài viết này, Medpro sẽ tổng hợp các thông tin quan trọng
+                                    về MedFit bao gồm thế mạnh chuyên môn, đội ngũ bác sĩ, dịch vụ
+                                    nổi bật, chi phí tham khảo và cách đặt lịch khám để bạn đọc có
+                                    thể dễ dàng lựa chọn và chủ động chăm sóc sức khỏe một cách toàn
+                                    diện.
+                                </p>
+                            </div>
+
+                            <div id="bang-gia" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Bảng giá</h3>
+                                <div className={styles.priceTable}>
+                                    <div className={styles.priceItem}>
+                                        <span className={styles.priceNumber}>1.</span>
+                                        <span className={styles.priceService}>
+                                            Khám bệnh Da dày & Đại tràng
+                                        </span>
+                                        <span className={styles.priceAmount}>200.000đ</span>
                                     </div>
-                                )}
-                                {activeTab === 'business_hours' && (
-                                    <BusinessHours
-                                        businessHours={mockBusinessHours}
-                                        isActive={activeTab === 'business_hours'}
-                                    />
-                                )}
+                                    <div className={styles.priceItem}>
+                                        <span className={styles.priceNumber}>2.</span>
+                                        <span className={styles.priceService}>
+                                            Khám bệnh Tiêu hóa - Gan mật
+                                        </span>
+                                        <span className={styles.priceAmount}>200.000đ</span>
+                                    </div>
+                                    <div className={styles.priceItem}>
+                                        <span className={styles.priceNumber}>3.</span>
+                                        <span className={styles.priceService}>
+                                            Nội soi Da dày không đau
+                                        </span>
+                                        <span className={styles.priceAmount}>3.100.000đ</span>
+                                    </div>
+                                    <div className={styles.priceItem}>
+                                        <span className={styles.priceNumber}>4.</span>
+                                        <span className={styles.priceService}>
+                                            Nội soi Đại tràng không đau
+                                        </span>
+                                        <span className={styles.priceAmount}>4.100.000đ</span>
+                                    </div>
+                                    <div className={styles.priceItem}>
+                                        <span className={styles.priceNumber}>5.</span>
+                                        <span className={styles.priceService}>
+                                            Nội soi Da dày và Đại tràng không đau
+                                        </span>
+                                        <span className={styles.priceAmount}>6.700.000đ</span>
+                                    </div>
+                                    <div className={styles.priceItem}>
+                                        <span className={styles.priceNumber}>6.</span>
+                                        <span className={styles.priceService}>
+                                            Tầm soát ung thư Da dày
+                                        </span>
+                                        <span className={styles.priceAmount}>3.100.000đ</span>
+                                    </div>
+                                    <div className={styles.priceItem}>
+                                        <span className={styles.priceNumber}>7.</span>
+                                        <span className={styles.priceService}>
+                                            Tầm soát ung thư Đại tràng
+                                        </span>
+                                        <span className={styles.priceAmount}>4.340.000đ</span>
+                                    </div>
+                                    <div className={styles.priceItem}>
+                                        <span className={styles.priceNumber}>8.</span>
+                                        <span className={styles.priceService}>
+                                            Tầm soát ung thư Da dày & Đại tràng
+                                        </span>
+                                        <span className={styles.priceAmount}>6.940.000đ</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="huong-dan" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Hướng dẫn đi khám</h3>
+                                <div className={styles.guideContent}>
+                                    <div className={styles.guideStep}>
+                                        <span className={styles.stepLabel}>Bước 1:</span>
+                                        <span className={styles.stepContent}>
+                                            Truy cập website{' '}
+                                            <a
+                                                href="https://medpro.vn/"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={styles.guideLink}
+                                            >
+                                                https://medpro.vn/
+                                            </a>{' '}
+                                            hoặc tải ứng dụng Medpro – Đặt lịch khám bệnh trên điện
+                                            thoại.
+                                        </span>
+                                    </div>
+
+                                    <div className={styles.guideStep}>
+                                        <span className={styles.stepLabel}>Bước 2:</span>
+                                        <span className={styles.stepContent}>
+                                            Tìm kiếm "Phòng khám Giảm cân chuyên sâu MedFit".
+                                        </span>
+                                    </div>
+
+                                    <div className={styles.guideStep}>
+                                        <span className={styles.stepLabel}>Bước 3:</span>
+                                        <span className={styles.stepContent}>
+                                            Chọn loại dịch vụ bạn mong muốn như khám giảm cân với
+                                            bác sĩ dinh dưỡng, khám giảm cân với bác sĩ nội tiết,
+                                            khám tăng cơ giảm mỡ công nghệ cao với bác sĩ da liễu...
+                                        </span>
+                                    </div>
+
+                                    <div className={styles.guideStep}>
+                                        <span className={styles.stepLabel}>Bước 4:</span>
+                                        <span className={styles.stepContent}>
+                                            Lựa chọn thời gian, bác sĩ và hình thức khám (tại phòng
+                                            khám hoặc tư vấn online).
+                                        </span>
+                                    </div>
+
+                                    <div className={styles.guideStep}>
+                                        <span className={styles.stepLabel}>Bước 5:</span>
+                                        <span className={styles.stepContent}>
+                                            Xác nhận thông tin, nhận phiếu khám điện tử qua email
+                                            hoặc ứng dụng.
+                                        </span>
+                                    </div>
+
+                                    <div className={styles.guideNote}>
+                                        <span className={styles.noteLabel}>Lưu ý:</span>
+                                        <span className={styles.noteContent}>
+                                            Vui lòng đến sớm 15 phút trước giờ hẹn để được hỗ trợ
+                                            đón tiếp, do chi số cơ bản và hoàn thiện thủ tục trước
+                                            khi vào khám.
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="faq" className={styles.sectionBlock}>
+                                <h3 className={styles.sectionTitle}>Câu hỏi thường gặp</h3>
+                                <div className={styles.faqList} role="list">
+                                    {faqs.map((item, idx) => (
+                                        <div key={idx} className={styles.faqItem} role="listitem">
+                                            <button
+                                                className={clsx(
+                                                    styles.faqQuestion,
+                                                    openFaqIndex === idx && styles.faqOpen
+                                                )}
+                                                aria-expanded={openFaqIndex === idx}
+                                                onClick={() =>
+                                                    setOpenFaqIndex(
+                                                        openFaqIndex === idx ? null : idx
+                                                    )
+                                                }
+                                            >
+                                                <span className={styles.faqIndex}>{idx + 1}.</span>
+                                                <span className={styles.faqText}>{item.q}</span>
+                                                <i
+                                                    className="fa-solid fa-chevron-right"
+                                                    aria-hidden="true"
+                                                />
+                                            </button>
+                                            {openFaqIndex === idx && (
+                                                <div className={styles.faqAnswer}>{item.a}</div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
+
+                        {/* RIGHT: sticky sidebar with map and ad banner */}
+                        <aside
+                            className={styles.sidebar}
+                            aria-label="Thông tin vị trí và quảng cáo"
+                        >
+                            <div className={clsx(styles.mapCtaBar, showMapCta && styles.visible)}>
+                                <Button
+                                    className={clsx(styles.mapBookBtn)}
+                                    text="Đặt khám ngay"
+                                    type="button"
+                                />
+                            </div>
+                            <div className={styles.mapCard}>
+                                <div className={styles.mapBody}>
+                                    <iframe
+                                        title="Bản đồ Phòng khám MedFit"
+                                        src="https://www.google.com/maps?q=462/9+Nguyen+Tri+Phuong,+Ho+Chi+Minh&output=embed"
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    ></iframe>
+                                </div>
+                            </div>
+                            <div className={styles.adCard}>
+                                <div className={styles.adBadge}>Ads</div>
+                                <Swiper
+                                    modules={[Pagination, Autoplay]}
+                                    spaceBetween={0}
+                                    slidesPerView={1}
+                                    pagination={{
+                                        clickable: true,
+                                        el: `.${styles.adPagination}`,
+                                    }}
+                                    autoplay={{ delay: 3000, disableOnInteraction: false }}
+                                    loop={true}
+                                    className={styles.adSwiper}
+                                >
+                                    {ads.map((ad) => (
+                                        <SwiperSlide key={ad.id}>
+                                            <img
+                                                src={ad.img}
+                                                alt={ad.title}
+                                                className={styles.adImg}
+                                            />
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                                <div ref={adPaginationRef} className={styles.adPagination}></div>
+                            </div>
+                        </aside>
                     </div>
                 </div>
-            </div>
+            </section>
+            {/* Testimonial Section */}
+            <section className={styles.testimonialSection}>
+                <TestimonialSection />
+            </section>
         </MainLayout>
     );
 };

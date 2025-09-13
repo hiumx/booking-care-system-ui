@@ -9,12 +9,17 @@ import styles from './MainLayout.module.scss';
 interface MainLayoutProps {
     children: ReactNode;
     hasFooter?: boolean;
+    hasHeader?: boolean;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children, hasFooter = true }) => {
+const MainLayout: React.FC<MainLayoutProps> = ({
+    children,
+    hasFooter = true,
+    hasHeader = true,
+}) => {
     return (
         <div className={styles.mainLayout}>
-            <MainHeader />
+            {hasHeader && <MainHeader />}
             <main className={styles.contentContainer}>{children || <Outlet />}</main>
             {hasFooter && <MainFooter />}
         </div>

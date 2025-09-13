@@ -1,0 +1,39 @@
+.carouselContainer {
+    position: relative;
+    width: 100%;
+    padding-bottom: 3rem; // space for buttons
+}
+
+.carouselNav {
+    position: absolute;
+    bottom: -0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 1rem;
+}
+
+.carouselButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background-color: #f1f5fb; // light background
+    color: #1e3a8a; // blue icon
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    &:hover {
+        background-color: #e0e7f1;
+    }
+
+    &.prev svg,
+    &.next svg {
+        stroke-width: 2.5;
+    }
+}
