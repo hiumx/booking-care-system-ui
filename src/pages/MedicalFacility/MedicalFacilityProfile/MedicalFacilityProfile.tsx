@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Breadcrumb from '@/components/Breadcrumb';
 import styles from './MedicalFacilityProfile.module.scss';
@@ -220,7 +221,7 @@ const MedicalFacilityProfile: React.FC = () => {
                                 >
                                     {services.map((service) => (
                                         <SwiperSlide key={service.id}>
-                                            <a href="#" className={styles.serviceCard}>
+                                            <Link to="/doctor/list" className={styles.serviceCard}>
                                                 <img
                                                     src={service.img}
                                                     alt={service.name}
@@ -229,7 +230,7 @@ const MedicalFacilityProfile: React.FC = () => {
                                                 <div className={styles.serviceName}>
                                                     {service.name}
                                                 </div>
-                                            </a>
+                                            </Link>
                                         </SwiperSlide>
                                     ))}
                                 </Swiper>
@@ -258,7 +259,10 @@ const MedicalFacilityProfile: React.FC = () => {
                                     >
                                         {specialties.map((specialty) => (
                                             <SwiperSlide key={specialty.id}>
-                                                <a href="#" className={clsx('spaciality-item')}>
+                                                <Link
+                                                    to="/doctor/list"
+                                                    className={clsx('spaciality-item')}
+                                                >
                                                     <div className={clsx('spaciality-img')}>
                                                         <img
                                                             src={specialty.img}
@@ -275,12 +279,12 @@ const MedicalFacilityProfile: React.FC = () => {
                                                         </span>
                                                     </div>
                                                     <h6 className={styles.specialityTitle}>
-                                                        <a
-                                                            href="doctor-grid.html"
+                                                        <Link
+                                                            to="/doctor/list"
                                                             className={styles.specialityTitleLink}
                                                         >
                                                             {specialty.name}
-                                                        </a>
+                                                        </Link>
                                                     </h6>
                                                     <p
                                                         className={clsx(
@@ -290,7 +294,7 @@ const MedicalFacilityProfile: React.FC = () => {
                                                     >
                                                         {specialty.doctorCount} Bác sĩ
                                                     </p>
-                                                </a>
+                                                </Link>
                                             </SwiperSlide>
                                         ))}
                                     </Swiper>
@@ -299,9 +303,9 @@ const MedicalFacilityProfile: React.FC = () => {
                                 {/* Mobile Simple List */}
                                 <div className={styles.mobileSpecialtyList}>
                                     {specialties.map((specialty) => (
-                                        <a
+                                        <Link
                                             key={specialty.id}
-                                            href="#"
+                                            to="/doctor/list"
                                             className={styles.specialtyItem}
                                         >
                                             <div className={styles.specialtyIcon}>
@@ -315,7 +319,7 @@ const MedicalFacilityProfile: React.FC = () => {
                                                     {specialty.doctorCount} Bác sĩ
                                                 </p>
                                             </div>
-                                        </a>
+                                        </Link>
                                     ))}
                                 </div>
                             </div>
