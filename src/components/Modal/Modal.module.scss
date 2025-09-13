@@ -1,0 +1,235 @@
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem; // 16px
+    z-index: 99999;
+}
+
+.modalContainer {
+    background-color: white;
+    border-radius: 1rem; // 16px
+    width: 40%;
+    max-width: none;
+    margin: 0 auto;
+    box-shadow: 0 1.5625rem 3.125rem -0.75rem rgba(0, 0, 0, 0.25); // 25px 50px -12px
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.5rem 1rem; // 24px 24px 16px
+}
+
+.title {
+    font-size: 1.125rem; // 18px
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.closeButton {
+    width: 2rem; // 32px
+    height: 2rem; // 32px
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    transition: color 0.2s ease;
+    border: none;
+    outline: none;
+    background: transparent;
+
+    &:hover {
+        color: #4b5563;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+}
+
+.searchContainer {
+    padding: 0 1.5rem 1rem; // 0 24px 16px
+}
+
+.searchInputWrapper {
+    position: relative;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 0.75rem; // 12px
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    width: 1.25rem; // 20px
+    height: 1.25rem; // 20px
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem; // 12px 16px 12px 40px
+    background-color: #f3f4f6;
+    border-radius: 0.75rem; // 12px
+    border: none;
+    color: #374151;
+    font-size: 1rem; // 16px
+    transition: all 0.2s ease;
+
+    &::placeholder {
+        color: #6b7280;
+    }
+
+    &:focus {
+        outline: none;
+        background-color: white;
+        box-shadow: 0 0 0 2px #f3f4f6;
+    }
+}
+
+.specialtyList {
+    padding: 0 1.5rem 1.5rem; // 0 24px 24px
+}
+
+.scrollContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem; // 4px
+    max-height: 20rem; // 320px
+    overflow-y: auto;
+    padding-right: 0.5rem; // 8px
+}
+
+.actionButtons {
+    padding: 0 1.5rem 1.5rem; // 0 24px 24px
+    display: flex;
+    gap: 0.75rem; // 12px
+}
+
+.clearButton {
+    flex: 1;
+    padding: 0.75rem 1rem; // 12px 16px
+    background-color: #f3f4f6;
+    color: #374151;
+    border-radius: 0.75rem; // 12px
+    font-size: 1rem; // 16px
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    border: none;
+    outline: none;
+
+    &:hover {
+        background-color: #e5e7eb;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+}
+
+.applyButton {
+    flex: 1;
+    padding: 0.75rem 1rem; // 12px 16px
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 0.75rem; // 12px
+    font-size: 1rem; // 16px
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    border: none;
+    outline: none;
+
+    &:hover {
+        background-color: #2563eb;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+}
+
+@media (max-width: 48rem) {
+    // 768px
+    .modalContainer {
+        width: 100%; // responsive cho mobile
+    }
+}
+
+/* Default: Desktop lớn (>=1280px) */
+.modalContainer {
+    width: 40%;
+    max-width: 640px; // giữ modal gọn trên màn to
+}
+
+/* Laptop vừa (<=1280px) */
+@media (max-width: 80rem) {
+    // 1280px
+    .modalContainer {
+        width: 50%;
+    }
+}
+
+/* Tablet ngang (<=1024px) */
+@media (max-width: 64rem) {
+    // 1024px
+    .modalContainer {
+        width: 60%;
+    }
+}
+
+/* Tablet dọc (<=768px) */
+@media (max-width: 48rem) {
+    // 768px
+    .modalContainer {
+        width: 80%;
+    }
+}
+
+/* Mobile lớn (<=640px) */
+@media (max-width: 40rem) {
+    // 640px
+    .modalContainer {
+        width: 95%;
+        border-radius: 0.75rem; // bo góc ít hơn
+    }
+
+    .header {
+        padding: 1rem;
+    }
+
+    .searchContainer,
+    .specialtyList,
+    .actionButtons {
+        padding: 0 1rem 1rem;
+    }
+
+    .title {
+        font-size: 1rem;
+    }
+
+    .searchInput {
+        font-size: 0.95rem;
+    }
+}
+
+/* Mobile nhỏ (<=480px) */
+@media (max-width: 30rem) {
+    // 480px
+    .modalContainer {
+        width: 100%;
+        height: 100%; // modal full màn hình
+        border-radius: 0; // bỏ bo góc cho trải nghiệm app-like
+    }
+
+    .scrollContainer {
+        max-height: calc(100vh - 12rem); // giữ vùng scroll hợp lý
+    }
+}

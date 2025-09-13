@@ -19,45 +19,29 @@ interface FilterSection {
 
 const mockFilterData: FilterSection[] = [
     {
-        title: 'Chuyên khoa',
-        options: [
-            { id: 'checkebox-sm2', label: 'Tiết niệu', count: 21 },
-            { id: 'checkebox-sm3', label: 'Tâm thần học', count: 15 },
-            { id: 'checkebox-sm4', label: 'Tim mạch', count: 30 },
-            { id: 'checkebox-sm5', label: 'Nhi khoa', count: 25 },
-            { id: 'checkebox-sm6', label: 'Tiêu hóa', count: 18 },
-            { id: 'checkebox-sm7', label: 'Thần kinh', count: 12 },
-            { id: 'checkebox-sm8', label: 'Phổi', count: 20 },
-            { id: 'checkebox-sm9', label: 'Chỉnh hình', count: 10 },
-            { id: 'checkebox-sm10', label: 'Nội tiết', count: 14 },
-            { id: 'checkebox-sm11', label: 'Da liễu', count: 22 },
-            { id: 'checkebox-sm12', label: 'Mắt', count: 17 },
-            { id: 'checkebox-sm13', label: 'Tai mũi họng', count: 19 },
-        ],
-        hasViewMore: true,
-    },
-    {
-        title: 'Giới tính',
-        options: [
-            { id: 'checkebox-sm14', label: 'Nam', count: 50 },
-            { id: 'checkebox-sm15', label: 'Nữ', count: 45 },
-            { id: 'checkebox-sm16', label: 'Khác', count: 5 },
-        ],
-    },
-    {
-        title: 'Lịch trống',
-        options: [
-            { id: 'checkebox-sm17', label: 'Hôm nay' },
-            { id: 'checkebox-sm18', label: 'Ngày mai' },
-            { id: 'checkebox-sm19', label: 'Trong 7 ngày tới' },
-            { id: 'checkebox-sm20', label: 'Trong 30 ngày tới' },
-            { id: 'checkebox-sm21', label: 'Cuối tuần này' },
-        ],
-        hasViewMore: true,
-    },
-    {
         title: 'Giá cả',
         options: [],
+    },
+    {
+        title: 'Đánh giá',
+        options: [
+            { id: 'checkebox-sm46', label: '5 Sao' },
+            { id: 'checkebox-sm47', label: '4 Sao' },
+            { id: 'checkebox-sm48', label: '3 Sao' },
+            { id: 'checkebox-sm49', label: '2 Sao' },
+            { id: 'checkebox-sm50', label: '1 Sao' },
+        ],
+    },
+    {
+        title: 'Học vị',
+        options: [
+            { id: 'checkebox-sm60', label: 'Bác sĩ', count: 40 },
+            { id: 'checkebox-sm61', label: 'Thạc sĩ', count: 25 },
+            { id: 'checkebox-sm62', label: 'Tiến sĩ', count: 15 },
+            { id: 'checkebox-sm63', label: 'Phó Giáo sư', count: 10 },
+            { id: 'checkebox-sm64', label: 'Giáo sư', count: 5 },
+        ],
+        hasViewMore: true,
     },
     {
         title: 'Kinh nghiệm',
@@ -72,15 +56,13 @@ const mockFilterData: FilterSection[] = [
         hasViewMore: true,
     },
     {
-        title: 'Phòng khám',
+        title: 'Lịch trống',
         options: [
-            { id: 'checkebox-sm28', label: 'Phòng khám Nha khoa Nụ Cười Rạng Rỡ' },
-            { id: 'checkebox-sm29', label: 'Phòng khám Chăm sóc Gia đình' },
-            { id: 'checkebox-sm30', label: 'Phòng khám Sức khỏe Nhanh' },
-            { id: 'checkebox-sm31', label: 'Phòng khám Phục hồi Chức năng' },
-            { id: 'checkebox-sm32', label: 'Phòng khám Sức khỏe Phụ nữ Hoa Sen' },
-            { id: 'checkebox-sm33', label: 'Phòng khám Đa khoa Quốc tế' },
-            { id: 'checkebox-sm34', label: 'Phòng khám Tâm lý Tâm An' },
+            { id: 'checkebox-sm17', label: 'Hôm nay' },
+            { id: 'checkebox-sm18', label: 'Ngày mai' },
+            { id: 'checkebox-sm19', label: 'Trong 7 ngày tới' },
+            { id: 'checkebox-sm20', label: 'Trong 30 ngày tới' },
+            { id: 'checkebox-sm21', label: 'Cuối tuần này' },
         ],
         hasViewMore: true,
     },
@@ -95,6 +77,14 @@ const mockFilterData: FilterSection[] = [
         ],
     },
     {
+        title: 'Giới tính',
+        options: [
+            { id: 'checkebox-sm14', label: 'Nam', count: 50 },
+            { id: 'checkebox-sm15', label: 'Nữ', count: 45 },
+            { id: 'checkebox-sm16', label: 'Khác', count: 5 },
+        ],
+    },
+    {
         title: 'Ngôn ngữ',
         options: [
             { id: 'checkebox-sm40', label: 'Tiếng Anh' },
@@ -103,27 +93,6 @@ const mockFilterData: FilterSection[] = [
             { id: 'checkebox-sm43', label: 'Tiếng Đức' },
             { id: 'checkebox-sm44', label: 'Tiếng Nhật' },
             { id: 'checkebox-sm45', label: 'Tiếng Hàn' },
-        ],
-        hasViewMore: true,
-    },
-    {
-        title: 'Đánh giá',
-        options: [
-            { id: 'checkebox-sm46', label: '5 Sao' },
-            { id: 'checkebox-sm47', label: '4 Sao' },
-            { id: 'checkebox-sm48', label: '3 Sao' },
-            { id: 'checkebox-sm49', label: '2 Sao' },
-            { id: 'checkebox-sm50', label: '1 Sao' },
-        ],
-    },
-    {
-        title: 'Khu vực',
-        options: [
-            { id: 'checkebox-sm51', label: 'Hà Nội', count: 30 },
-            { id: 'checkebox-sm52', label: 'TP. Hồ Chí Minh', count: 35 },
-            { id: 'checkebox-sm53', label: 'Đà Nẵng', count: 15 },
-            { id: 'checkebox-sm54', label: 'Cần Thơ', count: 10 },
-            { id: 'checkebox-sm55', label: 'Hải Phòng', count: 12 },
         ],
         hasViewMore: true,
     },
@@ -278,14 +247,7 @@ const SideBar: React.FC = () => {
                 <div className="card-header">
                     <div className="d-flex align-items-center filter-head justify-content-between">
                         <h4>Bộ lọc</h4>
-                        <Link
-                            to="#"
-                            className={clsx(
-                                'text-decoration-underline',
-                                styles.textSecondaryCustom
-                            )}
-                            onClick={handleClearAll}
-                        >
+                        <Link to="#" className="btn btn-light btn-sm" onClick={handleClearAll}>
                             Xóa tất cả
                         </Link>
                     </div>
@@ -296,7 +258,7 @@ const SideBar: React.FC = () => {
                                 className="form-control"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Tìm chuyên khoa, phòng khám..."
+                                placeholder="Tìm kiếm..."
                             />
                             <span>
                                 <i className="isax isax-search-normal-1"></i>
@@ -450,9 +412,7 @@ const SideBar: React.FC = () => {
                                                                 to="#"
                                                                 className={clsx(
                                                                     `viewall-button-${index + 1}`,
-                                                                    'text-decoration-underline',
-                                                                    styles.viewAllLink,
-                                                                    styles.textSecondaryCustom
+                                                                    'btn btn-light btn-sm'
                                                                 )}
                                                                 onClick={() =>
                                                                     toggleViewMore(section.title)

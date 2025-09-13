@@ -1,0 +1,105 @@
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
+import { X, Search } from 'lucide-react';
+import ModalItem from './components/ModalItem';
+import styles from './Modal.module.scss';
+
+interface ModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onApply: (selectedItems: string[], searchTerm: string) => void;
+    items: Array<{
+        id: string;
+        name: string;
+        icon?: React.ComponentType<{ className?: string }>;
+        imageUrl?: string;
+        color?: string;
+    }>;
+    title: string;
+}
+
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onApply, items, title }) => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+    const handleItemToggle = (itemId: string) => {
+        setSelectedItems((prev) =>
+            prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
+        );
+    };
+
+    const handleClearFilter = () => {
+        setSearchTerm('');
+        setSelectedItems([]);
+    };
+
+    const handleApply = () => {
+        onApply(selectedItems, searchTerm);
+        onClose();
+    };
+
+    const filteredItems = items.filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (!isOpen) return null;
+
+    return ReactDOM.createPortal(
+        <div className={styles.modalOverlay}>
+            <div className={styles.modalContainer}>
+                {/* Header */}
+                <div className={styles.header}>
+                    <h2 className={styles.title}>{title}</h2>
+                    <button onClick={onClose} className={styles.closeButton}>
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                {/* Search Input */}
+                <div className={styles.searchContainer}>
+                    <div className={styles.searchInputWrapper}>
+                        <Search className={styles.searchIcon} />
+                        <input
+                            type="text"
+                            placeholder="Tìm theo tên"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className={styles.searchInput}
+                        />
+                    </div>
+                </div>
+
+                {/* Item List */}
+                <div className={styles.specialtyList}>
+                    <div className={styles.scrollContainer}>
+                        {filteredItems.map((item) => (
+                            <ModalItem
+                                key={item.id}
+                                id={item.id}
+                                name={item.name}
+                                icon={item.icon}
+                                imageUrl={item.imageUrl}
+                                color={item.color}
+                                isSelected={selectedItems.includes(item.id)}
+                                onToggle={handleItemToggle}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className={styles.actionButtons}>
+                    <button onClick={handleClearFilter} className={styles.clearButton}>
+                        Xóa bỏ lọc
+                    </button>
+                    <button onClick={handleApply} className={styles.applyButton}>
+                        Áp dụng
+                    </button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+};
+
+export default Modal;
