@@ -109,14 +109,20 @@ export const CAROUSEL_CLINICS_BREAKPOINTS = {
 };
 
 export const CAROUSEL_DOCTORS_BREAKPOINTS = {
-    320: {
-        slidesPerView: 1,
-    },
-    640: {
-        slidesPerView: 2,
-    },
-    1024: {
+    1204: {
         slidesPerView: 4,
+    },
+    1000: {
+        slidesPerView: 3,
+    },
+    768: {
+        slidesPerView: 2, // tablets
+    },
+    480: {
+        slidesPerView: 2, // mobile
+    },
+    0: {
+        slidesPerView: 1, // small mobile
     },
 };
 

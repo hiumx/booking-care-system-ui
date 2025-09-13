@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import styles from './DoctorCarouselItem.module.scss';
 import { Link } from 'react-router-dom';
+import clsx from 'clsx';
 
 type DoctorCarouselItemProps = {
     image: string;
@@ -36,7 +37,7 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
     };
 
     return (
-        <div className="card">
+        <div className={clsx(styles.doctorCarouselItemContainer, 'card')}>
             <div className="card-img card-img-hover">
                 <Link to={profileLink}>
                     <img src={image} alt={name} />
@@ -64,7 +65,7 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
                         {specialty}
                     </Link>
                     <span className="badge bg-success-light d-inline-flex align-items-center">
-                        <div className={styles.fsWrapper}>
+                        <div className={styles.dotIconWrapper}>
                             <i className="fa-solid fa-circle me-1"></i>
                         </div>
                         {available ? 'Available' : 'Unavailable'}
