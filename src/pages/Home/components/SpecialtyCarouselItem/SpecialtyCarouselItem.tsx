@@ -1,3 +1,6 @@
+import clsx from 'clsx';
+import styles from './SpecialtyCarouselItem.module.scss';
+
 interface SpecialtyCarouselItemProps {
     imageSrc: string;
     iconSrc: string;
@@ -12,7 +15,7 @@ const SpecialtyCarouselItem: React.FC<SpecialtyCarouselItemProps> = ({
     doctorCount,
 }) => {
     return (
-        <div className="spaciality-item">
+        <div className={clsx(styles.specialtyCarouselItemContainer, 'spaciality-item')}>
             <div className="spaciality-img">
                 <img src={imageSrc} alt="img" />
                 <span className="spaciality-icon">

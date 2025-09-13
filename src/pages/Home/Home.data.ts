@@ -90,6 +90,126 @@ export const CAROUSEL_SPECIALTIES_BREAKPOINTS = {
     },
 };
 
+export const CAROUSEL_CLINICS_BREAKPOINTS = {
+    1280: {
+        slidesPerView: 4, // desktops
+    },
+    1024: {
+        slidesPerView: 3, // laptops
+    },
+    768: {
+        slidesPerView: 2, // tablets
+    },
+    480: {
+        slidesPerView: 2, // mobile
+    },
+    0: {
+        slidesPerView: 1, // small mobile
+    },
+};
+
+export const CAROUSEL_DOCTORS_BREAKPOINTS = {
+    320: {
+        slidesPerView: 1,
+    },
+    640: {
+        slidesPerView: 2,
+    },
+    1024: {
+        slidesPerView: 4,
+    },
+};
+
+export type Clinic = {
+    id: number;
+    name: string;
+    image: string;
+    address: string;
+    rating: number;
+    reviewCount: number;
+    distance?: string;
+    specialties: string[];
+    description?: string;
+    priceRange?: string;
+    availableSlots?: number;
+    isVerified?: boolean;
+};
+
+export const LIST_CLINICS: Clinic[] = [
+    {
+        id: 1,
+        name: 'Bệnh viện Chợ Rẫy',
+        image: '/src/assets/img/features/feature-01.jpg',
+        address: '201B Nguyễn Chí Thanh, Quận 5, TP. Hồ Chí Minh',
+        rating: 4.7,
+        reviewCount: 512,
+        distance: '3.1 km',
+        specialties: ['Tim mạch', 'Thần kinh', 'Chấn thương chỉnh hình'],
+        priceRange: '500.000 - 2.000.000 VNĐ',
+        availableSlots: 10,
+    },
+    {
+        id: 2,
+        name: 'Bệnh viện Bạch Mai',
+        image: '/src/assets/img/features/feature-02.jpg',
+        address: '78 Giải Phóng, Đống Đa, Hà Nội',
+        rating: 4.6,
+        reviewCount: 430,
+        distance: '2.8 km',
+        specialties: ['Nhi khoa', 'Hô hấp', 'Nội tổng quát'],
+        priceRange: '400.000 - 1.500.000 VNĐ',
+        availableSlots: 8,
+    },
+    {
+        id: 3,
+        name: 'Phòng khám Đa khoa Quốc tế Vinmec',
+        image: '/src/assets/img/features/feature-01.jpg',
+        address: '458 Minh Khai, Hai Bà Trưng, Hà Nội',
+        rating: 4.8,
+        reviewCount: 320,
+        distance: '4.0 km',
+        specialties: ['Sản phụ khoa', 'Nội tiết', 'Tiêu hóa'],
+        priceRange: '800.000 - 3.000.000 VNĐ',
+        availableSlots: 12,
+    },
+    {
+        id: 4,
+        name: 'Phòng khám Đa khoa Hoàn Mỹ Sài Gòn',
+        image: '/src/assets/img/features/feature-02.jpg',
+        address: '60-60A Phan Xích Long, Phú Nhuận, TP. Hồ Chí Minh',
+        rating: 4.5,
+        reviewCount: 210,
+        distance: '1.5 km',
+        specialties: ['Khám tổng quát', 'Tiêm chủng', 'Da liễu'],
+        priceRange: '300.000 - 1.200.000 VNĐ',
+        availableSlots: 7,
+    },
+    {
+        id: 5,
+        name: 'Bệnh viện Đại học Y Dược TP.HCM',
+        image: '/src/assets/img/features/feature-03.jpg',
+        address: '215 Hồng Bàng, Quận 5, TP. Hồ Chí Minh',
+        rating: 4.9,
+        reviewCount: 610,
+        distance: '2.2 km',
+        specialties: ['Tim mạch', 'Nội tiết', 'Chấn thương chỉnh hình'],
+        priceRange: '600.000 - 2.500.000 VNĐ',
+        availableSlots: 15,
+    },
+    {
+        id: 6,
+        name: 'Phòng khám Quốc tế CarePlus',
+        image: '/src/assets/img/features/feature-04.jpg',
+        address: 'CarePlus, 2 Phan Đăng Lưu, Bình Thạnh, TP. Hồ Chí Minh',
+        rating: 4.4,
+        reviewCount: 185,
+        distance: '3.7 km',
+        specialties: ['Nhi khoa', 'Tiêm chủng', 'Khám tổng quát'],
+        priceRange: '350.000 - 1.800.000 VNĐ',
+        availableSlots: 9,
+    },
+];
+
 // -----------------------------
 // Doctor mock data
 // -----------------------------

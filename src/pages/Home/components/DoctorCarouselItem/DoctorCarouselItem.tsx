@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import styles from './DoctorCarouselItem.module.scss';
+import { Link } from 'react-router-dom';
 
 type DoctorCarouselItemProps = {
     image: string;
@@ -29,16 +30,16 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
     return (
         <div className={`${styles.root} card`}>
             <div className="card-img card-img-hover">
-                <a href={profileLink}>
+                <Link to={profileLink}>
                     <img src={image} alt={name} />
-                </a>
+                </Link>
                 <div className="grid-overlay-item d-flex align-items-center justify-content-between">
                     <span className="badge bg-orange">
                         <i className="fa-solid fa-star me-1"></i> {rating.toFixed(1)}
                     </span>
-                    <a href="javascript:void(0)" className="fav-icon">
+                    <button className="fav-icon">
                         <i className="fa fa-heart"></i>
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -73,13 +74,13 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
                             <p className="mb-1">Consultation Fees</p>
                             <h3 className="text-orange">${fee}</h3>
                         </div>
-                        <a
-                            href={bookingLink}
+                        <Link
+                            to={bookingLink}
                             className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
                         >
                             <i className="isax isax-calendar-1 me-2"></i>
                             Book Now
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>
