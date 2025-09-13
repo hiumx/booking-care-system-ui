@@ -13,6 +13,7 @@ type DoctorCarouselItemProps = {
     consultationTime: string;
     profileLink?: string;
     bookingLink?: string;
+    specialtiesLink?: string;
 };
 
 const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
@@ -26,8 +27,8 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
     consultationTime,
     profileLink = '#',
     bookingLink = '#',
+    specialtiesLink = '#',
 }) => {
-    // State để lưu trạng thái yêu thích
     const [isFavorite, setIsFavorite] = useState(false);
 
     const toggleFavorite = () => {
@@ -59,9 +60,9 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
 
             <div className="card-body p-0">
                 <div className="d-flex active-bar align-items-center justify-content-between p-3">
-                    <a href="#" className="text-indigo fw-medium fs-14">
+                    <Link to={specialtiesLink} className="text-indigo fw-medium fs-14">
                         {specialty}
-                    </a>
+                    </Link>
                     <span className="badge bg-success-light d-inline-flex align-items-center">
                         <div className={styles.fsWrapper}>
                             <i className="fa-solid fa-circle me-1"></i>
@@ -74,7 +75,7 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
                     <div className="doctor-info-detail mb-3 pb-3">
                         <div className={styles.doctorName}>
                             <h3 className="mb-1">
-                                <a href={profileLink}>{name}</a>
+                                <Link to={profileLink}>{name}</Link>
                             </h3>
                         </div>
                         <div className="d-flex align-items-center">
@@ -99,7 +100,7 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
                             className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
                         >
                             <i className="isax isax-calendar-1 me-2"></i>
-                            Book Now
+                            {'Book Now'}
                         </Link>
                     </div>
                 </div>

@@ -225,6 +225,7 @@ export type Doctor = {
     available: boolean;
     profileLink: string;
     bookingLink: string;
+    specialtiesLink: string;
 };
 
 export const LIST_DOCTORS: Doctor[] = [
@@ -240,6 +241,7 @@ export const LIST_DOCTORS: Doctor[] = [
         available: true,
         profileLink: '/doctor/1',
         bookingLink: '/booking/1',
+        specialtiesLink: '/specialties/cardiology',
     },
     {
         id: 2,
@@ -253,6 +255,7 @@ export const LIST_DOCTORS: Doctor[] = [
         available: true,
         profileLink: '/doctor/2',
         bookingLink: '/booking/2',
+        specialtiesLink: '/specialties/orthopedics',
     },
     {
         id: 3,
@@ -266,6 +269,7 @@ export const LIST_DOCTORS: Doctor[] = [
         available: true,
         profileLink: '/doctor/3',
         bookingLink: '/booking/3',
+        specialtiesLink: '/specialties/neurology',
     },
     {
         id: 4,
@@ -279,6 +283,7 @@ export const LIST_DOCTORS: Doctor[] = [
         available: false,
         profileLink: '/doctor/4',
         bookingLink: '/booking/4',
+        specialtiesLink: '/specialties/pediatrics',
     },
     {
         id: 5,
@@ -292,6 +297,7 @@ export const LIST_DOCTORS: Doctor[] = [
         available: true,
         profileLink: '/doctor/5',
         bookingLink: '/booking/5',
+        specialtiesLink: '/specialties/psychiatry',
     },
     {
         id: 6,
@@ -305,5 +311,6 @@ export const LIST_DOCTORS: Doctor[] = [
         available: true,
         profileLink: '/doctor/6',
         bookingLink: '/booking/6',
+        specialtiesLink: '/specialties/endocrinology',
     },
 ];

@@ -56,6 +56,7 @@ const Home: React.FC = () => {
                 id: doctor.id,
             })}
             bookingLink={replacePathParams(PATHS.BOOKING.ROOT, { doctorId: doctor.id })}
+            specialtiesLink={doctor.specialtiesLink}
         />
     ));
     return (
