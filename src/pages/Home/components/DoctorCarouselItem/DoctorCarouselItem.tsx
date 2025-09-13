@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import styles from './DoctorCarouselItem.module.scss';
 import { Link } from 'react-router-dom';
 
@@ -27,8 +27,15 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
     profileLink = '#',
     bookingLink = '#',
 }) => {
+    // State để lưu trạng thái yêu thích
+    const [isFavorite, setIsFavorite] = useState(false);
+
+    const toggleFavorite = () => {
+        setIsFavorite((prev) => !prev);
+    };
+
     return (
-        <div className={`${styles.root} card`}>
+        <div className="card">
             <div className="card-img card-img-hover">
                 <Link to={profileLink}>
                     <img src={image} alt={name} />
@@ -37,9 +44,16 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
                     <span className="badge bg-orange">
                         <i className="fa-solid fa-star me-1"></i> {rating.toFixed(1)}
                     </span>
-                    <button className="fav-icon">
-                        <i className="fa fa-heart"></i>
-                    </button>
+                    <div className={styles.favWrapper}>
+                        <button
+                            className={`${styles.favIcon} ${isFavorite ? styles.active : ''}`}
+                            onClick={toggleFavorite}
+                        >
+                            <i
+                                className={`fa${isFavorite ? ' fa-heart' : ' fa-regular fa-heart'}`}
+                            ></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -49,22 +63,28 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
                         {specialty}
                     </a>
                     <span className="badge bg-success-light d-inline-flex align-items-center">
-                        <i className="fa-solid fa-circle fs-5 me-1"></i>
+                        <div className={styles.fsWrapper}>
+                            <i className="fa-solid fa-circle me-1"></i>
+                        </div>
                         {available ? 'Available' : 'Unavailable'}
                     </span>
                 </div>
 
                 <div className="p-3 pt-0">
                     <div className="doctor-info-detail mb-3 pb-3">
-                        <h3 className="mb-1">
-                            <a href={profileLink}>{name}</a>
-                        </h3>
+                        <div className={styles.doctorName}>
+                            <h3 className="mb-1">
+                                <a href={profileLink}>{name}</a>
+                            </h3>
+                        </div>
                         <div className="d-flex align-items-center">
                             <p className="d-flex align-items-center mb-0 fs-14">
                                 <i className="isax isax-location me-2"></i>
                                 {location}
                             </p>
-                            <i className="fa-solid fa-circle fs-5 text-primary mx-2 me-1"></i>
+                            <div className={styles.fsWrapper}>
+                                <i className="fa-solid fa-circle text-primary mx-2 me-1"></i>
+                            </div>
                             <span className="fs-14 fw-medium">{consultationTime}</span>
                         </div>
                     </div>
