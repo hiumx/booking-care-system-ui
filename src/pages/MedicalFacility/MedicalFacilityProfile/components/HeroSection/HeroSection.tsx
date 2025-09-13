@@ -239,8 +239,23 @@ const HeroSection: React.FC = () => {
                 </div>
             </section>
             {isLightboxOpen && (
-                <div className={styles.lightbox} onClick={() => setIsLightboxOpen(false)}>
-                    <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
+                <div
+                    className={styles.lightbox}
+                    onClick={() => setIsLightboxOpen(false)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+                            setIsLightboxOpen(false);
+                        }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Đóng lightbox"
+                >
+                    <div
+                        className={styles.lightboxContent}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                    >
                         <div className={styles.lightboxHeader}>
                             <span className={styles.lightboxTitle}>
                                 Phòng khám MedFit - Phòng khám giảm cân chuyên sâu
