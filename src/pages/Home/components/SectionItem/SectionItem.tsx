@@ -12,6 +12,7 @@ interface SectionItemProps {
     viewAllTarget?: string;
     viewAllText?: string;
     isBackgroundColor?: boolean;
+    isAutoPlay?: boolean;
 }
 
 const SectionItem: React.FC<SectionItemProps> = ({
@@ -22,6 +23,7 @@ const SectionItem: React.FC<SectionItemProps> = ({
     viewAllTarget,
     viewAllText = 'View All',
     isBackgroundColor = false,
+    isAutoPlay = false,
 }) => {
     return (
         <section
@@ -52,7 +54,7 @@ const SectionItem: React.FC<SectionItemProps> = ({
                     )}
                 </div>
                 <div className="owl-carousel spciality-slider aos">
-                    <Carousel slides={items} breakpoints={breakpoints} />
+                    <Carousel slides={items} breakpoints={breakpoints} isAutoPlay={isAutoPlay} />
                 </div>
             </div>
         </section>

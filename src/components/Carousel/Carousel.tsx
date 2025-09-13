@@ -21,7 +21,7 @@ const Carousel: FC<CarouselProps> = ({
     slides,
     autoPlayDelayMs = 5000,
     loop = true,
-    isAutoPlay = true,
+    isAutoPlay = false,
     breakpoints,
 }) => {
     const prevRef = useRef<HTMLButtonElement>(null);
