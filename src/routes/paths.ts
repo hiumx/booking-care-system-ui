@@ -50,6 +50,11 @@ export const PATHS = {
         PROFILE: 'profile',
     },
 
+    // Service paths
+    Service: {
+        Service_Types: '/service-types/:serviceId',
+    },
+
     // Booking
     BOOKING: {
         ROOT: '/booking/:doctorId',
