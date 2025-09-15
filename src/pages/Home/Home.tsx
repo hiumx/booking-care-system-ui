@@ -5,6 +5,7 @@ import ClinicCaroulselItem from './components/ClinicCaroulselItem';
 import SectionItem from './components/SectionItem';
 import SpecialtyCarouselItem from './components/SpecialtyCarouselItem';
 import DoctorCarouselItem from './components/DoctorCarouselItem';
+import ServiceSection from './components/ServicesSection/ServiceSection';
 import {
     CAROUSEL_SPECIALTIES_BREAKPOINTS,
     CAROUSEL_CLINICS_BREAKPOINTS,
@@ -12,6 +13,7 @@ import {
     LIST_SPECIALTIES,
     LIST_DOCTORS,
     CAROUSEL_DOCTORS_BREAKPOINTS,
+    LIST_SERVICES,
 } from './Home.data';
 
 const Home: React.FC = () => {
@@ -59,6 +61,8 @@ const Home: React.FC = () => {
             specialtiesLink={doctor.specialtiesLink}
         />
     ));
+    const leftServices = LIST_SERVICES.slice(0, 5); // 0 -> 4
+    const rightServices = LIST_SERVICES.slice(5, 10); // 5 -> 9
     return (
         <div>
             <MainLayout>
@@ -92,6 +96,8 @@ const Home: React.FC = () => {
                     viewAllTarget={PATHS.DOCTOR.ROOT}
                     viewAllText="View All Doctors"
                 />
+                {/* Services Section */}
+                <ServiceSection leftServices={leftServices} rightServices={rightServices} />
             </MainLayout>
         </div>
     );
