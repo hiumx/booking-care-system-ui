@@ -825,7 +825,7 @@ const DoctorList: React.FC = () => {
                             <div className="row">
                                 {isLoading
                                     ? [...Array(10)].map((_, index) => (
-                                          <div className="col-md-12 mb-4" key={index}>
+                                          <div className="col-md-12 mb-4" key={`skeleton-${index}`}>
                                               <DoctorAppointmentBookingCardSkeleton />
                                           </div>
                                       ))
