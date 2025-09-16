@@ -1,5 +1,3 @@
-import UserProfile from '@/examples/UserExamples';
-
 const Demo = () => {
     return (
         <div style={{ padding: '20px' }}>
@@ -11,7 +9,6 @@ const Demo = () => {
                     <component.component {...component.mockData} />
                 </div>
             ))} */}
-            <UserProfile userId="1" />
         </div>
     );
 };
