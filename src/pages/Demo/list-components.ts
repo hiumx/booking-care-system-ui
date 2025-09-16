@@ -1,4 +1,4 @@
-import DoctorAppointmentBookingCard from '@/pages/Doctor/DoctorList/components/DoctorAppointmentBookingCard';
+import { DoctorAppointmentBookingCard } from '@/pages/Doctor/DoctorList/components/DoctorAppointmentBookingCard';
 import type { ComponentType } from 'react';
 
 const COMPONENTS: Array<{

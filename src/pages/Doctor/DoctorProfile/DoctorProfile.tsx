@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import clsx from 'clsx';
 import styles from './DoctorProfile.module.scss';
 import Pagination from '@/components/Pagination';
@@ -26,6 +26,7 @@ import clinicImg1 from '@/assets/img/clinic/clinic-11.jpg';
 // Icon CSS
 import '@/assets/css/feather.css';
 import DoctorAvailability from './components/DoctorAvailability';
+import { PATHS, replacePathParams } from '@/routes/paths';
 
 // Mock data for Doctor
 const mockDoctor = {
@@ -293,6 +294,8 @@ const DoctorProfile: React.FC = () => {
     };
 
     const [expanded, setExpanded] = useState(false);
+    const { id } = useParams<{ id: string }>();
+
     const limit = 300;
     const isLongText = mockDoctor.bio.length > limit;
     const displayText =
@@ -557,7 +560,12 @@ const DoctorProfile: React.FC = () => {
                                         <span>Giá: {priceRange}</span> mỗi lượt khám
                                     </p>
                                     <div className="clinic-booking">
-                                        <Link className="apt-btn" to="/booking">
+                                        <Link
+                                            className="apt-btn"
+                                            to={replacePathParams(PATHS.BOOKING.ROOT, {
+                                                doctorId: id || '',
+                                            })}
+                                        >
                                             Đặt lịch hẹn
                                         </Link>
                                     </div>

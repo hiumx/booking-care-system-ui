@@ -25,3 +25,14 @@
 .paddingLeftZero {
     padding-left: 0;
 }
+
+.slotsAvailable {
+    cursor: pointer;
+
+    .slotLink {
+        font-weight: 500;
+        font-size: 14px;
+        color: #012047;
+        text-decoration: none;
+    }
+}

@@ -33,10 +33,6 @@ const routes: RouteObject[] = [
         element: <Home />,
     },
     {
-        path: PATHS.ABOUT,
-        element: <h1>About Page</h1>,
-    },
-    {
         path: PATHS.FAQ,
         element: <FAQ />,
     },

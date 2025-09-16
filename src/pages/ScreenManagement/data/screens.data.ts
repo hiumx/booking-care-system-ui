@@ -18,7 +18,7 @@ export const SCREENS_DATA: Screen[] = [
     {
         id: 'about',
         name: 'About Page',
-        path: PATHS.ABOUT,
+        path: PATHS.ABOUT_US,
         category: ScreenCategory.PUBLIC,
         description: 'Information about the platform and services',
         status: ScreenStatus.PLANNED,

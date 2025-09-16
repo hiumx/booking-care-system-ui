@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Calendar from '@/components/Calendar';
 import styles from './DoctorAvailability.module.scss';
+import { PATHS, replacePathParams } from '@/routes/paths';
 
 interface AppointmentTime {
     id: number;
@@ -405,10 +406,28 @@ const DoctorAvailability: React.FC = () => {
                                     <div className="slot-body">
                                         <ul className={clsx(styles.paddingLeftZero, 'time-slots')}>
                                             {getSlotsForDate(day.date).length > 0 ? (
-                                                getSlotsForDate(day.date).map((slot, index) => (
-                                                    <li key={index}>
-                                                        <i className={clsx('isax', 'isax-clock')} />{' '}
-                                                        {slot}
+                                                getSlotsForDate(day.date).map((slot) => (
+                                                    <li
+                                                        key={slot}
+                                                        className={styles.slotsAvailable}
+                                                    >
+                                                        <Link
+                                                            className={clsx(styles.slotLink)}
+                                                            to={replacePathParams(
+                                                                PATHS.BOOKING.ROOT,
+                                                                {
+                                                                    doctorId: '1',
+                                                                }
+                                                            )}
+                                                        >
+                                                            <i
+                                                                className={clsx(
+                                                                    'isax',
+                                                                    'isax-clock'
+                                                                )}
+                                                            />{' '}
+                                                            {slot}
+                                                        </Link>
                                                     </li>
                                                 ))
                                             ) : (
