@@ -743,6 +743,7 @@ const DoctorList: React.FC = () => {
 
     const doctorsPerPage = 10; // Cập nhật thành 10 bác sĩ mỗi trang
     const patientId = '1';
+    const skeletonKeys = Array.from({ length: 10 }, (_, i) => `skeleton-${i}`);
 
     const sortOptions = [
         { label: 'Giá từ thấp đến cao', value: 'low-to-high' },
@@ -824,8 +825,8 @@ const DoctorList: React.FC = () => {
                             </div>
                             <div className="row">
                                 {isLoading
-                                    ? [...Array(10)].map((_, index) => (
-                                          <div className="col-md-12 mb-4" key={`skeleton-${index}`}>
+                                    ? skeletonKeys.map((key) => (
+                                          <div className="col-md-12 mb-4" key={key}>
                                               <DoctorAppointmentBookingCardSkeleton />
                                           </div>
                                       ))
