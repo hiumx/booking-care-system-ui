@@ -32,7 +32,6 @@ $font-weight-semibold: 600;
 $font-weight-bold: 700;
 
 .clinicCarouselItem {
-    padding: 5px;
     height: 100%;
     cursor: pointer;
 
@@ -49,7 +48,7 @@ $font-weight-bold: 700;
         flex-direction: column;
 
         &:hover {
-            transform: translateY(-5px);
+            transform: translateY(2px);
             box-shadow: $box-shadow-hover;
             border-color: $primary-color;
 
@@ -77,7 +76,7 @@ $font-weight-bold: 700;
     // Image Section
     .clinicImageContainer {
         position: relative;
-        height: 154px;
+        height: 176px;
         overflow: hidden;
         background: $light-color;
 
@@ -149,7 +148,7 @@ $font-weight-bold: 700;
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
 
         .clinicName {
             display: flex;
@@ -184,6 +183,7 @@ $font-weight-bold: 700;
             display: flex;
             align-items: center;
             gap: 8px;
+            justify-content: flex-end;
 
             .stars {
                 display: flex;

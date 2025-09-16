@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import styles from './ConfirmSection.module.scss';
-import { buildPath, PATHS } from '@/routes/paths';
+import { PATHS } from '@/routes/paths';
 
 interface ConfirmSectionProps {
     handleGoBack: () => void;
@@ -146,7 +146,7 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                             Add To Calendar
                                         </a>
                                         <Link
-                                            to={buildPath(PATHS.DOCTOR.ROOT, PATHS.DOCTOR.LIST)}
+                                            to={PATHS.DOCTOR.ROOT}
                                             className="btn w-100 btn-md btn-primary-gradient next_btns inline-flex align-items-center rounded-pill"
                                         >
                                             Start New Booking

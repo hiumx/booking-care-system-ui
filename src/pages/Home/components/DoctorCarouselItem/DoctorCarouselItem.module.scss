@@ -1,0 +1,45 @@
+.doctorCarouselItemContainer {
+    border-radius: 10px !important;
+
+    .dotIconWrapper {
+        font-size: 0.3125rem !important;
+        font-weight: 900;
+        margin-top: 2px;
+    }
+
+    .doctorName {
+        h3 a {
+            color: #012047;
+            text-decoration: none;
+
+            &:hover {
+                color: #0e82fd;
+            }
+        }
+    }
+
+    .favWrapper {
+        display: flex;
+        justify-content: flex-end;
+
+        .favIcon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background-color: #fff;
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #777;
+            transition: all 0.3s ease;
+
+            &.active {
+                color: red;
+            }
+        }
+    }
+}

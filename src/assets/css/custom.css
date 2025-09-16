@@ -14056,10 +14056,6 @@ header.inner-header .header-nav .header-navbar-rht li.noti-nav > a i {
 
 .search-box-one {
   min-width: 800px;
-  background: #ffffff;
-  border: 1px solid #E6E8EE;
-  box-shadow: 0px 4px 14px 0px rgba(226, 237, 255, 0.25);
-  border-radius: 10px;
   margin: 0;
   padding: 20px;
   display: table;
@@ -14067,7 +14063,6 @@ header.inner-header .header-nav .header-navbar-rht li.noti-nav > a i {
   z-index: 1;
 }
 .search-box-one form {
-  float: left;
   width: 100%;
 }
 .search-box-one input:hover, .search-box-one input:focus {
@@ -14096,6 +14091,54 @@ header.inner-header .header-nav .header-navbar-rht li.noti-nav > a i {
 
 .search-box-one .form-control:hover, .search-box-one .form-control:focus {
   background-color: #ffffff !important;
+}
+
+.search-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.first-row .symptom-input {
+  flex: 1;
+  max-width: 100%;
+}
+
+.second-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.second-row .input-item {
+  flex: 1;
+  min-width: 150px;
+  margin-right: 10px;
+}
+
+.second-row .form-search-btn {
+  min-width: 120px;
+  margin-right: 0;
+}
+
+@media (max-width: 767.98px) {
+  .second-row .input-item {
+    flex: 1 1 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+  .second-row .form-search-btn {
+    flex: 1 1 100%;
+    margin-bottom: 10px;
+  }
+  .second-row .form-search-btn button {
+    justify-content: center;
+    width: 100%;
+  }
 }
 
 .search-input {
@@ -55168,7 +55211,7 @@ ul li {
   position: relative;
   transition: 0.5s;
 }
-.slot-box .slot-body .time-slots li:hover::before {
+/* .slot-box .slot-body .time-slots li:hover::before {
   content: "Space : 2";
   background: #000F28;
   color: #FFF;
@@ -55181,7 +55224,7 @@ ul li {
   margin: 0 15px 15px 0;
   padding: 12px 13px;
   transition: 0.5s;
-}
+} */
 .slot-box .slot-body .time-slots li i {
   margin-right: 10px;
 }
@@ -57063,7 +57106,6 @@ ul li {
 }
 
 .doctors-search-box {
-  max-width: 855px;
   margin: 20px auto -80px;
   padding: 2px;
 }
@@ -57074,21 +57116,20 @@ ul li {
 }
 .doctors-search-box .search-box-one {
   padding: 8px;
+  background: #ffffff;
+  border: 1px solid #E6E8EE;
+  box-shadow: 0px 4px 14px 0px rgba(226, 237, 255, 0.25);
+  border-radius: 10px;
 }
 @media (max-width: 767.98px) {
   .doctors-search-box .search-box-one {
     border-radius: 10px !important;
   }
 }
-@media (max-width: 767.98px) {
-  .doctors-search-box .search-box-one .form-search-btn button {
-    justify-content: center;
-  }
-}
 .doctors-search-box .search-box-one form {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  width: 100%;
 }
 
 .head-icon {

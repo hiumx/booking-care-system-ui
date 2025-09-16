@@ -107,18 +107,18 @@ const ClinicCaroulselItem: React.FC<ClinicCaroulselItemProps> = ({
                         <p className={styles.priceRange}>{priceRange}</p>
                     </div>
 
+                    {/* Location */}
+                    <div className={styles.locationSection}>
+                        <i className={`fas fa-map-marker-alt ${styles.locationIcon}`}></i>
+                        <span className={styles.locationText}>{location}</span>
+                    </div>
+
                     {/* Rating Section */}
                     <div className={styles.ratingSection}>
                         <div className={styles.stars}>{renderStars(rating)}</div>
                         <span className={styles.ratingText}>
                             {rating.toFixed(1)} ({reviewCount} reviews)
                         </span>
-                    </div>
-
-                    {/* Location */}
-                    <div className={styles.locationSection}>
-                        <i className={`fas fa-map-marker-alt ${styles.locationIcon}`}></i>
-                        <span className={styles.locationText}>{location}</span>
                     </div>
 
                     {/* Specialties */}

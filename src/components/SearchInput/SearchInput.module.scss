@@ -1,5 +1,5 @@
 .doctorsSearchBoxCustom {
-    max-width: 845px;
+    width: 85%;
 
     @media (max-width: 768px) {
         margin: 0 10px;
@@ -10,8 +10,12 @@
     box-shadow: none !important;
 }
 
+.customWidthSearch {
+    width: 100%;
+}
+
 .roundedPillCustom {
-    border-radius: 50rem;
+    border-radius: 10px;
 
     @media (max-width: 768px) {
         border-radius: 0.625rem;
@@ -20,4 +24,172 @@
 
 .btnNoWrap {
     white-space: nowrap;
+}
+
+.symptomInput {
+    min-width: 100%;
+}
+
+.doctorsSearchBox {
+    margin: 20px auto -80px;
+    padding: 2px;
+
+    @media (max-width: 767.98px) {
+        border-radius: 10px !important;
+    }
+}
+
+.searchBoxOne {
+    min-width: 300px !important;
+    margin: 0;
+    padding: 20px;
+    display: table;
+    position: relative;
+    z-index: 1;
+    background: #ffffff;
+    border: 1px solid #e6e8ee;
+    box-shadow: 0px 4px 14px 0px rgba(226, 237, 255, 0.25);
+    border-radius: 10px;
+
+    @media (max-width: 1399.96px) {
+        margin: 0;
+        padding: 20px;
+    }
+
+    @media (max-width: 991.98px) {
+        min-width: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 13px 15px;
+    }
+
+    @media (max-width: 767.98px) {
+        margin: 0;
+        padding: 0px 15px 15px;
+        border-radius: 10px !important;
+    }
+
+    & input:hover,
+    & input:focus,
+    & .form-control:hover,
+    & .form-control:focus {
+        background-color: #ffffff !important;
+    }
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.searchRow {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.firstRow {
+    & .symptomInput {
+        flex: 1;
+        max-width: 100%;
+    }
+}
+
+.secondRow {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+
+    & .inputItem {
+        flex: 1;
+        min-width: 150px;
+        margin-right: 10px;
+    }
+
+    & .formSearchBtn {
+        min-width: 120px;
+        margin-right: 0;
+    }
+
+    /* 🔹 Fix cho tablet (768px–991.98px) */
+    @media (max-width: 991.98px) and (min-width: 768px) {
+        flex-wrap: wrap;
+        gap: 10px;
+
+        & .inputItem {
+            flex: 1 1 calc(50% - 10px);
+            min-width: 200px;
+            margin-right: 0;
+        }
+
+        & .formSearchBtn {
+            flex: 1 1 100%;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 6px;
+
+            button {
+                width: auto;
+                justify-content: center;
+            }
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        flex-direction: column;
+        align-items: stretch;
+
+        & .inputItem {
+            flex: 1 1 100%;
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+
+        & .formSearchBtn {
+            flex: 1 1 100%;
+            margin-bottom: 0;
+
+            & button {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+    }
+}
+
+@media (max-width: 767.98px) {
+    .doctorsSearchBoxCustom {
+        max-width: 100%;
+    }
+
+    .secondRow {
+        flex-direction: column;
+        align-items: stretch;
+
+        .inputItem {
+            width: 100% !important;
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+
+        .search-calendar-line,
+        .search-map-line {
+            width: 100% !important;
+        }
+
+        .formSearchBtn {
+            width: 100%;
+            margin-bottom: 0;
+
+            button {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+    }
 }

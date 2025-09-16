@@ -7,6 +7,7 @@ export interface User {
     email: string;
     phoneNumber?: string;
     avatarUrl?: string;
+    phone?: string;
     role: 'patient' | 'doctor' | 'admin';
     isActive: boolean;
     createdAt: string;
