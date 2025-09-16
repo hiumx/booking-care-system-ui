@@ -5,6 +5,8 @@ import patientImg from '@/assets/img/patients/patient.jpg';
 import patientImg1 from '@/assets/img/patients/patient1.jpg';
 import patientImg2 from '@/assets/img/patients/patient2.jpg';
 import Button from '@/components/Button';
+import { PATHS } from '@/routes/paths';
+import { useNavigate } from 'react-router-dom';
 
 // Hook to detect mobile screen size
 const useIsMobile = () => {
@@ -54,6 +56,8 @@ const HeroSection: React.FC = () => {
 
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
+    const navigate = useNavigate();
+
     // lock body scroll when lightbox open
     useEffect(() => {
         if (isLightboxOpen) {
@@ -64,6 +68,10 @@ const HeroSection: React.FC = () => {
             };
         }
     }, [isLightboxOpen]);
+
+    const handleClickBookNow = () => {
+        navigate(PATHS.DOCTOR.ROOT);
+    };
 
     return (
         <>
@@ -157,7 +165,12 @@ const HeroSection: React.FC = () => {
                                 </div>
 
                                 <div className={styles.ctaWrap}>
-                                    <Button text="Đặt khám ngay" className="w-100" type="button" />
+                                    <Button
+                                        text="Đặt khám ngay"
+                                        className="w-100"
+                                        type="button"
+                                        onClick={handleClickBookNow}
+                                    />
                                 </div>
                             </div>
                         </div>
