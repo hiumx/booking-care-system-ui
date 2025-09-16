@@ -4,7 +4,6 @@
 export const PATHS = {
     // General paths
     HOME: '/',
-    ABOUT: '/about',
     DEMO: '/demo',
     FAQ: '/faq',
     BLOG: '/blog',
