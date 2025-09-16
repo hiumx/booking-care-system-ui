@@ -773,7 +773,7 @@ const DoctorList: React.FC = () => {
         // Simulate loading delay
         const timer = setTimeout(() => {
             setIsLoading(false);
-        }, 1500);
+        }, 400);
 
         return () => clearTimeout(timer);
     }, []);

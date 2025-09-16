@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Calendar from '@/components/Calendar';
 import styles from './DoctorAvailability.module.scss';
+import { PATHS, replacePathParams } from '@/routes/paths';
 
 interface AppointmentTime {
     id: number;
@@ -27,6 +28,8 @@ const DoctorAvailability: React.FC = () => {
     ); // Ngày bắt đầu cho 7 ngày
     const [showDatePicker, setShowDatePicker] = useState(false);
     const anchorRef = useRef<HTMLLIElement>(null); // Ref cho icon lịch
+
+    const navigate = useNavigate();
 
     // Tạo danh sách 7 ngày từ startDate
     const generateNext7Days = (start: Date) => {
@@ -406,7 +409,18 @@ const DoctorAvailability: React.FC = () => {
                                         <ul className={clsx(styles.paddingLeftZero, 'time-slots')}>
                                             {getSlotsForDate(day.date).length > 0 ? (
                                                 getSlotsForDate(day.date).map((slot, index) => (
-                                                    <li key={index}>
+                                                    <li
+                                                        key={index}
+                                                        className={styles.slotsAvailable}
+                                                        onClick={() => {
+                                                            navigate(
+                                                                replacePathParams(
+                                                                    PATHS.BOOKING.ROOT,
+                                                                    { doctorId: '1' }
+                                                                )
+                                                            );
+                                                        }}
+                                                    >
                                                         <i className={clsx('isax', 'isax-clock')} />{' '}
                                                         {slot}
                                                     </li>
