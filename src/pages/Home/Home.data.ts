@@ -320,3 +320,66 @@ export const LIST_DOCTORS: Doctor[] = [
         specialtiesLink: '/specialties/endocrinology',
     },
 ];
+
+// -----------------------------
+// Services Section Data
+// -----------------------------
+
+export type Service = {
+    id: number;
+    name: string;
+    image: string;
+};
+
+export const LIST_SERVICES: Service[] = [
+    {
+        id: 1,
+        name: 'Nurse at Home',
+        image: '/src/assets/img/service/service-doctor-01.jpg',
+    },
+    {
+        id: 2,
+        name: 'Mobility Assistance',
+        image: '/src/assets/img/service/service-doctor-02.jpg',
+    },
+    {
+        id: 3,
+        name: 'Physiotherapy',
+        image: '/src/assets/img/service/service-doctor-03.jpg',
+    },
+    {
+        id: 4,
+        name: 'Medical Equipment',
+        image: '/src/assets/img/service/service-doctor-04.jpg',
+    },
+    {
+        id: 5,
+        name: 'Trained Attendants',
+        image: '/src/assets/img/service/service-doctor-05.jpg',
+    },
+    {
+        id: 6,
+        name: 'Lab Tests',
+        image: '/src/assets//img/service/service-doctor-06.jpg',
+    },
+    {
+        id: 7,
+        name: 'Doctor Consultation',
+        image: '/src/assets/img/service/service-doctor-07.jpg',
+    },
+    {
+        id: 8,
+        name: 'Mother & Baby Care',
+        image: '/src/assets/img/service/service-doctor-08.jpg',
+    },
+    {
+        id: 9,
+        name: 'Vaccination',
+        image: '/src/assets/img/service/service-doctor-09.jpg',
+    },
+    {
+        id: 10,
+        name: 'Tele Consultation',
+        image: '/src/assets/img/service/service-doctor-10.jpg',
+    },
+];
