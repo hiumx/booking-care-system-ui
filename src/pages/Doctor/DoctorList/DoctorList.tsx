@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SideBar from './components/SideBar';
-import DoctorAppointmentBookingCard from './components/DoctorAppointmentBookingCard';
+import {
+    DoctorAppointmentBookingCard,
+    DoctorAppointmentBookingCardSkeleton,
+} from './components/DoctorAppointmentBookingCard';
 import Pagination from '@/components/Pagination';
 import Select from '@/components/Select';
 import styles from './DoctorList.module.scss';
@@ -736,8 +739,11 @@ const breadcrumbData = {
 const DoctorList: React.FC = () => {
     const [sortOption, setSortOption] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
+
     const doctorsPerPage = 10; // Cập nhật thành 10 bác sĩ mỗi trang
     const patientId = '1';
+    const skeletonKeys = Array.from({ length: 10 }, (_, i) => `skeleton-${i}`);
 
     const sortOptions = [
         { label: 'Giá từ thấp đến cao', value: 'low-to-high' },
@@ -762,6 +768,15 @@ const DoctorList: React.FC = () => {
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
+
+    useEffect(() => {
+        // Simulate loading delay
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 1500);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     return (
         <MainLayout>
@@ -809,30 +824,36 @@ const DoctorList: React.FC = () => {
                                 </div>
                             </div>
                             <div className="row">
-                                {currentDoctors.map((doctor) => (
-                                    <DoctorAppointmentBookingCard
-                                        key={doctor.doctorId}
-                                        doctorId={doctor.doctorId}
-                                        patientId={patientId}
-                                        name={doctor.name}
-                                        specialty={doctor.specialty}
-                                        position={doctor.position}
-                                        bookCounts={doctor.bookCounts}
-                                        rating={doctor.rating}
-                                        location={doctor.location}
-                                        yearsOfExperience={doctor.yearsOfExperience}
-                                        fees={doctor.consultationFee}
-                                        isFavorite={doctor.isFavorite}
-                                        likeCounts={doctor.likeCounts}
-                                        dislikeCounts={doctor.dislikeCounts}
-                                        nextAvailableTime={
-                                            doctor.available
-                                                ? doctor.consultationTime
-                                                : 'Không có lịch'
-                                        }
-                                        image={doctor.image}
-                                    />
-                                ))}
+                                {isLoading
+                                    ? skeletonKeys.map((key) => (
+                                          <div className="col-md-12 mb-4" key={key}>
+                                              <DoctorAppointmentBookingCardSkeleton />
+                                          </div>
+                                      ))
+                                    : currentDoctors.map((doctor) => (
+                                          <DoctorAppointmentBookingCard
+                                              key={doctor.doctorId}
+                                              doctorId={doctor.doctorId}
+                                              patientId={patientId}
+                                              name={doctor.name}
+                                              specialty={doctor.specialty}
+                                              position={doctor.position}
+                                              bookCounts={doctor.bookCounts}
+                                              rating={doctor.rating}
+                                              location={doctor.location}
+                                              yearsOfExperience={doctor.yearsOfExperience}
+                                              fees={doctor.consultationFee}
+                                              isFavorite={doctor.isFavorite}
+                                              likeCounts={doctor.likeCounts}
+                                              dislikeCounts={doctor.dislikeCounts}
+                                              nextAvailableTime={
+                                                  doctor.available
+                                                      ? doctor.consultationTime
+                                                      : 'Không có lịch'
+                                              }
+                                              image={doctor.image}
+                                          />
+                                      ))}
                                 <div className="col-md-12">
                                     <Pagination
                                         currentPage={currentPage}
