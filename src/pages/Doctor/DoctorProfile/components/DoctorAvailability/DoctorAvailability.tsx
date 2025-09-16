@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Calendar from '@/components/Calendar';
 import styles from './DoctorAvailability.module.scss';
@@ -28,8 +28,6 @@ const DoctorAvailability: React.FC = () => {
     ); // Ngày bắt đầu cho 7 ngày
     const [showDatePicker, setShowDatePicker] = useState(false);
     const anchorRef = useRef<HTMLLIElement>(null); // Ref cho icon lịch
-
-    const navigate = useNavigate();
 
     // Tạo danh sách 7 ngày từ startDate
     const generateNext7Days = (start: Date) => {
@@ -412,18 +410,24 @@ const DoctorAvailability: React.FC = () => {
                                                     <li
                                                         key={slot}
                                                         className={styles.slotsAvailable}
-                                                        role="button"
-                                                        onClick={() => {
-                                                            navigate(
-                                                                replacePathParams(
-                                                                    PATHS.BOOKING.ROOT,
-                                                                    { doctorId: '1' }
-                                                                )
-                                                            );
-                                                        }}
                                                     >
-                                                        <i className={clsx('isax', 'isax-clock')} />{' '}
-                                                        {slot}
+                                                        <Link
+                                                            className={clsx(styles.slotLink)}
+                                                            to={replacePathParams(
+                                                                PATHS.BOOKING.ROOT,
+                                                                {
+                                                                    doctorId: '1',
+                                                                }
+                                                            )}
+                                                        >
+                                                            <i
+                                                                className={clsx(
+                                                                    'isax',
+                                                                    'isax-clock'
+                                                                )}
+                                                            />{' '}
+                                                            {slot}
+                                                        </Link>
                                                     </li>
                                                 ))
                                             ) : (

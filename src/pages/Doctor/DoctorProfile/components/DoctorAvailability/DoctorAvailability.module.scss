@@ -29,11 +29,10 @@
 .slotsAvailable {
     cursor: pointer;
 
-    .slotButton {
-        border: none;
-        outline: none;
-        background-color: transparent;
+    .slotLink {
         font-weight: 500;
         font-size: 14px;
+        color: #012047;
+        text-decoration: none;
     }
 }
