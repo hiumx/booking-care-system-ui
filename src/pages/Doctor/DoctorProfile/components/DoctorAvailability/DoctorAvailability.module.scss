@@ -28,4 +28,12 @@
 
 .slotsAvailable {
     cursor: pointer;
+
+    .slotButton {
+        border: none;
+        outline: none;
+        background-color: transparent;
+        font-weight: 500;
+        font-size: 14px;
+    }
 }

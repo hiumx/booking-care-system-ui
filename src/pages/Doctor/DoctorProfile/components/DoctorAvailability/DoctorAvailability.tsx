@@ -408,10 +408,11 @@ const DoctorAvailability: React.FC = () => {
                                     <div className="slot-body">
                                         <ul className={clsx(styles.paddingLeftZero, 'time-slots')}>
                                             {getSlotsForDate(day.date).length > 0 ? (
-                                                getSlotsForDate(day.date).map((slot, index) => (
+                                                getSlotsForDate(day.date).map((slot) => (
                                                     <li
-                                                        key={index}
+                                                        key={slot}
                                                         className={styles.slotsAvailable}
+                                                        role="button"
                                                         onClick={() => {
                                                             navigate(
                                                                 replacePathParams(
