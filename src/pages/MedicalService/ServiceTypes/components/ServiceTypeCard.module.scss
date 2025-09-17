@@ -1,0 +1,42 @@
+.card {
+    display: block;
+    height: 12rem; // tương đương h-48
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+
+    .imageWrapper {
+        height: 100%;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.5rem; // giống rounded-lg
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    .overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        color: white;
+        padding: 0.75rem;
+        background: linear-gradient(90.08deg, #0e82fd 0.09%, #06aed4 70.28%);
+
+        h3 {
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-align: center;
+            line-height: 1.25rem;
+        }
+    }
+}

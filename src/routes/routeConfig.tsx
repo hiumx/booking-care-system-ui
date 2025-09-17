@@ -25,6 +25,7 @@ import AboutUs from '@/pages/AboutUs/AboutUs';
 import DoctorList from '@/pages/Doctor/DoctorList';
 import ContactUs from '@/pages/ContactUs';
 import Booking from '@/pages/Booking/Booking';
+import ServiceTypes from '@/pages/MedicalService/ServiceTypes/ServiceTypesPage';
 
 const routes: RouteObject[] = [
     {
@@ -108,6 +109,10 @@ const routes: RouteObject[] = [
         path: PATHS.SPECIALTIES.ROOT,
         element: <SpecialtiesList />,
         // children: [{ path: PATHS.SPECIALTIES.PROFILE, element: <SpecialtiesProfile /> }],
+    },
+    {
+        path: PATHS.Service.Service_Types,
+        element: <ServiceTypes />,
     },
     {
         path: PATHS.MEDICAL_FACILITY.ROOT,
