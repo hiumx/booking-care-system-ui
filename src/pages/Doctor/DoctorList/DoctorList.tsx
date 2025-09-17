@@ -781,7 +781,9 @@ const DoctorList: React.FC = () => {
     return (
         <MainLayout>
             <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
-            <SearchInput />
+            <div className="container">
+                <SearchInput />
+            </div>
             <div className="content mt-5">
                 <div className="container">
                     <div className="row">
