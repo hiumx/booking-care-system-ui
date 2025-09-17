@@ -86,7 +86,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                             </Link>
                         </li>
                         <li className={isActive('chat') ? 'active' : ''}>
-                            <Link to="/user/profile?tab=chat">
+                            <Link to="/chat">
                                 <i className="isax isax-messages-1"></i>
                                 <span>Tin nhắn</span>
                                 <small className="unread-msg">7</small>
