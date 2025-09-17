@@ -1,5 +1,6 @@
 .doctorsSearchBoxCustom {
-    width: 85%;
+    width: 100%;
+    overflow: hidden; /* keep gradient border visible and clip children */
 
     @media (max-width: 768px) {
         margin: 0 10px;
@@ -43,13 +44,15 @@
     min-width: 300px !important;
     margin: 0;
     padding: 20px;
-    display: table;
+    display: block; /* avoid table layout clipping rounded border */
+    width: 100%;
+    box-sizing: border-box;
     position: relative;
     z-index: 1;
     background: #ffffff;
     border: 1px solid #e6e8ee;
     box-shadow: 0px 4px 14px 0px rgba(226, 237, 255, 0.25);
-    border-radius: 10px;
+    border-radius: inherit; /* Match outer radius */
 
     @media (max-width: 1399.96px) {
         margin: 0;
@@ -116,8 +119,8 @@
         margin-right: 0;
     }
 
-    /* 🔹 Fix cho tablet (768px–991.98px) */
-    @media (max-width: 991.98px) and (min-width: 768px) {
+    /* 🔹 Fix cho tablet & small desktop (768px–1199.98px) */
+    @media (max-width: 1199.98px) and (min-width: 768px) {
         flex-wrap: wrap;
         gap: 10px;
 
@@ -132,6 +135,7 @@
             display: flex;
             justify-content: flex-end;
             margin-top: 6px;
+            padding-right: 8px; /* keep button off the inner border */
 
             button {
                 width: auto;
@@ -153,6 +157,7 @@
         & .formSearchBtn {
             flex: 1 1 100%;
             margin-bottom: 0;
+            padding-right: 0;
 
             & button {
                 justify-content: center;

@@ -202,7 +202,7 @@ const SearchInput: React.FC = () => {
         >
             <div
                 className={clsx(
-                    'search-box-one',
+                    styles.searchBoxOne,
                     styles.roundedPillCustom,
                     styles.customWidthSearch
                 )}
