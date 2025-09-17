@@ -55211,7 +55211,7 @@ ul li {
   position: relative;
   transition: 0.5s;
 }
-.slot-box .slot-body .time-slots li:hover::before {
+/* .slot-box .slot-body .time-slots li:hover::before {
   content: "Space : 2";
   background: #000F28;
   color: #FFF;
@@ -55224,7 +55224,7 @@ ul li {
   margin: 0 15px 15px 0;
   padding: 12px 13px;
   transition: 0.5s;
-}
+} */
 .slot-box .slot-body .time-slots li i {
   margin-right: 10px;
 }

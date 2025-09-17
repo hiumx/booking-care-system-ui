@@ -28,7 +28,8 @@
             "@/types/*": ["src/types/*"],
             "@/constants/*": ["src/constants/*"],
             "@/store/*": ["src/store/*"],
-            "@/assets/*": ["src/assets/*"]
+            "@/assets/*": ["src/assets/*"],
+            "@/examples/*": ["src/examples/*"]
         }
     }
 }
