@@ -1,0 +1,46 @@
+@startuml
+|Patient|
+start
+:Sign in / Register;
+:Search hospital;
+:Select service;
+
+if (Quick booking?) then (Yes)
+  :Click Quick Booking;
+  |System|
+  :Create booking (no doctor assigned yet);
+  |Hospital Staff|
+  :Assign doctor to booking;
+  if (Doctor available?) then (Yes)
+    |System|
+    :Confirm booking;
+  else (No)
+    |System|
+    :Reject booking;
+    stop
+  endif
+else (No)
+  :Choose doctor;
+  |System|
+  :Create booking with selected doctor;
+  :Confirm booking;
+endif
+
+if (Service = Online Consultation?) then (Yes)
+  |Patient|
+  :Make payment;
+  if (Payment success?) then (Yes)
+    |System|
+    :Mark booking as Paid;
+  else (No)
+    |System|
+    :Cancel booking (Payment Failed);
+    stop
+  endif
+endif
+
+|Patient|
+:View booking status;
+
+stop
+@enduml

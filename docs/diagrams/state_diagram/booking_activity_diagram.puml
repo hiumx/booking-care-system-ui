@@ -1,0 +1,94 @@
+@startuml
+|Patient|
+start
+:Sign in / Register;
+:Search hospital;
+
+if (Hospital found?) then (Yes)
+  :Select service;
+  
+  if (Service available?) then (Yes)
+    if (Quick booking?) then (Yes)
+      :Click Quick Booking;
+      :Review booking information;
+      if (Confirm booking details?) then (Yes)
+        if (Service = Online Consultation?) then (Yes)
+          :Make payment;
+          if (Payment success?) then (Yes)
+            |System|
+            :Create booking (no doctor assigned yet);
+            |Hospital Staff|
+            :Assign doctor to booking;
+            if (Doctor available?) then (Yes)
+              |System|
+              :Confirm booking;
+            else (No)
+              |System|
+              :Reject booking;
+              stop
+            endif
+          else (No)
+          |Patient|
+              :Payment failed;
+              stop
+          endif
+        else (No)
+          |System|
+          :Create booking (no doctor assigned yet);
+          |Hospital Staff|
+          :Assign doctor to booking;
+          if (Doctor available?) then (Yes)
+            |System|
+            :Confirm booking;
+          else (No)
+            |System|
+            :Reject booking;
+            stop
+          endif
+        endif
+      else (No)
+        :Edit booking details;
+        :Review booking information;
+      endif
+    else (No)
+      :Choose doctor;
+      if (Doctor available for selected time?) then (Yes)
+        :Review booking information;
+        if (Confirm booking details?) then (Yes)
+          if (Service = Online Consultation?) then (Yes)
+            :Make payment;
+            if (Payment success?) then (Yes)
+              |System|
+              :Create booking with selected doctor;
+              :Confirm booking;
+            else (No)
+              stop
+            endif
+          else (No)
+            |System|
+            :Create booking with selected doctor;
+            :Confirm booking;
+          endif
+        else (No)
+          :Edit booking details;
+          :Review booking information;
+        endif
+      else (No)
+        :Show "Doctor not available" message;
+        :Choose another doctor or time;
+      endif
+    endif
+  else (No)
+    :Show "Service not available" message;
+    stop
+  endif
+else (No)
+  :Show "No hospital found" message;
+  stop
+endif
+
+|Patient|
+:View booking status;
+
+stop
+@enduml
