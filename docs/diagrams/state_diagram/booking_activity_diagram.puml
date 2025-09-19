@@ -21,7 +21,7 @@ if (Hospital found?) then (Yes)
             :Assign doctor to booking;
             if (Doctor available?) then (Yes)
               |System|
-              :Confirm booking;
+              :Update booking;
             else (No)
               |System|
               :Reject booking;
@@ -39,7 +39,7 @@ if (Hospital found?) then (Yes)
           :Assign doctor to booking;
           if (Doctor available?) then (Yes)
             |System|
-            :Confirm booking;
+            :Update booking;
           else (No)
             |System|
             :Reject booking;
