@@ -43,6 +43,88 @@
             text-align: left;
         }
     }
+    .appointmentTabHead {
+        flex-wrap: nowrap;
+    }
+    .filterHead {
+        align-items: start;
+        gap: 0.5rem;
+    }
+}
+
+// Date Range Picker styling
+.dateRangePickerWrapper {
+    .appointmentDatePicker {
+        max-width: 320px;
+        :global(.dateRangePicker) {
+            .trigger {
+                font-size: 14px;
+                min-height: 40px;
+                padding: 8px 12px;
+            }
+
+            .dropdown {
+                min-width: 640px; // Đủ rộng cho 2 tháng side by side
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+                border-radius: 12px;
+
+                // Đảm bảo 2 tháng hiển thị ngang hàng trên desktop
+                :global(.rdrCalendarWrapper) {
+                    display: flex;
+                    flex-direction: row;
+                }
+
+                :global(.rdrDateRangeWrapper) {
+                    display: flex;
+                    flex-direction: row;
+
+                    :global(.rdrMonth) {
+                        padding: 16px 20px;
+
+                        &:not(:last-child) {
+                            border-right: 1px solid #e0e0e0;
+                        }
+                    }
+                }
+
+                // Responsive breakpoints
+                @media (max-width: 1024px) {
+                    min-width: 580px; // Tablet: thu nhỏ một chút
+                }
+
+                @media (max-width: 768px) {
+                    min-width: 320px; // Mobile: width cho 1 tháng
+
+                    :global(.rdrCalendarWrapper) {
+                        flex-direction: column;
+                    }
+
+                    :global(.rdrDateRangeWrapper) {
+                        flex-direction: column;
+
+                        :global(.rdrMonth) {
+                            &:not(:last-child) {
+                                border-right: none;
+                                border-bottom: 1px solid #e0e0e0;
+                            }
+                        }
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    position: fixed !important;
+                    top: 50% !important;
+                    left: 50% !important;
+                    transform: translate(-50%, -50%) !important;
+                    width: calc(100vw - 32px) !important;
+                    max-width: 350px !important;
+                    min-width: unset !important;
+                    max-height: calc(100vh - 64px);
+                    overflow-y: auto;
+                }
+            }
+        }
+    }
 }
 
 // Override for pagination spacing
@@ -224,7 +306,6 @@
             .filterHead {
                 flex-direction: column;
                 gap: 1rem;
-
                 .daterangeWraper {
                     margin-right: 0 !important;
                 }
