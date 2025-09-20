@@ -1,5 +1,6 @@
 // src/routes/routeConfig.tsx
 import Demo from '@/pages/Demo';
+import DateRangePickerDemo from '@/pages/Demo/DateRangePickerDemo';
 import Home from '@/pages/Home';
 import UserProfile from '@/pages/UserProfile';
 import ScreenManagement from '@/pages/ScreenManagement';
@@ -73,6 +74,10 @@ const routes: RouteObject[] = [
     {
         path: PATHS.DEMO,
         element: <Demo />,
+    },
+    {
+        path: PATHS.DEMO_DATE_RANGE_PICKER,
+        element: <DateRangePickerDemo />,
     },
     {
         path: PATHS.LOGIN,
