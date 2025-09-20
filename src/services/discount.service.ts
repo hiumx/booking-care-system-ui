@@ -51,12 +51,7 @@ export class DiscountService {
                 message: response.message,
             };
         } catch (error: any) {
-            throw {
-                success: false,
-                message: error.message || 'Failed to fetch discounts',
-                data: [],
-                pagination: { page: 1, limit: 10, total: 0, totalPages: 0 },
-            };
+            throw new Error(error.message || 'Failed to fetch discounts');
         }
     }
 
@@ -73,11 +68,7 @@ export class DiscountService {
                 message: response.message,
             };
         } catch (error: any) {
-            throw {
-                success: false,
-                message: error.message || `Failed to fetch discount with ID: ${id}`,
-                data: null,
-            };
+            throw new Error(error.message || `Failed to fetch discount with ID: ${id}`);
         }
     }
 
@@ -96,11 +87,7 @@ export class DiscountService {
                 message: response.message,
             };
         } catch (error: any) {
-            throw {
-                success: false,
-                message: error.message || `Failed to fetch discount with code: ${code}`,
-                data: null,
-            };
+            throw new Error(error.message || `Failed to fetch discount with code: ${code}`);
         }
     }
 
@@ -117,11 +104,7 @@ export class DiscountService {
                 message: response.message || 'Discount created successfully',
             };
         } catch (error: any) {
-            throw {
-                success: false,
-                message: error.message || 'Failed to create discount',
-                data: null,
-            };
+            throw new Error(error.message || 'Failed to create discount');
         }
     }
 
@@ -142,11 +125,7 @@ export class DiscountService {
                 message: response.message || 'Discount updated successfully',
             };
         } catch (error: any) {
-            throw {
-                success: false,
-                message: error.message || 'Failed to update discount',
-                data: null,
-            };
+            throw new Error(error.message || 'Failed to update discount');
         }
     }
 
@@ -162,10 +141,7 @@ export class DiscountService {
                 message: response.message || 'Discount deleted successfully',
             };
         } catch (error: any) {
-            throw {
-                success: false,
-                message: error.message || 'Failed to delete discount',
-            };
+            throw new Error(error.message || 'Failed to delete discount');
         }
     }
 
@@ -189,13 +165,7 @@ export class DiscountService {
 
             return response.data || response;
         } catch (error: any) {
-            throw {
-                isValid: false,
-                appliedAmount: 0,
-                finalAmount: context.amount,
-                message: error.message || 'Failed to validate discount code',
-                errors: [error.message || 'Validation failed'],
-            };
+            throw new Error(error.message || 'Failed to validate discount');
         }
     }
 
@@ -208,13 +178,7 @@ export class DiscountService {
 
             return response.data || response;
         } catch (error: any) {
-            throw {
-                isValid: false,
-                appliedAmount: 0,
-                finalAmount: request.originalAmount,
-                message: error.message || 'Failed to apply discount',
-                errors: [error.message || 'Application failed'],
-            };
+            throw new Error(error.message || 'Failed to apply discount');
         }
     }
 
@@ -243,15 +207,7 @@ export class DiscountService {
 
             return response.data || response;
         } catch (error: any) {
-            console.log(error);
-            throw {
-                totalDiscounts: 0,
-                activeDiscounts: 0,
-                expiredDiscounts: 0,
-                totalUsage: 0,
-                totalSavings: 0,
-                averageDiscount: 0,
-            };
+            throw new Error(error.message || 'Failed to fetch discount stats');
         }
     }
 
@@ -274,11 +230,7 @@ export class DiscountService {
                 updatedCount: response.data?.updatedCount || response.updatedCount || 0,
             };
         } catch (error: any) {
-            throw {
-                success: false,
-                message: error.message || 'Failed to update discount statuses',
-                updatedCount: 0,
-            };
+            throw new Error(error.message || 'Failed to update discount statuses');
         }
     }
 
@@ -299,11 +251,7 @@ export class DiscountService {
                 deletedCount: response.data?.deletedCount || response.deletedCount || 0,
             };
         } catch (error: any) {
-            throw {
-                success: false,
-                message: error.message || 'Failed to delete discounts',
-                deletedCount: 0,
-            };
+            throw new Error(error.message || 'Failed to delete discounts in bulk');
         }
     }
 
@@ -327,9 +275,8 @@ export class DiscountService {
 
             const result = await this.getDiscounts(queryParams);
             return result.data.discounts;
-        } catch (error) {
-            console.error('Failed to fetch active discounts:', error);
-            return [];
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to fetch active discounts');
         }
     }
 
@@ -394,10 +341,7 @@ export class DiscountService {
                 message: 'Discount is available',
             };
         } catch (error: any) {
-            return {
-                available: false,
-                message: error.message || 'Failed to check discount availability',
-            };
+            throw new Error(error.message || 'Failed to check discount availability');
         }
     }
 }

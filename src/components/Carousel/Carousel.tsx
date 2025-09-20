@@ -10,7 +10,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 
 type CarouselProps = {
-    slides: ReactNode[];
+    slides: { id: string | number; node: ReactNode }[];
     autoPlayDelayMs?: number;
     loop?: boolean;
     isAutoPlay?: boolean;
@@ -57,7 +57,7 @@ const Carousel: FC<CarouselProps> = ({
                 breakpoints={breakpoints as any}
             >
                 {slides.map((content) => (
-                    <SwiperSlide key={content?.toString()}>{content}</SwiperSlide>
+                    <SwiperSlide key={content.id}>{content.node}</SwiperSlide>
                 ))}
             </Swiper>
 
