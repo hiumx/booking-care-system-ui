@@ -7,7 +7,7 @@ import clsx from 'clsx';
 interface SectionItemProps {
     title: string;
     desc: string;
-    items: React.ReactNode[];
+    items: { id: string | number; node: React.ReactNode }[];
     breakpoints: object;
     viewAllTarget?: string;
     viewAllText?: string;

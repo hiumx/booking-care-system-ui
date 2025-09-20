@@ -17,50 +17,67 @@ import {
 } from './Home.data';
 
 const Home: React.FC = () => {
-    const listSpecialtyItems = LIST_SPECIALTIES.map((specialty) => (
-        <SpecialtyCarouselItem
-            key={specialty.id}
-            imageSrc={specialty.image}
-            iconSrc={specialty.icon}
-            title={specialty.name}
-            doctorCount={specialty.doctorCount}
-        />
-    ));
+    const listSpecialtyItems: { id: string | number; node: React.ReactNode }[] =
+        LIST_SPECIALTIES.map((specialty) => ({
+            id: specialty.id,
+            node: (
+                <SpecialtyCarouselItem
+                    key={specialty.id}
+                    imageSrc={specialty.image}
+                    iconSrc={specialty.icon}
+                    title={specialty.name}
+                    doctorCount={specialty.doctorCount}
+                />
+            ),
+        }));
 
-    const listClinicItems = LIST_CLINICS.map((clinic) => (
-        <ClinicCaroulselItem
-            key={clinic.id}
-            clinic={{
-                id: clinic.id.toString(),
-                name: clinic.name,
-                image: clinic.image,
-                rating: clinic.rating,
-                reviewCount: clinic.reviewCount,
-                specialties: clinic.specialties,
-                location: clinic.address,
-                distance: clinic.distance,
-                priceRange: clinic.priceRange || '$100-300',
-                availableSlots: clinic.availableSlots || 0,
-            }}
-        />
-    ));
-    const listDoctorItems = LIST_DOCTORS.map((doctor) => (
-        <DoctorCarouselItem
-            key={doctor.id}
-            image={doctor.image}
-            name={doctor.name}
-            specialty={doctor.specialty}
-            location={doctor.location}
-            rating={doctor.rating}
-            fee={doctor.fee}
-            consultationTime={doctor.consultationTime}
-            profileLink={replacePathParams(buildPath(PATHS.DOCTOR.ROOT, PATHS.DOCTOR.PROFILE), {
-                id: doctor.id,
-            })}
-            bookingLink={replacePathParams(PATHS.BOOKING.ROOT, { doctorId: doctor.id })}
-            specialtiesLink={doctor.specialtiesLink}
-        />
-    ));
+    const listClinicItems: { id: string | number; node: React.ReactNode }[] = LIST_CLINICS.map(
+        (clinic) => ({
+            id: clinic.id,
+            node: (
+                <ClinicCaroulselItem
+                    key={clinic.id}
+                    clinic={{
+                        id: clinic.id.toString(),
+                        name: clinic.name,
+                        image: clinic.image,
+                        rating: clinic.rating,
+                        reviewCount: clinic.reviewCount,
+                        specialties: clinic.specialties,
+                        location: clinic.address,
+                        distance: clinic.distance,
+                        priceRange: clinic.priceRange || '$100-300',
+                        availableSlots: clinic.availableSlots || 0,
+                    }}
+                />
+            ),
+        })
+    );
+    const listDoctorItems: { id: string | number; node: React.ReactNode }[] = LIST_DOCTORS.map(
+        (doctor) => ({
+            id: doctor.id,
+            node: (
+                <DoctorCarouselItem
+                    key={doctor.id}
+                    image={doctor.image}
+                    name={doctor.name}
+                    specialty={doctor.specialty}
+                    location={doctor.location}
+                    rating={doctor.rating}
+                    fee={doctor.fee}
+                    consultationTime={doctor.consultationTime}
+                    profileLink={replacePathParams(
+                        buildPath(PATHS.DOCTOR.ROOT, PATHS.DOCTOR.PROFILE),
+                        {
+                            id: doctor.id,
+                        }
+                    )}
+                    bookingLink={replacePathParams(PATHS.BOOKING.ROOT, { doctorId: doctor.id })}
+                    specialtiesLink={doctor.specialtiesLink}
+                />
+            ),
+        })
+    );
     const leftServices = LIST_SERVICES.slice(0, 5); // 0 -> 4
     const rightServices = LIST_SERVICES.slice(5, 10); // 5 -> 9
     return (
