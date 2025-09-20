@@ -124,7 +124,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
     const formatDateRange = () => {
         const selection = ranges[0];
-        if (!selection || !selection.startDate || !selection.endDate) {
+        if (!selection?.startDate || !selection?.endDate) {
             return placeholder;
         }
 
@@ -150,7 +150,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             startDate: new Date(),
             endDate: new Date(),
         }));
-        onChange?.({ [ranges[0].key || 'selection']: clearedRanges[0] });
+        onChange?.({ [ranges[0]?.key || 'selection']: clearedRanges[0] });
     };
 
     const handleApply = () => {

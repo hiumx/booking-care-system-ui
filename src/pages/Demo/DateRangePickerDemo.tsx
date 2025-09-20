@@ -16,7 +16,8 @@ const DateRangePickerDemo: React.FC = () => {
 
     const handleRangeChange = (rangesByKey: RangeKeyDict) => {
         const selection = rangesByKey.selection;
-        if (selection && selection.startDate && selection.endDate && selection.key) {
+
+        if (selection?.startDate && selection?.endDate && selection.key) {
             setRanges([
                 {
                     startDate: selection.startDate,
