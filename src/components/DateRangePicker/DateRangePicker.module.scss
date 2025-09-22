@@ -109,6 +109,8 @@
         border-radius: 12px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
         overflow: hidden;
+        min-width: 640px;
+
         @media (max-width: 768px) {
             min-width: 320px;
             left: 50%;
@@ -127,13 +129,13 @@
                 background: transparent;
             }
 
-            // Hide defined ranges and input ranges completely
             :global(.rdrDefinedRangesWrapper) {
-                display: none !important;
-            }
+                border-right: 1px solid #e0e0e0;
+                background: #fafafa;
 
-            :global(.rdrInputRangesWrapper) {
-                display: none !important;
+                @media (max-width: 768px) {
+                    display: none;
+                }
             }
 
             :global(.rdrDateDisplayWrapper) {
@@ -250,6 +252,39 @@
                             }
                         }
                     }
+                }
+            }
+
+            :global(.rdrStaticRange) {
+                border: none;
+                background: transparent;
+
+                &:hover {
+                    background: rgba(61, 145, 255, 0.1);
+                }
+
+                &.rdrStaticRangeSelected,
+                &:active {
+                    background: rgba(61, 145, 255, 0.1);
+                    color: #3d91ff;
+                }
+
+                .rdrStaticRangeLabel {
+                    color: inherit;
+                    font-size: 14px;
+                    padding: 8px 16px;
+                }
+            }
+
+            :global(.rdrInputRange) {
+                padding: 8px 16px;
+
+                input {
+                    border: 1px solid #e0e0e0;
+                    border-radius: 6px;
+                    padding: 6px 8px;
+                    font-size: 14px;
+                    width: 100%;
                 }
             }
         }
@@ -370,6 +405,11 @@
             border-color: #404040;
 
             .pickerContainer {
+                :global(.rdrDefinedRangesWrapper) {
+                    background: #1a1a1a;
+                    border-color: #404040;
+                }
+
                 :global(.rdrDateDisplayWrapper) {
                     background: #1a1a1a;
                     border-color: #404040;
