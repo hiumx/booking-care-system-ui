@@ -178,14 +178,15 @@
 .formSorts {
     .dropdownToggle {
         border: none;
-        color: #465d7c;
+        color: #5d728d;
         padding: 0;
         display: flex;
         align-items: center;
         line-height: 1.5;
         justify-content: space-between;
 
-        font-size: 16px;
+        font-size: 14px;
+        font-weight: 400;
     }
 }
 // Filter dropdown styling

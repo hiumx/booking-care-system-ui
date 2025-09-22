@@ -60,14 +60,24 @@ const DateRangePickerDemo: React.FC = () => {
                 </div>
 
                 <div style={{ marginBottom: '40px' }}>
-                    <h2>Custom Configuration</h2>
+                    <h2>Cấu hình tùy chỉnh</h2>
                     <DateRangePicker
                         ranges={ranges}
                         onChange={handleRangeChange}
                         months={1}
                         direction="vertical"
                         rangeColors={['#00b894']}
-                        placeholder="Custom configured picker"
+                        placeholder="Picker được cấu hình tùy chỉnh"
+                    />
+                </div>
+
+                <div style={{ marginBottom: '40px' }}>
+                    <h2>Không hiển thị khoảng thời gian định sẵn</h2>
+                    <DateRangePicker
+                        ranges={ranges}
+                        onChange={handleRangeChange}
+                        showDefinedRanges={false}
+                        placeholder="Picker không có khoảng thời gian định sẵn"
                     />
                 </div>
 

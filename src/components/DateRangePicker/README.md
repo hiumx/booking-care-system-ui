@@ -77,6 +77,9 @@ const MyComponet: React.FC = () => {
 | `maxDate`                 | `Date`                           | `undefined`                                                          | Maximum selectable date                      |
 | `rangeColors`             | `string[]`                       | `['#3d91ff']`                                                        | Color for selected date range                |
 | `showDateDisplay`         | `boolean`                        | `true`                                                               | Show date display row                        |
+| `showDefinedRanges`       | `boolean`                        | `true`                                                               | Show predefined ranges sidebar               |
+| `staticRanges`            | `any[]`                          | `undefined`                                                          | Custom predefined ranges                     |
+| `inputRanges`             | `any[]`                          | `undefined`                                                          | Custom input ranges                          |
 
 ## Examples
 
@@ -104,6 +107,17 @@ const [isOpen, setIsOpen] = useState(false);
     direction="vertical"
     rangeColors={['#00b894']}
     placeholder="Custom configured picker"
+/>
+```
+
+### Without Predefined Ranges
+
+```tsx
+<DateRangePicker
+    ranges={ranges}
+    onChange={handleRangeChange}
+    showDefinedRanges={false}
+    placeholder="Date picker without predefined ranges"
 />
 ```
 

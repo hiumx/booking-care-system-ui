@@ -10,6 +10,130 @@ import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import Button from '@/components/Button';
 
+// Vietnamese predefined ranges
+const getVietnameseStaticRanges = () => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const thisWeekStart = new Date(today);
+    thisWeekStart.setDate(today.getDate() - today.getDay());
+
+    const lastWeekStart = new Date(thisWeekStart);
+    lastWeekStart.setDate(thisWeekStart.getDate() - 7);
+    const lastWeekEnd = new Date(thisWeekStart);
+    lastWeekEnd.setDate(thisWeekStart.getDate() - 1);
+
+    const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+
+    return [
+        {
+            label: 'Hôm nay',
+            range: () => ({
+                startDate: today,
+                endDate: today,
+            }),
+            isSelected: (range: any) => {
+                const definedRange = {
+                    startDate: today,
+                    endDate: today,
+                };
+                return (
+                    range.startDate?.toDateString() === definedRange.startDate.toDateString() &&
+                    range.endDate?.toDateString() === definedRange.endDate.toDateString()
+                );
+            },
+        },
+        {
+            label: 'Hôm qua',
+            range: () => ({
+                startDate: yesterday,
+                endDate: yesterday,
+            }),
+            isSelected: (range: any) => {
+                const definedRange = {
+                    startDate: yesterday,
+                    endDate: yesterday,
+                };
+                return (
+                    range.startDate?.toDateString() === definedRange.startDate.toDateString() &&
+                    range.endDate?.toDateString() === definedRange.endDate.toDateString()
+                );
+            },
+        },
+        {
+            label: 'Tuần này',
+            range: () => ({
+                startDate: thisWeekStart,
+                endDate: today,
+            }),
+            isSelected: (range: any) => {
+                const definedRange = {
+                    startDate: thisWeekStart,
+                    endDate: today,
+                };
+                return (
+                    range.startDate?.toDateString() === definedRange.startDate.toDateString() &&
+                    range.endDate?.toDateString() === definedRange.endDate.toDateString()
+                );
+            },
+        },
+        {
+            label: 'Tuần trước',
+            range: () => ({
+                startDate: lastWeekStart,
+                endDate: lastWeekEnd,
+            }),
+            isSelected: (range: any) => {
+                const definedRange = {
+                    startDate: lastWeekStart,
+                    endDate: lastWeekEnd,
+                };
+                return (
+                    range.startDate?.toDateString() === definedRange.startDate.toDateString() &&
+                    range.endDate?.toDateString() === definedRange.endDate.toDateString()
+                );
+            },
+        },
+        {
+            label: 'Tháng này',
+            range: () => ({
+                startDate: thisMonthStart,
+                endDate: today,
+            }),
+            isSelected: (range: any) => {
+                const definedRange = {
+                    startDate: thisMonthStart,
+                    endDate: today,
+                };
+                return (
+                    range.startDate?.toDateString() === definedRange.startDate.toDateString() &&
+                    range.endDate?.toDateString() === definedRange.endDate.toDateString()
+                );
+            },
+        },
+        {
+            label: 'Tháng trước',
+            range: () => ({
+                startDate: lastMonthStart,
+                endDate: lastMonthEnd,
+            }),
+            isSelected: (range: any) => {
+                const definedRange = {
+                    startDate: lastMonthStart,
+                    endDate: lastMonthEnd,
+                };
+                return (
+                    range.startDate?.toDateString() === definedRange.startDate.toDateString() &&
+                    range.endDate?.toDateString() === definedRange.endDate.toDateString()
+                );
+            },
+        },
+    ];
+};
+
 export interface DateRangePickerProps {
     /** Initial date range selection */
     ranges?: Range[];
@@ -41,6 +165,12 @@ export interface DateRangePickerProps {
     rangeColors?: string[];
     /** Show date display row */
     showDateDisplay?: boolean;
+    /** Show predefined ranges */
+    showDefinedRanges?: boolean;
+    /** Custom predefined ranges */
+    staticRanges?: any[];
+    /** Custom input ranges */
+    inputRanges?: any[];
     /** Locale for date formatting */
     locale?: any;
 }
@@ -67,6 +197,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     maxDate,
     rangeColors = ['#3d91ff'],
     showDateDisplay = true,
+    showDefinedRanges = true,
+    staticRanges,
+    inputRanges,
     locale = vi,
 }) => {
     const [internalOpen, setInternalOpen] = useState(isOpen);
@@ -136,7 +269,12 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             });
         };
 
-        if (selection.startDate.toDateString() === selection.endDate.toDateString()) {
+        // If months = 1 (single month view) and dates are same, show single date
+        // Otherwise, always show range format
+        if (
+            months === 1 &&
+            selection.startDate.toDateString() === selection.endDate.toDateString()
+        ) {
             return formatDate(selection.startDate);
         }
 
@@ -219,8 +357,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                             maxDate={maxDate}
                             rangeColors={rangeColors}
                             showDateDisplay={showDateDisplay}
-                            staticRanges={[]}
-                            inputRanges={[]}
+                            staticRanges={
+                                showDefinedRanges ? staticRanges || getVietnameseStaticRanges() : []
+                            }
+                            inputRanges={showDefinedRanges ? inputRanges : []}
                             moveRangeOnFirstSelection={false}
                             retainEndDateOnFirstSelection={false}
                             locale={locale}
