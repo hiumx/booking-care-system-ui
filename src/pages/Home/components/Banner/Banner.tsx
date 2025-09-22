@@ -1,3 +1,5 @@
+import SearchInput from '@/components/SearchInput';
+
 const Banner: React.FC = () => {
     return (
         <section className="banner-section banner-sec-one">
@@ -49,8 +51,8 @@ const Banner: React.FC = () => {
                                 </span>{' '}
                                 <span className="text-gradient">Doctors</span> Today
                             </h1>
-                            <div className="search-box-one aos">
-                                <form action="https://doccure.dreamstechnologies.com/html/template/search-2.html">
+
+                            {/* <form action="https://doccure.dreamstechnologies.com/html/template/search-2.html">
                                     <div className="search-input search-line">
                                         <i className="isax isax-hospital5 bficon"></i>
                                         <div className=" mb-0">
@@ -86,8 +88,8 @@ const Banner: React.FC = () => {
                                             <i className="isax isax-search-normal5 me-2"></i>Search
                                         </button>
                                     </div>
-                                </form>
-                            </div>
+                                </form> */}
+                            <SearchInput forceWrap showSupportButton />
                         </div>
                     </div>
                     <div className="col-lg-5">
