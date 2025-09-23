@@ -950,6 +950,7 @@ const Register: React.FC = () => {
                                                 borderRadius: '8px',
                                                 borderColor: '#e5e7eb',
                                                 boxShadow: 'none',
+                                                height: '45px',
                                                 '&:hover': {
                                                     borderColor: '#d1d5db',
                                                 },
@@ -1029,6 +1030,7 @@ const Register: React.FC = () => {
                                             style={{
                                                 paddingLeft: 16,
                                                 paddingRight: 16,
+                                                height: '45px',
                                             }}
                                             required
                                             max={new Date().toISOString().split('T')[0]}
