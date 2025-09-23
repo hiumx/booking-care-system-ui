@@ -1,30 +1,59 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { Check, Lock, User, Phone, Mail, CheckCircle } from 'lucide-react';
+import { Lock, User, Phone, Mail, CheckCircle } from 'lucide-react';
 import Select from 'react-select';
-import GoogleIcon from '@/assets/img/icons/google-icon.svg';
-import FacebookIcon from '@/assets/img/icons/facebook-icon.svg';
+import { SocialLogin } from '@/components/SocialLogin';
 import AuthLayout from '@/layouts/AuthLayout';
+import StepWizard from '@/components/StepWizard';
 import clsx from 'clsx';
 import styles from './Register.module.scss';
 import { PATHS } from '@/routes/paths';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import { registerAsync, clearError } from '@/store/slices/authSlice';
+import { RootState, AppDispatch } from '@/store';
+import { RegisterRequest } from '@/types/auth.types';
+import { SendOtpRequest, VerifyOtpRequest } from '@/types/otp.types';
+import { AuthService } from '@/services/auth.service';
+import { OtpService } from '@/services/otp.service';
+import { usePhoneInput } from '@/hooks/usePhoneInput';
+import { toast } from 'react-toastify';
+import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH, OTP_REGEX, NAME_REGEX } from '@/constants';
+import { Gender } from '@/enums/common.enums';
 
 type Step = 0 | 1 | 2 | 3;
 
 const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+const deviceId = import.meta.env.VITE_DEVICE_ID || 'booking-care-web-client';
 const OTP_LENGTH = 6;
 
 const Register: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const { isLoading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
     const [step, setStep] = useState<Step>(0);
     const [method, setMethod] = useState<'email' | 'phone'>('phone');
     const [isTransitioning, setIsTransitioning] = useState(false);
 
     // Step 0: phone/email
-    const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
+
+    // Use phone input hook for registration method
+    const { phone, handlePhoneChange, handlePhonePaste, handlePhoneKeyDown, isPhoneValid } =
+        usePhoneInput();
+
+    // Use separate phone input hook for profile phone
+    const {
+        phone: profilePhone,
+        handlePhoneChange: handleProfilePhoneChange,
+        handlePhonePaste: handleProfilePhonePaste,
+        handlePhoneKeyDown: handleProfilePhoneKeyDown,
+        setPhoneValue: setProfilePhoneValue,
+        isPhoneValid: isProfilePhoneValid,
+    } = usePhoneInput();
     const [isHuman, setIsHuman] = useState(false);
     const [showCaptcha, setShowCaptcha] = useState(false);
     const [agree, setAgree] = useState(true);
@@ -33,7 +62,10 @@ const Register: React.FC = () => {
     const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''));
     const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
     const [countdown, setCountdown] = useState<number>(60);
+    const [isSending, setIsSending] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
+    const [otpProof, setOtpProof] = useState<string>('');
+    const [otpIssuedAt, setOtpIssuedAt] = useState<string>('');
 
     // Step 2: password
     const [password, setPassword] = useState('');
@@ -42,11 +74,11 @@ const Register: React.FC = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     // Password requirements validation
     const passwordRequirements = useMemo(() => {
-        const hasMinLength = password.length >= 8;
-        const hasUppercase = /[A-Z]/.test(password);
-        const hasLowercase = /[a-z]/.test(password);
-        const hasNumber = /\d/.test(password);
-        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+        const hasMinLength = password.length >= PASSWORD_MIN_LENGTH;
+        const hasUppercase = PASSWORD_REGEX.UPPERCASE.test(password);
+        const hasLowercase = PASSWORD_REGEX.LOWERCASE.test(password);
+        const hasNumber = PASSWORD_REGEX.DIGIT.test(password);
+        const hasSpecialChar = PASSWORD_REGEX.SPECIAL_CHAR.test(password);
 
         return {
             hasMinLength,
@@ -99,42 +131,95 @@ const Register: React.FC = () => {
 
     // Step 3: profile
     const [fullName, setFullName] = useState('');
-    const [birthDate, setBirthDate] = useState('');
-    const [gender, setGender] = useState<'male' | 'female' | 'other' | ''>('');
+    const [birthday, setBirthday] = useState('');
+    const [gender, setGender] = useState<Gender | ''>('');
+
+    // Helper function to get gender label
+    const getGenderLabel = (genderValue: Gender | '') => {
+        switch (genderValue) {
+            case Gender.MALE:
+                return 'Nam';
+            case Gender.FEMALE:
+                return 'Nữ';
+            case Gender.OTHER:
+                return 'Khác';
+            default:
+                return '';
+        }
+    };
     const [address, setAddress] = useState('');
     const [profileEmail, setProfileEmail] = useState('');
-    const [profilePhone, setProfilePhone] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Social login handlers
+    const handleSocialSuccess = () => navigate('/');
+    const handleSocialError = (error: any) => console.error('Social login error:', error);
+
     const canSendOtp = useMemo(() => {
-        const numericPhone = phone.replace(/\D/g, '');
-        const validEmail = /.+@.+\..+/.test(email);
-        const validIdentifier = method === 'phone' ? numericPhone.length >= 9 : validEmail;
+        // Use AuthService for consistent email validation
+        const validEmail = email.trim() && AuthService.validateEmail(email);
+
+        // Use phone validation from hook (must be exactly 10 digits starting with 0)
+        const validPhone = isPhoneValid();
+
+        // Check if the selected method has valid input
+        const validIdentifier = method === 'phone' ? validPhone : validEmail;
+
         return validIdentifier && isHuman && agree;
-    }, [method, phone, email, isHuman, agree]);
+    }, [method, email, isPhoneValid, isHuman, agree]);
 
     const otpValue = useMemo(() => otp.join(''), [otp]);
-    const canVerifyOtp = otpValue.length === OTP_LENGTH && /^\d{6}$/.test(otpValue);
+    const canVerifyOtp = otpValue.length === OTP_LENGTH && OTP_REGEX.SIX_DIGITS.test(otpValue);
 
     const canCompleteRegistration = useMemo(() => {
+        // Validate full name (at least 2 characters, no numbers)
+        const validFullName = fullName.trim().length >= 2 && NAME_REGEX.NO_NUMBERS.test(fullName);
+
+        // Validate birth date (not empty and not future date)
+        const validBirthday = birthday && new Date(birthday) <= new Date();
+
+        // Validate gender selection
+        const validGender = gender !== '';
+
+        // Validate address (at least 5 characters)
+        const validAddress = address.trim().length >= 5;
+
+        // Validate email using AuthService
+        const validProfileEmail = profileEmail.trim() && AuthService.validateEmail(profileEmail);
+
+        // Validate phone using hook (exactly 10 digits starting with 0)
+        const validProfilePhone = isProfilePhoneValid();
+
         return (
-            fullName.trim().length >= 2 &&
-            birthDate &&
-            gender !== '' &&
-            address.trim().length >= 5 &&
-            profileEmail &&
-            profilePhone
+            validFullName &&
+            validBirthday &&
+            validGender &&
+            validAddress &&
+            validProfileEmail &&
+            validProfilePhone
         );
-    }, [fullName, birthDate, gender, address, profileEmail, profilePhone]);
+    }, [fullName, birthday, gender, address, profileEmail, profilePhone, isProfilePhoneValid]);
 
     // Auto-fill email/phone based on registration method
     useEffect(() => {
         if (method === 'email') {
             setProfileEmail(email);
         } else {
-            setProfilePhone(phone);
+            setProfilePhoneValue(phone);
         }
-    }, [method, email, phone]);
+    }, [method, email, phone, setProfilePhoneValue]);
+
+    // Clear error when component mounts
+    useEffect(() => {
+        dispatch(clearError());
+    }, [dispatch]);
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/');
+        }
+    }, [isAuthenticated, navigate]);
 
     // Countdown timer
     useEffect(() => {
@@ -157,11 +242,32 @@ const Register: React.FC = () => {
     const handleSendOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!canSendOtp) return;
-        transitionToStep(1);
+        setIsSending(true);
+
+        try {
+            // Call send OTP API
+            const sendOtpData: SendOtpRequest = {
+                ...(method === 'email' ? { email } : { phone, deviceId }),
+                purpose: 'REGISTER',
+            };
+            const response = await OtpService.sendOtp(sendOtpData);
+
+            transitionToStep(1);
+            toast.success(response.message || 'Mã OTP đã được gửi thành công!');
+        } catch (error: any) {
+            console.error('Send OTP error:', error);
+            toast.error(
+                method === 'email'
+                    ? 'Email này đã được đăng ký.'
+                    : 'Số điện thoại này đã được đăng ký.'
+            );
+        } finally {
+            setIsSending(false);
+        }
     };
 
     const handleOtpChange = (index: number, value: string) => {
-        if (!/^\d?$/.test(value)) return;
+        if (!OTP_REGEX.SINGLE_DIGIT.test(value)) return;
         setOtp((prev) => {
             const next = [...prev];
             next[index] = value;
@@ -182,9 +288,53 @@ const Register: React.FC = () => {
         e.preventDefault();
         if (!canVerifyOtp) return;
         setIsVerifying(true);
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        setIsVerifying(false);
-        transitionToStep(2);
+
+        try {
+            // Call verify OTP API
+            const verifyOtpData: VerifyOtpRequest = {
+                ...(method === 'email' ? { email } : { phone }),
+                otp: otpValue,
+                purpose: 'REGISTER',
+            };
+            const response = await OtpService.verifyOtp(verifyOtpData);
+
+            // Store OTP verification proof for registration
+            setOtpProof(response.data.proof);
+            setOtpIssuedAt(response.data.issuedAt);
+
+            // OTP verification successful, move to password creation step
+            transitionToStep(2);
+            toast.success(response.message || 'Xác thực OTP thành công!');
+        } catch (error: any) {
+            console.error('Verify OTP error:', error);
+            toast.error('Mã OTP không chính xác hoặc đã hết hạn');
+        } finally {
+            setIsVerifying(false);
+        }
+    };
+
+    const handleResendOtp = async () => {
+        if (countdown > 0) return;
+
+        try {
+            // Call send OTP API again
+            const sendOtpData: SendOtpRequest = {
+                ...(method === 'email' ? { email } : { phone, deviceId }),
+                purpose: 'REGISTER',
+            };
+            const response = await OtpService.sendOtp(sendOtpData);
+
+            setCountdown(60);
+            setOtp(Array(6).fill(''));
+            toast.success(response.message || 'Mã OTP mới đã được gửi thành công!');
+        } catch (error: any) {
+            console.error('Resend OTP error:', error);
+            toast.error(
+                method === 'email'
+                    ? 'Email này đã được đăng ký.'
+                    : 'Số điện thoại này đã được đăng ký.'
+            );
+        }
     };
 
     const handleCreatePassword = async (e: React.FormEvent) => {
@@ -196,10 +346,42 @@ const Register: React.FC = () => {
     const handleCompleteRegistration = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!canCompleteRegistration) return;
+
         setIsSubmitting(true);
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        setIsSubmitting(false);
-        alert('Registration completed successfully!');
+
+        const registerData: RegisterRequest = {
+            email: profileEmail,
+            phoneNumber: profilePhone,
+            password,
+            confirmPassword,
+            fullName,
+            gender: gender as Gender,
+            address,
+            birthday: birthday, // Keep as YYYY-MM-DD format
+            channel: method,
+            purpose: 'REGISTER',
+            proof: otpProof,
+            issuedAt: otpIssuedAt,
+        };
+
+        try {
+            await dispatch(registerAsync(registerData)).unwrap();
+
+            // Registration successful, redirect to home
+            toast.success('Đăng ký thành công! Chào mừng bạn đến với Doccure!');
+            navigate('/login');
+        } catch (error) {
+            console.error('Registration error:', error);
+            if (method === 'phone') {
+                toast.error('Độ tuổi không hợp lệ hoặc email này đã được đăng ký tài khoản.');
+            } else {
+                toast.error(
+                    'Độ tuổi không hợp lệ hoặc số điện thoại này đã được đăng ký tài khoản.'
+                );
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const getStepTitle = () => {
@@ -243,68 +425,15 @@ const Register: React.FC = () => {
         >
             {/* Progress indicator */}
             {step > 0 && (
-                <div className="mb-4">
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                        <span className="text-muted" style={{ fontSize: 14 }}>
-                            Bước {step} / 3
-                        </span>
-                        <span className="text-muted" style={{ fontSize: 14 }}>
-                            {Math.round((step / 3) * 100)}%
-                        </span>
-                    </div>
-                    <div
-                        className="rounded-pill overflow-hidden"
-                        style={{ height: 8, background: '#e5e7eb' }}
-                    >
-                        <div
-                            className="h-100 rounded-pill"
-                            style={{
-                                width: `${(step / 3) * 100}%`,
-                                background: 'linear-gradient(90deg,#0e82fd,#06aed4)',
-                                transition: 'width .5s ease',
-                            }}
-                        />
-                    </div>
-                    <div className="d-flex justify-content-between mt-3">
-                        {[1, 2, 3].map((stepNum) => (
-                            <div key={stepNum} className="d-flex align-items-center">
-                                <div
-                                    className={clsx(
-                                        'rounded-circle d-flex align-items-center justify-content-center',
-                                        step >= stepNum
-                                            ? 'bg-primary text-white border-0'
-                                            : 'text-muted'
-                                    )}
-                                    style={{
-                                        width: 30,
-                                        height: 30,
-                                        border: '2px solid',
-                                        borderColor: step >= stepNum ? 'transparent' : '#d1d5db',
-                                    }}
-                                >
-                                    {step > stepNum ? (
-                                        <Check size={16} />
-                                    ) : (
-                                        <span className="fw-medium" style={{ fontSize: 14 }}>
-                                            {stepNum}
-                                        </span>
-                                    )}
-                                </div>
-                                <span
-                                    className={clsx(
-                                        'ms-2 fw-medium',
-                                        step >= stepNum ? 'text-primary' : 'text-muted'
-                                    )}
-                                    style={{ fontSize: 14 }}
-                                >
-                                    {stepNum === 1 && 'Xác thực'}
-                                    {stepNum === 2 && 'Mật khẩu'}
-                                    {stepNum === 3 && 'Hoàn tất'}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                <StepWizard
+                    steps={[
+                        { id: 1, title: 'Xác thực' },
+                        { id: 2, title: 'Mật khẩu' },
+                        { id: 3, title: 'Hoàn tất' },
+                    ]}
+                    currentStep={step}
+                    className="mb-4"
+                />
             )}
 
             {/* Step 0: Initial registration */}
@@ -344,6 +473,7 @@ const Register: React.FC = () => {
                                 <Input
                                     label="Số điện thoại"
                                     type="tel"
+                                    inputMode="numeric"
                                     placeholder="Nhập số điện thoại"
                                     leftContent={
                                         <>
@@ -360,7 +490,9 @@ const Register: React.FC = () => {
                                     }
                                     wrapVariant="phone"
                                     value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
+                                    onChange={handlePhoneChange}
+                                    onKeyDown={handlePhoneKeyDown}
+                                    onPaste={handlePhonePaste}
                                     onFocus={() => setShowCaptcha(true)}
                                 />
                             ) : (
@@ -428,25 +560,19 @@ const Register: React.FC = () => {
                         </div>
 
                         <Button
-                            text="Gửi mã OTP"
+                            text={isSending ? 'Đang gửi...' : 'Gửi mã OTP'}
                             type="submit"
-                            isDisabled={!canSendOtp}
+                            isDisabled={!canSendOtp || isSending}
                             className="w-100 fw-bold"
                         />
                     </form>
-                    {/* Social login */}
-                    <div className="login-or">
-                        <span className="or-line"></span>
-                        <span className="span-or">hoặc</span>
-                    </div>
-                    <div className="social-login-btn">
-                        <button type="button" className="btn w-100">
-                            <img src={GoogleIcon} alt="google-icon" /> Đăng nhập với Google
-                        </button>
-                        <button type="button" className="btn w-100">
-                            <img src={FacebookIcon} alt="fb-icon" /> Đăng nhập với Facebook
-                        </button>
-                    </div>
+
+                    <SocialLogin
+                        onSuccess={handleSocialSuccess}
+                        onError={handleSocialError}
+                        isDisabled={isSending}
+                    />
+
                     <div className="account-signup">
                         <p>
                             Đã có tài khoản? <Link to={PATHS.LOGIN}>Đăng nhập ngay</Link>
@@ -538,7 +664,7 @@ const Register: React.FC = () => {
                                 <button
                                     type="button"
                                     className="btn btn-link p-0"
-                                    onClick={() => setCountdown(60)}
+                                    onClick={handleResendOtp}
                                     style={{ marginBottom: 14 }}
                                 >
                                     {'(Gửi lại mã)'}
@@ -797,33 +923,27 @@ const Register: React.FC = () => {
                                     <label className="form-label">
                                         Giới tính <span className="text-danger">*</span>
                                     </label>
-                                    <Select
+                                    <Select<{ value: Gender; label: string }>
                                         options={[
-                                            { value: 'male', label: 'Nam' },
-                                            { value: 'female', label: 'Nữ' },
-                                            { value: 'other', label: 'Khác' },
+                                            { value: Gender.MALE, label: 'Nam' },
+                                            { value: Gender.FEMALE, label: 'Nữ' },
+                                            { value: Gender.OTHER, label: 'Khác' },
                                         ]}
                                         value={
-                                            gender
+                                            gender !== ''
                                                 ? {
-                                                      value: gender,
-                                                      label:
-                                                          gender === 'male'
-                                                              ? 'Nam'
-                                                              : gender === 'female'
-                                                                ? 'Nữ'
-                                                                : 'Khác',
+                                                      value: gender as Gender,
+                                                      label: getGenderLabel(gender),
                                                   }
-                                                : null
+                                                : undefined
                                         }
-                                        onChange={(selected) =>
-                                            setGender(
-                                                selected?.value as 'male' | 'female' | 'other' | ''
-                                            )
-                                        }
+                                        onChange={(selected) => {
+                                            setGender(selected?.value ?? '');
+                                        }}
                                         placeholder="Chọn giới tính"
                                         className="react-select-container"
                                         classNamePrefix="react-select"
+                                        isClearable={false}
                                         styles={{
                                             control: (base) => ({
                                                 ...base,
@@ -871,9 +991,12 @@ const Register: React.FC = () => {
                                         label="Số điện thoại"
                                         isRequired
                                         type="tel"
+                                        inputMode="numeric"
                                         leftIcon={<i className="feather-phone" />}
                                         value={profilePhone}
-                                        onChange={(e) => setProfilePhone(e.target.value)}
+                                        onChange={handleProfilePhoneChange}
+                                        onKeyDown={handleProfilePhoneKeyDown}
+                                        onPaste={handleProfilePhonePaste}
                                         className={clsx('rounded-3')}
                                         placeholder="Nhập số điện thoại"
                                         required
@@ -897,8 +1020,8 @@ const Register: React.FC = () => {
                                     <div className="position-relative">
                                         <input
                                             type="date"
-                                            value={birthDate}
-                                            onChange={(e) => setBirthDate(e.target.value)}
+                                            value={birthday}
+                                            onChange={(e) => setBirthday(e.target.value)}
                                             className={clsx(
                                                 'form-control rounded-3',
                                                 styles.inputCustom
@@ -960,17 +1083,24 @@ const Register: React.FC = () => {
                             </div>
                         </div>
 
+                        {/* Error message */}
+                        {error && (
+                            <div className="alert alert-danger text-center mb-3" role="alert">
+                                {error}
+                            </div>
+                        )}
+
                         <button
                             type="submit"
-                            disabled={!canCompleteRegistration || isSubmitting}
+                            disabled={!canCompleteRegistration || isSubmitting || isLoading}
                             className={clsx(
                                 'btn w-100 fw-medium',
-                                canCompleteRegistration && !isSubmitting
+                                canCompleteRegistration && !isSubmitting && !isLoading
                                     ? 'btn-primary-gradient'
                                     : 'btn-secondary disabled'
                             )}
                         >
-                            {isSubmitting ? (
+                            {isSubmitting || isLoading ? (
                                 <>
                                     <div
                                         className="spinner-border spinner-border-sm me-2"

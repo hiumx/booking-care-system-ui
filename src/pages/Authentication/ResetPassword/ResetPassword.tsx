@@ -1,36 +1,42 @@
-import { useState, useMemo } from 'react';
-import ReCAPTCHA from 'react-google-recaptcha';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import AuthLayout from '@/layouts/AuthLayout';
 import { CheckCircle, Shield } from 'lucide-react';
 import clsx from 'clsx';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import { resetPasswordAsync, clearError } from '@/store/slices/authSlice';
+import { RootState, AppDispatch } from '@/store';
+import { ResetPasswordRequest } from '@/types/auth.types';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'react-toastify';
+import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH } from '@/constants';
+import { PATHS } from '@/routes/paths';
 
-interface ResetPasswordProps {
-    onSubmit?: (currentPassword: string, newPassword: string) => void;
-}
+const ResetPassword: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const { isLoading, error } = useSelector((state: RootState) => state.auth);
+    const { isAuthenticated } = useAuth();
 
-const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+    // Get email and token from URL params
+    const email = searchParams.get('email') || '';
+    const resetToken = searchParams.get('token') || '';
 
-const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
-    const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [isHuman, setIsHuman] = useState(false);
-    const [showCaptcha, setShowCaptcha] = useState(false);
-
-    // Password visibility states
-    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     // Password requirements validation
     const passwordRequirements = useMemo(() => {
-        const hasMinLength = newPassword.length >= 8;
-        const hasUppercase = /[A-Z]/.test(newPassword);
-        const hasLowercase = /[a-z]/.test(newPassword);
-        const hasNumber = /\d/.test(newPassword);
-        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+        const hasMinLength = newPassword.length >= PASSWORD_MIN_LENGTH;
+        const hasUppercase = PASSWORD_REGEX.UPPERCASE.test(newPassword);
+        const hasLowercase = PASSWORD_REGEX.LOWERCASE.test(newPassword);
+        const hasNumber = PASSWORD_REGEX.DIGIT.test(newPassword);
+        const hasSpecialChar = PASSWORD_REGEX.SPECIAL_CHAR.test(newPassword);
 
         return {
             hasMinLength,
@@ -61,35 +67,61 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
     }, [newPassword, passwordRequirements]);
 
     const canSubmit = useMemo(() => {
-        const hasCurrentPassword = currentPassword.trim() !== '';
+        const hasEmail = email.trim() !== '';
+        const hasResetToken = resetToken.trim() !== '';
         const hasNewPassword = newPassword.trim() !== '';
         const hasConfirmPassword = confirmPassword.trim() !== '';
         const passwordsMatch = newPassword === confirmPassword;
         const newPasswordValid = passwordRequirements.allMet;
-        const isCaptchaValid = isHuman;
 
         return (
-            hasCurrentPassword &&
+            hasEmail &&
+            hasResetToken &&
             hasNewPassword &&
             hasConfirmPassword &&
             passwordsMatch &&
-            newPasswordValid &&
-            isCaptchaValid
+            newPasswordValid
         );
-    }, [currentPassword, newPassword, confirmPassword, passwordRequirements.allMet, isHuman]);
+    }, [email, resetToken, newPassword, confirmPassword, passwordRequirements.allMet]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // Check authentication and validate token/email
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate(PATHS.HOME);
+        }
+        dispatch(clearError());
+    }, [isAuthenticated, navigate, dispatch]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (canSubmit && onSubmit) {
-            onSubmit(currentPassword, newPassword);
+        if (!canSubmit) return;
+
+        const resetPasswordData: ResetPasswordRequest = {
+            email,
+            resetToken,
+            newPassword,
+            confirmNewPassword: confirmPassword,
+        };
+
+        try {
+            await dispatch(resetPasswordAsync(resetPasswordData)).unwrap();
+
+            toast.success('Đặt lại mật khẩu thành công!');
+            // Redirect to login after 2 seconds
+            setTimeout(() => {
+                navigate(PATHS.LOGIN);
+            }, 2000);
+        } catch (error: any) {
+            console.error('Reset password error:', error);
+            toast.error(
+                error.message ||
+                    'Đặt lại mật khẩu thất bại. Link có thể đã hết hạn hoặc không hợp lệ.'
+            );
         }
     };
 
-    const togglePasswordVisibility = (field: 'current' | 'new' | 'confirm') => {
+    const togglePasswordVisibility = (field: 'new' | 'confirm') => {
         switch (field) {
-            case 'current':
-                setShowCurrentPassword(!showCurrentPassword);
-                break;
             case 'new':
                 setShowNewPassword(!showNewPassword);
                 break;
@@ -98,6 +130,50 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
                 break;
         }
     };
+
+    // Error state for invalid/missing token
+    if (!resetToken || !email) {
+        return (
+            <AuthLayout
+                title="Link không hợp lệ!"
+                subtitle="Link đặt lại này không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu đặt lại
+                            mật khẩu mới."
+            >
+                <div className="text-center">
+                    <div
+                        style={{
+                            width: '4rem',
+                            height: '4rem',
+                            backgroundColor: '#FEE2E2',
+                            borderRadius: '9999px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            margin: '0 auto',
+                            marginBottom: '1.5rem',
+                        }}
+                    >
+                        <i
+                            className="feather-x-circle"
+                            style={{
+                                fontSize: '2rem',
+                                color: '#DC2626',
+                            }}
+                        />
+                    </div>
+
+                    <div className="d-grid gap-2">
+                        <Button
+                            text="Yêu cầu đặt lại mới"
+                            type="button"
+                            className="w-100"
+                            onClick={() => navigate(PATHS.FORGOT_PASSWORD)}
+                        />
+                    </div>
+                </div>
+            </AuthLayout>
+        );
+    }
 
     return (
         <AuthLayout title="Đặt lại mật khẩu" subtitle="Tạo mật khẩu mới cho tài khoản của bạn">
@@ -124,22 +200,6 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
             </div>
 
             <form onSubmit={handleSubmit}>
-                {/* Current Password */}
-                <div className="mb-3">
-                    <Input
-                        label="Mật khẩu hiện tại"
-                        type="password"
-                        placeholder="Nhập mật khẩu hiện tại"
-                        leftIcon={<i className="feather-lock" />}
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        onFocus={() => setShowCaptcha(true)}
-                        showPasswordToggle
-                        isPasswordVisible={showCurrentPassword}
-                        onTogglePassword={() => togglePasswordVisibility('current')}
-                    />
-                </div>
-
                 {/* New Password */}
                 <div className="mb-3">
                     <Input
@@ -303,37 +363,19 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onSubmit }) => {
                     </div>
                 </div>
 
-                {/* Captcha */}
-                {showCaptcha && (
-                    <div className="mb-3">
-                        {siteKey ? (
-                            <ReCAPTCHA
-                                sitekey={siteKey}
-                                onChange={() => setIsHuman(true)}
-                                onExpired={() => setIsHuman(false)}
-                            />
-                        ) : (
-                            <div className="d-flex align-items-center p-3 bg-light rounded-3 border">
-                                <input
-                                    type="checkbox"
-                                    id="captcha"
-                                    className="me-2"
-                                    onChange={(e) => setIsHuman(e.target.checked)}
-                                />
-                                <label htmlFor="captcha" className="text-muted">
-                                    Tôi không phải là robot
-                                </label>
-                            </div>
-                        )}
+                {/* Error message */}
+                {error && (
+                    <div className="alert alert-danger text-center mb-3" role="alert">
+                        {error}
                     </div>
                 )}
 
                 {/* Submit Button */}
                 <div className="mb-1 mt-3">
                     <Button
-                        text="Đặt lại mật khẩu"
+                        text={isLoading ? 'Đang đặt lại...' : 'Đặt lại mật khẩu'}
                         type="submit"
-                        isDisabled={!canSubmit}
+                        isDisabled={!canSubmit || isLoading}
                         className="w-100 fw-bold"
                     />
                 </div>
