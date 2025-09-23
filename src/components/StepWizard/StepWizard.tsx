@@ -22,13 +22,15 @@ const StepWizard: React.FC<StepWizardProps> = ({ steps, currentStep, className }
                 {steps.map((stepItem) => (
                     <li
                         key={stepItem.id}
-                        className={
-                            stepItem.id === currentStep
-                                ? 'progress-active'
-                                : stepItem.id < currentStep
-                                  ? 'progress-activated'
-                                  : ''
-                        }
+                        className={(() => {
+                            if (stepItem.id === currentStep) {
+                                return 'progress-active';
+                            }
+                            if (stepItem.id < currentStep) {
+                                return 'progress-activated';
+                            }
+                            return '';
+                        })()}
                     >
                         <div className="profile-step">
                             <span className="multi-steps">{stepItem.id}</span>

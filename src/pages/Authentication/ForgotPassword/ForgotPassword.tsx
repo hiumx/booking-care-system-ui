@@ -41,7 +41,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
     const [showCaptcha, setShowCaptcha] = useState(false);
 
     // OTP states
-    const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
+    const [otp, setOtp] = useState<string[]>(new Array(6).fill(''));
     const [isVerifying, setIsVerifying] = useState(false);
     const [countdown, setCountdown] = useState(60);
     const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
@@ -78,6 +78,30 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
     const otpValue = useMemo(() => otp.join(''), [otp]);
     const canVerifyOtp = otpValue.length === 6 && OTP_REGEX.SIX_DIGITS.test(otpValue);
 
+    const handleEmailFlow = async () => {
+        // Email flow: reset captcha and show success toast
+        setIsHuman(false); // Reset human verification
+
+        // Reset ReCAPTCHA if it exists
+        if (recaptchaRef.current) {
+            recaptchaRef.current.reset();
+        }
+
+        // Also keep captcha visible for user to verify again
+        setShowCaptcha(true);
+
+        toast.success(
+            'Nếu email tồn tại trong hệ thống, bạn sẽ nhận được hướng dẫn đặt lại mật khẩu.'
+        );
+    };
+
+    const handlePhoneFlow = async () => {
+        // Phone flow: move to OTP step
+        setStep('otp');
+        setCountdown(60);
+        toast.success('Mã OTP đã được gửi đến số điện thoại của bạn.');
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!canSend) return;
@@ -90,25 +114,9 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
             await dispatch(forgotPasswordAsync(forgotPasswordData)).unwrap();
 
             if (method === 'email') {
-                // Email flow: reset captcha and show success toast
-                setIsHuman(false); // Reset human verification
-
-                // Reset ReCAPTCHA if it exists
-                if (recaptchaRef.current) {
-                    recaptchaRef.current.reset();
-                }
-
-                // Also keep captcha visible for user to verify again
-                setShowCaptcha(true);
-
-                toast.success(
-                    'Nếu email tồn tại trong hệ thống, bạn sẽ nhận được hướng dẫn đặt lại mật khẩu.'
-                );
+                await handleEmailFlow();
             } else {
-                // Phone flow: move to OTP step
-                setStep('otp');
-                setCountdown(60);
-                toast.success('Mã OTP đã được gửi đến số điện thoại của bạn.');
+                await handlePhoneFlow();
             }
         } catch (error) {
             console.error('Forgot password error:', error);
@@ -141,6 +149,25 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         }
     };
 
+    const processOtpVerification = async () => {
+        const verifyOtpData: VerifyOtpRequest = {
+            phone: phone,
+            otp: otpValue,
+            purpose: 'FORGOT_PASSWORD',
+        };
+        return await OtpService.verifyOtp(verifyOtpData);
+    };
+
+    const processResetToken = async (verifyResponse: any) => {
+        const resetTokenData: ResetTokenRequest = {
+            phoneNumber: phone,
+            purpose: 'FORGOT_PASSWORD',
+            proof: verifyResponse.data.proof,
+            issuedAt: verifyResponse.data.issuedAt,
+        };
+        return await AuthService.resetToken(resetTokenData);
+    };
+
     const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!canVerifyOtp) return;
@@ -148,26 +175,11 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         setIsVerifying(true);
 
         try {
-            // Step 1: Verify OTP
-            const verifyOtpData: VerifyOtpRequest = {
-                phone: phone,
-                otp: otpValue,
-                purpose: 'FORGOT_PASSWORD',
-            };
-            const verifyResponse = await OtpService.verifyOtp(verifyOtpData);
-
-            // Step 2: Get reset token
-            const resetTokenData: ResetTokenRequest = {
-                phoneNumber: phone,
-                purpose: 'FORGOT_PASSWORD',
-                proof: verifyResponse.data.proof,
-                issuedAt: verifyResponse.data.issuedAt,
-            };
-            const resetTokenResponse = await AuthService.resetToken(resetTokenData);
+            const verifyResponse = await processOtpVerification();
+            const resetTokenResponse = await processResetToken(verifyResponse);
 
             toast.success('Xác thực thành công! Đang chuyển hướng...');
-            // Navigate to reset password page
-            window.location.href = resetTokenResponse.data.resetUrl;
+            globalThis.location.href = resetTokenResponse.data.resetUrl;
         } catch (error: any) {
             console.error('OTP verification error:', error);
             toast.error('Xác thực OTP thất bại. Vui lòng thử lại.');
@@ -182,7 +194,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         try {
             await dispatch(forgotPasswordAsync({ phoneNumber: phone, deviceId })).unwrap();
             setCountdown(60);
-            setOtp(Array(6).fill(''));
+            setOtp(new Array(6).fill(''));
             toast.success('Mã OTP mới đã được gửi.');
         } catch (error) {
             console.error('Resend OTP error:', error);
@@ -192,7 +204,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
 
     const handleBackToInput = () => {
         setStep('input');
-        setOtp(Array(6).fill(''));
+        setOtp(new Array(6).fill(''));
         setCountdown(60);
     };
 
@@ -355,7 +367,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                         <div className="d-flex justify-content-center gap-2 mb-4">
                             {otp.map((digit, idx) => (
                                 <input
-                                    key={idx}
+                                    key={`otp-input-${idx}`}
                                     ref={(el) => {
                                         otpRefs.current[idx] = el;
                                     }}

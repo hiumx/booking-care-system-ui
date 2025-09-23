@@ -47,7 +47,7 @@ export const useFacebookAuth = (onSuccess?: () => void, onError?: (error: string
                 return;
             }
 
-            if (window.FB) {
+            if (globalThis.window.FB) {
                 return; // Already initialized
             }
 
@@ -60,8 +60,8 @@ export const useFacebookAuth = (onSuccess?: () => void, onError?: (error: string
             document.head.appendChild(script);
 
             // Initialize when loaded
-            window.fbAsyncInit = () => {
-                window.FB.init({
+            globalThis.window.fbAsyncInit = () => {
+                globalThis.window.FB.init({
                     appId: import.meta.env.VITE_FACEBOOK_APP_ID,
                     cookie: true,
                     xfbml: true,
@@ -89,7 +89,7 @@ export const useFacebookAuth = (onSuccess?: () => void, onError?: (error: string
                 }
 
                 // Get user info from Facebook
-                window.FB.api(
+                globalThis.window.FB.api(
                     '/me',
                     { fields: 'id,name,email,picture' },
                     async (userInfo: FacebookUser) => {
@@ -134,7 +134,7 @@ export const useFacebookAuth = (onSuccess?: () => void, onError?: (error: string
             return;
         }
 
-        if (!window.FB) {
+        if (!globalThis.window.FB) {
             toast.error('Facebook SDK chưa được tải. Vui lòng thử lại sau.');
             onError?.('Facebook SDK not loaded');
             return;
@@ -144,13 +144,13 @@ export const useFacebookAuth = (onSuccess?: () => void, onError?: (error: string
 
         try {
             // Get login status first
-            window.FB.getLoginStatus((response: FacebookAuthResponse) => {
+            globalThis.window.FB.getLoginStatus((response: FacebookAuthResponse) => {
                 if (response.status === 'connected') {
                     // User is already logged in
                     handleFacebookResponse(response);
                 } else {
                     // Trigger Facebook login
-                    window.FB.login(
+                    globalThis.window.FB.login(
                         (loginResponse: FacebookAuthResponse) => {
                             if (loginResponse.status === 'connected') {
                                 handleFacebookResponse(loginResponse);

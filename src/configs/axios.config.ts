@@ -38,13 +38,13 @@ let isRefreshing = false;
 let failedQueue: Array<{ resolve: (value?: any) => void; reject: (err: any) => void }> = [];
 
 const processQueue = (error: any, token: string | null = null) => {
-    failedQueue.forEach((prom) => {
+    for (const prom of failedQueue) {
         if (token) {
             prom.resolve();
         } else {
             prom.reject(error);
         }
-    });
+    }
     failedQueue = [];
 };
 
@@ -59,8 +59,8 @@ const handleNetworkError = (error: AxiosError) => {
 };
 
 const handleForbiddenError = (err: any) => {
-    if (typeof window !== 'undefined') {
-        window.location.href = '/error-403';
+    if (typeof globalThis.window !== 'undefined') {
+        globalThis.location.href = '/error-403';
     }
     return Promise.reject(new Error(err?.message || 'Access forbidden'));
 };
@@ -70,7 +70,9 @@ const queueFailedRequest = (originalRequest: ExtendedAxiosRequestConfig) => {
         failedQueue.push({ resolve, reject });
     })
         .then(() => instance(originalRequest))
-        .catch((queueErr) => Promise.reject(new Error(String(queueErr))));
+        .catch((error_) => {
+            throw new Error(String(error_));
+        });
 };
 
 const handleTokenRefresh = async (originalRequest: ExtendedAxiosRequestConfig) => {
@@ -94,7 +96,7 @@ const handleTokenRefresh = async (originalRequest: ExtendedAxiosRequestConfig) =
         if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
             window.location.href = '/login';
         }
-        return Promise.reject(new Error(String(refreshError)));
+        throw new Error(String(refreshError));
     }
 };
 
@@ -135,7 +137,7 @@ const handleResponseError = async (error: AxiosError) => {
         data: err,
     });
 
-    return Promise.reject(new Error(err?.message || error.message || 'An error occurred'));
+    throw new Error(err?.message || error.message || 'An error occurred');
 };
 
 // Response interceptor for handling responses and errors

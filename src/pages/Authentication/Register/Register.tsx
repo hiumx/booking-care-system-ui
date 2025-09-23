@@ -325,7 +325,7 @@ const Register: React.FC = () => {
             const response = await OtpService.sendOtp(sendOtpData);
 
             setCountdown(60);
-            setOtp(Array(6).fill(''));
+            setOtp(new Array(6).fill(''));
             toast.success(response.message || 'Mã OTP mới đã được gửi thành công!');
         } catch (error: any) {
             console.error('Resend OTP error:', error);
@@ -930,12 +930,12 @@ const Register: React.FC = () => {
                                             { value: Gender.OTHER, label: 'Khác' },
                                         ]}
                                         value={
-                                            gender !== ''
-                                                ? {
-                                                      value: gender as Gender,
+                                            gender === ''
+                                                ? undefined
+                                                : {
+                                                      value: gender,
                                                       label: getGenderLabel(gender),
                                                   }
-                                                : undefined
                                         }
                                         onChange={(selected) => {
                                             setGender(selected?.value ?? '');

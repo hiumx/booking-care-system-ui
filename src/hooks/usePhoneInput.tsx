@@ -18,7 +18,7 @@ export const usePhoneInput = (initialValue: string = '') => {
         // Vietnamese phone number validation
         if (cleanedValue.length > 0) {
             // If first digit is not 0, prepend 0
-            if (cleanedValue[0] !== '0') {
+            if (!cleanedValue.startsWith('0')) {
                 cleanedValue = '0' + cleanedValue;
             }
 
@@ -84,13 +84,13 @@ export const usePhoneInput = (initialValue: string = '') => {
             }
 
             // Block typing if already at 10 digits limit
-            if (phone.length >= 10 && /^[0-9]$/.test(e.key)) {
+            if (phone.length >= 10 && /^\d$/.test(e.key)) {
                 e.preventDefault();
                 return;
             }
 
             // Allow only numbers (0-9)
-            if (!/^[0-9]$/.test(e.key)) {
+            if (!/^\d$/.test(e.key)) {
                 e.preventDefault();
             }
         },
