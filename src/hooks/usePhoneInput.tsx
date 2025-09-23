@@ -13,7 +13,7 @@ export const usePhoneInput = (initialValue: string = '') => {
      */
     const validateAndFormatPhone = useCallback((value: string): string => {
         // Clean any non-numeric characters
-        let cleanedValue = value.replace(/[^0-9]/g, '');
+        let cleanedValue = value.replace(/\D/g, '');
 
         // Vietnamese phone number validation
         if (cleanedValue.length > 0) {

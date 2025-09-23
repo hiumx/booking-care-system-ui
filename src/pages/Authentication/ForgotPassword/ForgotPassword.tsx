@@ -225,221 +225,222 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         return maskedPart + lastThreeDigits;
     };
 
-    return (
-        <AuthLayout title={getTitle()} subtitle={getSubtitle()}>
-            {step === 'input' ? (
-                <form onSubmit={handleSubmit}>
-                    <div className="d-flex justify-content-center mb-3">
-                        <div className="method-toggle">
-                            <button
-                                type="button"
-                                className={clsx(
-                                    'toggle-btn',
-                                    method === 'phone' && 'toggle-btn-active'
-                                )}
-                                onClick={() => setMethod('phone')}
-                            >
-                                <i className="feather-phone me-1"></i>
-                                Số điện thoại
-                            </button>
-                            <button
-                                type="button"
-                                className={clsx(
-                                    'toggle-btn',
-                                    method === 'email' && 'toggle-btn-active'
-                                )}
-                                onClick={() => setMethod('email')}
-                            >
-                                <i className="feather-mail me-1"></i>
-                                Email
-                            </button>
-                        </div>
-                    </div>
-                    <div className="mb-3">
-                        {method === 'phone' ? (
-                            <Input
-                                label="Số điện thoại"
-                                type="tel"
-                                inputMode="numeric"
-                                placeholder="Nhập số điện thoại"
-                                leftContent={
-                                    <>
-                                        <img
-                                            src="https://flagcdn.com/w20/vn.png"
-                                            alt="VN"
-                                            width={20}
-                                            height={15}
-                                        />
-                                        <span className="text-muted" style={{ fontSize: 14 }}>
-                                            +84
-                                        </span>
-                                    </>
-                                }
-                                wrapVariant="phone"
-                                value={phone}
-                                onChange={handlePhoneChange}
-                                onKeyDown={handlePhoneKeyDown}
-                                onPaste={handlePhonePaste}
-                                onFocus={() => setShowCaptcha(true)}
-                            />
-                        ) : (
-                            <Input
-                                label="Địa chỉ email"
-                                type="email"
-                                placeholder="Nhập địa chỉ email"
-                                leftIcon={<Mail size={18} className="text-muted" />}
-                                wrapVariant="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                onFocus={() => setShowCaptcha(true)}
-                            />
-                        )}
-                    </div>
-                    {/* Error message */}
-                    {error && (
-                        <div className="alert alert-danger text-center mb-3" role="alert">
-                            {error}
-                        </div>
-                    )}
-                    {/* Captcha */}
-                    {showCaptcha && (
-                        <div>
-                            {siteKey ? (
-                                <ReCAPTCHA
-                                    ref={recaptchaRef}
-                                    sitekey={siteKey}
-                                    onChange={(value) => setIsHuman(!!value)}
-                                    onExpired={() => setIsHuman(false)}
+    const renderMethodToggle = () => (
+        <div className="d-flex justify-content-center mb-3">
+            <div className="method-toggle">
+                <button
+                    type="button"
+                    className={clsx('toggle-btn', method === 'phone' && 'toggle-btn-active')}
+                    onClick={() => setMethod('phone')}
+                >
+                    <i className="feather-phone me-1"></i>
+                    Số điện thoại
+                </button>
+                <button
+                    type="button"
+                    className={clsx('toggle-btn', method === 'email' && 'toggle-btn-active')}
+                    onClick={() => setMethod('email')}
+                >
+                    <i className="feather-mail me-1"></i>
+                    Email
+                </button>
+            </div>
+        </div>
+    );
+
+    const renderInputStep = () => (
+        <form onSubmit={handleSubmit}>
+            {renderMethodToggle()}
+            <div className="mb-3">
+                {method === 'phone' ? (
+                    <Input
+                        label="Số điện thoại"
+                        type="tel"
+                        inputMode="numeric"
+                        placeholder="Nhập số điện thoại"
+                        leftContent={
+                            <>
+                                <img
+                                    src="https://flagcdn.com/w20/vn.png"
+                                    alt="VN"
+                                    width={20}
+                                    height={15}
                                 />
-                            ) : (
-                                <div className="d-flex align-items-center p-3 bg-light rounded-3 border">
-                                    <input
-                                        type="checkbox"
-                                        id="captcha"
-                                        className="me-2"
-                                        checked={isHuman}
-                                        onChange={(e) => setIsHuman(e.target.checked)}
-                                    />
-                                    <label htmlFor="captcha" className="text-muted">
-                                        Tôi không phải là robot
-                                    </label>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <div className="mb-3 mt-3">
-                        <Button
-                            text={isLoading ? 'Đang gửi...' : 'Đặt lại mật khẩu'}
-                            type="submit"
-                            isDisabled={!canSend || isLoading}
-                            className="w-100 fw-bold"
-                        />
-                    </div>
-                    <div className="account-signup">
-                        <p>
-                            Đã nhớ mật khẩu? <Link to={PATHS.LOGIN}>Đăng nhập ngay</Link>
-                        </p>
-                    </div>
-                </form>
-            ) : (
-                /* OTP Verification Step */
-                <div style={{ maxWidth: 480, margin: '0 auto' }}>
-                    <div className="text-center mb-4">
-                        <div
-                            className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
-                            style={{
-                                width: 64,
-                                height: 64,
-                                background: '#dbeafe',
-                            }}
-                        >
-                            <Phone size={24} className="text-primary" />
-                        </div>
-                        <p className="text-muted">
-                            Mã OTP đã được gửi đến số điện thoại{' '}
-                            <span className="fw-medium text-dark">{maskPhoneNumber(phone)}</span>
-                        </p>
-                    </div>
-
-                    <form onSubmit={handleVerifyOtp}>
-                        {/* OTP Input */}
-                        <div className="d-flex justify-content-center gap-2 mb-4">
-                            {otp.map((digit, idx) => (
-                                <input
-                                    key={`otp-input-${idx}`}
-                                    ref={(el) => {
-                                        otpRefs.current[idx] = el;
-                                    }}
-                                    type="text"
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    maxLength={1}
-                                    value={digit}
-                                    onChange={(e) => handleOtpChange(idx, e.target.value)}
-                                    onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                                    className={clsx(
-                                        'text-center fw-bold border rounded',
-                                        digit ? 'border-primary' : 'border-secondary',
-                                        'focus:border-primary focus:ring-1 focus:ring-primary'
-                                    )}
-                                    style={{
-                                        width: 48,
-                                        height: 56,
-                                        fontSize: 20,
-                                        outline: 'none',
-                                        transition: 'border-color 0.15s ease-in-out',
-                                    }}
-                                />
-                            ))}
-                        </div>
-
-                        {/* Error message */}
-                        {error && (
-                            <div className="alert alert-danger mb-3 text-center" role="alert">
-                                {error}
-                            </div>
-                        )}
-
-                        {/* Verify Button */}
-                        <Button
-                            text={isVerifying ? 'Đang xác thực...' : 'Xác thực OTP'}
-                            type="submit"
-                            isDisabled={!canVerifyOtp || isVerifying}
-                            className={clsx(
-                                'w-100 fw-medium mb-3',
-                                canVerifyOtp && !isVerifying ? 'btn-primary' : 'btn-secondary'
-                            )}
-                        />
-
-                        {/* Resend & Back buttons */}
-                        <div className="d-flex justify-content-between align-items-center">
-                            <button
-                                type="button"
-                                onClick={handleBackToInput}
-                                className="btn btn-link p-0 d-flex align-items-center text-muted"
-                            >
-                                <ArrowLeft size={16} className="me-1" />
-                                Quay lại
-                            </button>
-
-                            <div className="text-muted">
-                                {countdown > 0 ? (
-                                    <span>Gửi lại sau {countdown}s</span>
-                                ) : (
-                                    <button
-                                        type="button"
-                                        onClick={handleResendOtp}
-                                        className="btn btn-link p-0 text-primary"
-                                    >
-                                        Gửi lại mã OTP
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </form>
+                                <span className="text-muted" style={{ fontSize: 14 }}>
+                                    +84
+                                </span>
+                            </>
+                        }
+                        wrapVariant="phone"
+                        value={phone}
+                        onChange={handlePhoneChange}
+                        onKeyDown={handlePhoneKeyDown}
+                        onPaste={handlePhonePaste}
+                        onFocus={() => setShowCaptcha(true)}
+                    />
+                ) : (
+                    <Input
+                        label="Địa chỉ email"
+                        type="email"
+                        placeholder="Nhập địa chỉ email"
+                        leftIcon={<Mail size={18} className="text-muted" />}
+                        wrapVariant="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        onFocus={() => setShowCaptcha(true)}
+                    />
+                )}
+            </div>
+            {/* Error message */}
+            {error && (
+                <div className="alert alert-danger text-center mb-3" role="alert">
+                    {error}
                 </div>
             )}
+            {/* Captcha */}
+            {showCaptcha && (
+                <div>
+                    {siteKey ? (
+                        <ReCAPTCHA
+                            ref={recaptchaRef}
+                            sitekey={siteKey}
+                            onChange={(value) => setIsHuman(!!value)}
+                            onExpired={() => setIsHuman(false)}
+                        />
+                    ) : (
+                        <div className="d-flex align-items-center p-3 bg-light rounded-3 border">
+                            <input
+                                type="checkbox"
+                                id="captcha"
+                                className="me-2"
+                                checked={isHuman}
+                                onChange={(e) => setIsHuman(e.target.checked)}
+                            />
+                            <label htmlFor="captcha" className="text-muted">
+                                Tôi không phải là robot
+                            </label>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            <div className="mb-3 mt-3">
+                <Button
+                    text={isLoading ? 'Đang gửi...' : 'Đặt lại mật khẩu'}
+                    type="submit"
+                    isDisabled={!canSend || isLoading}
+                    className="w-100 fw-bold"
+                />
+            </div>
+            <div className="account-signup">
+                <p>
+                    Đã nhớ mật khẩu? <Link to={PATHS.LOGIN}>Đăng nhập ngay</Link>
+                </p>
+            </div>
+        </form>
+    );
+
+    const renderOtpStep = () => (
+        <div style={{ maxWidth: 480, margin: '0 auto' }}>
+            <div className="text-center mb-4">
+                <div
+                    className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                    style={{
+                        width: 64,
+                        height: 64,
+                        background: '#dbeafe',
+                    }}
+                >
+                    <Phone size={24} className="text-primary" />
+                </div>
+                <p className="text-muted">
+                    Mã OTP đã được gửi đến số điện thoại{' '}
+                    <span className="fw-medium text-dark">{maskPhoneNumber(phone)}</span>
+                </p>
+            </div>
+
+            <form onSubmit={handleVerifyOtp}>
+                {/* OTP Input */}
+                <div className="d-flex justify-content-center gap-2 mb-4">
+                    {otp.map((digit, idx) => (
+                        <input
+                            key={`otp-input-${idx}`}
+                            ref={(el) => {
+                                otpRefs.current[idx] = el;
+                            }}
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            maxLength={1}
+                            value={digit}
+                            onChange={(e) => handleOtpChange(idx, e.target.value)}
+                            onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                            className={clsx(
+                                'text-center fw-bold border rounded',
+                                digit ? 'border-primary' : 'border-secondary',
+                                'focus:border-primary focus:ring-1 focus:ring-primary'
+                            )}
+                            style={{
+                                width: 48,
+                                height: 56,
+                                fontSize: 20,
+                                outline: 'none',
+                                transition: 'border-color 0.15s ease-in-out',
+                            }}
+                        />
+                    ))}
+                </div>
+
+                {/* Error message */}
+                {error && (
+                    <div className="alert alert-danger mb-3 text-center" role="alert">
+                        {error}
+                    </div>
+                )}
+
+                {/* Verify Button */}
+                <Button
+                    text={isVerifying ? 'Đang xác thực...' : 'Xác thực OTP'}
+                    type="submit"
+                    isDisabled={!canVerifyOtp || isVerifying}
+                    className={clsx(
+                        'w-100 fw-medium mb-3',
+                        canVerifyOtp && !isVerifying ? 'btn-primary' : 'btn-secondary'
+                    )}
+                />
+
+                {/* Resend & Back buttons */}
+                <div className="d-flex justify-content-between align-items-center">
+                    <button
+                        type="button"
+                        onClick={handleBackToInput}
+                        className="btn btn-link p-0 d-flex align-items-center text-muted"
+                    >
+                        <ArrowLeft size={16} className="me-1" />
+                        Quay lại
+                    </button>
+
+                    <div className="text-muted">
+                        {countdown > 0 ? (
+                            <span>Gửi lại sau {countdown}s</span>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={handleResendOtp}
+                                className="btn btn-link p-0 text-primary"
+                            >
+                                Gửi lại mã OTP
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </form>
+        </div>
+    );
+
+    return (
+        <AuthLayout title={getTitle()} subtitle={getSubtitle()}>
+            {step === 'input' ? renderInputStep() : renderOtpStep()}
         </AuthLayout>
     );
 };

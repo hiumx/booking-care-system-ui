@@ -59,7 +59,7 @@ const handleNetworkError = (error: AxiosError) => {
 };
 
 const handleForbiddenError = (err: any) => {
-    if (typeof globalThis.window !== 'undefined') {
+    if (globalThis.window !== undefined) {
         globalThis.location.href = '/error-403';
     }
     return Promise.reject(new Error(err?.message || 'Access forbidden'));
