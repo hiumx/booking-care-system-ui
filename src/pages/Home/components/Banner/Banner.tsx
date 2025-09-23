@@ -1,95 +1,149 @@
+import { useNavigate } from 'react-router-dom';
+import { motion, useAnimation } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 import SearchInput from '@/components/SearchInput';
 
 const Banner: React.FC = () => {
+    const navigate = useNavigate();
+    const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+    const [tooltipPos, setTooltipPos] = useState<{ top: number; left: number } | null>(null);
+    const controls = useAnimation();
+    const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+    const handleNavigate = () => {
+        navigate('/schedule-support');
+    };
+
+    const updateTooltipPosition = () => {
+        if (!buttonRef.current) return;
+        const rect = buttonRef.current.getBoundingClientRect();
+        setTooltipPos({ top: rect.bottom + 8, left: rect.left + rect.width / 2 });
+    };
+
+    const handleHoverStart = () => {
+        setIsTooltipVisible(true);
+        updateTooltipPosition();
+        controls.start({ opacity: 1, scale: 1 });
+    };
+
+    const handleHoverEnd = () => {
+        setIsTooltipVisible(false);
+        controls.start({ opacity: 0, scale: 0.9 });
+    };
+
+    useEffect(() => {
+        if (!isTooltipVisible) return;
+        const onResize = () => updateTooltipPosition();
+        window.addEventListener('resize', onResize);
+        window.addEventListener('scroll', onResize, true);
+        return () => {
+            window.removeEventListener('resize', onResize);
+            window.removeEventListener('scroll', onResize, true);
+        };
+    }, [isTooltipVisible]);
+
     return (
-        <section className="banner-section banner-sec-one">
+        <section
+            className="banner-section banner-sec-one"
+            style={{ overflow: 'visible', position: 'relative', zIndex: 2 }}
+        >
             <div className="container">
                 <div className="row align-items-center">
                     <div className="col-lg-7">
                         <div className="banner-content aos">
-                            <div className="rating-appointment d-inline-flex align-items-center gap-2">
-                                <div className="avatar-list-stacked avatar-group-lg">
-                                    <span className="avatar avatar-rounded">
-                                        <img
-                                            className="border border-white"
-                                            src="/src/assets/img/doctors/doctor-thumb-22.jpg"
-                                            alt="img"
-                                        />
-                                    </span>
-                                    <span className="avatar avatar-rounded">
-                                        <img
-                                            className="border border-white"
-                                            src="/src/assets/img/doctors/doctor-thumb-23.jpg"
-                                            alt="img"
-                                        />
-                                    </span>
-                                    <span className="avatar avatar-rounded">
-                                        <img
-                                            src="/src/assets/img/doctors/doctor-thumb-24.jpg"
-                                            alt="img"
-                                        />
-                                    </span>
-                                </div>
-                                <div className="me-2">
-                                    <h6 className="mb-1">5K+ Appointments</h6>
-                                    <div className="d-flex align-items-center">
-                                        <div className="d-flex align-items-center">
-                                            <i className="fa-solid fa-star text-orange me-1"></i>
-                                            <i className="fa-solid fa-star text-orange me-1"></i>
-                                            <i className="fa-solid fa-star text-orange me-1"></i>
-                                            <i className="fa-solid fa-star text-orange me-1"></i>
-                                            <i className="fa-solid fa-star text-orange me-1"></i>
-                                        </div>
-                                        <p>5.0 Ratings</p>
+                            <motion.div
+                                className="relative inline-block"
+                                style={{
+                                    position: 'relative',
+                                    display: 'inline-block',
+                                    overflow: 'visible',
+                                    zIndex: 2,
+                                }}
+                            >
+                                <motion.button
+                                    ref={buttonRef}
+                                    className="rating-appointment d-inline-flex align-items-center gap-2"
+                                    onClick={handleNavigate}
+                                    onMouseEnter={handleHoverStart}
+                                    onMouseLeave={handleHoverEnd}
+                                    onFocus={handleHoverStart}
+                                    onBlur={handleHoverEnd}
+                                    whileHover={{ scale: 1.05 }}
+                                    transition={{ type: 'spring', stiffness: 300 }}
+                                >
+                                    <div className="avatar-list-stacked avatar-group-lg">
+                                        <span className="avatar avatar-rounded">
+                                            <img
+                                                src="https://img.freepik.com/premium-psd/happy-robot-3d-ai-character-chat-bot-mascot-gpt-chatbot-icon-artificial-intelligence_95505-496.jpg?semt=ais_incoming&w=740&q=80"
+                                                alt="img"
+                                            />
+                                        </span>
                                     </div>
-                                </div>
-                            </div>
+                                    <div className="me-2">
+                                        <h6 className="mb-1">Hỗ trợ đặt lịch</h6>
+                                        <div className="d-flex align-items-center">
+                                            <div className="d-flex align-items-center">
+                                                <i className="fa-solid fa-star text-orange me-1"></i>
+                                                <i className="fa-solid fa-star text-orange me-1"></i>
+                                                <i className="fa-solid fa-star text-orange me-1"></i>
+                                                <i className="fa-solid fa-star text-orange me-1"></i>
+                                                <i className="fa-solid fa-star text-orange me-1"></i>
+                                            </div>
+                                            <p>5.0 sao</p>
+                                        </div>
+                                    </div>
+                                </motion.button>
+                                <motion.div
+                                    style={{
+                                        position: 'fixed',
+                                        top: tooltipPos ? `${tooltipPos.top}px` : '-9999px',
+                                        left: tooltipPos ? `${tooltipPos.left}px` : '-9999px',
+                                        transform: 'translateX(-50%)',
+                                        background:
+                                            'linear-gradient(990deg, #BDFCFF, #0066FF 0%, #2EA8FF 50% 100%)',
+                                        color: '#ffffff',
+                                        fontSize: '0.875rem',
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '0.5rem',
+                                        boxShadow:
+                                            '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+                                        zIndex: 100000,
+                                        whiteSpace: 'nowrap',
+                                        pointerEvents: 'none',
+                                        visibility: isTooltipVisible ? 'visible' : 'hidden',
+                                    }}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={
+                                        isTooltipVisible
+                                            ? { opacity: 1, scale: 1 }
+                                            : { opacity: 0, scale: 0.95 }
+                                    }
+                                    transition={{ duration: 0.15 }}
+                                >
+                                    Click vào đặt lịch thông minh nha!
+                                    <span
+                                        style={{
+                                            width: 0,
+                                            height: 0,
+                                            borderLeft: '8px solid transparent',
+                                            borderRight: '8px solid transparent',
+                                            borderBottom: '8px solid #0066FF',
+                                            position: 'absolute',
+                                            top: '-8px',
+                                            left: '50%',
+                                            transform: 'translateX(-50%)',
+                                        }}
+                                    />
+                                </motion.div>
+                            </motion.div>
                             <h1 className="display-5">
-                                Discover Health: Find Your Trusted{' '}
+                                Khám phá sức khỏe: Tìm bác sĩ{' '}
                                 <span className="banner-icon">
                                     <img src="/src/assets/img/icons/video.svg" alt="img" />
                                 </span>{' '}
-                                <span className="text-gradient">Doctors</span> Today
+                                <span className="text-gradient">của bạn</span> ngay hôm nay
                             </h1>
-
-                            {/* <form action="https://doccure.dreamstechnologies.com/html/template/search-2.html">
-                                    <div className="search-input search-line">
-                                        <i className="isax isax-hospital5 bficon"></i>
-                                        <div className=" mb-0">
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Search doctors, clinics, hospitals, etc"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="search-input search-map-line">
-                                        <i className="isax isax-location5"></i>
-                                        <div className=" mb-0">
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Location"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="search-input search-calendar-line">
-                                        <i className="isax isax-calendar-tick5"></i>
-                                        <div className=" mb-0">
-                                            <input
-                                                type="text"
-                                                className="form-control datetimepicker"
-                                                placeholder="Date"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-search-btn">
-                                        <button className="btn btn-primary" type="submit">
-                                            <i className="isax isax-search-normal5 me-2"></i>Search
-                                        </button>
-                                    </div>
-                                </form> */}
-                            <SearchInput forceWrap showSupportButton />
+                            <SearchInput forceWrap />
                         </div>
                     </div>
                     <div className="col-lg-5">
@@ -100,9 +154,9 @@ const Banner: React.FC = () => {
                                 alt="patient-image"
                             />
                             <div className="banner-appointment">
-                                <h6>1K</h6>
-                                <p>
-                                    Appointments <span className="d-block">Completed</span>
+                                <h6 style={{ fontSize: '20px', fontWeight: 'bold' }}>100</h6>
+                                <p style={{ fontSize: '16px' }}>
+                                    Cuộc hẹn <span className="d-block">đã hoàn thành</span>
                                 </p>
                             </div>
                             <div className="banner-patient">
@@ -126,43 +180,27 @@ const Banner: React.FC = () => {
                                         />
                                     </span>
                                 </div>
-                                <p>15K+</p>
-                                <p>Satisfied Patients</p>
+                                <p style={{ fontSize: '20px', fontWeight: 'bold' }}>1000</p>
+                                <p style={{ fontSize: '16px' }}>Bệnh nhân hài lòng</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div className="banner-bg">
+                <img src="/src/assets/img/bg/banner-bg-02.png" alt="img" className="banner-bg-01" />
+                <img src="/src/assets/img/bg/banner-bg-03.png" alt="img" className="banner-bg-02" />
+                <img src="/src/assets/img/bg/banner-bg-04.png" alt="img" className="banner-bg-03" />
+                <img src="/src/assets/img/bg/banner-bg-05.png" alt="img" className="banner-bg-04" />
                 <img
-                    src="/src/assets/img/bg/banner-bg-02.png"
+                    src="/src/assets/img/bg/banner-icon-01.svg"
                     alt="img"
-                    className="banner-bg-01 "
-                />
-                <img
-                    src="/src/assets/img/bg/banner-bg-03.png"
-                    alt="img"
-                    className="banner-bg-02 "
-                />
-                <img
-                    src="/src/assets/img/bg/banner-bg-04.png"
-                    alt="img"
-                    className="banner-bg-03 "
-                />
-                <img
-                    src="/src/assets/img/bg/banner-bg-05.png"
-                    alt="img"
-                    className="banner-bg-04 "
+                    className="banner-bg-05"
                 />
                 <img
                     src="/src/assets/img/bg/banner-icon-01.svg"
                     alt="img"
-                    className="banner-bg-05 "
-                />
-                <img
-                    src="/src/assets/img/bg/banner-icon-01.svg"
-                    alt="img"
-                    className="banner-bg-06 "
+                    className="banner-bg-06"
                 />
             </div>
         </section>

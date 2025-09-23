@@ -120,13 +120,9 @@ const mockClinics = [
 
 type SearchInputProps = {
     forceWrap?: boolean; // make inputs wrap into multiple rows regardless of screen size
-    showSupportButton?: boolean; // show the booking support button next to search
 };
 
-const SearchInput: React.FC<SearchInputProps> = ({
-    forceWrap = false,
-    showSupportButton = false,
-}) => {
+const SearchInput: React.FC<SearchInputProps> = ({ forceWrap = false }) => {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showSpecialtyModal, setShowSpecialtyModal] = useState(false);
@@ -217,24 +213,6 @@ const SearchInput: React.FC<SearchInputProps> = ({
                 )}
             >
                 <form action="#">
-                    {/* First Row: Symptom Input */}
-                    {/* <div className={clsx('search-row first-row', styles.firstRow)}>
-                        <div
-                            className={clsx(
-                                'search-input search-calendar-line',
-                                styles.symptomInput
-                            )}
-                        >
-                            <i className="isax isax-note-25"></i>
-                            <div className="mb-0">
-                                <input
-                                    type="text"
-                                    className={clsx('form-control', styles.formControlCustom)}
-                                    placeholder="Mô tả triệu chứng AI sẽ phân tích và giúp bạn tìm kiếm bác sĩ, chuyên khoa hoặc dịch vụ phù hợp ..."
-                                />
-                            </div>
-                        </div>
-                    </div> */}
                     {/* Second Row: Doctor, Specialty, Clinic, Location, Date, and Button */}
                     <div className={clsx('search-row second-row', styles.secondRow)}>
                         <div className={clsx('search-input search-map-line', styles.inputItem)}>
@@ -243,7 +221,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                 <input
                                     type="text"
                                     className={clsx('form-control', styles.formControlCustom)}
-                                    placeholder="Nhập tên bác sĩ, chuyên gia"
+                                    placeholder="Nhập tên bác sĩ"
                                 />
                             </div>
                         </div>
@@ -333,20 +311,6 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                 />
                             </div>
                         </div>
-                        {showSupportButton && (
-                            <div className="form-support-btn">
-                                <button
-                                    className={clsx(
-                                        'd-inline-flex align-items-center rounded-pill',
-                                        styles.btnNoWrap,
-                                        styles.supportBtn
-                                    )}
-                                    type="button"
-                                >
-                                    <i className="isax isax-call-calling5 me-2"></i>Hỗ trợ đặt lịch
-                                </button>
-                            </div>
-                        )}
                         <div className="form-search-btn">
                             <button
                                 className={clsx(
