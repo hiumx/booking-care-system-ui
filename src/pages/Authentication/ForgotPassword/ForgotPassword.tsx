@@ -45,6 +45,12 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
     const [isVerifying, setIsVerifying] = useState(false);
     const [countdown, setCountdown] = useState(60);
     const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+    // Create stable IDs for OTP inputs to avoid using array index as key
+    const otpInputIds = useMemo(
+        () => new Array(6).fill(0).map((_, i) => `otp-input-${i}-${Date.now()}`),
+        []
+    );
     const recaptchaRef = useRef<ReCAPTCHA>(null);
 
     const canSend = useMemo(() => {
@@ -364,7 +370,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                 <div className="d-flex justify-content-center gap-2 mb-4">
                     {otp.map((digit, idx) => (
                         <input
-                            key={`otp-input-${idx}`}
+                            key={otpInputIds[idx]}
                             ref={(el) => {
                                 otpRefs.current[idx] = el;
                             }}
