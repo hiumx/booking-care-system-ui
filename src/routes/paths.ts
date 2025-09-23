@@ -5,6 +5,7 @@ export const PATHS = {
     // General paths
     HOME: '/',
     DEMO: '/demo',
+    DEMO_DATE_RANGE_PICKER: '/demo/date-range-picker',
     FAQ: '/faq',
     BLOG: '/blog',
     BLOG_DETAIL: '/blog/:slug',

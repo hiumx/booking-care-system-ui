@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { RangeKeyDict } from 'react-date-range';
 import clsx from 'clsx';
 
 import Pagination from '@/components/Pagination';
+import DateRangePicker from '@/components/DateRangePicker';
 import AppointmentHeader from './components/AppointmentHeader';
 import AppointmentTabs from './components/AppointmentTabs';
-import DateRangePicker from './components/DateRangePicker';
 import AppointmentFilters from './components/AppointmentFilters';
 import AppointmentCard from './components/AppointmentCard';
 import AddReviewModal from './components/AddReviewModal';
@@ -155,17 +156,44 @@ const PatientAppointments: React.FC = () => {
     const [activeTab, setActiveTab] = useState<AppointmentStatus>('upcoming');
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [fromDate, setFromDate] = useState('');
-    const [toDate, setToDate] = useState('');
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [selectedAppointmentForReview, setSelectedAppointmentForReview] =
         useState<Appointment | null>(null);
-    const [dateRange, setDateRange] = useState('');
     const [selectedAppointmentForDetail, setSelectedAppointmentForDetail] =
         useState<Appointment | null>(null);
     const [showAppointmentDetail, setShowAppointmentDetail] = useState(false);
+
+    // Date range picker state
+    const [dateRanges, setDateRanges] = useState([
+        {
+            startDate: new Date(),
+            endDate: new Date(),
+            key: 'selection',
+        },
+    ]);
+
+    // Responsive months for date picker
+    const [calendarMonths, setCalendarMonths] = useState(2);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setCalendarMonths(1); // Mobile: 1 tháng
+            } else {
+                setCalendarMonths(2); // Desktop: 2 tháng
+            }
+        };
+
+        // Initial check
+        handleResize();
+
+        // Add event listener
+        window.addEventListener('resize', handleResize);
+
+        // Cleanup
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Filter states
     const [filterState, setFilterState] = useState<FilterState>({
@@ -186,36 +214,19 @@ const PatientAppointments: React.FC = () => {
         },
     });
 
-    // Handle single date input for range selection
-    const handleDateSelection = (selectedDate: string) => {
-        if (!fromDate || (fromDate && toDate)) {
-            // First selection or reset selection
-            setFromDate(selectedDate);
-            setToDate('');
-        } else if (fromDate && !toDate) {
-            // Second selection - complete the range
-            if (selectedDate >= fromDate) {
-                setToDate(selectedDate);
-            } else {
-                // If selected date is before fromDate, swap them
-                setToDate(fromDate);
-                setFromDate(selectedDate);
-            }
+    // Handle date range change
+    const handleDateRangeChange = (ranges: RangeKeyDict) => {
+        const selection = ranges.selection;
+        if (selection?.startDate && selection?.endDate && selection?.key) {
+            setDateRanges([
+                {
+                    startDate: selection.startDate,
+                    endDate: selection.endDate,
+                    key: selection.key,
+                },
+            ]);
         }
     };
-
-    // Update dateRange when fromDate or toDate changes
-    useEffect(() => {
-        if (fromDate && toDate) {
-            setDateRange(`${fromDate} đến ${toDate}`);
-        } else if (fromDate) {
-            setDateRange(`Từ ${fromDate}`);
-        } else if (toDate) {
-            setDateRange(`Khi ${toDate}`);
-        } else {
-            setDateRange('');
-        }
-    }, [fromDate, toDate]);
 
     // Filter appointments based on active tab
     const filteredAppointments = mockAppointments.filter(
@@ -326,16 +337,6 @@ const PatientAppointments: React.FC = () => {
             ...prev,
             filterSearchTerm: value,
         }));
-    };
-
-    // Date range handlers
-    const handleDateRangeClear = () => {
-        setFromDate('');
-        setToDate('');
-    };
-
-    const handleDateRangeApply = () => {
-        setIsCalendarOpen(false);
     };
 
     // Appointment action handlers
@@ -449,16 +450,16 @@ const PatientAppointments: React.FC = () => {
 
                 {/* Filter Section */}
                 <div className={clsx(styles.filterHead, 'filter-head')}>
-                    <DateRangePicker
-                        isOpen={isCalendarOpen}
-                        onToggle={() => setIsCalendarOpen(!isCalendarOpen)}
-                        fromDate={fromDate}
-                        toDate={toDate}
-                        dateRange={dateRange}
-                        onDateSelection={handleDateSelection}
-                        onClear={handleDateRangeClear}
-                        onApply={handleDateRangeApply}
-                    />
+                    <div className={styles.dateRangePickerWrapper}>
+                        <DateRangePicker
+                            ranges={dateRanges}
+                            onChange={handleDateRangeChange}
+                            placeholder="Chọn khoảng thời gian"
+                            className={styles.appointmentDatePicker}
+                            months={calendarMonths}
+                            direction="horizontal"
+                        />
+                    </div>
 
                     <AppointmentFilters
                         isOpen={isFilterOpen}
