@@ -94,9 +94,15 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                                             </div>
                                         </div>
                                         <div className="mb-3">
-                                            <label className="form-label">Số thẻ</label>
+                                            <label className="form-label" htmlFor="card-number">
+                                                Số thẻ
+                                            </label>
                                             <div className="position-relative input-icon">
-                                                <input type="text" className="form-control" />
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="card-number"
+                                                />
                                                 <span>
                                                     <i className="isax isax-card-tick"></i>
                                                 </span>
