@@ -18,7 +18,7 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                     <div className="card-header pt-3">
                                         <h5 className="d-flex align-items-center flex-wrap rpw-gap-2">
                                             <i className="isax isax-tick-circle5 text-success me-2"></i>
-                                            Booking Confirmed
+                                            Đặt lịch thành công
                                         </h5>
                                     </div>
                                     <div className="card-header d-flex align-items-center flex-wrap rpw-gap-2">
@@ -29,65 +29,65 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                             />
                                         </span>
                                         <p className="mb-0">
-                                            Your Booking has been Confirmed with{' '}
-                                            <span className="text-dark">Dr. Michael Brown </span> be
-                                            on time before{' '}
-                                            <span className="text-dark">15 Mins </span> From the
-                                            appointment Time
+                                            Lịch khám của bạn đã được xác nhận với{' '}
+                                            <span className="text-dark">BS. Nguyễn Văn Minh </span>.
+                                            Vui lòng đến trước{' '}
+                                            <span className="text-dark">15 phút </span> so với giờ
+                                            hẹn.
                                         </p>
                                     </div>
                                     <div className="card-body pb-1">
                                         <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-3">
-                                            <h6>Booking Info</h6>
-                                            <a
-                                                href="javascript:void(0);"
+                                            <h6>Thông tin lịch khám</h6>
+                                            <Link
+                                                to={PATHS.DOCTOR.ROOT}
                                                 className="btn btn-light rounded-pill"
                                             >
                                                 <i className="isax isax-calendar me-1"></i>
-                                                Reschedule
-                                            </a>
+                                                Đặt lại lịch
+                                            </Link>
                                         </div>
                                         <div className="row">
                                             <div className="col-md-6">
                                                 <div className="mb-3">
-                                                    <label className="form-label">Service</label>
+                                                    <label className="form-label">Dịch vụ</label>
                                                     <div className="form-plain-text">
-                                                        Cardiology (30 Mins)
+                                                        Tim mạch (30 phút)
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="col-md-6">
                                                 <div className="mb-3">
                                                     <label className="form-label">
-                                                        Additional Service
+                                                        Dịch vụ bổ sung
                                                     </label>
                                                     <div className="form-plain-text">
-                                                        Echocardiograms
+                                                        Siêu âm tim
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="mb-3">
+                                                    <label className="form-label">Ngày & Giờ</label>
+                                                    <div className="form-plain-text">
+                                                        10:00 - 11:00, 15 Tháng 10, 2025
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="col-md-6">
                                                 <div className="mb-3">
                                                     <label className="form-label">
-                                                        Date & Time
+                                                        Hình thức khám
                                                     </label>
                                                     <div className="form-plain-text">
-                                                        10:00 - 11:00 AM, 15, Oct 2025{' '}
+                                                        Tại phòng khám
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="col-md-6">
                                                 <div className="mb-3">
                                                     <label className="form-label">
-                                                        Appointment type
-                                                    </label>
-                                                    <div className="form-plain-text">Clinic </div>
-                                                </div>
-                                            </div>
-                                            <div className="col-md-6">
-                                                <div className="mb-3">
-                                                    <label className="form-label">
-                                                        Clinic Name & Location
+                                                        Tên & Địa chỉ phòng khám
                                                     </label>
                                                     <div className="form-plain-text">
                                                         Wellness Path{' '}
@@ -95,7 +95,7 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                                             href="javascript:void(0);"
                                                             className="text-primary"
                                                         >
-                                                            View Location
+                                                            Xem vị trí
                                                         </a>
                                                     </div>
                                                 </div>
@@ -106,17 +106,18 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                 <div className="card">
                                     <div className="card-body d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between">
                                         <div>
-                                            <h6 className="mb-1">Need Our Assistance</h6>
+                                            <h6 className="mb-1">Cần hỗ trợ?</h6>
                                             <p className="mb-0">
-                                                Call us in case you face any Issue on Booking /
-                                                Cancellation
+                                                Gọi cho chúng tôi nếu bạn gặp vấn đề khi đặt lịch
+                                                hoặc hủy lịch.
                                             </p>
                                         </div>
                                         <a
                                             href="javascript:void(0);"
                                             className="btn btn-light rounded-pill"
                                         >
-                                            <i className="isax isax-call5 me-1"></i>Call Us
+                                            <i className="isax isax-call5 me-1"></i>Gọi cho chúng
+                                            tôi
                                         </a>
                                     </div>
                                 </div>
@@ -126,7 +127,7 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                             <div className="card flex-fill">
                                 <div className="card-body d-flex flex-column justify-content-between">
                                     <div className="text-center">
-                                        <h6 className="fs-14 mb-2">Booking Number</h6>
+                                        <h6 className="fs-14 mb-2">Mã đặt lịch</h6>
                                         <span className="booking-id-badge mb-3">DCRA12565</span>
                                         <span className="d-block mb-3">
                                             <img
@@ -134,22 +135,20 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                                 alt=""
                                             />
                                         </span>
-                                        <p>
-                                            Scan this QR Code to Download the details of Appointment
-                                        </p>
+                                        <p>Quét mã QR này để tải thông tin chi tiết về lịch hẹn</p>
                                     </div>
                                     <div>
                                         <a
                                             href="javascript:void(0);"
                                             className="btn w-100 mb-3 btn-md btn-dark prev_btns inline-flex align-items-center rounded-pill"
                                         >
-                                            Add To Calendar
+                                            Thêm vào lịch
                                         </a>
                                         <Link
                                             to={PATHS.DOCTOR.ROOT}
                                             className="btn w-100 btn-md btn-primary-gradient next_btns inline-flex align-items-center rounded-pill"
                                         >
-                                            Start New Booking
+                                            Đặt lịch mới
                                         </Link>
                                     </div>
                                 </div>
@@ -161,7 +160,7 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
             <div>
                 <div onClick={handleGoBack} className={styles.backToBookings}>
                     <i className="isax isax-arrow-left-2 me-1"></i>
-                    Back to Bookings
+                    Quay lại danh sách đặt lịch
                 </div>
             </div>
         </fieldset>

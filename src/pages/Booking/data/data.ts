@@ -1,18 +1,18 @@
 export const BOOKING_STEPS = [
     {
         id: 1,
-        title: 'Date & Time',
+        title: 'Ngày & Giờ',
     },
     {
         id: 2,
-        title: 'Basic Information',
+        title: 'Thông Tin Cơ Bản',
     },
     {
         id: 3,
-        title: 'Payment',
+        title: 'Thanh Toán',
     },
     {
         id: 4,
-        title: 'Confirmation',
+        title: 'Xác Nhận',
     },
 ];
