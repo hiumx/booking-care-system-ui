@@ -5,8 +5,6 @@ import BookingHeader, {
 } from '../BookingHeader/BookingHeader';
 import BookingAction from '../BookingAction/BookingAction';
 
-export type { DoctorInfo, AppointmentInfo };
-
 interface BookingSectionWrapperProps {
     doctor: DoctorInfo;
     appointment: AppointmentInfo;
