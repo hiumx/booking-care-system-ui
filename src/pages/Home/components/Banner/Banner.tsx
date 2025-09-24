@@ -137,7 +137,7 @@ const Banner: React.FC = () => {
                                 </motion.div>
                             </motion.div>
                             <h1 className="display-5">
-                                Khám phá sức khỏe: Tìm bác sĩ{' '}
+                                Khám sức khỏe: Tìm bác sĩ{' '}
                                 <span className="banner-icon">
                                     <img src="/src/assets/img/icons/video.svg" alt="img" />
                                 </span>{' '}

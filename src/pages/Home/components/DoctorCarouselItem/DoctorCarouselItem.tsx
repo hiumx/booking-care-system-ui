@@ -93,7 +93,7 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
 
                     <div className="d-flex align-items-center justify-content-between">
                         <div>
-                            <p className="mb-1">Consultation Fees</p>
+                            <p className="mb-1">Phí tư vấn</p>
                             <h3 className="text-orange">${fee}</h3>
                         </div>
                         <Link
@@ -101,7 +101,7 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
                             className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
                         >
                             <i className="isax isax-calendar-1 me-2"></i>
-                            {'Book Now'}
+                            {'Đặt ngay'}
                         </Link>
                     </div>
                 </div>

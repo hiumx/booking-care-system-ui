@@ -31,8 +31,8 @@ const ServiceSection: React.FC<ServiceSectionProps> = ({ leftServices, rightServ
             </div>
             <div className="container">
                 <SectionHeader
-                    title="Our"
-                    subtitle="More the quantity, higher the discount. Hurry, Buy Now!"
+                    title="Dịch Vụ"
+                    subtitle="Ưu đãi đặc biệt khi đặt nhiều dịch vụ. Đặt ngay hôm nay!"
                     data-aos="fade-up"
                 />
                 <div className="row justify-content-center">

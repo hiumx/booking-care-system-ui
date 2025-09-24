@@ -15,6 +15,7 @@ import {
     CAROUSEL_DOCTORS_BREAKPOINTS,
     LIST_SERVICES,
 } from './Home.data';
+import ListServiceCategories from './components/ListServiceCategories';
 
 const Home: React.FC = () => {
     const listSpecialtyItems: { id: string | number; node: React.ReactNode }[] =
@@ -85,33 +86,34 @@ const Home: React.FC = () => {
             <MainLayout>
                 {/* Banner */}
                 <Banner />
+                <ListServiceCategories />
                 {/* List Specialties */}
                 <SectionItem
-                    title="Top Specialties"
-                    desc="Highlighting the Care & Support"
+                    title="Chuyên khoa hàng đầu"
+                    desc="Chăm sóc và hỗ trợ"
                     items={listSpecialtyItems}
                     breakpoints={CAROUSEL_SPECIALTIES_BREAKPOINTS}
                     viewAllTarget={PATHS.SPECIALTIES.ROOT}
-                    viewAllText="View All Specialties"
+                    viewAllText="Xem tất cả chuyên khoa"
                 />
                 {/* List Clinics */}
                 <SectionItem
-                    title="Top Clinics"
-                    desc="Explore Our Featured Clinics"
+                    title="Bệnh viện hàng đầu"
+                    desc="Khám phá các bệnh viện nổi bật"
                     items={listClinicItems}
                     breakpoints={CAROUSEL_CLINICS_BREAKPOINTS}
-                    viewAllText="View All Clinics"
+                    viewAllText="Xem tất cả bệnh viện"
                     viewAllTarget={PATHS.MEDICAL_FACILITY.ROOT}
                     isBackgroundColor
                 />
                 {/* List Doctors */}
                 <SectionItem
-                    title="Top Doctors"
-                    desc="Meet Our Best Specialists"
+                    title="Bác sĩ hàng đầu"
+                    desc="Gặp gỡ các chuyên gia giỏi nhất"
                     items={listDoctorItems}
                     breakpoints={CAROUSEL_DOCTORS_BREAKPOINTS}
                     viewAllTarget={PATHS.DOCTOR.ROOT}
-                    viewAllText="View All Doctors"
+                    viewAllText="Xem tất cả bác sĩ"
                 />
                 {/* Services Section */}
                 <ServiceSection leftServices={leftServices} rightServices={rightServices} />
