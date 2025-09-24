@@ -85,9 +85,18 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                                         role="tabpanel"
                                     >
                                         <div className="mb-3">
-                                            <label className="form-label">Tên chủ thẻ</label>
+                                            <label
+                                                className="form-label"
+                                                htmlFor="card-holder-name"
+                                            >
+                                                Tên chủ thẻ
+                                            </label>
                                             <div className="position-relative input-icon">
-                                                <input type="text" className="form-control" />
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="card-holder-name"
+                                                />
                                                 <span>
                                                     <i className="isax isax-user"></i>
                                                 </span>
@@ -109,18 +118,30 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                                             </div>
                                         </div>
                                         <div className="mb-3">
-                                            <label className="form-label">Ngày hết hạn</label>
+                                            <label className="form-label" htmlFor="expiry-date">
+                                                Ngày hết hạn
+                                            </label>
                                             <div className="position-relative input-icon">
-                                                <input type="text" className="form-control" />
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="expiry-date"
+                                                />
                                                 <span>
                                                     <i className="isax isax-calendar-2"></i>
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="mb-0">
-                                            <label className="form-label">CVV</label>
+                                            <label className="form-label" htmlFor="cvv">
+                                                CVV
+                                            </label>
                                             <div className="position-relative input-icon">
-                                                <input type="text" className="form-control" />
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="cvv"
+                                                />
                                                 <span>
                                                     <i className="isax isax-check"></i>
                                                 </span>
@@ -133,20 +154,29 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                                         role="tabpanel"
                                     >
                                         <div className="mb-3">
-                                            <label className="form-label">Địa chỉ Email</label>
+                                            <label className="form-label" htmlFor="paypal-email">
+                                                Địa chỉ Email
+                                            </label>
                                             <div className="position-relative input-icon">
-                                                <input type="text" className="form-control" />
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="paypal-email"
+                                                />
                                                 <span>
                                                     <i className="isax isax-sms"></i>
                                                 </span>
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="form-label">Mật khẩu</label>
+                                            <label className="form-label" htmlFor="paypal-password">
+                                                Mật khẩu
+                                            </label>
                                             <div className="pass-group">
                                                 <input
                                                     type="password"
                                                     className="form-control pass-input"
+                                                    id="paypal-password"
                                                 />
                                                 <span className="feather-eye-off toggle-password"></span>
                                             </div>
@@ -158,20 +188,29 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                                         role="tabpanel"
                                     >
                                         <div className="mb-3">
-                                            <label className="form-label">Địa chỉ Email</label>
+                                            <label className="form-label" htmlFor="stripe-email">
+                                                Địa chỉ Email
+                                            </label>
                                             <div className="position-relative input-icon">
-                                                <input type="text" className="form-control" />
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="stripe-email"
+                                                />
                                                 <span>
                                                     <i className="isax isax-sms"></i>
                                                 </span>
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="form-label">Mật khẩu</label>
+                                            <label className="form-label" htmlFor="stripe-password">
+                                                Mật khẩu
+                                            </label>
                                             <div className="pass-group">
                                                 <input
                                                     type="password"
                                                     className="form-control pass-input-sub"
+                                                    id="stripe-password"
                                                 />
                                                 <span className="feather-eye-off toggle-password-sub"></span>
                                             </div>
@@ -187,13 +226,13 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                         <div className="card-body">
                             <h6 className="mb-3">Thông tin lịch khám</h6>
                             <div className="mb-3">
-                                <label className="form-label">Ngày & Giờ</label>
+                                <div className="fw-medium">Ngày & Giờ</div>
                                 <div className="form-plain-text">
                                     10:00 - 11:00, 15, Tháng 10 2025{' '}
                                 </div>
                             </div>
                             <div className="mb-3">
-                                <label className="form-label">Loại lịch hẹn</label>
+                                <div className="fw-medium">Loại lịch hẹn</div>
                                 <div className="form-plain-text">Phòng khám (Wellness Path) </div>
                             </div>
                             <div className="pt-3 border-top booking-more-info">

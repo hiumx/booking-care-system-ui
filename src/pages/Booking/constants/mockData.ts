@@ -3,7 +3,7 @@ import { DoctorInfo, AppointmentInfo } from '../components/BookingHeader/Booking
 export const mockDoctorInfo: DoctorInfo = {
     name: 'BS. Nguyễn Văn Minh',
     specialty: 'Bác sĩ Tâm lý Cao cấp',
-    rating: 5.0,
+    rating: 5,
     location: 'Quận 1, TP. Hồ Chí Minh',
     avatar: '/src/assets/img/clients/client-15.jpg',
 };

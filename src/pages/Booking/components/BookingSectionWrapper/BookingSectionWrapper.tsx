@@ -1,8 +1,11 @@
 import React from 'react';
-import BookingHeader, { DoctorInfo, AppointmentInfo } from '../BookingHeader/BookingHeader';
+import BookingHeader, {
+    type DoctorInfo,
+    type AppointmentInfo,
+} from '../BookingHeader/BookingHeader';
 import BookingAction from '../BookingAction/BookingAction';
 
-// export { DoctorInfo, AppointmentInfo };
+export type { DoctorInfo, AppointmentInfo };
 
 interface BookingSectionWrapperProps {
     doctor: DoctorInfo;
