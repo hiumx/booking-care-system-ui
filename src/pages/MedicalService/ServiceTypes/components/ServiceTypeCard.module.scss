@@ -1,7 +1,7 @@
 .card {
     display: flex;
-    flex-direction: column; // để ảnh nằm trên, tên nằm dưới
-    height: 12rem; // tương đương h-48
+    flex-direction: column;
+    height: 12rem;
     cursor: pointer;
     transition: transform 0.2s ease;
 
@@ -20,7 +20,7 @@
         background: #f7f7f7;
 
         img {
-            max-width: 70%; // 🔥 tăng từ 50% → 70%
+            max-width: 70%;
             max-height: 70%;
             object-fit: contain;
             transition: transform 0.2s ease-in-out;

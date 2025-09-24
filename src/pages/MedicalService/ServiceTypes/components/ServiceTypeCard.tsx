@@ -14,7 +14,7 @@ const ServiceTypeCard: FC<ServiceTypeCardProps> = ({ name, image, link = '#' }) 
         <Link to={link} className={styles.card}>
             {/* Chỉ chứa ảnh */}
             <div className={styles.imageWrapper}>
-                <img src={image || '/placeholder.svg'} alt={name} />
+                <img src={image} alt={name} />
             </div>
 
             {/* Chỉ chứa tên dịch vụ */}
