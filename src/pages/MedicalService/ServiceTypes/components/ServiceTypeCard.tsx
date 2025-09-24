@@ -12,11 +12,14 @@ type ServiceTypeCardProps = {
 const ServiceTypeCard: FC<ServiceTypeCardProps> = ({ name, image, link = '#' }) => {
     return (
         <Link to={link} className={styles.card}>
+            {/* Chỉ chứa ảnh */}
             <div className={styles.imageWrapper}>
                 <img src={image || '/placeholder.svg'} alt={name} />
-                <div className={styles.overlay}>
-                    <h3>{name}</h3>
-                </div>
+            </div>
+
+            {/* Chỉ chứa tên dịch vụ */}
+            <div className={styles.nameWrapper}>
+                <h3>{name}</h3>
             </div>
         </Link>
     );
