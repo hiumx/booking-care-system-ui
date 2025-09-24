@@ -1,0 +1,39 @@
+.doctorCarouselItemContainer {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.favWrapper {
+    display: flex;
+}
+
+.favIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    cursor: pointer;
+}
+
+.favIcon.active {
+    color: #e03131;
+}
+
+.dotIconWrapper {
+    display: inline-flex;
+}
+
+.doctorName {
+    h3 {
+        font-size: 18px;
+        font-weight: 700;
+    }
+}
+
+.fsWrapper {
+    display: inline-flex;
+}

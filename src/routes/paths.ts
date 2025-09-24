@@ -15,6 +15,7 @@ export const PATHS = {
     SUBSCRIPTION_PLANS: '/subscription-plans',
     ABOUT_US: '/about-us',
     CONTACT_US: '/contact-us',
+    SMART_BOOKING: '/smart-booking',
 
     // Authentication paths
     LOGIN: '/login',

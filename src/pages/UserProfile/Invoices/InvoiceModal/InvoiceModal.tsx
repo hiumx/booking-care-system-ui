@@ -29,12 +29,12 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
     useEffect(() => {
         if (show && !isClosing) {
             // Add class and set styles to prevent scroll
-            document.body.classList.add('modalOpen');
+            document.body.classList.add(clsx(styles.modalOpen));
         } else if (!show && !isClosing) {
             // Modal is completely closed, restore scroll
             const timer = setTimeout(() => {
                 // Remove class and styles
-                document.body.classList.remove('modalOpen');
+                document.body.classList.remove(clsx(styles.modalOpen));
             }, 100); // Slightly longer delay to ensure modal is fully closed
 
             return () => clearTimeout(timer);
@@ -42,7 +42,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
 
         // Cleanup on unmount
         return () => {
-            document.body.classList.remove('modalOpen');
+            document.body.classList.remove(clsx(styles.modalOpen));
             document.body.style.overflow = '';
         };
     }, [show, isClosing]);

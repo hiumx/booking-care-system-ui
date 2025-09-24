@@ -7,12 +7,20 @@ import DateTimeSection from './sections/DateTimeSection';
 import PaymentSection from './sections/PaymentSection';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
+import { useNavigate } from 'react-router-dom';
+import { PATHS } from '@/routes/paths';
 
 const Booking: React.FC = () => {
     const [currentStep, setCurrentStep] = useState<number>(1);
 
+    const navigate = useNavigate();
+
     const nextStep = () => setCurrentStep((prev) => prev + 1);
     const prevStep = () => setCurrentStep((prev) => prev - 1);
+
+    if (currentStep < 1 || currentStep > BOOKING_STEPS.length) {
+        navigate(PATHS.DOCTOR.ROOT);
+    }
 
     return (
         <BookingLayout>

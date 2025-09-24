@@ -27,6 +27,7 @@ import DoctorList from '@/pages/Doctor/DoctorList';
 import ContactUs from '@/pages/ContactUs';
 import Booking from '@/pages/Booking/Booking';
 import ServiceTypes from '@/pages/MedicalService/ServiceTypes/ServiceTypesPage';
+import SmartBooking from '@/pages/SmartBooking';
 
 const routes: RouteObject[] = [
     {
@@ -68,6 +69,10 @@ const routes: RouteObject[] = [
     {
         path: PATHS.CONTACT_US,
         element: <ContactUs />,
+    },
+    {
+        path: PATHS.SMART_BOOKING,
+        element: <SmartBooking />,
     },
 
     // Authentication paths

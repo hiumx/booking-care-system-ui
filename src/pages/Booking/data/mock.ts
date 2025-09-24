@@ -34,7 +34,7 @@ const mockTimeSlots = {
 };
 
 export const mockSlotCategories = [
-    { title: 'Morning', timeSlots: mockTimeSlots.morning },
-    { title: 'Afternoon', timeSlots: mockTimeSlots.afternoon },
-    { title: 'Evening', timeSlots: mockTimeSlots.evening },
+    { title: 'Buổi sáng', timeSlots: mockTimeSlots.morning },
+    { title: 'Buổi chiều', timeSlots: mockTimeSlots.afternoon },
+    { title: 'Buổi tối', timeSlots: mockTimeSlots.evening },
 ];

@@ -273,7 +273,7 @@ export const LIST_DOCTORS: Doctor[] = [
     },
     {
         id: 3,
-        name: 'BS. Michael Brown',
+        name: 'BS. Nguyễn Văn Minh',
         image: '/src/assets/img/doctors/doctor-03.jpg',
         specialty: 'Bác sĩ Thần kinh',
         location: 'Chicago, Mỹ',

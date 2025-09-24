@@ -1,0 +1,109 @@
+.clinicCarouselItem {
+    text-decoration: none;
+}
+
+.clinicCard {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.clinicImageContainer {
+    position: relative;
+}
+
+.clinicImage {
+    height: 180px;
+    object-fit: cover;
+}
+
+.imageOverlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px;
+}
+
+.distanceBadge {
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border-radius: 9999px;
+    padding: 4px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.slotsIndicator {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(220, 53, 69, 0.9);
+    color: #fff;
+    border-radius: 12px;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.slotsCount {
+    font-weight: 700;
+}
+
+.slotsText {
+    font-size: 12px;
+}
+
+.clinicBody {
+}
+.clinicName {
+    font-weight: 700;
+}
+.priceContainer {
+}
+.priceRange {
+    color: #6c757d;
+    margin: 0;
+}
+.locationSection {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6c757d;
+}
+.locationIcon {
+}
+.locationText {
+}
+.ratingSection {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.stars {
+    display: inline-flex;
+    gap: 2px;
+}
+.ratingText {
+    color: #6c757d;
+    font-size: 14px;
+}
+.specialtiesSection {
+}
+.specialtiesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.specialtyTag {
+    background: #f1f3f5;
+    color: #343a40;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 12px;
+}
+.more {
+    background: #e7f1ff;
+    color: #0d6efd;
+}

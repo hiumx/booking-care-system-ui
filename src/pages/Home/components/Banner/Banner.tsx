@@ -11,7 +11,7 @@ const Banner: React.FC = () => {
     const buttonRef = useRef<HTMLButtonElement | null>(null);
 
     const handleNavigate = () => {
-        navigate('/schedule-support');
+        navigate('/smart-booking');
     };
 
     const updateTooltipPosition = () => {
