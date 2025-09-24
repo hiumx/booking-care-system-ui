@@ -13,7 +13,7 @@ const BookingAction: React.FC<BookingActionProps> = ({ nextStepTitle, prevStep, 
                     onClick={prevStep}
                 >
                     <i className="isax isax-arrow-left-2 me-1"></i>
-                    Back
+                    Quay lại
                 </button>
                 <button
                     onClick={nextStep}

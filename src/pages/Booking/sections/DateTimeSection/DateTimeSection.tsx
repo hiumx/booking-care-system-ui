@@ -32,44 +32,44 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({ nextStep, prevStep })
                                     </span>
                                     <div>
                                         <h4 className="mb-1">
-                                            Dr. Michael Brown{' '}
+                                            BS. Nguyễn Văn Minh{' '}
                                             <span className="badge bg-orange fs-12">
                                                 <i className="fa-solid fa-star me-1"></i>5.0
                                             </span>
                                         </h4>
-                                        <p className="text-indigo mb-3 fw-medium">Psychologist</p>
+                                        <p className="text-indigo mb-3 fw-medium">
+                                            Bác sĩ Tâm lý Cao cấp
+                                        </p>
                                         <p className="mb-0">
-                                            <i className="isax isax-location me-2"></i>5th Street -
-                                            1011 W 5th St, Suite 120, Austin, TX 78703
+                                            <i className="isax isax-location me-2"></i>Quận 1, TP.
+                                            Hồ Chí Minh
                                         </p>
                                     </div>
                                 </div>
-                                <h6 className="mb-2">Booking Info</h6>
+                                <h6 className="mb-2">Thông tin lịch khám</h6>
                                 <div className="row gx-2 gy-3">
                                     <div className="col-lg-3 col-sm-6">
                                         <div>
-                                            <h6 className="fs-14 fw-medium mb-1">Service</h6>
-                                            <p className="mb-0">Cardiology (30 Mins)</p>
+                                            <h6 className="fs-14 fw-medium mb-1">Dịch vụ</h6>
+                                            <p className="mb-0">Tim mạch (30 phút)</p>
                                         </div>
                                     </div>
                                     <div className="col-lg-3 col-sm-6">
                                         <div>
-                                            <h6 className="fs-14 fw-medium mb-1">Service</h6>
-                                            <p className="mb-0">Echocardiograms</p>
+                                            <h6 className="fs-14 fw-medium mb-1">Dịch vụ</h6>
+                                            <p className="mb-0">Siêu âm tim</p>
                                         </div>
                                     </div>
                                     <div className="col-lg-3 col-sm-6">
                                         <div>
-                                            <h6 className="fs-14 fw-medium mb-1">Date & Time</h6>
-                                            <p className="mb-0">10:00 - 11:00 AM, 15, Oct</p>
+                                            <h6 className="fs-14 fw-medium mb-1">Ngày & Giờ</h6>
+                                            <p className="mb-0">10:00 - 11:00, 15 Tháng 10</p>
                                         </div>
                                     </div>
                                     <div className="col-lg-3 col-sm-6">
                                         <div>
-                                            <h6 className="fs-14 fw-medium mb-1">
-                                                Appointment type
-                                            </h6>
-                                            <p className="mb-0">Clinic (Wellness Path)</p>
+                                            <h6 className="fs-14 fw-medium mb-1">Loại cuộc hẹn</h6>
+                                            <p className="mb-0">Phòng khám (Wellness Path)</p>
                                         </div>
                                     </div>
                                 </div>
@@ -110,7 +110,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({ nextStep, prevStep })
                     </div>
                 </div>
                 <BookingAction
-                    nextStepTitle="Add Basic Information"
+                    nextStepTitle="Thêm thông tin cơ bản"
                     nextStep={nextStep}
                     prevStep={prevStep}
                 />
