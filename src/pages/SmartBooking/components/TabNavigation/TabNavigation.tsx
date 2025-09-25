@@ -1,6 +1,7 @@
 import React from 'react';
 import { TabType } from '../types/booking';
-import { User, Building2, Stethoscope } from 'lucide-react';
+import { User, Building2, Stethoscope, Layers } from 'lucide-react';
+import styles from './TabNavigation.module.scss';
 
 interface TabNavigationProps {
     activeTab: TabType;
@@ -14,6 +15,12 @@ interface TabNavigationProps {
 
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange, resultCounts }) => {
     const tabs = [
+        {
+            id: 'all' as TabType,
+            label: 'Tất cả',
+            icon: Layers,
+            count: resultCounts.doctors + resultCounts.hospitals + resultCounts.services,
+        },
         { id: 'doctors' as TabType, label: 'Bác sĩ', icon: User, count: resultCounts.doctors },
         {
             id: 'hospitals' as TabType,
@@ -30,73 +37,45 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange, r
     ];
 
     return (
-        <div className="container-fluid">
-            <div className="row justify-content-center mb-4">
-                <div className="col-12 col-lg-8">
-                    <div className="bg-white rounded-pill p-2 shadow border">
-                        <div className="d-flex position-relative">
-                            {/* Active tab indicator */}
-                            <div
-                                className="position-absolute bg-primary rounded-pill shadow"
-                                style={{
-                                    top: '8px',
-                                    bottom: '8px',
-                                    width: '33.333%',
-                                    left: `${tabs.findIndex((tab) => tab.id === activeTab) * 33.333}%`,
-                                    transition: 'all 0.3s ease-out',
-                                    zIndex: 1,
-                                }}
-                            />
-
-                            {tabs.map((tab) => {
-                                const Icon = tab.icon;
-                                const isActive = activeTab === tab.id;
-
-                                return (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => onTabChange(tab.id)}
-                                        className={`flex-fill position-relative px-4 py-3 rounded-pill fw-semibold border-0 d-flex align-items-center justify-content-center ${
-                                            isActive ? 'text-white' : 'text-muted bg-transparent'
+        <div className={styles.tabWrapper}>
+            <ul className="nav nav-tabs border-0 d-flex justify-content-around position-relative m-0 p-0">
+                {/* Underline indicator */}
+                <div
+                    className={styles.tabIndicator}
+                    style={{
+                        width: `${100 / tabs.length}%`,
+                        left: `${tabs.findIndex((tab) => tab.id === activeTab) * (100 / tabs.length)}%`,
+                    }}
+                />
+                {tabs.map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.id;
+                    return (
+                        <li className="nav-item flex-fill text-center" key={tab.id}>
+                            <button
+                                className={`${styles.tabBtn} btn w-100 py-3 d-flex align-items-center justify-content-center gap-2 fw-semibold ${
+                                    isActive ? 'text-primary' : 'text-muted'
+                                }`}
+                                onClick={() => onTabChange(tab.id)}
+                            >
+                                <Icon size={18} />
+                                <span className={styles.tabLabel}>{tab.label}</span>
+                                {tab.count > 0 && (
+                                    <span
+                                        className={`${styles.tabBadge} badge rounded-pill ${
+                                            isActive
+                                                ? 'bg-primary text-white'
+                                                : 'bg-light text-muted'
                                         }`}
-                                        style={{
-                                            transition: 'all 0.3s ease',
-                                            zIndex: 2,
-                                            backgroundColor: isActive
-                                                ? 'transparent'
-                                                : 'transparent',
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            if (!isActive) {
-                                                e.currentTarget.style.color = '#0d6efd';
-                                            }
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            if (!isActive) {
-                                                e.currentTarget.style.color = '#6c757d';
-                                            }
-                                        }}
                                     >
-                                        <Icon size={20} className="me-2" />
-                                        <span>{tab.label}</span>
-                                        {tab.count > 0 && (
-                                            <span
-                                                className={`ms-2 px-2 py-1 rounded-pill small ${
-                                                    isActive
-                                                        ? 'bg-light bg-opacity-25 text-white'
-                                                        : 'bg-primary bg-opacity-10 text-primary'
-                                                }`}
-                                            >
-                                                {tab.count}
-                                            </span>
-                                        )}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                        {tab.count}
+                                    </span>
+                                )}
+                            </button>
+                        </li>
+                    );
+                })}
+            </ul>
         </div>
     );
 };

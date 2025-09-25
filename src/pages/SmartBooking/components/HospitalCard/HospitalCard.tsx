@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
 import styles from './HospitalCard.module.scss';
-import { Hospital } from '../types/booking';
 
 interface HospitalCardProps {
     hospital: Hospital;
@@ -67,7 +66,7 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
                     </div>
                     <div className={styles.specialtiesSection}>
                         <div className={styles.specialtiesContainer}>
-                            {hospital.specialties.slice(0, 3).map((s: string) => (
+                            {hospital.specialties.slice(0, 3).map((s) => (
                                 <span key={s} className={styles.specialtyTag}>
                                     {s}
                                 </span>

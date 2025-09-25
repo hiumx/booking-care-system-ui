@@ -9,7 +9,7 @@
         }
     ],
     "compilerOptions": {
-        "types": ["vitest", "vite/client"],
+        "types": ["vitest", "vite/client", "./src/types/speech"],
         "composite": true,
         "target": "ES2020",
         "module": "ESNext",

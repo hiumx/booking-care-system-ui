@@ -1,0 +1,130 @@
+.searchBoxWrapper {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+
+    &.recording {
+        border-color: #e02424;
+        box-shadow: 0 0 10px rgba(224, 36, 36, 0.5);
+        background: #fff5f5;
+    }
+}
+
+.textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 15px;
+    background: transparent;
+    padding: 12px;
+    box-sizing: border-box;
+    line-height: 1.5em;
+    transition: color 0.3s ease;
+}
+
+.textareaRecording {
+    color: #e02424;
+    animation: blinkText 1s infinite;
+}
+
+@keyframes blinkText {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.iconRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin-top: 4px;
+}
+
+.leftIcons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.iconButton {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+
+    &:hover {
+        background: #f5f5f5;
+    }
+}
+
+.autoButton {
+    min-width: 60px;
+    height: 40px;
+    border-radius: 20px;
+    background: #111;
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 12px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.micButton {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #111;
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s ease;
+
+    &.recording {
+        background: #e02424;
+        animation: pulse 1s infinite;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
