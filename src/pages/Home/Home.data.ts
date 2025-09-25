@@ -98,7 +98,7 @@ export const CAROUSEL_SPECIALTIES_BREAKPOINTS = {
     },
 };
 
-export const CAROUSEL_CLINICS_BREAKPOINTS = {
+export const CAROUSEL_HOSPITALS_BREAKPOINTS = {
     1280: {
         slidesPerView: 4, // máy tính để bàn
     },
@@ -149,7 +149,7 @@ export type Clinic = {
     isVerified?: boolean;
 };
 
-export const LIST_CLINICS: Clinic[] = [
+export const LIST_HOSPITALS: Clinic[] = [
     {
         id: 1,
         name: 'Bệnh viện Chợ Rẫy',

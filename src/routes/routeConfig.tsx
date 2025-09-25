@@ -109,10 +109,10 @@ const routes: RouteObject[] = [
         children: [{ path: PATHS.USER.PROFILE, element: <UserProfile /> }],
     },
     {
-        path: PATHS.MEDICAL_FACILITY.ROOT,
+        path: PATHS.HOSPITAL.ROOT,
         children: [
             { index: true, element: <MedicalFacility /> },
-            { path: PATHS.MEDICAL_FACILITY.DETAIL, element: <MedicalFacilityProfile /> },
+            { path: PATHS.HOSPITAL.DETAIL, element: <MedicalFacilityProfile /> },
         ],
     },
     {
@@ -125,9 +125,9 @@ const routes: RouteObject[] = [
         element: <ServiceTypes />,
     },
     {
-        path: PATHS.MEDICAL_FACILITY.ROOT,
+        path: PATHS.HOSPITAL.ROOT,
         element: <MedicalFacility />,
-        // children: [{ path: PATHS.MEDICAL_FACILITY.PROFILE, element: <MedicalFacilityProfile /> }],
+        // children: [{ path: PATHS.HOSPITAL.DETAIL, element: <MedicalFacilityProfile /> }],
     },
     {
         path: PATHS.CHAT,

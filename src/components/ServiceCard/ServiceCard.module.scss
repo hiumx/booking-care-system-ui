@@ -108,3 +108,46 @@
         transform: translateY(0);
     }
 }
+
+/* Responsive breakpoints for ServiceCard */
+@media (max-width: 1200px) {
+    .cardImg {
+        height: 200px;
+    }
+}
+
+@media (max-width: 992px) {
+    .cardImg {
+        height: 180px;
+    }
+
+    .cardBody {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .cardImg {
+        height: 200px;
+    }
+
+    .cardBody {
+        padding: 1.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .cardImg {
+        height: 180px;
+    }
+
+    .cardBody {
+        padding: 1rem;
+    }
+
+    .btnOutlinePrimary,
+    .btnDark {
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+    }
+}

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Service } from '@/types/booking';
 import { Clock, DollarSign, Calendar, Tag, Star, Shield, Zap, CheckCircle } from 'lucide-react';
+import styles from './ServiceCard.module.scss';
 
-interface ServiceCardProps {
+export interface ServiceCardProps {
     service: Service;
     onBookService: (serviceId: string) => void;
+    className?: string;
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ service, onBookService }) => {
+const ServiceCard: React.FC<ServiceCardProps> = ({ service, onBookService, className }) => {
     const [showDetails, setShowDetails] = useState(false);
 
     const getServiceFeatures = () => [
@@ -27,28 +29,20 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onBookService }) => 
     const availabilityColor = getAvailabilityColor(service.availability);
 
     return (
-        <div
-            className="card border h-100 shadow-sm position-relative"
-            style={{
-                transition: 'all 0.3s ease',
-                borderRadius: '1rem',
-                overflow: 'hidden',
-            }}
-        >
+        <div className={`${styles.card} ${className || ''}`}>
             <div className="position-relative">
                 <img
                     src={'/src/assets/img/service/service-img-02.jpg'}
                     alt={service.name}
-                    className="card-img-top"
-                    style={{ height: '160px', objectFit: 'cover' }}
+                    className={styles.cardImg}
                 />
-                <div className="position-absolute top-0 end-0 m-2 px-2 py-1 rounded-pill small fw-medium d-flex align-items-center bg-primary text-white">
+                <div className={styles.categoryBadge}>
                     <Tag size={12} className="me-1" />
                     {service.category}
                 </div>
             </div>
 
-            <div className="card-body p-3">
+            <div className={styles.cardBody}>
                 <div className="d-flex align-items-start justify-content-between mb-4">
                     <div className="flex-grow-1">
                         <h5 className="card-title mb-2 text-dark fw-bold fs-5">{service.name}</h5>
@@ -123,14 +117,14 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onBookService }) => 
                 <div className="d-flex gap-2">
                     <button
                         onClick={() => setShowDetails(!showDetails)}
-                        className="btn btn-outline-primary btn-sm rounded-pill px-3"
+                        className={`btn btn-outline-primary btn-sm rounded-pill px-3 ${styles.btnOutlinePrimary}`}
                         style={{ fontSize: '12px' }}
                     >
                         Chi tiết
                     </button>
                     <button
                         onClick={() => onBookService(service.id)}
-                        className="btn btn-dark flex-fill py-2 fw-semibold rounded-pill d-inline-flex align-items-center justify-content-center"
+                        className={`btn btn-dark flex-fill py-2 fw-semibold rounded-pill d-inline-flex align-items-center justify-content-center ${styles.btnDark}`}
                     >
                         <Calendar size={16} className="me-2" />
                         <span>Đặt ngay</span>
@@ -138,7 +132,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onBookService }) => 
                 </div>
 
                 {/* Expandable Details */}
-                {showDetails && (
+                <div className={`${styles.expandDetails} ${showDetails ? styles.show : ''}`}>
                     <div className="border-top pt-3 mt-3">
                         <div className="row g-3">
                             <div className="col-6">
@@ -155,7 +149,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onBookService }) => 
                             </div>
                         </div>
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );

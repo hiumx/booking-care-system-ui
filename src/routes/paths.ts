@@ -33,9 +33,9 @@ export const PATHS = {
         SETTINGS: 'settings',
     },
 
-    // Medical Facility paths
-    MEDICAL_FACILITY: {
-        ROOT: '/medical-facility',
+    // Hospital paths
+    HOSPITAL: {
+        ROOT: '/hospitals',
         DETAIL: ':id',
     },
 

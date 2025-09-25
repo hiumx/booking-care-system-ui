@@ -1,0 +1,309 @@
+// HospitalCard styles
+
+.clinicCarouselItem {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+        text-decoration: none;
+        color: inherit;
+    }
+}
+
+.clinicCard {
+    width: 100%;
+    flex: 1;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff !important;
+    border-color: #e9ecef !important;
+    color: #333333 !important;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    min-height: 400px; // Ensure minimum height for consistency
+    display: flex;
+    flex-direction: column;
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        text-decoration: none;
+        color: inherit;
+    }
+}
+
+.clinicImageContainer {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 12px 12px 0 0;
+
+    .clinicImage {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.3s ease;
+
+        &:hover {
+            transform: scale(1.05);
+        }
+    }
+}
+
+.imageOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.1) 0%,
+        transparent 30%,
+        transparent 70%,
+        rgba(0, 0, 0, 0.2) 100%
+    );
+    pointer-events: none;
+}
+
+.distanceBadge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333333;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    i {
+        font-size: 0.7rem;
+    }
+}
+
+.slotsIndicator {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #3498db;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+    .slotsCount {
+        font-size: 1rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .slotsText {
+        font-size: 0.6rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
+.clinicBody {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: space-between;
+
+    .clinicName {
+        display: flex;
+        align-items: center;
+        min-height: 48px;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #333333 !important;
+        margin: 0;
+        line-height: 1.3;
+        flex: 1;
+    }
+
+    .priceContainer {
+        display: flex;
+        justify-content: flex-end;
+
+        .priceRange {
+            width: fit-content;
+            background: #f8f9fa;
+            color: #3498db;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            margin-bottom: 0;
+        }
+    }
+
+    .ratingSection {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 8px 0;
+
+        .stars {
+            display: flex;
+            gap: 2px;
+
+            i {
+                font-size: 0.875rem;
+            }
+        }
+
+        .ratingText {
+            font-size: 0.875rem;
+            color: #666666 !important;
+            font-weight: 500;
+        }
+    }
+
+    .locationSection {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 8px 0;
+
+        .locationIcon {
+            color: #3498db;
+            font-size: 0.875rem;
+        }
+
+        .locationText {
+            font-size: 0.875rem;
+            color: #666666 !important;
+            font-weight: 500;
+        }
+    }
+
+    .specialtiesSection {
+        margin-top: auto;
+
+        .specialtiesContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+
+            .specialtyTag {
+                background: #f8f9fa;
+                color: #3498db;
+                padding: 4px 8px;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                font-weight: 500;
+                white-space: nowrap;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    background: #3498db;
+                    color: white;
+                    transform: translateY(-1px);
+                }
+
+                &.more {
+                    background: #666666;
+                    color: white;
+                    font-style: italic;
+                }
+            }
+        }
+    }
+}
+
+/* Responsive breakpoints for HospitalCard */
+@media (max-width: 1200px) {
+    .clinicImageContainer {
+        height: 180px;
+    }
+
+    .clinicBody {
+        padding: 16px;
+
+        .clinicName {
+            font-size: 1rem;
+            min-height: 40px;
+        }
+    }
+}
+
+@media (max-width: 992px) {
+    .clinicImageContainer {
+        height: 160px;
+    }
+
+    .clinicBody {
+        padding: 14px;
+
+        .clinicName {
+            font-size: 0.875rem;
+            min-height: 36px;
+        }
+
+        .specialtiesSection .specialtiesContainer .specialtyTag {
+            font-size: 0.7rem;
+            padding: 3px 6px;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .clinicImageContainer {
+        height: 200px;
+    }
+
+    .clinicBody {
+        padding: 16px;
+
+        .clinicName {
+            font-size: 1rem;
+            min-height: 44px;
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    .clinicImageContainer {
+        height: 180px;
+    }
+
+    .clinicBody {
+        padding: 12px;
+
+        .clinicName {
+            font-size: 0.875rem;
+            min-height: 40px;
+        }
+
+        .specialtiesSection .specialtiesContainer {
+            gap: 4px;
+
+            .specialtyTag {
+                font-size: 0.65rem;
+                padding: 2px 6px;
+            }
+        }
+    }
+}

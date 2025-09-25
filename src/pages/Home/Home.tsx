@@ -1,15 +1,15 @@
 import { buildPath, PATHS, replacePathParams } from '@/routes/paths';
 import MainLayout from '../../layouts/MainLayout';
 import Banner from './components/Banner';
-import ClinicCaroulselItem from './components/ClinicCaroulselItem';
+import HospitalCard from '@/components/HospitalCard';
 import SectionItem from './components/SectionItem';
 import SpecialtyCarouselItem from './components/SpecialtyCarouselItem';
-import DoctorCarouselItem from './components/DoctorCarouselItem';
+import DoctorCard from '@/components/DoctorCard';
 import ServiceSection from './components/ServicesSection/ServiceSection';
 import {
     CAROUSEL_SPECIALTIES_BREAKPOINTS,
-    CAROUSEL_CLINICS_BREAKPOINTS,
-    LIST_CLINICS,
+    CAROUSEL_HOSPITALS_BREAKPOINTS,
+    LIST_HOSPITALS,
     LIST_SPECIALTIES,
     LIST_DOCTORS,
     CAROUSEL_DOCTORS_BREAKPOINTS,
@@ -32,23 +32,23 @@ const Home: React.FC = () => {
             ),
         }));
 
-    const listClinicItems: { id: string | number; node: React.ReactNode }[] = LIST_CLINICS.map(
-        (clinic) => ({
-            id: clinic.id,
+    const listHospitalItems: { id: string | number; node: React.ReactNode }[] = LIST_HOSPITALS.map(
+        (hospital) => ({
+            id: hospital.id,
             node: (
-                <ClinicCaroulselItem
-                    key={clinic.id}
+                <HospitalCard
+                    key={hospital.id}
                     clinic={{
-                        id: clinic.id.toString(),
-                        name: clinic.name,
-                        image: clinic.image,
-                        rating: clinic.rating,
-                        reviewCount: clinic.reviewCount,
-                        specialties: clinic.specialties,
-                        location: clinic.address,
-                        distance: clinic.distance,
-                        priceRange: clinic.priceRange || '$100-300',
-                        availableSlots: clinic.availableSlots || 0,
+                        id: hospital.id.toString(),
+                        name: hospital.name,
+                        image: hospital.image,
+                        rating: hospital.rating,
+                        reviewCount: hospital.reviewCount,
+                        specialties: hospital.specialties,
+                        location: hospital.address,
+                        distance: hospital.distance,
+                        priceRange: hospital.priceRange || '$100-300',
+                        availableSlots: hospital.availableSlots || 0,
                     }}
                 />
             ),
@@ -58,7 +58,7 @@ const Home: React.FC = () => {
         (doctor) => ({
             id: doctor.id,
             node: (
-                <DoctorCarouselItem
+                <DoctorCard
                     key={doctor.id}
                     image={doctor.image}
                     name={doctor.name}
@@ -96,14 +96,14 @@ const Home: React.FC = () => {
                     viewAllTarget={PATHS.SPECIALTIES.ROOT}
                     viewAllText="Xem tất cả chuyên khoa"
                 />
-                {/* List Clinics */}
+                {/* List Hospitals */}
                 <SectionItem
                     title="Bệnh viện hàng đầu"
                     desc="Khám phá các bệnh viện nổi bật"
-                    items={listClinicItems}
-                    breakpoints={CAROUSEL_CLINICS_BREAKPOINTS}
+                    items={listHospitalItems}
+                    breakpoints={CAROUSEL_HOSPITALS_BREAKPOINTS}
                     viewAllText="Xem tất cả bệnh viện"
-                    viewAllTarget={PATHS.MEDICAL_FACILITY.ROOT}
+                    viewAllTarget={PATHS.HOSPITAL.ROOT}
                     isBackgroundColor
                 />
                 {/* List Doctors */}

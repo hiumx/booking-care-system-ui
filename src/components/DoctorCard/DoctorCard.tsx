@@ -1,9 +1,9 @@
 import { FC, useState } from 'react';
-import styles from './DoctorCard.module.scss';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
+import styles from './DoctorCard.module.scss';
 
-type DoctorCardProps = {
+export type DoctorCardProps = {
     image: string;
     name: string;
     specialty: string;
@@ -15,6 +15,7 @@ type DoctorCardProps = {
     profileLink?: string;
     bookingLink?: string;
     specialtiesLink?: string;
+    className?: string;
 };
 
 const DoctorCard: FC<DoctorCardProps> = ({
@@ -29,6 +30,7 @@ const DoctorCard: FC<DoctorCardProps> = ({
     profileLink = '#',
     bookingLink = '#',
     specialtiesLink = '#',
+    className,
 }) => {
     const [isFavorite, setIsFavorite] = useState(false);
 
@@ -37,7 +39,7 @@ const DoctorCard: FC<DoctorCardProps> = ({
     };
 
     return (
-        <div className={clsx(styles.DoctorCardContainer, 'card')}>
+        <div className={clsx(styles.doctorCardContainer, 'card', className)}>
             <div className="card-img card-img-hover">
                 <Link to={profileLink}>
                     <img src={image} alt={name} />
