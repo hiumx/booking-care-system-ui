@@ -34,6 +34,8 @@ $font-weight-bold: 700;
 .clinicCarouselItem {
     height: 100%;
     cursor: pointer;
+    display: flex;
+    width: 100%;
 
     .clinicCard {
         border: 1px solid $border-light;
@@ -44,8 +46,10 @@ $font-weight-bold: 700;
         position: relative;
         background: $white;
         height: 100%;
+        width: 100%;
         display: flex;
         flex-direction: column;
+        flex: 1;
 
         &:hover {
             transform: translateY(2px);
@@ -149,6 +153,7 @@ $font-weight-bold: 700;
         display: flex;
         flex-direction: column;
         gap: 8px;
+        justify-content: space-between;
 
         .clinicName {
             display: flex;
@@ -278,6 +283,34 @@ $font-weight-bold: 700;
 }
 
 // Responsive Design
+@media (max-width: 1200px) {
+    .clinicCarouselItem {
+        .clinicImageContainer {
+            height: 160px;
+        }
+
+        .clinicBody {
+            padding: 18px;
+        }
+    }
+}
+
+@media (max-width: 992px) {
+    .clinicCarouselItem {
+        .clinicImageContainer {
+            height: 150px;
+        }
+
+        .clinicBody {
+            padding: 16px;
+
+            .clinicName {
+                font-size: $font-size-base;
+            }
+        }
+    }
+}
+
 @media (max-width: 768px) {
     .clinicCarouselItem {
         padding: 10px;
@@ -338,29 +371,22 @@ $font-weight-bold: 700;
     }
 }
 
-// Dark Theme Support
-@media (prefers-color-scheme: dark) {
-    .clinicCarouselItem {
-        .clinicCard {
-            background: #2d3748;
-            border-color: #4a5568;
-            color: #e2e8f0;
+// Force white background for hospital cards
+.clinicCarouselItem {
+    .clinicCard {
+        background: $white !important;
+        border-color: $border-light !important;
+        color: $dark-color !important;
 
-            .clinicBody {
-                .clinicName {
-                    color: #e2e8f0;
-                }
-
-                .ratingText,
-                .locationText,
-                .clinicDescription {
-                    color: #a0aec0;
-                }
+        .clinicBody {
+            .clinicName {
+                color: $dark-color !important;
             }
 
-            .clinicFooter {
-                background: #1a202c;
-                border-color: #4a5568;
+            .ratingText,
+            .locationText,
+            .clinicDescription {
+                color: $secondary-color !important;
             }
         }
     }

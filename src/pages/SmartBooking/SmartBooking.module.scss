@@ -46,51 +46,105 @@
 }
 
 .featuresRow {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 1.5rem;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .featureItem {
-    flex: 1 1 200px;
-    max-width: 300px;
+    width: 100%;
 }
 
 .featureBox {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
     padding: 1rem;
-    border: 1px solid #dee2e6;
-    border-radius: 0.5rem;
     background: #fff;
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+    min-height: 80px;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
 }
 
 .featureIcon {
     color: #0d6efd;
+    flex-shrink: 0;
 }
 
 .featureText {
     font-weight: 600;
     color: #212529;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+/* Responsive breakpoints for features */
+@media (max-width: 1200px) {
+    .featuresRow {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .featuresRow {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        width: 100%;
+        padding: 0 1rem;
+    }
+
+    .featureBox {
+        padding: 0.75rem;
+        min-height: 70px;
+    }
+
+    .featureText {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .featuresRow {
+        padding: 0 0.5rem;
+    }
+
+    .featureBox {
+        padding: 0.5rem;
+        min-height: 60px;
+    }
+
+    .featureText {
+        font-size: 15px;
+    }
 }
 
 .loadingWrapper {
-    text-align: center;
-    padding: 2rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
 }
 
 .spinner {
-    width: 2.5rem;
-    height: 2.5rem;
-    border: 0.35rem solid #e9ecef;
-    border-top-color: #0d6efd;
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0d6efd;
     border-radius: 50%;
-    animation: spin 0.9s linear infinite;
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
@@ -103,24 +157,85 @@
     margin-top: 2rem;
 }
 
+/* Shared 90% width container for all blocks */
+.content90 {
+    width: 90%;
+    margin: 0 auto;
+}
+
 .cardGrid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
+    align-items: stretch;
 }
 
 .cardCol {
     width: 100%;
+    display: flex;
+    min-height: 0;
 }
 
-/* Responsive chỉnh theo media query cũ */
+/* Responsive breakpoints */
+@media (max-width: 1200px) {
+    .cardGrid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .cardGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .content90 {
+        width: 95%;
+    }
+}
+
 @media (max-width: 768px) {
     .cardGrid {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
 
     .headerTitle h1 {
         font-size: 1.5rem;
+    }
+
+    .content90 {
+        width: 100%;
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .cardGrid {
+        gap: 0.75rem;
+    }
+
+    .content90 {
+        padding: 0 0.5rem;
+    }
+}
+
+/* Service-specific responsive - max 3 services per row */
+.cardGrid.services {
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+}
+
+@media (max-width: 992px) {
+    .cardGrid.services {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .cardGrid.services {
+        grid-template-columns: 1fr;
     }
 }
 

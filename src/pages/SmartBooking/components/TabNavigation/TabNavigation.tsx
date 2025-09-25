@@ -1,6 +1,6 @@
 import React from 'react';
 import { TabType } from '@/types/booking';
-import { User, Building2, Stethoscope, Layers } from 'lucide-react';
+import { User, Building2, Stethoscope } from 'lucide-react';
 import styles from './TabNavigation.module.scss';
 
 interface TabNavigationProps {
@@ -15,12 +15,6 @@ interface TabNavigationProps {
 
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange, resultCounts }) => {
     const tabs = [
-        {
-            id: 'all' as TabType,
-            label: 'Tất cả',
-            icon: Layers,
-            count: resultCounts.doctors + resultCounts.hospitals + resultCounts.services,
-        },
         { id: 'doctors' as TabType, label: 'Bác sĩ', icon: User, count: resultCounts.doctors },
         {
             id: 'hospitals' as TabType,

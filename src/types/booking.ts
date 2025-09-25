@@ -33,7 +33,7 @@ export interface Service {
     availability: string;
 }
 
-export type TabType = 'all' | 'doctors' | 'hospitals' | 'services';
+export type TabType = 'doctors' | 'hospitals' | 'services';
 
 export interface SearchResults {
     doctors: Doctor[];

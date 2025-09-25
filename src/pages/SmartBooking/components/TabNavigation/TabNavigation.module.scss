@@ -1,10 +1,40 @@
 .tabWrapper {
-    width: 90%;
     overflow: hidden;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     margin: 20px auto;
+}
+
+/* Responsive breakpoints for TabNavigation */
+@media (max-width: 768px) {
+    .tabWrapper {
+        margin: 15px auto;
+        border-radius: 8px;
+    }
+
+    .tabLabel {
+        font-size: 14px;
+    }
+
+    .tabBadge {
+        font-size: 14px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .tabWrapper {
+        margin: 10px auto;
+        border-radius: 6px;
+    }
+
+    .tabLabel {
+        font-size: 13px;
+    }
+
+    .tabBadge {
+        font-size: 13px !important;
+    }
 }
 
 .tabIndicator {

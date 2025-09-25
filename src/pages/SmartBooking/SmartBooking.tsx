@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
+// import { Link } from 'react-router-dom';
+import clsx from 'clsx';
 import { TabType, SearchResults, Doctor, Hospital, Service } from '@/types/booking';
+import MainLayout from '@/layouts/MainLayout';
+import Breadcrumb from '@/components/Breadcrumb';
 import SearchBox from './components/SearchBox';
 import TabNavigation from './components/TabNavigation';
 import DoctorCard from './components/DoctorCard';
@@ -267,11 +271,83 @@ const mockServices: Service[] = [
         category: 'Xét nghiệm',
         availability: 'Trong tuần',
     },
+    {
+        id: '3',
+        name: 'Siêu âm tim',
+        description: 'Siêu âm tim để kiểm tra chức năng tim và phát hiện các bệnh lý tim mạch',
+        price: '300.000đ - 600.000đ',
+        duration: '30 phút',
+        category: 'Tim mạch',
+        availability: 'Hôm nay',
+    },
+    {
+        id: '4',
+        name: 'Nội soi dạ dày',
+        description: 'Nội soi dạ dày để chẩn đoán các bệnh lý đường tiêu hóa',
+        price: '800.000đ - 1.200.000đ',
+        duration: '60 phút',
+        category: 'Tiêu hóa',
+        availability: 'Trong tuần',
+    },
+    {
+        id: '5',
+        name: 'Chụp X-quang ngực',
+        description: 'Chụp X-quang ngực để kiểm tra phổi và tim',
+        price: '100.000đ - 200.000đ',
+        duration: '10 phút',
+        category: 'Chẩn đoán hình ảnh',
+        availability: 'Hôm nay',
+    },
+    {
+        id: '6',
+        name: 'Khám mắt tổng quát',
+        description: 'Khám mắt toàn diện bao gồm đo thị lực và kiểm tra các bệnh lý mắt',
+        price: '250.000đ - 400.000đ',
+        duration: '30 phút',
+        category: 'Mắt',
+        availability: 'Hôm nay',
+    },
+    {
+        id: '7',
+        name: 'Khám phụ khoa',
+        description: 'Khám phụ khoa định kỳ và tư vấn sức khỏe sinh sản',
+        price: '200.000đ - 350.000đ',
+        duration: '30 phút',
+        category: 'Sản phụ khoa',
+        availability: 'Trong tuần',
+    },
+    {
+        id: '8',
+        name: 'Khám da liễu',
+        description: 'Khám và điều trị các bệnh lý về da, tóc, móng',
+        price: '150.000đ - 300.000đ',
+        duration: '20 phút',
+        category: 'Da liễu',
+        availability: 'Hôm nay',
+    },
+    {
+        id: '9',
+        name: 'Khám tai mũi họng',
+        description: 'Khám tai mũi họng để phát hiện các bệnh lý về đường hô hấp',
+        price: '180.000đ - 320.000đ',
+        duration: '25 phút',
+        category: 'Tai mũi họng',
+        availability: 'Hôm nay',
+    },
+    {
+        id: '10',
+        name: 'Tư vấn tâm lý',
+        description: 'Tư vấn tâm lý và hỗ trợ điều trị các vấn đề tâm lý',
+        price: '400.000đ - 800.000đ',
+        duration: '50 phút',
+        category: 'Tâm lý',
+        availability: 'Trong tuần',
+    },
 ];
 
 const SmartBooking: React.FC = () => {
     const [symptoms, setSymptoms] = useState('');
-    const [activeTab, setActiveTab] = useState<TabType>('all');
+    const [activeTab, setActiveTab] = useState<TabType>('doctors');
     const [searchResults, setSearchResults] = useState<SearchResults>({
         doctors: [],
         hospitals: [],
@@ -334,222 +410,181 @@ const SmartBooking: React.FC = () => {
         services: searchResults.services.length,
     });
 
-    const getAllResults = () => {
-        const allResults: Array<{
-            id: string;
-            type: 'doctor' | 'hospital' | 'service';
-            data: Doctor | Hospital | Service;
-        }> = [];
-        searchResults.doctors.forEach((d) =>
-            allResults.push({ id: d.id, type: 'doctor', data: d })
-        );
-        searchResults.hospitals.forEach((h) =>
-            allResults.push({ id: h.id, type: 'hospital', data: h })
-        );
-        searchResults.services.forEach((s) =>
-            allResults.push({ id: s.id, type: 'service', data: s })
-        );
-        return allResults;
+    // removed All tab aggregate helper
+
+    // Breadcrumb data
+    const breadcrumbData = {
+        items: [
+            { label: 'Home', path: '/', isActive: false },
+            { label: 'Hỗ trợ đặt lịch', isActive: true },
+        ],
+        title: 'Hỗ trợ đặt lịch',
     };
 
     return (
-        <div className={styles.smartBooking}>
-            <div className={styles.searchContainer}>
-                {/* Header */}
-                <div className={styles.headerSection}>
-                    <motion.div
-                        className={styles.headerWrapper}
-                        initial={{ opacity: 0, y: -30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, ease: 'easeOut' }}
-                    >
-                        <motion.div
-                            className={styles.headerIcon}
-                            initial={{ scale: 0.7, rotate: -15 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            transition={{ duration: 0.6, ease: 'easeOut' }}
-                        >
-                            <Brain size={40} className={styles.headerBrain} />
-                        </motion.div>
-
-                        <div className={styles.headerTitle}>
-                            <h1>Đặt lịch thông minh theo triệu chứng</h1>
-                        </div>
-                    </motion.div>
-
-                    {/* Features */}
-                    <div className={styles.featuresRow}>
-                        {[
-                            {
-                                icon: <Stethoscope size={22} />,
-                                text: 'Hơn 500+ bác sĩ chuyên khoa',
-                            },
-                            { icon: <Sparkles size={22} />, text: 'AI gợi ý theo triệu chứng' },
-                            { icon: <CalendarCheck size={22} />, text: 'Đặt lịch 24/7 dễ dàng' },
-                            {
-                                icon: <ShieldCheck size={22} />,
-                                text: 'Thông tin & bảo mật an toàn',
-                            },
-                        ].map((feature, i) => (
+        <MainLayout>
+            <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
+            <div className={clsx('smart-booking-content')}>
+                <div className={styles.smartBooking}>
+                    <div className={styles.searchContainer}>
+                        {/* Header */}
+                        <div className={styles.headerSection}>
                             <motion.div
-                                key={i}
-                                className={styles.featureItem}
-                                initial={{ opacity: 0, y: 20 }}
+                                className={styles.headerWrapper}
+                                initial={{ opacity: 0, y: -30 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 0.2 + i * 0.2 }}
+                                transition={{ duration: 0.6, ease: 'easeOut' }}
                             >
-                                <div className={styles.featureBox}>
-                                    <span className={styles.featureIcon}>{feature.icon}</span>
-                                    <span className={styles.featureText}>{feature.text}</span>
+                                <motion.div
+                                    className={styles.headerIcon}
+                                    initial={{ scale: 0.7, rotate: -15 }}
+                                    animate={{ scale: 1, rotate: 0 }}
+                                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                                >
+                                    <Brain size={40} className={styles.headerBrain} />
+                                </motion.div>
+
+                                <div className={styles.headerTitle}>
+                                    <h1>Đặt lịch thông minh theo triệu chứng</h1>
                                 </div>
                             </motion.div>
-                        ))}
-                    </div>
-                </div>
 
-                {/* Search Box */}
-                <SearchBox
-                    symptoms={symptoms}
-                    onSymptomsChange={setSymptoms}
-                    onSearch={handleSearch}
-                    isLoading={isLoading}
-                />
-
-                {/* Loading */}
-                {isLoading && (
-                    <div className={styles.loadingWrapper}>
-                        <div className={styles.spinner} />
-                    </div>
-                )}
-
-                {/* Tabs */}
-                {hasSearched && !isLoading && (
-                    <TabNavigation
-                        activeTab={activeTab}
-                        onTabChange={setActiveTab}
-                        resultCounts={getResultCounts()}
-                    />
-                )}
-
-                {/* Results */}
-                {!isLoading && (
-                    <div className={styles.resultsWrapper}>
-                        {activeTab === 'all' ? (
-                            getAllResults().length > 0 ? (
-                                <div className={styles.cardGrid}>
-                                    {getAllResults().map((item) => (
-                                        <div
-                                            key={`${item.type}-${item.id}`}
-                                            className={styles.cardCol}
-                                        >
-                                            {item.type === 'doctor' && (
-                                                <DoctorCard
-                                                    image={(item.data as Doctor).avatar}
-                                                    name={(item.data as Doctor).name}
-                                                    specialty={(item.data as Doctor).specialty}
-                                                    location={(item.data as Doctor).location}
-                                                    rating={(item.data as Doctor).rating}
-                                                    available={(item.data as Doctor).availableToday}
-                                                    fee={(item.data as Doctor).consultationFee}
-                                                    consultationTime="45 phút"
-                                                    profileLink={`/doctor/${(item.data as Doctor).id}`}
-                                                    bookingLink={`/booking/doctor/${(item.data as Doctor).id}`}
-                                                    specialtiesLink={`/specialty/${(item.data as Doctor).specialty}`}
-                                                />
-                                            )}
-                                            {item.type === 'hospital' && (
-                                                <HospitalCard
-                                                    clinic={{
-                                                        id: (item.data as Hospital).id,
-                                                        name: (item.data as Hospital).name,
-                                                        image: (item.data as Hospital).logo,
-                                                        rating: (item.data as Hospital).rating,
-                                                        reviewCount: (item.data as Hospital)
-                                                            .reviewCount,
-                                                        specialties: (item.data as Hospital)
-                                                            .specialties,
-                                                        location: (item.data as Hospital).address,
-                                                        distance: (item.data as Hospital).distance,
-                                                        priceRange: '200.000đ - 500.000đ',
-                                                        availableSlots: 5,
-                                                    }}
-                                                />
-                                            )}
-                                            {item.type === 'service' && (
-                                                <ServiceCard
-                                                    service={item.data as Service}
-                                                    onBookService={(id) =>
-                                                        handleBookAppointment(id, 'service')
-                                                    }
-                                                />
-                                            )}
+                            {/* Features */}
+                            <div className={styles.featuresRow}>
+                                {[
+                                    {
+                                        icon: <Stethoscope size={22} />,
+                                        text: 'Hơn 500+ bác sĩ chuyên khoa',
+                                    },
+                                    {
+                                        icon: <Sparkles size={22} />,
+                                        text: 'AI gợi ý theo triệu chứng',
+                                    },
+                                    {
+                                        icon: <CalendarCheck size={22} />,
+                                        text: 'Đặt lịch 24/7 dễ dàng',
+                                    },
+                                    {
+                                        icon: <ShieldCheck size={22} />,
+                                        text: 'Thông tin & bảo mật an toàn',
+                                    },
+                                ].map((feature, i) => (
+                                    <motion.div
+                                        key={i}
+                                        className={styles.featureItem}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.5, delay: 0.2 + i * 0.2 }}
+                                    >
+                                        <div className={styles.featureBox}>
+                                            <span className={styles.featureIcon}>
+                                                {feature.icon}
+                                            </span>
+                                            <span className={styles.featureText}>
+                                                {feature.text}
+                                            </span>
                                         </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <EmptyState
-                                    activeTab={activeTab}
-                                    hasSearched={hasSearched}
-                                    onAIAssist={() => {}}
-                                />
-                            )
-                        ) : searchResults[activeTab].length > 0 ? (
-                            <div className={styles.cardGrid}>
-                                {searchResults[activeTab].map((item) => (
-                                    <div key={item.id} className={styles.cardCol}>
-                                        {activeTab === 'doctors' && (
-                                            <DoctorCard
-                                                image={(item as Doctor).avatar}
-                                                name={(item as Doctor).name}
-                                                specialty={(item as Doctor).specialty}
-                                                location={(item as Doctor).location}
-                                                rating={(item as Doctor).rating}
-                                                available={(item as Doctor).availableToday}
-                                                fee={(item as Doctor).consultationFee}
-                                                consultationTime="45 phút"
-                                                profileLink={`/doctor/${(item as Doctor).id}`}
-                                                bookingLink={`/booking/doctor/${(item as Doctor).id}`}
-                                                specialtiesLink={`/specialty/${(item as Doctor).specialty}`}
-                                            />
-                                        )}
-                                        {activeTab === 'hospitals' && (
-                                            <HospitalCard
-                                                clinic={{
-                                                    id: (item as Hospital).id,
-                                                    name: (item as Hospital).name,
-                                                    image: (item as Hospital).logo,
-                                                    rating: (item as Hospital).rating,
-                                                    reviewCount: (item as Hospital).reviewCount,
-                                                    specialties: (item as Hospital).specialties,
-                                                    location: (item as Hospital).address,
-                                                    distance: (item as Hospital).distance,
-                                                    priceRange: '200.000đ - 500.000đ',
-                                                    availableSlots: 5,
-                                                }}
-                                            />
-                                        )}
-                                        {activeTab === 'services' && (
-                                            <ServiceCard
-                                                service={item as Service}
-                                                onBookService={(id) =>
-                                                    handleBookAppointment(id, 'service')
-                                                }
-                                            />
-                                        )}
-                                    </div>
+                                    </motion.div>
                                 ))}
                             </div>
-                        ) : (
-                            <EmptyState
-                                activeTab={activeTab}
-                                hasSearched={hasSearched}
-                                onAIAssist={() => {}}
+                        </div>
+
+                        {/* Search Box */}
+                        <div className={styles.content90}>
+                            <SearchBox
+                                symptoms={symptoms}
+                                onSymptomsChange={setSymptoms}
+                                onSearch={handleSearch}
+                                isLoading={isLoading}
                             />
+                        </div>
+
+                        {/* Loading */}
+                        {isLoading && (
+                            <div className={styles.content90}>
+                                <div className={styles.loadingWrapper}>
+                                    <div className={styles.spinner} />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Tabs */}
+                        {hasSearched && (
+                            <div className={styles.content90}>
+                                <TabNavigation
+                                    activeTab={activeTab}
+                                    onTabChange={setActiveTab}
+                                    resultCounts={getResultCounts()}
+                                />
+                            </div>
+                        )}
+
+                        {/* Results */}
+                        {!isLoading && (
+                            <div className={`${styles.resultsWrapper} ${styles.content90}`}>
+                                {searchResults[activeTab].length > 0 ? (
+                                    <div
+                                        className={`${styles.cardGrid} ${activeTab === 'services' ? styles.services : ''}`}
+                                    >
+                                        {searchResults[activeTab].map((item) => (
+                                            <div key={item.id} className={styles.cardCol}>
+                                                {activeTab === 'doctors' && (
+                                                    <DoctorCard
+                                                        image={(item as Doctor).avatar}
+                                                        name={(item as Doctor).name}
+                                                        specialty={(item as Doctor).specialty}
+                                                        location={(item as Doctor).location}
+                                                        rating={(item as Doctor).rating}
+                                                        available={(item as Doctor).availableToday}
+                                                        fee={(item as Doctor).consultationFee}
+                                                        consultationTime="45 phút"
+                                                        profileLink={`/doctor/${(item as Doctor).id}`}
+                                                        bookingLink={`/booking/doctor/${(item as Doctor).id}`}
+                                                        specialtiesLink={`/specialty/${(item as Doctor).specialty}`}
+                                                    />
+                                                )}
+                                                {activeTab === 'hospitals' && (
+                                                    <HospitalCard
+                                                        clinic={{
+                                                            id: (item as Hospital).id,
+                                                            name: (item as Hospital).name,
+                                                            image: (item as Hospital).logo,
+                                                            rating: (item as Hospital).rating,
+                                                            reviewCount: (item as Hospital)
+                                                                .reviewCount,
+                                                            specialties: (item as Hospital)
+                                                                .specialties,
+                                                            location: (item as Hospital).address,
+                                                            distance: (item as Hospital).distance,
+                                                            priceRange: '200.000đ - 500.000đ',
+                                                            availableSlots: 5,
+                                                        }}
+                                                    />
+                                                )}
+                                                {activeTab === 'services' && (
+                                                    <ServiceCard
+                                                        service={item as Service}
+                                                        onBookService={(id) =>
+                                                            handleBookAppointment(id, 'service')
+                                                        }
+                                                    />
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <EmptyState
+                                        activeTab={activeTab}
+                                        hasSearched={hasSearched}
+                                        onAIAssist={() => {}}
+                                    />
+                                )}
+                            </div>
                         )}
                     </div>
-                )}
+                </div>
             </div>
-        </div>
+        </MainLayout>
     );
 };
 
