@@ -1,79 +1,137 @@
+import React from 'react';
+import styles from './HospitalCard.module.scss';
 import { Link } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
-import styles from './HospitalCard.module.scss';
 
-interface HospitalCardProps {
-    hospital: Hospital;
-    onViewDetails: (hospitalId: string) => void;
-    onBookAppointment: (hospitalId: string) => void;
+export interface HospitalCardProps {
+    clinic: {
+        id: string;
+        name: string;
+        image: string;
+        rating: number;
+        reviewCount: number;
+        specialties: string[];
+        location: string;
+        distance?: string;
+        priceRange: string;
+        availableSlots: number;
+    };
 }
 
-const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
-    const rating = hospital.rating || 0;
-    const full = Math.floor(rating);
-    const hasHalf = rating % 1 !== 0;
-    const empty = 5 - Math.ceil(rating);
+const HospitalCard: React.FC<HospitalCardProps> = ({
+    clinic = {
+        id: '1',
+        name: 'City Medical Center',
+        image: '/src/assets/img/clinic-1.jpg',
+        rating: 4.5,
+        reviewCount: 128,
+        specialties: ['Cardiology', 'Neurology', 'Orthopedics'],
+        location: 'Downtown, City Center',
+        distance: '2.5 km',
+        priceRange: '$50 - $200',
+        availableSlots: 5,
+        description:
+            'Leading healthcare facility with state-of-the-art equipment and experienced medical professionals.',
+    },
+}) => {
+    const {
+        id,
+        name,
+        image,
+        rating,
+        reviewCount,
+        specialties,
+        location,
+        distance,
+        priceRange,
+        availableSlots,
+    } = clinic;
+
+    const renderStars = (rating: number) => {
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 !== 0;
+
+        for (let i = 0; i < fullStars; i++) {
+            stars.push(<i key={i} className="fas fa-star text-warning"></i>);
+        }
+
+        if (hasHalfStar) {
+            stars.push(<i key="half" className="fas fa-star-half-alt text-warning"></i>);
+        }
+
+        const emptyStars = 5 - Math.ceil(rating);
+        for (let i = 0; i < emptyStars; i++) {
+            stars.push(<i key={`empty-${i}`} className="far fa-star text-muted"></i>);
+        }
+
+        return stars;
+    };
 
     return (
-        <Link
-            to={`${PATHS.MEDICAL_FACILITY.ROOT}/${hospital.id}`}
-            className={styles.clinicCarouselItem}
-        >
+        <Link to={`${PATHS.MEDICAL_FACILITY.ROOT}/${id}`} className={styles.clinicCarouselItem}>
             <div className={`card h-100 ${styles.clinicCard}`}>
+                {/* Image Section */}
                 <div className={styles.clinicImageContainer}>
                     <img
-                        src={hospital.logo}
-                        alt={hospital.name}
+                        src={image}
+                        alt={name}
                         className={`card-img-top ${styles.clinicImage}`}
                         loading="lazy"
                     />
+
+                    {/* Overlay Elements */}
                     <div className={styles.imageOverlay}>
-                        {hospital.distance && (
+                        {distance && (
                             <div className={styles.distanceBadge}>
                                 <i className="fas fa-map-marker-alt"></i>
-                                <span>{hospital.distance}</span>
+                                <span>{distance}</span>
                             </div>
                         )}
                     </div>
-                    <div className={styles.slotsIndicator}>
-                        <span className={styles.slotsCount}>10</span>
-                        <span className={styles.slotsText}>SLOTS TODAY</span>
-                    </div>
+
+                    {/* Available Slots Indicator */}
+                    {availableSlots > 0 && (
+                        <div className={styles.slotsIndicator}>
+                            <span className={styles.slotsCount}>{availableSlots}</span>
+                            <span className={styles.slotsText}>slots today</span>
+                        </div>
+                    )}
                 </div>
 
+                {/* Card Body */}
                 <div className={`card-body ${styles.clinicBody}`}>
-                    <h5 className={styles.clinicName}>{hospital.name}</h5>
+                    {/* Header Section */}
+                    <h5 className={styles.clinicName}>{name}</h5>
                     <div className={styles.priceContainer}>
-                        <p className={styles.priceRange}>500.000 - 2.000.000 VNĐ</p>
+                        <p className={styles.priceRange}>{priceRange}</p>
                     </div>
+
+                    {/* Location */}
                     <div className={styles.locationSection}>
                         <i className={`fas fa-map-marker-alt ${styles.locationIcon}`}></i>
-                        <span className={styles.locationText}>{hospital.address}</span>
+                        <span className={styles.locationText}>{location}</span>
                     </div>
+
+                    {/* Rating Section */}
                     <div className={styles.ratingSection}>
-                        <div className={styles.stars}>
-                            {Array.from({ length: full }).map((_, i) => (
-                                <i key={`f-${i}`} className="fas fa-star text-warning"></i>
-                            ))}
-                            {hasHalf && <i className="fas fa-star-half-alt text-warning"></i>}
-                            {Array.from({ length: empty }).map((_, i) => (
-                                <i key={`e-${i}`} className="far fa-star text-muted"></i>
-                            ))}
-                        </div>
+                        <div className={styles.stars}>{renderStars(rating)}</div>
                         <span className={styles.ratingText}>
-                            {rating.toFixed(1)} ({hospital.reviewCount} reviews)
+                            {rating.toFixed(1)} ({reviewCount} reviews)
                         </span>
                     </div>
+
+                    {/* Specialties */}
                     <div className={styles.specialtiesSection}>
                         <div className={styles.specialtiesContainer}>
-                            {hospital.specialties.slice(0, 3).map((s) => (
-                                <span key={s} className={styles.specialtyTag}>
-                                    {s}
+                            {specialties.slice(0, 3).map((specialty) => (
+                                <span key={specialty} className={styles.specialtyTag}>
+                                    {specialty}
                                 </span>
                             ))}
-                            {hospital.specialties.length > 3 && (
+                            {specialties.length > 3 && (
                                 <span className={`${styles.specialtyTag} ${styles.more}`}>
-                                    +{hospital.specialties.length - 3} more
+                                    +{specialties.length - 3} more
                                 </span>
                             )}
                         </div>

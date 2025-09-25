@@ -1,28 +1,46 @@
-import React, { useState } from 'react';
+import { FC, useState } from 'react';
+import styles from './DoctorCard.module.scss';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
-import styles from './DoctorCard.module.scss';
-import { Doctor } from '../types/booking';
 
-interface DoctorCardProps {
-    doctor: Doctor;
-    onBookAppointment: (doctorId: string) => void;
-}
+type DoctorCardProps = {
+    image: string;
+    name: string;
+    specialty: string;
+    location: string;
+    rating: number;
+    available?: boolean;
+    fee: number;
+    consultationTime: string;
+    profileLink?: string;
+    bookingLink?: string;
+    specialtiesLink?: string;
+};
 
-const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onBookAppointment }) => {
+const DoctorCard: FC<DoctorCardProps> = ({
+    image,
+    name,
+    specialty,
+    location,
+    rating,
+    available = true,
+    fee,
+    consultationTime,
+    profileLink = '#',
+    bookingLink = '#',
+    specialtiesLink = '#',
+}) => {
     const [isFavorite, setIsFavorite] = useState(false);
 
-    const toggleFavorite = () => setIsFavorite((prev) => !prev);
-
-    const rating = doctor.rating || 0;
-    const available = doctor.availableToday;
-    const feeUsd = Math.round((doctor.consultationFee || 0) / 24000);
+    const toggleFavorite = () => {
+        setIsFavorite((prev) => !prev);
+    };
 
     return (
-        <div className={clsx(styles.doctorCarouselItemContainer, 'card')}>
+        <div className={clsx(styles.DoctorCardContainer, 'card')}>
             <div className="card-img card-img-hover">
-                <Link to="#">
-                    <img src={doctor.avatar} alt={doctor.name} />
+                <Link to={profileLink}>
+                    <img src={image} alt={name} />
                 </Link>
                 <div className="grid-overlay-item d-flex align-items-center justify-content-between">
                     <span className="badge bg-orange">
@@ -43,8 +61,8 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onBookAppointment }) =>
 
             <div className="card-body p-0">
                 <div className="d-flex active-bar align-items-center justify-content-between p-3">
-                    <Link to="#" className="text-indigo fw-medium fs-14">
-                        {doctor.specialty}
+                    <Link to={specialtiesLink} className="text-indigo fw-medium fs-14">
+                        {specialty}
                     </Link>
                     <span className="badge bg-success-light d-inline-flex align-items-center">
                         <div className={styles.dotIconWrapper}>
@@ -58,33 +76,33 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onBookAppointment }) =>
                     <div className="doctor-info-detail mb-3 pb-3">
                         <div className={styles.doctorName}>
                             <h3 className="mb-1">
-                                <Link to="#">{doctor.name}</Link>
+                                <Link to={profileLink}>{name}</Link>
                             </h3>
                         </div>
                         <div className="d-flex align-items-center">
                             <p className="d-flex align-items-center mb-0 fs-14">
                                 <i className="isax isax-location me-2"></i>
-                                {doctor.location}
+                                {location}
                             </p>
                             <div className={styles.fsWrapper}>
                                 <i className="fa-solid fa-circle text-primary mx-2 me-1"></i>
                             </div>
-                            <span className="fs-14 fw-medium">30 Phút</span>
+                            <span className="fs-14 fw-medium">{consultationTime}</span>
                         </div>
                     </div>
 
                     <div className="d-flex align-items-center justify-content-between">
                         <div>
                             <p className="mb-1">Phí tư vấn</p>
-                            <h3 className="text-orange">${feeUsd}</h3>
+                            <h3 className="text-orange">${fee}</h3>
                         </div>
-                        <button
-                            onClick={() => onBookAppointment(doctor.id)}
+                        <Link
+                            to={bookingLink}
                             className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
                         >
                             <i className="isax isax-calendar-1 me-2"></i>
                             {'Đặt ngay'}
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

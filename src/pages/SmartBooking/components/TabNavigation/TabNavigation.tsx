@@ -1,5 +1,5 @@
 import React from 'react';
-import { TabType } from '../types/booking';
+import { TabType } from '@/types/booking';
 import { User, Building2, Stethoscope, Layers } from 'lucide-react';
 import styles from './TabNavigation.module.scss';
 

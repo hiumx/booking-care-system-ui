@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Service } from '../types/booking';
+import { Service } from '@/types/booking';
 import { Clock, DollarSign, Calendar, Tag, Star, Shield, Zap, CheckCircle } from 'lucide-react';
 
 interface ServiceCardProps {
@@ -37,7 +37,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onBookService }) => 
         >
             <div className="position-relative">
                 <img
-                    src={'/src/assets/img/clinic/clinic-1.jpg'}
+                    src={'/src/assets/img/service/service-img-02.jpg'}
                     alt={service.name}
                     className="card-img-top"
                     style={{ height: '160px', objectFit: 'cover' }}

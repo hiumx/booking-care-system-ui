@@ -3,21 +3,26 @@ import { Paperclip, Trash2, Mic, Send } from 'lucide-react';
 import styles from './SearchBox.module.scss';
 
 interface SearchBoxProps {
-    onSearch: (text: string) => void; // giống code cũ
-    onClear?: () => void;
-    onAttach?: () => void;
+    symptoms: string;
+    onSymptomsChange: (symptoms: string) => void;
+    onSearch: () => void;
     isLoading?: boolean;
 }
 
 const SearchBox: React.FC<SearchBoxProps> = ({
+    symptoms,
+    onSymptomsChange,
     onSearch,
-    onClear,
-    onAttach,
     isLoading = false,
 }) => {
-    const [text, setText] = useState('');
     const [isRecording, setIsRecording] = useState(false);
     const recognitionRef = useRef<SpeechRecognition | null>(null);
+    const symptomsRef = useRef<string>(symptoms);
+
+    // Update symptomsRef when symptoms prop changes
+    useEffect(() => {
+        symptomsRef.current = symptoms;
+    }, [symptoms]);
 
     // setup speech recognition
     useEffect(() => {
@@ -35,7 +40,12 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                 for (let i = event.resultIndex; i < event.results.length; i++) {
                     transcript += event.results[i][0].transcript;
                 }
-                setText((prev) => prev + ' ' + transcript.trim());
+                console.log('🎤 Speech recognition result:', transcript);
+                console.log('🎤 Current symptoms:', symptomsRef.current);
+
+                // Sử dụng symptomsRef.current để đảm bảo có giá trị mới nhất
+                const newText = symptomsRef.current + ' ' + transcript.trim();
+                onSymptomsChange(newText);
             };
 
             recognition.onend = () => {
@@ -55,15 +65,17 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     };
 
     const handleSearch = () => {
-        if (text.trim()) {
-            onSearch(text.trim());
-            setText('');
+        console.log('🔍 SearchBox handleSearch called with symptoms:', symptoms);
+        if (symptoms.trim()) {
+            console.log('🔍 Calling onSearch...');
+            onSearch();
+        } else {
+            console.log('🔍 No symptoms to search');
         }
     };
 
     const handleClear = () => {
-        setText('');
-        if (onClear) onClear();
+        onSymptomsChange('');
     };
 
     // 👇 logic Enter giống code cũ
@@ -78,11 +90,11 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         <div className={`${styles.searchBoxWrapper} ${isRecording ? styles.recording : ''}`}>
             {/* textarea */}
             <textarea
-                placeholder="What do you want to know?"
+                placeholder="Mô tả triệu chứng hoặc nhu cầu khám bệnh của bạn..."
                 rows={4}
-                value={text}
+                value={symptoms}
                 disabled={isLoading}
-                onChange={(e) => setText(e.target.value)}
+                onChange={(e) => onSymptomsChange(e.target.value)}
                 onKeyDown={handleKeyDown} // 👈 giữ logic enter để search
                 className={`${styles.textarea} ${isRecording ? styles.textareaRecording : ''}`}
             />
@@ -94,7 +106,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                     <button
                         type="button"
                         title="Đính kèm tập tin"
-                        onClick={onAttach}
+                        onClick={() => {}}
                         className={styles.iconButton}
                     >
                         <Paperclip size={16} />

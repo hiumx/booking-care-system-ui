@@ -1,4 +1,129 @@
 // SmartBooking Responsive Styles
+.smartBooking {
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 50%, #e3f2fd 100%);
+}
+
+.searchContainer {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.headerSection {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.headerWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.headerIcon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.headerBrain {
+    color: #fff;
+}
+
+.headerTitle h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #212529;
+    margin: 0;
+}
+
+.featuresRow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1.5rem;
+    gap: 1rem;
+}
+
+.featureItem {
+    flex: 1 1 200px;
+    max-width: 300px;
+}
+
+.featureBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+}
+
+.featureIcon {
+    color: #0d6efd;
+}
+
+.featureText {
+    font-weight: 600;
+    color: #212529;
+}
+
+.loadingWrapper {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 0.35rem solid #e9ecef;
+    border-top-color: #0d6efd;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.resultsWrapper {
+    margin-top: 2rem;
+}
+
+.cardGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.cardCol {
+    width: 100%;
+}
+
+/* Responsive chỉnh theo media query cũ */
+@media (max-width: 768px) {
+    .cardGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .headerTitle h1 {
+        font-size: 1.5rem;
+    }
+}
+
 .smart-booking {
     // Mobile-first responsive design
     @media (max-width: 576px) {
@@ -112,10 +237,8 @@
             }
         }
 
-        .card-grid {
-            .col-md-6 {
-                margin-bottom: 1.5rem;
-            }
+        .cardGrid {
+            grid-template-columns: repeat(2, 1fr);
         }
     }
 
@@ -142,10 +265,8 @@
             }
         }
 
-        .card-grid {
-            .col-lg-4 {
-                margin-bottom: 2rem;
-            }
+        .cardGrid {
+            grid-template-columns: repeat(4, 1fr);
         }
     }
 
