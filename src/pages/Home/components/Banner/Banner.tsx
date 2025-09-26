@@ -120,7 +120,7 @@ const Banner: React.FC = () => {
                                     }
                                     transition={{ duration: 0.15 }}
                                 >
-                                    Click vào đặt lịch thông minh nha!
+                                    {'Click vào đặt lịch thông minh nha!'}
                                     <span
                                         style={{
                                             width: 0,
