@@ -1,0 +1,26 @@
+// Banner.module.scss
+.tooltipArrow {
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #0066ff;
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.bannerText {
+    display: inline;
+}
+
+.bannerIcon {
+    display: inline;
+    margin: 0 4px;
+}
+
+.textGradient {
+    display: inline;
+    margin: 0 4px;
+}

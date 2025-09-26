@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import SearchInput from '@/components/SearchInput';
+import styles from './Banner.module.scss';
 
 const Banner: React.FC = () => {
     const navigate = useNavigate();
@@ -120,28 +121,21 @@ const Banner: React.FC = () => {
                                     }
                                     transition={{ duration: 0.15 }}
                                 >
-                                    {'Click vào đặt lịch thông minh nha!'}
-                                    <span
-                                        style={{
-                                            width: 0,
-                                            height: 0,
-                                            borderLeft: '8px solid transparent',
-                                            borderRight: '8px solid transparent',
-                                            borderBottom: '8px solid #0066FF',
-                                            position: 'absolute',
-                                            top: '-8px',
-                                            left: '50%',
-                                            transform: 'translateX(-50%)',
-                                        }}
-                                    />
+                                    <span className={styles.bannerText}>
+                                        Click vào đặt lịch thông minh nha!
+                                    </span>
+                                    <span className={styles.tooltipArrow} />
                                 </motion.div>
                             </motion.div>
                             <h1 className="display-5">
-                                Khám sức khỏe: Tìm bác sĩ{' '}
-                                <span className="banner-icon">
+                                <span className={styles.bannerText}>Khám sức khỏe: Tìm bác sĩ</span>
+                                <span className={`banner-icon ${styles.bannerIcon}`}>
                                     <img src="/src/assets/img/icons/video.svg" alt="img" />
-                                </span>{' '}
-                                <span className="text-gradient">của bạn</span> ngay hôm nay
+                                </span>
+                                <span className={`text-gradient ${styles.textGradient}`}>
+                                    của bạn
+                                </span>
+                                <span className={styles.bannerText}>ngay hôm nay</span>
                             </h1>
                             <SearchInput forceWrap />
                         </div>
