@@ -469,7 +469,7 @@ const SmartBooking: React.FC = () => {
                                     },
                                 ].map((feature, i) => (
                                     <motion.div
-                                        key={i}
+                                        key={feature.text}
                                         className={styles.featureItem}
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
