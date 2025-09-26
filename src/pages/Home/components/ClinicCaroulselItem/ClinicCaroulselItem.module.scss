@@ -149,6 +149,7 @@ $font-weight-bold: 700;
         display: flex;
         flex-direction: column;
         gap: 8px;
+        background-color: $white;
 
         .clinicName {
             display: flex;
@@ -156,7 +157,7 @@ $font-weight-bold: 700;
             min-height: 48px;
             font-size: $font-size-lg;
             font-weight: $font-weight-semibold;
-            color: $dark-color;
+            color: #124992;
             margin: 0;
             line-height: 1.3;
             flex: 1;
@@ -333,34 +334,6 @@ $font-weight-bold: 700;
                     font-size: 11px;
                     padding: 2px 6px;
                 }
-            }
-        }
-    }
-}
-
-// Dark Theme Support
-@media (prefers-color-scheme: dark) {
-    .clinicCarouselItem {
-        .clinicCard {
-            background: #2d3748;
-            border-color: #4a5568;
-            color: #e2e8f0;
-
-            .clinicBody {
-                .clinicName {
-                    color: #e2e8f0;
-                }
-
-                .ratingText,
-                .locationText,
-                .clinicDescription {
-                    color: #a0aec0;
-                }
-            }
-
-            .clinicFooter {
-                background: #1a202c;
-                border-color: #4a5568;
             }
         }
     }
