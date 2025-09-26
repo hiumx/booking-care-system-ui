@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import { TabType, SearchResults, Doctor, Hospital, Service } from '@/types/booking';
 import MainLayout from '@/layouts/MainLayout';

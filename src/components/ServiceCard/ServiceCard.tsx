@@ -94,11 +94,11 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onBookService, class
                 <div className="mb-4">
                     <p className="small fw-medium text-muted mb-2">Đặc điểm:</p>
                     <div className="d-flex flex-wrap gap-2">
-                        {serviceFeatures.map((feature, index) => {
+                        {serviceFeatures.map((feature) => {
                             const Icon = feature.icon;
                             return (
                                 <div
-                                    key={index}
+                                    key={feature.text}
                                     className={`d-flex align-items-center px-2 py-1 rounded-pill small ${
                                         feature.available
                                             ? 'bg-success bg-opacity-10 text-success'
