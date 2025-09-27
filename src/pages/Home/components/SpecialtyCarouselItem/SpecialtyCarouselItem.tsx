@@ -25,7 +25,7 @@ const SpecialtyCarouselItem: React.FC<SpecialtyCarouselItemProps> = ({
             <h6>
                 <a href="doctor-grid.html">{title}</a>
             </h6>
-            <p className="mb-0">{doctorCount} Doctors</p>
+            <p className="mb-0">{doctorCount} bác sĩ</p>
         </div>
     );
 };

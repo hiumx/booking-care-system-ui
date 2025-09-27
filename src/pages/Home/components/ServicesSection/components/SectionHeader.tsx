@@ -9,7 +9,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ title, subtitle }) => {
     return (
         <div className="section-head-fourteen">
             <h2>
-                {title} <span> Services</span>
+                {title} <span> Của Chúng Tôi</span>
             </h2>
             <p>{subtitle}</p>
         </div>

@@ -1,9 +1,9 @@
 import { FC, useState } from 'react';
-import styles from './DoctorCarouselItem.module.scss';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
+import styles from './DoctorCard.module.scss';
 
-type DoctorCarouselItemProps = {
+export type DoctorCardProps = {
     image: string;
     name: string;
     specialty: string;
@@ -15,9 +15,10 @@ type DoctorCarouselItemProps = {
     profileLink?: string;
     bookingLink?: string;
     specialtiesLink?: string;
+    className?: string;
 };
 
-const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
+const DoctorCard: FC<DoctorCardProps> = ({
     image,
     name,
     specialty,
@@ -29,6 +30,7 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
     profileLink = '#',
     bookingLink = '#',
     specialtiesLink = '#',
+    className,
 }) => {
     const [isFavorite, setIsFavorite] = useState(false);
 
@@ -37,7 +39,7 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
     };
 
     return (
-        <div className={clsx(styles.doctorCarouselItemContainer, 'card')}>
+        <div className={clsx(styles.doctorCardContainer, 'card', className)}>
             <div className="card-img card-img-hover">
                 <Link to={profileLink}>
                     <img src={image} alt={name} />
@@ -93,7 +95,7 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
 
                     <div className="d-flex align-items-center justify-content-between">
                         <div>
-                            <p className="mb-1">Consultation Fees</p>
+                            <p className="mb-1">Phí tư vấn</p>
                             <h3 className="text-orange">${fee}</h3>
                         </div>
                         <Link
@@ -101,7 +103,7 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
                             className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
                         >
                             <i className="isax isax-calendar-1 me-2"></i>
-                            {'Book Now'}
+                            {'Đặt ngay'}
                         </Link>
                     </div>
                 </div>
@@ -110,4 +112,4 @@ const DoctorCarouselItem: FC<DoctorCarouselItemProps> = ({
     );
 };
 
-export default DoctorCarouselItem;
+export default DoctorCard;

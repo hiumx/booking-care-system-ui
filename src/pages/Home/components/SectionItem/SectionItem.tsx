@@ -21,7 +21,7 @@ const SectionItem: React.FC<SectionItemProps> = ({
     items,
     breakpoints,
     viewAllTarget,
-    viewAllText = 'View All',
+    viewAllText = 'Xem tất cả',
     isBackgroundColor = false,
     isAutoPlay = false,
 }) => {

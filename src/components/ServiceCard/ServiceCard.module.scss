@@ -1,0 +1,153 @@
+.card {
+    border: none !important;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #fff;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+
+    &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+    }
+}
+
+.cardImg {
+    height: 220px;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+.categoryBadge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition:
+        background 0.3s ease,
+        transform 0.2s ease;
+
+    &:hover {
+        transform: scale(1.05);
+        background: #0d6efd !important;
+    }
+}
+
+.cardBody {
+    animation: fadeIn 0.5s ease both;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.btnOutlinePrimary {
+    border-width: 1.5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background: #0d6efd;
+        color: #fff;
+        transform: translateY(-2px);
+    }
+}
+
+.btnDark {
+    background: #212529;
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background: #000;
+        transform: translateY(-2px);
+    }
+}
+
+.featurePill {
+    transition: all 0.3s ease;
+    cursor: default;
+
+    &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+}
+
+.expandDetails {
+    max-height: 0;
+    overflow: hidden;
+    transition:
+        max-height 0.5s ease,
+        opacity 0.5s ease;
+    opacity: 0;
+
+    &.show {
+        max-height: 300px;
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive breakpoints for ServiceCard */
+@media (max-width: 1200px) {
+    .cardImg {
+        height: 200px;
+    }
+}
+
+@media (max-width: 992px) {
+    .cardImg {
+        height: 180px;
+    }
+
+    .cardBody {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .cardImg {
+        height: 200px;
+    }
+
+    .cardBody {
+        padding: 1.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .cardImg {
+        height: 180px;
+    }
+
+    .cardBody {
+        padding: 1rem;
+    }
+
+    .btnOutlinePrimary,
+    .btnDark {
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+    }
+}

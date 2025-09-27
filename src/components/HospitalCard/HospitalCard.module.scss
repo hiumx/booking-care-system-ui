@@ -32,10 +32,21 @@ $font-weight-semibold: 600;
 $font-weight-bold: 700;
 
 .clinicCarouselItem {
+    display: flex;
+    width: 100%;
     height: 100%;
+    text-decoration: none;
+    color: inherit;
     cursor: pointer;
 
+    &:hover {
+        text-decoration: none;
+        color: inherit;
+    }
+
     .clinicCard {
+        width: 100%;
+        flex: 1;
         border: 1px solid $border-light;
         border-radius: $border-radius;
         box-shadow: $box-shadow;
@@ -43,13 +54,12 @@ $font-weight-bold: 700;
         overflow: hidden;
         position: relative;
         background: $white;
-        height: 100%;
+        min-height: 400px;
         display: flex;
         flex-direction: column;
 
         &:hover {
-            transform: translateY(2px);
-            box-shadow: $box-shadow-hover;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
             border-color: $primary-color;
 
             .clinicImage {
@@ -76,14 +86,16 @@ $font-weight-bold: 700;
     // Image Section
     .clinicImageContainer {
         position: relative;
-        height: 176px;
+        height: 200px;
         overflow: hidden;
         background: $light-color;
+        border-radius: $border-radius $border-radius 0 0;
 
         .clinicImage {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center;
             transition: $transition-base;
         }
 
@@ -93,7 +105,6 @@ $font-weight-bold: 700;
             left: 12px;
             right: 12px;
             display: flex;
-            justify-content: space-between;
             justify-content: flex-end;
             z-index: 2;
         }
@@ -150,6 +161,7 @@ $font-weight-bold: 700;
         flex-direction: column;
         gap: 8px;
         background-color: $white;
+        justify-content: space-between;
 
         .clinicName {
             display: flex;
@@ -185,6 +197,7 @@ $font-weight-bold: 700;
             align-items: center;
             gap: 8px;
             justify-content: flex-end;
+            margin: 8px 0;
 
             .stars {
                 display: flex;
@@ -208,6 +221,7 @@ $font-weight-bold: 700;
             gap: 6px;
             color: $secondary-color;
             min-height: 40px;
+            margin: 8px 0;
 
             .locationIcon {
                 font-size: 14px;
@@ -222,6 +236,7 @@ $font-weight-bold: 700;
 
         .specialtiesSection {
             min-height: 58px;
+            margin-top: auto;
 
             .specialtiesContainer {
                 display: flex;
@@ -279,41 +294,57 @@ $font-weight-bold: 700;
 }
 
 // Responsive Design
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
     .clinicCarouselItem {
-        padding: 10px;
-
         .clinicImageContainer {
             height: 180px;
         }
 
         .clinicBody {
             padding: 16px;
-            gap: 10px;
 
-            .clinicHeader {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-
-                .clinicName {
-                    font-size: $font-size-base;
-                }
+            .clinicName {
+                font-size: $font-size-base;
+                min-height: 40px;
             }
         }
+    }
+}
 
-        .clinicFooter {
-            padding: 12px 16px;
+@media (max-width: 992px) {
+    .clinicCarouselItem {
+        .clinicImageContainer {
+            height: 160px;
+        }
 
-            .actionButtons {
-                .btn {
-                    padding: 8px 12px;
-                    font-size: 12px;
+        .clinicBody {
+            padding: 14px;
 
-                    i {
-                        font-size: 12px;
-                    }
-                }
+            .clinicName {
+                font-size: $font-size-sm;
+                min-height: 36px;
+            }
+
+            .specialtiesSection .specialtiesContainer .specialtyTag {
+                font-size: 0.7rem;
+                padding: 3px 6px;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .clinicCarouselItem {
+        .clinicImageContainer {
+            height: 200px;
+        }
+
+        .clinicBody {
+            padding: 16px;
+
+            .clinicName {
+                font-size: $font-size-base;
+                min-height: 44px;
             }
         }
     }
@@ -321,17 +352,23 @@ $font-weight-bold: 700;
 
 @media (max-width: 576px) {
     .clinicCarouselItem {
-        .clinicFooter {
-            .actionButtons {
-                flex-direction: column;
-                gap: 8px;
-            }
+        .clinicImageContainer {
+            height: 180px;
         }
 
-        .specialtiesSection {
-            .specialtiesContainer {
+        .clinicBody {
+            padding: 12px;
+
+            .clinicName {
+                font-size: $font-size-sm;
+                min-height: 40px;
+            }
+
+            .specialtiesSection .specialtiesContainer {
+                gap: 4px;
+
                 .specialtyTag {
-                    font-size: 11px;
+                    font-size: 0.65rem;
                     padding: 2px 6px;
                 }
             }

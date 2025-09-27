@@ -1,9 +1,9 @@
 import React from 'react';
-import styles from './ClinicCaroulselItem.module.scss';
 import { Link } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
+import styles from './HospitalCard.module.scss';
 
-export interface ClinicCaroulselItemProps {
+export interface HospitalCardProps {
     clinic: {
         id: string;
         name: string;
@@ -15,10 +15,12 @@ export interface ClinicCaroulselItemProps {
         distance?: string;
         priceRange: string;
         availableSlots: number;
+        description?: string;
     };
+    className?: string;
 }
 
-const ClinicCaroulselItem: React.FC<ClinicCaroulselItemProps> = ({
+const HospitalCard: React.FC<HospitalCardProps> = ({
     clinic = {
         id: '1',
         name: 'City Medical Center',
@@ -33,6 +35,7 @@ const ClinicCaroulselItem: React.FC<ClinicCaroulselItemProps> = ({
         description:
             'Leading healthcare facility with state-of-the-art equipment and experienced medical professionals.',
     },
+    className,
 }) => {
     const {
         id,
@@ -69,8 +72,8 @@ const ClinicCaroulselItem: React.FC<ClinicCaroulselItemProps> = ({
     };
 
     return (
-        <Link to={`${PATHS.MEDICAL_FACILITY.ROOT}/${id}`} className={styles.clinicCarouselItem}>
-            <div className={`card h-100 ${styles.clinicCard}`}>
+        <Link to={`${PATHS.HOSPITAL.ROOT}/${id}`} className={styles.clinicCarouselItem}>
+            <div className={`card h-100 ${styles.clinicCard} ${className || ''}`}>
                 {/* Image Section */}
                 <div className={styles.clinicImageContainer}>
                     <img
@@ -142,4 +145,4 @@ const ClinicCaroulselItem: React.FC<ClinicCaroulselItemProps> = ({
     );
 };
 
-export default ClinicCaroulselItem;
+export default HospitalCard;

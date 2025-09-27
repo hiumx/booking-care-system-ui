@@ -27,6 +27,7 @@ import DoctorList from '@/pages/Doctor/DoctorList';
 import ContactUs from '@/pages/ContactUs';
 import Booking from '@/pages/Booking/Booking';
 import ServiceTypes from '@/pages/MedicalService/ServiceTypes/ServiceTypesPage';
+import SmartBooking from '@/pages/SmartBooking';
 
 const routes: RouteObject[] = [
     {
@@ -69,6 +70,10 @@ const routes: RouteObject[] = [
         path: PATHS.CONTACT_US,
         element: <ContactUs />,
     },
+    {
+        path: PATHS.SMART_BOOKING,
+        element: <SmartBooking />,
+    },
 
     // Authentication paths
     {
@@ -104,10 +109,10 @@ const routes: RouteObject[] = [
         children: [{ path: PATHS.USER.PROFILE, element: <UserProfile /> }],
     },
     {
-        path: PATHS.MEDICAL_FACILITY.ROOT,
+        path: PATHS.HOSPITAL.ROOT,
         children: [
             { index: true, element: <MedicalFacility /> },
-            { path: PATHS.MEDICAL_FACILITY.DETAIL, element: <MedicalFacilityProfile /> },
+            { path: PATHS.HOSPITAL.DETAIL, element: <MedicalFacilityProfile /> },
         ],
     },
     {
@@ -120,9 +125,9 @@ const routes: RouteObject[] = [
         element: <ServiceTypes />,
     },
     {
-        path: PATHS.MEDICAL_FACILITY.ROOT,
+        path: PATHS.HOSPITAL.ROOT,
         element: <MedicalFacility />,
-        // children: [{ path: PATHS.MEDICAL_FACILITY.PROFILE, element: <MedicalFacilityProfile /> }],
+        // children: [{ path: PATHS.HOSPITAL.DETAIL, element: <MedicalFacilityProfile /> }],
     },
     {
         path: PATHS.CHAT,
