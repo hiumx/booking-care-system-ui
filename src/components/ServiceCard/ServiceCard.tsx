@@ -43,22 +43,20 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onBookService, class
             </div>
 
             <div className={styles.cardBody}>
-                <div className="d-flex align-items-start justify-content-between mb-4">
-                    <div className="flex-grow-1">
-                        <h5 className="card-title mb-2 text-dark fw-bold fs-5">{service.name}</h5>
-                        <p
-                            className="text-muted small mb-3"
-                            style={{
-                                display: '-webkit-box',
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: 'vertical',
-                                overflow: 'hidden',
-                                lineHeight: '1.4',
-                            }}
-                        >
-                            {service.description}
-                        </p>
-                    </div>
+                <div className="mb-4">
+                    <h5 className="card-title mb-2 text-dark fw-bold fs-5">{service.name}</h5>
+                    <p
+                        className="text-muted small mb-3"
+                        style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            lineHeight: '1.4',
+                        }}
+                    >
+                        {service.description}
+                    </p>
                 </div>
 
                 {/* Service Details */}
@@ -99,7 +97,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onBookService, class
                             return (
                                 <div
                                     key={feature.text}
-                                    className={`d-flex align-items-center px-2 py-1 rounded-pill small ${
+                                    className={`d-flex align-items-center rounded-pill ${styles.featurePill} ${
                                         feature.available
                                             ? 'bg-success bg-opacity-10 text-success'
                                             : 'bg-light text-muted'
