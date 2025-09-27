@@ -27,7 +27,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     // setup speech recognition
     useEffect(() => {
         const SpeechRecognition =
-            (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+            (globalThis as any).SpeechRecognition || (globalThis as any).webkitSpeechRecognition;
         if (SpeechRecognition) {
             const recognition = new SpeechRecognition();
             recognition.continuous = true;

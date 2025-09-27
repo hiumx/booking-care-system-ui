@@ -177,7 +177,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ forceWrap = false }) => {
 
     // Handle date selection
     const handleDateChange = (value: Date | null) => {
-        if (!value || isNaN(value.getTime())) return; // Ignore invalid dates
+        if (!value || Number.isNaN(value.getTime())) return; // Ignore invalid dates
         setSelectedDate(value);
         setShowDatePicker(false);
     };

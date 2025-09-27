@@ -59,7 +59,6 @@ $font-weight-bold: 700;
         flex-direction: column;
 
         &:hover {
-            transform: translateY(-4px);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
             border-color: $primary-color;
 
