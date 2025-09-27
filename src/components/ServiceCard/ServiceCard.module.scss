@@ -6,13 +6,14 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition:
         transform 0.3s ease,
         box-shadow 0.3s ease;
 
     &:hover {
         transform: translateY(-6px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
     }
 }
 
@@ -29,6 +30,13 @@
 }
 
 .categoryBadge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #0d6efd;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.3px;
@@ -36,10 +44,11 @@
     transition:
         background 0.3s ease,
         transform 0.2s ease;
+    z-index: 2;
 
     &:hover {
         transform: scale(1.05);
-        background: #0d6efd !important;
+        background: #0b5ed7 !important;
     }
 }
 
@@ -49,12 +58,14 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    padding: 1.5rem;
 }
 
 .btnOutlinePrimary {
     border-width: 1.5px;
     font-weight: 500;
     transition: all 0.3s ease;
+    flex-shrink: 0;
 
     &:hover {
         background: #0d6efd;
@@ -67,6 +78,7 @@
     background: #212529;
     font-weight: 600;
     transition: all 0.3s ease;
+    min-width: 120px;
 
     &:hover {
         background: #000;
@@ -77,6 +89,8 @@
 .featurePill {
     transition: all 0.3s ease;
     cursor: default;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
 
     &:hover {
         transform: scale(1.05);
@@ -114,6 +128,10 @@
     .cardImg {
         height: 200px;
     }
+
+    .cardBody {
+        padding: 1.25rem;
+    }
 }
 
 @media (max-width: 992px) {
@@ -124,6 +142,13 @@
     .cardBody {
         padding: 1rem;
     }
+
+    .categoryBadge {
+        top: 0.75rem;
+        right: 0.75rem;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.7rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -133,6 +158,10 @@
 
     .cardBody {
         padding: 1.25rem;
+    }
+
+    .btnDark {
+        min-width: 100px;
     }
 }
 
@@ -149,5 +178,16 @@
     .btnDark {
         font-size: 0.75rem;
         padding: 0.5rem 1rem;
+    }
+
+    .btnDark {
+        min-width: 80px;
+    }
+
+    .categoryBadge {
+        top: 0.5rem;
+        right: 0.5rem;
+        padding: 0.3rem 0.5rem;
+        font-size: 0.65rem;
     }
 }
