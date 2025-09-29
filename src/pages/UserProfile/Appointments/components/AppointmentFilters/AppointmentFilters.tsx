@@ -2,8 +2,8 @@ import React, { useRef, useEffect } from 'react';
 import clsx from 'clsx';
 
 import Button from '@/components/Button';
-import { FilterState } from '../AppointmentTypes';
-import styles from '../../PatientAppointments.module.scss';
+import { FilterState } from './AppointmentTypes';
+import styles from './AppointmentFilters.module.scss';
 
 interface AppointmentFiltersProps {
     isOpen: boolean;
@@ -59,6 +59,14 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                 className={clsx(styles.dropdownToggle, 'dropdown-toggle btn')}
                 id="table-filter"
                 onClick={onToggle}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onToggle();
+                    }
+                }}
+                aria-expanded={isOpen}
+                aria-haspopup="true"
             >
                 <i className="isax isax-filter me-2"></i>Lọc theo
             </button>
