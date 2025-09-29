@@ -15,27 +15,29 @@ const createDoctor = (
     phone,
 });
 
-// Helper function to create appointment data
-const createAppointment = (
-    id: string,
-    doctorData: ReturnType<typeof createDoctor>,
-    date: string,
-    time: string,
-    appointmentType: AppointmentType,
-    visitType: string,
-    status: AppointmentStatus,
-    price: string,
-    options: { isNew?: boolean; hasReview?: boolean } = {}
-): AppointmentData => ({
-    appointmentId: id,
-    doctor: doctorData,
-    appointmentDate: date,
-    appointmentTime: time,
-    appointmentType,
-    visitType,
-    status,
-    price,
-    ...options,
+// Helper function to create appointment data with reduced parameters
+interface CreateAppointmentParams {
+    id: string;
+    doctorData: ReturnType<typeof createDoctor>;
+    date: string;
+    time: string;
+    appointmentType: AppointmentType;
+    visitType: string;
+    status: AppointmentStatus;
+    price: string;
+    options?: { isNew?: boolean; hasReview?: boolean };
+}
+
+const createAppointment = (params: CreateAppointmentParams): AppointmentData => ({
+    appointmentId: params.id,
+    doctor: params.doctorData,
+    appointmentDate: params.date,
+    appointmentTime: params.time,
+    appointmentType: params.appointmentType,
+    visitType: params.visitType,
+    status: params.status,
+    price: params.price,
+    ...params.options,
 });
 
 // Predefined doctors to reduce duplication
@@ -50,218 +52,218 @@ const doctors = {
 
 export const mockAppointmentsData: AppointmentData[] = [
     // Upcoming Appointments
-    createAppointment(
-        '#Apt0001',
-        doctors.edalin,
-        '2024-11-11',
-        '10:45 AM',
-        'video_call',
-        'General Visit',
-        'upcoming',
-        '$300'
-    ),
-    createAppointment(
-        '#Apt0002',
-        doctors.shanta,
-        '2024-11-05',
-        '11:50 AM',
-        'audio_call',
-        'General Visit',
-        'upcoming',
-        '$250',
-        { isNew: true }
-    ),
-    createAppointment(
-        '#Apt0003',
-        doctors.john,
-        '2024-10-27',
-        '09:30 AM',
-        'video_call',
-        'General Visit',
-        'upcoming',
-        '$400'
-    ),
-    createAppointment(
-        '#Apt0004',
-        doctors.susan,
-        '2024-10-18',
-        '12:20 PM',
-        'direct_visit',
-        'General Visit',
-        'upcoming',
-        '$350'
-    ),
-    createAppointment(
-        '#Apt0005',
-        doctors.juliet,
-        '2024-10-10',
-        '11:30 AM',
-        'chat',
-        'General Visit',
-        'upcoming',
-        '$200'
-    ),
-    createAppointment(
-        '#Apt0006',
-        doctors.michael,
-        '2024-10-05',
-        '02:30 PM',
-        'video_call',
-        'Consultation',
-        'upcoming',
-        '$280'
-    ),
-    createAppointment(
-        '#Apt0007',
-        doctors.michael,
-        '2024-10-05',
-        '02:30 PM',
-        'video_call',
-        'Consultation',
-        'upcoming',
-        '$280'
-    ),
-    createAppointment(
-        '#Apt0008',
-        doctors.michael,
-        '2024-10-05',
-        '02:30 PM',
-        'video_call',
-        'Consultation',
-        'upcoming',
-        '$280'
-    ),
-    createAppointment(
-        '#Apt0009',
-        doctors.michael,
-        '2024-10-05',
-        '02:30 PM',
-        'video_call',
-        'Consultation',
-        'upcoming',
-        '$280'
-    ),
-    createAppointment(
-        '#Apt0010',
-        doctors.michael,
-        '2024-10-05',
-        '02:30 PM',
-        'video_call',
-        'Consultation',
-        'upcoming',
-        '$280'
-    ),
+    createAppointment({
+        id: '#Apt0001',
+        doctorData: doctors.edalin,
+        date: '2024-11-11',
+        time: '10:45 AM',
+        appointmentType: 'video_call',
+        visitType: 'General Visit',
+        status: 'upcoming',
+        price: '$300',
+    }),
+    createAppointment({
+        id: '#Apt0002',
+        doctorData: doctors.shanta,
+        date: '2024-11-05',
+        time: '11:50 AM',
+        appointmentType: 'audio_call',
+        visitType: 'General Visit',
+        status: 'upcoming',
+        price: '$250',
+        options: { isNew: true },
+    }),
+    createAppointment({
+        id: '#Apt0003',
+        doctorData: doctors.john,
+        date: '2024-10-27',
+        time: '09:30 AM',
+        appointmentType: 'video_call',
+        visitType: 'General Visit',
+        status: 'upcoming',
+        price: '$400',
+    }),
+    createAppointment({
+        id: '#Apt0004',
+        doctorData: doctors.susan,
+        date: '2024-10-18',
+        time: '12:20 PM',
+        appointmentType: 'direct_visit',
+        visitType: 'General Visit',
+        status: 'upcoming',
+        price: '$350',
+    }),
+    createAppointment({
+        id: '#Apt0005',
+        doctorData: doctors.juliet,
+        date: '2024-10-10',
+        time: '11:30 AM',
+        appointmentType: 'chat',
+        visitType: 'General Visit',
+        status: 'upcoming',
+        price: '$200',
+    }),
+    createAppointment({
+        id: '#Apt0006',
+        doctorData: doctors.michael,
+        date: '2024-10-05',
+        time: '02:30 PM',
+        appointmentType: 'video_call',
+        visitType: 'Consultation',
+        status: 'upcoming',
+        price: '$280',
+    }),
+    createAppointment({
+        id: '#Apt0007',
+        doctorData: doctors.michael,
+        date: '2024-10-05',
+        time: '02:30 PM',
+        appointmentType: 'video_call',
+        visitType: 'Consultation',
+        status: 'upcoming',
+        price: '$280',
+    }),
+    createAppointment({
+        id: '#Apt0008',
+        doctorData: doctors.michael,
+        date: '2024-10-05',
+        time: '02:30 PM',
+        appointmentType: 'video_call',
+        visitType: 'Consultation',
+        status: 'upcoming',
+        price: '$280',
+    }),
+    createAppointment({
+        id: '#Apt0009',
+        doctorData: doctors.michael,
+        date: '2024-10-05',
+        time: '02:30 PM',
+        appointmentType: 'video_call',
+        visitType: 'Consultation',
+        status: 'upcoming',
+        price: '$280',
+    }),
+    createAppointment({
+        id: '#Apt0010',
+        doctorData: doctors.michael,
+        date: '2024-10-05',
+        time: '02:30 PM',
+        appointmentType: 'video_call',
+        visitType: 'Consultation',
+        status: 'upcoming',
+        price: '$280',
+    }),
 
     // Cancelled Appointments
-    createAppointment(
-        '#Apt0011',
-        doctors.edalin,
-        '2024-11-11',
-        '10:45 AM',
-        'video_call',
-        'General Visit',
-        'cancelled',
-        '$300'
-    ),
-    createAppointment(
-        '#Apt0012',
-        doctors.shanta,
-        '2024-11-05',
-        '11:50 AM',
-        'audio_call',
-        'General Visit',
-        'cancelled',
-        '$250',
-        { isNew: true }
-    ),
-    createAppointment(
-        '#Apt0013',
-        doctors.john,
-        '2024-10-27',
-        '09:30 AM',
-        'video_call',
-        'General Visit',
-        'cancelled',
-        '$400'
-    ),
-    createAppointment(
-        '#Apt0014',
-        doctors.susan,
-        '2024-10-15',
-        '03:15 PM',
-        'direct_visit',
-        'Follow-up',
-        'cancelled',
-        '$350'
-    ),
+    createAppointment({
+        id: '#Apt0011',
+        doctorData: doctors.edalin,
+        date: '2024-11-11',
+        time: '10:45 AM',
+        appointmentType: 'video_call',
+        visitType: 'General Visit',
+        status: 'cancelled',
+        price: '$300',
+    }),
+    createAppointment({
+        id: '#Apt0012',
+        doctorData: doctors.shanta,
+        date: '2024-11-05',
+        time: '11:50 AM',
+        appointmentType: 'audio_call',
+        visitType: 'General Visit',
+        status: 'cancelled',
+        price: '$250',
+        options: { isNew: true },
+    }),
+    createAppointment({
+        id: '#Apt0013',
+        doctorData: doctors.john,
+        date: '2024-10-27',
+        time: '09:30 AM',
+        appointmentType: 'video_call',
+        visitType: 'General Visit',
+        status: 'cancelled',
+        price: '$400',
+    }),
+    createAppointment({
+        id: '#Apt0014',
+        doctorData: doctors.susan,
+        date: '2024-10-15',
+        time: '03:15 PM',
+        appointmentType: 'direct_visit',
+        visitType: 'Follow-up',
+        status: 'cancelled',
+        price: '$350',
+    }),
 
     // Completed Appointments
-    createAppointment(
-        '#Apt0021',
-        doctors.edalin,
-        '2024-09-15',
-        '10:45 AM',
-        'video_call',
-        'General Visit',
-        'completed',
-        '$300',
-        { hasReview: false }
-    ),
-    createAppointment(
-        '#Apt0022',
-        doctors.shanta,
-        '2024-09-10',
-        '11:50 AM',
-        'audio_call',
-        'General Visit',
-        'completed',
-        '$250',
-        { isNew: true, hasReview: true }
-    ),
-    createAppointment(
-        '#Apt0023',
-        doctors.john,
-        '2024-09-05',
-        '09:30 AM',
-        'video_call',
-        'General Visit',
-        'completed',
-        '$400',
-        { hasReview: true }
-    ),
-    createAppointment(
-        '#Apt0024',
-        doctors.susan,
-        '2024-08-28',
-        '12:20 PM',
-        'direct_visit',
-        'General Visit',
-        'completed',
-        '$350',
-        { hasReview: true }
-    ),
-    createAppointment(
-        '#Apt0025',
-        doctors.juliet,
-        '2024-08-20',
-        '11:30 AM',
-        'chat',
-        'General Visit',
-        'completed',
-        '$200',
-        { hasReview: true }
-    ),
-    createAppointment(
-        '#Apt0026',
-        doctors.michael,
-        '2024-08-15',
-        '02:00 PM',
-        'video_call',
-        'Consultation',
-        'completed',
-        '$280',
-        { hasReview: false }
-    ),
+    createAppointment({
+        id: '#Apt0021',
+        doctorData: doctors.edalin,
+        date: '2024-09-15',
+        time: '10:45 AM',
+        appointmentType: 'video_call',
+        visitType: 'General Visit',
+        status: 'completed',
+        price: '$300',
+        options: { hasReview: false },
+    }),
+    createAppointment({
+        id: '#Apt0022',
+        doctorData: doctors.shanta,
+        date: '2024-09-10',
+        time: '11:50 AM',
+        appointmentType: 'audio_call',
+        visitType: 'General Visit',
+        status: 'completed',
+        price: '$250',
+        options: { isNew: true, hasReview: true },
+    }),
+    createAppointment({
+        id: '#Apt0023',
+        doctorData: doctors.john,
+        date: '2024-09-05',
+        time: '09:30 AM',
+        appointmentType: 'video_call',
+        visitType: 'General Visit',
+        status: 'completed',
+        price: '$400',
+        options: { hasReview: true },
+    }),
+    createAppointment({
+        id: '#Apt0024',
+        doctorData: doctors.susan,
+        date: '2024-08-28',
+        time: '12:20 PM',
+        appointmentType: 'direct_visit',
+        visitType: 'General Visit',
+        status: 'completed',
+        price: '$350',
+        options: { hasReview: true },
+    }),
+    createAppointment({
+        id: '#Apt0025',
+        doctorData: doctors.juliet,
+        date: '2024-08-20',
+        time: '11:30 AM',
+        appointmentType: 'chat',
+        visitType: 'General Visit',
+        status: 'completed',
+        price: '$200',
+        options: { hasReview: true },
+    }),
+    createAppointment({
+        id: '#Apt0026',
+        doctorData: doctors.michael,
+        date: '2024-08-15',
+        time: '02:00 PM',
+        appointmentType: 'video_call',
+        visitType: 'Consultation',
+        status: 'completed',
+        price: '$280',
+        options: { hasReview: false },
+    }),
 ];
 
 export type { AppointmentData } from '../types/appointment.types';

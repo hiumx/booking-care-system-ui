@@ -224,10 +224,10 @@ const Appointments: React.FC = () => {
                 ...filterState,
                 appointmentTypeFilters: {
                     allType: checked,
-                    videoCall: !checked ? false : filterState.appointmentTypeFilters.videoCall,
-                    audioCall: !checked ? false : filterState.appointmentTypeFilters.audioCall,
-                    chat: !checked ? false : filterState.appointmentTypeFilters.chat,
-                    directVisit: !checked ? false : filterState.appointmentTypeFilters.directVisit,
+                    videoCall: checked ? filterState.appointmentTypeFilters.videoCall : false,
+                    audioCall: checked ? filterState.appointmentTypeFilters.audioCall : false,
+                    chat: checked ? filterState.appointmentTypeFilters.chat : false,
+                    directVisit: checked ? filterState.appointmentTypeFilters.directVisit : false,
                 },
             });
         } else {
@@ -249,10 +249,10 @@ const Appointments: React.FC = () => {
                 ...filterState,
                 visitTypeFilters: {
                     allVisit: checked,
-                    general: !checked ? false : filterState.visitTypeFilters.general,
-                    consultation: !checked ? false : filterState.visitTypeFilters.consultation,
-                    followUp: !checked ? false : filterState.visitTypeFilters.followUp,
-                    directVisit: !checked ? false : filterState.visitTypeFilters.directVisit,
+                    general: checked ? filterState.visitTypeFilters.general : false,
+                    consultation: checked ? filterState.visitTypeFilters.consultation : false,
+                    followUp: checked ? filterState.visitTypeFilters.followUp : false,
+                    directVisit: checked ? filterState.visitTypeFilters.directVisit : false,
                 },
             });
         } else {
@@ -343,7 +343,7 @@ const Appointments: React.FC = () => {
                 <>
                     {/* Skeleton Loading */}
                     {Array.from({ length: itemsPerPage }).map((_, index) => (
-                        <AppointmentCardSkeleton key={`skeleton-${index}`} />
+                        <AppointmentCardSkeleton key={`skeleton-${Date.now()}-${index}`} />
                     ))}
                 </>
             );
@@ -442,8 +442,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('upcoming')}
                             >
-                                Sắp Tới
-                                <span>{appointmentCounts.upcoming}</span>
+                                Sắp Tới <span>{appointmentCounts.upcoming}</span>
                             </button>
                         </li>
                         <li className="nav-item" role="presentation">
@@ -452,8 +451,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('cancelled')}
                             >
-                                Đã Hủy
-                                <span>{appointmentCounts.cancelled}</span>
+                                Đã Hủy <span>{appointmentCounts.cancelled}</span>
                             </button>
                         </li>
                         <li className="nav-item" role="presentation">
@@ -462,8 +460,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('completed')}
                             >
-                                Hoàn Thành
-                                <span>{appointmentCounts.completed}</span>
+                                Hoàn Thành <span>{appointmentCounts.completed}</span>
                             </button>
                         </li>
                     </ul>
@@ -537,7 +534,13 @@ const Appointments: React.FC = () => {
                                                                 id="rating5"
                                                             />
                                                             <label htmlFor="rating5">
-                                                                <i className="fa-solid fa-star"></i>
+                                                                <i
+                                                                    className="fa-solid fa-star"
+                                                                    aria-hidden="true"
+                                                                ></i>
+                                                                <span className="visually-hidden">
+                                                                    5 sao
+                                                                </span>
                                                             </label>
                                                             <input
                                                                 type="radio"
@@ -546,7 +549,13 @@ const Appointments: React.FC = () => {
                                                                 id="rating4"
                                                             />
                                                             <label htmlFor="rating4">
-                                                                <i className="fa-solid fa-star"></i>
+                                                                <i
+                                                                    className="fa-solid fa-star"
+                                                                    aria-hidden="true"
+                                                                ></i>
+                                                                <span className="visually-hidden">
+                                                                    4 sao
+                                                                </span>
                                                             </label>
                                                             <input
                                                                 type="radio"
@@ -555,7 +564,13 @@ const Appointments: React.FC = () => {
                                                                 id="rating3"
                                                             />
                                                             <label htmlFor="rating3">
-                                                                <i className="fa-solid fa-star"></i>
+                                                                <i
+                                                                    className="fa-solid fa-star"
+                                                                    aria-hidden="true"
+                                                                ></i>
+                                                                <span className="visually-hidden">
+                                                                    3 sao
+                                                                </span>
                                                             </label>
                                                             <input
                                                                 type="radio"
@@ -565,7 +580,13 @@ const Appointments: React.FC = () => {
                                                                 defaultChecked
                                                             />
                                                             <label htmlFor="rating2">
-                                                                <i className="fa-solid fa-star"></i>
+                                                                <i
+                                                                    className="fa-solid fa-star"
+                                                                    aria-hidden="true"
+                                                                ></i>
+                                                                <span className="visually-hidden">
+                                                                    2 sao
+                                                                </span>
                                                             </label>
                                                             <input
                                                                 type="radio"
@@ -575,7 +596,13 @@ const Appointments: React.FC = () => {
                                                                 defaultChecked
                                                             />
                                                             <label htmlFor="rating1">
-                                                                <i className="fa-solid fa-star"></i>
+                                                                <i
+                                                                    className="fa-solid fa-star"
+                                                                    aria-hidden="true"
+                                                                ></i>
+                                                                <span className="visually-hidden">
+                                                                    1 sao
+                                                                </span>
                                                             </label>
                                                         </div>
                                                     </div>
@@ -654,7 +681,7 @@ const Appointments: React.FC = () => {
                                                 <span className="user-avatar me-2">
                                                     <img
                                                         src="/src/assets/img/doctors/doctor-thumb-01.jpg"
-                                                        alt="Doctor"
+                                                        alt="Dr Edalin"
                                                     />
                                                 </span>
                                                 <h6 className="fs-16 fw-medium">Dr Edalin</h6>
@@ -674,7 +701,7 @@ const Appointments: React.FC = () => {
                                                 <span className="user-avatar me-2">
                                                     <img
                                                         src="/src/assets/img/doctors-dashboard/profile-06.jpg"
-                                                        alt="Patient"
+                                                        alt="Hendrita"
                                                     />
                                                 </span>
                                                 <h6 className="fs-16 fw-medium">Hendrita</h6>
@@ -690,7 +717,6 @@ const Appointments: React.FC = () => {
                                             <div
                                                 className="d-flex align-items-center rating-list"
                                                 id="review-rating"
-                                                role="img"
                                                 aria-label="4 out of 5 stars"
                                             >
                                                 <i className="fa-solid fa-star selected"></i>
