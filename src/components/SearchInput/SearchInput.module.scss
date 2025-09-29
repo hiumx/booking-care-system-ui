@@ -27,6 +27,27 @@
     white-space: nowrap;
 }
 
+/* Styled support button to match primary button size and aesthetics */
+.supportBtn {
+    height: 48px;
+    padding: 0 20px;
+    border-radius: 999px;
+    border: 1px solid #0d6efd;
+    color: #0d6efd;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.15);
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+
+    &:hover {
+        background: #0d6efd;
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(13, 110, 253, 0.25);
+    }
+}
+
 .symptomInput {
     min-width: 100%;
 }
@@ -43,7 +64,7 @@
 .searchBoxOne {
     min-width: 300px !important;
     margin: 0;
-    padding: 20px;
+    padding: 8px 10px 0; /* tighter top padding, no bottom */
     display: block; /* avoid table layout clipping rounded border */
     width: 100%;
     box-sizing: border-box;
@@ -56,19 +77,19 @@
 
     @media (max-width: 1399.96px) {
         margin: 0;
-        padding: 20px;
+        padding: 12px 16px 0;
     }
 
     @media (max-width: 991.98px) {
         min-width: 100%;
         width: 100%;
         margin: 0;
-        padding: 13px 15px;
+        padding: 10px 15px 0;
     }
 
     @media (max-width: 767.98px) {
         margin: 0;
-        padding: 0px 15px 15px;
+        padding: 0 15px 0;
         border-radius: 10px !important;
     }
 
@@ -114,9 +135,17 @@
         margin-right: 10px;
     }
 
-    & .formSearchBtn {
+    & .form-search-btn {
         min-width: 120px;
         margin-right: 0;
+    }
+
+    /* Prevent date field from expanding and pushing buttons to next line */
+    & .search-calendar-line {
+        flex: 0 0 auto;
+    }
+    & .search-calendar-line .form-control {
+        width: auto !important;
     }
 
     /* 🔹 Fix cho tablet & small desktop (768px–1199.98px) */
@@ -130,7 +159,7 @@
             margin-right: 0;
         }
 
-        & .formSearchBtn {
+        & .form-search-btn {
             flex: 1 1 100%;
             display: flex;
             justify-content: flex-end;
@@ -154,7 +183,15 @@
             margin-bottom: 10px;
         }
 
-        & .formSearchBtn {
+        /* On mobile the date input should be full width */
+        & .search-calendar-line {
+            flex: 1 1 100%;
+        }
+        & .search-calendar-line .form-control {
+            width: 100% !important;
+        }
+
+        & .form-search-btn {
             flex: 1 1 100%;
             margin-bottom: 0;
             padding-right: 0;
@@ -187,13 +224,39 @@
             width: 100% !important;
         }
 
-        .formSearchBtn {
+        .form-search-btn {
             width: 100%;
             margin-bottom: 0;
 
             button {
                 justify-content: center;
                 width: 100%;
+            }
+        }
+    }
+}
+
+/* Force wrap layout regardless of viewport (used by Banner) */
+.forceWrap {
+    .secondRow {
+        flex-wrap: wrap;
+        gap: 12px;
+
+        .inputItem {
+            flex: 1 1 calc(50% - 12px);
+            min-width: 260px;
+            margin-right: 0;
+        }
+
+        .form-search-btn {
+            flex: 1 1 100%;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 6px;
+            padding-right: 8px;
+
+            button {
+                width: auto;
             }
         }
     }

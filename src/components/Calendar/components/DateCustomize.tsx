@@ -63,7 +63,6 @@ const DateCustomize: React.FC<DateCalendarProps> = ({
         '& .MuiPickersDay-root': {
             fontFamily: "'Inter', sans-serif",
             fontSize: '14px',
-            color: '#333',
             borderRadius: '4px',
             '&:hover': {
                 background: '#e9ecef',
