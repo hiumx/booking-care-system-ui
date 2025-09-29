@@ -342,8 +342,8 @@ const Appointments: React.FC = () => {
             return (
                 <>
                     {/* Skeleton Loading */}
-                    {Array.from({ length: itemsPerPage }).map((_, index) => (
-                        <AppointmentCardSkeleton key={`skeleton-${Date.now()}-${index}`} />
+                    {Array.from({ length: itemsPerPage }, (_, index) => (
+                        <AppointmentCardSkeleton key={`skeleton-loading-${index}`} />
                     ))}
                 </>
             );
@@ -435,8 +435,8 @@ const Appointments: React.FC = () => {
             {/* Appointment Tabs and Filter */}
             <div className="appointment-tab-head">
                 <div className="appointment-tabs">
-                    <ul className="nav nav-pills inner-tab" id="pills-tab" role="tablist">
-                        <li className="nav-item" role="presentation">
+                    <ul className="nav nav-pills inner-tab" id="pills-tab">
+                        <li className="nav-item">
                             <button
                                 className={`nav-link ${activeTab === 'upcoming' ? 'active' : ''}`}
                                 type="button"
@@ -445,7 +445,7 @@ const Appointments: React.FC = () => {
                                 Sắp Tới <span>{appointmentCounts.upcoming}</span>
                             </button>
                         </li>
-                        <li className="nav-item" role="presentation">
+                        <li className="nav-item">
                             <button
                                 className={`nav-link ${activeTab === 'cancelled' ? 'active' : ''}`}
                                 type="button"
@@ -454,7 +454,7 @@ const Appointments: React.FC = () => {
                                 Đã Hủy <span>{appointmentCounts.cancelled}</span>
                             </button>
                         </li>
-                        <li className="nav-item" role="presentation">
+                        <li className="nav-item">
                             <button
                                 className={`nav-link ${activeTab === 'completed' ? 'active' : ''}`}
                                 type="button"
