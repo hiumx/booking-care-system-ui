@@ -1,0 +1,120 @@
+.formSorts {
+    margin-bottom: 0px !important;
+    .dropdownToggle {
+        border: none;
+        color: #5d728d;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        line-height: 1.5;
+        justify-content: space-between;
+
+        font-size: 14px;
+        font-weight: 400;
+    }
+}
+
+// Filter dropdown styling
+.filterDropdownMenu {
+    .filterSetContent {
+        &:last-child {
+            border-bottom: none;
+        }
+
+        .filterSetContentHead {
+            button {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                text-align: left;
+                background: none;
+                border: none;
+                padding: 0.5rem;
+                font-weight: 500;
+                color: #333;
+                text-decoration: none;
+
+                &:hover {
+                    background-color: rgba(0, 0, 0, 0.05);
+                    text-decoration: none;
+                }
+
+                i {
+                    float: right;
+                    transition: transform 0.3s ease;
+                }
+
+                &[aria-expanded='true'] i {
+                    transform: rotate(90deg);
+                }
+            }
+        }
+
+        .filterSetContents {
+            ul {
+                list-style: none;
+                padding: 0;
+                margin-bottom: 1rem;
+
+                li {
+                    margin-bottom: 0.5rem;
+
+                    .filterChecks {
+                        .checkBoxs {
+                            display: flex;
+                            align-items: center;
+                            cursor: pointer;
+                            margin: 0;
+
+                            input[type='checkbox'] {
+                                margin-right: 0.5rem;
+                            }
+
+                            .checkTitle {
+                                color: #555;
+                                font-size: 0.9rem;
+                            }
+                        }
+                    }
+
+                    .dashSearchInput {
+                        margin-bottom: 0;
+
+                        .formControl {
+                            border-radius: 4px;
+                            border: 1px solid #ddd;
+                            font-size: 14px;
+                            &:focus {
+                                border-color: var(--primary-color);
+                                box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .filterResetBtn {
+        button {
+            flex: 1;
+            display: inline-flex;
+            justify-content: center;
+        }
+        .btnLight {
+            color: #465d7c !important;
+            background-image: none;
+            background-color: #e6e8ee;
+            border: 1px solid #e6e8ee;
+            &:hover {
+                background: #d3d4d5 !important;
+                border-color: #c6c7c8 !important;
+            }
+            &:before {
+                background: #d3d4d5 !important;
+                border-color: #c6c7c8 !important;
+            }
+        }
+    }
+}
