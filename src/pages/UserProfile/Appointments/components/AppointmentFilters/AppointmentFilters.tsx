@@ -54,13 +54,22 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                 'table-filter-show': isOpen,
             })}
         >
-            <a
+            <button
+                type="button"
                 className={clsx(styles.dropdownToggle, 'dropdown-toggle btn')}
                 id="table-filter"
                 onClick={onToggle}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onToggle();
+                    }
+                }}
+                aria-expanded={isOpen}
+                aria-haspopup="true"
             >
                 <i className="isax isax-filter me-2"></i>Lọc theo
-            </a>
+            </button>
             <div className={clsx(styles.filterDropdownMenu, 'filter-dropdown-menu')}>
                 <div className="filter-set-view">
                     <div className="accordion" id="accordionExample">

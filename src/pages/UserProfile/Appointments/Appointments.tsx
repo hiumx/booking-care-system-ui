@@ -44,14 +44,17 @@ const Appointments: React.FC = () => {
         },
     });
 
-    // Date range picker state
-    const [dateRanges, setDateRanges] = useState([
+    // Helper function to create default date range
+    const createDefaultDateRange = () => [
         {
             startDate: new Date(),
             endDate: new Date(),
             key: 'selection',
         },
-    ]);
+    ];
+
+    // Date range picker state
+    const [dateRanges, setDateRanges] = useState(createDefaultDateRange);
 
     // Responsive months for date picker
     const [calendarMonths, setCalendarMonths] = useState(2);
@@ -185,13 +188,7 @@ const Appointments: React.FC = () => {
             visitType: [],
             dateRange: { from: '', to: '' },
         });
-        setDateRanges([
-            {
-                startDate: new Date(),
-                endDate: new Date(),
-                key: 'selection',
-            },
-        ]);
+        setDateRanges(createDefaultDateRange());
         setFilterState({
             filterSearchTerm: '',
             appointmentTypeFilters: {
@@ -644,38 +641,58 @@ const Appointments: React.FC = () => {
                                 <div className="mb-3">
                                     <div className="d-flex justify-content-between flex-wrap gap-3">
                                         <div>
-                                            <label className="form-label text-gray-6">
+                                            <label
+                                                className="form-label text-gray-6"
+                                                htmlFor="review-for"
+                                            >
                                                 Đánh giá cho
                                             </label>
-                                            <div className="d-flex align-items-center">
+                                            <div
+                                                className="d-flex align-items-center"
+                                                id="review-for"
+                                            >
                                                 <span className="user-avatar me-2">
                                                     <img
                                                         src="/src/assets/img/doctors/doctor-thumb-01.jpg"
-                                                        alt="img"
+                                                        alt="Doctor"
                                                     />
                                                 </span>
                                                 <h6 className="fs-16 fw-medium">Dr Edalin</h6>
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="form-label text-gray-6">
+                                            <label
+                                                className="form-label text-gray-6"
+                                                htmlFor="review-by"
+                                            >
                                                 Đánh giá bởi
                                             </label>
-                                            <div className="d-flex align-items-center">
+                                            <div
+                                                className="d-flex align-items-center"
+                                                id="review-by"
+                                            >
                                                 <span className="user-avatar me-2">
                                                     <img
                                                         src="/src/assets/img/doctors-dashboard/profile-06.jpg"
-                                                        alt="img"
+                                                        alt="Patient"
                                                     />
                                                 </span>
                                                 <h6 className="fs-16 fw-medium">Hendrita</h6>
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="form-label text-gray-6">
+                                            <label
+                                                className="form-label text-gray-6"
+                                                htmlFor="review-rating"
+                                            >
                                                 Đánh giá
                                             </label>
-                                            <div className="d-flex align-items-center rating-list">
+                                            <div
+                                                className="d-flex align-items-center rating-list"
+                                                id="review-rating"
+                                                role="img"
+                                                aria-label="4 out of 5 stars"
+                                            >
                                                 <i className="fa-solid fa-star selected"></i>
                                                 <i className="fa-solid fa-star selected"></i>
                                                 <i className="fa-solid fa-star selected"></i>
@@ -687,8 +704,13 @@ const Appointments: React.FC = () => {
                                 </div>
                                 <div className="mb-0">
                                     <div className="review-wrap">
-                                        <label className="form-label text-gray-6">Nhận xét</label>
-                                        <p className="mb-0">
+                                        <label
+                                            className="form-label text-gray-6"
+                                            htmlFor="review-comment"
+                                        >
+                                            Nhận xét
+                                        </label>
+                                        <p className="mb-0" id="review-comment">
                                             Bác sĩ Edalin đã chăm sóc rất tốt và dành thời gian lắng
                                             nghe những lo lắng của tôi. Tôi cảm thấy khỏe hơn bao
                                             giờ hết và rất khuyến khích mọi người đến gặp bác sĩ!
