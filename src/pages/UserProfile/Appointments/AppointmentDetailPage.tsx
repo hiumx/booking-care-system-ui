@@ -27,7 +27,7 @@ const AppointmentDetailPage: React.FC = () => {
     };
 
     const handleCancel = () => {
-        if (window.confirm('Bạn có chắc chắn muốn hủy cuộc hẹn này?')) {
+        if (globalThis.confirm('Bạn có chắc chắn muốn hủy cuộc hẹn này?')) {
             alert('Cuộc hẹn đã được hủy');
             // In real app: call API to cancel appointment
             navigate('/user-profile?tab=appointments');
@@ -91,10 +91,7 @@ const AppointmentDetailPage: React.FC = () => {
                         <li>
                             <div className="patinet-information">
                                 <Link to="#">
-                                    <img
-                                        src="/src/assets/img/doctors/doctor-15.jpg"
-                                        alt="User Image"
-                                    />
+                                    <img src="/src/assets/img/doctors/doctor-15.jpg" alt="Doctor" />
                                 </Link>
                                 <div className="patient-info">
                                     <p>#Apt0002</p>
@@ -141,16 +138,16 @@ const AppointmentDetailPage: React.FC = () => {
                     <ul>
                         <li>
                             <div className="patinet-information">
-                                <a href="#">
+                                <Link to="#">
                                     <img
                                         src="/src/assets/img/doctors/doctor-thumb-02.jpg"
-                                        alt="User Image"
+                                        alt="Doctor"
                                     />
-                                </a>
+                                </Link>
                                 <div className="patient-info">
                                     <p>#Apt0003</p>
                                     <h6>
-                                        <a href="#">Dr.John Ewel</a>
+                                        <Link to="#">Dr.John Ewel</Link>
                                     </h6>
                                 </div>
                             </div>

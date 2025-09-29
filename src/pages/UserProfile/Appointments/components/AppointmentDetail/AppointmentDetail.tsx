@@ -156,7 +156,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     <li>
                         <div className="patinet-information">
                             <Link to="#">
-                                <img src={appointment.doctor.image} alt="Doctor Image" />
+                                <img src={appointment.doctor.image} alt="Doctor" />
                             </Link>
                             <div className="patient-info">
                                 <p>#{appointment.appointmentId}</p>
@@ -203,13 +203,13 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                         <div className="detail-badge-info">
                             <span className={config.badge.className}>{config.badge.text}</span>
                             {config.showReasonLink && (
-                                <a
-                                    href="#reject_reason"
+                                <Link
+                                    to="#reject_reason"
                                     className="reject-popup"
                                     data-bs-toggle="modal"
                                 >
                                     Lý do
-                                </a>
+                                </Link>
                             )}
                         </div>
                         <div className="consult-fees">

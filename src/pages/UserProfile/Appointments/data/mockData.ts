@@ -257,4 +257,4 @@ export const mockAppointmentsData: AppointmentData[] = [
     },
 ];
 
-export type { AppointmentData };
+export type { AppointmentData } from '../types/appointment.types';

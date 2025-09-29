@@ -56,8 +56,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }
                         </li>
                         <li className="appointment-detail-btn">
                             <Link to="#" className="btn btn-md btn-primary-gradient">
-                                <i className="isax isax-calendar-tick5 me-1"></i>
-                                Tham Gia
+                                <i className="isax isax-calendar-tick5 me-1"></i> Tham Gia
                             </Link>
                         </li>
                     </>
@@ -69,8 +68,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }
                         <Link
                             to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                         >
-                            <i className="isax isax-calendar-tick5 me-1"></i>
-                            Đặt Lại
+                            <i className="isax isax-calendar-tick5 me-1"></i> Đặt Lại
                         </Link>
                     </li>
                 );
@@ -80,37 +78,35 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }
                     <>
                         <li>
                             {appointment.hasReview ? (
-                                <a
-                                    href="#"
+                                <Link
+                                    to="#"
                                     className="text-decoration-underline"
                                     data-bs-toggle="modal"
                                     data-bs-target="#view_review"
                                 >
                                     Xem Đánh Giá
-                                </a>
+                                </Link>
                             ) : (
-                                <a
-                                    href="#"
+                                <Link
+                                    to="#"
                                     className="text-decoration-underline"
                                     data-bs-toggle="modal"
                                     data-bs-target="#add_review"
                                 >
                                     Thêm Đánh Giá
-                                </a>
+                                </Link>
                             )}
                         </li>
                         <li className="appointment-detail-btn d-flex align-items-center gap-3 flex-wrap">
                             <Link to="#" className="btn btn-md btn-dark">
-                                Đặt Lại
-                                <i className="isax isax-arrow-right-3 ms-1"></i>
+                                Đặt Lại <i className="isax isax-arrow-right-3 ms-1"></i>
                             </Link>
                             <Link
                                 to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                                 title="Xem chi tiết"
                                 className="btn btn-md btn-primary-gradient"
                             >
-                                Xem Chi Tiết
-                                <i className="isax isax-arrow-right-3 ms-1"></i>
+                                Xem Chi Tiết <i className="isax isax-arrow-right-3 ms-1"></i>
                             </Link>
                         </li>
                     </>
@@ -164,15 +160,15 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }
                         <ul>
                             <li>
                                 <i className="isax isax-sms5"></i>
-                                <a href={`mailto:${appointment.doctor.email}`}>
+                                <Link to={`mailto:${appointment.doctor.email}`}>
                                     {appointment.doctor.email}
-                                </a>
+                                </Link>
                             </li>
                             <li>
                                 <i className="isax isax-call5"></i>
-                                <a href={`tel:${appointment.doctor.phone}`}>
+                                <Link to={`tel:${appointment.doctor.phone}`}>
                                     {appointment.doctor.phone}
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </li>

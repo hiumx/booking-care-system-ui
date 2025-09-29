@@ -10,6 +10,7 @@ import { mockAppointmentsData } from './data/mockData';
 import { AppointmentStatus, AppointmentType } from './types/appointment.types';
 import { FilterState } from './components/AppointmentFilters/AppointmentTypes';
 import styles from './Appointments.module.scss';
+import { Link } from 'react-router-dom';
 
 const Appointments: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -152,9 +153,9 @@ const Appointments: React.FC = () => {
     // Get appointment counts for tabs
     const appointmentCounts = useMemo(() => {
         const counts = { upcoming: 0, cancelled: 0, completed: 0 };
-        mockAppointmentsData.forEach((appointment) => {
+        for (const appointment of mockAppointmentsData) {
             counts[appointment.status]++;
-        });
+        }
         return counts;
     }, []);
 
@@ -278,26 +279,7 @@ const Appointments: React.FC = () => {
     const handleFilterApply = () => {
         setIsLoading(true);
 
-        // Convert FilterState to selectedFilters format
-        const appointmentTypes: AppointmentType[] = [];
-        const visitTypes: string[] = [];
-
-        // Convert appointment type filters
-        if (!filterState.appointmentTypeFilters.allType) {
-            if (filterState.appointmentTypeFilters.videoCall) appointmentTypes.push('video_call');
-            if (filterState.appointmentTypeFilters.audioCall) appointmentTypes.push('audio_call');
-            if (filterState.appointmentTypeFilters.chat) appointmentTypes.push('chat');
-            if (filterState.appointmentTypeFilters.directVisit)
-                appointmentTypes.push('direct_visit');
-        }
-
-        // Convert visit type filters
-        if (!filterState.visitTypeFilters.allVisit) {
-            if (filterState.visitTypeFilters.general) visitTypes.push('General Visit');
-            if (filterState.visitTypeFilters.consultation) visitTypes.push('Consultation');
-            if (filterState.visitTypeFilters.followUp) visitTypes.push('Follow-up');
-            if (filterState.visitTypeFilters.directVisit) visitTypes.push('Direct Visit');
-        }
+        const { appointmentTypes, visitTypes } = convertFilterStateToSelectedFilters();
 
         // Simulate loading delay
         setTimeout(() => {
@@ -313,6 +295,121 @@ const Appointments: React.FC = () => {
             setIsFilterOpen(false);
             setIsLoading(false);
         }, 600);
+    };
+
+    // Extract complex logic to separate function to reduce cognitive complexity
+    const convertFilterStateToSelectedFilters = () => {
+        const appointmentTypes: AppointmentType[] = [];
+        const visitTypes: string[] = [];
+
+        // Convert appointment type filters - use positive conditions
+        const appointmentTypeFilters = filterState.appointmentTypeFilters;
+        if (appointmentTypeFilters.allType === false) {
+            const appointmentTypeMap = {
+                videoCall: 'video_call' as AppointmentType,
+                audioCall: 'audio_call' as AppointmentType,
+                chat: 'chat' as AppointmentType,
+                directVisit: 'direct_visit' as AppointmentType,
+            };
+
+            for (const [key, value] of Object.entries(appointmentTypeMap)) {
+                if (appointmentTypeFilters[key as keyof typeof appointmentTypeFilters]) {
+                    appointmentTypes.push(value);
+                }
+            }
+        }
+
+        // Convert visit type filters - use positive conditions
+        const visitTypeFilters = filterState.visitTypeFilters;
+        if (visitTypeFilters.allVisit === false) {
+            const visitTypeMap = {
+                general: 'General Visit',
+                consultation: 'Consultation',
+                followUp: 'Follow-up',
+                directVisit: 'Direct Visit',
+            };
+
+            for (const [key, value] of Object.entries(visitTypeMap)) {
+                if (visitTypeFilters[key as keyof typeof visitTypeFilters]) {
+                    visitTypes.push(value);
+                }
+            }
+        }
+
+        return { appointmentTypes, visitTypes };
+    };
+
+    // Extract nested ternary to separate function
+    const renderAppointmentContent = () => {
+        if (isLoading) {
+            return (
+                <>
+                    {/* Skeleton Loading */}
+                    {Array.from({ length: itemsPerPage }).map((_, index) => (
+                        <AppointmentCardSkeleton key={`skeleton-${index}`} />
+                    ))}
+                </>
+            );
+        }
+
+        if (currentAppointments.length > 0) {
+            return (
+                <>
+                    {/* Appointment List */}
+                    {currentAppointments.map((appointment) => (
+                        <AppointmentCard
+                            key={appointment.appointmentId}
+                            appointment={appointment}
+                            status={activeTab}
+                        />
+                    ))}
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                            showPrevNext={true}
+                            maxVisiblePages={5}
+                        />
+                    )}
+                </>
+            );
+        }
+
+        return renderEmptyState();
+    };
+
+    // Extract empty state to separate function
+    const renderEmptyState = () => {
+        const hasActiveFilters =
+            searchTerm ||
+            selectedFilters.appointmentType.length > 0 ||
+            selectedFilters.visitType.length > 0;
+
+        return (
+            <div className="text-center py-5">
+                <div className="mb-4" style={{ fontSize: '4rem', color: 'var(--bs-gray-400)' }}>
+                    <i className="isax isax-calendar-search"></i>
+                </div>
+                <h4 className="text-muted">Không có lịch hẹn nào</h4>
+                <p className="text-muted mb-4">
+                    {hasActiveFilters
+                        ? 'Không tìm thấy lịch hẹn nào phù hợp với bộ lọc của bạn.'
+                        : 'Bạn chưa có lịch hẹn nào trong danh mục này.'}
+                </p>
+                {hasActiveFilters && (
+                    <button
+                        type="button"
+                        className="btn btn-primary-gradient rounded-pill"
+                        onClick={resetFilters}
+                    >
+                        Xóa Bộ Lọc
+                    </button>
+                )}
+            </div>
+        );
     };
 
     return (
@@ -403,71 +500,12 @@ const Appointments: React.FC = () => {
 
             {/* Appointment Content */}
             <div className="tab-content appointment-tab-content">
-                <div className="tab-pane fade show active">
-                    {isLoading ? (
-                        <>
-                            {/* Skeleton Loading */}
-                            {Array.from({ length: itemsPerPage }).map((_, index) => (
-                                <AppointmentCardSkeleton key={index} />
-                            ))}
-                        </>
-                    ) : currentAppointments.length > 0 ? (
-                        <>
-                            {/* Appointment List */}
-                            {currentAppointments.map((appointment) => (
-                                <AppointmentCard
-                                    key={appointment.appointmentId}
-                                    appointment={appointment}
-                                    status={activeTab}
-                                />
-                            ))}
-
-                            {/* Pagination */}
-                            {totalPages > 1 && (
-                                <Pagination
-                                    currentPage={currentPage}
-                                    totalPages={totalPages}
-                                    onPageChange={handlePageChange}
-                                    showPrevNext={true}
-                                    maxVisiblePages={5}
-                                />
-                            )}
-                        </>
-                    ) : (
-                        <div className="text-center py-5">
-                            <div
-                                className="mb-4"
-                                style={{ fontSize: '4rem', color: 'var(--bs-gray-400)' }}
-                            >
-                                <i className="isax isax-calendar-search"></i>
-                            </div>
-                            <h4 className="text-muted">Không có lịch hẹn nào</h4>
-                            <p className="text-muted mb-4">
-                                {searchTerm ||
-                                selectedFilters.appointmentType.length > 0 ||
-                                selectedFilters.visitType.length > 0
-                                    ? 'Không tìm thấy lịch hẹn nào phù hợp với bộ lọc của bạn.'
-                                    : 'Bạn chưa có lịch hẹn nào trong danh mục này.'}
-                            </p>
-                            {(searchTerm ||
-                                selectedFilters.appointmentType.length > 0 ||
-                                selectedFilters.visitType.length > 0) && (
-                                <button
-                                    type="button"
-                                    className="btn btn-primary-gradient rounded-pill"
-                                    onClick={resetFilters}
-                                >
-                                    Xóa Bộ Lọc
-                                </button>
-                            )}
-                        </div>
-                    )}
-                </div>
+                <div className="tab-pane fade show active">{renderAppointmentContent()}</div>
             </div>
 
             {/* Add Review Modal */}
             <div className="modal fade custom-modals" id="add_review">
-                <div className="modal-dialog modal-dialog-centered" role="document">
+                <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
                             <h3 className="modal-title">Thêm đánh giá</h3>
@@ -486,7 +524,10 @@ const Appointments: React.FC = () => {
                                     <div className="row">
                                         <div className="col-md-12">
                                             <div className="mb-3">
-                                                <label className="form-label">
+                                                <label
+                                                    className="form-label"
+                                                    htmlFor="rating-group"
+                                                >
                                                     Đánh giá <span className="text-danger">*</span>
                                                 </label>
                                                 <div className="selection-wrap">
@@ -544,10 +585,14 @@ const Appointments: React.FC = () => {
                                                 </div>
                                             </div>
                                             <div className="mb-3">
-                                                <label className="form-label">
+                                                <label
+                                                    className="form-label"
+                                                    htmlFor="comment-textarea"
+                                                >
                                                     Nhận xét <span className="text-danger">*</span>
                                                 </label>
                                                 <textarea
+                                                    id="comment-textarea"
                                                     className="form-control"
                                                     rows={3}
                                                 ></textarea>
@@ -558,14 +603,14 @@ const Appointments: React.FC = () => {
                             </div>
                             <div className="modal-footer">
                                 <div className="modal-btn text-end">
-                                    <a
-                                        href="#"
+                                    <Link
+                                        to="#"
                                         className="btn btn-md btn-dark rounded-pill"
                                         data-bs-toggle="modal"
                                         data-bs-dismiss="modal"
                                     >
                                         Hủy
-                                    </a>
+                                    </Link>
                                     <button
                                         type="submit"
                                         className="btn btn-md btn-primary-gradient rounded-pill"
@@ -581,7 +626,7 @@ const Appointments: React.FC = () => {
 
             {/* View Review Modal */}
             <div className="modal fade custom-modals" id="view_review">
-                <div className="modal-dialog modal-dialog-centered" role="document">
+                <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
                             <h3 className="modal-title">Chi tiết đánh giá</h3>
