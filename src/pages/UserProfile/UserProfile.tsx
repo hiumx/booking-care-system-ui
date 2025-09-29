@@ -3,7 +3,8 @@ import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import Favourite from './Favourite';
 import ProfileSidebar from './ProfileSidebar';
-import PatientAppointments from './PatientAppointments';
+import Appointments from './Appointments';
+import AppointmentDetailPage from './Appointments/AppointmentDetailPage';
 import SettingsContainer from './Setting/SettingsContainer/SettingsContainer';
 import Invoices from './Invoices';
 
@@ -34,6 +35,7 @@ const UserProfile = () => {
         const validTabs = [
             'dashboard',
             'appointments',
+            'appointment-detail',
             'favourites',
             'dependent',
             'medical-records',
@@ -45,6 +47,13 @@ const UserProfile = () => {
         ];
 
         return validTabs.includes(tab) ? tab : 'favourites'; // Default to favourites
+    };
+
+    // Get active sidebar tab (appointment-detail should show appointments as active)
+    const getActiveSidebarTab = () => {
+        const activeTab = getActiveTab();
+        // If viewing appointment detail, keep appointments active in sidebar
+        return activeTab === 'appointment-detail' ? 'appointments' : activeTab;
     };
 
     // Get breadcrumb items and title based on active tab
@@ -116,7 +125,9 @@ const UserProfile = () => {
 
         switch (activeTab) {
             case 'appointments':
-                return <PatientAppointments />;
+                return <Appointments />;
+            case 'appointment-detail':
+                return <AppointmentDetailPage />;
             case 'favourites':
                 return <Favourite />;
             case 'settings':
@@ -138,7 +149,10 @@ const UserProfile = () => {
                     <div className="row">
                         {/* Profile Sidebar */}
                         <div className="col-lg-4 col-xl-3 theiaStickySidebar">
-                            <ProfileSidebar userData={mockUserData} activeTab={getActiveTab()} />
+                            <ProfileSidebar
+                                userData={mockUserData}
+                                activeTab={getActiveSidebarTab()}
+                            />
                         </div>
 
                         {/* Main Content */}
