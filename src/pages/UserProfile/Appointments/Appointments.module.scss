@@ -1,0 +1,102 @@
+// Appointments styling
+
+// Date Range Picker styling
+.dateRangePickerWrapper {
+    .appointmentDatePicker {
+        max-width: 320px;
+        :global(.dateRangePicker) {
+            .trigger {
+                font-size: 14px;
+                min-height: 40px;
+                padding: 8px 12px;
+            }
+
+            .dropdown {
+                min-width: 640px; // Đủ rộng cho 2 tháng side by side
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+                border-radius: 12px;
+
+                // Đảm bảo 2 tháng hiển thị ngang hàng trên desktop
+                :global(.rdrCalendarWrapper) {
+                    display: flex;
+                    flex-direction: row;
+                }
+
+                :global(.rdrDateRangeWrapper) {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 0;
+                }
+
+                // Responsive cho mobile
+                @media (max-width: 768px) {
+                    min-width: 320px;
+                    :global(.rdrCalendarWrapper),
+                    :global(.rdrDateRangeWrapper) {
+                        flex-direction: column;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Filter head styling
+.filterHead {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    // Remove blue focus/active state from filter button
+    :global(.form-sorts.dropdown) {
+        :global(.dropdown-toggle),
+        :global(.dropdown-toggle.btn),
+        :global(a.dropdown-toggle),
+        :global(a.dropdown-toggle.btn) {
+            &:focus,
+            &:focus-visible {
+                outline: none !important;
+                box-shadow: none !important;
+                border-color: #fff !important;
+                background-color: #fff !important;
+                color: #333 !important;
+            }
+
+            &:active {
+                background-color: #fff !important;
+                border-color: #fff !important;
+                box-shadow: none !important;
+                color: #333 !important;
+            }
+
+            &:hover {
+                background-color: #fff !important;
+                border-color: #fff !important;
+                color: #333 !important;
+                text-decoration: none !important;
+            }
+
+            // Remove all Bootstrap button blue states
+            &.btn:focus,
+            &.btn:focus-visible,
+            &.btn.focus {
+                outline: none !important;
+                box-shadow: none !important;
+            }
+
+            &.btn:active,
+            &.btn.active {
+                background-color: #fff !important;
+                border-color: #fff !important;
+                box-shadow: none !important;
+            }
+        }
+    }
+}
