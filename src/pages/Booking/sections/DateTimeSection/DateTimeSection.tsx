@@ -1,24 +1,140 @@
 import Calendar from '@/components/Calendar';
-import React, { useState } from 'react';
-import { mockSlotCategories } from '../../data/mock';
+import React, { useState, useEffect, useCallback } from 'react';
 import SlotCategory from './components/SlotCategory';
 import styles from './DateTimeSection.module.scss';
 import clsx from 'clsx';
 import BookingSectionWrapper from '../../components/BookingSectionWrapper/BookingSectionWrapper';
 import { mockDoctorInfo, mockAppointmentInfo } from '../../constants/mockData';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import {
+    setSelectedDate,
+    setSelectedDoctor,
+    fetchDoctorAvailableSlots,
+    setSelectedSlot,
+} from '../../../../store/slices/schedule.slice';
+import {
+    selectScheduleCategories,
+    selectAvailableSlotsLoading,
+    selectScheduleError,
+    selectSelectedDate,
+    selectSelectedDoctorId,
+    selectAvailableSlotCount,
+} from '../../../../store/selectors/schedule.selectors';
+import { ScheduleService } from '../../../../services/schedule.service';
 
 interface DateTimeSectionProps {
     nextStep: () => void;
     prevStep: () => void;
+    doctorId?: string; // Pass doctorId as prop or get from URL params
+    medicalServiceId?: string; // Pass medicalServiceId as prop or get from context
 }
 
-const DateTimeSection: React.FC<DateTimeSectionProps> = ({ nextStep, prevStep }) => {
+const DateTimeSection: React.FC<DateTimeSectionProps> = ({
+    nextStep,
+    prevStep,
+    doctorId = 'a38c0460-25c2-41f4-82b9-4233251ca0d9', // Default or from props
+    medicalServiceId,
+}) => {
+    const dispatch = useAppDispatch();
+
+    // Redux state
+    const scheduleCategories = useAppSelector(selectScheduleCategories);
+    const isLoadingSlots = useAppSelector(selectAvailableSlotsLoading);
+    const scheduleError = useAppSelector(selectScheduleError);
+    const selectedDate = useAppSelector(selectSelectedDate);
+    const selectedDoctorId = useAppSelector(selectSelectedDoctorId);
+    const availableSlotCount = useAppSelector(selectAvailableSlotCount);
+
+    // Debug logging
+    console.log('Redux State:', {
+        scheduleCategories,
+    });
+
+    // Local state
     const [date, setDate] = useState<Date | null>(new Date());
     const [slotChecked, setSlotChecked] = useState<Array<number>>([]);
 
-    const handleClickSlot = (idx: number) => {
-        setSlotChecked([...slotChecked, idx]);
-    };
+    // Initialize doctor selection
+    useEffect(() => {
+        if (doctorId && doctorId !== selectedDoctorId) {
+            dispatch(setSelectedDoctor(doctorId));
+        }
+    }, [doctorId, selectedDoctorId, dispatch]);
+
+    // Handle date change and fetch available slots
+    const handleDateChange = useCallback(
+        async (newDate: Date | null) => {
+            setDate(newDate);
+
+            if (newDate && doctorId) {
+                const formattedDate = ScheduleService.formatDateForApi(newDate);
+                console.log('Fetching slots for:', { doctorId, formattedDate, medicalServiceId });
+
+                // Update Redux state
+                dispatch(setSelectedDate(formattedDate));
+
+                // Fetch available slots for the selected date and doctor
+                try {
+                    const result = await dispatch(
+                        fetchDoctorAvailableSlots({
+                            doctorId,
+                            date: formattedDate,
+                            ...(medicalServiceId && { medicalServiceId }),
+                        })
+                    ).unwrap();
+                    console.log('API Response:', result);
+                } catch (error) {
+                    console.error('Failed to fetch available slots:', error);
+                }
+            }
+        },
+        [doctorId, medicalServiceId, dispatch]
+    );
+
+    // Handle slot click
+    const handleClickSlot = useCallback(
+        (slotIndex: number) => {
+            // Toggle slot selection
+            if (slotChecked.includes(slotIndex)) {
+                setSlotChecked((prev) => prev.filter((idx) => idx !== slotIndex));
+                // Clear selected slot in Redux if this was the selected one
+                // You might want to implement multi-slot selection or single selection
+            } else {
+                setSlotChecked([slotIndex]); // Single selection mode
+
+                // Find the corresponding slot and update Redux
+                const allSlots = scheduleCategories.flatMap((category) =>
+                    category.timeSlots.map((slot, idx) => ({
+                        ...slot,
+                        categoryIndex: scheduleCategories.indexOf(category),
+                        slotIndex: idx,
+                        globalIndex: slotIndex,
+                    }))
+                );
+
+                const selectedSlotData = allSlots.find((slot) => slot.globalIndex === slotIndex);
+                if (selectedSlotData) {
+                    // Create AvailableSlot object for Redux
+                    dispatch(
+                        setSelectedSlot({
+                            startTime: selectedSlotData.startTime,
+                            endTime: selectedSlotData.endTime,
+                            isAvailable: true,
+                            isBlocked: false,
+                        })
+                    );
+                }
+            }
+        },
+        [slotChecked, scheduleCategories, dispatch]
+    );
+
+    // Initialize with current date on component mount
+    useEffect(() => {
+        if (date && doctorId && !selectedDate) {
+            handleDateChange(date);
+        }
+    }, [date, doctorId, selectedDate, handleDateChange]);
 
     return (
         <BookingSectionWrapper
@@ -36,23 +152,109 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({ nextStep, prevStep })
                             <div className={styles.calendarContainer}>
                                 <Calendar
                                     value={date}
-                                    onChange={setDate}
+                                    onChange={handleDateChange}
                                     usePopper={false}
                                     styles={{ width: '100%' }}
                                 />
+                                {selectedDate && (
+                                    <div className="mt-2 text-center">
+                                        <small className="text-muted">
+                                            Ngày đã chọn:{' '}
+                                            {new Date(selectedDate).toLocaleDateString('vi-VN')}
+                                        </small>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="col-lg-7">
                             <div className="card booking-wizard-slots">
                                 <div className={clsx(styles.timeSlot, 'card-body')}>
-                                    {mockSlotCategories.map((category, idx) => (
-                                        <SlotCategory
-                                            key={idx}
-                                            title={category.title}
-                                            timeSlots={category.timeSlots}
-                                            handleClickSlot={handleClickSlot}
-                                        />
-                                    ))}
+                                    {isLoadingSlots && (
+                                        <div className="text-center py-4">
+                                            <div className="spinner-border" role="status">
+                                                <span className="visually-hidden">Đang tải...</span>
+                                            </div>
+                                            <p className="mt-2 text-muted">Đang tải lịch khám...</p>
+                                        </div>
+                                    )}
+
+                                    {scheduleError && (
+                                        <div className="alert alert-warning" role="alert">
+                                            <i className="fas fa-exclamation-triangle me-2"></i>
+                                            {scheduleError}
+                                        </div>
+                                    )}
+
+                                    {!isLoadingSlots &&
+                                        !scheduleError &&
+                                        scheduleCategories.length === 0 &&
+                                        selectedDate && (
+                                            <div className="text-center py-4">
+                                                <i className="fas fa-calendar-times fs-1 text-muted mb-3"></i>
+                                                <p className="text-muted">
+                                                    Không có lịch khám cho ngày đã chọn
+                                                </p>
+                                                <small className="text-muted">
+                                                    Vui lòng chọn ngày khác
+                                                </small>
+                                            </div>
+                                        )}
+
+                                    {!isLoadingSlots &&
+                                        !scheduleError &&
+                                        scheduleCategories.length > 0 && (
+                                            <>
+                                                <div className="mb-3">
+                                                    <small className="text-success">
+                                                        <i className="fas fa-check-circle me-1"></i>
+                                                        Có {availableSlotCount} khung giờ khám
+                                                    </small>
+                                                </div>
+                                                {scheduleCategories.map((category, idx) => (
+                                                    <SlotCategory
+                                                        key={idx}
+                                                        title={category.title}
+                                                        timeSlots={category.timeSlots.map(
+                                                            (slot, slotIdx) => ({
+                                                                id:
+                                                                    scheduleCategories
+                                                                        .slice(0, idx)
+                                                                        .reduce(
+                                                                            (acc, cat) =>
+                                                                                acc +
+                                                                                cat.timeSlots
+                                                                                    .length,
+                                                                            0
+                                                                        ) +
+                                                                    slotIdx +
+                                                                    1,
+                                                                time: `${slot.startTime} - ${slot.endTime}`,
+                                                            })
+                                                        )}
+                                                        handleClickSlot={(slotIdx) => {
+                                                            // Calculate global index based on previous categories
+                                                            const globalIndex =
+                                                                scheduleCategories
+                                                                    .slice(0, idx)
+                                                                    .reduce(
+                                                                        (acc, cat) =>
+                                                                            acc +
+                                                                            cat.timeSlots.length,
+                                                                        0
+                                                                    ) + slotIdx;
+                                                            handleClickSlot(globalIndex);
+                                                        }}
+                                                    />
+                                                ))}
+                                            </>
+                                        )}
+
+                                    {!selectedDate && (
+                                        <div className="text-center py-4">
+                                            <i className="fas fa-calendar-alt fs-1 text-muted mb-3"></i>
+                                            <p className="text-muted">Vui lòng chọn ngày khám</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
