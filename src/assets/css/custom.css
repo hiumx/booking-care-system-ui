@@ -14268,7 +14268,6 @@ header.inner-header .header-nav .header-navbar-rht li.noti-nav > a i {
 }
 .search-input > i.bficon {
   right: inherit;
-  left: 0;
   z-index: 1;
 }
 @media (max-width: 767.96px) {

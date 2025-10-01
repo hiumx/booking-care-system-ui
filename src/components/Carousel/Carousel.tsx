@@ -52,7 +52,7 @@ const Carousel: FC<CarouselProps> = ({
                     isAutoPlay ? { delay: autoPlayDelayMs, disableOnInteraction: false } : false
                 }
                 loop={loop}
-                className={`w-full h-64`}
+                className={`w-full`}
                 onSwiper={(swiper) => (swiperRef.current = swiper)}
                 breakpoints={breakpoints as any}
             >

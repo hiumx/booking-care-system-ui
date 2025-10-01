@@ -10,22 +10,19 @@ import { replacePathParams, PATHS } from '@/routes/paths';
 const serviceTypes = {
     title: 'Các Chuyên Khoa Trong Gói Khám',
     data: [
-        { id: 1, name: 'Cơ Xương Khớp', image: '/placeholder-iu3nm.png' },
-        { id: 2, name: 'Thần kinh', image: '/placeholder-k6snl.png' },
-        { id: 3, name: 'Tiêu hóa', image: '/placeholder-teryf.png' },
-        { id: 4, name: 'Tim mạch', image: '/placeholder-dn2tm.png' },
-        { id: 5, name: 'Tai Mũi Họng', image: '/placeholder-f79tp.png' },
-        { id: 6, name: 'Cột sống', image: '/placeholder-85358.png' },
-        { id: 7, name: 'Y học Cổ truyền', image: '/placeholder-o17r3.png' },
+        { id: 1, name: 'Cơ Xương Khớp', image: '/src/assets/img/specialities/specialities-04.svg' },
+        { id: 2, name: 'Thần kinh', image: '/src/assets/img/specialities/speciality-icon-03.svg' },
+        { id: 3, name: 'Tiêu hóa', image: '/src/assets/img/specialities/speciality-04.svg' },
+        { id: 4, name: 'Tim mạch', image: '/src/assets/img/specialities/speciality-icon-01.svg' },
+        { id: 5, name: 'Khoa Sản', image: '/src/assets/img/specialities/speciality-icon-04.svg' },
+        { id: 6, name: 'Cột sống', image: '/src/assets/img/specialities/speciality-icon-02.svg' },
+        { id: 7, name: 'Đầu', image: '/src/assets/img/specialities/speciality-icon-05.svg' },
         {
             id: 8,
-            name: 'Châm cứu',
-            image: '/acupuncture-needles-medical-icon-professional-oran.png',
+            name: 'Hô hấp',
+            image: '/src/assets/img/specialities/speciality-icon-07.svg',
         },
-        { id: 9, name: 'Sản Phụ khoa', image: '/placeholder-xiagp.png' },
-        { id: 10, name: 'Siêu âm thai', image: '/placeholder-eehfz.png' },
-        { id: 11, name: 'Nhi khoa', image: '/placeholder-4yawi.png' },
-        { id: 12, name: 'Da liễu', image: '/placeholder-s5ssn.png' },
+        { id: 9, name: 'Thận', image: '/src/assets/img/specialities/speciality-icon-08.svg' },
     ],
 };
 

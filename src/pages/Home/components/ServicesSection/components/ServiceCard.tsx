@@ -30,7 +30,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ id, name, image, reverse }) =
                     <Link to={fullLink}>{name}</Link>
                 </h4>
                 <Link to={fullLink} className="explore-link">
-                    Explore<i className="feather-arrow-right-circle"></i>
+                    Khám phá<i className="feather-arrow-right-circle"></i>
                 </Link>
             </div>
             {reverse && (

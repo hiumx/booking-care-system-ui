@@ -1,3 +1,11 @@
+import icon01 from '@/assets/img/icons/list-icon-01.svg';
+import icon02 from '@/assets/img/icons/list-icon-02.svg';
+import icon03 from '@/assets/img/icons/list-icon-03.svg';
+import icon04 from '@/assets/img/icons/list-icon-04.svg';
+import icon05 from '@/assets/img/icons/list-icon-05.svg';
+import icon06 from '@/assets/img/icons/list-icon-06.svg';
+import icon07 from '@/assets/img/icons/list-icon-07.svg';
+
 export type Specialty = {
     id: number;
     name: string;
@@ -9,63 +17,63 @@ export type Specialty = {
 export const LIST_SPECIALTIES: Specialty[] = [
     {
         id: 1,
-        name: 'Cardiology',
+        name: 'Tim mạch',
         image: '/src/assets/img/specialities/speciality-01.jpg',
         icon: '/src/assets/img/specialities/speciality-icon-01.svg',
         doctorCount: 254,
     },
     {
         id: 2,
-        name: 'Orthopedics',
+        name: 'Chấn thương chỉnh hình',
         image: '/src/assets/img/specialities/speciality-02.jpg',
         icon: '/src/assets/img/specialities/speciality-icon-02.svg',
         doctorCount: 151,
     },
     {
         id: 3,
-        name: 'Neurology',
+        name: 'Thần kinh',
         image: '/src/assets/img/specialities/speciality-03.jpg',
         icon: '/src/assets/img/specialities/speciality-icon-03.svg',
         doctorCount: 176,
     },
     {
         id: 4,
-        name: 'Pediatrics',
+        name: 'Nhi khoa',
         image: '/src/assets/img/specialities/speciality-04.jpg',
         icon: '/src/assets/img/specialities/speciality-icon-04.svg',
         doctorCount: 124,
     },
     {
         id: 5,
-        name: 'Psychiatry',
+        name: 'Tâm thần học',
         image: '/src/assets/img/specialities/speciality-05.jpg',
         icon: '/src/assets/img/specialities/speciality-icon-05.svg',
         doctorCount: 112,
     },
     {
         id: 6,
-        name: 'Endocrinology',
+        name: 'Nội tiết',
         image: '/src/assets/img/specialities/speciality-06.jpg',
         icon: '/src/assets/img/specialities/speciality-icon-06.svg',
         doctorCount: 104,
     },
     {
         id: 7,
-        name: 'Pulmonology',
+        name: 'Hô hấp',
         image: '/src/assets/img/specialities/speciality-07.jpg',
         icon: '/src/assets/img/specialities/speciality-icon-07.svg',
         doctorCount: 41,
     },
     {
         id: 8,
-        name: 'Urology',
+        name: 'Tiết niệu',
         image: '/src/assets/img/specialities/speciality-08.jpg',
         icon: '/src/assets/img/specialities/speciality-icon-08.svg',
         doctorCount: 39,
     },
     {
         id: 9,
-        name: 'Neurology',
+        name: 'Thần kinh',
         image: '/src/assets/img/specialities/speciality-03.jpg',
         icon: '/src/assets/img/specialities/speciality-icon-03.svg',
         doctorCount: 176,
@@ -74,37 +82,37 @@ export const LIST_SPECIALTIES: Specialty[] = [
 
 export const CAROUSEL_SPECIALTIES_BREAKPOINTS = {
     1280: {
-        slidesPerView: 8, // desktops
+        slidesPerView: 8, // máy tính để bàn
     },
     1024: {
-        slidesPerView: 6, // laptops
+        slidesPerView: 6, // laptop
     },
     768: {
-        slidesPerView: 5, // tablets
+        slidesPerView: 5, // máy tính bảng
     },
     480: {
-        slidesPerView: 4, // mobile
+        slidesPerView: 4, // điện thoại
     },
     0: {
-        slidesPerView: 3, // small mobile
+        slidesPerView: 3, // điện thoại nhỏ
     },
 };
 
-export const CAROUSEL_CLINICS_BREAKPOINTS = {
+export const CAROUSEL_HOSPITALS_BREAKPOINTS = {
     1280: {
-        slidesPerView: 4, // desktops
+        slidesPerView: 4, // máy tính để bàn
     },
     1024: {
-        slidesPerView: 3, // laptops
+        slidesPerView: 3, // laptop
     },
     768: {
-        slidesPerView: 2, // tablets
+        slidesPerView: 2, // máy tính bảng
     },
     480: {
-        slidesPerView: 2, // mobile
+        slidesPerView: 2, // điện thoại
     },
     0: {
-        slidesPerView: 1, // small mobile
+        slidesPerView: 1, // điện thoại nhỏ
     },
 };
 
@@ -116,13 +124,13 @@ export const CAROUSEL_DOCTORS_BREAKPOINTS = {
         slidesPerView: 3,
     },
     768: {
-        slidesPerView: 2, // tablets
+        slidesPerView: 2, // máy tính bảng
     },
     480: {
-        slidesPerView: 2, // mobile
+        slidesPerView: 2, // điện thoại
     },
     0: {
-        slidesPerView: 1, // small mobile
+        slidesPerView: 1, // điện thoại nhỏ
     },
 };
 
@@ -141,7 +149,7 @@ export type Clinic = {
     isVerified?: boolean;
 };
 
-export const LIST_CLINICS: Clinic[] = [
+export const LIST_HOSPITALS: Clinic[] = [
     {
         id: 1,
         name: 'Bệnh viện Chợ Rẫy',
@@ -217,7 +225,7 @@ export const LIST_CLINICS: Clinic[] = [
 ];
 
 // -----------------------------
-// Doctor mock data
+// Dữ liệu bác sĩ
 // -----------------------------
 export type Doctor = {
     id: number;
@@ -237,94 +245,93 @@ export type Doctor = {
 export const LIST_DOCTORS: Doctor[] = [
     {
         id: 1,
-        name: 'Dr. John Smith',
+        name: 'BS. John Smith',
         image: '/src/assets/img/doctors/doctor-01.jpg',
-        specialty: 'Cardiologist',
-        location: 'New York, USA',
+        specialty: 'Bác sĩ Tim mạch',
+        location: 'New York, Mỹ',
         rating: 4.9,
-        consultationTime: '30 Min',
+        consultationTime: '30 Phút',
         fee: 650,
         available: true,
         profileLink: '/doctor/1',
         bookingLink: '/booking/1',
-        specialtiesLink: '/specialties/cardiology',
+        specialtiesLink: '/specialties/tim-mach',
     },
     {
         id: 2,
-        name: 'Dr. Sarah Johnson',
+        name: 'BS. Sarah Johnson',
         image: '/src/assets/img/doctors/doctor-02.jpg',
-        specialty: 'Orthopedic Surgeon',
-        location: 'Los Angeles, USA',
+        specialty: 'Bác sĩ Phẫu thuật Chấn thương chỉnh hình',
+        location: 'Los Angeles, Mỹ',
         rating: 4.7,
-        consultationTime: '45 Min',
+        consultationTime: '45 Phút',
         fee: 550,
         available: true,
         profileLink: '/doctor/2',
         bookingLink: '/booking/2',
-        specialtiesLink: '/specialties/orthopedics',
+        specialtiesLink: '/specialties/chan-thuong-chinh-hinh',
     },
     {
         id: 3,
-        name: 'Dr. Michael Brown',
+        name: 'BS. Nguyễn Văn Minh',
         image: '/src/assets/img/doctors/doctor-03.jpg',
-        specialty: 'Neurologist',
-        location: 'Chicago, USA',
+        specialty: 'Bác sĩ Thần kinh',
+        location: 'Chicago, Mỹ',
         rating: 4.8,
-        consultationTime: '30 Min',
+        consultationTime: '30 Phút',
         fee: 500,
         available: true,
         profileLink: '/doctor/3',
         bookingLink: '/booking/3',
-        specialtiesLink: '/specialties/neurology',
+        specialtiesLink: '/specialties/than-kinh',
     },
     {
         id: 4,
-        name: 'Dr. Emily Davis',
+        name: 'BS. Emily Davis',
         image: '/src/assets/img/doctors/doctor-04.jpg',
-        specialty: 'Pediatrician',
-        location: 'Houston, USA',
+        specialty: 'Bác sĩ Nhi khoa',
+        location: 'Houston, Mỹ',
         rating: 4.6,
-        consultationTime: '60 Min',
+        consultationTime: '60 Phút',
         fee: 400,
         available: false,
         profileLink: '/doctor/4',
         bookingLink: '/booking/4',
-        specialtiesLink: '/specialties/pediatrics',
+        specialtiesLink: '/specialties/nhi-khoa',
     },
     {
         id: 5,
-        name: 'Dr. James Wilson',
+        name: 'BS. James Wilson',
         image: '/src/assets/img/doctors/doctor-05.jpg',
-        specialty: 'Psychiatrist',
-        location: 'Boston, USA',
+        specialty: 'Bác sĩ Tâm thần học',
+        location: 'Boston, Mỹ',
         rating: 4.5,
-        consultationTime: '30 Min',
+        consultationTime: '30 Phút',
         fee: 600,
         available: true,
         profileLink: '/doctor/5',
         bookingLink: '/booking/5',
-        specialtiesLink: '/specialties/psychiatry',
+        specialtiesLink: '/specialties/tam-than-hoc',
     },
     {
         id: 6,
-        name: 'Dr. Sophia Martinez',
+        name: 'BS. Sophia Martinez',
         image: '/src/assets/img/doctors/doctor-06.jpg',
-        specialty: 'Endocrinologist',
-        location: 'San Francisco, USA',
+        specialty: 'Bác sĩ Nội tiết',
+        location: 'San Francisco, Mỹ',
         rating: 4.9,
-        consultationTime: '45 Min',
+        consultationTime: '45 Phút',
         fee: 700,
         available: true,
         profileLink: '/doctor/6',
         bookingLink: '/booking/6',
-        specialtiesLink: '/specialties/endocrinology',
+        specialtiesLink: '/specialties/noi-tiet',
     },
 ];
 
 // -----------------------------
-// Services Section Data
+// Dữ liệu phần dịch vụ
 // -----------------------------
-
 export type Service = {
     id: number;
     name: string;
@@ -334,52 +341,115 @@ export type Service = {
 export const LIST_SERVICES: Service[] = [
     {
         id: 1,
-        name: 'Nurse at Home',
+        name: 'Y tá tại nhà',
         image: '/src/assets/img/service/service-doctor-01.jpg',
     },
     {
         id: 2,
-        name: 'Mobility Assistance',
+        name: 'Hỗ trợ di chuyển',
         image: '/src/assets/img/service/service-doctor-02.jpg',
     },
     {
         id: 3,
-        name: 'Physiotherapy',
+        name: 'Vật lý trị liệu',
         image: '/src/assets/img/service/service-doctor-03.jpg',
     },
     {
         id: 4,
-        name: 'Medical Equipment',
+        name: 'Thiết bị y tế',
         image: '/src/assets/img/service/service-doctor-04.jpg',
     },
     {
         id: 5,
-        name: 'Trained Attendants',
+        name: 'Nhân viên chăm sóc chuyên nghiệp',
         image: '/src/assets/img/service/service-doctor-05.jpg',
     },
     {
         id: 6,
-        name: 'Lab Tests',
+        name: 'Xét nghiệm y khoa',
         image: '/src/assets//img/service/service-doctor-06.jpg',
     },
     {
         id: 7,
-        name: 'Doctor Consultation',
+        name: 'Tư vấn bác sĩ',
         image: '/src/assets/img/service/service-doctor-07.jpg',
     },
     {
         id: 8,
-        name: 'Mother & Baby Care',
+        name: 'Chăm sóc mẹ và bé',
         image: '/src/assets/img/service/service-doctor-08.jpg',
     },
     {
         id: 9,
-        name: 'Vaccination',
+        name: 'Tiêm chủng',
         image: '/src/assets/img/service/service-doctor-09.jpg',
     },
     {
         id: 10,
-        name: 'Tele Consultation',
+        name: 'Tư vấn từ xa',
         image: '/src/assets/img/service/service-doctor-10.jpg',
+    },
+];
+
+// -----------------------------
+// Dữ liệu danh mục dịch vụ
+// -----------------------------
+export type ServiceCategory = {
+    id: number;
+    href: string;
+    icon: string;
+    bgColor: string;
+    text: string;
+};
+
+export const LIST_SERVICE_CATEGORIES: ServiceCategory[] = [
+    {
+        id: 1,
+        href: '/doctors',
+        icon: icon01,
+        bgColor: 'bg-secondary',
+        text: 'Đặt lịch hẹn',
+    },
+    {
+        id: 2,
+        href: '/doctors',
+        icon: icon02,
+        bgColor: 'bg-primary',
+        text: 'Tư vấn trực tuyến',
+    },
+    {
+        id: 3,
+        href: '/medical-facility',
+        icon: icon03,
+        bgColor: 'bg-pink',
+        text: 'Bệnh viện',
+    },
+    {
+        id: 4,
+        href: '/doctors',
+        icon: icon04,
+        bgColor: 'bg-cyan',
+        text: 'Chăm sóc sức khỏe',
+    },
+    {
+        id: 5,
+        href: '/doctors',
+        icon: icon05,
+        bgColor: 'bg-purple',
+        text: 'Tiêm chủng',
+    },
+    {
+        id: 6,
+        href: '/doctors',
+        icon: icon06,
+        bgColor: 'bg-orange',
+        text: 'Xét nghiệm y khoa',
+    },
+    {
+        id: 7,
+        href: '/doctors',
+        icon: icon07,
+        bgColor: 'bg-teal',
+        text: 'Chăm sóc tại nhà',
     },
 ];
