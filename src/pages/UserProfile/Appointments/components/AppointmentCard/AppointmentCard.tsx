@@ -1,14 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-    AppointmentCardData,
-    AppointmentUITab,
-    getAppointmentTypeText,
-} from '@/types/appointment.types';
+import { AppointmentData, AppointmentStatus } from '../../types/appointment.types';
 
 interface AppointmentCardProps {
-    appointment: AppointmentCardData;
-    status: AppointmentUITab;
+    appointment: AppointmentData;
+    status: AppointmentStatus;
 }
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }) => {
@@ -19,6 +15,16 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }
             month: '2-digit',
             year: 'numeric',
         });
+    };
+
+    const getAppointmentTypeLabel = (type: string) => {
+        const typeLabels = {
+            video_call: 'Video Call',
+            audio_call: 'Audio Call',
+            chat: 'Chat',
+            direct_visit: 'Direct Visit',
+        };
+        return typeLabels[type as keyof typeof typeLabels] || type;
     };
 
     const renderActionButtons = () => {
@@ -123,7 +129,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }
                             <img src={appointment.doctor.avatar} alt={appointment.doctor.name} />
                         </Link>
                         <div className="patient-info">
-                            <p>Bác sĩ</p>
+                            <p>{appointment.appointmentId}</p>
                             <h6>
                                 <Link
                                     to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
@@ -140,11 +146,11 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }
                 <li className="appointment-info">
                     <p>
                         <i className="isax isax-clock5"></i>
-                        {formatDate(appointment.appointmentDate)} 8h-8h30
+                        {formatDate(appointment.appointmentDate)} {appointment.appointmentTime}
                     </p>
                     <ul className="d-flex apponitment-types">
                         <li>{appointment.visitType}</li>
-                        <li>{getAppointmentTypeText(appointment.appointmentType)}</li>
+                        <li>{getAppointmentTypeLabel(appointment.appointmentType)}</li>
                     </ul>
                 </li>
 
@@ -161,7 +167,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }
                             <li>
                                 <i className="isax isax-call5"></i>
                                 <Link to={`tel:${appointment.doctor.phone}`}>
-                                    {appointment.doctor.phone || '0763583081'}
+                                    {appointment.doctor.phone}
                                 </Link>
                             </li>
                         </ul>
