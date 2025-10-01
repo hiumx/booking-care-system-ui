@@ -1,13 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-    AppointmentDetailProps,
-    StatusConfig,
-    AppointmentStatus,
-    AppointmentType,
-    getAppointmentTypeText as getTypeText,
-    getAppointmentTypeIcon,
-} from '@/types/appointment.types';
+import { AppointmentDetailProps, StatusConfig } from '../../types/appointmentDetail.types';
 
 const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     appointment,
@@ -19,8 +12,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     // Configuration cho từng trạng thái
     const getStatusConfig = (): StatusConfig => {
         switch (appointment.status) {
-            case AppointmentStatus.CONFIRMED:
-            case AppointmentStatus.PENDING:
+            case 'upcoming':
                 return {
                     badge: { className: 'badge bg-secondary', text: 'Sắp Tới' },
                     showContactInfo: true,
@@ -31,7 +23,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     showReasonLink: false,
                     bottomSection: 'start_session',
                 };
-            case AppointmentStatus.CANCELLED:
+            case 'cancelled':
                 return {
                     badge: { className: 'badge bg-red me-2', text: 'Đã Hủy' },
                     showContactInfo: true,
@@ -42,8 +34,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     showReasonLink: true,
                     bottomSection: 'reschedule_status',
                 };
-            case AppointmentStatus.COMPLETED:
-            case AppointmentStatus.NO_SHOW:
+            case 'completed':
                 return {
                     badge: { className: 'badge bg-green', text: 'Hoàn Thành' },
                     showContactInfo: true,
@@ -69,30 +60,36 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
 
     const config = getStatusConfig();
 
-    // Render appointment type icon with custom colors
+    // Render appointment type icon
     const renderAppointmentTypeIcon = () => {
-        const iconClass = getAppointmentTypeIcon(appointment.appointmentType);
-
-        // Add custom color classes based on type
-        let colorClass = '';
         switch (appointment.appointmentType) {
-            case AppointmentType.VIDEO_CALL:
-                colorClass = 'text-indigo';
-                break;
-            case AppointmentType.AUDIO_CALL:
-                colorClass = 'text-success';
-                break;
-            case AppointmentType.CHAT:
-                colorClass = 'text-warning';
-                break;
-            case AppointmentType.IN_PERSON:
-                colorClass = 'text-green';
-                break;
+            case 'video_call':
+                return <i className="isax isax-video5 text-indigo"></i>;
+            case 'audio_call':
+                return <i className="isax isax-call5 text-success"></i>;
+            case 'chat':
+                return <i className="isax isax-messages-25 text-warning"></i>;
+            case 'direct_visit':
+                return <i className="isax isax-hospital5 text-green"></i>;
             default:
-                colorClass = '';
+                return <i className="isax isax-calendar5"></i>;
         }
+    };
 
-        return <i className={`${iconClass} ${colorClass}`}></i>;
+    // Render appointment type text
+    const getAppointmentTypeText = () => {
+        switch (appointment.appointmentType) {
+            case 'video_call':
+                return 'Video Call';
+            case 'audio_call':
+                return 'Audio Call';
+            case 'chat':
+                return 'Chat';
+            case 'direct_visit':
+                return 'Direct Visit';
+            default:
+                return 'Unknown';
+        }
     };
 
     // Render bottom section based on status
@@ -197,7 +194,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                             <ul className="d-flex apponitment-types">
                                 <li>
                                     {renderAppointmentTypeIcon()}
-                                    {getTypeText(appointment.appointmentType)}
+                                    {getAppointmentTypeText()}
                                 </li>
                             </ul>
                         </div>

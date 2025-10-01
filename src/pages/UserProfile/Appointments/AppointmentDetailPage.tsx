@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import AppointmentDetail from './components/AppointmentDetail';
 import { mockAppointmentDetailData } from './data/appointmentDetailMockData';
-import { AppointmentStatus } from '@/types/appointment.types';
+import { AppointmentDetailStatus } from './types/appointmentDetail.types';
 
 const AppointmentDetailPage: React.FC = () => {
     const location = useLocation();
@@ -12,7 +12,7 @@ const AppointmentDetailPage: React.FC = () => {
     const getUrlParams = () => {
         const urlParams = new URLSearchParams(location.search);
         const appointmentId = urlParams.get('id') || '';
-        const status = (urlParams.get('status') as AppointmentStatus) || 'upcoming';
+        const status = (urlParams.get('status') as AppointmentDetailStatus) || 'upcoming';
         return { appointmentId, status };
     };
 
