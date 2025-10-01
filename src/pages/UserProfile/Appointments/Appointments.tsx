@@ -1,20 +1,39 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { RangeKeyDict } from 'react-date-range';
 import clsx from 'clsx';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import AppointmentCard from './components/AppointmentCard/AppointmentCard';
 import AppointmentCardSkeleton from './components/AppointmentCard/AppointmentCardSkeleton';
 import AppointmentFilters from './components/AppointmentFilters/AppointmentFilters';
 import Pagination from '@/components/Pagination/Pagination';
 import DateRangePicker from '@/components/DateRangePicker';
-import { mockAppointmentsData } from './data/mockData';
-import { AppointmentStatus, AppointmentType } from './types/appointment.types';
+import {
+    AppointmentUITab,
+    AppointmentType,
+    AppointmentQueryRequest,
+    AppointmentCardData,
+    mapUITabToStatus,
+    transformToCardData,
+    isNewAppointment,
+} from '@/types/appointment.types';
+import { AppointmentService } from '@/services/appointment.service';
+import { RootState } from '@/store';
 import { FilterState } from './components/AppointmentFilters/AppointmentTypes';
 import styles from './Appointments.module.scss';
 import { Link } from 'react-router-dom';
+import AppointmentGridCard from './components/AppointmentGridCard/AppointmentGridCard';
+
+// View mode type
+type ViewMode = 'list' | 'grid';
 
 const Appointments: React.FC = () => {
+    // Get user profile from Redux
+    const userProfile = useSelector((state: RootState) => state.user.profile);
+
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState<AppointmentStatus>('upcoming');
+    const [activeTab, setActiveTab] = useState<AppointmentUITab>('upcoming');
+    const [viewMode, setViewMode] = useState<ViewMode>('list');
     const [selectedFilters, setSelectedFilters] = useState({
         appointmentType: [] as AppointmentType[],
         visitType: [] as string[],
@@ -23,6 +42,11 @@ const Appointments: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const itemsPerPage = 5;
+
+    // API data state
+    const [appointments, setAppointments] = useState<AppointmentCardData[]>([]);
+    const [totalCount, setTotalCount] = useState(0);
+    const [apiError, setApiError] = useState<string | null>(null);
 
     // Filter states for AppointmentFilters component
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -78,6 +102,82 @@ const Appointments: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Fetch appointments from API
+    useEffect(() => {
+        const fetchAppointments = async () => {
+            if (!userProfile?.id) {
+                console.warn('User profile not available');
+                toast.warning('Vui lòng đăng nhập để xem lịch hẹn');
+                return;
+            }
+
+            setIsLoading(true);
+            setApiError(null);
+
+            try {
+                // Build query request using new helper functions
+                const query: AppointmentQueryRequest = {
+                    patientId: userProfile.id,
+                    status: mapUITabToStatus(activeTab),
+                    searchTerm: searchTerm || filterState.filterSearchTerm || undefined,
+                    fromDate: selectedFilters.dateRange.from || undefined,
+                    toDate: selectedFilters.dateRange.to || undefined,
+                    pageNumber: currentPage,
+                    pageSize: itemsPerPage,
+                    sortBy: 'CreatedAt',
+                    sortDescending: true,
+                };
+
+                // Add appointment type filter if selected
+                if (selectedFilters.appointmentType.length > 0) {
+                    query.appointmentType = selectedFilters.appointmentType[0];
+                }
+
+                // Call API
+                const response = await AppointmentService.getAppointmentsByPatient(query);
+
+                if (response.success && response.data) {
+                    // Transform API responses to UI-friendly format
+                    const transformedAppointments = response.data.appointments.map((apt) => {
+                        const cardData = transformToCardData(apt);
+                        // Add computed fields
+                        cardData.isNew = isNewAppointment(apt.createdAt);
+                        return cardData;
+                    });
+
+                    setAppointments(transformedAppointments);
+                    setTotalCount(response.data.totalCount || 0);
+
+                    // Show info toast only when no results found
+                    if (response.data.totalCount === 0) {
+                        toast.info('Không tìm thấy lịch hẹn nào');
+                    }
+                } else {
+                    throw new Error(response.message || 'Không thể tải danh sách lịch hẹn');
+                }
+            } catch (error: any) {
+                console.error('Error fetching appointments:', error);
+                const errorMessage = error.message || 'Không thể tải danh sách lịch hẹn';
+                setApiError(errorMessage);
+                setAppointments([]);
+                setTotalCount(0);
+                toast.error(errorMessage);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchAppointments();
+    }, [
+        userProfile,
+        activeTab,
+        searchTerm,
+        filterState.filterSearchTerm,
+        selectedFilters,
+        currentPage,
+        itemsPerPage,
+    ]);
+
     // Handle date range change
     const handleDateRangeChange = (ranges: RangeKeyDict) => {
         const selection = ranges.selection;
@@ -101,76 +201,28 @@ const Appointments: React.FC = () => {
         }
     };
 
-    // Filter appointments based on active tab and filters
-    const filteredAppointments = useMemo(() => {
-        let filtered = mockAppointmentsData.filter(
-            (appointment) => appointment.status === activeTab
-        );
+    // Appointments are already transformed to UI format, no need to map
+    const filteredAppointments = appointments;
 
-        // Apply search filter (from header search or filter search)
-        const effectiveSearchTerm = searchTerm || filterState.filterSearchTerm || '';
-        if (effectiveSearchTerm) {
-            filtered = filtered.filter(
-                (appointment) =>
-                    appointment.doctor.name
-                        .toLowerCase()
-                        .includes(effectiveSearchTerm.toLowerCase()) ||
-                    appointment.appointmentId
-                        .toLowerCase()
-                        .includes(effectiveSearchTerm.toLowerCase())
-            );
-        }
-
-        // Apply appointment type filter
-        if (selectedFilters.appointmentType.length > 0) {
-            filtered = filtered.filter((appointment) =>
-                selectedFilters.appointmentType.includes(appointment.appointmentType)
-            );
-        }
-
-        // Apply visit type filter
-        if (selectedFilters.visitType.length > 0) {
-            filtered = filtered.filter((appointment) =>
-                selectedFilters.visitType.includes(appointment.visitType)
-            );
-        }
-
-        // Apply date range filter
-        if (selectedFilters.dateRange.from && selectedFilters.dateRange.to) {
-            const fromDate = new Date(selectedFilters.dateRange.from);
-            const toDate = new Date(selectedFilters.dateRange.to);
-            filtered = filtered.filter((appointment) => {
-                const appointmentDate = new Date(appointment.appointmentDate);
-                return appointmentDate >= fromDate && appointmentDate <= toDate;
-            });
-        }
-
-        return filtered;
-    }, [activeTab, searchTerm, selectedFilters, filterState.filterSearchTerm]);
-
-    // Pagination
-    const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentAppointments = filteredAppointments.slice(startIndex, startIndex + itemsPerPage);
+    // Pagination - use totalCount from API
+    const totalPages = Math.ceil(totalCount / itemsPerPage);
+    const currentAppointments = filteredAppointments;
 
     // Get appointment counts for tabs
+    // Note: This is a simple display count. For accurate counts per tab,
+    // we'd need separate API calls or a summary endpoint
     const appointmentCounts = useMemo(() => {
-        const counts = { upcoming: 0, cancelled: 0, completed: 0 };
-        for (const appointment of mockAppointmentsData) {
-            counts[appointment.status]++;
-        }
-        return counts;
-    }, []);
+        return {
+            upcoming: activeTab === 'upcoming' ? totalCount : 0,
+            cancelled: activeTab === 'cancelled' ? totalCount : 0,
+            completed: activeTab === 'completed' ? totalCount : 0,
+        };
+    }, [activeTab, totalCount]);
 
-    const handleTabChange = (tab: AppointmentStatus) => {
-        setIsLoading(true);
+    const handleTabChange = (tab: AppointmentUITab) => {
         setActiveTab(tab);
         setCurrentPage(1); // Reset to first page when changing tabs
-
-        // Simulate loading delay
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 800);
+        // Loading state will be handled by useEffect when fetching
     };
 
     const handleSearchChange = (value: string) => {
@@ -274,24 +326,19 @@ const Appointments: React.FC = () => {
     };
 
     const handleFilterApply = () => {
-        setIsLoading(true);
-
         const { appointmentTypes, visitTypes } = convertFilterStateToSelectedFilters();
 
-        // Simulate loading delay
-        setTimeout(() => {
-            setSelectedFilters({
-                ...selectedFilters,
-                appointmentType: appointmentTypes,
-                visitType: visitTypes,
-            });
+        setSelectedFilters({
+            ...selectedFilters,
+            appointmentType: appointmentTypes,
+            visitType: visitTypes,
+        });
 
-            // Also update search term
-            setSearchTerm(filterState.filterSearchTerm);
-            setCurrentPage(1);
-            setIsFilterOpen(false);
-            setIsLoading(false);
-        }, 600);
+        // Also update search term
+        setSearchTerm(filterState.filterSearchTerm);
+        setCurrentPage(1);
+        setIsFilterOpen(false);
+        // Loading state will be handled by useEffect when fetching
     };
 
     // Extract complex logic to separate function to reduce cognitive complexity
@@ -303,10 +350,10 @@ const Appointments: React.FC = () => {
         const appointmentTypeFilters = filterState.appointmentTypeFilters;
         if (appointmentTypeFilters.allType === false) {
             const appointmentTypeMap = {
-                videoCall: 'video_call' as AppointmentType,
-                audioCall: 'audio_call' as AppointmentType,
-                chat: 'chat' as AppointmentType,
-                directVisit: 'direct_visit' as AppointmentType,
+                videoCall: AppointmentType.VIDEO_CALL,
+                audioCall: AppointmentType.AUDIO_CALL,
+                chat: AppointmentType.CHAT,
+                directVisit: AppointmentType.IN_PERSON,
             };
 
             for (const [key, value] of Object.entries(appointmentTypeMap)) {
@@ -338,6 +385,26 @@ const Appointments: React.FC = () => {
 
     // Extract nested ternary to separate function
     const renderAppointmentContent = () => {
+        // Show error state if API call failed
+        if (apiError) {
+            return (
+                <div className="text-center py-5">
+                    <div className="mb-4" style={{ fontSize: '4rem', color: 'var(--bs-danger)' }}>
+                        <i className="isax isax-close-circle"></i>
+                    </div>
+                    <h4 className="text-danger">Đã xảy ra lỗi</h4>
+                    <p className="text-muted mb-4">{apiError}</p>
+                    <button
+                        type="button"
+                        className="btn btn-primary-gradient rounded-pill"
+                        onClick={() => window.location.reload()}
+                    >
+                        Thử lại
+                    </button>
+                </div>
+            );
+        }
+
         if (isLoading) {
             return (
                 <>
@@ -352,14 +419,28 @@ const Appointments: React.FC = () => {
         if (currentAppointments.length > 0) {
             return (
                 <>
-                    {/* Appointment List */}
-                    {currentAppointments.map((appointment) => (
-                        <AppointmentCard
-                            key={appointment.appointmentId}
-                            appointment={appointment}
-                            status={activeTab}
-                        />
-                    ))}
+                    {/* Appointment List or Grid */}
+                    {viewMode === 'list' ? (
+                        <>
+                            {currentAppointments.map((appointment) => (
+                                <AppointmentCard
+                                    key={appointment.appointmentId}
+                                    appointment={appointment}
+                                    status={activeTab}
+                                />
+                            ))}
+                        </>
+                    ) : (
+                        <div className="row">
+                            {currentAppointments.map((appointment) => (
+                                <AppointmentGridCard
+                                    key={appointment.appointmentId}
+                                    appointment={appointment}
+                                    status={activeTab}
+                                />
+                            ))}
+                        </div>
+                    )}
 
                     {/* Pagination */}
                     {totalPages > 1 && (
@@ -429,6 +510,34 @@ const Appointments: React.FC = () => {
                             </span>
                         </div>
                     </li>
+                    <li>
+                        <div className="view-icons">
+                            <a
+                                href="#"
+                                className={viewMode === 'list' ? 'active' : ''}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setViewMode('list');
+                                }}
+                            >
+                                <i className="isax isax-grid-7"></i>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div className="view-icons">
+                            <a
+                                href="#"
+                                className={viewMode === 'grid' ? 'active' : ''}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setViewMode('grid');
+                                }}
+                            >
+                                <i className="fa-solid fa-th"></i>
+                            </a>
+                        </div>
+                    </li>
                 </ul>
             </div>
 
@@ -493,7 +602,9 @@ const Appointments: React.FC = () => {
             </div>
 
             {/* Appointment Content */}
-            <div className="tab-content appointment-tab-content">
+            <div
+                className={`tab-content appointment-tab-content ${viewMode === 'grid' ? 'appoint-patient' : ''}`}
+            >
                 <div className="tab-pane fade show active">{renderAppointmentContent()}</div>
             </div>
 
