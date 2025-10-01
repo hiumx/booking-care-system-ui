@@ -1,8 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import styles from './SideBar.module.scss';
 import { Slider, styled } from '@mui/material';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { getPositionsAsync } from '@/store/slices/positionSlice';
+import { getLanguagesAsync } from '@/store/slices/languageSlice';
+import { getServiceTypesAsync } from '@/store/slices/serviceTypeSlice';
 
 interface FilterOption {
     id: string;
@@ -15,6 +19,26 @@ interface FilterSection {
     title: string;
     options: FilterOption[];
     hasViewMore?: boolean;
+}
+
+interface SideBarProps {
+    onSearchChange?: (searchTerm: string) => void;
+    onSpecialtyFilter?: (specialtyId: string) => void;
+    onPositionFilter?: (positionId: string) => void;
+    onPositionFilters?: (positionIds: string[]) => void; // Support multiple position filters
+    onLanguageFilter?: (languageId: string) => void;
+    onLanguageFilters?: (languageIds: string[]) => void; // Support multiple language filters
+    onServiceTypeFilter?: (serviceTypeId: string) => void;
+    onServiceTypeFilters?: (serviceTypeIds: string[]) => void; // Support multiple service type filters
+    onRatingFilter?: (rating: string) => void;
+    onRatingFilters?: (ratings: string[]) => void; // Support multiple rating filters
+    onExperienceFilter?: (experience: string) => void;
+    onExperienceFilters?: (experiences: string[]) => void; // Support multiple experience filters
+    onAvailabilityFilter?: (availability: string) => void;
+    onConsultationTypeFilter?: (consultationType: string) => void;
+    onGenderFilter?: (gender: string) => void;
+    onGenderFilters?: (genders: string[]) => void; // Support multiple gender filters
+    onPriceFilter?: (priceRange: { min: number; max: number }) => void;
 }
 
 const mockFilterData: FilterSection[] = [
@@ -34,24 +58,17 @@ const mockFilterData: FilterSection[] = [
     },
     {
         title: 'Học vị',
-        options: [
-            { id: 'checkebox-sm60', label: 'Bác sĩ', count: 40 },
-            { id: 'checkebox-sm61', label: 'Thạc sĩ', count: 25 },
-            { id: 'checkebox-sm62', label: 'Tiến sĩ', count: 15 },
-            { id: 'checkebox-sm63', label: 'Phó Giáo sư', count: 10 },
-            { id: 'checkebox-sm64', label: 'Giáo sư', count: 5 },
-        ],
+        options: [], // Will be populated with real data from Redux
         hasViewMore: true,
     },
     {
         title: 'Kinh nghiệm',
         options: [
             { id: 'checkebox-sm22', label: 'Dưới 2 năm' },
-            { id: 'checkebox-sm23', label: 'Trên 2 năm' },
-            { id: 'checkebox-sm24', label: 'Trên 5 năm' },
-            { id: 'checkebox-sm25', label: 'Trên 7 năm' },
-            { id: 'checkebox-sm26', label: 'Trên 10 năm' },
-            { id: 'checkebox-sm27', label: 'Trên 15 năm' },
+            { id: 'checkebox-sm23', label: 'Từ 2 – 5 năm' },
+            { id: 'checkebox-sm24', label: 'Từ 5 – 10 năm' },
+            { id: 'checkebox-sm25', label: 'Từ 10 – 20 năm' },
+            { id: 'checkebox-sm26', label: 'Trên 20 năm' },
         ],
         hasViewMore: true,
     },
@@ -79,31 +96,19 @@ const mockFilterData: FilterSection[] = [
     {
         title: 'Giới tính',
         options: [
-            { id: 'checkebox-sm14', label: 'Nam', count: 50 },
-            { id: 'checkebox-sm15', label: 'Nữ', count: 45 },
-            { id: 'checkebox-sm16', label: 'Khác', count: 5 },
+            { id: 'checkebox-sm14', label: 'Nam' },
+            { id: 'checkebox-sm15', label: 'Nữ' },
+            { id: 'checkebox-sm16', label: 'Khác' },
         ],
     },
     {
         title: 'Ngôn ngữ',
-        options: [
-            { id: 'checkebox-sm40', label: 'Tiếng Anh' },
-            { id: 'checkebox-sm41', label: 'Tiếng Pháp' },
-            { id: 'checkebox-sm42', label: 'Tiếng Tây Ban Nha' },
-            { id: 'checkebox-sm43', label: 'Tiếng Đức' },
-            { id: 'checkebox-sm44', label: 'Tiếng Nhật' },
-            { id: 'checkebox-sm45', label: 'Tiếng Hàn' },
-        ],
+        options: [], // Will be populated with real data from Redux
         hasViewMore: true,
     },
     {
         title: 'Loại hình dịch vụ',
-        options: [
-            { id: 'checkebox-sm56', label: 'Khám bệnh định kỳ' },
-            { id: 'checkebox-sm57', label: 'Tư vấn sức khỏe' },
-            { id: 'checkebox-sm58', label: 'Chăm sóc tại nhà' },
-            { id: 'checkebox-sm59', label: 'Xét nghiệm y khoa' },
-        ],
+        options: [], // Will be populated with real data from Redux
         hasViewMore: true,
     },
 ];
@@ -159,7 +164,30 @@ const formatVND = (value: number): string => {
     }).format(value);
 };
 
-const SideBar: React.FC = () => {
+const SideBar: React.FC<SideBarProps> = ({
+    onSearchChange,
+    onSpecialtyFilter,
+    onPositionFilter,
+    onPositionFilters,
+    onLanguageFilter,
+    onLanguageFilters,
+    onServiceTypeFilter,
+    onServiceTypeFilters,
+    onRatingFilter,
+    onRatingFilters,
+    onExperienceFilter,
+    onExperienceFilters,
+    onAvailabilityFilter,
+    onConsultationTypeFilter,
+    onGenderFilter,
+    onGenderFilters,
+    onPriceFilter,
+}) => {
+    const dispatch = useAppDispatch();
+    const { positions } = useAppSelector((state) => state.position);
+    const { languages } = useAppSelector((state) => state.language);
+    const { serviceTypes } = useAppSelector((state) => state.serviceType);
+
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>(() =>
         mockFilterData.reduce(
@@ -169,6 +197,26 @@ const SideBar: React.FC = () => {
             },
             {} as { [key: string]: boolean }
         )
+    );
+
+    // Debounced search function
+    const debouncedSearch = useCallback(
+        (() => {
+            let timeoutId: NodeJS.Timeout;
+            return (value: string) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    if (onSearchChange) {
+                        console.log(
+                            'SideBar: debounced search calling onSearchChange with:',
+                            value
+                        );
+                        onSearchChange(value);
+                    }
+                }, 300); // 300ms delay
+            };
+        })(),
+        [onSearchChange]
     );
     const [viewMoreSections, setViewMoreSections] = useState<{ [key: string]: boolean }>({});
     const [priceRange, setPriceRange] = useState<number[]>([200000, 1000000]);
@@ -184,18 +232,93 @@ const SideBar: React.FC = () => {
         )
     );
 
-    // Lọc dữ liệu theo từ khóa tìm kiếm
+    // Load data on component mount
+    useEffect(() => {
+        dispatch(getPositionsAsync());
+        dispatch(getLanguagesAsync());
+        dispatch(getServiceTypesAsync());
+    }, [dispatch]);
+
+    // Create dynamic filter data from Redux
+    const dynamicFilterData = useMemo(() => {
+        const baseData = [...mockFilterData];
+
+        // Update Học vị (Positions) section with real data
+        const positionSectionIndex = baseData.findIndex((section) => section.title === 'Học vị');
+        if (positionSectionIndex !== -1) {
+            baseData[positionSectionIndex] = {
+                ...baseData[positionSectionIndex],
+                options: positions.map((position) => ({
+                    id: `position-${position.id}`,
+                    label: position.name,
+                    count: position.doctorCount, // Real count from backend
+                })),
+            };
+        }
+
+        // Update Ngôn ngữ (Languages) section with real data
+        const languageSectionIndex = baseData.findIndex((section) => section.title === 'Ngôn ngữ');
+        if (languageSectionIndex !== -1) {
+            baseData[languageSectionIndex] = {
+                ...baseData[languageSectionIndex],
+                options: languages.map((language) => ({
+                    id: `language-${language.id}`,
+                    label: language.name,
+                })),
+            };
+        }
+
+        // Update Loại hình dịch vụ (Service Types) section with real data
+        const serviceTypeSectionIndex = baseData.findIndex(
+            (section) => section.title === 'Loại hình dịch vụ'
+        );
+        if (serviceTypeSectionIndex !== -1) {
+            baseData[serviceTypeSectionIndex] = {
+                ...baseData[serviceTypeSectionIndex],
+                options: serviceTypes.map((serviceType) => ({
+                    id: `serviceType-${serviceType.id}`,
+                    label: serviceType.name,
+                })),
+            };
+        }
+
+        return baseData;
+    }, [positions, languages, serviceTypes]);
+
+    // Lọc dữ liệu theo từ khóa tìm kiếm và ẩn section không có data
     const filteredSections = useMemo(() => {
-        if (!searchTerm) return mockFilterData;
-        return mockFilterData
-            .map((section) => ({
-                ...section,
-                options: section.options.filter((option) =>
-                    option.label.toLowerCase().includes(searchTerm.toLowerCase())
-                ),
-            }))
-            .filter((section) => section.options.length > 0); // Chỉ giữ section có options
-    }, [searchTerm]);
+        let sections = dynamicFilterData;
+
+        // Ẩn section không có data (trừ các section luôn hiển thị)
+        sections = sections.filter((section) => {
+            const alwaysShowSections = [
+                'Giá cả',
+                'Đánh giá',
+                'Kinh nghiệm',
+                'Lịch trống',
+                'Loại tư vấn',
+                'Giới tính',
+            ];
+            if (alwaysShowSections.includes(section.title)) {
+                return true;
+            }
+            return section.options.length > 0;
+        });
+
+        // Lọc theo search term
+        if (searchTerm) {
+            sections = sections
+                .map((section) => ({
+                    ...section,
+                    options: section.options.filter((option) =>
+                        option.label.toLowerCase().includes(searchTerm.toLowerCase())
+                    ),
+                }))
+                .filter((section) => section.options.length > 0);
+        }
+
+        return sections;
+    }, [searchTerm, dynamicFilterData]);
 
     const toggleSection = (sectionTitle: string): void => {
         setExpandedSections((prev) => ({
@@ -212,31 +335,177 @@ const SideBar: React.FC = () => {
     };
 
     const handlePriceChange = (_event: Event, newValue: number | number[]): void => {
-        setPriceRange(newValue as number[]);
+        const newRange = newValue as number[];
+        setPriceRange(newRange);
+        // Call price filter callback
+        if (onPriceFilter) {
+            console.log('SideBar: calling onPriceFilter with:', {
+                min: newRange[0],
+                max: newRange[1],
+            });
+            onPriceFilter({ min: newRange[0], max: newRange[1] });
+        }
     };
 
-    const handleCheckboxChange = (id: string): void => {
-        setCheckedOptions((prev) => ({
-            ...prev,
-            [id]: !prev[id],
-        }));
+    const handleCheckboxChange = (id: string, sectionTitle: string): void => {
+        const isChecked = !checkedOptions[id];
+        console.log('SideBar checkbox changed:', { id, sectionTitle, isChecked });
+
+        // Update checked options state first
+        const newCheckedOptions = {
+            ...checkedOptions,
+            [id]: isChecked,
+        };
+        setCheckedOptions(newCheckedOptions);
+
+        // Get all checked options for this section after the state update
+        const getCheckedOptionsForSection = (sectionTitle: string): string[] => {
+            const section = dynamicFilterData.find((s) => s.title === sectionTitle);
+            if (!section) return [];
+
+            return section.options
+                .filter((option) => newCheckedOptions[option.id]) // Use updated state
+                .map((option) => {
+                    if (sectionTitle === 'Học vị') return option.id.replace('position-', '');
+                    if (sectionTitle === 'Ngôn ngữ') return option.id.replace('language-', '');
+                    if (sectionTitle === 'Loại hình dịch vụ')
+                        return option.id.replace('serviceType-', '');
+                    if (sectionTitle === 'Giới tính') {
+                        // Map gender IDs to Gender enum values
+                        const genderMap: { [key: string]: string } = {
+                            'checkebox-sm14': 'MALE',
+                            'checkebox-sm15': 'FEMALE',
+                            'checkebox-sm16': 'OTHER',
+                        };
+                        return genderMap[option.id] || option.id;
+                    }
+                    if (sectionTitle === 'Đánh giá') {
+                        // Map rating IDs to numbers
+                        const ratingMap: { [key: string]: number } = {
+                            'checkebox-sm46': 5,
+                            'checkebox-sm47': 4,
+                            'checkebox-sm48': 3,
+                            'checkebox-sm49': 2,
+                            'checkebox-sm50': 1,
+                        };
+                        return ratingMap[option.id]?.toString() || option.id;
+                    }
+                    if (sectionTitle === 'Kinh nghiệm') {
+                        // Map experience IDs to ranges with correct property names for backend
+                        // Fixed ranges to avoid overlap
+                        const experienceMap: {
+                            [key: string]: { MinYears: number; MaxYears: number };
+                        } = {
+                            'checkebox-sm22': { MinYears: 0, MaxYears: 1 }, // Dưới 2 năm (0-1 năm)
+                            'checkebox-sm23': { MinYears: 2, MaxYears: 4 }, // Từ 2 – 5 năm (2-4 năm)
+                            'checkebox-sm24': { MinYears: 5, MaxYears: 9 }, // Từ 5 – 10 năm (5-9 năm)
+                            'checkebox-sm25': { MinYears: 10, MaxYears: 19 }, // Từ 10 – 20 năm (10-19 năm)
+                            'checkebox-sm26': { MinYears: 20, MaxYears: 100 }, // Trên 20 năm (20+ năm)
+                        };
+                        return experienceMap[option.id]
+                            ? JSON.stringify(experienceMap[option.id])
+                            : option.id;
+                    }
+                    return option.id;
+                });
+        };
+
+        // Call appropriate callback based on section
+        if (sectionTitle === 'Học vị') {
+            const checkedPositionIds = getCheckedOptionsForSection('Học vị');
+            if (onPositionFilters) {
+                console.log('Calling onPositionFilters with:', checkedPositionIds);
+                onPositionFilters(checkedPositionIds);
+            } else if (onPositionFilter) {
+                const positionId = isChecked ? id.replace('position-', '') : '';
+                console.log('Calling onPositionFilter with:', positionId);
+                onPositionFilter(positionId);
+            }
+        } else if (sectionTitle === 'Ngôn ngữ') {
+            const checkedLanguageIds = getCheckedOptionsForSection('Ngôn ngữ');
+            if (onLanguageFilters) {
+                console.log('Calling onLanguageFilters with:', checkedLanguageIds);
+                onLanguageFilters(checkedLanguageIds);
+            } else if (onLanguageFilter) {
+                const languageId = isChecked ? id.replace('language-', '') : '';
+                console.log('Calling onLanguageFilter with:', languageId);
+                onLanguageFilter(languageId);
+            }
+        } else if (sectionTitle === 'Loại hình dịch vụ') {
+            const checkedServiceTypeIds = getCheckedOptionsForSection('Loại hình dịch vụ');
+            if (onServiceTypeFilters) {
+                console.log('Calling onServiceTypeFilters with:', checkedServiceTypeIds);
+                onServiceTypeFilters(checkedServiceTypeIds);
+            } else if (onServiceTypeFilter) {
+                const serviceTypeId = isChecked ? id.replace('serviceType-', '') : '';
+                console.log('Calling onServiceTypeFilter with:', serviceTypeId);
+                onServiceTypeFilter(serviceTypeId);
+            }
+        } else if (sectionTitle === 'Đánh giá') {
+            const checkedRatings = getCheckedOptionsForSection('Đánh giá');
+            if (onRatingFilters) {
+                console.log('Calling onRatingFilters with:', checkedRatings);
+                onRatingFilters(checkedRatings);
+            } else if (onRatingFilter) {
+                const rating = isChecked ? id : '';
+                console.log('Calling onRatingFilter with:', rating);
+                onRatingFilter(rating);
+            }
+        } else if (sectionTitle === 'Kinh nghiệm') {
+            const checkedExperiences = getCheckedOptionsForSection('Kinh nghiệm');
+            if (onExperienceFilters) {
+                console.log('Calling onExperienceFilters with:', checkedExperiences);
+                onExperienceFilters(checkedExperiences);
+            } else if (onExperienceFilter) {
+                const experience = isChecked ? id : '';
+                console.log('Calling onExperienceFilter with:', experience);
+                onExperienceFilter(experience);
+            }
+        } else if (sectionTitle === 'Lịch trống' && onAvailabilityFilter) {
+            const availability = isChecked ? id : '';
+            console.log('Calling onAvailabilityFilter with:', availability);
+            onAvailabilityFilter(availability);
+        } else if (sectionTitle === 'Loại tư vấn' && onConsultationTypeFilter) {
+            const consultationType = isChecked ? id : '';
+            console.log('Calling onConsultationTypeFilter with:', consultationType);
+            onConsultationTypeFilter(consultationType);
+        } else if (sectionTitle === 'Giới tính') {
+            const checkedGenders = getCheckedOptionsForSection('Giới tính');
+            if (onGenderFilters) {
+                console.log('Calling onGenderFilters with:', checkedGenders);
+                onGenderFilters(checkedGenders);
+            } else if (onGenderFilter) {
+                const gender = isChecked ? id : '';
+                console.log('Calling onGenderFilter with:', gender);
+                onGenderFilter(gender);
+            }
+        }
     };
 
     const handleClearAll = (): void => {
         setSearchTerm('');
         setPriceRange([200000, 1000000]);
-        setCheckedOptions(
-            mockFilterData.reduce(
-                (acc, section) => {
-                    section.options.forEach((option) => {
-                        acc[option.id] = false;
-                    });
-                    return acc;
-                },
-                {} as { [key: string]: boolean }
-            )
-        );
+        setCheckedOptions({});
         setViewMoreSections({});
+
+        // Clear all filters by calling callbacks with empty values
+        if (onSearchChange) onSearchChange('');
+        if (onSpecialtyFilter) onSpecialtyFilter('');
+        if (onPositionFilter) onPositionFilter('');
+        if (onPositionFilters) onPositionFilters([]);
+        if (onLanguageFilter) onLanguageFilter('');
+        if (onLanguageFilters) onLanguageFilters([]);
+        if (onServiceTypeFilter) onServiceTypeFilter('');
+        if (onServiceTypeFilters) onServiceTypeFilters([]);
+        if (onRatingFilter) onRatingFilter('');
+        if (onRatingFilters) onRatingFilters([]);
+        if (onExperienceFilter) onExperienceFilter('');
+        if (onExperienceFilters) onExperienceFilters([]);
+        if (onAvailabilityFilter) onAvailabilityFilter('');
+        if (onConsultationTypeFilter) onConsultationTypeFilter('');
+        if (onGenderFilter) onGenderFilter('');
+        if (onGenderFilters) onGenderFilters([]);
+        if (onPriceFilter) onPriceFilter({ min: 0, max: 10000000 });
     };
 
     const valueLabelFormat = (value: number): string => formatVND(value);
@@ -257,7 +526,12 @@ const SideBar: React.FC = () => {
                                 type="text"
                                 className="form-control"
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setSearchTerm(value);
+                                    // Call debounced search
+                                    debouncedSearch(value);
+                                }}
                                 placeholder="Tìm kiếm..."
                             />
                             <span>
@@ -344,9 +618,14 @@ const SideBar: React.FC = () => {
                                                             type="checkbox"
                                                             value=""
                                                             id={option.id}
-                                                            checked={checkedOptions[option.id]}
+                                                            checked={
+                                                                checkedOptions[option.id] || false
+                                                            }
                                                             onChange={() =>
-                                                                handleCheckboxChange(option.id)
+                                                                handleCheckboxChange(
+                                                                    option.id,
+                                                                    section.title
+                                                                )
                                                             }
                                                         />
                                                         <label
@@ -393,7 +672,7 @@ const SideBar: React.FC = () => {
                                                             )}
                                                         </label>
                                                     </div>
-                                                    {option.count && (
+                                                    {option.count !== undefined && (
                                                         <span className={styles.filterBadgeCustom}>
                                                             {option.count}
                                                         </span>

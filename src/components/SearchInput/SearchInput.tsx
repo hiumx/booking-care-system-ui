@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Calendar from '@/components/Calendar';
 import Modal from '@/components/Modal';
 import ModalArea from './components/ModalArea';
@@ -16,113 +16,55 @@ import {
     Baby,
     Bone,
 } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { getHospitalsAsync } from '@/store/slices/hospitalSlice';
+import { getSpecialtiesAsync } from '@/store/slices/specialtySlice';
 
-// Mock data based on database schema
-const mockSpecialties = [
-    {
-        id: '1',
-        name: 'Dị ứng - miễn dịch',
-        icon: Shield,
-        color: 'blue',
-        status: 'ACTIVE',
-    },
-    {
-        id: '2',
-        name: 'Y học cổ truyền',
-        icon: Activity,
-        color: 'green',
-        status: 'ACTIVE',
-    },
-    {
-        id: '3',
-        name: 'Lao - bệnh phổi',
-        icon: Heart,
-        color: 'red',
-        status: 'ACTIVE',
-    },
-    {
-        id: '4',
-        name: 'Y học thể thao',
-        icon: Brain,
-        color: 'orange',
-        status: 'ACTIVE',
-    },
-    {
-        id: '5',
-        name: 'Nhãn khoa',
-        icon: Eye,
-        color: 'purple',
-        status: 'ACTIVE',
-    },
-    {
-        id: '6',
-        name: 'Tim mạch',
-        icon: Stethoscope,
-        color: 'pink',
-        status: 'ACTIVE',
-    },
-    {
-        id: '7',
-        name: 'Dược học',
-        icon: Pill,
-        color: 'yellow',
-        status: 'ACTIVE',
-    },
-    {
-        id: '8',
-        name: 'Tiêm chủng',
-        icon: Syringe,
-        color: 'indigo',
-        status: 'ACTIVE',
-    },
-    {
-        id: '9',
-        name: 'Nhi khoa',
-        icon: Baby,
-        color: 'teal',
-        status: 'ACTIVE',
-    },
-    {
-        id: '10',
-        name: 'Chấn thương chỉnh hình',
-        icon: Bone,
-        color: 'cyan',
-        status: 'ACTIVE',
-    },
-];
+// Icon mapping for specialties
+const specialtyIconMap: Record<string, any> = {
+    'Dị ứng - miễn dịch': Shield,
+    'Y học cổ truyền': Activity,
+    'Lao - bệnh phổi': Heart,
+    'Y học thể thao': Brain,
+    'Nhãn khoa': Eye,
+    'Tim mạch': Stethoscope,
+    'Dược học': Pill,
+    'Tiêm chủng': Syringe,
+    'Nhi khoa': Baby,
+    'Chấn thương chỉnh hình': Bone,
+};
 
-const mockClinics = [
-    {
-        id: '1',
-        name: 'Bệnh viện Chợ Rẫy',
-        address: '201B Nguyễn Chí Thanh, Quận 5, TP.HCM',
-        avatar_url:
-            'https://images2.thanhnien.vn/528068263637045248/2023/8/18/img9538-16923539714192021645154.jpg',
-        status: 'ACTIVE',
-    },
-    {
-        id: '2',
-        name: 'Bệnh viện Từ Dũ',
-        address: '284 Cống Quỳnh, Quận 1, TP.HCM',
-        avatar_url:
-            'https://cdn.medpro.vn/medpro-production/medpro/topics/dat-lich-kham-benh-vien-Tu-Du-1.jpg',
-        status: 'ACTIVE',
-    },
-    {
-        id: '3',
-        name: 'Bệnh viện Nhi Đồng 1',
-        address: '341 Sư Vạn Hạnh, Quận 10, TP.HCM',
-        avatar_url:
-            'https://diadiemvietnam.vn/wp-content/uploads/2022/12/benh-vien-nhi-dong-1-750x422.jpg',
-        status: 'ACTIVE',
-    },
-];
+// Color mapping for specialties
+const specialtyColorMap: Record<string, string> = {
+    'Dị ứng - miễn dịch': 'blue',
+    'Y học cổ truyền': 'green',
+    'Lao - bệnh phổi': 'red',
+    'Y học thể thao': 'orange',
+    'Nhãn khoa': 'purple',
+    'Tim mạch': 'pink',
+    'Dược học': 'yellow',
+    'Tiêm chủng': 'indigo',
+    'Nhi khoa': 'teal',
+    'Chấn thương chỉnh hình': 'cyan',
+};
 
 type SearchInputProps = {
     forceWrap?: boolean; // make inputs wrap into multiple rows regardless of screen size
+    onSearchChange?: (searchTerm: string) => void; // Callback for search term changes
+    onSpecialtyFilter?: (specialtyId: string) => void; // Callback for specialty filter
+    onHospitalFilter?: (hospitalId: string) => void; // Callback for hospital filter
 };
 
-const SearchInput: React.FC<SearchInputProps> = ({ forceWrap = false }) => {
+const SearchInput: React.FC<SearchInputProps> = ({
+    forceWrap = false,
+    onSearchChange,
+    onSpecialtyFilter,
+    onHospitalFilter,
+}) => {
+    const dispatch = useAppDispatch();
+    const { hospitals } = useAppSelector((state) => state.hospital);
+    const { specialties } = useAppSelector((state) => state.specialty);
+
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showSpecialtyModal, setShowSpecialtyModal] = useState(false);
@@ -131,7 +73,33 @@ const SearchInput: React.FC<SearchInputProps> = ({ forceWrap = false }) => {
     const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
     const [selectedClinics, setSelectedClinics] = useState<string[]>([]);
     const [selectedArea, setSelectedArea] = useState<string>('');
+    const [doctorName, setDoctorName] = useState<string>('');
     const dateInputRef = useRef<HTMLInputElement>(null);
+
+    // Load data on component mount
+    useEffect(() => {
+        // Load hospitals
+        dispatch(getHospitalsAsync({ page: 1, pageSize: 100 }));
+
+        // Load specialties
+        dispatch(getSpecialtiesAsync());
+    }, [dispatch]);
+
+    // Transform hospitals data for modal
+    const hospitalItems = hospitals.map((hospital) => ({
+        id: hospital.id,
+        name: hospital.name,
+        imageUrl: hospital.avatarUrl || '',
+        address: hospital.address,
+    }));
+
+    // Transform specialties data for modal (using specialties from Redux)
+    const specialtyItems = specialties.map((specialty) => ({
+        id: specialty.id,
+        name: specialty.name,
+        icon: specialtyIconMap[specialty.name] || Shield,
+        color: specialtyColorMap[specialty.name] || 'blue',
+    }));
 
     // Handle specialty modal
     const handleSpecialtyClick = () => {
@@ -143,8 +111,14 @@ const SearchInput: React.FC<SearchInputProps> = ({ forceWrap = false }) => {
     };
 
     const handleSpecialtyApply = (specialties: string[]) => {
+        console.log('SearchInput: handleSpecialtyApply called with:', specialties);
         setSelectedSpecialties(specialties);
         setShowSpecialtyModal(false);
+        // Call callback with first selected specialty
+        if (specialties.length > 0 && onSpecialtyFilter) {
+            console.log('SearchInput: calling onSpecialtyFilter with:', specialties[0]);
+            onSpecialtyFilter(specialties[0]);
+        }
     };
 
     // Handle clinic modal
@@ -157,8 +131,14 @@ const SearchInput: React.FC<SearchInputProps> = ({ forceWrap = false }) => {
     };
 
     const handleClinicApply = (clinics: string[]) => {
+        console.log('SearchInput: handleClinicApply called with:', clinics);
         setSelectedClinics(clinics);
         setShowClinicModal(false);
+        // Call callback with first selected hospital
+        if (clinics.length > 0 && onHospitalFilter) {
+            console.log('SearchInput: calling onHospitalFilter with:', clinics[0]);
+            onHospitalFilter(clinics[0]);
+        }
     };
 
     // Handle area modal
@@ -222,6 +202,15 @@ const SearchInput: React.FC<SearchInputProps> = ({ forceWrap = false }) => {
                                     type="text"
                                     className={clsx('form-control', styles.formControlCustom)}
                                     placeholder="Nhập tên bác sĩ"
+                                    value={doctorName}
+                                    onChange={(e) => {
+                                        console.log(
+                                            'SearchInput: doctor name changed to:',
+                                            e.target.value
+                                        );
+                                        setDoctorName(e.target.value);
+                                        onSearchChange?.(e.target.value);
+                                    }}
                                 />
                             </div>
                         </div>
@@ -237,7 +226,8 @@ const SearchInput: React.FC<SearchInputProps> = ({ forceWrap = false }) => {
                                     value={selectedClinics
                                         .map(
                                             (id) =>
-                                                mockClinics.find((clinic) => clinic.id === id)?.name
+                                                hospitalItems.find((clinic) => clinic.id === id)
+                                                    ?.name
                                         )
                                         .filter(Boolean)
                                         .join(', ')}
@@ -256,7 +246,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ forceWrap = false }) => {
                                     value={selectedSpecialties
                                         .map(
                                             (id) =>
-                                                mockSpecialties.find((spec) => spec.id === id)?.name
+                                                specialtyItems.find((spec) => spec.id === id)?.name
                                         )
                                         .filter(Boolean)
                                         .join(', ')}
@@ -329,27 +319,14 @@ const SearchInput: React.FC<SearchInputProps> = ({ forceWrap = false }) => {
                     isOpen={showSpecialtyModal}
                     onClose={handleSpecialtyModalClose}
                     onApply={handleSpecialtyApply}
-                    items={mockSpecialties
-                        .filter((spec) => spec.status === 'ACTIVE')
-                        .map((spec) => ({
-                            id: spec.id,
-                            name: spec.name,
-                            icon: spec.icon,
-                            color: spec.color,
-                        }))}
+                    items={specialtyItems}
                     title="Tìm theo chuyên khoa"
                 />
                 <Modal
                     isOpen={showClinicModal}
                     onClose={handleClinicModalClose}
                     onApply={handleClinicApply}
-                    items={mockClinics
-                        .filter((clinic) => clinic.status === 'ACTIVE')
-                        .map((clinic) => ({
-                            id: clinic.id,
-                            name: clinic.name,
-                            imageUrl: clinic.avatar_url,
-                        }))}
+                    items={hospitalItems}
                     title="Tìm theo cơ sở y tế"
                 />
                 <ModalArea
