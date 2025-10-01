@@ -1,4 +1,4 @@
-import { AppointmentData, AppointmentStatus, AppointmentType } from '../types/appointment.types';
+import { AppointmentCardData, AppointmentType, AppointmentStatus } from '@/types/appointment.types';
 
 // Helper function to create doctor data
 const createDoctor = (
@@ -16,27 +16,58 @@ const createDoctor = (
 });
 
 // Helper function to create appointment data
+// Accepts string literals for backward compatibility with mock data
 const createAppointment = (
     id: string,
     doctorData: ReturnType<typeof createDoctor>,
     date: string,
     time: string,
-    appointmentType: AppointmentType,
+    appointmentType: string, // Legacy string literals
     visitType: string,
-    status: AppointmentStatus,
+    status: string, // Legacy string literals
     price: string,
     options: { isNew?: boolean; hasReview?: boolean } = {}
-): AppointmentData => ({
+): AppointmentCardData => ({
     appointmentId: id,
     doctor: doctorData,
     appointmentDate: date,
     appointmentTime: time,
-    appointmentType,
+    appointmentType: convertMockAppointmentType(appointmentType),
     visitType,
-    status,
+    status: convertMockAppointmentStatus(status),
     price,
+    notes: '',
     ...options,
 });
+
+// Helper to convert legacy string literals to enums for mock data
+const convertMockAppointmentType = (type: string): AppointmentType => {
+    switch (type) {
+        case 'video_call':
+            return AppointmentType.VIDEO_CALL;
+        case 'audio_call':
+            return AppointmentType.AUDIO_CALL;
+        case 'chat':
+            return AppointmentType.CHAT;
+        case 'direct_visit':
+            return AppointmentType.IN_PERSON;
+        default:
+            return AppointmentType.IN_PERSON;
+    }
+};
+
+const convertMockAppointmentStatus = (status: string): AppointmentStatus => {
+    switch (status) {
+        case 'upcoming':
+            return AppointmentStatus.CONFIRMED;
+        case 'cancelled':
+            return AppointmentStatus.CANCELLED;
+        case 'completed':
+            return AppointmentStatus.COMPLETED;
+        default:
+            return AppointmentStatus.CONFIRMED;
+    }
+};
 
 // Predefined doctors to reduce duplication
 const doctors = {
@@ -48,7 +79,7 @@ const doctors = {
     michael: createDoctor('6', 'Dr. Michael', '17', 'michael@example.com', '+1 123 456 7890'),
 };
 
-export const mockAppointmentsData: AppointmentData[] = [
+export const mockAppointmentsData: AppointmentCardData[] = [
     // Upcoming Appointments
     createAppointment(
         '#Apt0001',
@@ -264,4 +295,4 @@ export const mockAppointmentsData: AppointmentData[] = [
     ),
 ];
 
-export type { AppointmentData } from '../types/appointment.types';
+export type { AppointmentCardData } from '@/types/appointment.types';

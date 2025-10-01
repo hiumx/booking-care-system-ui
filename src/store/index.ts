@@ -14,6 +14,7 @@ import { PersistConfig } from 'redux-persist';
 
 // Import reducers
 import authReducer from './slices/authSlice';
+import userReducer from './slices/userSlice';
 import discountReducer from './slices/discount.slice';
 import uiReducer from './slices/uiSlice';
 import doctorReducer from './slices/doctorSlice';
@@ -26,6 +27,7 @@ import specialtyReducer from './slices/specialtySlice';
 // Root reducer
 const rootReducer = combineReducers({
     auth: authReducer,
+    user: userReducer,
     discount: discountReducer,
     ui: uiReducer,
     doctor: doctorReducer,
