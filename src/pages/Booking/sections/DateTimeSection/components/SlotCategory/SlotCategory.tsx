@@ -8,7 +8,7 @@ interface SlotCategoryProps {
 
 const SlotCategory: React.FC<SlotCategoryProps> = ({ title, timeSlots, handleClickSlot }) => {
     return (
-        <>
+        <div className="mb-4">
             <div className="book-title">
                 <h6 className="fs-14 mb-2">{title}</h6>
             </div>
@@ -22,7 +22,7 @@ const SlotCategory: React.FC<SlotCategoryProps> = ({ title, timeSlots, handleCli
                     />
                 ))}
             </div>
-        </>
+        </div>
     );
 };
 
