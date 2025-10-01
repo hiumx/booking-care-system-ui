@@ -1,45 +1,72 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import Select from 'react-select';
 import settingStyles from '@/pages/UserProfile/Setting/Setting.module.scss';
 import clsx from 'clsx';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
-
-interface ProfileData {
-    firstName: string;
-    lastName: string;
-    dateOfBirth: string;
-    phoneNumber: string;
-    email: string;
-    gender: string;
-    address: string;
-}
+import DateInput from '@/components/DateInput';
+import { AppDispatch, RootState } from '@/store';
+import { updateUserProfile } from '@/store/slices/userSlice';
+import { Gender } from '@/enums/common.enums';
+import { getGenderText, UpdateUserRequest } from '@/types/user.types';
 
 interface GenderOption {
-    value: string;
+    value: Gender;
     label: string;
 }
 
 const Profile = () => {
-    // Mock data
-    const [profileData, setProfileData] = useState<ProfileData>({
-        firstName: 'Nguyễn Văn',
-        lastName: 'An',
-        dateOfBirth: '15/03/1990',
-        phoneNumber: '0901234567',
-        email: 'nguyenvanan@gmail.com',
-        gender: 'Nam',
-        address: '123 Đường ABC, Phường XYZ',
+    const dispatch = useDispatch<AppDispatch>();
+    const { profile, isLoading } = useSelector((state: RootState) => state.user);
+
+    const [updateData, setUpdateData] = useState<UpdateUserRequest>({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phoneNumber: '',
+        gender: Gender.MALE,
+        dateOfBirth: '',
+        address: '',
+        avatarUrl: '',
     });
 
     const genderOptions: GenderOption[] = [
-        { value: 'Nam', label: 'Nam' },
-        { value: 'Nữ', label: 'Nữ' },
-        { value: 'Khác', label: 'Khác' },
+        { value: Gender.MALE, label: getGenderText(Gender.MALE) },
+        { value: Gender.FEMALE, label: getGenderText(Gender.FEMALE) },
+        { value: Gender.OTHER, label: getGenderText(Gender.OTHER) },
     ];
 
-    const handleInputChange = (field: keyof ProfileData, value: string) => {
-        setProfileData((prev) => ({
+    // Helper function to format date for input field
+    const formatDateForInput = (dateString: string): string => {
+        if (!dateString) return '';
+        try {
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+        } catch {
+            return '';
+        }
+    };
+
+    // Load user profile data when component mounts or profile changes
+    useEffect(() => {
+        if (profile) {
+            setUpdateData({
+                firstName: profile.firstName || '',
+                lastName: profile.lastName || '',
+                email: profile.email || '',
+                phoneNumber: profile.phoneNumber || '',
+                gender: profile.gender || Gender.MALE,
+                dateOfBirth: formatDateForInput(profile.dateOfBirth),
+                address: profile.address || '',
+                avatarUrl: profile.avatarUrl || '',
+            });
+        }
+    }, [profile]);
+
+    const handleInputChange = (field: keyof UpdateUserRequest, value: string | Gender) => {
+        setUpdateData((prev) => ({
             ...prev,
             [field]: value,
         }));
@@ -47,25 +74,40 @@ const Profile = () => {
 
     const handleGenderChange = (selectedOption: GenderOption | null) => {
         if (selectedOption) {
-            setProfileData((prev) => ({
-                ...prev,
-                gender: selectedOption.value,
-            }));
+            handleInputChange('gender', selectedOption.value);
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Profile data:', profileData);
-        // Xử lý lưu dữ liệu
+
+        try {
+            // Create UpdateUserRequest object with current data
+            const updateRequest: UpdateUserRequest = {
+                firstName: updateData.firstName,
+                lastName: updateData.lastName,
+                email: updateData.email,
+                phoneNumber: updateData.phoneNumber,
+                gender: updateData.gender,
+                dateOfBirth: updateData.dateOfBirth,
+                address: updateData.address,
+                avatarUrl: updateData.avatarUrl,
+            };
+
+            await dispatch(updateUserProfile(updateRequest)).unwrap();
+            toast.success('Cập nhật thông tin thành công!');
+        } catch (error: any) {
+            console.error('Failed to update profile:', error);
+            toast.error(error.message || 'Không thể cập nhật thông tin. Vui lòng thử lại!');
+        }
     };
 
     const customSelectStyles = {
         control: (provided: any) => ({
             ...provided,
-            minHeight: '38px',
-            border: '1px solid #ced4da',
-            borderRadius: '0.375rem',
+            minHeight: '45px',
+            border: '1px solid #e5e7eb',
+            borderRadius: '12px',
         }),
         option: (provided: any, state: any) => ({
             ...provided,
@@ -108,7 +150,7 @@ const Profile = () => {
                                 label="Họ"
                                 isRequired
                                 type="text"
-                                value={profileData.firstName}
+                                value={updateData.firstName || ''}
                                 onChange={(e) => handleInputChange('firstName', e.target.value)}
                             />
                         </div>
@@ -119,30 +161,9 @@ const Profile = () => {
                                 label="Tên"
                                 isRequired
                                 type="text"
-                                value={profileData.lastName}
+                                value={updateData.lastName || ''}
                                 onChange={(e) => handleInputChange('lastName', e.target.value)}
                             />
-                        </div>
-                    </div>
-                    <div className="col-lg-4 col-md-6">
-                        <div className="mb-3">
-                            <label className="form-label">
-                                Ngày sinh <span className="text-danger">*</span>
-                            </label>
-                            <div className="form-icon">
-                                <input
-                                    type="text"
-                                    className="form-control datetimepicker"
-                                    placeholder="dd/mm/yyyy"
-                                    value={profileData.dateOfBirth}
-                                    onChange={(e) =>
-                                        handleInputChange('dateOfBirth', e.target.value)
-                                    }
-                                />
-                                <span className="icon">
-                                    <i className="isax isax-calendar-1"></i>
-                                </span>
-                            </div>
                         </div>
                     </div>
                     <div className="col-lg-4 col-md-6">
@@ -152,7 +173,7 @@ const Profile = () => {
                             </label>
                             <Select
                                 value={genderOptions.find(
-                                    (option) => option.value === profileData.gender
+                                    (option) => option.value === updateData.gender
                                 )}
                                 onChange={handleGenderChange}
                                 options={genderOptions}
@@ -162,36 +183,50 @@ const Profile = () => {
                             />
                         </div>
                     </div>
+
+                    <div className="col-lg-4 col-md-6">
+                        <div className="mb-3">
+                            <DateInput
+                                label="Ngày sinh"
+                                value={updateData.dateOfBirth || ''}
+                                onChange={(date) => handleInputChange('dateOfBirth', date)}
+                                placeholder="Chọn ngày sinh"
+                                isRequired={true}
+                                maxDate={new Date()} // Không cho chọn ngày tương lai
+                                minDate={new Date('1900-01-01')} // Giới hạn năm sinh
+                            />
+                        </div>
+                    </div>
+                    <div className="col-lg-4 col-md-6">
+                        <div className="mb-3">
+                            <Input
+                                label="Email"
+                                isRequired
+                                type="email"
+                                value={updateData.email || ''}
+                                onChange={(e) => handleInputChange('email', e.target.value)}
+                            />
+                        </div>
+                    </div>
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
                             <Input
                                 label="Số điện thoại"
                                 isRequired
                                 type="text"
-                                value={profileData.phoneNumber}
+                                value={updateData.phoneNumber || ''}
                                 onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
                             />
                         </div>
                     </div>
-                    <div className="col-lg-6 col-md-6">
-                        <div className="mb-3">
-                            <Input
-                                label="Email"
-                                isRequired
-                                type="email"
-                                value={profileData.email}
-                                onChange={(e) => handleInputChange('email', e.target.value)}
-                            />
-                        </div>
-                    </div>
 
-                    <div className="col-lg-12">
+                    <div className="col-lg-8 col-md-6">
                         <div className="mb-3">
                             <Input
                                 label="Địa chỉ"
                                 isRequired
                                 type="text"
-                                value={profileData.address}
+                                value={updateData.address || ''}
                                 onChange={(e) => handleInputChange('address', e.target.value)}
                             />
                         </div>
@@ -203,7 +238,12 @@ const Profile = () => {
                 <a href="#" className="btn btn-md btn-light rounded-pill">
                     Hủy
                 </a>
-                <Button text="Lưu thay đổi" type="submit" className="btn-md rounded-pill" />
+                <Button
+                    text={isLoading ? 'Đang lưu...' : 'Lưu thay đổi'}
+                    type="submit"
+                    className="btn-md rounded-pill"
+                    isDisabled={isLoading}
+                />
             </div>
         </form>
     );

@@ -1,33 +1,49 @@
 import { Link } from 'react-router-dom';
+import { UserProfile, getGenderText } from '@/types/user.types';
 import styles from './ProfileSidebar.module.scss';
-interface UserData {
-    id: string;
-    fullName: string;
-    email: string;
-    phoneNumber: string;
-    avatarUrl: string;
-    gender: string;
-    age: string;
-    role: 'Bệnh nhân' | 'Bác sĩ' | 'admin';
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
-}
 
 interface ProfileSidebarProps {
-    userData: UserData;
+    userData: UserProfile | null;
     activeTab: string;
 }
 
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) => {
     const isActive = (tab: string) => activeTab === tab;
 
+    // Helper function to format date of birth
+    const formatDateOfBirth = (dateString: string | undefined) => {
+        if (!dateString) return 'Chưa cập nhật';
+
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN');
+        } catch {
+            return dateString;
+        }
+    };
+
+    // Show loading state if no user data
+    if (!userData) {
+        return (
+            <div className="profile-sidebar patient-sidebar profile-sidebar-new">
+                <div className="widget-profile pro-widget-content">
+                    <div className="profile-info-widget text-center">
+                        <p>Đang tải thông tin...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="profile-sidebar patient-sidebar profile-sidebar-new">
             <div className="widget-profile pro-widget-content">
                 <div className="profile-info-widget">
                     <Link to="/profile-settings" className="booking-doc-img">
-                        <img src={userData.avatarUrl} alt="User Image" />
+                        <img
+                            src={userData.avatarUrl || '/assets/img/default-avatar-male.png'}
+                            alt="User Image"
+                        />
                     </Link>
                     <div className="profile-det-info">
                         <h3>
@@ -36,11 +52,12 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                             </Link>
                         </h3>
                         <div className="patient-details">
-                            <h5 className="mb-0">Vai trò : {userData.role}</h5>
+                            <h5 className="mb-0">Vai trò : Bệnh nhân</h5>
                         </div>
                         <span>
-                            Giới tính: {userData.gender} <i className="fa-solid fa-circle"></i>Ngày
-                            sinh: {userData.age}
+                            Giới tính: {getGenderText(userData.gender)}{' '}
+                            <i className="fa-solid fa-circle"></i>Ngày sinh:{' '}
+                            {formatDateOfBirth(userData.dateOfBirth)}
                         </span>
                     </div>
                 </div>
