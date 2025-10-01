@@ -1,37 +1,78 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '@/layouts/AuthLayout';
-import GoogleIcon from '@/assets/img/icons/google-icon.svg';
-import FacebookIcon from '@/assets/img/icons/facebook-icon.svg';
 import clsx from 'clsx';
 import styles from './Login.module.scss';
 import { PATHS } from '@/routes/paths';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
-interface LoginProps {
-    onSubmit?: (credentials: {
-        method: 'email' | 'phone';
-        email?: string;
-        phone?: string;
-        password: string;
-    }) => void;
-}
+import { SocialLogin } from '@/components/SocialLogin';
+import { LoginRequest } from '@/types/auth.types';
+import { useAuth } from '@/hooks/useAuth';
+import { usePhoneInput } from '@/hooks/usePhoneInput';
+import { AuthService } from '@/services/auth.service';
+import { toast } from 'react-toastify';
 
-const Login: React.FC<LoginProps> = ({ onSubmit }) => {
+const Login: React.FC = () => {
+    const navigate = useNavigate();
+    const { login, isLoading, error, isAuthenticated, clearError } = useAuth();
     const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [method, setMethod] = useState<'email' | 'phone'>('phone');
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    // Use phone input hook
+    const { phone, handlePhoneChange, handlePhonePaste, handlePhoneKeyDown, isPhoneValid } =
+        usePhoneInput();
+
+    // Validation logic for form submission
+    const canSubmit = useMemo(() => {
+        // Validate password (must not be empty)
+        const validPassword = password.trim().length > 0;
+
+        // Validate email using AuthService
+        const validEmail = email.trim() && AuthService.validateEmail(email);
+
+        // Validate phone using hook (exactly 10 digits starting with 0)
+        const validPhone = isPhoneValid();
+
+        // Check if the selected method has valid input
+        const validIdentifier = method === 'email' ? validEmail : validPhone;
+
+        return validIdentifier && validPassword;
+    }, [method, email, phone, password, isPhoneValid]);
+
+    // Social login handlers
+    const handleSocialSuccess = () => navigate(PATHS.HOME);
+    const handleSocialError = (error: any) => console.error('Social login error:', error);
+
+    // Clear error when component mounts or method changes
+    useEffect(() => {
+        clearError();
+    }, [clearError, method]);
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate(PATHS.HOME);
+        }
+    }, [isAuthenticated, navigate]);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        onSubmit?.({
-            method,
-            email: method === 'email' ? email : undefined,
-            phone: method === 'phone' ? phone : undefined,
+
+        const credentials: LoginRequest = {
             password,
-        });
+            ...(method === 'email' ? { email } : { phoneNumber: phone }),
+        };
+
+        try {
+            await login(credentials);
+            toast.success('Đăng nhập thành công!');
+            navigate(PATHS.HOME);
+        } catch (error) {
+            console.error('Login error:', error);
+        }
     };
 
     return (
@@ -87,11 +128,13 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                             name="phone"
                             label="Số điện thoại"
                             type="tel"
-                            inputMode="tel"
+                            inputMode="numeric"
                             placeholder="Nhập số điện thoại"
                             leftIcon={<i className="feather-phone" />}
                             value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
+                            onChange={handlePhoneChange}
+                            onKeyDown={handlePhoneKeyDown}
+                            onPaste={handlePhonePaste}
                         />
                     )}
                 </div>
@@ -127,30 +170,35 @@ const Login: React.FC<LoginProps> = ({ onSubmit }) => {
                                 Ghi nhớ đăng nhập
                             </label>
                         </div>
-                        <Link to="/forgot-password" className={clsx(styles.forgotPassword)}>
+                        <Link to={PATHS.FORGOT_PASSWORD} className={clsx(styles.forgotPassword)}>
                             Quên mật khẩu?
                         </Link>
                     </div>
                 </div>
 
+                {/* Error message */}
+                {error && (
+                    <div className="alert alert-danger text-center mb-3" role="alert">
+                        {error}
+                    </div>
+                )}
+
                 {/* Submit */}
                 <div className="mb-3">
-                    <Button text="Đăng nhập" type="submit" className="w-100" />
+                    <Button
+                        text={isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                        type="submit"
+                        className="w-100"
+                        isDisabled={isLoading || !canSubmit}
+                    />
                 </div>
 
                 {/* Social login */}
-                <div className="login-or">
-                    <span className="or-line"></span>
-                    <span className="span-or">hoặc</span>
-                </div>
-                <div className="social-login-btn">
-                    <button type="button" className="btn w-100">
-                        <img src={GoogleIcon} alt="google-icon" /> Đăng nhập với Google
-                    </button>
-                    <button type="button" className="btn w-100">
-                        <img src={FacebookIcon} alt="fb-icon" /> Đăng nhập với Facebook
-                    </button>
-                </div>
+                <SocialLogin
+                    onSuccess={handleSocialSuccess}
+                    onError={handleSocialError}
+                    isDisabled={isLoading}
+                />
 
                 {/* Register link */}
                 <div className="account-signup">
