@@ -26,8 +26,11 @@ import AboutUs from '@/pages/AboutUs/AboutUs';
 import DoctorList from '@/pages/Doctor/DoctorList';
 import ContactUs from '@/pages/ContactUs';
 import Booking from '@/pages/Booking/Booking';
-import ServiceTypes from '@/pages/MedicalService/ServiceTypes/ServiceTypesPage';
+import ServiceCategories from '@/pages/MedicalService/ServiceCategories/ServiceCategoriesPage';
 import SmartBooking from '@/pages/SmartBooking';
+import ServiceList from '@/pages/MedicalService/MedicalService/MedicalServicePage';
+import ServiceHospitals from '@/pages/MedicalService/ServiceHospital/ServiceHospitalPage';
+import ServiceDetail from '@/pages/MedicalService/ServiceDetail/ServiceDetailPage';
 
 const routes: RouteObject[] = [
     {
@@ -120,9 +123,22 @@ const routes: RouteObject[] = [
         element: <SpecialtiesList />,
         // children: [{ path: PATHS.SPECIALTIES.PROFILE, element: <SpecialtiesProfile /> }],
     },
+
     {
-        path: PATHS.Service.Service_Types,
-        element: <ServiceTypes />,
+        path: PATHS.Service.ROOT,
+        element: <ServiceList />,
+    },
+    {
+        path: PATHS.Service.CATEGORIES,
+        element: <ServiceCategories />,
+    },
+    {
+        path: PATHS.Service.HOSPITALS,
+        element: <ServiceHospitals />,
+    },
+    {
+        path: PATHS.Service.DETAIL,
+        element: <ServiceDetail />,
     },
     {
         path: PATHS.HOSPITAL.ROOT,
