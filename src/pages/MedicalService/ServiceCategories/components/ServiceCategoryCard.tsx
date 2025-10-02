@@ -1,15 +1,14 @@
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
-import styles from './ServiceTypeCard.module.scss';
+import styles from './ServiceCategoryCard.module.scss';
 
-type ServiceTypeCardProps = {
-    id: number;
+type ServiceCategoryCardProps = {
     name: string;
     image: string;
-    link?: string;
+    link: string;
 };
 
-const ServiceTypeCard: FC<ServiceTypeCardProps> = ({ name, image, link = '#' }) => {
+const ServiceCategoryCard: FC<ServiceCategoryCardProps> = ({ name, image, link = '#' }) => {
     return (
         <Link to={link} className={styles.card}>
             {/* Chỉ chứa ảnh */}
@@ -25,4 +24,4 @@ const ServiceTypeCard: FC<ServiceTypeCardProps> = ({ name, image, link = '#' }) 
     );
 };
 
-export default ServiceTypeCard;
+export default ServiceCategoryCard;
