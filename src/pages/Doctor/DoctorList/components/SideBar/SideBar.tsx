@@ -32,8 +32,8 @@ interface SideBarProps {
     onServiceTypeFilters?: (serviceTypeIds: string[]) => void; // Support multiple service type filters
     onRatingFilter?: (rating: string) => void;
     onRatingFilters?: (ratings: string[]) => void; // Support multiple rating filters
-    onExperienceFilter?: (experience: string) => void;
-    onExperienceFilters?: (experiences: string[]) => void; // Support multiple experience filters
+    onExperienceFilter?: (experienceRange: { min: number; max: number }) => void; // Changed to slider format
+    onExperienceFilters?: (experiences: any[]) => void; // Keep for backward compatibility
     onAvailabilityFilter?: (availability: string) => void;
     onConsultationTypeFilter?: (consultationType: string) => void;
     onGenderFilter?: (gender: string) => void;
@@ -132,6 +132,16 @@ const PrettoSlider = styled(Slider)({
             display: 'none',
         },
     },
+    '& .MuiSlider-mark': {
+        backgroundColor: '#0E82FD',
+        height: 8,
+        width: 8,
+        borderRadius: '50%',
+        '&.MuiSlider-markActive': {
+            opacity: 1,
+            backgroundColor: '#0E82FD',
+        },
+    },
     '& .MuiSlider-valueLabel': {
         lineHeight: 1.2,
         fontSize: 14,
@@ -162,6 +172,13 @@ const formatVND = (value: number): string => {
         currency: 'VND',
         minimumFractionDigits: 0,
     }).format(value);
+};
+
+const formatYears = (value: number): string => {
+    if (value === 0) return '0 năm';
+    if (value === 1) return '1 năm';
+    if (value >= 50) return '50+ năm';
+    return `${value} năm`;
 };
 
 const SideBar: React.FC<SideBarProps> = ({
@@ -220,6 +237,7 @@ const SideBar: React.FC<SideBarProps> = ({
     );
     const [viewMoreSections, setViewMoreSections] = useState<{ [key: string]: boolean }>({});
     const [priceRange, setPriceRange] = useState<number[]>([200000, 1000000]);
+    const [experienceRange, setExperienceRange] = useState<number[]>([1, 20]); // 1 to 30 years
     const [checkedOptions, setCheckedOptions] = useState<{ [key: string]: boolean }>(() =>
         mockFilterData.reduce(
             (acc, section) => {
@@ -347,6 +365,19 @@ const SideBar: React.FC<SideBarProps> = ({
         }
     };
 
+    const handleExperienceChange = (_event: Event, newValue: number | number[]): void => {
+        const newRange = newValue as number[];
+        setExperienceRange(newRange);
+        // Call experience filter callback
+        if (onExperienceFilter) {
+            console.log('SideBar: calling onExperienceFilter with:', {
+                min: newRange[0],
+                max: newRange[1],
+            });
+            onExperienceFilter({ min: newRange[0], max: newRange[1] });
+        }
+    };
+
     const handleCheckboxChange = (id: string, sectionTitle: string): void => {
         const isChecked = !checkedOptions[id];
         console.log('SideBar checkbox changed:', { id, sectionTitle, isChecked });
@@ -359,7 +390,7 @@ const SideBar: React.FC<SideBarProps> = ({
         setCheckedOptions(newCheckedOptions);
 
         // Get all checked options for this section after the state update
-        const getCheckedOptionsForSection = (sectionTitle: string): string[] => {
+        const getCheckedOptionsForSection = (sectionTitle: string): any[] => {
             const section = dynamicFilterData.find((s) => s.title === sectionTitle);
             if (!section) return [];
 
@@ -402,9 +433,7 @@ const SideBar: React.FC<SideBarProps> = ({
                             'checkebox-sm25': { MinYears: 10, MaxYears: 19 }, // Từ 10 – 20 năm (10-19 năm)
                             'checkebox-sm26': { MinYears: 20, MaxYears: 100 }, // Trên 20 năm (20+ năm)
                         };
-                        return experienceMap[option.id]
-                            ? JSON.stringify(experienceMap[option.id])
-                            : option.id;
+                        return experienceMap[option.id] || option.id;
                     }
                     return option.id;
                 });
@@ -451,16 +480,6 @@ const SideBar: React.FC<SideBarProps> = ({
                 console.log('Calling onRatingFilter with:', rating);
                 onRatingFilter(rating);
             }
-        } else if (sectionTitle === 'Kinh nghiệm') {
-            const checkedExperiences = getCheckedOptionsForSection('Kinh nghiệm');
-            if (onExperienceFilters) {
-                console.log('Calling onExperienceFilters with:', checkedExperiences);
-                onExperienceFilters(checkedExperiences);
-            } else if (onExperienceFilter) {
-                const experience = isChecked ? id : '';
-                console.log('Calling onExperienceFilter with:', experience);
-                onExperienceFilter(experience);
-            }
         } else if (sectionTitle === 'Lịch trống' && onAvailabilityFilter) {
             const availability = isChecked ? id : '';
             console.log('Calling onAvailabilityFilter with:', availability);
@@ -485,6 +504,7 @@ const SideBar: React.FC<SideBarProps> = ({
     const handleClearAll = (): void => {
         setSearchTerm('');
         setPriceRange([200000, 1000000]);
+        setExperienceRange([1, 30]);
         setCheckedOptions({});
         setViewMoreSections({});
 
@@ -499,7 +519,7 @@ const SideBar: React.FC<SideBarProps> = ({
         if (onServiceTypeFilters) onServiceTypeFilters([]);
         if (onRatingFilter) onRatingFilter('');
         if (onRatingFilters) onRatingFilters([]);
-        if (onExperienceFilter) onExperienceFilter('');
+        if (onExperienceFilter) onExperienceFilter({ min: 1, max: 30 }); // Reset to full range
         if (onExperienceFilters) onExperienceFilters([]);
         if (onAvailabilityFilter) onAvailabilityFilter('');
         if (onConsultationTypeFilter) onConsultationTypeFilter('');
@@ -509,6 +529,7 @@ const SideBar: React.FC<SideBarProps> = ({
     };
 
     const valueLabelFormat = (value: number): string => formatVND(value);
+    const experienceValueLabelFormat = (value: number): string => formatYears(value);
 
     return (
         <div className="col-xl-3">
@@ -590,11 +611,45 @@ const SideBar: React.FC<SideBarProps> = ({
                                                 valueLabelFormat={valueLabelFormat}
                                                 min={0}
                                                 max={10000000}
+                                                step={100000}
+                                                marks={[
+                                                    { value: 0, label: '0' },
+                                                    { value: 1000000, label: '1tr' },
+                                                    { value: 2000000, label: '2tr' },
+                                                    { value: 5000000, label: '5tr' },
+                                                    { value: 10000000, label: '10tr' },
+                                                ]}
                                                 aria-label="pretto slider"
                                             />
                                             <p className={styles.labelCustom}>
                                                 Giá: {formatVND(priceRange[0])} -{' '}
                                                 {formatVND(priceRange[1])}
+                                            </p>
+                                        </div>
+                                    ) : section.title === 'Kinh nghiệm' ? (
+                                        <div className="filter-range">
+                                            <PrettoSlider
+                                                value={experienceRange}
+                                                onChange={handleExperienceChange}
+                                                valueLabelDisplay="on"
+                                                valueLabelFormat={experienceValueLabelFormat}
+                                                min={1}
+                                                max={30}
+                                                step={1}
+                                                marks={[
+                                                    { value: 1, label: '1' },
+                                                    { value: 5, label: '5' },
+                                                    { value: 10, label: '10' },
+                                                    { value: 15, label: '15' },
+                                                    { value: 20, label: '20' },
+                                                    { value: 25, label: '25' },
+                                                    { value: 30, label: '30' },
+                                                ]}
+                                                aria-label="experience slider"
+                                            />
+                                            <p className={styles.labelCustom}>
+                                                Kinh nghiệm: {formatYears(experienceRange[0])} -{' '}
+                                                {formatYears(experienceRange[1])}
                                             </p>
                                         </div>
                                     ) : (

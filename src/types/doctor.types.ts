@@ -131,9 +131,11 @@ export interface DoctorSearchParams {
     pageSize?: number;
     searchTerm?: string;
     specialtyFilter?: string;
+    specialtyFilters?: string[]; // Support multiple specialty filters
     positionFilter?: string;
     positionFilters?: string[]; // Support multiple position filters
     hospitalFilter?: string;
+    hospitalFilters?: string[]; // Support multiple hospital filters
     languageFilter?: string;
     languageFilters?: string[]; // Support multiple language filters
     serviceTypeFilter?: string;
@@ -146,8 +148,9 @@ export interface DoctorSearchParams {
     ratingFilters?: number[]; // Support multiple rating filters
     genderFilter?: Gender;
     genderFilters?: string[]; // Support multiple gender filters
-    experienceFilter?: string;
-    experienceFilters?: { MinYears: number; MaxYears: number }[]; // Support multiple experience ranges
+    experienceRange?: { min: number; max: number }; // New slider format like price
+    experienceFilter?: string; // Keep for backward compatibility
+    experienceFilters?: { MinYears: number; MaxYears: number }[]; // Keep for backward compatibility
     sortBy?: 'name' | 'rating' | 'price' | 'experience' | 'createdAt';
     sortOrder?: 'asc' | 'desc';
     patientId?: string;

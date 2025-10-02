@@ -39,7 +39,9 @@ const DoctorList: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [specialtyFilter, setSpecialtyFilter] = useState('');
+    const [specialtyFilters, setSpecialtyFilters] = useState<string[]>([]);
     const [hospitalFilter, setHospitalFilter] = useState('');
+    const [hospitalFilters, setHospitalFilters] = useState<string[]>([]);
     const [positionFilter, setPositionFilter] = useState('');
     const [positionFilters, setPositionFilters] = useState<string[]>([]);
     const [languageFilter, setLanguageFilter] = useState('');
@@ -48,10 +50,12 @@ const DoctorList: React.FC = () => {
     const [serviceTypeFilters, setServiceTypeFilters] = useState<string[]>([]);
     const [ratingFilter, setRatingFilter] = useState<number | undefined>(undefined);
     const [ratingFilters, setRatingFilters] = useState<number[]>([]);
-    const [experienceFilter, setExperienceFilter] = useState('');
+    const [experienceFilter, setExperienceFilter] = useState<
+        { min: number; max: number } | undefined
+    >(undefined); // Changed to slider format like price
     const [experienceFilters, setExperienceFilters] = useState<
         { MinYears: number; MaxYears: number }[]
-    >([]);
+    >([]); // Keep for backward compatibility
     const [availabilityFilter, setAvailabilityFilter] = useState('');
     const [consultationTypeFilter, setConsultationTypeFilter] = useState('');
     const [genderFilter, setGenderFilter] = useState<Gender | undefined>(undefined);
@@ -77,7 +81,9 @@ const DoctorList: React.FC = () => {
             searchTerm: searchTerm && searchTerm.trim() ? searchTerm : undefined,
             specialtyFilter:
                 specialtyFilter && specialtyFilter.trim() ? specialtyFilter : undefined,
+            specialtyFilters: specialtyFilters.length > 0 ? specialtyFilters : undefined,
             hospitalFilter: hospitalFilter && hospitalFilter.trim() ? hospitalFilter : undefined,
+            hospitalFilters: hospitalFilters.length > 0 ? hospitalFilters : undefined,
             positionFilter: positionFilter && positionFilter.trim() ? positionFilter : undefined,
             positionFilters: positionFilters.length > 0 ? positionFilters : undefined,
             languageFilter: languageFilter && languageFilter.trim() ? languageFilter : undefined,
@@ -87,9 +93,8 @@ const DoctorList: React.FC = () => {
             serviceTypeFilters: serviceTypeFilters.length > 0 ? serviceTypeFilters : undefined,
             ratingFilter: ratingFilter,
             ratingFilters: ratingFilters.length > 0 ? ratingFilters : undefined,
-            experienceFilter:
-                experienceFilter && experienceFilter.trim() ? experienceFilter : undefined,
-            experienceFilters: experienceFilters.length > 0 ? experienceFilters : undefined,
+            experienceRange: experienceFilter, // Use new slider format
+            experienceFilters: experienceFilters.length > 0 ? experienceFilters : undefined, // Keep for backward compatibility
             availabilityFilter:
                 availabilityFilter && availabilityFilter.trim() ? availabilityFilter : undefined,
             consultationTypeFilter:
@@ -111,7 +116,11 @@ const DoctorList: React.FC = () => {
             serviceTypeFilters.length > 0 ||
             ratingFilters.length > 0 ||
             experienceFilters.length > 0 ||
-            genderFilters.length > 0
+            genderFilters.length > 0 ||
+            specialtyFilters.length > 0 || // Add multiple specialty filters
+            hospitalFilters.length > 0 || // Add multiple hospital filters
+            experienceFilter || // Add experience slider filter
+            priceFilter // Also check for price filter
         ) {
             dispatch(filterDoctorsAsync(params));
         } else {
@@ -123,7 +132,9 @@ const DoctorList: React.FC = () => {
         currentPage,
         searchTerm,
         specialtyFilter,
+        specialtyFilters,
         hospitalFilter,
+        hospitalFilters,
         positionFilter,
         positionFilters,
         languageFilter,
@@ -132,7 +143,7 @@ const DoctorList: React.FC = () => {
         serviceTypeFilters,
         ratingFilter,
         ratingFilters,
-        experienceFilter,
+        experienceFilter, // Now object instead of string
         experienceFilters,
         availabilityFilter,
         consultationTypeFilter,
@@ -144,30 +155,7 @@ const DoctorList: React.FC = () => {
     // Filter and sort doctors locally (backend should handle this in production)
     const filteredAndSortedDoctors = [...doctors]
         .filter((doctor) => {
-            // Experience filter
-            if (experienceFilter) {
-                const experience = doctor.yearsOfExperience;
-                switch (experienceFilter) {
-                    case 'checkebox-sm22': // Dưới 2 năm (0-1 năm)
-                        if (experience >= 2) return false;
-                        break;
-                    case 'checkebox-sm23': // Từ 2 – 5 năm (2-4 năm)
-                        if (experience < 2 || experience >= 5) return false;
-                        break;
-                    case 'checkebox-sm24': // Từ 5 – 10 năm (5-9 năm)
-                        if (experience < 5 || experience >= 10) return false;
-                        break;
-                    case 'checkebox-sm25': // Từ 10 – 20 năm (10-19 năm)
-                        if (experience < 10 || experience >= 20) return false;
-                        break;
-                    case 'checkebox-sm26': // Trên 20 năm (20+ năm)
-                        if (experience < 20) return false;
-                        break;
-                    default:
-                        // If no valid experience filter, don't filter
-                        break;
-                }
-            }
+            // Experience filtering is now handled by backend
 
             // Availability filter (simplified - check if doctor is active)
             if (availabilityFilter) {
@@ -227,6 +215,12 @@ const DoctorList: React.FC = () => {
         setCurrentPage(1);
     };
 
+    const handleSpecialtyFilters = (specialtyIds: string[]) => {
+        console.log('DoctorList: handleSpecialtyFilters called with:', specialtyIds);
+        setSpecialtyFilters(specialtyIds);
+        setCurrentPage(1);
+    };
+
     const handlePositionFilter = (positionId: string) => {
         console.log('DoctorList: handlePositionFilter called with:', positionId);
         setPositionFilter(positionId);
@@ -252,6 +246,12 @@ const DoctorList: React.FC = () => {
         setCurrentPage(1);
     };
 
+    const handleHospitalFilters = (hospitalIds: string[]) => {
+        console.log('DoctorList: handleHospitalFilters called with:', hospitalIds);
+        setHospitalFilters(hospitalIds);
+        setCurrentPage(1);
+    };
+
     const handleRatingFilter = (rating: string) => {
         console.log('DoctorList: handleRatingFilter called with:', rating);
         if (rating) {
@@ -267,12 +267,6 @@ const DoctorList: React.FC = () => {
         } else {
             setRatingFilter(undefined);
         }
-        setCurrentPage(1);
-    };
-
-    const handleExperienceFilter = (experience: string) => {
-        console.log('DoctorList: handleExperienceFilter called with:', experience);
-        setExperienceFilter(experience);
         setCurrentPage(1);
     };
 
@@ -307,6 +301,12 @@ const DoctorList: React.FC = () => {
     const handlePriceFilter = (priceRange: { min: number; max: number }) => {
         console.log('DoctorList: handlePriceFilter called with:', priceRange);
         setPriceFilter(priceRange);
+        setCurrentPage(1);
+    };
+
+    const handleExperienceFilter = (experienceRange: { min: number; max: number }) => {
+        console.log('DoctorList: handleExperienceFilter called with:', experienceRange);
+        setExperienceFilter(experienceRange);
         setCurrentPage(1);
     };
 
@@ -352,35 +352,26 @@ const DoctorList: React.FC = () => {
         setCurrentPage(1);
     };
 
-    const handleExperienceFilters = (experiences: string[]) => {
+    const handleExperienceFilters = (experiences: any[]) => {
         console.log('DoctorList: handleExperienceFilters called with:', experiences);
         if (experiences.length > 0) {
-            // Parse JSON strings to experience ranges
-            const parsedExperiences = experiences
-                .map((exp) => {
-                    try {
-                        const parsed = JSON.parse(exp);
-                        console.log('DoctorList: parsed experience:', parsed);
-                        // Validate the parsed object
-                        if (
-                            typeof parsed.MinYears !== 'number' ||
-                            typeof parsed.MaxYears !== 'number'
-                        ) {
-                            console.error(
-                                'DoctorList: invalid experience range structure:',
-                                parsed
-                            );
-                            return null;
-                        }
-                        return parsed;
-                    } catch (error) {
-                        console.error('DoctorList: error parsing experience:', exp, error);
-                        return null;
-                    }
-                })
-                .filter(Boolean);
-            console.log('DoctorList: final experience filters:', parsedExperiences);
-            setExperienceFilters(parsedExperiences);
+            // Filter valid experience ranges
+            const validExperiences = experiences.filter((exp) => {
+                // Check if it's a valid experience range object
+                if (
+                    typeof exp === 'object' &&
+                    exp !== null &&
+                    typeof exp.MinYears === 'number' &&
+                    typeof exp.MaxYears === 'number'
+                ) {
+                    console.log('DoctorList: valid experience range:', exp);
+                    return true;
+                }
+                console.warn('DoctorList: invalid experience range:', exp);
+                return false;
+            });
+            console.log('DoctorList: final experience filters:', validExperiences);
+            setExperienceFilters(validExperiences);
         } else {
             setExperienceFilters([]);
         }
@@ -407,7 +398,9 @@ const DoctorList: React.FC = () => {
                 <SearchInput
                     onSearchChange={handleSearchChange}
                     onSpecialtyFilter={handleSpecialtyFilter}
+                    onSpecialtyFilters={handleSpecialtyFilters}
                     onHospitalFilter={handleHospitalFilter}
+                    onHospitalFilters={handleHospitalFilters}
                 />
             </div>
             <div className="content mt-5">

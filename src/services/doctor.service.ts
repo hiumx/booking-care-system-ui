@@ -245,17 +245,18 @@ export class DoctorService {
         try {
             const filterRequest = {
                 specialtyId: params.specialtyFilter,
+                specialtyIds: params.specialtyFilters, // Add multiple specialty support
                 positionId: params.positionFilter,
                 positionIds: params.positionFilters,
                 gender: params.genderFilter,
                 genders: params.genderFilters,
-                minYearsOfExperience: params.experienceFilter
-                    ? parseInt(params.experienceFilter)
-                    : undefined,
-                experienceRanges: params.experienceFilters, // Fixed: Use camelCase to match backend JSON property
+                minYearsOfExperience: params.experienceRange?.min,
+                maxYearsOfExperience: params.experienceRange?.max,
+                experienceRanges: params.experienceFilters, // Keep for backward compatibility
                 minPrice: params.priceRange?.min,
                 maxPrice: params.priceRange?.max,
                 hospitalId: params.hospitalFilter,
+                hospitalIds: params.hospitalFilters, // Add multiple hospital support
                 serviceType: params.serviceTypeFilter,
                 serviceTypes: params.serviceTypeFilters,
                 language: params.languageFilter,

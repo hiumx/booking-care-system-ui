@@ -51,15 +51,19 @@ const specialtyColorMap: Record<string, string> = {
 type SearchInputProps = {
     forceWrap?: boolean; // make inputs wrap into multiple rows regardless of screen size
     onSearchChange?: (searchTerm: string) => void; // Callback for search term changes
-    onSpecialtyFilter?: (specialtyId: string) => void; // Callback for specialty filter
-    onHospitalFilter?: (hospitalId: string) => void; // Callback for hospital filter
+    onSpecialtyFilter?: (specialtyId: string) => void; // Callback for single specialty filter (backward compatibility)
+    onSpecialtyFilters?: (specialtyIds: string[]) => void; // Callback for multiple specialty filters
+    onHospitalFilter?: (hospitalId: string) => void; // Callback for single hospital filter (backward compatibility)
+    onHospitalFilters?: (hospitalIds: string[]) => void; // Callback for multiple hospital filters
 };
 
 const SearchInput: React.FC<SearchInputProps> = ({
     forceWrap = false,
     onSearchChange,
     onSpecialtyFilter,
+    onSpecialtyFilters,
     onHospitalFilter,
+    onHospitalFilters,
 }) => {
     const dispatch = useAppDispatch();
     const { hospitals } = useAppSelector((state) => state.hospital);
@@ -114,8 +118,14 @@ const SearchInput: React.FC<SearchInputProps> = ({
         console.log('SearchInput: handleSpecialtyApply called with:', specialties);
         setSelectedSpecialties(specialties);
         setShowSpecialtyModal(false);
-        // Call callback with first selected specialty
-        if (specialties.length > 0 && onSpecialtyFilter) {
+
+        // Call multiple specialty callback if available
+        if (onSpecialtyFilters) {
+            console.log('SearchInput: calling onSpecialtyFilters with:', specialties);
+            onSpecialtyFilters(specialties);
+        }
+        // Fallback to single specialty callback for backward compatibility
+        else if (specialties.length > 0 && onSpecialtyFilter) {
             console.log('SearchInput: calling onSpecialtyFilter with:', specialties[0]);
             onSpecialtyFilter(specialties[0]);
         }
@@ -134,8 +144,14 @@ const SearchInput: React.FC<SearchInputProps> = ({
         console.log('SearchInput: handleClinicApply called with:', clinics);
         setSelectedClinics(clinics);
         setShowClinicModal(false);
-        // Call callback with first selected hospital
-        if (clinics.length > 0 && onHospitalFilter) {
+
+        // Call multiple hospital callback if available
+        if (onHospitalFilters) {
+            console.log('SearchInput: calling onHospitalFilters with:', clinics);
+            onHospitalFilters(clinics);
+        }
+        // Fallback to single hospital callback for backward compatibility
+        else if (clinics.length > 0 && onHospitalFilter) {
             console.log('SearchInput: calling onHospitalFilter with:', clinics[0]);
             onHospitalFilter(clinics[0]);
         }
