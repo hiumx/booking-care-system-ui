@@ -53,7 +53,10 @@ export const PATHS = {
 
     // Service paths
     Service: {
-        Service_Types: '/service-types/:serviceId',
+        ROOT: '/servicesparent', // List all services
+        CATEGORIES: '/servicesparent/:servicesparentId/categories', // List categories of a service
+        HOSPITALS: '/servicesparent/:servicesparentId/serviceschild/:serviceschildId/services', // List hospitals of a category
+        DETAIL: '/servicesparent/:servicesparentId/serviceschild/:serviceschildId/services/:servicesId', // Service detail in hospital
     },
 
     // Booking
