@@ -10,8 +10,8 @@ interface ServiceCardProps {
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ id, name, image, reverse }) => {
-    const fullLink = replacePathParams(buildPath(PATHS.Service.Service_Types), {
-        serviceId: id.toString(),
+    const fullLink = replacePathParams(buildPath(PATHS.Service.CATEGORIES), {
+        servicesparentId: id.toString(),
     });
     return (
         <div
