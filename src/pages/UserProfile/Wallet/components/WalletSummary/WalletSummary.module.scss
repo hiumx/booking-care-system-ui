@@ -23,9 +23,28 @@
     }
 }
 
-.addCardButton {
-    position: absolute !important;
-    bottom: 10px;
+.cardButton {
+    position: absolute;
     right: 10px;
-    border: none;
+
+    display: flex;
+    bottom: 10px;
+
+    align-items: flex-end;
+    justify-content: flex-end;
+    .buttonGroup {
+        margin-right: 1rem;
+        :first-child {
+            border-right: 1px solid #e6e8ee;
+        }
+    }
+    button {
+        color: #0e82fd;
+        font-size: 14px;
+        background-color: transparent;
+        border: none;
+        margin-right: 8px;
+        padding-right: 8px;
+        display: inline-block;
+    }
 }

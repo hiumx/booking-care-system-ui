@@ -11,6 +11,8 @@ export interface BankDetails {
     bankName: string;
     accountNumber: string;
     accountName: string;
+    branch?: string;
+    bankCode?: string;
 }
 
 export interface WalletBalance {
@@ -23,4 +25,10 @@ export interface CardFormData {
     cardHolderName: string;
     cardNumber: string;
     bankName: string;
+    bankCode: string;
+}
+
+export interface OtherAccount extends BankDetails {
+    id: string;
+    isCurrent: boolean;
 }

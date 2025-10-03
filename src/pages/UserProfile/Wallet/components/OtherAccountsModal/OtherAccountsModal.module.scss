@@ -1,0 +1,108 @@
+.otherAccountsInfo {
+    max-height: 400px; // Limit height for scrolling
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 8px; // Space for scrollbar
+    scroll-behavior: smooth; // Smooth scrolling
+
+    // Custom scrollbar styling
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+
+        &:hover {
+            background: #a8a8a8;
+        }
+    }
+
+    // Firefox scrollbar
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+.otherAccountsInfo > ul > li ul li:nth-child(3) {
+    flex-basis: 22% !important;
+}
+
+// Scroll indicator (optional - shows when there are more items)
+.scrollIndicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(transparent, rgba(255, 255, 255, 0.9));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
+    &.visible {
+        opacity: 1;
+    }
+}
+
+// Action buttons styling
+.actionButtons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: flex-end;
+    span {
+        font-size: 16px;
+        color: #0e82fd !important;
+        text-decoration: underline;
+        font-weight: 500;
+    }
+}
+
+.currentLabel {
+    color: #28a745;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.setDefaultBtn {
+    font-size: 16px;
+    color: #0e82fd !important;
+    text-decoration: underline;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+}
+
+.deleteBtn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover:not(.disabled) {
+        background: #c82333;
+    }
+
+    &.disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    i {
+        font-size: 10px;
+    }
+}

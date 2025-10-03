@@ -4,13 +4,21 @@ import clsx from 'clsx';
 import { BankDetails } from '../../types/wallet.types';
 import styles from './WalletSummary.module.scss';
 
-import Button from '../../../../../components/Button';
 interface WalletSummaryProps {
     bankDetails: BankDetails | null;
-    onAddPayment: () => void;
+    onAddCard: () => void;
+    onEditDetails: () => void;
+    onOtherAccounts: () => void;
+    accountsCount?: number;
 }
 
-const WalletSummary: React.FC<WalletSummaryProps> = ({ bankDetails, onAddPayment }) => {
+const WalletSummary: React.FC<WalletSummaryProps> = ({
+    bankDetails,
+    onAddCard,
+    onEditDetails,
+    onOtherAccounts,
+    accountsCount = 0,
+}) => {
     const hasCardDetails = bankDetails !== null;
 
     return (
@@ -36,17 +44,29 @@ const WalletSummary: React.FC<WalletSummaryProps> = ({ bankDetails, onAddPayment
                                 <h6>Tên ngân hàng</h6>
                                 <h5>{hasCardDetails ? bankDetails.bankName : 'Chưa được thêm'}</h5>
                             </li>
+                            <li>
+                                <h6>Chi nhánh</h6>
+                                <h5>
+                                    {hasCardDetails && bankDetails.bankCode
+                                        ? bankDetails.bankCode
+                                        : 'Chưa được thêm'}
+                                </h5>
+                            </li>
                         </ul>
                     </div>
                 </div>
-                <div className="col-xxl-5 col-lg-5">
-                    {' '}
-                    <Button
-                        text={hasCardDetails ? 'Cập nhật số tài khoản' : 'Thêm số tài khoản'}
-                        type="submit"
-                        onClick={onAddPayment}
-                        className={styles.addCardButton}
-                    />
+                <div className={clsx(styles.cardButton, 'bank-details-info col-xxl-5 col-lg-5')}>
+                    <div className="edit-detail-link d-flex align-items-center w-80">
+                        <div className={styles.buttonGroup}>
+                            {hasCardDetails && (
+                                <button onClick={onEditDetails}>Edit Details</button>
+                            )}
+                            <button onClick={onAddCard}>Add Cards</button>
+                        </div>
+                        <button onClick={onOtherAccounts}>
+                            Other Accounts {accountsCount > 0 && `(${accountsCount})`}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

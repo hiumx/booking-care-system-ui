@@ -1,4 +1,4 @@
-import { VietQRResponse, Bank } from '../types/bank.types';
+import { VietQRResponse, Bank } from '../pages/UserProfile/Wallet/types/bank.types';
 
 const VIETQR_API_URL = 'https://api.vietqr.io/v2/banks';
 

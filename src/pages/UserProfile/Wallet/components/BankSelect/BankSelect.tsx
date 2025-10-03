@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 
 import { Bank } from '../../types/bank.types';
-import BankService from '../../services/bank.service';
+import BankService from '../../../../../services/bank.service';
 import styles from './BankSelect.module.scss';
 
 interface BankSelectProps {
@@ -127,32 +127,61 @@ const BankSelect: React.FC<BankSelectProps> = ({
                 type="button"
                 className={clsx(styles.selectButton, {
                     [styles.open]: isOpen,
-                    [styles.hasValue]: selectedBank,
-                    [styles.required]: required && !selectedBank,
+                    [styles.hasValue]: selectedBank || value,
+                    [styles.required]: required && !selectedBank && !value,
                 })}
                 onClick={handleToggle}
                 whileTap={{ scale: 0.98 }}
                 aria-required={required}
             >
                 <div className={styles.selectedContent}>
-                    {selectedBank ? (
-                        <div className={styles.selectedBank}>
-                            <img
-                                src={selectedBank.logo}
-                                alt={selectedBank.shortName}
-                                className={styles.bankLogo}
-                                onError={(e) => {
-                                    (e.target as HTMLImageElement).src = '/placeholder-bank.png';
-                                }}
-                            />
-                            <div className={styles.bankInfo}>
-                                <span className={styles.bankName}>{selectedBank.shortName}</span>
-                                <span className={styles.bankCode}>{selectedBank.code}</span>
-                            </div>
-                        </div>
-                    ) : (
-                        <span className={styles.placeholder}>{placeholder}</span>
-                    )}
+                    {(() => {
+                        if (selectedBank) {
+                            return (
+                                <div className={styles.selectedBank}>
+                                    <img
+                                        src={selectedBank.logo}
+                                        alt={selectedBank.shortName}
+                                        className={styles.bankLogo}
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).src =
+                                                '/placeholder-bank.png';
+                                        }}
+                                    />
+                                    <div className={styles.bankInfo}>
+                                        <span className={styles.bankName}>
+                                            {selectedBank.shortName}
+                                        </span>
+                                        <span className={styles.bankCode}>{selectedBank.code}</span>
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        if (value && loading) {
+                            return (
+                                <div className={styles.selectedBank}>
+                                    <div className={styles.bankInfo}>
+                                        <span className={styles.bankName}>Loading bank...</span>
+                                        <span className={styles.bankCode}>{value}</span>
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        if (value && !loading) {
+                            return (
+                                <div className={styles.selectedBank}>
+                                    <div className={styles.bankInfo}>
+                                        <span className={styles.bankName}>Bank ({value})</span>
+                                        <span className={styles.bankCode}>{value}</span>
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        return <span className={styles.placeholder}>{placeholder}</span>;
+                    })()}
                 </div>
 
                 <motion.div

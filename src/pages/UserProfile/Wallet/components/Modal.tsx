@@ -10,9 +10,66 @@ interface ModalProps {
     onClose: () => void;
     title: string;
     children: React.ReactNode;
+    /** Custom inline styles for the modal dialog */
+    modalStyle?: React.CSSProperties;
+    /** Modal width (e.g., '600px', '50%', 400) */
+    width?: string | number;
+    /** Maximum width (e.g., '90vw', '1200px') */
+    maxWidth?: string | number;
+    /** Minimum width (default: '500px') */
+    minWidth?: string | number;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+/**
+ * Usage examples:
+ *
+ * // Basic modal with default width
+ * <Modal isOpen={isOpen} onClose={onClose} title="My Modal">
+ *   <div>Content</div>
+ * </Modal>
+ *
+ * // Modal with custom width
+ * <Modal isOpen={isOpen} onClose={onClose} title="Wide Modal" width="800px">
+ *   <div>Content</div>
+ * </Modal>
+ *
+ * // Modal with responsive width
+ * <Modal
+ *   isOpen={isOpen}
+ *   onClose={onClose}
+ *   title="Responsive Modal"
+ *   width="90vw"
+ *   maxWidth="1200px"
+ *   minWidth="300px"
+ * >
+ *   <div>Content</div>
+ * </Modal>
+ *
+ * // Modal with custom styles
+ * <Modal
+ *   isOpen={isOpen}
+ *   onClose={onClose}
+ *   title="Custom Modal"
+ *   modalStyle={{
+ *     backgroundColor: '#f8f9fa',
+ *     border: '2px solid #007bff',
+ *     borderRadius: '20px'
+ *   }}
+ * >
+ *   <div>Content</div>
+ * </Modal>
+ */
+
+const Modal: React.FC<ModalProps> = ({
+    isOpen,
+    onClose,
+    title,
+    children,
+    modalStyle = {},
+    width,
+    maxWidth,
+    minWidth = '500px',
+}) => {
     useEffect(() => {
         if (isOpen) {
             // Prevent body scroll when modal is open
@@ -138,13 +195,15 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
                         style={{
                             background: 'white',
                             borderRadius: '12px',
-                            maxWidth: '500px',
-                            width: '90%',
+                            minWidth: minWidth,
+                            width: width || 'auto',
+                            maxWidth: maxWidth,
                             maxHeight: '90vh',
                             overflow: 'hidden',
                             boxShadow:
                                 '0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.08)',
                             border: '1px solid rgba(255, 255, 255, 0.2)',
+                            ...modalStyle, // Merge custom styles
                         }}
                     >
                         <div className="modal-content">
