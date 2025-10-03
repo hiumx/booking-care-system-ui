@@ -1,5 +1,11 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 import { UserProfile, getGenderText } from '@/types/user.types';
+import { AppDispatch } from '@/store';
+import { logoutAsync } from '@/store/slices/authSlice';
+import { clearUserProfile } from '@/store/slices/userSlice';
+import { PATHS } from '@/routes/paths';
 import styles from './ProfileSidebar.module.scss';
 
 interface ProfileSidebarProps {
@@ -8,6 +14,9 @@ interface ProfileSidebarProps {
 }
 
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+
     const isActive = (tab: string) => activeTab === tab;
 
     // Helper function to format date of birth
@@ -19,6 +28,20 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
             return date.toLocaleDateString('vi-VN');
         } catch {
             return dateString;
+        }
+    };
+
+    // Handle logout
+    const handleLogout = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        try {
+            await dispatch(logoutAsync()).unwrap();
+            dispatch(clearUserProfile()); // Clear user profile from state
+            toast.success('Đăng xuất thành công');
+            navigate(PATHS.HOME); // Redirect to home page
+        } catch (error: any) {
+            console.error('Logout failed:', error);
+            toast.error('Không thể đăng xuất. Vui lòng thử lại');
         }
     };
 
@@ -117,7 +140,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                             </Link>
                         </li>
                         <li>
-                            <Link to="/login">
+                            <Link to="#" onClick={handleLogout}>
                                 <i className="isax isax-logout"></i>
                                 <span>Đăng xuất</span>
                             </Link>
