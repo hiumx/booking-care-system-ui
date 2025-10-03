@@ -58,8 +58,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                         </ul>
                         <div className="appointment-detail-btn">
                             <Link to="#" className="start-link">
-                                <i className="isax isax-calendar-tick5 me-1"></i>
-                                Attend
+                                <i className="isax isax-calendar-tick5 me-1"></i> Attend
                             </Link>
                         </div>
                     </li>
@@ -134,12 +133,11 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                     </li>
                     <li className="appointment-info">
                         <p>
-                            <i className="isax isax-calendar5"></i>
+                            <i className="isax isax-calendar5"></i>{' '}
                             {formatDate(appointment.appointmentDate)}
                         </p>
                         <p>
-                            <i className="isax isax-clock5"></i>
-                            8h-8h30
+                            <i className="isax isax-clock5"></i> 8h-8h30
                         </p>
                     </li>
                     {renderActionButtons()}

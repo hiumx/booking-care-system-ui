@@ -64,28 +64,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                         <i className="isax isax-moon"></i>
                                     </a>
                                 </li>
-                                {!isAuthenticated ? (
-                                    <>
-                                        <li>
-                                            <Link
-                                                to={PATHS.LOGIN}
-                                                className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
-                                            >
-                                                <i className="isax isax-lock-1 me-1"></i>
-                                                Đăng nhập
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to={PATHS.REGISTER}
-                                                className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
-                                            >
-                                                <i className="isax isax-user-tick me-1"></i>
-                                                Đăng ký
-                                            </Link>
-                                        </li>
-                                    </>
-                                ) : (
+                                {isAuthenticated ? (
                                     <li className="nav-item dropdown has-arrow logged-item">
                                         <Link
                                             to={
@@ -157,6 +136,27 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                             </Link>
                                         </div>
                                     </li>
+                                ) : (
+                                    <>
+                                        <li>
+                                            <Link
+                                                to={PATHS.LOGIN}
+                                                className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
+                                            >
+                                                <i className="isax isax-lock-1 me-1"></i>
+                                                Đăng nhập
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link
+                                                to={PATHS.REGISTER}
+                                                className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
+                                            >
+                                                <i className="isax isax-user-tick me-1"></i>
+                                                Đăng ký
+                                            </Link>
+                                        </li>
+                                    </>
                                 )}
                             </ul>
                         </div>

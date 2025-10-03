@@ -180,19 +180,21 @@ const Profile = () => {
 
         const validators: Record<string, () => void> = {
             firstName: () => {
-                const error = value.trim()
-                    ? value.trim().length < 2
-                        ? 'Họ phải có ít nhất 2 ký tự'
-                        : ''
-                    : 'Họ không được để trống';
+                let error = '';
+                if (!value.trim()) {
+                    error = 'Họ không được để trống';
+                } else if (value.trim().length < 2) {
+                    error = 'Họ phải có ít nhất 2 ký tự';
+                }
                 setFirstNameError(error);
             },
             lastName: () => {
-                const error = value.trim()
-                    ? value.trim().length < 2
-                        ? 'Tên phải có ít nhất 2 ký tự'
-                        : ''
-                    : 'Tên không được để trống';
+                let error = '';
+                if (!value.trim()) {
+                    error = 'Tên không được để trống';
+                } else if (value.trim().length < 2) {
+                    error = 'Tên phải có ít nhất 2 ký tự';
+                }
                 setLastNameError(error);
             },
             email: () => {
@@ -202,19 +204,21 @@ const Profile = () => {
                 setEmailError(error);
             },
             dateOfBirth: () => {
-                const error = value.trim()
-                    ? validateAge(value)
-                        ? ''
-                        : 'Bạn phải từ 18 tuổi trở lên'
-                    : 'Ngày sinh không được để trống';
+                let error = '';
+                if (!value.trim()) {
+                    error = 'Ngày sinh không được để trống';
+                } else if (!validateAge(value)) {
+                    error = 'Bạn phải từ 18 tuổi trở lên';
+                }
                 setDateOfBirthError(error);
             },
             address: () => {
-                const error = value.trim()
-                    ? value.trim().length < 5
-                        ? 'Địa chỉ phải có ít nhất 5 ký tự'
-                        : ''
-                    : 'Địa chỉ không được để trống';
+                let error = '';
+                if (!value.trim()) {
+                    error = 'Địa chỉ không được để trống';
+                } else if (value.trim().length < 5) {
+                    error = 'Địa chỉ phải có ít nhất 5 ký tự';
+                }
                 setAddressError(error);
             },
         };
@@ -235,14 +239,14 @@ const Profile = () => {
 
     // Handle phone validation separately
     const handlePhoneValidation = (value: string) => {
-        if (!phoneConfirmed) {
-            if (!value.trim()) {
-                setPhoneError('');
-            } else if (!AuthService.validatePhoneNumber(value)) {
-                setPhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
-            } else {
-                setPhoneError('');
-            }
+        if (phoneConfirmed) return;
+
+        if (!value.trim()) {
+            setPhoneError('');
+        } else if (!AuthService.validatePhoneNumber(value)) {
+            setPhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
+        } else {
+            setPhoneError('');
         }
     };
 
@@ -534,8 +538,16 @@ const Profile = () => {
                     <div className="upload-img">
                         <div className="imgs-load d-flex align-items-center">
                             <div
+                                role="button"
+                                tabIndex={0}
                                 className="change-photo"
                                 onClick={handleAvatarClick}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleAvatarClick();
+                                    }
+                                }}
                                 style={{ cursor: 'pointer' }}
                             >
                                 Tải ảnh mới
@@ -549,24 +561,26 @@ const Profile = () => {
                                     style={{ display: 'none' }}
                                 />
                             </div>
-                            <a
-                                href="#"
+                            <button
+                                type="button"
                                 className={'upload-remove'}
-                                onClick={(e) => {
-                                    e.preventDefault();
+                                onClick={() => {
                                     if (isAvatarDeleted) {
                                         handleCancelDelete();
                                     } else {
                                         handleAvatarDelete();
                                     }
                                 }}
+                                disabled={isUploadingAvatar}
                                 style={{
-                                    pointerEvents: isUploadingAvatar ? 'none' : 'auto',
+                                    border: 'none',
+                                    background: 'none',
+                                    cursor: isUploadingAvatar ? 'not-allowed' : 'pointer',
                                     opacity: isUploadingAvatar ? 0.5 : 1,
                                 }}
                             >
                                 {isAvatarDeleted ? 'Hủy' : 'Xóa'}
-                            </a>
+                            </button>
                         </div>
                         <p>
                             Ảnh của bạn phải dưới 5 MB, định dạng được chấp nhận: jpg, jpeg, png,
@@ -650,8 +664,8 @@ const Profile = () => {
                             />
                             {emailConfirmed && (
                                 <small className="text-success d-block mt-1">
-                                    <i className="fa-solid fa-circle-check me-1"></i>
-                                    Email đã được xác thực
+                                    <i className="fa-solid fa-circle-check me-1"></i> Email đã được
+                                    xác thực
                                 </small>
                             )}
                         </div>
@@ -675,8 +689,8 @@ const Profile = () => {
                             />
                             {phoneConfirmed && (
                                 <small className="text-success d-block mt-1">
-                                    <i className="fa-solid fa-circle-check me-1"></i>
-                                    Số điện thoại đã được xác thực
+                                    <i className="fa-solid fa-circle-check me-1"></i> Số điện thoại
+                                    đã được xác thực
                                 </small>
                             )}
                         </div>

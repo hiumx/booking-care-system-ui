@@ -199,10 +199,13 @@ const Register: React.FC = () => {
             setFullNameError('Họ và tên không được để trống');
         } else if (value.trim().length < 2) {
             setFullNameError('Họ và tên phải có ít nhất 2 ký tự');
-        } else if (!NAME_REGEX.NO_NUMBERS.test(value)) {
-            setFullNameError('Họ và tên không được chứa số');
         } else {
-            setFullNameError('');
+            const hasNumbers = NAME_REGEX.NO_NUMBERS.test(value);
+            if (hasNumbers) {
+                setFullNameError('');
+            } else {
+                setFullNameError('Họ và tên không được chứa số');
+            }
         }
     };
 
@@ -212,10 +215,13 @@ const Register: React.FC = () => {
             setBirthdayError('Ngày sinh không được để trống');
         } else if (new Date(value) > new Date()) {
             setBirthdayError('Ngày sinh không thể là ngày trong tương lai');
-        } else if (!validateAge(value)) {
-            setBirthdayError('Bạn phải từ 18 tuổi trở lên');
         } else {
-            setBirthdayError('');
+            const isAgeValid = validateAge(value);
+            if (isAgeValid) {
+                setBirthdayError('');
+            } else {
+                setBirthdayError('Bạn phải từ 18 tuổi trở lên');
+            }
         }
     };
 
@@ -245,10 +251,13 @@ const Register: React.FC = () => {
 
         if (!value.trim()) {
             setProfileEmailError('');
-        } else if (!AuthService.validateEmail(value)) {
-            setProfileEmailError('Email không hợp lệ');
         } else {
-            setProfileEmailError('');
+            const isEmailValid = AuthService.validateEmail(value);
+            if (isEmailValid) {
+                setProfileEmailError('');
+            } else {
+                setProfileEmailError('Email không hợp lệ');
+            }
         }
     };
 
@@ -260,10 +269,13 @@ const Register: React.FC = () => {
 
         if (!value.trim()) {
             setProfilePhoneError('');
-        } else if (!AuthService.validatePhoneNumber(value)) {
-            setProfilePhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
         } else {
-            setProfilePhoneError('');
+            const isPhoneValid = AuthService.validatePhoneNumber(value);
+            if (isPhoneValid) {
+                setProfilePhoneError('');
+            } else {
+                setProfilePhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
+            }
         }
     };
 
