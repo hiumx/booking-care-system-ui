@@ -47,7 +47,7 @@ export interface ResetPasswordRequest {
 }
 
 export interface ChangePasswordRequest {
-    currentPassword: string;
+    currentPassword?: string; // Optional for external login accounts
     newPassword: string;
     confirmNewPassword: string;
 }
@@ -86,4 +86,7 @@ export interface AuthState {
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
+    emailConfirmed: boolean;
+    phoneConfirmed: boolean;
+    hasExternalProvider: boolean;
 }

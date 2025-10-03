@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import Select from 'react-select';
@@ -11,26 +11,78 @@ import { AppDispatch, RootState } from '@/store';
 import { updateUserProfile } from '@/store/slices/userSlice';
 import { Gender } from '@/enums/common.enums';
 import { getGenderText, UpdateUserRequest } from '@/types/user.types';
+import { AuthService } from '@/services/auth.service';
+import { UploadService } from '@/services/upload.service';
+import { usePhoneInput } from '@/hooks/usePhoneInput';
 
 interface GenderOption {
     value: Gender;
     label: string;
 }
 
+// Default avatar URLs based on gender
+const DEFAULT_AVATAR_MALE =
+    'https://d24em9p7s2uixh.cloudfront.net/avatars/patients/male_20251003_f9c91483.png';
+const DEFAULT_AVATAR_FEMALE =
+    'https://d24em9p7s2uixh.cloudfront.net/avatars/patients/female_20251003_d13e4998.png';
+
+/**
+ * Get default avatar URL based on gender
+ */
+const getDefaultAvatarByGender = (gender: Gender | undefined): string => {
+    if (gender === Gender.FEMALE) {
+        return DEFAULT_AVATAR_FEMALE;
+    }
+    // Default to male avatar for MALE, OTHER, or undefined
+    return DEFAULT_AVATAR_MALE;
+};
+
 const Profile = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { profile, isLoading } = useSelector((state: RootState) => state.user);
+    const { emailConfirmed, phoneConfirmed } = useSelector((state: RootState) => state.auth);
+
+    // Use phone input hook
+    const { phone, handlePhoneChange, handlePhonePaste, handlePhoneKeyDown, setPhoneValue } =
+        usePhoneInput();
 
     const [updateData, setUpdateData] = useState<UpdateUserRequest>({
         firstName: '',
         lastName: '',
         email: '',
-        phoneNumber: '',
+        phone: '',
         gender: Gender.MALE,
         dateOfBirth: '',
         address: '',
         avatarUrl: '',
     });
+
+    // Store original data for comparison
+    const [originalData, setOriginalData] = useState<UpdateUserRequest>({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        gender: Gender.MALE,
+        dateOfBirth: '',
+        address: '',
+        avatarUrl: '',
+    });
+
+    // Validation states
+    const [emailError, setEmailError] = useState<string>('');
+    const [phoneError, setPhoneError] = useState<string>('');
+    const [firstNameError, setFirstNameError] = useState<string>('');
+    const [lastNameError, setLastNameError] = useState<string>('');
+    const [addressError, setAddressError] = useState<string>('');
+    const [dateOfBirthError, setDateOfBirthError] = useState<string>('');
+
+    // Avatar upload states
+    const [avatarPreview, setAvatarPreview] = useState<string>('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isAvatarDeleted, setIsAvatarDeleted] = useState(false);
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const genderOptions: GenderOption[] = [
         { value: Gender.MALE, label: getGenderText(Gender.MALE) },
@@ -49,27 +101,142 @@ const Profile = () => {
         }
     };
 
+    // Check if data has changed from original
+    const hasChanges = useMemo(() => {
+        return (
+            updateData.firstName !== originalData.firstName ||
+            updateData.lastName !== originalData.lastName ||
+            updateData.email !== originalData.email ||
+            phone !== originalData.phone || // Use phone from hook
+            updateData.gender !== originalData.gender ||
+            updateData.dateOfBirth !== originalData.dateOfBirth ||
+            updateData.address !== originalData.address ||
+            updateData.avatarUrl !== originalData.avatarUrl ||
+            selectedFile !== null || // Có file mới chọn
+            isAvatarDeleted // Đã đánh dấu xóa
+        );
+    }, [updateData, originalData, phone, selectedFile, isAvatarDeleted]);
+
+    // Validation helper: Check if user is at least 18 years old
+    const validateAge = (dateOfBirth: string): boolean => {
+        if (!dateOfBirth) return false;
+        const birthDate = new Date(dateOfBirth);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            return age - 1 >= 18;
+        }
+        return age >= 18;
+    };
+
     // Load user profile data when component mounts or profile changes
     useEffect(() => {
         if (profile) {
-            setUpdateData({
+            // Set default avatar if not exists
+            const avatarUrl =
+                profile.avatarUrl || getDefaultAvatarByGender(profile.gender || Gender.MALE);
+
+            const profileData = {
                 firstName: profile.firstName || '',
                 lastName: profile.lastName || '',
                 email: profile.email || '',
-                phoneNumber: profile.phoneNumber || '',
+                phone: profile.phone || '',
                 gender: profile.gender || Gender.MALE,
                 dateOfBirth: formatDateForInput(profile.dateOfBirth),
                 address: profile.address || '',
-                avatarUrl: profile.avatarUrl || '',
-            });
+                avatarUrl: avatarUrl,
+            };
+
+            setUpdateData(profileData);
+            setOriginalData(profileData); // Store original data
+            // Set phone value from profile
+            setPhoneValue(profile.phone || '');
+            // Set avatar preview from profile (use default if not exists)
+            setAvatarPreview(avatarUrl);
+            // Clear all error states
+            setEmailError('');
+            setPhoneError('');
+            setFirstNameError('');
+            setLastNameError('');
+            setAddressError('');
+            setDateOfBirthError('');
         }
-    }, [profile]);
+    }, [profile, setPhoneValue]);
+
+    // Cleanup avatar preview URL on unmount
+    useEffect(() => {
+        return () => {
+            if (avatarPreview && avatarPreview.startsWith('blob:')) {
+                UploadService.revokePreviewUrl(avatarPreview);
+            }
+        };
+    }, [avatarPreview]);
 
     const handleInputChange = (field: keyof UpdateUserRequest, value: string | Gender) => {
         setUpdateData((prev) => ({
             ...prev,
             [field]: value,
         }));
+
+        // Validate firstName
+        if (field === 'firstName' && typeof value === 'string') {
+            if (!value.trim()) {
+                setFirstNameError('Họ không được để trống');
+            } else if (value.trim().length < 2) {
+                setFirstNameError('Họ phải có ít nhất 2 ký tự');
+            } else {
+                setFirstNameError('');
+            }
+        }
+
+        // Validate lastName
+        if (field === 'lastName' && typeof value === 'string') {
+            if (!value.trim()) {
+                setLastNameError('Tên không được để trống');
+            } else if (value.trim().length < 2) {
+                setLastNameError('Tên phải có ít nhất 2 ký tự');
+            } else {
+                setLastNameError('');
+            }
+        }
+
+        // Validate email on change (only if not confirmed)
+        if (field === 'email' && !emailConfirmed && typeof value === 'string') {
+            if (!value.trim()) {
+                setEmailError('');
+            } else if (!AuthService.validateEmail(value)) {
+                setEmailError('Email không hợp lệ');
+            } else {
+                setEmailError('');
+            }
+        }
+
+        // Note: Phone validation is handled separately by handlePhoneValidation
+        // because phone uses the usePhoneInput hook
+
+        // Validate dateOfBirth
+        if (field === 'dateOfBirth' && typeof value === 'string') {
+            if (!value.trim()) {
+                setDateOfBirthError('Ngày sinh không được để trống');
+            } else if (!validateAge(value)) {
+                setDateOfBirthError('Bạn phải từ 18 tuổi trở lên');
+            } else {
+                setDateOfBirthError('');
+            }
+        }
+
+        // Validate address
+        if (field === 'address' && typeof value === 'string') {
+            if (!value.trim()) {
+                setAddressError('Địa chỉ không được để trống');
+            } else if (value.trim().length < 5) {
+                setAddressError('Địa chỉ phải có ít nhất 5 ký tự');
+            } else {
+                setAddressError('');
+            }
+        }
     };
 
     const handleGenderChange = (selectedOption: GenderOption | null) => {
@@ -78,28 +245,244 @@ const Profile = () => {
         }
     };
 
+    // Handle phone validation separately
+    const handlePhoneValidation = (value: string) => {
+        if (!phoneConfirmed) {
+            if (!value.trim()) {
+                setPhoneError('');
+            } else if (!AuthService.validatePhoneNumber(value)) {
+                setPhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
+            } else {
+                setPhoneError('');
+            }
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Check if there are any changes (including avatar)
+        const hasAvatarChange = selectedFile !== null || isAvatarDeleted;
+        if (!hasChanges && !hasAvatarChange) {
+            toast.info('Không có thay đổi nào để lưu');
+            return;
+        }
+
+        let hasError = false;
+
+        // Validate firstName
+        if (!updateData.firstName?.trim()) {
+            setFirstNameError('Họ không được để trống');
+            hasError = true;
+        } else if (updateData.firstName.trim().length < 2) {
+            setFirstNameError('Họ phải có ít nhất 2 ký tự');
+            hasError = true;
+        }
+
+        // Validate lastName
+        if (!updateData.lastName?.trim()) {
+            setLastNameError('Tên không được để trống');
+            hasError = true;
+        } else if (updateData.lastName.trim().length < 2) {
+            setLastNameError('Tên phải có ít nhất 2 ký tự');
+            hasError = true;
+        }
+
+        // Validate email if not confirmed
+        if (!emailConfirmed && updateData.email?.trim()) {
+            if (!AuthService.validateEmail(updateData.email)) {
+                setEmailError('Email không hợp lệ');
+                hasError = true;
+            }
+        }
+
+        // Validate phone if not confirmed (use phone from hook)
+        if (!phoneConfirmed && phone.trim()) {
+            if (!AuthService.validatePhoneNumber(phone)) {
+                setPhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
+                hasError = true;
+            }
+        }
+
+        // Validate dateOfBirth
+        if (!updateData.dateOfBirth?.trim()) {
+            setDateOfBirthError('Ngày sinh không được để trống');
+            hasError = true;
+        } else if (!validateAge(updateData.dateOfBirth)) {
+            setDateOfBirthError('Bạn phải từ 18 tuổi trở lên');
+            hasError = true;
+        }
+
+        // Validate address
+        if (!updateData.address?.trim()) {
+            setAddressError('Địa chỉ không được để trống');
+            hasError = true;
+        } else if (updateData.address.trim().length < 5) {
+            setAddressError('Địa chỉ phải có ít nhất 5 ký tự');
+            hasError = true;
+        }
+
+        // Check if at least one of email or phone is provided (use phone from hook)
+        if (!updateData.email?.trim() && !phone.trim()) {
+            toast.error('Vui lòng cung cấp ít nhất một trong email hoặc số điện thoại!');
+            hasError = true;
+        }
+
+        if (hasError) {
+            toast.error('Vui lòng kiểm tra lại thông tin!');
+            return;
+        }
+
         try {
-            // Create UpdateUserRequest object with current data
+            setIsUploadingAvatar(true);
+            let avatarUrl = updateData.avatarUrl;
+
+            // Nếu có file mới, upload trước
+            if (selectedFile) {
+                const uploadResult = await UploadService.uploadAvatar(selectedFile);
+                if (uploadResult.success) {
+                    avatarUrl = uploadResult.cloudFrontUrl || uploadResult.fileUrl || '';
+                } else {
+                    throw new Error(uploadResult.errorMessage || 'Upload ảnh thất bại');
+                }
+            }
+
+            // Nếu đã xóa ảnh, set về default avatar dựa trên giới tính
+            if (isAvatarDeleted) {
+                avatarUrl = getDefaultAvatarByGender(updateData.gender);
+            }
+
+            // Create UpdateUserRequest object with current data (use phone from hook)
             const updateRequest: UpdateUserRequest = {
                 firstName: updateData.firstName,
                 lastName: updateData.lastName,
                 email: updateData.email,
-                phoneNumber: updateData.phoneNumber,
+                phone: phone || undefined, // Convert empty string to undefined
                 gender: updateData.gender,
                 dateOfBirth: updateData.dateOfBirth,
                 address: updateData.address,
-                avatarUrl: updateData.avatarUrl,
+                avatarUrl: avatarUrl,
             };
 
             await dispatch(updateUserProfile(updateRequest)).unwrap();
+
+            // Reset avatar states sau khi thành công
+            setSelectedFile(null);
+            setIsAvatarDeleted(false);
+
+            // Reset input để có thể chọn lại file
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+
             toast.success('Cập nhật thông tin thành công!');
         } catch (error: any) {
             console.error('Failed to update profile:', error);
             toast.error(error.message || 'Không thể cập nhật thông tin. Vui lòng thử lại!');
+        } finally {
+            setIsUploadingAvatar(false);
         }
+    };
+
+    // Handle avatar file selection (CHỈ preview, chưa upload)
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file
+        const validation = UploadService.validateImageFile(file);
+        if (!validation.valid) {
+            toast.error(validation.error);
+            // Reset input để có thể chọn lại file khác
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+            return;
+        }
+
+        // Lưu file và tạo preview (chưa upload)
+        setSelectedFile(file);
+        const previewUrl = UploadService.createPreviewUrl(file);
+        setAvatarPreview(previewUrl);
+        setIsAvatarDeleted(false); // Reset trạng thái xóa nếu có
+
+        // Reset input value để có thể chọn lại cùng file
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    // Handle avatar delete (Chỉ đánh dấu, chưa xóa thật)
+    const handleAvatarDelete = () => {
+        if (!avatarPreview && !originalData.avatarUrl) {
+            toast.info('Không có ảnh đại diện để xóa');
+            return;
+        }
+
+        // Cleanup blob URL nếu có
+        if (avatarPreview && avatarPreview.startsWith('blob:')) {
+            UploadService.revokePreviewUrl(avatarPreview);
+        }
+
+        // Set default avatar based on gender
+        const defaultAvatar = getDefaultAvatarByGender(updateData.gender);
+        setAvatarPreview(defaultAvatar);
+        setSelectedFile(null);
+        setIsAvatarDeleted(true);
+
+        // Reset input để có thể chọn lại file
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    // Handle cancel delete (Khôi phục ảnh cũ)
+    const handleCancelDelete = () => {
+        setAvatarPreview(originalData.avatarUrl || '');
+        setSelectedFile(null);
+        setIsAvatarDeleted(false);
+
+        // Reset input để có thể chọn lại file
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    // Trigger file input click
+    const handleAvatarClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    // Handle cancel - reset to original profile data
+    const handleCancel = () => {
+        // Reset to original data
+        setUpdateData(originalData);
+        setPhoneValue(originalData.phone || '');
+
+        // Reset avatar preview
+        if (avatarPreview && avatarPreview.startsWith('blob:')) {
+            UploadService.revokePreviewUrl(avatarPreview);
+        }
+        setAvatarPreview(originalData.avatarUrl || '');
+
+        // Reset avatar states
+        setSelectedFile(null);
+        setIsAvatarDeleted(false);
+
+        // Reset input để có thể chọn lại file
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+
+        // Clear all errors
+        setEmailError('');
+        setPhoneError('');
+        setFirstNameError('');
+        setLastNameError('');
+        setAddressError('');
+        setDateOfBirthError('');
+
+        toast.info('Đã hủy thay đổi');
     };
 
     const customSelectStyles = {
@@ -121,20 +504,78 @@ const Profile = () => {
             <div className="setting-card">
                 <label className="form-label mb-2">Ảnh đại diện</label>
                 <div className="change-avatar img-upload">
-                    <div className="profile-img">
-                        <i className="fa-solid fa-file-image"></i>
+                    <div
+                        className="profile-img"
+                        style={{
+                            position: 'relative',
+                            width: '60px',
+                            height: '60px',
+                            borderRadius: '50%',
+                            overflow: 'hidden',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: '#f5f5f5',
+                        }}
+                    >
+                        {avatarPreview ? (
+                            <img
+                                src={avatarPreview}
+                                alt="Avatar preview"
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                }}
+                            />
+                        ) : (
+                            <i
+                                className="fa-solid fa-user"
+                                style={{ fontSize: '48px', color: '#ccc' }}
+                            ></i>
+                        )}
                     </div>
                     <div className="upload-img">
                         <div className="imgs-load d-flex align-items-center">
-                            <div className="change-photo">
+                            <div
+                                className="change-photo"
+                                onClick={handleAvatarClick}
+                                style={{ cursor: 'pointer' }}
+                            >
                                 Tải ảnh mới
-                                <input type="file" className="upload" accept="image/*" />
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    className="upload"
+                                    accept="image/jpeg,image/jpg,image/png,image/gif"
+                                    onChange={handleAvatarChange}
+                                    disabled={isUploadingAvatar}
+                                    style={{ display: 'none' }}
+                                />
                             </div>
-                            <a href="#" className="upload-remove">
-                                Xóa
+                            <a
+                                href="#"
+                                className={'upload-remove'}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    if (isAvatarDeleted) {
+                                        handleCancelDelete();
+                                    } else {
+                                        handleAvatarDelete();
+                                    }
+                                }}
+                                style={{
+                                    pointerEvents: isUploadingAvatar ? 'none' : 'auto',
+                                    opacity: isUploadingAvatar ? 0.5 : 1,
+                                }}
+                            >
+                                {isAvatarDeleted ? 'Hủy' : 'Xóa'}
                             </a>
                         </div>
-                        <p>Ảnh của bạn phải dưới 4 MB, định dạng được chấp nhận: jpg, png, svg</p>
+                        <p>
+                            Ảnh của bạn phải dưới 5 MB, định dạng được chấp nhận: jpg, jpeg, png,
+                            gif
+                        </p>
                     </div>
                 </div>
             </div>
@@ -152,6 +593,7 @@ const Profile = () => {
                                 type="text"
                                 value={updateData.firstName || ''}
                                 onChange={(e) => handleInputChange('firstName', e.target.value)}
+                                error={firstNameError}
                             />
                         </div>
                     </div>
@@ -163,6 +605,7 @@ const Profile = () => {
                                 type="text"
                                 value={updateData.lastName || ''}
                                 onChange={(e) => handleInputChange('lastName', e.target.value)}
+                                error={lastNameError}
                             />
                         </div>
                     </div>
@@ -194,6 +637,7 @@ const Profile = () => {
                                 isRequired={true}
                                 maxDate={new Date()} // Không cho chọn ngày tương lai
                                 minDate={new Date('1900-01-01')} // Giới hạn năm sinh
+                                error={dateOfBirthError}
                             />
                         </div>
                     </div>
@@ -201,22 +645,44 @@ const Profile = () => {
                         <div className="mb-3">
                             <Input
                                 label="Email"
-                                isRequired
+                                isRequired={emailConfirmed}
                                 type="email"
                                 value={updateData.email || ''}
                                 onChange={(e) => handleInputChange('email', e.target.value)}
+                                disabled={emailConfirmed}
+                                error={emailError}
                             />
+                            {emailConfirmed && (
+                                <small className="text-success d-block mt-1">
+                                    <i className="fa-solid fa-circle-check me-1"></i>
+                                    Email đã được xác thực
+                                </small>
+                            )}
                         </div>
                     </div>
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
                             <Input
                                 label="Số điện thoại"
-                                isRequired
-                                type="text"
-                                value={updateData.phoneNumber || ''}
-                                onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                                isRequired={phoneConfirmed}
+                                type="tel"
+                                inputMode="numeric"
+                                value={phone}
+                                onChange={(e) => {
+                                    handlePhoneChange(e);
+                                    handlePhoneValidation(e.target.value);
+                                }}
+                                onKeyDown={handlePhoneKeyDown}
+                                onPaste={handlePhonePaste}
+                                disabled={phoneConfirmed}
+                                error={phoneError}
                             />
+                            {phoneConfirmed && (
+                                <small className="text-success d-block mt-1">
+                                    <i className="fa-solid fa-circle-check me-1"></i>
+                                    Số điện thoại đã được xác thực
+                                </small>
+                            )}
                         </div>
                     </div>
 
@@ -228,6 +694,7 @@ const Profile = () => {
                                 type="text"
                                 value={updateData.address || ''}
                                 onChange={(e) => handleInputChange('address', e.target.value)}
+                                error={addressError}
                             />
                         </div>
                     </div>
@@ -235,14 +702,19 @@ const Profile = () => {
             </div>
 
             <div className="modal-btn text-end">
-                <a href="#" className="btn btn-md btn-light rounded-pill">
+                <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="btn btn-md btn-light rounded-pill"
+                    disabled={isUploadingAvatar || isLoading || !hasChanges}
+                >
                     Hủy
-                </a>
+                </button>
                 <Button
-                    text={isLoading ? 'Đang lưu...' : 'Lưu thay đổi'}
+                    text={isUploadingAvatar ? 'Đang lưu...' : 'Lưu thay đổi'}
                     type="submit"
                     className="btn-md rounded-pill"
-                    isDisabled={isLoading}
+                    isDisabled={isUploadingAvatar || isLoading || !hasChanges}
                 />
             </div>
         </form>

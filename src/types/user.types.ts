@@ -8,7 +8,7 @@ export interface UserProfile {
     lastName: string;
     fullName: string;
     email: string;
-    phoneNumber: string;
+    phone: string;
     avatarUrl?: string;
     gender: Gender;
     dateOfBirth: string;
@@ -29,7 +29,7 @@ export interface UpdateUserRequest {
     firstName?: string;
     lastName?: string;
     email?: string;
-    phoneNumber?: string;
+    phone?: string;
     gender?: Gender;
     dateOfBirth?: string;
     address?: string;
