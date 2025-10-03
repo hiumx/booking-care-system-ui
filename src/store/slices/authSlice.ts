@@ -39,6 +39,28 @@ const validateRoles = (response: any, rejectWithValue: any) => {
     return null; // No error
 };
 
+// Helper function to handle validation result (DRY principle)
+const handleValidationResult = (validationResult: any) => {
+    if (validationResult?.roles) {
+        return {
+            roles: validationResult.roles,
+            emailConfirmed: validationResult.emailConfirmed,
+            phoneConfirmed: validationResult.phoneConfirmed,
+            hasExternalProvider: validationResult.hasExternalProvider,
+        };
+    }
+    if (validationResult === null) {
+        // No token found, return empty roles
+        return {
+            roles: [],
+            emailConfirmed: false,
+            phoneConfirmed: false,
+            hasExternalProvider: false,
+        };
+    }
+    return validationResult; // This is the error case
+};
+
 // Initial state - Redux Persist will automatically restore roles and confirmation statuses
 const initialState: AuthState = {
     roles: [],
@@ -59,24 +81,7 @@ export const loginAsync = createAsyncThunk(
 
             // Validate roles using helper function
             const validationResult = validateRoles(response, rejectWithValue);
-            if (validationResult?.roles) {
-                return {
-                    roles: validationResult.roles,
-                    emailConfirmed: validationResult.emailConfirmed,
-                    phoneConfirmed: validationResult.phoneConfirmed,
-                    hasExternalProvider: validationResult.hasExternalProvider,
-                };
-            }
-            if (validationResult === null) {
-                // No token found, return empty roles
-                return {
-                    roles: [],
-                    emailConfirmed: false,
-                    phoneConfirmed: false,
-                    hasExternalProvider: false,
-                };
-            }
-            return validationResult; // This is the error case
+            return handleValidationResult(validationResult);
         } catch (error: any) {
             return rejectWithValue(error.message || 'Login failed');
         }
@@ -151,24 +156,7 @@ export const googleLoginAsync = createAsyncThunk(
 
             // Validate roles using helper function
             const validationResult = validateRoles(response, rejectWithValue);
-            if (validationResult?.roles) {
-                return {
-                    roles: validationResult.roles,
-                    emailConfirmed: validationResult.emailConfirmed,
-                    phoneConfirmed: validationResult.phoneConfirmed,
-                    hasExternalProvider: validationResult.hasExternalProvider,
-                };
-            }
-            if (validationResult === null) {
-                // No token found, return empty roles
-                return {
-                    roles: [],
-                    emailConfirmed: false,
-                    phoneConfirmed: false,
-                    hasExternalProvider: false,
-                };
-            }
-            return validationResult; // This is the error case
+            return handleValidationResult(validationResult);
         } catch (error: any) {
             return rejectWithValue(error.message || 'Google login failed');
         }
@@ -183,24 +171,7 @@ export const facebookLoginAsync = createAsyncThunk(
 
             // Validate roles using helper function
             const validationResult = validateRoles(response, rejectWithValue);
-            if (validationResult?.roles) {
-                return {
-                    roles: validationResult.roles,
-                    emailConfirmed: validationResult.emailConfirmed,
-                    phoneConfirmed: validationResult.phoneConfirmed,
-                    hasExternalProvider: validationResult.hasExternalProvider,
-                };
-            }
-            if (validationResult === null) {
-                // No token found, return empty roles
-                return {
-                    roles: [],
-                    emailConfirmed: false,
-                    phoneConfirmed: false,
-                    hasExternalProvider: false,
-                };
-            }
-            return validationResult; // This is the error case
+            return handleValidationResult(validationResult);
         } catch (error: any) {
             return rejectWithValue(error.message || 'Facebook login failed');
         }

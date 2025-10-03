@@ -22,6 +22,7 @@ import { usePhoneInput } from '@/hooks/usePhoneInput';
 import { toast } from 'react-toastify';
 import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH, OTP_REGEX, NAME_REGEX } from '@/constants';
 import { Gender } from '@/enums/common.enums';
+import { validateAge } from '@/utils/validation';
 
 type Step = 0 | 1 | 2 | 3;
 
@@ -162,20 +163,6 @@ const Register: React.FC = () => {
     const handleSocialSuccess = () => navigate('/');
     const handleSocialError = (error: any) => console.error('Social login error:', error);
 
-    // Validation helper: Check if user is at least 18 years old
-    const validateAge = (dateOfBirth: string): boolean => {
-        if (!dateOfBirth) return false;
-        const birthDate = new Date(dateOfBirth);
-        const today = new Date();
-        const age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            return age - 1 >= 18;
-        }
-        return age >= 18;
-    };
-
     const canSendOtp = useMemo(() => {
         // Use AuthService for consistent email validation
         const validEmail = email.trim() && AuthService.validateEmail(email);
@@ -249,15 +236,15 @@ const Register: React.FC = () => {
         setProfileEmail(value);
         if (method === 'email') return; // Skip validation if email is used for registration
 
-        if (!value.trim()) {
-            setProfileEmailError('');
-        } else {
+        if (value.trim()) {
             const isEmailValid = AuthService.validateEmail(value);
             if (isEmailValid) {
                 setProfileEmailError('');
             } else {
                 setProfileEmailError('Email không hợp lệ');
             }
+        } else {
+            setProfileEmailError('');
         }
     };
 
@@ -267,15 +254,15 @@ const Register: React.FC = () => {
 
         if (method === 'phone') return; // Skip validation if phone is used for registration
 
-        if (!value.trim()) {
-            setProfilePhoneError('');
-        } else {
+        if (value.trim()) {
             const isPhoneValid = AuthService.validatePhoneNumber(value);
             if (isPhoneValid) {
                 setProfilePhoneError('');
             } else {
                 setProfilePhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
             }
+        } else {
+            setProfilePhoneError('');
         }
     };
 

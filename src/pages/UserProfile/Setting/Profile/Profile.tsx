@@ -14,6 +14,7 @@ import { getGenderText, UpdateUserRequest } from '@/types/user.types';
 import { AuthService } from '@/services/auth.service';
 import { UploadService } from '@/services/upload.service';
 import { usePhoneInput } from '@/hooks/usePhoneInput';
+import { validateAge } from '@/utils/validation';
 
 interface GenderOption {
     value: Gender;
@@ -116,20 +117,6 @@ const Profile = () => {
             isAvatarDeleted // Đã đánh dấu xóa
         );
     }, [updateData, originalData, phone, selectedFile, isAvatarDeleted]);
-
-    // Validation helper: Check if user is at least 18 years old
-    const validateAge = (dateOfBirth: string): boolean => {
-        if (!dateOfBirth) return false;
-        const birthDate = new Date(dateOfBirth);
-        const today = new Date();
-        const age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            return age - 1 >= 18;
-        }
-        return age >= 18;
-    };
 
     // Load user profile data when component mounts or profile changes
     useEffect(() => {
@@ -537,30 +524,23 @@ const Profile = () => {
                     </div>
                     <div className="upload-img">
                         <div className="imgs-load d-flex align-items-center">
-                            <div
-                                role="button"
-                                tabIndex={0}
+                            <button
+                                type="button"
                                 className="change-photo"
                                 onClick={handleAvatarClick}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault();
-                                        handleAvatarClick();
-                                    }
-                                }}
-                                style={{ cursor: 'pointer' }}
+                                style={{ cursor: 'pointer', border: 'none', background: 'none' }}
                             >
                                 Tải ảnh mới
-                                <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    className="upload"
-                                    accept="image/jpeg,image/jpg,image/png,image/gif"
-                                    onChange={handleAvatarChange}
-                                    disabled={isUploadingAvatar}
-                                    style={{ display: 'none' }}
-                                />
-                            </div>
+                            </button>{' '}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                className="upload"
+                                accept="image/jpeg,image/jpg,image/png,image/gif"
+                                onChange={handleAvatarChange}
+                                disabled={isUploadingAvatar}
+                                style={{ display: 'none' }}
+                            />
                             <button
                                 type="button"
                                 className={'upload-remove'}
