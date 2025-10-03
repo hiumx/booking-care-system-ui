@@ -228,10 +228,12 @@ const Profile = () => {
     const handlePhoneValidation = (value: string) => {
         if (phoneConfirmed) return;
 
-        if (!value.trim()) {
-            setPhoneError('');
-        } else if (!AuthService.validatePhoneNumber(value)) {
-            setPhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
+        if (value.trim()) {
+            if (AuthService.validatePhoneNumber(value)) {
+                setPhoneError('');
+            } else {
+                setPhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
+            }
         } else {
             setPhoneError('');
         }
