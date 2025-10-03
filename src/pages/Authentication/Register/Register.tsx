@@ -410,12 +410,11 @@ const Register: React.FC = () => {
         transitionToStep(3);
     };
 
-    const handleCompleteRegistration = async (e: React.FormEvent) => {
-        e.preventDefault();
-
+    // Helper: Validate all registration fields
+    const validateRegistrationFields = (): boolean => {
         let hasError = false;
 
-        // Validate all fields
+        // Validate fullName
         if (!fullName.trim()) {
             setFullNameError('Họ và tên không được để trống');
             hasError = true;
@@ -427,6 +426,7 @@ const Register: React.FC = () => {
             hasError = true;
         }
 
+        // Validate birthday
         if (!birthday.trim()) {
             setBirthdayError('Ngày sinh không được để trống');
             hasError = true;
@@ -438,11 +438,13 @@ const Register: React.FC = () => {
             hasError = true;
         }
 
+        // Validate gender
         if (gender === '') {
             setGenderError('Vui lòng chọn giới tính');
             hasError = true;
         }
 
+        // Validate address
         if (!address.trim()) {
             setAddressError('Địa chỉ không được để trống');
             hasError = true;
@@ -451,17 +453,26 @@ const Register: React.FC = () => {
             hasError = true;
         }
 
+        // Validate email (if not primary method)
         if (method !== 'email' && !AuthService.validateEmail(profileEmail)) {
             setProfileEmailError('Email không hợp lệ');
             hasError = true;
         }
 
+        // Validate phone (if not primary method)
         if (method !== 'phone' && !AuthService.validatePhoneNumber(profilePhone)) {
             setProfilePhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
             hasError = true;
         }
 
-        if (hasError) {
+        return hasError;
+    };
+
+    const handleCompleteRegistration = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Validate all fields
+        if (validateRegistrationFields()) {
             toast.error('Vui lòng kiểm tra lại thông tin!');
             return;
         }
@@ -476,7 +487,7 @@ const Register: React.FC = () => {
             fullName,
             gender: gender as Gender,
             address,
-            birthday: birthday, // Keep as YYYY-MM-DD format
+            birthday: birthday,
             channel: method,
             purpose: 'REGISTER',
             proof: otpProof,
@@ -485,19 +496,15 @@ const Register: React.FC = () => {
 
         try {
             await dispatch(registerAsync(registerData)).unwrap();
-
-            // Registration successful, redirect to home
             toast.success('Đăng ký thành công! Chào mừng bạn đến với Doccure!');
             navigate('/login');
         } catch (error) {
             console.error('Registration error:', error);
-            if (method === 'phone') {
-                toast.error('Độ tuổi không hợp lệ hoặc email này đã được đăng ký tài khoản.');
-            } else {
-                toast.error(
-                    'Độ tuổi không hợp lệ hoặc số điện thoại này đã được đăng ký tài khoản.'
-                );
-            }
+            const errorMsg =
+                method === 'phone'
+                    ? 'Độ tuổi không hợp lệ hoặc email này đã được đăng ký tài khoản.'
+                    : 'Độ tuổi không hợp lệ hoặc số điện thoại này đã được đăng ký tài khoản.';
+            toast.error(errorMsg);
         } finally {
             setIsSubmitting(false);
         }

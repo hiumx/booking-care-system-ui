@@ -65,7 +65,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                     <Link to="/profile-settings" className="booking-doc-img">
                         <img
                             src={userData.avatarUrl || '/assets/img/default-avatar-male.png'}
-                            alt="User Image"
+                            alt={`${userData.fullName} avatar`}
                         />
                     </Link>
                     <div className="profile-det-info">

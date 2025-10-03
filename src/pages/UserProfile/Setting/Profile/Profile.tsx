@@ -168,75 +168,63 @@ const Profile = () => {
     // Cleanup avatar preview URL on unmount
     useEffect(() => {
         return () => {
-            if (avatarPreview && avatarPreview.startsWith('blob:')) {
+            if (avatarPreview?.startsWith('blob:')) {
                 UploadService.revokePreviewUrl(avatarPreview);
             }
         };
     }, [avatarPreview]);
 
+    // Helper: Validate field on change
+    const validateFieldOnChange = (field: keyof UpdateUserRequest, value: string | Gender) => {
+        if (typeof value !== 'string') return;
+
+        const validators: Record<string, () => void> = {
+            firstName: () => {
+                const error = value.trim()
+                    ? value.trim().length < 2
+                        ? 'Họ phải có ít nhất 2 ký tự'
+                        : ''
+                    : 'Họ không được để trống';
+                setFirstNameError(error);
+            },
+            lastName: () => {
+                const error = value.trim()
+                    ? value.trim().length < 2
+                        ? 'Tên phải có ít nhất 2 ký tự'
+                        : ''
+                    : 'Tên không được để trống';
+                setLastNameError(error);
+            },
+            email: () => {
+                if (emailConfirmed) return;
+                const error =
+                    value.trim() && !AuthService.validateEmail(value) ? 'Email không hợp lệ' : '';
+                setEmailError(error);
+            },
+            dateOfBirth: () => {
+                const error = value.trim()
+                    ? validateAge(value)
+                        ? ''
+                        : 'Bạn phải từ 18 tuổi trở lên'
+                    : 'Ngày sinh không được để trống';
+                setDateOfBirthError(error);
+            },
+            address: () => {
+                const error = value.trim()
+                    ? value.trim().length < 5
+                        ? 'Địa chỉ phải có ít nhất 5 ký tự'
+                        : ''
+                    : 'Địa chỉ không được để trống';
+                setAddressError(error);
+            },
+        };
+
+        validators[field]?.();
+    };
+
     const handleInputChange = (field: keyof UpdateUserRequest, value: string | Gender) => {
-        setUpdateData((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
-
-        // Validate firstName
-        if (field === 'firstName' && typeof value === 'string') {
-            if (!value.trim()) {
-                setFirstNameError('Họ không được để trống');
-            } else if (value.trim().length < 2) {
-                setFirstNameError('Họ phải có ít nhất 2 ký tự');
-            } else {
-                setFirstNameError('');
-            }
-        }
-
-        // Validate lastName
-        if (field === 'lastName' && typeof value === 'string') {
-            if (!value.trim()) {
-                setLastNameError('Tên không được để trống');
-            } else if (value.trim().length < 2) {
-                setLastNameError('Tên phải có ít nhất 2 ký tự');
-            } else {
-                setLastNameError('');
-            }
-        }
-
-        // Validate email on change (only if not confirmed)
-        if (field === 'email' && !emailConfirmed && typeof value === 'string') {
-            if (!value.trim()) {
-                setEmailError('');
-            } else if (!AuthService.validateEmail(value)) {
-                setEmailError('Email không hợp lệ');
-            } else {
-                setEmailError('');
-            }
-        }
-
-        // Note: Phone validation is handled separately by handlePhoneValidation
-        // because phone uses the usePhoneInput hook
-
-        // Validate dateOfBirth
-        if (field === 'dateOfBirth' && typeof value === 'string') {
-            if (!value.trim()) {
-                setDateOfBirthError('Ngày sinh không được để trống');
-            } else if (!validateAge(value)) {
-                setDateOfBirthError('Bạn phải từ 18 tuổi trở lên');
-            } else {
-                setDateOfBirthError('');
-            }
-        }
-
-        // Validate address
-        if (field === 'address' && typeof value === 'string') {
-            if (!value.trim()) {
-                setAddressError('Địa chỉ không được để trống');
-            } else if (value.trim().length < 5) {
-                setAddressError('Địa chỉ phải có ít nhất 5 ký tự');
-            } else {
-                setAddressError('');
-            }
-        }
+        setUpdateData((prev) => ({ ...prev, [field]: value }));
+        validateFieldOnChange(field, value);
     };
 
     const handleGenderChange = (selectedOption: GenderOption | null) => {
@@ -258,16 +246,8 @@ const Profile = () => {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        // Check if there are any changes (including avatar)
-        const hasAvatarChange = selectedFile !== null || isAvatarDeleted;
-        if (!hasChanges && !hasAvatarChange) {
-            toast.info('Không có thay đổi nào để lưu');
-            return;
-        }
-
+    // Helper: Validate all fields before submit
+    const validateAllFields = (): boolean => {
         let hasError = false;
 
         // Validate firstName
@@ -289,19 +269,19 @@ const Profile = () => {
         }
 
         // Validate email if not confirmed
-        if (!emailConfirmed && updateData.email?.trim()) {
-            if (!AuthService.validateEmail(updateData.email)) {
-                setEmailError('Email không hợp lệ');
-                hasError = true;
-            }
+        if (
+            !emailConfirmed &&
+            updateData.email?.trim() &&
+            !AuthService.validateEmail(updateData.email)
+        ) {
+            setEmailError('Email không hợp lệ');
+            hasError = true;
         }
 
         // Validate phone if not confirmed (use phone from hook)
-        if (!phoneConfirmed && phone.trim()) {
-            if (!AuthService.validatePhoneNumber(phone)) {
-                setPhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
-                hasError = true;
-            }
+        if (!phoneConfirmed && phone.trim() && !AuthService.validatePhoneNumber(phone)) {
+            setPhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
+            hasError = true;
         }
 
         // Validate dateOfBirth
@@ -328,49 +308,65 @@ const Profile = () => {
             hasError = true;
         }
 
-        if (hasError) {
+        return hasError;
+    };
+
+    // Helper: Handle avatar upload
+    const processAvatarUpload = async (): Promise<string | undefined> => {
+        if (selectedFile) {
+            const uploadResult = await UploadService.uploadAvatar(selectedFile);
+            if (uploadResult.success) {
+                return uploadResult.cloudFrontUrl || uploadResult.fileUrl || '';
+            }
+            throw new Error(uploadResult.errorMessage || 'Upload ảnh thất bại');
+        }
+
+        if (isAvatarDeleted) {
+            return getDefaultAvatarByGender(updateData.gender);
+        }
+
+        return updateData.avatarUrl;
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Check if there are any changes (including avatar)
+        const hasAvatarChange = selectedFile !== null || isAvatarDeleted;
+        if (!hasChanges && !hasAvatarChange) {
+            toast.info('Không có thay đổi nào để lưu');
+            return;
+        }
+
+        // Validate all fields
+        if (validateAllFields()) {
             toast.error('Vui lòng kiểm tra lại thông tin!');
             return;
         }
 
         try {
             setIsUploadingAvatar(true);
-            let avatarUrl = updateData.avatarUrl;
 
-            // Nếu có file mới, upload trước
-            if (selectedFile) {
-                const uploadResult = await UploadService.uploadAvatar(selectedFile);
-                if (uploadResult.success) {
-                    avatarUrl = uploadResult.cloudFrontUrl || uploadResult.fileUrl || '';
-                } else {
-                    throw new Error(uploadResult.errorMessage || 'Upload ảnh thất bại');
-                }
-            }
+            // Process avatar upload/delete
+            const avatarUrl = await processAvatarUpload();
 
-            // Nếu đã xóa ảnh, set về default avatar dựa trên giới tính
-            if (isAvatarDeleted) {
-                avatarUrl = getDefaultAvatarByGender(updateData.gender);
-            }
-
-            // Create UpdateUserRequest object with current data (use phone from hook)
+            // Create UpdateUserRequest object
             const updateRequest: UpdateUserRequest = {
                 firstName: updateData.firstName,
                 lastName: updateData.lastName,
                 email: updateData.email,
-                phone: phone || undefined, // Convert empty string to undefined
+                phone: phone || undefined,
                 gender: updateData.gender,
                 dateOfBirth: updateData.dateOfBirth,
                 address: updateData.address,
-                avatarUrl: avatarUrl,
+                avatarUrl,
             };
 
             await dispatch(updateUserProfile(updateRequest)).unwrap();
 
-            // Reset avatar states sau khi thành công
+            // Reset avatar states
             setSelectedFile(null);
             setIsAvatarDeleted(false);
-
-            // Reset input để có thể chọn lại file
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';
             }
@@ -420,7 +416,7 @@ const Profile = () => {
         }
 
         // Cleanup blob URL nếu có
-        if (avatarPreview && avatarPreview.startsWith('blob:')) {
+        if (avatarPreview?.startsWith('blob:')) {
             UploadService.revokePreviewUrl(avatarPreview);
         }
 
@@ -460,7 +456,7 @@ const Profile = () => {
         setPhoneValue(originalData.phone || '');
 
         // Reset avatar preview
-        if (avatarPreview && avatarPreview.startsWith('blob:')) {
+        if (avatarPreview?.startsWith('blob:')) {
             UploadService.revokePreviewUrl(avatarPreview);
         }
         setAvatarPreview(originalData.avatarUrl || '');

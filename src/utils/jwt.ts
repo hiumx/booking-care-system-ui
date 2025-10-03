@@ -56,10 +56,9 @@ export function getAllJwtInfo(token: string | null): {
     }
 
     // Extract confirmation statuses
-    const emailConfirmed = payload.confirmEmail?.toLowerCase() === 'true' ? true : false;
-    const phoneConfirmed = payload.confirmPhone?.toLowerCase() === 'true' ? true : false;
-    const hasExternalProvider =
-        payload.hasExternalProvider?.toLowerCase() === 'true' ? true : false;
+    const emailConfirmed = payload.confirmEmail?.toLowerCase() === 'true';
+    const phoneConfirmed = payload.confirmPhone?.toLowerCase() === 'true';
+    const hasExternalProvider = payload.hasExternalProvider?.toLowerCase() === 'true';
 
     return {
         roles,

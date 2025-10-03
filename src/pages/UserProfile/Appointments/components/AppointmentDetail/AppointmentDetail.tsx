@@ -88,8 +88,6 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
             case AppointmentType.IN_PERSON:
                 colorClass = 'text-green';
                 break;
-            default:
-                colorClass = '';
         }
 
         return <i className={`${iconClass} ${colorClass}`}></i>;

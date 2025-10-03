@@ -397,7 +397,7 @@ const Appointments: React.FC = () => {
                     <button
                         type="button"
                         className="btn btn-primary-gradient rounded-pill"
-                        onClick={() => window.location.reload()}
+                        onClick={() => globalThis.location.reload()}
                     >
                         Thử lại
                     </button>

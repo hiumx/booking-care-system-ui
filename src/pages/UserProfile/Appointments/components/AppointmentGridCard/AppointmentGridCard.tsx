@@ -36,35 +36,33 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
         switch (status) {
             case 'upcoming':
                 return (
-                    <>
-                        <li className="appointment-action">
-                            <ul>
-                                <li>
-                                    <Link
-                                        to={`/user-profile/appointments/${appointment.appointmentId}`}
-                                    >
-                                        <i className="isax isax-eye4"></i>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <i className="isax isax-messages-25"></i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <i className="isax isax-close-circle5"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                            <div className="appointment-detail-btn">
-                                <a href="#" className="start-link">
-                                    <i className="isax isax-calendar-tick5 me-1"></i>
-                                    Attend
-                                </a>
-                            </div>
-                        </li>
-                    </>
+                    <li className="appointment-action">
+                        <ul>
+                            <li>
+                                <Link
+                                    to={`/user-profile/appointments/${appointment.appointmentId}`}
+                                >
+                                    <i className="isax isax-eye4"></i>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="#">
+                                    <i className="isax isax-messages-25"></i>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="#">
+                                    <i className="isax isax-close-circle5"></i>
+                                </Link>
+                            </li>
+                        </ul>
+                        <div className="appointment-detail-btn">
+                            <Link to="#" className="start-link">
+                                <i className="isax isax-calendar-tick5 me-1"></i>
+                                Attend
+                            </Link>
+                        </div>
+                    </li>
                 );
             case 'cancelled':
             case 'completed':
@@ -123,13 +121,13 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                                         getAppointmentTypeText(appointment.appointmentType)
                                     )}
                                 >
-                                    <a href="#">
+                                    <Link to="#">
                                         <i
                                             className={getAppointmentTypeIcon(
                                                 appointment.appointmentType
                                             )}
                                         ></i>
-                                    </a>
+                                    </Link>
                                 </span>
                             </div>
                         </div>

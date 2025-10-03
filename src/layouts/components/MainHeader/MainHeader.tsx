@@ -117,7 +117,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                                             profile?.avatarUrl ||
                                                             '/src/assets/img/doctors-dashboard/profile-06.jpg'
                                                         }
-                                                        alt="User Image"
+                                                        alt={`${profile?.fullName || 'User'} avatar`}
                                                         className="avatar-img rounded-circle"
                                                     />
                                                 </div>
