@@ -10,7 +10,6 @@ export interface Transaction {
 export interface BankDetails {
     bankName: string;
     accountNumber: string;
-    branchName: string;
     accountName: string;
 }
 
@@ -23,8 +22,5 @@ export interface WalletBalance {
 export interface CardFormData {
     cardHolderName: string;
     cardNumber: string;
-    expireDate: string;
-    cvv: string;
-    branch: string;
-    markAsDefault: boolean;
+    bankName: string;
 }

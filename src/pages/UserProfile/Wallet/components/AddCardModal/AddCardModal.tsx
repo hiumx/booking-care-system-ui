@@ -1,24 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 
+import { motion } from 'framer-motion';
+
 import Modal from '../Modal';
-import { CardFormData } from '../../types/wallet.types';
+import BankSelect from '../BankSelect';
+import { CardFormData, BankDetails } from '../../types/wallet.types';
+import { Bank } from '../../types/bank.types';
 import styles from '../../Wallet.module.scss';
 import Button from '../../../../../components/Button';
 interface AddCardModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onSave: (data: CardFormData) => void;
+    existingData?: BankDetails | null;
 }
 
-const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose }) => {
+const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose, onSave, existingData }) => {
     const [formData, setFormData] = useState<CardFormData>({
         cardHolderName: '',
         cardNumber: '',
-        expireDate: '',
-        cvv: '',
-        branch: '',
-        markAsDefault: false,
+        bankName: '',
     });
+
+    // Pre-populate form with existing data when editing
+    useEffect(() => {
+        if (existingData && isOpen) {
+            setFormData({
+                cardHolderName: existingData.accountName || '',
+                cardNumber: existingData.accountNumber || '',
+                bankName: existingData.bankName || '',
+            });
+        } else if (isOpen) {
+            // Reset form when opening for new card
+            setFormData({
+                cardHolderName: '',
+                cardNumber: '',
+                bankName: '',
+            });
+        }
+    }, [existingData, isOpen]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -37,10 +58,25 @@ const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose }) => {
         }
     };
 
+    const handleBankChange = (bankCode: string, bank?: Bank) => {
+        setFormData((prev) => ({
+            ...prev,
+            bankName: bankCode,
+        }));
+        console.log('Selected bank:', bank);
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle form submission logic here
-        console.log('Add card form submitted:', formData);
+
+        // Validate required fields
+        if (!formData.cardHolderName || !formData.cardNumber || !formData.bankName) {
+            alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+
+            return;
+        }
+
+        onSave(formData);
         onClose();
     };
 
@@ -49,23 +85,24 @@ const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose }) => {
         setFormData({
             cardHolderName: '',
             cardNumber: '',
-            expireDate: '',
-            cvv: '',
-            branch: '',
-            markAsDefault: false,
+            bankName: '',
         });
         onClose();
     };
 
+    const isEditing = existingData !== null && existingData !== undefined;
+    const modalTitle = isEditing ? 'Cập nhật số tài khoản' : 'Thêm số tài khoản';
+    const submitButtonText = isEditing ? 'Cập nhật số tài khoản' : 'Thêm số tài khoản';
+
     return (
-        <Modal isOpen={isOpen} onClose={handleClose} title="Add Card">
+        <Modal isOpen={isOpen} onClose={handleClose} title={modalTitle}>
             <form onSubmit={handleSubmit}>
                 <div className={clsx(styles.modalBody, 'modal-body pb-0')}>
                     <div className={styles.formGroup}>
                         <label className={styles.formLabel} htmlFor="cardHolderName">
-                            Card Holder Name <span className={styles.required}>*</span>
+                            Tên chủ tài khoản <span className={styles.required}>*</span>
                         </label>
-                        <input
+                        <motion.input
                             type="text"
                             id="cardHolderName"
                             name="cardHolderName"
@@ -73,13 +110,17 @@ const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose }) => {
                             value={formData.cardHolderName}
                             onChange={handleInputChange}
                             required
+                            whileFocus={{
+                                scale: 1.02,
+                                transition: { duration: 0.2 },
+                            }}
                         />
                     </div>
                     <div className={styles.formGroup}>
                         <label className={styles.formLabel} htmlFor="cardNumber">
-                            Card Number <span className={styles.required}>*</span>
+                            Số tài khoản <span className={styles.required}>*</span>
                         </label>
-                        <input
+                        <motion.input
                             type="text"
                             id="cardNumber"
                             name="cardNumber"
@@ -88,60 +129,25 @@ const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose }) => {
                             onChange={handleInputChange}
                             placeholder="1234 5678 9012 3456"
                             required
+                            whileFocus={{
+                                scale: 1.02,
+                                transition: { duration: 0.2 },
+                            }}
                         />
                     </div>
-                    <div className={styles.formGroup}>
-                        <label className={styles.formLabel} htmlFor="expireDate">
-                            Expire Date <span className={styles.required}>*</span>
-                        </label>
-                        <div className={styles.formIcon}>
-                            <input
-                                type="text"
-                                id="expireDate"
-                                name="expireDate"
-                                className={styles.formControl}
-                                value={formData.expireDate}
-                                onChange={handleInputChange}
-                                placeholder="MM/YY"
-                                required
-                            />
-                            <span className={styles.icon}>
-                                <i className="isax isax-calendar-1"></i>
-                            </span>
-                        </div>
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label className={styles.formLabel} htmlFor="cvv">
-                            CVV <span className={styles.required}>*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="cvv"
-                            name="cvv"
-                            className={styles.formControl}
-                            value={formData.cvv}
-                            onChange={handleInputChange}
-                            placeholder="123"
-                            maxLength={4}
-                            required
-                        />
-                    </div>
+
                     <div className={styles.formGroup}>
                         <label className={styles.formLabel} htmlFor="branch">
-                            Branch <span className={styles.required}>*</span>
+                            Ngân hàng <span className={styles.required}>*</span>
                         </label>
-                        <select
+                        <BankSelect
                             id="branch"
-                            name="branch"
+                            value={formData.bankName}
+                            onChange={handleBankChange}
+                            placeholder="Chọn ngân hàng của bạn"
                             className={styles.formSelect}
-                            value={formData.branch}
-                            onChange={handleInputChange}
-                            required
-                        >
-                            <option value="">Select</option>
-                            <option value="london">London</option>
-                            <option value="newyork">New York</option>
-                        </select>
+                            required={true}
+                        />
                     </div>
                 </div>
                 <div className={clsx(styles.modalFooter, 'modal-footer')}>
@@ -152,10 +158,14 @@ const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose }) => {
                                 className={styles.btnCancel}
                                 onClick={handleClose}
                             >
-                                Cancel
+                                Huỷ
                             </button>
 
-                            <Button text="Add Card" type="submit" className={styles.btnPrimary} />
+                            <Button
+                                text={submitButtonText}
+                                type="submit"
+                                className={styles.btnPrimary}
+                            />
                         </div>
                     </div>
                 </div>

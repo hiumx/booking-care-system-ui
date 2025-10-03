@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import clsx from 'clsx';
 
 import AddCardModal from './components/AddCardModal';
-import EditCardModal from './components/EditCardModal';
 import WalletSummary from './components/WalletSummary';
 import TransactionTable from './components/TransactionTable';
-import { mockTransactions, mockBankDetails, mockWalletBalance } from './data/mockData';
+import { mockTransactions } from './data/mockData';
+import { BankDetails, CardFormData } from './types/wallet.types';
 
 import styles from './Wallet.module.scss';
 
 const Wallet: React.FC = () => {
     const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
-    const [isEditCardModalOpen, setIsEditCardModalOpen] = useState(false);
+    const [bankDetails, setBankDetails] = useState<BankDetails | null>(null);
 
     const handleOpenAddCardModal = () => {
         setIsAddCardModalOpen(true);
@@ -21,17 +21,16 @@ const Wallet: React.FC = () => {
         setIsAddCardModalOpen(false);
     };
 
-    const handleOpenEditCardModal = () => {
-        setIsEditCardModalOpen(true);
-    };
+    const handleSaveAddCard = (cardData: CardFormData) => {
+        // Convert CardFormData to BankDetails
+        const newBankDetails: BankDetails = {
+            bankName: cardData.bankName, // Assuming branch contains bank name
+            accountNumber: cardData.cardNumber,
+            accountName: cardData.cardHolderName,
+        };
 
-    const handleCloseEditCardModal = () => {
-        setIsEditCardModalOpen(false);
-    };
-
-    const handleOtherAccounts = () => {
-        console.log('Other accounts clicked');
-        // Handle other accounts logic here
+        setBankDetails(newBankDetails);
+        console.log('Card saved:', newBankDetails);
     };
 
     return (
@@ -42,19 +41,16 @@ const Wallet: React.FC = () => {
                 </div>
             </div>
 
-            <WalletSummary
-                walletBalance={mockWalletBalance}
-                bankDetails={mockBankDetails}
-                onAddPayment={handleOpenAddCardModal}
-                onEditDetails={handleOpenEditCardModal}
-                onAddCards={handleOpenAddCardModal}
-                onOtherAccounts={handleOtherAccounts}
-            />
+            <WalletSummary bankDetails={bankDetails} onAddPayment={handleOpenAddCardModal} />
 
             <TransactionTable transactions={mockTransactions} />
 
-            <AddCardModal isOpen={isAddCardModalOpen} onClose={handleCloseAddCardModal} />
-            <EditCardModal isOpen={isEditCardModalOpen} onClose={handleCloseEditCardModal} />
+            <AddCardModal
+                isOpen={isAddCardModalOpen}
+                onClose={handleCloseAddCardModal}
+                onSave={handleSaveAddCard}
+                existingData={bankDetails}
+            />
         </div>
     );
 };

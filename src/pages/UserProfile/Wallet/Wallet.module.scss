@@ -58,50 +58,44 @@
     }
 }
 
-// Modal overlay styles
+// Modal overlay styles (Framer Motion handles animations)
 .modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1050;
-    opacity: 0;
-    visibility: hidden;
-    transition:
-        opacity 0.3s ease,
-        visibility 0.3s ease;
-    backdrop-filter: blur(2px);
-
-    &.isOpen {
-        opacity: 1;
-        visibility: visible;
+    // Base styles only, Framer Motion handles positioning and animations
+    .modalBackdrop {
+        cursor: default;
     }
 }
 
 .modalDialog {
-    background: white;
-    border-radius: 8px;
-    min-width: 500px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    transform: translateY(-50px);
-    transition: transform 0.3s ease;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    // Framer Motion handles transforms and animations
 
-    .modalOverlay.isOpen & {
-        transform: translateY(0);
-    }
+    background: 'white';
 
     @media (max-width: 768px) {
-        width: 95%;
-        max-height: 95vh;
+        width: 95% !important;
+        max-height: 95vh !important;
         margin: 1rem;
+        min-width: auto !important;
+        border-radius: 8px !important;
+    }
+
+    @media (max-width: 576px) {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100vh !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+    @media (max-height: 568px) {
+        overflow: auto !important;
+        height: fit-content !important;
+        margin: 1rem;
+        .modalHeader {
+            padding: 0 1.5rem !important;
+        }
+        .modalBody {
+            padding: 0 1.5rem !important;
+        }
     }
 }
 
