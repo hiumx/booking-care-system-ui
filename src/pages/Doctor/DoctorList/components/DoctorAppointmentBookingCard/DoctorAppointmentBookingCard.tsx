@@ -84,10 +84,12 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                 'd-flex align-items-center justify-content-between'
                             )}
                         >
-                            <span className={clsx(styles.badge, styles.bgOrange, 'badge')}>
-                                <i className="fa-solid fa-star me-1"></i>
-                                {rating > 0 ? rating.toFixed(1) : 'Chưa có đánh giá'}
-                            </span>
+                            <div className="d-flex flex-column gap-1">
+                                <span className={clsx(styles.badge, styles.bgOrange, 'badge')}>
+                                    <i className="fa-solid fa-star me-1"></i>
+                                    {rating > 0 ? rating.toFixed(1) : 'Chưa có đánh giá'}
+                                </span>
+                            </div>
                             <span
                                 className={clsx(styles.favIcon, {
                                     [styles.isSelected]: isSelected,

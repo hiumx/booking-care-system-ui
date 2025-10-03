@@ -151,6 +151,12 @@ export interface DoctorSearchParams {
     experienceRange?: { min: number; max: number }; // New slider format like price
     experienceFilter?: string; // Keep for backward compatibility
     experienceFilters?: { MinYears: number; MaxYears: number }[]; // Keep for backward compatibility
+    areaFilter?: {
+        provinceId?: string;
+        districtId?: string;
+        provinceName?: string;
+        districtName?: string;
+    }; // Area/location filter
     sortBy?: 'name' | 'rating' | 'price' | 'experience' | 'createdAt';
     sortOrder?: 'asc' | 'desc';
     patientId?: string;

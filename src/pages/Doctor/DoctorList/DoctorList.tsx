@@ -63,6 +63,15 @@ const DoctorList: React.FC = () => {
     const [priceFilter, setPriceFilter] = useState<{ min: number; max: number } | undefined>(
         undefined
     );
+    const [areaFilter, setAreaFilter] = useState<
+        | {
+              provinceId?: string;
+              districtId?: string;
+              provinceName?: string;
+              districtName?: string;
+          }
+        | undefined
+    >(undefined);
 
     const doctorsPerPage = 10;
     const patientId = '2FC80E8F-D296-42BC-ADDF-EAA6281BF244'; // Valid GUID format
@@ -104,6 +113,7 @@ const DoctorList: React.FC = () => {
             genderFilter: genderFilter,
             genderFilters: genderFilters.length > 0 ? genderFilters : undefined,
             priceRange: priceFilter,
+            areaFilter: areaFilter,
             patientId,
         };
 
@@ -120,7 +130,8 @@ const DoctorList: React.FC = () => {
             specialtyFilters.length > 0 || // Add multiple specialty filters
             hospitalFilters.length > 0 || // Add multiple hospital filters
             experienceFilter || // Add experience slider filter
-            priceFilter // Also check for price filter
+            priceFilter || // Also check for price filter
+            areaFilter // Add area filter
         ) {
             dispatch(filterDoctorsAsync(params));
         } else {
@@ -150,6 +161,7 @@ const DoctorList: React.FC = () => {
         genderFilter,
         genderFilters,
         priceFilter,
+        areaFilter,
     ]);
 
     // Filter and sort doctors locally (backend should handle this in production)
@@ -249,6 +261,17 @@ const DoctorList: React.FC = () => {
     const handleHospitalFilters = (hospitalIds: string[]) => {
         console.log('DoctorList: handleHospitalFilters called with:', hospitalIds);
         setHospitalFilters(hospitalIds);
+        setCurrentPage(1);
+    };
+
+    const handleAreaFilter = (areaInfo: {
+        provinceId?: string;
+        districtId?: string;
+        provinceName?: string;
+        districtName?: string;
+    }) => {
+        console.log('DoctorList: handleAreaFilter called with:', areaInfo);
+        setAreaFilter(areaInfo);
         setCurrentPage(1);
     };
 
@@ -401,6 +424,7 @@ const DoctorList: React.FC = () => {
                     onSpecialtyFilters={handleSpecialtyFilters}
                     onHospitalFilter={handleHospitalFilter}
                     onHospitalFilters={handleHospitalFilters}
+                    onAreaFilter={handleAreaFilter}
                 />
             </div>
             <div className="content mt-5">

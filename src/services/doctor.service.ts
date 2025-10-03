@@ -256,6 +256,8 @@ export class DoctorService {
                 minPrice: params.priceRange?.min,
                 maxPrice: params.priceRange?.max,
                 hospitalId: params.hospitalFilter,
+                ProvinceId: params.areaFilter?.provinceId, // Use PascalCase for backend
+                DistrictId: params.areaFilter?.districtId, // Use PascalCase for backend
                 hospitalIds: params.hospitalFilters, // Add multiple hospital support
                 serviceType: params.serviceTypeFilter,
                 serviceTypes: params.serviceTypeFilters,
@@ -272,6 +274,14 @@ export class DoctorService {
             console.log(
                 'Frontend: ExperienceRanges being sent:',
                 JSON.stringify(params.experienceFilters, null, 2)
+            );
+            console.log(
+                'Frontend: AreaFilter being sent:',
+                JSON.stringify(params.areaFilter, null, 2)
+            );
+            console.log(
+                'Frontend: FilterRequest being sent:',
+                JSON.stringify(filterRequest, null, 2)
             );
             const response: any = await axiosInstance.post(
                 DOCTOR_ENDPOINTS.FILTER_DOCTORS,

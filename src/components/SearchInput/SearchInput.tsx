@@ -55,6 +55,12 @@ type SearchInputProps = {
     onSpecialtyFilters?: (specialtyIds: string[]) => void; // Callback for multiple specialty filters
     onHospitalFilter?: (hospitalId: string) => void; // Callback for single hospital filter (backward compatibility)
     onHospitalFilters?: (hospitalIds: string[]) => void; // Callback for multiple hospital filters
+    onAreaFilter?: (areaInfo: {
+        provinceId?: string;
+        districtId?: string;
+        provinceName?: string;
+        districtName?: string;
+    }) => void; // Callback for area filter
 };
 
 const SearchInput: React.FC<SearchInputProps> = ({
@@ -64,6 +70,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
     onSpecialtyFilters,
     onHospitalFilter,
     onHospitalFilters,
+    onAreaFilter,
 }) => {
     const dispatch = useAppDispatch();
     const { hospitals } = useAppSelector((state) => state.hospital);
@@ -77,6 +84,12 @@ const SearchInput: React.FC<SearchInputProps> = ({
     const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
     const [selectedClinics, setSelectedClinics] = useState<string[]>([]);
     const [selectedArea, setSelectedArea] = useState<string>('');
+    const [selectedAreaInfo, setSelectedAreaInfo] = useState<{
+        provinceId?: string;
+        districtId?: string;
+        provinceName?: string;
+        districtName?: string;
+    }>({});
     const [doctorName, setDoctorName] = useState<string>('');
     const dateInputRef = useRef<HTMLInputElement>(null);
 
@@ -89,16 +102,49 @@ const SearchInput: React.FC<SearchInputProps> = ({
         dispatch(getSpecialtiesAsync());
     }, [dispatch]);
 
-    // Transform hospitals data for modal
-    const hospitalItems = hospitals.map((hospital) => ({
+    // Transform hospitals data for modal - filter based on area or specialty selection
+    const getFilteredHospitals = () => {
+        let filteredHospitals = hospitals;
+
+        // If area is selected first, filter hospitals by location
+        if (selectedAreaInfo.provinceId || selectedAreaInfo.districtId) {
+            // TODO: Add location-based filtering when hospital location data is available
+            // For now, return all hospitals (will be implemented with backend support)
+            filteredHospitals = hospitals;
+        }
+
+        // If specialty is selected first, filter hospitals that have doctors with those specialties
+        if (selectedSpecialties.length > 0) {
+            // TODO: Add specialty-based hospital filtering when doctor-hospital-specialty relationship is available
+            // For now, return all hospitals (will be implemented with backend support)
+            filteredHospitals = hospitals;
+        }
+
+        return filteredHospitals;
+    };
+
+    // Transform specialties data for modal - filter based on hospital selection
+    const getFilteredSpecialties = () => {
+        let filteredSpecialties = specialties;
+
+        // If hospital is selected first, filter specialties available in those hospitals
+        if (selectedClinics.length > 0) {
+            // TODO: Add hospital-based specialty filtering when doctor-hospital-specialty relationship is available
+            // For now, return all specialties (will be implemented with backend support)
+            filteredSpecialties = specialties;
+        }
+
+        return filteredSpecialties;
+    };
+
+    const hospitalItems = getFilteredHospitals().map((hospital) => ({
         id: hospital.id,
         name: hospital.name,
         imageUrl: hospital.avatarUrl || '',
         address: hospital.address,
     }));
 
-    // Transform specialties data for modal (using specialties from Redux)
-    const specialtyItems = specialties.map((specialty) => ({
+    const specialtyItems = getFilteredSpecialties().map((specialty) => ({
         id: specialty.id,
         name: specialty.name,
         icon: specialtyIconMap[specialty.name] || Shield,
@@ -166,9 +212,27 @@ const SearchInput: React.FC<SearchInputProps> = ({
         setShowAreaModal(false);
     };
 
-    const handleAreaApply = (areaDisplay: string) => {
+    const handleAreaApply = (areaDisplay: string, locationId: string) => {
+        console.log('SearchInput: handleAreaApply called with:', areaDisplay, locationId);
         setSelectedArea(areaDisplay);
+
+        // Parse area info from the display string and locationId
+        const areaInfo = {
+            // If areaDisplay contains ' - ', then locationId is districtId, otherwise it's provinceId
+            provinceId: areaDisplay.includes(' - ') ? undefined : locationId,
+            districtId: areaDisplay.includes(' - ') ? locationId : undefined,
+            provinceName: areaDisplay.includes(' - ') ? areaDisplay.split(' - ')[0] : areaDisplay,
+            districtName: areaDisplay.includes(' - ') ? areaDisplay.split(' - ')[1] : '',
+        };
+
+        setSelectedAreaInfo(areaInfo);
         setShowAreaModal(false);
+
+        // Call area filter callback
+        if (onAreaFilter) {
+            console.log('SearchInput: calling onAreaFilter with:', areaInfo);
+            onAreaFilter(areaInfo);
+        }
     };
 
     // Handle date selection
@@ -349,6 +413,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     isOpen={showAreaModal}
                     onClose={handleAreaModalClose}
                     onApply={handleAreaApply}
+                    selectedProvinceId={selectedAreaInfo.provinceId}
+                    selectedDistrictId={selectedAreaInfo.districtId}
                 />
             </div>
         </div>
