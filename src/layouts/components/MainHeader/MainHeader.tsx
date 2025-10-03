@@ -1,17 +1,18 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { PATHS } from '@/routes/paths';
 import { AppDispatch, RootState } from '@/store';
-import { logout } from '@/store/slices/authSlice';
-import { fetchUserProfile } from '@/store/slices/userSlice';
+import { logoutAsync } from '@/store/slices/authSlice';
+import { fetchUserProfile, clearUserProfile } from '@/store/slices/userSlice';
 interface HeaderProps {
     isHeaderMenu?: boolean;
 }
 
 const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
     const { profile } = useSelector((state: RootState) => state.user);
 
@@ -27,10 +28,12 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
         }
     }, [isAuthenticated, profile]);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         try {
-            dispatch(logout());
+            await dispatch(logoutAsync()).unwrap();
+            dispatch(clearUserProfile()); // Clear user profile from state
             toast.success('Đăng xuất thành công');
+            navigate(PATHS.HOME); // Redirect to home page
         } catch (error: any) {
             console.error('Logout failed:', error);
             toast.error('Không thể đăng xuất. Vui lòng thử lại');

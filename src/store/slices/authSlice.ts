@@ -10,13 +10,16 @@ import {
     GoogleLoginRequest,
     FacebookLoginRequest,
 } from '@/types/auth.types';
-import { getRolesFromJwt } from '@/utils/jwt';
+import { getAllJwtInfo } from '@/utils/jwt';
 
 // Helper function to validate roles for patient front-end
 const validateRoles = (response: any, rejectWithValue: any) => {
     const token = response.data?.token;
     if (token) {
-        const roles = getRolesFromJwt(token).map((r) => r.toUpperCase());
+        // Get all JWT information (roles, confirmEmail, confirmPhone, hasExternalProvider)
+        const jwtInfo = getAllJwtInfo(token);
+        const roles = jwtInfo.roles.map((r) => r.toUpperCase());
+
         // For patient front-end, we only allow PATIENT role
         const hasPatientRole = roles.includes('PATIENT');
         if (!hasPatientRole) {
@@ -24,18 +27,27 @@ const validateRoles = (response: any, rejectWithValue: any) => {
                 'Tài khoản của bạn không có quyền truy cập vào hệ thống bệnh nhân.'
             );
         }
-        // Return roles data (Redux will persist automatically)
-        return { roles };
+
+        // Return all JWT information (Redux will persist automatically)
+        return {
+            roles,
+            emailConfirmed: jwtInfo.emailConfirmed,
+            phoneConfirmed: jwtInfo.phoneConfirmed,
+            hasExternalProvider: jwtInfo.hasExternalProvider,
+        };
     }
     return null; // No error
 };
 
-// Initial state - Redux Persist will automatically restore roles
+// Initial state - Redux Persist will automatically restore roles and confirmation statuses
 const initialState: AuthState = {
     roles: [],
     isAuthenticated: false,
     isLoading: false,
     error: null,
+    emailConfirmed: false,
+    phoneConfirmed: false,
+    hasExternalProvider: false,
 };
 
 // Async thunks
@@ -48,11 +60,21 @@ export const loginAsync = createAsyncThunk(
             // Validate roles using helper function
             const validationResult = validateRoles(response, rejectWithValue);
             if (validationResult?.roles) {
-                return { roles: validationResult.roles };
+                return {
+                    roles: validationResult.roles,
+                    emailConfirmed: validationResult.emailConfirmed,
+                    phoneConfirmed: validationResult.phoneConfirmed,
+                    hasExternalProvider: validationResult.hasExternalProvider,
+                };
             }
             if (validationResult === null) {
                 // No token found, return empty roles
-                return { roles: [] };
+                return {
+                    roles: [],
+                    emailConfirmed: false,
+                    phoneConfirmed: false,
+                    hasExternalProvider: false,
+                };
             }
             return validationResult; // This is the error case
         } catch (error: any) {
@@ -66,17 +88,7 @@ export const registerAsync = createAsyncThunk(
     async (request: RegisterRequest, { rejectWithValue }) => {
         try {
             const response = await AuthService.register(request);
-
-            // Validate roles using helper function
-            const validationResult = validateRoles(response, rejectWithValue);
-            if (validationResult?.roles) {
-                return { roles: validationResult.roles };
-            }
-            if (validationResult === null) {
-                // No token found, return empty roles
-                return { roles: [] };
-            }
-            return validationResult; // This is the error case
+            return response;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Registration failed');
         }
@@ -140,11 +152,21 @@ export const googleLoginAsync = createAsyncThunk(
             // Validate roles using helper function
             const validationResult = validateRoles(response, rejectWithValue);
             if (validationResult?.roles) {
-                return { roles: validationResult.roles };
+                return {
+                    roles: validationResult.roles,
+                    emailConfirmed: validationResult.emailConfirmed,
+                    phoneConfirmed: validationResult.phoneConfirmed,
+                    hasExternalProvider: validationResult.hasExternalProvider,
+                };
             }
             if (validationResult === null) {
                 // No token found, return empty roles
-                return { roles: [] };
+                return {
+                    roles: [],
+                    emailConfirmed: false,
+                    phoneConfirmed: false,
+                    hasExternalProvider: false,
+                };
             }
             return validationResult; // This is the error case
         } catch (error: any) {
@@ -162,11 +184,21 @@ export const facebookLoginAsync = createAsyncThunk(
             // Validate roles using helper function
             const validationResult = validateRoles(response, rejectWithValue);
             if (validationResult?.roles) {
-                return { roles: validationResult.roles };
+                return {
+                    roles: validationResult.roles,
+                    emailConfirmed: validationResult.emailConfirmed,
+                    phoneConfirmed: validationResult.phoneConfirmed,
+                    hasExternalProvider: validationResult.hasExternalProvider,
+                };
             }
             if (validationResult === null) {
                 // No token found, return empty roles
-                return { roles: [] };
+                return {
+                    roles: [],
+                    emailConfirmed: false,
+                    phoneConfirmed: false,
+                    hasExternalProvider: false,
+                };
             }
             return validationResult; // This is the error case
         } catch (error: any) {
@@ -183,11 +215,15 @@ const authSlice = createSlice({
         clearError: (state) => {
             state.error = null;
         },
-        logout: (state) => {
-            state.isAuthenticated = false;
+        resetAuthState: (state) => {
+            // Reset to initial state (used for force logout)
             state.roles = [];
-            state.error = null;
+            state.isAuthenticated = false;
             state.isLoading = false;
+            state.error = null;
+            state.emailConfirmed = false;
+            state.phoneConfirmed = false;
+            state.hasExternalProvider = false;
         },
     },
     extraReducers: (builder) => {
@@ -200,6 +236,9 @@ const authSlice = createSlice({
             .addCase(loginAsync.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.roles = action.payload?.roles || [];
+                state.emailConfirmed = action.payload?.emailConfirmed || false;
+                state.phoneConfirmed = action.payload?.phoneConfirmed || false;
+                state.hasExternalProvider = action.payload?.hasExternalProvider || false;
                 state.isAuthenticated = state.roles.length > 0;
                 state.error = null;
             })
@@ -212,10 +251,8 @@ const authSlice = createSlice({
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(registerAsync.fulfilled, (state, action) => {
+            .addCase(registerAsync.fulfilled, (state) => {
                 state.isLoading = false;
-                state.roles = action.payload?.roles || [];
-                state.isAuthenticated = state.roles.length > 0;
                 state.error = null;
             })
             .addCase(registerAsync.rejected, (state, action) => {
@@ -274,6 +311,9 @@ const authSlice = createSlice({
             })
             .addCase(googleLoginAsync.fulfilled, (state, action) => {
                 state.roles = action.payload?.roles || [];
+                state.emailConfirmed = action.payload?.emailConfirmed || false;
+                state.phoneConfirmed = action.payload?.phoneConfirmed || false;
+                state.hasExternalProvider = action.payload?.hasExternalProvider || false;
                 state.isAuthenticated = state.roles.length > 0;
                 state.error = null;
             })
@@ -286,6 +326,9 @@ const authSlice = createSlice({
             })
             .addCase(facebookLoginAsync.fulfilled, (state, action) => {
                 state.roles = action.payload?.roles || [];
+                state.emailConfirmed = action.payload?.emailConfirmed || false;
+                state.phoneConfirmed = action.payload?.phoneConfirmed || false;
+                state.hasExternalProvider = action.payload?.hasExternalProvider || false;
                 state.isAuthenticated = state.roles.length > 0;
                 state.error = null;
             })
@@ -295,6 +338,6 @@ const authSlice = createSlice({
     },
 });
 
-export const { clearError, logout } = authSlice.actions;
+export const { clearError, resetAuthState } = authSlice.actions;
 
 export default authSlice.reducer;
