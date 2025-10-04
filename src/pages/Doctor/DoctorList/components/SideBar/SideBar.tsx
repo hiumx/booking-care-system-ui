@@ -607,14 +607,28 @@ const SideBar: React.FC<SideBarProps> = ({
     // Helper function to render rating stars
     const renderRatingStars = (option: FilterOption) => {
         const rating = Number.parseInt(option.label.charAt(0));
-        const filledStars = new Array(rating)
-            .fill(0)
-            .map((_, i) => <i key={`filled-${i}`} className="fa-solid fa-star text-orange me-1" />);
-        const emptyStars = new Array(5 - rating)
-            .fill(0)
-            .map((_, i) => (
-                <i key={`empty-${i}`} className="fa-regular fa-star text-orange me-1" />
-            ));
+
+        // Generate filled stars
+        const filledStars = [];
+        for (let i = 1; i <= rating; i++) {
+            filledStars.push(
+                <i
+                    key={`${option.id}-filled-star-${i}`}
+                    className="fa-solid fa-star text-orange me-1"
+                />
+            );
+        }
+
+        // Generate empty stars
+        const emptyStars = [];
+        for (let i = rating + 1; i <= 5; i++) {
+            emptyStars.push(
+                <i
+                    key={`${option.id}-empty-star-${i}`}
+                    className="fa-regular fa-star text-orange me-1"
+                />
+            );
+        }
 
         return (
             <>
