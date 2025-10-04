@@ -224,10 +224,6 @@ const SideBar: React.FC<SideBarProps> = ({
                 clearTimeout(timeoutId);
                 timeoutId = setTimeout(() => {
                     if (onSearchChange) {
-                        console.log(
-                            'SideBar: debounced search calling onSearchChange with:',
-                            value
-                        );
                         onSearchChange(value);
                     }
                 }, 300); // 300ms delay
@@ -357,10 +353,6 @@ const SideBar: React.FC<SideBarProps> = ({
         setPriceRange(newRange);
         // Call price filter callback
         if (onPriceFilter) {
-            console.log('SideBar: calling onPriceFilter with:', {
-                min: newRange[0],
-                max: newRange[1],
-            });
             onPriceFilter({ min: newRange[0], max: newRange[1] });
         }
     };
@@ -370,17 +362,12 @@ const SideBar: React.FC<SideBarProps> = ({
         setExperienceRange(newRange);
         // Call experience filter callback
         if (onExperienceFilter) {
-            console.log('SideBar: calling onExperienceFilter with:', {
-                min: newRange[0],
-                max: newRange[1],
-            });
             onExperienceFilter({ min: newRange[0], max: newRange[1] });
         }
     };
 
     const handleCheckboxChange = (id: string, sectionTitle: string): void => {
         const isChecked = !checkedOptions[id];
-        console.log('SideBar checkbox changed:', { id, sectionTitle, isChecked });
 
         // Update checked options state first
         const newCheckedOptions = {
@@ -443,59 +430,47 @@ const SideBar: React.FC<SideBarProps> = ({
         if (sectionTitle === 'Học vị') {
             const checkedPositionIds = getCheckedOptionsForSection('Học vị');
             if (onPositionFilters) {
-                console.log('Calling onPositionFilters with:', checkedPositionIds);
                 onPositionFilters(checkedPositionIds);
             } else if (onPositionFilter) {
                 const positionId = isChecked ? id.replace('position-', '') : '';
-                console.log('Calling onPositionFilter with:', positionId);
                 onPositionFilter(positionId);
             }
         } else if (sectionTitle === 'Ngôn ngữ') {
             const checkedLanguageIds = getCheckedOptionsForSection('Ngôn ngữ');
             if (onLanguageFilters) {
-                console.log('Calling onLanguageFilters with:', checkedLanguageIds);
                 onLanguageFilters(checkedLanguageIds);
             } else if (onLanguageFilter) {
                 const languageId = isChecked ? id.replace('language-', '') : '';
-                console.log('Calling onLanguageFilter with:', languageId);
                 onLanguageFilter(languageId);
             }
         } else if (sectionTitle === 'Loại hình dịch vụ') {
             const checkedServiceTypeIds = getCheckedOptionsForSection('Loại hình dịch vụ');
             if (onServiceTypeFilters) {
-                console.log('Calling onServiceTypeFilters with:', checkedServiceTypeIds);
                 onServiceTypeFilters(checkedServiceTypeIds);
             } else if (onServiceTypeFilter) {
                 const serviceTypeId = isChecked ? id.replace('serviceType-', '') : '';
-                console.log('Calling onServiceTypeFilter with:', serviceTypeId);
                 onServiceTypeFilter(serviceTypeId);
             }
         } else if (sectionTitle === 'Đánh giá') {
             const checkedRatings = getCheckedOptionsForSection('Đánh giá');
             if (onRatingFilters) {
-                console.log('Calling onRatingFilters with:', checkedRatings);
                 onRatingFilters(checkedRatings);
             } else if (onRatingFilter) {
                 const rating = isChecked ? id : '';
-                console.log('Calling onRatingFilter with:', rating);
                 onRatingFilter(rating);
             }
         } else if (sectionTitle === 'Lịch trống' && onAvailabilityFilter) {
             const availability = isChecked ? id : '';
-            console.log('Calling onAvailabilityFilter with:', availability);
             onAvailabilityFilter(availability);
         } else if (sectionTitle === 'Loại tư vấn' && onConsultationTypeFilter) {
             const consultationType = isChecked ? id : '';
-            console.log('Calling onConsultationTypeFilter with:', consultationType);
             onConsultationTypeFilter(consultationType);
         } else if (sectionTitle === 'Giới tính') {
             const checkedGenders = getCheckedOptionsForSection('Giới tính');
             if (onGenderFilters) {
-                console.log('Calling onGenderFilters with:', checkedGenders);
                 onGenderFilters(checkedGenders);
             } else if (onGenderFilter) {
                 const gender = isChecked ? id : '';
-                console.log('Calling onGenderFilter with:', gender);
                 onGenderFilter(gender);
             }
         }

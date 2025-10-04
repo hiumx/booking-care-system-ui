@@ -10,7 +10,7 @@ import LocationService, { Province, District } from '@/services/location.service
 interface ModalAreaProps {
     isOpen: boolean;
     onClose: () => void;
-    onApply: (areaDisplay: string, locationId: string) => void;
+    onApply: (areaDisplay: string, locationId: string, provinceId?: string) => void;
     selectedProvinceId?: string;
     selectedDistrictId?: string;
 }
@@ -196,26 +196,13 @@ const ModalArea: React.FC<ModalAreaProps> = ({
     };
 
     const handleApply = () => {
-        console.log('ModalArea: handleApply called with:', {
-            selectedProvinceId,
-            selectedDistrictId,
-            selectedProvince: selectedProvince?.name,
-            selectedDistrict: selectedDistrict?.name,
-        });
-
         if (selectedProvince && selectedDistrict) {
-            console.log(
-                'ModalArea: Applying district selection:',
+            onApply(
                 `${selectedProvince.name} - ${selectedDistrict.name}`,
-                selectedDistrictId
-            );
-            onApply(`${selectedProvince.name} - ${selectedDistrict.name}`, selectedDistrictId);
-        } else if (selectedProvince) {
-            console.log(
-                'ModalArea: Applying province selection:',
-                selectedProvince.name,
+                selectedDistrictId,
                 selectedProvinceId
             );
+        } else if (selectedProvince) {
             onApply(selectedProvince.name, selectedProvinceId);
         }
         onClose();

@@ -4,49 +4,14 @@ import Modal from '@/components/Modal';
 import ModalArea from './components/ModalArea';
 import clsx from 'clsx';
 import styles from './SearchInput.module.scss';
-import {
-    Shield,
-    Activity,
-    Heart,
-    Brain,
-    Eye,
-    Stethoscope,
-    Pill,
-    Syringe,
-    Baby,
-    Bone,
-} from 'lucide-react';
+// Removed unused icon imports as we now use images from backend
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getHospitalsAsync } from '@/store/slices/hospitalSlice';
 import { getSpecialtiesAsync } from '@/store/slices/specialtySlice';
 
-// Icon mapping for specialties
-const specialtyIconMap: Record<string, any> = {
-    'Dị ứng - miễn dịch': Shield,
-    'Y học cổ truyền': Activity,
-    'Lao - bệnh phổi': Heart,
-    'Y học thể thao': Brain,
-    'Nhãn khoa': Eye,
-    'Tim mạch': Stethoscope,
-    'Dược học': Pill,
-    'Tiêm chủng': Syringe,
-    'Nhi khoa': Baby,
-    'Chấn thương chỉnh hình': Bone,
-};
+// Removed specialtyIconMap as we now use images from backend
 
-// Color mapping for specialties
-const specialtyColorMap: Record<string, string> = {
-    'Dị ứng - miễn dịch': 'blue',
-    'Y học cổ truyền': 'green',
-    'Lao - bệnh phổi': 'red',
-    'Y học thể thao': 'orange',
-    'Nhãn khoa': 'purple',
-    'Tim mạch': 'pink',
-    'Dược học': 'yellow',
-    'Tiêm chủng': 'indigo',
-    'Nhi khoa': 'teal',
-    'Chấn thương chỉnh hình': 'cyan',
-};
+// Removed specialtyColorMap as we now use images from backend
 
 type SearchInputProps = {
     forceWrap?: boolean; // make inputs wrap into multiple rows regardless of screen size
@@ -93,6 +58,11 @@ const SearchInput: React.FC<SearchInputProps> = ({
     const [doctorName, setDoctorName] = useState<string>('');
     const dateInputRef = useRef<HTMLInputElement>(null);
 
+    // Refs for auto-resize
+    const doctorNameRef = useRef<HTMLDivElement>(null);
+    const clinicRef = useRef<HTMLDivElement>(null);
+    const specialtyRef = useRef<HTMLDivElement>(null);
+
     // Load data on component mount
     useEffect(() => {
         // Load hospitals
@@ -101,6 +71,31 @@ const SearchInput: React.FC<SearchInputProps> = ({
         // Load specialties
         dispatch(getSpecialtiesAsync());
     }, [dispatch]);
+
+    // Auto-resize function
+    const autoResize = (element: HTMLDivElement) => {
+        element.style.height = 'auto';
+        element.style.height = element.scrollHeight + 'px';
+    };
+
+    // Auto-resize on content change
+    useEffect(() => {
+        if (doctorNameRef.current) {
+            autoResize(doctorNameRef.current);
+        }
+    }, [doctorName]);
+
+    useEffect(() => {
+        if (clinicRef.current) {
+            autoResize(clinicRef.current);
+        }
+    }, [selectedClinics]);
+
+    useEffect(() => {
+        if (specialtyRef.current) {
+            autoResize(specialtyRef.current);
+        }
+    }, [selectedSpecialties]);
 
     // Transform hospitals data for modal - filter based on area or specialty selection
     const getFilteredHospitals = () => {
@@ -147,8 +142,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
     const specialtyItems = getFilteredSpecialties().map((specialty) => ({
         id: specialty.id,
         name: specialty.name,
-        icon: specialtyIconMap[specialty.name] || Shield,
-        color: specialtyColorMap[specialty.name] || 'blue',
+        imageUrl: specialty.imageUrl,
     }));
 
     // Handle specialty modal
@@ -161,18 +155,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
     };
 
     const handleSpecialtyApply = (specialties: string[]) => {
-        console.log('SearchInput: handleSpecialtyApply called with:', specialties);
         setSelectedSpecialties(specialties);
         setShowSpecialtyModal(false);
 
         // Call multiple specialty callback if available
         if (onSpecialtyFilters) {
-            console.log('SearchInput: calling onSpecialtyFilters with:', specialties);
             onSpecialtyFilters(specialties);
         }
         // Fallback to single specialty callback for backward compatibility
         else if (specialties.length > 0 && onSpecialtyFilter) {
-            console.log('SearchInput: calling onSpecialtyFilter with:', specialties[0]);
             onSpecialtyFilter(specialties[0]);
         }
     };
@@ -187,18 +178,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
     };
 
     const handleClinicApply = (clinics: string[]) => {
-        console.log('SearchInput: handleClinicApply called with:', clinics);
         setSelectedClinics(clinics);
         setShowClinicModal(false);
 
         // Call multiple hospital callback if available
         if (onHospitalFilters) {
-            console.log('SearchInput: calling onHospitalFilters with:', clinics);
             onHospitalFilters(clinics);
         }
         // Fallback to single hospital callback for backward compatibility
         else if (clinics.length > 0 && onHospitalFilter) {
-            console.log('SearchInput: calling onHospitalFilter with:', clinics[0]);
             onHospitalFilter(clinics[0]);
         }
     };
@@ -212,14 +200,13 @@ const SearchInput: React.FC<SearchInputProps> = ({
         setShowAreaModal(false);
     };
 
-    const handleAreaApply = (areaDisplay: string, locationId: string) => {
-        console.log('SearchInput: handleAreaApply called with:', areaDisplay, locationId);
+    const handleAreaApply = (areaDisplay: string, locationId: string, provinceId?: string) => {
         setSelectedArea(areaDisplay);
 
         // Parse area info from the display string and locationId
         const areaInfo = {
             // If areaDisplay contains ' - ', then locationId is districtId, otherwise it's provinceId
-            provinceId: areaDisplay.includes(' - ') ? undefined : locationId,
+            provinceId: areaDisplay.includes(' - ') ? provinceId : locationId,
             districtId: areaDisplay.includes(' - ') ? locationId : undefined,
             provinceName: areaDisplay.includes(' - ') ? areaDisplay.split(' - ')[0] : areaDisplay,
             districtName: areaDisplay.includes(' - ') ? areaDisplay.split(' - ')[1] : '',
@@ -230,7 +217,6 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
         // Call area filter callback
         if (onAreaFilter) {
-            console.log('SearchInput: calling onAreaFilter with:', areaInfo);
             onAreaFilter(areaInfo);
         }
     };
@@ -278,72 +264,109 @@ const SearchInput: React.FC<SearchInputProps> = ({
                         <div className={clsx('search-input search-map-line', styles.inputItem)}>
                             <i className="isax isax-profile-2user5"></i>
                             <div className="mb-0">
-                                <input
-                                    type="text"
-                                    className={clsx('form-control', styles.formControlCustom)}
-                                    placeholder="Nhập tên bác sĩ"
-                                    value={doctorName}
-                                    onChange={(e) => {
-                                        console.log(
-                                            'SearchInput: doctor name changed to:',
-                                            e.target.value
-                                        );
-                                        setDoctorName(e.target.value);
-                                        onSearchChange?.(e.target.value);
+                                <div
+                                    ref={doctorNameRef}
+                                    className={clsx(
+                                        'form-control',
+                                        styles.formControlCustom,
+                                        styles.multiLineInput
+                                    )}
+                                    contentEditable
+                                    suppressContentEditableWarning={true}
+                                    data-placeholder="Nhập tên bác sĩ"
+                                    onInput={(e) => {
+                                        const text = e.currentTarget.textContent || '';
+                                        setDoctorName(text);
+                                        onSearchChange?.(text);
+                                        autoResize(e.currentTarget);
                                     }}
+                                    style={{ minHeight: '50px' }}
                                 />
                             </div>
                         </div>
                         <div className={clsx('search-input search-map-line', styles.inputItem)}>
                             <i className="isax isax-hospital5 bficon"></i>
                             <div className="mb-0">
-                                <input
-                                    type="text"
-                                    className={clsx('form-control', styles.formControlCustom)}
-                                    placeholder="Chọn cơ sở y tế"
+                                <div
+                                    ref={clinicRef}
+                                    className={clsx(
+                                        'form-control',
+                                        styles.formControlCustom,
+                                        styles.multiLineInput
+                                    )}
+                                    contentEditable={false}
+                                    data-placeholder="Chọn cơ sở y tế"
                                     onClick={handleClinicClick}
-                                    readOnly
-                                    value={selectedClinics
-                                        .map(
-                                            (id) =>
-                                                hospitalItems.find((clinic) => clinic.id === id)
-                                                    ?.name
-                                        )
-                                        .filter(Boolean)
-                                        .join(', ')}
-                                />
+                                    style={{ minHeight: '50px' }}
+                                >
+                                    {selectedClinics.length > 0
+                                        ? selectedClinics
+                                              .map(
+                                                  (id) =>
+                                                      hospitalItems.find(
+                                                          (clinic) => clinic.id === id
+                                                      )?.name
+                                              )
+                                              .filter(Boolean)
+                                              .map((name, index) => (
+                                                  <span key={index} className={styles.tag}>
+                                                      {name}
+                                                  </span>
+                                              ))
+                                        : null}
+                                </div>
                             </div>
                         </div>
                         <div className={clsx('search-input search-map-line', styles.inputItem)}>
                             <i className="isax isax-health5"></i>
                             <div className="mb-0">
-                                <input
-                                    type="text"
-                                    className={clsx('form-control', styles.formControlCustom)}
-                                    placeholder="Chọn chuyên khoa"
+                                <div
+                                    ref={specialtyRef}
+                                    className={clsx(
+                                        'form-control',
+                                        styles.formControlCustom,
+                                        styles.multiLineInput
+                                    )}
+                                    contentEditable={false}
+                                    data-placeholder="Chọn chuyên khoa"
                                     onClick={handleSpecialtyClick}
-                                    readOnly
-                                    value={selectedSpecialties
-                                        .map(
-                                            (id) =>
-                                                specialtyItems.find((spec) => spec.id === id)?.name
-                                        )
-                                        .filter(Boolean)
-                                        .join(', ')}
-                                />
+                                    style={{ minHeight: '50px' }}
+                                >
+                                    {selectedSpecialties.length > 0
+                                        ? selectedSpecialties
+                                              .map(
+                                                  (id) =>
+                                                      specialtyItems.find((spec) => spec.id === id)
+                                                          ?.name
+                                              )
+                                              .filter(Boolean)
+                                              .map((name, index) => (
+                                                  <span key={index} className={styles.tag}>
+                                                      {name}
+                                                  </span>
+                                              ))
+                                        : null}
+                                </div>
                             </div>
                         </div>
                         <div className={clsx('search-input search-map-line', styles.inputItem)}>
                             <i className="isax isax-location5"></i>
                             <div className="mb-0">
-                                <input
-                                    type="text"
-                                    className={clsx('form-control', styles.formControlCustom)}
-                                    placeholder="Chọn địa điểm"
+                                <div
+                                    className={clsx(
+                                        'form-control',
+                                        styles.formControlCustom,
+                                        styles.multiLineInput
+                                    )}
+                                    contentEditable={false}
+                                    data-placeholder="Chọn địa điểm"
                                     onClick={handleAreaClick}
-                                    readOnly
-                                    value={selectedArea}
-                                />
+                                    style={{ minHeight: '50px' }}
+                                >
+                                    {selectedArea ? (
+                                        <span className={styles.tag}>{selectedArea}</span>
+                                    ) : null}
+                                </div>
                             </div>
                         </div>
                         <div
@@ -401,6 +424,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     onApply={handleSpecialtyApply}
                     items={specialtyItems}
                     title="Tìm theo chuyên khoa"
+                    itemType="specialty"
                 />
                 <Modal
                     isOpen={showClinicModal}
@@ -408,6 +432,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     onApply={handleClinicApply}
                     items={hospitalItems}
                     title="Tìm theo cơ sở y tế"
+                    itemType="hospital"
                 />
                 <ModalArea
                     isOpen={showAreaModal}

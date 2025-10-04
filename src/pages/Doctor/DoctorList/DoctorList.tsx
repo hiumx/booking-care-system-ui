@@ -117,8 +117,6 @@ const DoctorList: React.FC = () => {
             patientId,
         };
 
-        console.log('DoctorList: useEffect triggered with params:', params);
-
         // Use filterDoctorsAsync for advanced filtering with multiple criteria
         if (
             positionFilters.length > 0 ||
@@ -216,50 +214,42 @@ const DoctorList: React.FC = () => {
 
     // Callback functions for SearchInput and SideBar
     const handleSearchChange = (term: string) => {
-        console.log('DoctorList: handleSearchChange called with:', term);
         setSearchTerm(term);
         setCurrentPage(1); // Reset to first page when searching
     };
 
     const handleSpecialtyFilter = (specialtyId: string) => {
-        console.log('DoctorList: handleSpecialtyFilter called with:', specialtyId);
         setSpecialtyFilter(specialtyId);
         setCurrentPage(1);
     };
 
     const handleSpecialtyFilters = (specialtyIds: string[]) => {
-        console.log('DoctorList: handleSpecialtyFilters called with:', specialtyIds);
         setSpecialtyFilters(specialtyIds);
         setCurrentPage(1);
     };
 
     const handlePositionFilter = (positionId: string) => {
-        console.log('DoctorList: handlePositionFilter called with:', positionId);
         setPositionFilter(positionId);
         setCurrentPage(1);
     };
 
     const handleLanguageFilter = (languageId: string) => {
-        console.log('DoctorList: handleLanguageFilter called with:', languageId);
         setLanguageFilter(languageId);
         setCurrentPage(1);
     };
 
     const handleServiceTypeFilter = (serviceTypeId: string) => {
-        console.log('DoctorList: handleServiceTypeFilter called with:', serviceTypeId);
         setServiceTypeFilter(serviceTypeId);
         setCurrentPage(1);
     };
 
     const handleHospitalFilter = (hospitalId: string) => {
-        console.log('DoctorList: handleHospitalFilter called with:', hospitalId);
         setHospitalFilter(hospitalId);
         setSpecialtyFilter(''); // Clear specialty filter when hospital is selected
         setCurrentPage(1);
     };
 
     const handleHospitalFilters = (hospitalIds: string[]) => {
-        console.log('DoctorList: handleHospitalFilters called with:', hospitalIds);
         setHospitalFilters(hospitalIds);
         setCurrentPage(1);
     };
@@ -270,13 +260,11 @@ const DoctorList: React.FC = () => {
         provinceName?: string;
         districtName?: string;
     }) => {
-        console.log('DoctorList: handleAreaFilter called with:', areaInfo);
         setAreaFilter(areaInfo);
         setCurrentPage(1);
     };
 
     const handleRatingFilter = (rating: string) => {
-        console.log('DoctorList: handleRatingFilter called with:', rating);
         if (rating) {
             // Map rating IDs to numbers: sm46=5, sm47=4, sm48=3, sm49=2, sm50=1
             const ratingMap: { [key: string]: number } = {
@@ -294,19 +282,16 @@ const DoctorList: React.FC = () => {
     };
 
     const handleAvailabilityFilter = (availability: string) => {
-        console.log('DoctorList: handleAvailabilityFilter called with:', availability);
         setAvailabilityFilter(availability);
         setCurrentPage(1);
     };
 
     const handleConsultationTypeFilter = (consultationType: string) => {
-        console.log('DoctorList: handleConsultationTypeFilter called with:', consultationType);
         setConsultationTypeFilter(consultationType);
         setCurrentPage(1);
     };
 
     const handleGenderFilter = (gender: string) => {
-        console.log('DoctorList: handleGenderFilter called with:', gender);
         if (gender) {
             // Map gender IDs to Gender enum values
             const genderMap: { [key: string]: Gender } = {
@@ -322,26 +307,22 @@ const DoctorList: React.FC = () => {
     };
 
     const handlePriceFilter = (priceRange: { min: number; max: number }) => {
-        console.log('DoctorList: handlePriceFilter called with:', priceRange);
         setPriceFilter(priceRange);
         setCurrentPage(1);
     };
 
     const handleExperienceFilter = (experienceRange: { min: number; max: number }) => {
-        console.log('DoctorList: handleExperienceFilter called with:', experienceRange);
         setExperienceFilter(experienceRange);
         setCurrentPage(1);
     };
 
     // Multi-filter callback functions
     const handlePositionFilters = (positionIds: string[]) => {
-        console.log('DoctorList: handlePositionFilters called with:', positionIds);
         setPositionFilters(positionIds);
         setCurrentPage(1);
     };
 
     const handleLanguageFilters = (languageIds: string[]) => {
-        console.log('DoctorList: handleLanguageFilters called with:', languageIds);
         // Convert language IDs to names using Redux store
         const languageNames = languageIds.map((id) => {
             const language = languages.find((lang) => lang.id === id);
@@ -352,7 +333,6 @@ const DoctorList: React.FC = () => {
     };
 
     const handleServiceTypeFilters = (serviceTypeIds: string[]) => {
-        console.log('DoctorList: handleServiceTypeFilters called with:', serviceTypeIds);
         // Convert service type IDs to names using Redux store
         const serviceTypeNames = serviceTypeIds.map((id) => {
             const serviceType = serviceTypes.find((st) => st.id === id);
@@ -363,7 +343,6 @@ const DoctorList: React.FC = () => {
     };
 
     const handleRatingFilters = (ratings: string[]) => {
-        console.log('DoctorList: handleRatingFilters called with:', ratings);
         if (ratings.length > 0) {
             // Convert rating strings to numbers
             setRatingFilters(
@@ -376,7 +355,6 @@ const DoctorList: React.FC = () => {
     };
 
     const handleExperienceFilters = (experiences: any[]) => {
-        console.log('DoctorList: handleExperienceFilters called with:', experiences);
         if (experiences.length > 0) {
             // Filter valid experience ranges
             const validExperiences = experiences.filter((exp) => {
@@ -387,13 +365,12 @@ const DoctorList: React.FC = () => {
                     typeof exp.MinYears === 'number' &&
                     typeof exp.MaxYears === 'number'
                 ) {
-                    console.log('DoctorList: valid experience range:', exp);
                     return true;
                 }
                 console.warn('DoctorList: invalid experience range:', exp);
                 return false;
             });
-            console.log('DoctorList: final experience filters:', validExperiences);
+
             setExperienceFilters(validExperiences);
         } else {
             setExperienceFilters([]);
@@ -402,11 +379,10 @@ const DoctorList: React.FC = () => {
     };
 
     const handleGenderFilters = (genders: string[]) => {
-        console.log('DoctorList: handleGenderFilters called with:', genders);
         if (genders.length > 0) {
             // Keep gender strings as they are (MALE, FEMALE, OTHER)
             // Backend expects string values, not enum
-            console.log('DoctorList: gender strings:', genders);
+
             setGenderFilters(genders);
         } else {
             setGenderFilters([]);
@@ -458,7 +434,7 @@ const DoctorList: React.FC = () => {
                                         <h5 className={styles.h5Custom}>
                                             Hiển thị{' '}
                                             <span className={styles.spanCustom}>
-                                                {pagination.totalCount}
+                                                {filteredAndSortedDoctors.length}
                                             </span>{' '}
                                             Bác sĩ Dành Cho Bạn
                                         </h5>
@@ -536,6 +512,25 @@ const DoctorList: React.FC = () => {
                                             <p>
                                                 Vui lòng thử lại với từ khóa khác hoặc bộ lọc khác.
                                             </p>
+                                            {(searchTerm ||
+                                                specialtyFilters.length > 0 ||
+                                                hospitalFilters.length > 0 ||
+                                                areaFilter) && (
+                                                <div className="mt-3">
+                                                    <button
+                                                        className="btn btn-outline-primary"
+                                                        onClick={() => {
+                                                            setSearchTerm('');
+                                                            setSpecialtyFilters([]);
+                                                            setHospitalFilters([]);
+                                                            setAreaFilter(undefined);
+                                                            setCurrentPage(1);
+                                                        }}
+                                                    >
+                                                        Xóa tất cả bộ lọc
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 ) : (
@@ -567,15 +562,17 @@ const DoctorList: React.FC = () => {
                                         />
                                     ))
                                 )}
-                                <div className="col-md-12">
-                                    <Pagination
-                                        currentPage={currentPage}
-                                        totalPages={pagination.totalPages}
-                                        onPageChange={handlePageChange}
-                                        showPrevNext={true}
-                                        maxVisiblePages={5}
-                                    />
-                                </div>
+                                {pagination.totalCount > pagination.pageSize && (
+                                    <div className="col-md-12">
+                                        <Pagination
+                                            currentPage={currentPage}
+                                            totalPages={pagination.totalPages}
+                                            onPageChange={handlePageChange}
+                                            showPrevNext={true}
+                                            maxVisiblePages={5}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

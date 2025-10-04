@@ -5,6 +5,7 @@ export interface SpecialtyResponse {
     id: string;
     name: string;
     description?: string;
+    imageUrl: string;
     status: Status;
     createdAt: string;
     updatedAt: string;

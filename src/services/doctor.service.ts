@@ -18,7 +18,7 @@ const DOCTOR_ENDPOINTS = {
     HEALTH: '/doctors/health',
     GET_DOCTOR: (id: string) => `/doctors/${id}`,
     GET_DOCTORS: '/doctors',
-    GET_SPECIALTIES: '/specialties',
+    GET_SPECIALTIES: '/specialties/all',
     GET_ACTIVE_DOCTORS: '/doctors/patients/active',
     SEARCH_ACTIVE_DOCTORS: '/doctors/patients/search',
     GET_FEATURED_DOCTORS: '/doctors/patients/featured',
@@ -279,6 +279,8 @@ export class DoctorService {
                 'Frontend: AreaFilter being sent:',
                 JSON.stringify(params.areaFilter, null, 2)
             );
+            console.log('Frontend: ProvinceId being sent:', params.areaFilter?.provinceId);
+            console.log('Frontend: DistrictId being sent:', params.areaFilter?.districtId);
             console.log(
                 'Frontend: FilterRequest being sent:',
                 JSON.stringify(filterRequest, null, 2)
