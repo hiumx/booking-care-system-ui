@@ -608,27 +608,22 @@ const SideBar: React.FC<SideBarProps> = ({
     const renderRatingStars = (option: FilterOption) => {
         const rating = Number.parseInt(option.label.charAt(0));
 
-        // Generate filled stars
-        const filledStars = [];
-        for (let i = 1; i <= rating; i++) {
-            filledStars.push(
-                <i
-                    key={`${option.id}-filled-star-${i}`}
-                    className="fa-solid fa-star text-orange me-1"
-                />
-            );
-        }
+        // Helper function to generate star elements
+        const generateStars = (start: number, end: number, isFilled: boolean) => {
+            const stars = [];
+            for (let i = start; i <= end; i++) {
+                stars.push(
+                    <i
+                        key={`${option.id}-${isFilled ? 'filled' : 'empty'}-star-${i}`}
+                        className={`fa-${isFilled ? 'solid' : 'regular'} fa-star text-orange me-1`}
+                    />
+                );
+            }
+            return stars;
+        };
 
-        // Generate empty stars
-        const emptyStars = [];
-        for (let i = rating + 1; i <= 5; i++) {
-            emptyStars.push(
-                <i
-                    key={`${option.id}-empty-star-${i}`}
-                    className="fa-regular fa-star text-orange me-1"
-                />
-            );
-        }
+        const filledStars = generateStars(1, rating, true);
+        const emptyStars = generateStars(rating + 1, 5, false);
 
         return (
             <>
