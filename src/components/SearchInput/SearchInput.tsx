@@ -99,12 +99,12 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
     // Helper function to check if hospital has selected specialties
     const hospitalHasSelectedSpecialties = (hospital: any, selectedSpecialties: string[]) => {
-        if (!(hospital as any).specialties || (hospital as any).specialties.length === 0) {
+        if (!hospital.specialties || hospital.specialties.length === 0) {
             return true; // Include hospital if no specialty data available
         }
 
         return selectedSpecialties.some((selectedSpecialty) =>
-            (hospital as any).specialties.some(
+            hospital.specialties.some(
                 (hospitalSpecialty: any) => hospitalSpecialty.id === selectedSpecialty
             )
         );
@@ -113,11 +113,11 @@ const SearchInput: React.FC<SearchInputProps> = ({
     // Helper function to check if specialty is available in selected hospitals
     const specialtyAvailableInSelectedHospitals = (specialty: any, selectedClinics: any[]) => {
         return selectedClinics.some((hospital) => {
-            if (!(hospital as any).specialties || (hospital as any).specialties.length === 0) {
+            if (!hospital.specialties || hospital.specialties.length === 0) {
                 return true; // Include specialty if no hospital specialty data available
             }
 
-            return (hospital as any).specialties.some(
+            return hospital.specialties.some(
                 (hospitalSpecialty: any) => hospitalSpecialty.id === specialty.id
             );
         });

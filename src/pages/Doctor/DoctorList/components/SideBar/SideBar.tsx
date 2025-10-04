@@ -550,6 +550,153 @@ const SideBar: React.FC<SideBarProps> = ({
     const valueLabelFormat = (value: number): string => formatVND(value);
     const experienceValueLabelFormat = (value: number): string => formatYears(value);
 
+    // Helper function to render price filter section
+    const renderPriceFilter = () => (
+        <div className="filter-range">
+            <PrettoSlider
+                value={priceRange}
+                onChange={handlePriceChange}
+                valueLabelDisplay="on"
+                valueLabelFormat={valueLabelFormat}
+                min={0}
+                max={10000000}
+                step={100000}
+                marks={[
+                    { value: 0, label: '0' },
+                    { value: 1000000, label: '1tr' },
+                    { value: 2000000, label: '2tr' },
+                    { value: 5000000, label: '5tr' },
+                    { value: 10000000, label: '10tr' },
+                ]}
+                aria-label="pretto slider"
+            />
+            <p className={styles.labelCustom}>
+                Giá: {formatVND(priceRange[0])} - {formatVND(priceRange[1])}
+            </p>
+        </div>
+    );
+
+    // Helper function to render experience filter section
+    const renderExperienceFilter = () => (
+        <div className="filter-range">
+            <PrettoSlider
+                value={experienceRange}
+                onChange={handleExperienceChange}
+                valueLabelDisplay="on"
+                valueLabelFormat={experienceValueLabelFormat}
+                min={1}
+                max={30}
+                step={1}
+                marks={[
+                    { value: 1, label: '1' },
+                    { value: 5, label: '5' },
+                    { value: 10, label: '10' },
+                    { value: 15, label: '15' },
+                    { value: 20, label: '20' },
+                    { value: 25, label: '25' },
+                    { value: 30, label: '30' },
+                ]}
+                aria-label="experience slider"
+            />
+            <p className={styles.labelCustom}>
+                Kinh nghiệm: {formatYears(experienceRange[0])} - {formatYears(experienceRange[1])}
+            </p>
+        </div>
+    );
+
+    // Helper function to render rating stars
+    const renderRatingStars = (option: FilterOption) => {
+        const rating = parseInt(option.label.charAt(0));
+        const filledStars = Array(rating)
+            .fill(0)
+            .map((_, i) => <i key={i} className="fa-solid fa-star text-orange me-1" />);
+        const emptyStars = Array(5 - rating)
+            .fill(0)
+            .map((_, i) => <i key={i} className="fa-regular fa-star text-orange me-1" />);
+
+        return (
+            <>
+                <span>
+                    {filledStars}
+                    {emptyStars}
+                </span>
+                {option.label}
+            </>
+        );
+    };
+
+    // Helper function to render option list
+    const renderOptionList = (section: FilterSection) => {
+        const optionsToShow =
+            section.title === 'Đánh giá'
+                ? section.options
+                : section.options.slice(
+                      0,
+                      viewMoreSections[section.title] ? section.options.length : 3
+                  );
+
+        return optionsToShow.map((option) => (
+            <div className="d-flex align-items-center justify-content-between mb-2" key={option.id}>
+                <div className="form-check">
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        value=""
+                        id={option.id}
+                        checked={checkedOptions[option.id] || false}
+                        onChange={() => handleCheckboxChange(option.id, section.title)}
+                    />
+                    <label className={styles.labelCustom} htmlFor={option.id}>
+                        {section.title === 'Đánh giá' ? renderRatingStars(option) : option.label}
+                    </label>
+                </div>
+                {option.count !== undefined && (
+                    <span className={styles.filterBadgeCustom}>{option.count}</span>
+                )}
+            </div>
+        ));
+    };
+
+    // Helper function to render view more button
+    const renderViewMoreButton = (section: FilterSection, index: number) => {
+        if (!section.hasViewMore || section.title === 'Đánh giá' || section.options.length <= 3) {
+            return null;
+        }
+
+        return (
+            <div className="view-content">
+                <div className={`viewall-${index + 1}`}></div>
+                <div className="view-all">
+                    <Link
+                        to="#"
+                        className={clsx(`viewall-button-${index + 1}`, 'btn btn-light btn-sm')}
+                        onClick={() => toggleViewMore(section.title)}
+                    >
+                        {viewMoreSections[section.title] ? 'Thu gọn' : 'Xem thêm'}
+                    </Link>
+                </div>
+            </div>
+        );
+    };
+
+    // Main function to render filter section
+    const renderFilterSection = (section: FilterSection, index: number) => {
+        if (section.title === 'Giá cả') {
+            return renderPriceFilter();
+        }
+
+        if (section.title === 'Kinh nghiệm') {
+            return renderExperienceFilter();
+        }
+
+        return (
+            <>
+                {renderOptionList(section)}
+                {renderViewMoreButton(section, index)}
+            </>
+        );
+    };
+
     return (
         <div className="col-xl-3">
             <div className="card filter-lists">
@@ -621,165 +768,7 @@ const SideBar: React.FC<SideBarProps> = ({
                                 aria-labelledby={`heading${index + 1}`}
                             >
                                 <div className="accordion-body pt-3">
-                                    {section.title === 'Giá cả' ? (
-                                        <div className="filter-range">
-                                            <PrettoSlider
-                                                value={priceRange}
-                                                onChange={handlePriceChange}
-                                                valueLabelDisplay="on"
-                                                valueLabelFormat={valueLabelFormat}
-                                                min={0}
-                                                max={10000000}
-                                                step={100000}
-                                                marks={[
-                                                    { value: 0, label: '0' },
-                                                    { value: 1000000, label: '1tr' },
-                                                    { value: 2000000, label: '2tr' },
-                                                    { value: 5000000, label: '5tr' },
-                                                    { value: 10000000, label: '10tr' },
-                                                ]}
-                                                aria-label="pretto slider"
-                                            />
-                                            <p className={styles.labelCustom}>
-                                                Giá: {formatVND(priceRange[0])} -{' '}
-                                                {formatVND(priceRange[1])}
-                                            </p>
-                                        </div>
-                                    ) : section.title === 'Kinh nghiệm' ? (
-                                        <div className="filter-range">
-                                            <PrettoSlider
-                                                value={experienceRange}
-                                                onChange={handleExperienceChange}
-                                                valueLabelDisplay="on"
-                                                valueLabelFormat={experienceValueLabelFormat}
-                                                min={1}
-                                                max={30}
-                                                step={1}
-                                                marks={[
-                                                    { value: 1, label: '1' },
-                                                    { value: 5, label: '5' },
-                                                    { value: 10, label: '10' },
-                                                    { value: 15, label: '15' },
-                                                    { value: 20, label: '20' },
-                                                    { value: 25, label: '25' },
-                                                    { value: 30, label: '30' },
-                                                ]}
-                                                aria-label="experience slider"
-                                            />
-                                            <p className={styles.labelCustom}>
-                                                Kinh nghiệm: {formatYears(experienceRange[0])} -{' '}
-                                                {formatYears(experienceRange[1])}
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            {(section.title === 'Đánh giá'
-                                                ? section.options
-                                                : section.options.slice(
-                                                      0,
-                                                      viewMoreSections[section.title]
-                                                          ? section.options.length
-                                                          : 3
-                                                  )
-                                            ).map((option) => (
-                                                <div
-                                                    className="d-flex align-items-center justify-content-between mb-2"
-                                                    key={option.id}
-                                                >
-                                                    <div className="form-check">
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            value=""
-                                                            id={option.id}
-                                                            checked={
-                                                                checkedOptions[option.id] || false
-                                                            }
-                                                            onChange={() =>
-                                                                handleCheckboxChange(
-                                                                    option.id,
-                                                                    section.title
-                                                                )
-                                                            }
-                                                        />
-                                                        <label
-                                                            className={styles.labelCustom}
-                                                            htmlFor={option.id}
-                                                        >
-                                                            {section.title === 'Đánh giá' ? (
-                                                                <>
-                                                                    <span>
-                                                                        {[
-                                                                            ...Array(
-                                                                                parseInt(
-                                                                                    option.label.charAt(
-                                                                                        0
-                                                                                    )
-                                                                                )
-                                                                            ),
-                                                                        ].map((_, i) => (
-                                                                            <i
-                                                                                key={i}
-                                                                                className="fa-solid fa-star text-orange me-1"
-                                                                            ></i>
-                                                                        ))}
-                                                                        {[
-                                                                            ...Array(
-                                                                                5 -
-                                                                                    parseInt(
-                                                                                        option.label.charAt(
-                                                                                            0
-                                                                                        )
-                                                                                    )
-                                                                            ),
-                                                                        ].map((_, i) => (
-                                                                            <i
-                                                                                key={i}
-                                                                                className="fa-regular fa-star text-orange me-1"
-                                                                            ></i>
-                                                                        ))}
-                                                                    </span>
-                                                                    {option.label}
-                                                                </>
-                                                            ) : (
-                                                                option.label
-                                                            )}
-                                                        </label>
-                                                    </div>
-                                                    {option.count !== undefined && (
-                                                        <span className={styles.filterBadgeCustom}>
-                                                            {option.count}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            ))}
-                                            {section.hasViewMore &&
-                                                section.title !== 'Đánh giá' &&
-                                                section.options.length > 3 && (
-                                                    <div className="view-content">
-                                                        <div
-                                                            className={`viewall-${index + 1}`}
-                                                        ></div>
-                                                        <div className="view-all">
-                                                            <Link
-                                                                to="#"
-                                                                className={clsx(
-                                                                    `viewall-button-${index + 1}`,
-                                                                    'btn btn-light btn-sm'
-                                                                )}
-                                                                onClick={() =>
-                                                                    toggleViewMore(section.title)
-                                                                }
-                                                            >
-                                                                {viewMoreSections[section.title]
-                                                                    ? 'Thu gọn'
-                                                                    : 'Xem thêm'}
-                                                            </Link>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                        </>
-                                    )}
+                                    {renderFilterSection(section, index)}
                                 </div>
                             </div>
                         </div>
