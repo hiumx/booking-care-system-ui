@@ -109,33 +109,66 @@ const ModalArea: React.FC<ModalAreaProps> = ({
         }
     };
 
+    // Helper function to find first matching province
+    const findFirstMatchingProvince = (searchTerm: string) => {
+        return provinces.filter((province) =>
+            province.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    };
+
+    // Helper function to find first matching district
+    const findFirstMatchingDistrict = (searchTerm: string) => {
+        return districts
+            .filter((district) => district.provinceId === selectedProvinceId)
+            .filter((district) => district.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    };
+
     // Xử lý sự kiện bàn phím cho search input
     const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            // Nếu có kết quả search, chọn kết quả đầu tiên
-            if (searchTerm) {
-                const filteredProvinces = provinces.filter((province) =>
-                    province.name.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-                if (filteredProvinces.length > 0) {
-                    handleProvinceClick(filteredProvinces[0].id);
-                } else {
-                    // Nếu không có tỉnh nào match, tìm trong districts
-                    const filteredDistricts = districts
-                        .filter((district) => district.provinceId === selectedProvinceId)
-                        .filter((district) =>
-                            district.name.toLowerCase().includes(searchTerm.toLowerCase())
-                        );
-                    if (filteredDistricts.length > 0) {
-                        handleDistrictClick(filteredDistricts[0].id);
-                    }
-                }
-            }
+            handleSearchEnter();
         } else if (e.key === 'Escape') {
             e.preventDefault();
             onClose();
         }
+    };
+
+    // Handle Enter key in search
+    const handleSearchEnter = () => {
+        if (!searchTerm) return;
+
+        const filteredProvinces = findFirstMatchingProvince(searchTerm);
+        if (filteredProvinces.length > 0) {
+            handleProvinceClick(filteredProvinces[0].id);
+            return;
+        }
+
+        const filteredDistricts = findFirstMatchingDistrict(searchTerm);
+        if (filteredDistricts.length > 0) {
+            handleDistrictClick(filteredDistricts[0].id);
+        }
+    };
+
+    // Helper function to render current selection
+    const renderCurrentSelection = () => {
+        const hasSelection =
+            selectedProvinceId &&
+            selectedProvinceId !== '' &&
+            (selectedProvince || selectedDistrict);
+        if (!hasSelection) return null;
+
+        return (
+            <div className={styles.currentSelection}>
+                {selectedProvince && selectedDistrict ? (
+                    <span className={styles.selectionText}>
+                        Đã chọn: {selectedProvince.name} - {selectedDistrict.name}
+                    </span>
+                ) : selectedProvince ? (
+                    <span className={styles.selectionText}>Đã chọn: {selectedProvince.name}</span>
+                ) : null}
+            </div>
+        );
     };
 
     if (!isOpen) return null;
@@ -151,9 +184,9 @@ const ModalArea: React.FC<ModalAreaProps> = ({
         );
     }
 
-    const filteredProvinces = provinces
-        .filter((province) => province.name.toLowerCase().includes(searchTerm.toLowerCase()))
-        .sort((a, b) => {
+    // Helper function to sort provinces
+    const sortProvinces = (provinces: Province[]) => {
+        return provinces.sort((a, b) => {
             // Nếu có tỉnh đã chọn, đưa nó lên đầu
             if (selectedProvinceId && selectedProvinceId !== '') {
                 if (a.id === selectedProvinceId) return -1;
@@ -162,11 +195,11 @@ const ModalArea: React.FC<ModalAreaProps> = ({
             // Sắp xếp theo tên
             return a.name.localeCompare(b.name);
         });
+    };
 
-    const filteredDistricts = districts
-        .filter((district) => district.provinceId === selectedProvinceId)
-        .filter((district) => district.name.toLowerCase().includes(searchTerm.toLowerCase()))
-        .sort((a, b) => {
+    // Helper function to sort districts
+    const sortDistricts = (districts: District[]) => {
+        return districts.sort((a, b) => {
             // Nếu có quận đã chọn, đưa nó lên đầu
             if (selectedDistrictId && selectedDistrictId !== '') {
                 if (a.id === selectedDistrictId) return -1;
@@ -175,6 +208,30 @@ const ModalArea: React.FC<ModalAreaProps> = ({
             // Sắp xếp theo tên
             return a.name.localeCompare(b.name);
         });
+    };
+
+    // Helper function to filter provinces by search term
+    const filterProvincesBySearch = (provinces: Province[], searchTerm: string) => {
+        return provinces.filter((province) =>
+            province.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    };
+
+    // Helper function to filter districts by search term
+    const filterDistrictsBySearch = (districts: District[], searchTerm: string) => {
+        return districts.filter((district) =>
+            district.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    };
+
+    const filteredProvinces = sortProvinces(filterProvincesBySearch(provinces, searchTerm));
+
+    const filteredDistricts = sortDistricts(
+        filterDistrictsBySearch(
+            districts.filter((district) => district.provinceId === selectedProvinceId),
+            searchTerm
+        )
+    );
 
     const selectedProvince = provinces.find((p) => p.id === selectedProvinceId);
     const selectedDistrict = districts.find((d) => d.id === selectedDistrictId);
@@ -228,22 +285,7 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                 <div className={styles.modalHeader}>
                     <div className={styles.modalTitleSection}>
                         <h3 className={styles.modalTitle}>Chọn khu vực</h3>
-                        {selectedProvinceId &&
-                            selectedProvinceId !== '' &&
-                            (selectedProvince || selectedDistrict) && (
-                                <div className={styles.currentSelection}>
-                                    {selectedProvince && selectedDistrict ? (
-                                        <span className={styles.selectionText}>
-                                            Đã chọn: {selectedProvince.name} -{' '}
-                                            {selectedDistrict.name}
-                                        </span>
-                                    ) : selectedProvince ? (
-                                        <span className={styles.selectionText}>
-                                            Đã chọn: {selectedProvince.name}
-                                        </span>
-                                    ) : null}
-                                </div>
-                            )}
+                        {renderCurrentSelection()}
                     </div>
                     <div className={styles.modalActions}>
                         <button className={styles.clearButton} onClick={handleClearFilter}>

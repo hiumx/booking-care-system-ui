@@ -181,48 +181,55 @@ export class DoctorService {
     }
 
     /**
+     * Helper function to build query parameters for search
+     */
+    private static buildSearchQueryParams(params: DoctorSearchParams): Record<string, any> {
+        const queryParams: Record<string, any> = {};
+
+        // Basic filters
+        if (params.searchTerm) queryParams.searchTerm = params.searchTerm;
+        if (params.specialtyFilter) queryParams.specialtyId = params.specialtyFilter;
+        if (params.hospitalFilter) queryParams.hospitalId = params.hospitalFilter;
+        if (params.positionFilter) queryParams.positionId = params.positionFilter;
+        if (params.languageFilter) queryParams.language = params.languageFilter;
+        if (params.serviceTypeFilter) queryParams.serviceType = params.serviceTypeFilter;
+        if (params.ratingFilter) queryParams.minRating = params.ratingFilter;
+        if (params.genderFilter !== undefined) queryParams.gender = params.genderFilter;
+        if (params.patientId) queryParams.patientId = params.patientId;
+        if (params.pageNumber) queryParams.pageNumber = params.pageNumber;
+        if (params.pageSize) queryParams.pageSize = params.pageSize;
+        if (params.sortBy) queryParams.sortBy = params.sortBy;
+        if (params.sortOrder) queryParams.sortOrder = params.sortOrder;
+
+        // Array filters
+        if (params.positionFilters?.length > 0) queryParams.positionIds = params.positionFilters;
+        if (params.languageFilters?.length > 0) queryParams.languages = params.languageFilters;
+        if (params.serviceTypeFilters?.length > 0)
+            queryParams.serviceTypes = params.serviceTypeFilters;
+        if (params.ratingFilters?.length > 0) queryParams.minRatings = params.ratingFilters;
+        if (params.genderFilters?.length > 0) queryParams.genders = params.genderFilters;
+        if (params.experienceFilters?.length > 0)
+            queryParams.experienceRanges = params.experienceFilters;
+
+        // Object filters
+        if (params.experienceFilter) queryParams.experienceFilter = params.experienceFilter;
+        if (params.priceRange) {
+            queryParams.minPrice = params.priceRange.min;
+            queryParams.maxPrice = params.priceRange.max;
+        }
+
+        return queryParams;
+    }
+
+    /**
      * Search active doctors by name, specialty, or location for patients
      */
     static async searchActiveDoctors(
         params: DoctorSearchParams
     ): Promise<ApiResponse<DoctorListResponse>> {
         try {
-            const queryParams = {
-                ...(params.searchTerm && { searchTerm: params.searchTerm }),
-                ...(params.specialtyFilter && { specialtyId: params.specialtyFilter }),
-                ...(params.hospitalFilter && { hospitalId: params.hospitalFilter }),
-                ...(params.positionFilter && { positionId: params.positionFilter }),
-                ...(params.positionFilters &&
-                    params.positionFilters.length > 0 && { positionIds: params.positionFilters }),
-                ...(params.languageFilter && { language: params.languageFilter }),
-                ...(params.languageFilters &&
-                    params.languageFilters.length > 0 && { languages: params.languageFilters }),
-                ...(params.serviceTypeFilter && { serviceType: params.serviceTypeFilter }),
-                ...(params.serviceTypeFilters &&
-                    params.serviceTypeFilters.length > 0 && {
-                        serviceTypes: params.serviceTypeFilters,
-                    }),
-                ...(params.ratingFilter && { minRating: params.ratingFilter }),
-                ...(params.ratingFilters &&
-                    params.ratingFilters.length > 0 && { minRatings: params.ratingFilters }),
-                ...(params.genderFilter !== undefined && { gender: params.genderFilter }),
-                ...(params.genderFilters &&
-                    params.genderFilters.length > 0 && { genders: params.genderFilters }),
-                ...(params.experienceFilter && { experienceFilter: params.experienceFilter }),
-                ...(params.experienceFilters &&
-                    params.experienceFilters.length > 0 && {
-                        experienceRanges: params.experienceFilters,
-                    }),
-                ...(params.priceRange && {
-                    minPrice: params.priceRange.min,
-                    maxPrice: params.priceRange.max,
-                }),
-                ...(params.patientId && { patientId: params.patientId }),
-                ...(params.pageNumber && { pageNumber: params.pageNumber }),
-                ...(params.pageSize && { pageSize: params.pageSize }),
-                ...(params.sortBy && { sortBy: params.sortBy }),
-                ...(params.sortOrder && { sortOrder: params.sortOrder }),
-            };
+            const queryParams = this.buildSearchQueryParams(params);
+
             const response: any = await axiosInstance.get(DOCTOR_ENDPOINTS.SEARCH_ACTIVE_DOCTORS, {
                 params: queryParams,
             });

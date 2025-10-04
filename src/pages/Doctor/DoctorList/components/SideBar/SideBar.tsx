@@ -366,6 +366,129 @@ const SideBar: React.FC<SideBarProps> = ({
         }
     };
 
+    // Helper function to map option IDs based on section type
+    const mapOptionId = (optionId: string, sectionTitle: string): any => {
+        const mappingFunctions = {
+            'Học vị': (id: string) => id.replace('position-', ''),
+            'Ngôn ngữ': (id: string) => id.replace('language-', ''),
+            'Loại hình dịch vụ': (id: string) => id.replace('serviceType-', ''),
+            'Giới tính': (id: string) => {
+                const genderMap: { [key: string]: string } = {
+                    'checkebox-sm14': 'MALE',
+                    'checkebox-sm15': 'FEMALE',
+                    'checkebox-sm16': 'OTHER',
+                };
+                return genderMap[id] || id;
+            },
+            'Đánh giá': (id: string) => {
+                const ratingMap: { [key: string]: number } = {
+                    'checkebox-sm46': 5,
+                    'checkebox-sm47': 4,
+                    'checkebox-sm48': 3,
+                    'checkebox-sm49': 2,
+                    'checkebox-sm50': 1,
+                };
+                return ratingMap[id]?.toString() || id;
+            },
+            'Kinh nghiệm': (id: string) => {
+                const experienceMap: {
+                    [key: string]: { MinYears: number; MaxYears: number };
+                } = {
+                    'checkebox-sm22': { MinYears: 0, MaxYears: 1 },
+                    'checkebox-sm23': { MinYears: 2, MaxYears: 4 },
+                    'checkebox-sm24': { MinYears: 5, MaxYears: 9 },
+                    'checkebox-sm25': { MinYears: 10, MaxYears: 19 },
+                    'checkebox-sm26': { MinYears: 20, MaxYears: 100 },
+                };
+                return experienceMap[id] || id;
+            },
+        };
+
+        const mapper = mappingFunctions[sectionTitle as keyof typeof mappingFunctions];
+        return mapper ? mapper(optionId) : optionId;
+    };
+
+    // Helper function to get checked options for a section
+    const getCheckedOptionsForSection = (
+        sectionTitle: string,
+        newCheckedOptions: { [key: string]: boolean }
+    ): any[] => {
+        const section = dynamicFilterData.find((s) => s.title === sectionTitle);
+        if (!section) return [];
+
+        return section.options
+            .filter((option) => newCheckedOptions[option.id])
+            .map((option) => mapOptionId(option.id, sectionTitle));
+    };
+
+    // Helper function to handle filter callbacks
+    const handleFilterCallback = (
+        sectionTitle: string,
+        checkedValues: any[],
+        isChecked: boolean,
+        id: string
+    ) => {
+        const callbackMap = {
+            'Học vị': () => {
+                if (onPositionFilters) {
+                    onPositionFilters(checkedValues);
+                } else if (onPositionFilter) {
+                    const positionId = isChecked ? id.replace('position-', '') : '';
+                    onPositionFilter(positionId);
+                }
+            },
+            'Ngôn ngữ': () => {
+                if (onLanguageFilters) {
+                    onLanguageFilters(checkedValues);
+                } else if (onLanguageFilter) {
+                    const languageId = isChecked ? id.replace('language-', '') : '';
+                    onLanguageFilter(languageId);
+                }
+            },
+            'Loại hình dịch vụ': () => {
+                if (onServiceTypeFilters) {
+                    onServiceTypeFilters(checkedValues);
+                } else if (onServiceTypeFilter) {
+                    const serviceTypeId = isChecked ? id.replace('serviceType-', '') : '';
+                    onServiceTypeFilter(serviceTypeId);
+                }
+            },
+            'Đánh giá': () => {
+                if (onRatingFilters) {
+                    onRatingFilters(checkedValues);
+                } else if (onRatingFilter) {
+                    const rating = isChecked ? id : '';
+                    onRatingFilter(rating);
+                }
+            },
+            'Lịch trống': () => {
+                if (onAvailabilityFilter) {
+                    const availability = isChecked ? id : '';
+                    onAvailabilityFilter(availability);
+                }
+            },
+            'Loại tư vấn': () => {
+                if (onConsultationTypeFilter) {
+                    const consultationType = isChecked ? id : '';
+                    onConsultationTypeFilter(consultationType);
+                }
+            },
+            'Giới tính': () => {
+                if (onGenderFilters) {
+                    onGenderFilters(checkedValues);
+                } else if (onGenderFilter) {
+                    const gender = isChecked ? id : '';
+                    onGenderFilter(gender);
+                }
+            },
+        };
+
+        const callback = callbackMap[sectionTitle as keyof typeof callbackMap];
+        if (callback) {
+            callback();
+        }
+    };
+
     const handleCheckboxChange = (id: string, sectionTitle: string): void => {
         const isChecked = !checkedOptions[id];
 
@@ -376,131 +499,50 @@ const SideBar: React.FC<SideBarProps> = ({
         };
         setCheckedOptions(newCheckedOptions);
 
-        // Get all checked options for this section after the state update
-        const getCheckedOptionsForSection = (sectionTitle: string): any[] => {
-            const section = dynamicFilterData.find((s) => s.title === sectionTitle);
-            if (!section) return [];
+        // Get checked values for this section
+        const checkedValues = getCheckedOptionsForSection(sectionTitle, newCheckedOptions);
 
-            return section.options
-                .filter((option) => newCheckedOptions[option.id]) // Use updated state
-                .map((option) => {
-                    if (sectionTitle === 'Học vị') return option.id.replace('position-', '');
-                    if (sectionTitle === 'Ngôn ngữ') return option.id.replace('language-', '');
-                    if (sectionTitle === 'Loại hình dịch vụ')
-                        return option.id.replace('serviceType-', '');
-                    if (sectionTitle === 'Giới tính') {
-                        // Map gender IDs to Gender enum values
-                        const genderMap: { [key: string]: string } = {
-                            'checkebox-sm14': 'MALE',
-                            'checkebox-sm15': 'FEMALE',
-                            'checkebox-sm16': 'OTHER',
-                        };
-                        return genderMap[option.id] || option.id;
-                    }
-                    if (sectionTitle === 'Đánh giá') {
-                        // Map rating IDs to numbers
-                        const ratingMap: { [key: string]: number } = {
-                            'checkebox-sm46': 5,
-                            'checkebox-sm47': 4,
-                            'checkebox-sm48': 3,
-                            'checkebox-sm49': 2,
-                            'checkebox-sm50': 1,
-                        };
-                        return ratingMap[option.id]?.toString() || option.id;
-                    }
-                    if (sectionTitle === 'Kinh nghiệm') {
-                        // Map experience IDs to ranges with correct property names for backend
-                        // Fixed ranges to avoid overlap
-                        const experienceMap: {
-                            [key: string]: { MinYears: number; MaxYears: number };
-                        } = {
-                            'checkebox-sm22': { MinYears: 0, MaxYears: 1 }, // Dưới 2 năm (0-1 năm)
-                            'checkebox-sm23': { MinYears: 2, MaxYears: 4 }, // Từ 2 – 5 năm (2-4 năm)
-                            'checkebox-sm24': { MinYears: 5, MaxYears: 9 }, // Từ 5 – 10 năm (5-9 năm)
-                            'checkebox-sm25': { MinYears: 10, MaxYears: 19 }, // Từ 10 – 20 năm (10-19 năm)
-                            'checkebox-sm26': { MinYears: 20, MaxYears: 100 }, // Trên 20 năm (20+ năm)
-                        };
-                        return experienceMap[option.id] || option.id;
-                    }
-                    return option.id;
-                });
-        };
-
-        // Call appropriate callback based on section
-        if (sectionTitle === 'Học vị') {
-            const checkedPositionIds = getCheckedOptionsForSection('Học vị');
-            if (onPositionFilters) {
-                onPositionFilters(checkedPositionIds);
-            } else if (onPositionFilter) {
-                const positionId = isChecked ? id.replace('position-', '') : '';
-                onPositionFilter(positionId);
-            }
-        } else if (sectionTitle === 'Ngôn ngữ') {
-            const checkedLanguageIds = getCheckedOptionsForSection('Ngôn ngữ');
-            if (onLanguageFilters) {
-                onLanguageFilters(checkedLanguageIds);
-            } else if (onLanguageFilter) {
-                const languageId = isChecked ? id.replace('language-', '') : '';
-                onLanguageFilter(languageId);
-            }
-        } else if (sectionTitle === 'Loại hình dịch vụ') {
-            const checkedServiceTypeIds = getCheckedOptionsForSection('Loại hình dịch vụ');
-            if (onServiceTypeFilters) {
-                onServiceTypeFilters(checkedServiceTypeIds);
-            } else if (onServiceTypeFilter) {
-                const serviceTypeId = isChecked ? id.replace('serviceType-', '') : '';
-                onServiceTypeFilter(serviceTypeId);
-            }
-        } else if (sectionTitle === 'Đánh giá') {
-            const checkedRatings = getCheckedOptionsForSection('Đánh giá');
-            if (onRatingFilters) {
-                onRatingFilters(checkedRatings);
-            } else if (onRatingFilter) {
-                const rating = isChecked ? id : '';
-                onRatingFilter(rating);
-            }
-        } else if (sectionTitle === 'Lịch trống' && onAvailabilityFilter) {
-            const availability = isChecked ? id : '';
-            onAvailabilityFilter(availability);
-        } else if (sectionTitle === 'Loại tư vấn' && onConsultationTypeFilter) {
-            const consultationType = isChecked ? id : '';
-            onConsultationTypeFilter(consultationType);
-        } else if (sectionTitle === 'Giới tính') {
-            const checkedGenders = getCheckedOptionsForSection('Giới tính');
-            if (onGenderFilters) {
-                onGenderFilters(checkedGenders);
-            } else if (onGenderFilter) {
-                const gender = isChecked ? id : '';
-                onGenderFilter(gender);
-            }
-        }
+        // Handle the appropriate callback
+        handleFilterCallback(sectionTitle, checkedValues, isChecked, id);
     };
 
-    const handleClearAll = (): void => {
+    // Helper function to clear all state
+    const clearAllState = () => {
         setSearchTerm('');
         setPriceRange([200000, 1000000]);
         setExperienceRange([1, 30]);
         setCheckedOptions({});
         setViewMoreSections({});
+    };
 
-        // Clear all filters by calling callbacks with empty values
-        if (onSearchChange) onSearchChange('');
-        if (onSpecialtyFilter) onSpecialtyFilter('');
-        if (onPositionFilter) onPositionFilter('');
-        if (onPositionFilters) onPositionFilters([]);
-        if (onLanguageFilter) onLanguageFilter('');
-        if (onLanguageFilters) onLanguageFilters([]);
-        if (onServiceTypeFilter) onServiceTypeFilter('');
-        if (onServiceTypeFilters) onServiceTypeFilters([]);
-        if (onRatingFilter) onRatingFilter('');
-        if (onRatingFilters) onRatingFilters([]);
-        if (onExperienceFilter) onExperienceFilter({ min: 1, max: 30 }); // Reset to full range
-        if (onExperienceFilters) onExperienceFilters([]);
-        if (onAvailabilityFilter) onAvailabilityFilter('');
-        if (onConsultationTypeFilter) onConsultationTypeFilter('');
-        if (onGenderFilter) onGenderFilter('');
-        if (onGenderFilters) onGenderFilters([]);
-        if (onPriceFilter) onPriceFilter({ min: 0, max: 10000000 });
+    // Helper function to clear all filter callbacks
+    const clearAllFilterCallbacks = () => {
+        const clearCallbacks = [
+            () => onSearchChange?.(''),
+            () => onSpecialtyFilter?.(''),
+            () => onPositionFilter?.(''),
+            () => onPositionFilters?.([]),
+            () => onLanguageFilter?.(''),
+            () => onLanguageFilters?.([]),
+            () => onServiceTypeFilter?.(''),
+            () => onServiceTypeFilters?.([]),
+            () => onRatingFilter?.(''),
+            () => onRatingFilters?.([]),
+            () => onExperienceFilter?.({ min: 1, max: 30 }),
+            () => onExperienceFilters?.([]),
+            () => onAvailabilityFilter?.(''),
+            () => onConsultationTypeFilter?.(''),
+            () => onGenderFilter?.(''),
+            () => onGenderFilters?.([]),
+            () => onPriceFilter?.({ min: 0, max: 10000000 }),
+        ];
+
+        clearCallbacks.forEach((callback) => callback());
+    };
+
+    const handleClearAll = (): void => {
+        clearAllState();
+        clearAllFilterCallbacks();
     };
 
     const valueLabelFormat = (value: number): string => formatVND(value);

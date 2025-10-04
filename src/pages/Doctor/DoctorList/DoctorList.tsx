@@ -82,9 +82,9 @@ const DoctorList: React.FC = () => {
         { label: 'Giá từ cao đến thấp', value: 'high-to-low' },
     ];
 
-    // Load doctors on component mount and when filters change
-    useEffect(() => {
-        const params = {
+    // Helper function to build search parameters
+    const buildSearchParams = () => {
+        return {
             pageNumber: currentPage,
             pageSize: doctorsPerPage,
             searchTerm: searchTerm && searchTerm.trim() ? searchTerm : undefined,
@@ -102,8 +102,8 @@ const DoctorList: React.FC = () => {
             serviceTypeFilters: serviceTypeFilters.length > 0 ? serviceTypeFilters : undefined,
             ratingFilter: ratingFilter,
             ratingFilters: ratingFilters.length > 0 ? ratingFilters : undefined,
-            experienceRange: experienceFilter, // Use new slider format
-            experienceFilters: experienceFilters.length > 0 ? experienceFilters : undefined, // Keep for backward compatibility
+            experienceRange: experienceFilter,
+            experienceFilters: experienceFilters.length > 0 ? experienceFilters : undefined,
             availabilityFilter:
                 availabilityFilter && availabilityFilter.trim() ? availabilityFilter : undefined,
             consultationTypeFilter:
@@ -116,24 +116,32 @@ const DoctorList: React.FC = () => {
             areaFilter: areaFilter,
             patientId,
         };
+    };
 
-        // Use filterDoctorsAsync for advanced filtering with multiple criteria
-        if (
+    // Helper function to check if advanced filtering is needed
+    const shouldUseAdvancedFiltering = () => {
+        return (
             positionFilters.length > 0 ||
             languageFilters.length > 0 ||
             serviceTypeFilters.length > 0 ||
             ratingFilters.length > 0 ||
             experienceFilters.length > 0 ||
             genderFilters.length > 0 ||
-            specialtyFilters.length > 0 || // Add multiple specialty filters
-            hospitalFilters.length > 0 || // Add multiple hospital filters
-            experienceFilter || // Add experience slider filter
-            priceFilter || // Also check for price filter
-            areaFilter // Add area filter
-        ) {
+            specialtyFilters.length > 0 ||
+            hospitalFilters.length > 0 ||
+            experienceFilter ||
+            priceFilter ||
+            areaFilter
+        );
+    };
+
+    // Load doctors on component mount and when filters change
+    useEffect(() => {
+        const params = buildSearchParams();
+
+        if (shouldUseAdvancedFiltering()) {
             dispatch(filterDoctorsAsync(params));
         } else {
-            // Use searchDoctorsAsync for basic filtering
             dispatch(searchDoctorsAsync(params));
         }
     }, [
@@ -152,7 +160,7 @@ const DoctorList: React.FC = () => {
         serviceTypeFilters,
         ratingFilter,
         ratingFilters,
-        experienceFilter, // Now object instead of string
+        experienceFilter,
         experienceFilters,
         availabilityFilter,
         consultationTypeFilter,
@@ -162,46 +170,57 @@ const DoctorList: React.FC = () => {
         areaFilter,
     ]);
 
+    // Helper function to check if doctor passes availability filter
+    const passesAvailabilityFilter = (doctor: any) => {
+        if (!availabilityFilter) return true;
+        return doctor.status === Status.ACTIVE;
+    };
+
+    // Helper function to check if doctor passes consultation type filter
+    const passesConsultationTypeFilter = (doctor: any) => {
+        if (!consultationTypeFilter) return true;
+        return doctor.prices && doctor.prices.length > 0;
+    };
+
+    // Helper function to check if doctor passes price filter
+    const passesPriceFilter = (doctor: any) => {
+        if (!priceFilter) return true;
+        const doctorPrice = doctor.prices?.[0]?.amount || 0;
+        return doctorPrice >= priceFilter.min && doctorPrice <= priceFilter.max;
+    };
+
+    // Helper function to get doctor price
+    const getDoctorPrice = (doctor: any) => {
+        return doctor.prices?.[0]?.amount || 0;
+    };
+
+    // Helper function to sort doctors by price
+    const sortDoctorsByPrice = (a: any, b: any, order: 'low-to-high' | 'high-to-low') => {
+        const priceA = getDoctorPrice(a);
+        const priceB = getDoctorPrice(b);
+
+        // Doctors without prices go to the end
+        if (priceA === 0 && priceB > 0) return 1;
+        if (priceB === 0 && priceA > 0) return -1;
+
+        return order === 'low-to-high' ? priceA - priceB : priceB - priceA;
+    };
+
     // Use doctors directly from API - backend handles filtering and pagination
     // Only apply local filters that are not handled by backend
     const filteredAndSortedDoctors = [...doctors]
         .filter((doctor) => {
-            // Only apply filters that are NOT handled by backend
-            // Backend already handles: searchTerm, specialtyFilters, hospitalFilters, areaFilter, experienceFilter, etc.
-
-            // Availability filter (simplified - check if doctor is active)
-            if (availabilityFilter) {
-                if (doctor.status !== Status.ACTIVE) return false;
-            }
-
-            // Consultation type filter (simplified - check if doctor has prices)
-            if (consultationTypeFilter) {
-                if (!doctor.prices || doctor.prices.length === 0) return false;
-            }
-
-            // Price filter
-            if (priceFilter) {
-                const doctorPrice = doctor.prices?.[0]?.amount || 0;
-                if (doctorPrice < priceFilter.min || doctorPrice > priceFilter.max) return false;
-            }
-
-            return true;
+            return (
+                passesAvailabilityFilter(doctor) &&
+                passesConsultationTypeFilter(doctor) &&
+                passesPriceFilter(doctor)
+            );
         })
         .sort((a, b) => {
             if (sortOption === 'low-to-high') {
-                const priceA = a.prices?.[0]?.amount || 0;
-                const priceB = b.prices?.[0]?.amount || 0;
-                // Doctors without prices go to the end
-                if (priceA === 0 && priceB > 0) return 1;
-                if (priceB === 0 && priceA > 0) return -1;
-                return priceA - priceB;
+                return sortDoctorsByPrice(a, b, 'low-to-high');
             } else if (sortOption === 'high-to-low') {
-                const priceA = a.prices?.[0]?.amount || 0;
-                const priceB = b.prices?.[0]?.amount || 0;
-                // Doctors without prices go to the end
-                if (priceA === 0 && priceB > 0) return 1;
-                if (priceB === 0 && priceA > 0) return -1;
-                return priceB - priceA;
+                return sortDoctorsByPrice(a, b, 'high-to-low');
             }
             return 0;
         });
