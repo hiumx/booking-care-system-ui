@@ -109,13 +109,6 @@ const ModalArea: React.FC<ModalAreaProps> = ({
         }
     };
 
-    // Helper function to find first matching province
-    const findFirstMatchingProvince = (searchTerm: string) => {
-        return provinces.filter((province) =>
-            province.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    };
-
     // Helper function to find first matching district
     const findFirstMatchingDistrict = (searchTerm: string) => {
         return districts
@@ -138,7 +131,7 @@ const ModalArea: React.FC<ModalAreaProps> = ({
     const handleSearchEnter = () => {
         if (!searchTerm) return;
 
-        const filteredProvinces = findFirstMatchingProvince(searchTerm);
+        const filteredProvinces = filterProvincesBySearch(provinces, searchTerm);
         if (filteredProvinces.length > 0) {
             handleProvinceClick(filteredProvinces[0].id);
             return;

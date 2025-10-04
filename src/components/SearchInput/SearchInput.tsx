@@ -103,16 +103,34 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
         // If area is selected first, filter hospitals by location
         if (selectedAreaInfo.provinceId || selectedAreaInfo.districtId) {
-            // TODO: Add location-based filtering when hospital location data is available
-            // For now, return all hospitals (will be implemented with backend support)
-            filteredHospitals = hospitals;
+            // Filter hospitals by location (province or district)
+            filteredHospitals = hospitals.filter((hospital) => {
+                // Check if hospital has location data and matches selected area
+                if ((hospital as any).provinceId && selectedAreaInfo.provinceId) {
+                    return (hospital as any).provinceId === selectedAreaInfo.provinceId;
+                }
+                if ((hospital as any).districtId && selectedAreaInfo.districtId) {
+                    return (hospital as any).districtId === selectedAreaInfo.districtId;
+                }
+                return true; // Include hospital if no location data available
+            });
         }
 
         // If specialty is selected first, filter hospitals that have doctors with those specialties
         if (selectedSpecialties.length > 0) {
-            // TODO: Add specialty-based hospital filtering when doctor-hospital-specialty relationship is available
-            // For now, return all hospitals (will be implemented with backend support)
-            filteredHospitals = hospitals;
+            // Filter hospitals that have doctors with selected specialties
+            filteredHospitals = filteredHospitals.filter((hospital) => {
+                // Check if hospital has doctors with selected specialties
+                // This assumes hospital has a specialties array or can be determined from doctor data
+                if ((hospital as any).specialties && (hospital as any).specialties.length > 0) {
+                    return selectedSpecialties.some((selectedSpecialty) =>
+                        (hospital as any).specialties.some(
+                            (hospitalSpecialty: any) => hospitalSpecialty.id === selectedSpecialty
+                        )
+                    );
+                }
+                return true; // Include hospital if no specialty data available
+            });
         }
 
         return filteredHospitals;
@@ -124,9 +142,18 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
         // If hospital is selected first, filter specialties available in those hospitals
         if (selectedClinics.length > 0) {
-            // TODO: Add hospital-based specialty filtering when doctor-hospital-specialty relationship is available
-            // For now, return all specialties (will be implemented with backend support)
-            filteredSpecialties = specialties;
+            // Filter specialties available in selected hospitals
+            filteredSpecialties = specialties.filter((specialty) => {
+                // Check if specialty is available in any of the selected hospitals
+                return selectedClinics.some((hospital) => {
+                    if ((hospital as any).specialties && (hospital as any).specialties.length > 0) {
+                        return (hospital as any).specialties.some(
+                            (hospitalSpecialty: any) => hospitalSpecialty.id === specialty.id
+                        );
+                    }
+                    return true; // Include specialty if no hospital specialty data available
+                });
+            });
         }
 
         return filteredSpecialties;
@@ -297,6 +324,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                     contentEditable={false}
                                     data-placeholder="Chọn cơ sở y tế"
                                     onClick={handleClinicClick}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            handleClinicClick();
+                                        }
+                                    }}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label="Chọn cơ sở y tế"
                                     style={{ minHeight: '50px' }}
                                 >
                                     {selectedClinics.length > 0
@@ -308,8 +344,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                                       )?.name
                                               )
                                               .filter(Boolean)
-                                              .map((name, index) => (
-                                                  <span key={index} className={styles.tag}>
+                                              .map((name) => (
+                                                  <span key={name} className={styles.tag}>
                                                       {name}
                                                   </span>
                                               ))
@@ -330,6 +366,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                     contentEditable={false}
                                     data-placeholder="Chọn chuyên khoa"
                                     onClick={handleSpecialtyClick}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            handleSpecialtyClick();
+                                        }
+                                    }}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label="Chọn chuyên khoa"
                                     style={{ minHeight: '50px' }}
                                 >
                                     {selectedSpecialties.length > 0
@@ -340,8 +385,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                                           ?.name
                                               )
                                               .filter(Boolean)
-                                              .map((name, index) => (
-                                                  <span key={index} className={styles.tag}>
+                                              .map((name) => (
+                                                  <span key={name} className={styles.tag}>
                                                       {name}
                                                   </span>
                                               ))
@@ -361,6 +406,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                     contentEditable={false}
                                     data-placeholder="Chọn địa điểm"
                                     onClick={handleAreaClick}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            handleAreaClick();
+                                        }
+                                    }}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label="Chọn địa điểm"
                                     style={{ minHeight: '50px' }}
                                 >
                                     {selectedArea ? (

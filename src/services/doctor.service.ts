@@ -181,42 +181,87 @@ export class DoctorService {
     }
 
     /**
+     * Helper function to add basic filters to query params
+     */
+    private static addBasicFilters(
+        params: DoctorSearchParams,
+        queryParams: Record<string, any>
+    ): void {
+        const basicFilters = [
+            { key: 'searchTerm', value: params.searchTerm },
+            { key: 'specialtyId', value: params.specialtyFilter },
+            { key: 'hospitalId', value: params.hospitalFilter },
+            { key: 'positionId', value: params.positionFilter },
+            { key: 'language', value: params.languageFilter },
+            { key: 'serviceType', value: params.serviceTypeFilter },
+            { key: 'minRating', value: params.ratingFilter },
+            {
+                key: 'gender',
+                value: params.genderFilter !== undefined ? params.genderFilter : undefined,
+            },
+            { key: 'patientId', value: params.patientId },
+            { key: 'pageNumber', value: params.pageNumber },
+            { key: 'pageSize', value: params.pageSize },
+            { key: 'sortBy', value: params.sortBy },
+            { key: 'sortOrder', value: params.sortOrder },
+        ];
+
+        for (const filter of basicFilters) {
+            if (filter.value) {
+                queryParams[filter.key] = filter.value;
+            }
+        }
+    }
+
+    /**
+     * Helper function to add array filters to query params
+     */
+    private static addArrayFilters(
+        params: DoctorSearchParams,
+        queryParams: Record<string, any>
+    ): void {
+        const arrayFilters = [
+            { key: 'positionIds', value: params.positionFilters },
+            { key: 'languages', value: params.languageFilters },
+            { key: 'serviceTypes', value: params.serviceTypeFilters },
+            { key: 'minRatings', value: params.ratingFilters },
+            { key: 'genders', value: params.genderFilters },
+            { key: 'experienceRanges', value: params.experienceFilters },
+        ];
+
+        for (const filter of arrayFilters) {
+            if (filter.value && filter.value.length > 0) {
+                queryParams[filter.key] = filter.value;
+            }
+        }
+    }
+
+    /**
+     * Helper function to add object filters to query params
+     */
+    private static addObjectFilters(
+        params: DoctorSearchParams,
+        queryParams: Record<string, any>
+    ): void {
+        if (params.experienceFilter) {
+            queryParams.experienceFilter = params.experienceFilter;
+        }
+
+        if (params.priceRange) {
+            queryParams.minPrice = params.priceRange.min;
+            queryParams.maxPrice = params.priceRange.max;
+        }
+    }
+
+    /**
      * Helper function to build query parameters for search
      */
     private static buildSearchQueryParams(params: DoctorSearchParams): Record<string, any> {
         const queryParams: Record<string, any> = {};
 
-        // Basic filters
-        if (params.searchTerm) queryParams.searchTerm = params.searchTerm;
-        if (params.specialtyFilter) queryParams.specialtyId = params.specialtyFilter;
-        if (params.hospitalFilter) queryParams.hospitalId = params.hospitalFilter;
-        if (params.positionFilter) queryParams.positionId = params.positionFilter;
-        if (params.languageFilter) queryParams.language = params.languageFilter;
-        if (params.serviceTypeFilter) queryParams.serviceType = params.serviceTypeFilter;
-        if (params.ratingFilter) queryParams.minRating = params.ratingFilter;
-        if (params.genderFilter !== undefined) queryParams.gender = params.genderFilter;
-        if (params.patientId) queryParams.patientId = params.patientId;
-        if (params.pageNumber) queryParams.pageNumber = params.pageNumber;
-        if (params.pageSize) queryParams.pageSize = params.pageSize;
-        if (params.sortBy) queryParams.sortBy = params.sortBy;
-        if (params.sortOrder) queryParams.sortOrder = params.sortOrder;
-
-        // Array filters
-        if (params.positionFilters?.length > 0) queryParams.positionIds = params.positionFilters;
-        if (params.languageFilters?.length > 0) queryParams.languages = params.languageFilters;
-        if (params.serviceTypeFilters?.length > 0)
-            queryParams.serviceTypes = params.serviceTypeFilters;
-        if (params.ratingFilters?.length > 0) queryParams.minRatings = params.ratingFilters;
-        if (params.genderFilters?.length > 0) queryParams.genders = params.genderFilters;
-        if (params.experienceFilters?.length > 0)
-            queryParams.experienceRanges = params.experienceFilters;
-
-        // Object filters
-        if (params.experienceFilter) queryParams.experienceFilter = params.experienceFilter;
-        if (params.priceRange) {
-            queryParams.minPrice = params.priceRange.min;
-            queryParams.maxPrice = params.priceRange.max;
-        }
+        this.addBasicFilters(params, queryParams);
+        this.addArrayFilters(params, queryParams);
+        this.addObjectFilters(params, queryParams);
 
         return queryParams;
     }

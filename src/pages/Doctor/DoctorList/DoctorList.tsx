@@ -82,39 +82,58 @@ const DoctorList: React.FC = () => {
         { label: 'Giá từ cao đến thấp', value: 'high-to-low' },
     ];
 
+    // Helper function to get trimmed string or undefined
+    const getTrimmedString = (value: string | undefined): string | undefined => {
+        return value?.trim() || undefined;
+    };
+
+    // Helper function to get array or undefined if empty
+    const getArrayOrUndefined = (arr: any[]): any[] | undefined => {
+        return arr.length > 0 ? arr : undefined;
+    };
+
+    // Helper function to build basic filter parameters
+    const buildBasicFilters = () => ({
+        pageNumber: currentPage,
+        pageSize: doctorsPerPage,
+        searchTerm: getTrimmedString(searchTerm),
+        ratingFilter: ratingFilter,
+        genderFilter: genderFilter,
+        experienceRange: experienceFilter,
+        priceRange: priceFilter,
+        areaFilter: areaFilter,
+        patientId,
+    });
+
+    // Helper function to build string filter parameters
+    const buildStringFilters = () => ({
+        specialtyFilter: getTrimmedString(specialtyFilter),
+        hospitalFilter: getTrimmedString(hospitalFilter),
+        positionFilter: getTrimmedString(positionFilter),
+        languageFilter: getTrimmedString(languageFilter),
+        serviceTypeFilter: getTrimmedString(serviceTypeFilter),
+        availabilityFilter: getTrimmedString(availabilityFilter),
+        consultationTypeFilter: getTrimmedString(consultationTypeFilter),
+    });
+
+    // Helper function to build array filter parameters
+    const buildArrayFilters = () => ({
+        specialtyFilters: getArrayOrUndefined(specialtyFilters),
+        hospitalFilters: getArrayOrUndefined(hospitalFilters),
+        positionFilters: getArrayOrUndefined(positionFilters),
+        languageFilters: getArrayOrUndefined(languageFilters),
+        serviceTypeFilters: getArrayOrUndefined(serviceTypeFilters),
+        ratingFilters: getArrayOrUndefined(ratingFilters),
+        experienceFilters: getArrayOrUndefined(experienceFilters),
+        genderFilters: getArrayOrUndefined(genderFilters),
+    });
+
     // Helper function to build search parameters
     const buildSearchParams = () => {
         return {
-            pageNumber: currentPage,
-            pageSize: doctorsPerPage,
-            searchTerm: searchTerm && searchTerm.trim() ? searchTerm : undefined,
-            specialtyFilter:
-                specialtyFilter && specialtyFilter.trim() ? specialtyFilter : undefined,
-            specialtyFilters: specialtyFilters.length > 0 ? specialtyFilters : undefined,
-            hospitalFilter: hospitalFilter && hospitalFilter.trim() ? hospitalFilter : undefined,
-            hospitalFilters: hospitalFilters.length > 0 ? hospitalFilters : undefined,
-            positionFilter: positionFilter && positionFilter.trim() ? positionFilter : undefined,
-            positionFilters: positionFilters.length > 0 ? positionFilters : undefined,
-            languageFilter: languageFilter && languageFilter.trim() ? languageFilter : undefined,
-            languageFilters: languageFilters.length > 0 ? languageFilters : undefined,
-            serviceTypeFilter:
-                serviceTypeFilter && serviceTypeFilter.trim() ? serviceTypeFilter : undefined,
-            serviceTypeFilters: serviceTypeFilters.length > 0 ? serviceTypeFilters : undefined,
-            ratingFilter: ratingFilter,
-            ratingFilters: ratingFilters.length > 0 ? ratingFilters : undefined,
-            experienceRange: experienceFilter,
-            experienceFilters: experienceFilters.length > 0 ? experienceFilters : undefined,
-            availabilityFilter:
-                availabilityFilter && availabilityFilter.trim() ? availabilityFilter : undefined,
-            consultationTypeFilter:
-                consultationTypeFilter && consultationTypeFilter.trim()
-                    ? consultationTypeFilter
-                    : undefined,
-            genderFilter: genderFilter,
-            genderFilters: genderFilters.length > 0 ? genderFilters : undefined,
-            priceRange: priceFilter,
-            areaFilter: areaFilter,
-            patientId,
+            ...buildBasicFilters(),
+            ...buildStringFilters(),
+            ...buildArrayFilters(),
         };
     };
 
@@ -133,6 +152,69 @@ const DoctorList: React.FC = () => {
             priceFilter ||
             areaFilter
         );
+    };
+
+    // Helper function to render doctor list content
+    const renderDoctorListContent = () => {
+        if (isLoading) {
+            return skeletonKeys.map((key) => (
+                <div className="col-md-12 mb-4" key={key}>
+                    <DoctorAppointmentBookingCardSkeleton />
+                </div>
+            ));
+        }
+
+        if (filteredAndSortedDoctors.length === 0) {
+            return (
+                <div className="col-md-12 mb-4">
+                    <div className="text-center py-5">
+                        <h4>Không tìm thấy bác sĩ nào</h4>
+                        <p>Vui lòng thử lại với từ khóa khác hoặc bộ lọc khác.</p>
+                        {(searchTerm ||
+                            specialtyFilters.length > 0 ||
+                            hospitalFilters.length > 0 ||
+                            areaFilter) && (
+                            <div className="mt-3">
+                                <button
+                                    className="btn btn-outline-primary"
+                                    onClick={() => {
+                                        setSearchTerm('');
+                                        setSpecialtyFilters([]);
+                                        setHospitalFilters([]);
+                                        setAreaFilter(undefined);
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    Xóa tất cả bộ lọc
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        return filteredAndSortedDoctors.map((doctor) => (
+            <DoctorAppointmentBookingCard
+                key={doctor.id}
+                doctorId={doctor.id}
+                patientId={patientId}
+                name={`${doctor.firstName} ${doctor.lastName}`}
+                specialty={doctor.specialty?.name || 'Chưa cập nhật'}
+                position={doctor.position?.name || 'Chưa cập nhật'}
+                bookCounts={doctor.reviewStatistics?.totalReviews || 0}
+                rating={doctor.reviewStatistics?.averageRating || 0}
+                location={doctor.hospital?.name || doctor.address || 'Chưa cập nhật'}
+                yearsOfExperience={doctor.yearsOfExperience}
+                fees={doctor.prices?.[0]?.amount || 0}
+                isFavorite={doctor.isFavorited}
+                languages={doctor.languages || []}
+                nextAvailableTime={
+                    doctor.status === Status.ACTIVE ? 'Có lịch trống' : 'Không có lịch'
+                }
+                image={doctor.avatarUrl || docProfile01}
+            />
+        ));
     };
 
     // Load doctors on component mount and when filters change
@@ -367,7 +449,9 @@ const DoctorList: React.FC = () => {
         if (ratings.length > 0) {
             // Convert rating strings to numbers
             setRatingFilters(
-                ratings.map((rating) => parseInt(rating)).filter((rating) => !isNaN(rating))
+                ratings
+                    .map((rating) => Number.parseInt(rating))
+                    .filter((rating) => !Number.isNaN(rating))
             );
         } else {
             setRatingFilters([]);
@@ -505,14 +589,14 @@ const DoctorList: React.FC = () => {
                                             <div className="d-flex gap-2 flex-wrap">
                                                 <button
                                                     className="btn btn-primary btn-sm px-3 py-2 rounded-pill fw-semibold"
-                                                    onClick={() => window.location.reload()}
+                                                    onClick={() => globalThis.location.reload()}
                                                 >
                                                     <i className="fas fa-redo-alt me-2"></i>
                                                     Thử lại
                                                 </button>
                                                 <button
                                                     className="btn btn-outline-secondary btn-sm px-3 py-2 rounded-pill fw-semibold"
-                                                    onClick={() => window.history.back()}
+                                                    onClick={() => globalThis.history.back()}
                                                 >
                                                     <i className="fas fa-arrow-left me-2"></i>
                                                     Quay lại
@@ -520,68 +604,8 @@ const DoctorList: React.FC = () => {
                                             </div>
                                         </div>
                                     </div>
-                                ) : isLoading ? (
-                                    skeletonKeys.map((key) => (
-                                        <div className="col-md-12 mb-4" key={key}>
-                                            <DoctorAppointmentBookingCardSkeleton />
-                                        </div>
-                                    ))
-                                ) : filteredAndSortedDoctors.length === 0 ? (
-                                    <div className="col-md-12 mb-4">
-                                        <div className="text-center py-5">
-                                            <h4>Không tìm thấy bác sĩ nào</h4>
-                                            <p>
-                                                Vui lòng thử lại với từ khóa khác hoặc bộ lọc khác.
-                                            </p>
-                                            {(searchTerm ||
-                                                specialtyFilters.length > 0 ||
-                                                hospitalFilters.length > 0 ||
-                                                areaFilter) && (
-                                                <div className="mt-3">
-                                                    <button
-                                                        className="btn btn-outline-primary"
-                                                        onClick={() => {
-                                                            setSearchTerm('');
-                                                            setSpecialtyFilters([]);
-                                                            setHospitalFilters([]);
-                                                            setAreaFilter(undefined);
-                                                            setCurrentPage(1);
-                                                        }}
-                                                    >
-                                                        Xóa tất cả bộ lọc
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
                                 ) : (
-                                    filteredAndSortedDoctors.map((doctor) => (
-                                        <DoctorAppointmentBookingCard
-                                            key={doctor.id}
-                                            doctorId={doctor.id}
-                                            patientId={patientId}
-                                            name={`${doctor.firstName} ${doctor.lastName}`}
-                                            specialty={doctor.specialty?.name || 'Chưa cập nhật'}
-                                            position={doctor.position?.name || 'Chưa cập nhật'}
-                                            bookCounts={doctor.reviewStatistics?.totalReviews || 0}
-                                            rating={doctor.reviewStatistics?.averageRating || 0}
-                                            location={
-                                                doctor.hospital?.name ||
-                                                doctor.address ||
-                                                'Chưa cập nhật'
-                                            }
-                                            yearsOfExperience={doctor.yearsOfExperience}
-                                            fees={doctor.prices?.[0]?.amount || 0}
-                                            isFavorite={doctor.isFavorited}
-                                            languages={doctor.languages || []}
-                                            nextAvailableTime={
-                                                doctor.status === Status.ACTIVE
-                                                    ? 'Có lịch trống'
-                                                    : 'Không có lịch'
-                                            }
-                                            image={doctor.avatarUrl || docProfile01}
-                                        />
-                                    ))
+                                    renderDoctorListContent()
                                 )}
                                 {pagination.totalCount > pagination.pageSize && (
                                     <div className="col-md-12">

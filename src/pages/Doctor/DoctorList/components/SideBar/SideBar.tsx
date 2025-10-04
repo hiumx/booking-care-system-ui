@@ -537,7 +537,9 @@ const SideBar: React.FC<SideBarProps> = ({
             () => onPriceFilter?.({ min: 0, max: 10000000 }),
         ];
 
-        clearCallbacks.forEach((callback) => callback());
+        for (const callback of clearCallbacks) {
+            callback();
+        }
     };
 
     const handleClearAll = (): void => {
