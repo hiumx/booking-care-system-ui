@@ -606,13 +606,15 @@ const SideBar: React.FC<SideBarProps> = ({
 
     // Helper function to render rating stars
     const renderRatingStars = (option: FilterOption) => {
-        const rating = parseInt(option.label.charAt(0));
-        const filledStars = Array(rating)
+        const rating = Number.parseInt(option.label.charAt(0));
+        const filledStars = new Array(rating)
             .fill(0)
-            .map((_, i) => <i key={i} className="fa-solid fa-star text-orange me-1" />);
-        const emptyStars = Array(5 - rating)
+            .map((_, i) => <i key={`filled-${i}`} className="fa-solid fa-star text-orange me-1" />);
+        const emptyStars = new Array(5 - rating)
             .fill(0)
-            .map((_, i) => <i key={i} className="fa-regular fa-star text-orange me-1" />);
+            .map((_, i) => (
+                <i key={`empty-${i}`} className="fa-regular fa-star text-orange me-1" />
+            ));
 
         return (
             <>
@@ -625,15 +627,19 @@ const SideBar: React.FC<SideBarProps> = ({
         );
     };
 
+    // Helper function to get options to show based on section type and view more state
+    const getOptionsToShow = (section: FilterSection) => {
+        if (section.title === 'Đánh giá') {
+            return section.options;
+        }
+
+        const shouldShowAll = viewMoreSections[section.title];
+        return shouldShowAll ? section.options : section.options.slice(0, 3);
+    };
+
     // Helper function to render option list
     const renderOptionList = (section: FilterSection) => {
-        const optionsToShow =
-            section.title === 'Đánh giá'
-                ? section.options
-                : section.options.slice(
-                      0,
-                      viewMoreSections[section.title] ? section.options.length : 3
-                  );
+        const optionsToShow = getOptionsToShow(section);
 
         return optionsToShow.map((option) => (
             <div className="d-flex align-items-center justify-content-between mb-2" key={option.id}>
