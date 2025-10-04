@@ -162,10 +162,12 @@ const DoctorList: React.FC = () => {
         areaFilter,
     ]);
 
-    // Filter and sort doctors locally (backend should handle this in production)
+    // Use doctors directly from API - backend handles filtering and pagination
+    // Only apply local filters that are not handled by backend
     const filteredAndSortedDoctors = [...doctors]
         .filter((doctor) => {
-            // Experience filtering is now handled by backend
+            // Only apply filters that are NOT handled by backend
+            // Backend already handles: searchTerm, specialtyFilters, hospitalFilters, areaFilter, experienceFilter, etc.
 
             // Availability filter (simplified - check if doctor is active)
             if (availabilityFilter) {
@@ -434,7 +436,7 @@ const DoctorList: React.FC = () => {
                                         <h5 className={styles.h5Custom}>
                                             Hiển thị{' '}
                                             <span className={styles.spanCustom}>
-                                                {filteredAndSortedDoctors.length}
+                                                {pagination.totalCount}
                                             </span>{' '}
                                             Bác sĩ Dành Cho Bạn
                                         </h5>
