@@ -54,18 +54,18 @@ const WalletSummary: React.FC<WalletSummaryProps> = ({
                             </li>
                         </ul>
                     </div>
-                </div>
-                <div className={clsx(styles.cardButton, 'bank-details-info col-xxl-5 col-lg-5')}>
-                    <div className="edit-detail-link d-flex align-items-center w-80">
-                        <div className={styles.buttonGroup}>
-                            {hasCardDetails && (
-                                <button onClick={onEditDetails}>Edit Details</button>
-                            )}
-                            <button onClick={onAddCard}>Add Cards</button>
+                    <div className={clsx(styles.cardButton, 'bank-details-info')}>
+                        <div className="edit-detail-link d-flex align-items-center w-80">
+                            <div className={styles.buttonGroup}>
+                                {hasCardDetails && (
+                                    <button onClick={onEditDetails}>Edit Details</button>
+                                )}
+                                <button onClick={onAddCard}>Add Cards</button>
+                            </div>
+                            <button onClick={onOtherAccounts}>
+                                Other Accounts {accountsCount > 0 && `(${accountsCount})`}
+                            </button>
                         </div>
-                        <button onClick={onOtherAccounts}>
-                            Other Accounts {accountsCount > 0 && `(${accountsCount})`}
-                        </button>
                     </div>
                 </div>
             </div>

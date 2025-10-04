@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 
 import Modal from '../Modal';
 import BankSelect from '../BankSelect';
-import NotificationToast from '../../../../../components/NotificationToast';
+import NotificationToast from '@/components/NotificationToast';
 import { CardFormData, BankDetails } from '../../types/wallet.types';
 import { Bank } from '../../types/bank.types';
 import styles from '../../Wallet.module.scss';
-import Button from '../../../../../components/Button';
+import Button from '@/components/Button';
 interface AddCardModalProps {
     isOpen: boolean;
     onClose: () => void;

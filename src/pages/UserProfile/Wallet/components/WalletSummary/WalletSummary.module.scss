@@ -3,6 +3,7 @@
 }
 
 .bankDetailsInfo {
+    margin-bottom: 16px;
     ul {
         display: flex;
         flex-direction: column;
@@ -25,7 +26,7 @@
 
 .cardButton {
     position: absolute;
-    right: 10px;
+    left: 10;
 
     display: flex;
     bottom: 10px;

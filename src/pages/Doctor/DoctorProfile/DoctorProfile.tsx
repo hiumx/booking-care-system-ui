@@ -787,7 +787,7 @@ const DoctorProfile: React.FC = () => {
                             {/* Write Review  */}
                             <div ref={reviewRef}>
                                 <div id="review">
-                                    <div className="detail-title">
+                                    <div className="detail-title mb-3">
                                         <h4>Đánh giá ({reviews.length})</h4>
                                     </div>
 
