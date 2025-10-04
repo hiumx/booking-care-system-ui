@@ -197,7 +197,7 @@ export class DoctorService {
             { key: 'minRating', value: params.ratingFilter },
             {
                 key: 'gender',
-                value: params.genderFilter !== undefined ? params.genderFilter : undefined,
+                value: params.genderFilter ?? undefined,
             },
             { key: 'patientId', value: params.patientId },
             { key: 'pageNumber', value: params.pageNumber },

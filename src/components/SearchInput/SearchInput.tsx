@@ -60,8 +60,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
     // Refs for auto-resize
     const doctorNameRef = useRef<HTMLDivElement>(null);
-    const clinicRef = useRef<HTMLDivElement>(null);
-    const specialtyRef = useRef<HTMLDivElement>(null);
+    const clinicRef = useRef<HTMLButtonElement>(null);
+    const specialtyRef = useRef<HTMLButtonElement>(null);
 
     // Load data on component mount
     useEffect(() => {
@@ -87,15 +87,41 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
     useEffect(() => {
         if (clinicRef.current) {
-            autoResize(clinicRef.current);
+            // Button elements don't need auto-resize
         }
     }, [selectedClinics]);
 
     useEffect(() => {
         if (specialtyRef.current) {
-            autoResize(specialtyRef.current);
+            // Button elements don't need auto-resize
         }
     }, [selectedSpecialties]);
+
+    // Helper function to check if hospital has selected specialties
+    const hospitalHasSelectedSpecialties = (hospital: any, selectedSpecialties: string[]) => {
+        if (!(hospital as any).specialties || (hospital as any).specialties.length === 0) {
+            return true; // Include hospital if no specialty data available
+        }
+
+        return selectedSpecialties.some((selectedSpecialty) =>
+            (hospital as any).specialties.some(
+                (hospitalSpecialty: any) => hospitalSpecialty.id === selectedSpecialty
+            )
+        );
+    };
+
+    // Helper function to check if specialty is available in selected hospitals
+    const specialtyAvailableInSelectedHospitals = (specialty: any, selectedClinics: any[]) => {
+        return selectedClinics.some((hospital) => {
+            if (!(hospital as any).specialties || (hospital as any).specialties.length === 0) {
+                return true; // Include specialty if no hospital specialty data available
+            }
+
+            return (hospital as any).specialties.some(
+                (hospitalSpecialty: any) => hospitalSpecialty.id === specialty.id
+            );
+        });
+    };
 
     // Transform hospitals data for modal - filter based on area or specialty selection
     const getFilteredHospitals = () => {
@@ -119,18 +145,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
         // If specialty is selected first, filter hospitals that have doctors with those specialties
         if (selectedSpecialties.length > 0) {
             // Filter hospitals that have doctors with selected specialties
-            filteredHospitals = filteredHospitals.filter((hospital) => {
-                // Check if hospital has doctors with selected specialties
-                // This assumes hospital has a specialties array or can be determined from doctor data
-                if ((hospital as any).specialties && (hospital as any).specialties.length > 0) {
-                    return selectedSpecialties.some((selectedSpecialty) =>
-                        (hospital as any).specialties.some(
-                            (hospitalSpecialty: any) => hospitalSpecialty.id === selectedSpecialty
-                        )
-                    );
-                }
-                return true; // Include hospital if no specialty data available
-            });
+            filteredHospitals = filteredHospitals.filter((hospital) =>
+                hospitalHasSelectedSpecialties(hospital, selectedSpecialties)
+            );
         }
 
         return filteredHospitals;
@@ -143,17 +160,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
         // If hospital is selected first, filter specialties available in those hospitals
         if (selectedClinics.length > 0) {
             // Filter specialties available in selected hospitals
-            filteredSpecialties = specialties.filter((specialty) => {
-                // Check if specialty is available in any of the selected hospitals
-                return selectedClinics.some((hospital) => {
-                    if ((hospital as any).specialties && (hospital as any).specialties.length > 0) {
-                        return (hospital as any).specialties.some(
-                            (hospitalSpecialty: any) => hospitalSpecialty.id === specialty.id
-                        );
-                    }
-                    return true; // Include specialty if no hospital specialty data available
-                });
-            });
+            filteredSpecialties = specialties.filter((specialty) =>
+                specialtyAvailableInSelectedHospitals(specialty, selectedClinics)
+            );
         }
 
         return filteredSpecialties;
@@ -314,26 +323,18 @@ const SearchInput: React.FC<SearchInputProps> = ({
                         <div className={clsx('search-input search-map-line', styles.inputItem)}>
                             <i className="isax isax-hospital5 bficon"></i>
                             <div className="mb-0">
-                                <div
+                                <button
                                     ref={clinicRef}
+                                    type="button"
                                     className={clsx(
                                         'form-control',
                                         styles.formControlCustom,
                                         styles.multiLineInput
                                     )}
-                                    contentEditable={false}
                                     data-placeholder="Chọn cơ sở y tế"
                                     onClick={handleClinicClick}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' || e.key === ' ') {
-                                            e.preventDefault();
-                                            handleClinicClick();
-                                        }
-                                    }}
-                                    role="button"
-                                    tabIndex={0}
                                     aria-label="Chọn cơ sở y tế"
-                                    style={{ minHeight: '50px' }}
+                                    style={{ minHeight: '50px', textAlign: 'left' }}
                                 >
                                     {selectedClinics.length > 0
                                         ? selectedClinics
@@ -350,32 +351,24 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                                   </span>
                                               ))
                                         : null}
-                                </div>
+                                </button>
                             </div>
                         </div>
                         <div className={clsx('search-input search-map-line', styles.inputItem)}>
                             <i className="isax isax-health5"></i>
                             <div className="mb-0">
-                                <div
+                                <button
                                     ref={specialtyRef}
+                                    type="button"
                                     className={clsx(
                                         'form-control',
                                         styles.formControlCustom,
                                         styles.multiLineInput
                                     )}
-                                    contentEditable={false}
                                     data-placeholder="Chọn chuyên khoa"
                                     onClick={handleSpecialtyClick}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' || e.key === ' ') {
-                                            e.preventDefault();
-                                            handleSpecialtyClick();
-                                        }
-                                    }}
-                                    role="button"
-                                    tabIndex={0}
                                     aria-label="Chọn chuyên khoa"
-                                    style={{ minHeight: '50px' }}
+                                    style={{ minHeight: '50px', textAlign: 'left' }}
                                 >
                                     {selectedSpecialties.length > 0
                                         ? selectedSpecialties
@@ -391,36 +384,28 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                                   </span>
                                               ))
                                         : null}
-                                </div>
+                                </button>
                             </div>
                         </div>
                         <div className={clsx('search-input search-map-line', styles.inputItem)}>
                             <i className="isax isax-location5"></i>
                             <div className="mb-0">
-                                <div
+                                <button
+                                    type="button"
                                     className={clsx(
                                         'form-control',
                                         styles.formControlCustom,
                                         styles.multiLineInput
                                     )}
-                                    contentEditable={false}
                                     data-placeholder="Chọn địa điểm"
                                     onClick={handleAreaClick}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' || e.key === ' ') {
-                                            e.preventDefault();
-                                            handleAreaClick();
-                                        }
-                                    }}
-                                    role="button"
-                                    tabIndex={0}
                                     aria-label="Chọn địa điểm"
-                                    style={{ minHeight: '50px' }}
+                                    style={{ minHeight: '50px', textAlign: 'left' }}
                                 >
                                     {selectedArea ? (
                                         <span className={styles.tag}>{selectedArea}</span>
                                     ) : null}
-                                </div>
+                                </button>
                             </div>
                         </div>
                         <div

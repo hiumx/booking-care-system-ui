@@ -591,14 +591,14 @@ const DoctorList: React.FC = () => {
                                                     className="btn btn-primary btn-sm px-3 py-2 rounded-pill fw-semibold"
                                                     onClick={() => globalThis.location.reload()}
                                                 >
-                                                    <i className="fas fa-redo-alt me-2"></i>
+                                                    <i className="fas fa-redo-alt me-2" />
                                                     Thử lại
                                                 </button>
                                                 <button
                                                     className="btn btn-outline-secondary btn-sm px-3 py-2 rounded-pill fw-semibold"
                                                     onClick={() => globalThis.history.back()}
                                                 >
-                                                    <i className="fas fa-arrow-left me-2"></i>
+                                                    <i className="fas fa-arrow-left me-2" />
                                                     Quay lại
                                                 </button>
                                             </div>

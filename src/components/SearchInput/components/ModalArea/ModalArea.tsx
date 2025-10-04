@@ -143,6 +143,17 @@ const ModalArea: React.FC<ModalAreaProps> = ({
         }
     };
 
+    // Helper function to get selection text
+    const getSelectionText = () => {
+        if (selectedProvince && selectedDistrict) {
+            return `Đã chọn: ${selectedProvince.name} - ${selectedDistrict.name}`;
+        }
+        if (selectedProvince) {
+            return `Đã chọn: ${selectedProvince.name}`;
+        }
+        return null;
+    };
+
     // Helper function to render current selection
     const renderCurrentSelection = () => {
         const hasSelection =
@@ -151,15 +162,12 @@ const ModalArea: React.FC<ModalAreaProps> = ({
             (selectedProvince || selectedDistrict);
         if (!hasSelection) return null;
 
+        const selectionText = getSelectionText();
+        if (!selectionText) return null;
+
         return (
             <div className={styles.currentSelection}>
-                {selectedProvince && selectedDistrict ? (
-                    <span className={styles.selectionText}>
-                        Đã chọn: {selectedProvince.name} - {selectedDistrict.name}
-                    </span>
-                ) : selectedProvince ? (
-                    <span className={styles.selectionText}>Đã chọn: {selectedProvince.name}</span>
-                ) : null}
+                <span className={styles.selectionText}>{selectionText}</span>
             </div>
         );
     };
