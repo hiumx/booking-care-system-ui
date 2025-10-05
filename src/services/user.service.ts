@@ -1,44 +1,109 @@
-// src/services/user.service.ts
-import axios from 'axios';
-import { User, UserLogin, UserRegister, UserResponse } from '../types/user.type.js';
+import axiosInstance, { ApiResponse } from '@/configs/axios.config';
+import { UserProfile, UpdateUserRequest } from '@/types/user.types';
 
-const API_URL = 'https://your-api-domain.com/api/users';
+// Base API endpoints for users
+const USER_ENDPOINTS = {
+    BASE: '/users',
+    PROFILE: '/users/profile',
+    HEALTH: '/users/health',
+} as const;
 
-export const userService = {
-    login,
-    register,
-    getUserProfile,
-    updateUserProfile,
-    getAllUsers,
-};
+/**
+ * User Service
+ * Handles all user-related API operations
+ */
+export class UserService {
+    /**
+     * Health check endpoint
+     */
+    static async healthCheck(): Promise<ApiResponse> {
+        try {
+            const response: any = await axiosInstance.get(USER_ENDPOINTS.HEALTH);
+            return {
+                success: response.success ?? true,
+                data: response.data || response,
+                message: response.message,
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'User service health check failed');
+        }
+    }
 
-async function login(data: UserLogin): Promise<UserResponse> {
-    const response = await axios.post<UserResponse>(`${API_URL}/login`, data);
-    return response.data;
+    /**
+     * Get current user profile (uses JWT token from axios interceptor)
+     */
+    static async getCurrentUserProfile(): Promise<ApiResponse<UserProfile>> {
+        try {
+            const response: any = await axiosInstance.get(USER_ENDPOINTS.PROFILE);
+            return {
+                success: response.success ?? true,
+                data: response.data || response,
+                message: response.message || 'User profile retrieved successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to get user profile');
+        }
+    }
+
+    /**
+     * Update current user profile
+     */
+    static async updateUserProfile(
+        updateData: UpdateUserRequest
+    ): Promise<ApiResponse<UserProfile>> {
+        try {
+            const response: any = await axiosInstance.put(USER_ENDPOINTS.PROFILE, updateData);
+            return {
+                success: response.success ?? true,
+                data: response.data || response,
+                message: response.message || 'User profile updated successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to update user profile');
+        }
+    }
+
+    /**
+     * Get user by ID (admin only)
+     */
+    static async getUserById(id: string): Promise<ApiResponse<UserProfile>> {
+        try {
+            const response: any = await axiosInstance.get(`${USER_ENDPOINTS.BASE}/${id}`);
+            return {
+                success: response.success ?? true,
+                data: response.data || response,
+                message: response.message || 'User retrieved successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to get user');
+        }
+    }
+
+    /**
+     * Update user by ID (admin only)
+     */
+    static async updateUser(
+        id: string,
+        updateData: UpdateUserRequest
+    ): Promise<ApiResponse<UserProfile>> {
+        try {
+            const response: any = await axiosInstance.put(
+                `${USER_ENDPOINTS.BASE}/${id}`,
+                updateData
+            );
+            return {
+                success: response.success ?? true,
+                data: response.data || response,
+                message: response.message || 'User updated successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to update user');
+        }
+    }
 }
 
-async function register(data: UserRegister): Promise<UserResponse> {
-    const response = await axios.post<UserResponse>(`${API_URL}/register`, data);
-    return response.data;
-}
+// Export individual methods for convenience
+export const { healthCheck, getCurrentUserProfile, updateUserProfile } = UserService;
 
-async function getUserProfile(token: string): Promise<User> {
-    const response = await axios.get<User>(`${API_URL}/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-}
-
-async function updateUserProfile(token: string, updates: Partial<User>): Promise<User> {
-    const response = await axios.put<User>(`${API_URL}/profile`, updates, {
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-}
-
-async function getAllUsers(token: string): Promise<User[]> {
-    const response = await axios.get<User[]>(`${API_URL}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-}
+// Default export
+export default UserService;

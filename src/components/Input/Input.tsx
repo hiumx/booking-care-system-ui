@@ -32,6 +32,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     isPasswordVisible?: boolean;
     onTogglePassword?: (visible: boolean) => void;
     wrapperClassName?: string;
+    error?: string;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -48,6 +49,7 @@ const Input: React.FC<InputProps> = ({
     onTogglePassword,
     className,
     wrapperClassName,
+    error,
     ...rest
 }) => {
     const isPasswordType = useMemo(() => type === 'password', [type]);
@@ -84,6 +86,7 @@ const Input: React.FC<InputProps> = ({
                     wrapVariant === 'phone' && 'input-wrap-phone',
                     wrapVariant === 'email' && 'input-wrap-email'
                 )}
+                style={{ position: 'relative' }}
             >
                 {leftIcon && <span className={clsx('left-icon')}>{leftIcon}</span>}
                 {leftContent && <div className={clsx('left-icon')}>{leftContent}</div>}
@@ -92,8 +95,29 @@ const Input: React.FC<InputProps> = ({
                     name={name}
                     type={effectiveType}
                     className={clsx('form-control', className)}
+                    style={{
+                        outline: 'none',
+                        boxShadow: 'none',
+                        borderColor: error ? '#dc3545' : undefined,
+                        ...rest.style,
+                    }}
                     {...rest}
                 />
+                {error && (
+                    <span
+                        style={{
+                            position: 'absolute',
+                            right: '16px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            color: '#dc3545',
+                            fontSize: '13px',
+                            pointerEvents: 'none',
+                        }}
+                    >
+                        <i className="fa-solid fa-circle-exclamation"></i>
+                    </span>
+                )}
                 {isPasswordType && showPasswordToggle && (
                     <span
                         role="button"
@@ -103,9 +127,13 @@ const Input: React.FC<InputProps> = ({
                             passwordVisible ? 'feather-eye' : 'feather-eye-off',
                             'toggle-password'
                         )}
+                        style={{
+                            right: error ? '48px' : '16px',
+                        }}
                     />
                 )}
             </div>
+            {error && <div className="invalid-feedback d-block">{error}</div>}
         </div>
     );
 };

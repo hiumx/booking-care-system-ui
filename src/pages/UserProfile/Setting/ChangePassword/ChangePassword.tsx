@@ -1,9 +1,14 @@
 import { useState, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { CheckCircle } from 'lucide-react';
 import clsx from 'clsx';
 import '@/styles/_auth.scss';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
+import { AppDispatch, RootState } from '@/store';
+import { changePasswordAsync } from '@/store/slices/authSlice';
+import { ChangePasswordRequest } from '@/types/auth.types';
 
 interface PasswordData {
     currentPassword: string;
@@ -12,6 +17,9 @@ interface PasswordData {
 }
 
 const ChangePassword = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { hasExternalProvider, isLoading } = useSelector((state: RootState) => state.auth);
+
     const [passwordData, setPasswordData] = useState<PasswordData>({
         currentPassword: '',
         newPassword: '',
@@ -60,12 +68,18 @@ const ChangePassword = () => {
     }, [passwordData.newPassword, passwordRequirements]);
 
     const canSubmit = useMemo(() => {
-        const hasCurrentPassword = passwordData.currentPassword.trim() !== '';
         const hasNewPassword = passwordData.newPassword.trim() !== '';
         const hasConfirmPassword = passwordData.confirmPassword.trim() !== '';
         const passwordsMatch = passwordData.newPassword === passwordData.confirmPassword;
         const newPasswordValid = passwordRequirements.allMet;
 
+        // For external provider accounts, current password is not required
+        if (hasExternalProvider) {
+            return hasNewPassword && hasConfirmPassword && passwordsMatch && newPasswordValid;
+        }
+
+        // For regular accounts, current password is required
+        const hasCurrentPassword = passwordData.currentPassword.trim() !== '';
         return (
             hasCurrentPassword &&
             hasNewPassword &&
@@ -73,7 +87,7 @@ const ChangePassword = () => {
             passwordsMatch &&
             newPasswordValid
         );
-    }, [passwordData, passwordRequirements.allMet]);
+    }, [passwordData, passwordRequirements.allMet, hasExternalProvider]);
 
     const handleInputChange = (field: keyof PasswordData, value: string) => {
         setPasswordData((prev) => ({
@@ -82,11 +96,28 @@ const ChangePassword = () => {
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (canSubmit) {
-            console.log('Password data:', passwordData);
-            // Xử lý thay đổi mật khẩu
+        if (!canSubmit) return;
+
+        try {
+            const request: ChangePasswordRequest = {
+                currentPassword: hasExternalProvider ? undefined : passwordData.currentPassword,
+                newPassword: passwordData.newPassword,
+                confirmNewPassword: passwordData.confirmPassword,
+            };
+
+            await dispatch(changePasswordAsync(request)).unwrap();
+            toast.success('Thay đổi mật khẩu thành công!');
+
+            // Reset form
+            setPasswordData({
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: '',
+            });
+        } catch (error: any) {
+            toast.error(error || 'Không thể thay đổi mật khẩu. Vui lòng thử lại!');
         }
     };
 
@@ -108,21 +139,25 @@ const ChangePassword = () => {
         <form onSubmit={handleSubmit}>
             <div className="row">
                 <div className="col-md-7">
-                    {/* Current Password */}
-                    <div className="mb-3">
-                        <Input
-                            label="Mật khẩu hiện tại"
-                            isRequired
-                            type="password"
-                            placeholder="Nhập mật khẩu hiện tại"
-                            leftIcon={<i className="feather-lock" />}
-                            value={passwordData.currentPassword}
-                            onChange={(e) => handleInputChange('currentPassword', e.target.value)}
-                            showPasswordToggle
-                            isPasswordVisible={showCurrentPassword}
-                            onTogglePassword={() => togglePasswordVisibility('current')}
-                        />
-                    </div>
+                    {/* Current Password - Only show for regular accounts */}
+                    {!hasExternalProvider && (
+                        <div className="mb-3">
+                            <Input
+                                label="Mật khẩu hiện tại"
+                                isRequired
+                                type="password"
+                                placeholder="Nhập mật khẩu hiện tại"
+                                leftIcon={<i className="feather-lock" />}
+                                value={passwordData.currentPassword}
+                                onChange={(e) =>
+                                    handleInputChange('currentPassword', e.target.value)
+                                }
+                                showPasswordToggle
+                                isPasswordVisible={showCurrentPassword}
+                                onTogglePassword={() => togglePasswordVisibility('current')}
+                            />
+                        </div>
+                    )}
 
                     {/* New Password */}
                     <div className="mb-3">
@@ -308,10 +343,10 @@ const ChangePassword = () => {
                     Hủy
                 </a>
                 <Button
-                    text="Thay đổi mật khẩu"
+                    text={isLoading ? 'Đang xử lý...' : 'Thay đổi mật khẩu'}
                     type="submit"
                     className={clsx('btn-md rounded-pill', !canSubmit && 'disabled')}
-                    isDisabled={!canSubmit}
+                    isDisabled={!canSubmit || isLoading}
                 />
             </div>
         </form>
