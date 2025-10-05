@@ -2,22 +2,7 @@
 // API Types (matching backend exactly)
 // ============================================
 
-// Appointment Type Enums (matching backend)
-export enum AppointmentType {
-    VIDEO_CALL = 'VIDEO_CALL',
-    AUDIO_CALL = 'AUDIO_CALL',
-    CHAT = 'CHAT',
-    IN_PERSON = 'IN_PERSON',
-}
-
-// Appointment Status Enums (matching backend)
-export enum AppointmentStatus {
-    PENDING = 'PENDING',
-    CONFIRMED = 'CONFIRMED',
-    CANCELLED = 'CANCELLED',
-    COMPLETED = 'COMPLETED',
-    NO_SHOW = 'NO_SHOW',
-}
+import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
 
 // Patient Information from API
 export interface PatientInfo {
