@@ -27,7 +27,7 @@ const ServiceInfo: React.FC = () => {
         new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
     ); // Ngày bắt đầu cho 7 ngày
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const anchorRef = useRef<HTMLLIElement>(null); // Ref cho icon lịch
+    const anchorRef = useRef<HTMLButtonElement>(null); // Ref cho icon lịch
 
     // Tạo danh sách 7 ngày từ startDate
     const generateNext7Days = (start: Date) => {
@@ -332,11 +332,13 @@ const ServiceInfo: React.FC = () => {
                     <div className="card-header d-flex justify-content-between align-items-center">
                         <h3 className="header-title">Chọn Khung Giờ Có Sẵn</h3>
                         <div className="date-picker">
-                            <i
+                            <button
+                                type="button"
                                 className="isax isax-calendar-tick calendar-icon"
                                 onClick={() => setShowDatePicker(!showDatePicker)}
                                 ref={anchorRef}
                             />
+
                             <Calendar
                                 value={activeDay}
                                 onChange={handleDateChange}
