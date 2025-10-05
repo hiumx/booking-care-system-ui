@@ -22,6 +22,7 @@ import { usePhoneInput } from '@/hooks/usePhoneInput';
 import { toast } from 'react-toastify';
 import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH, OTP_REGEX, NAME_REGEX } from '@/constants';
 import { Gender } from '@/enums/common.enums';
+import { validateAge } from '@/utils/validation';
 
 type Step = 0 | 1 | 2 | 3;
 
@@ -52,7 +53,6 @@ const Register: React.FC = () => {
         handlePhonePaste: handleProfilePhonePaste,
         handlePhoneKeyDown: handleProfilePhoneKeyDown,
         setPhoneValue: setProfilePhoneValue,
-        isPhoneValid: isProfilePhoneValid,
     } = usePhoneInput();
     const [isHuman, setIsHuman] = useState(false);
     const [showCaptcha, setShowCaptcha] = useState(false);
@@ -151,6 +151,14 @@ const Register: React.FC = () => {
     const [profileEmail, setProfileEmail] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Validation error states for step 3
+    const [fullNameError, setFullNameError] = useState('');
+    const [birthdayError, setBirthdayError] = useState('');
+    const [genderError, setGenderError] = useState('');
+    const [addressError, setAddressError] = useState('');
+    const [profileEmailError, setProfileEmailError] = useState('');
+    const [profilePhoneError, setProfilePhoneError] = useState('');
+
     // Social login handlers
     const handleSocialSuccess = () => navigate('/');
     const handleSocialError = (error: any) => console.error('Social login error:', error);
@@ -171,34 +179,92 @@ const Register: React.FC = () => {
     const otpValue = useMemo(() => otp.join(''), [otp]);
     const canVerifyOtp = otpValue.length === OTP_LENGTH && OTP_REGEX.SIX_DIGITS.test(otpValue);
 
-    const canCompleteRegistration = useMemo(() => {
-        // Validate full name (at least 2 characters, no numbers)
-        const validFullName = fullName.trim().length >= 2 && NAME_REGEX.NO_NUMBERS.test(fullName);
+    // Validation handlers for step 3 fields
+    const handleFullNameChange = (value: string) => {
+        setFullName(value);
+        if (!value.trim()) {
+            setFullNameError('Họ và tên không được để trống');
+        } else if (value.trim().length < 2) {
+            setFullNameError('Họ và tên phải có ít nhất 2 ký tự');
+        } else {
+            const hasNumbers = NAME_REGEX.NO_NUMBERS.test(value);
+            if (hasNumbers) {
+                setFullNameError('');
+            } else {
+                setFullNameError('Họ và tên không được chứa số');
+            }
+        }
+    };
 
-        // Validate birth date (not empty and not future date)
-        const validBirthday = birthday && new Date(birthday) <= new Date();
+    const handleBirthdayChange = (value: string) => {
+        setBirthday(value);
+        if (!value.trim()) {
+            setBirthdayError('Ngày sinh không được để trống');
+        } else if (new Date(value) > new Date()) {
+            setBirthdayError('Ngày sinh không thể là ngày trong tương lai');
+        } else {
+            const isAgeValid = validateAge(value);
+            if (isAgeValid) {
+                setBirthdayError('');
+            } else {
+                setBirthdayError('Bạn phải từ 18 tuổi trở lên');
+            }
+        }
+    };
 
-        // Validate gender selection
-        const validGender = gender !== '';
+    const handleGenderChange = (value: Gender | '') => {
+        setGender(value);
+        if (value === '') {
+            setGenderError('Vui lòng chọn giới tính');
+        } else {
+            setGenderError('');
+        }
+    };
 
-        // Validate address (at least 5 characters)
-        const validAddress = address.trim().length >= 5;
+    const handleAddressChange = (value: string) => {
+        setAddress(value);
+        if (!value.trim()) {
+            setAddressError('Địa chỉ không được để trống');
+        } else if (value.trim().length < 5) {
+            setAddressError('Địa chỉ phải có ít nhất 5 ký tự');
+        } else {
+            setAddressError('');
+        }
+    };
 
-        // Validate email using AuthService
-        const validProfileEmail = profileEmail.trim() && AuthService.validateEmail(profileEmail);
+    const handleProfileEmailChange = (value: string) => {
+        setProfileEmail(value);
+        if (method === 'email') return; // Skip validation if email is used for registration
 
-        // Validate phone using hook (exactly 10 digits starting with 0)
-        const validProfilePhone = isProfilePhoneValid();
+        if (value.trim()) {
+            const isEmailValid = AuthService.validateEmail(value);
+            if (isEmailValid) {
+                setProfileEmailError('');
+            } else {
+                setProfileEmailError('Email không hợp lệ');
+            }
+        } else {
+            setProfileEmailError('');
+        }
+    };
 
-        return (
-            validFullName &&
-            validBirthday &&
-            validGender &&
-            validAddress &&
-            validProfileEmail &&
-            validProfilePhone
-        );
-    }, [fullName, birthday, gender, address, profileEmail, profilePhone, isProfilePhoneValid]);
+    const handleProfilePhoneChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+        handleProfilePhoneChange(e);
+        const value = e.target.value;
+
+        if (method === 'phone') return; // Skip validation if phone is used for registration
+
+        if (value.trim()) {
+            const isPhoneValid = AuthService.validatePhoneNumber(value);
+            if (isPhoneValid) {
+                setProfilePhoneError('');
+            } else {
+                setProfilePhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
+            }
+        } else {
+            setProfilePhoneError('');
+        }
+    };
 
     // Auto-fill email/phone based on registration method
     useEffect(() => {
@@ -343,9 +409,72 @@ const Register: React.FC = () => {
         transitionToStep(3);
     };
 
+    // Helper: Validate all registration fields
+    const validateRegistrationFields = (): boolean => {
+        let hasError = false;
+
+        // Validate fullName
+        if (!fullName.trim()) {
+            setFullNameError('Họ và tên không được để trống');
+            hasError = true;
+        } else if (fullName.trim().length < 2) {
+            setFullNameError('Họ và tên phải có ít nhất 2 ký tự');
+            hasError = true;
+        } else if (!NAME_REGEX.NO_NUMBERS.test(fullName)) {
+            setFullNameError('Họ và tên không được chứa số');
+            hasError = true;
+        }
+
+        // Validate birthday
+        if (!birthday.trim()) {
+            setBirthdayError('Ngày sinh không được để trống');
+            hasError = true;
+        } else if (new Date(birthday) > new Date()) {
+            setBirthdayError('Ngày sinh không thể là ngày trong tương lai');
+            hasError = true;
+        } else if (!validateAge(birthday)) {
+            setBirthdayError('Bạn phải từ 18 tuổi trở lên');
+            hasError = true;
+        }
+
+        // Validate gender
+        if (gender === '') {
+            setGenderError('Vui lòng chọn giới tính');
+            hasError = true;
+        }
+
+        // Validate address
+        if (!address.trim()) {
+            setAddressError('Địa chỉ không được để trống');
+            hasError = true;
+        } else if (address.trim().length < 5) {
+            setAddressError('Địa chỉ phải có ít nhất 5 ký tự');
+            hasError = true;
+        }
+
+        // Validate email (if not primary method)
+        if (method !== 'email' && !AuthService.validateEmail(profileEmail)) {
+            setProfileEmailError('Email không hợp lệ');
+            hasError = true;
+        }
+
+        // Validate phone (if not primary method)
+        if (method !== 'phone' && !AuthService.validatePhoneNumber(profilePhone)) {
+            setProfilePhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
+            hasError = true;
+        }
+
+        return hasError;
+    };
+
     const handleCompleteRegistration = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!canCompleteRegistration) return;
+
+        // Validate all fields
+        if (validateRegistrationFields()) {
+            toast.error('Vui lòng kiểm tra lại thông tin!');
+            return;
+        }
 
         setIsSubmitting(true);
 
@@ -357,7 +486,7 @@ const Register: React.FC = () => {
             fullName,
             gender: gender as Gender,
             address,
-            birthday: birthday, // Keep as YYYY-MM-DD format
+            birthday: birthday,
             channel: method,
             purpose: 'REGISTER',
             proof: otpProof,
@@ -366,19 +495,15 @@ const Register: React.FC = () => {
 
         try {
             await dispatch(registerAsync(registerData)).unwrap();
-
-            // Registration successful, redirect to home
             toast.success('Đăng ký thành công! Chào mừng bạn đến với Doccure!');
             navigate('/login');
         } catch (error) {
             console.error('Registration error:', error);
-            if (method === 'phone') {
-                toast.error('Độ tuổi không hợp lệ hoặc email này đã được đăng ký tài khoản.');
-            } else {
-                toast.error(
-                    'Độ tuổi không hợp lệ hoặc số điện thoại này đã được đăng ký tài khoản.'
-                );
-            }
+            const errorMsg =
+                method === 'phone'
+                    ? 'Độ tuổi không hợp lệ hoặc email này đã được đăng ký tài khoản.'
+                    : 'Độ tuổi không hợp lệ hoặc số điện thoại này đã được đăng ký tài khoản.';
+            toast.error(errorMsg);
         } finally {
             setIsSubmitting(false);
         }
@@ -904,11 +1029,11 @@ const Register: React.FC = () => {
                                         type="text"
                                         leftIcon={<User size={18} />}
                                         value={fullName}
-                                        onChange={(e) => setFullName(e.target.value)}
+                                        onChange={(e) => handleFullNameChange(e.target.value)}
                                         className={clsx('rounded-3', styles.inputCustom)}
                                         style={{ paddingLeft: 48 }}
                                         placeholder="Nhập họ và tên đầy đủ"
-                                        required
+                                        error={fullNameError}
                                     />
                                 </div>
 
@@ -938,10 +1063,13 @@ const Register: React.FC = () => {
                                                   }
                                         }
                                         onChange={(selected) => {
-                                            setGender(selected?.value ?? '');
+                                            handleGenderChange(selected?.value ?? '');
                                         }}
                                         placeholder="Chọn giới tính"
-                                        className="react-select-container"
+                                        className={clsx(
+                                            'react-select-container',
+                                            genderError && 'is-invalid'
+                                        )}
                                         classNamePrefix="react-select"
                                         isClearable={false}
                                         styles={{
@@ -985,6 +1113,11 @@ const Register: React.FC = () => {
                                             }),
                                         }}
                                     />
+                                    {genderError && (
+                                        <div className="invalid-feedback d-block">
+                                            {genderError}
+                                        </div>
+                                    )}
                                 </div>
                                 {/* Phone */}
                                 <div className="mb-3">
@@ -995,15 +1128,15 @@ const Register: React.FC = () => {
                                         inputMode="numeric"
                                         leftIcon={<i className="feather-phone" />}
                                         value={profilePhone}
-                                        onChange={handleProfilePhoneChange}
+                                        onChange={handleProfilePhoneChange2}
                                         onKeyDown={handleProfilePhoneKeyDown}
                                         onPaste={handleProfilePhonePaste}
                                         className={clsx('rounded-3')}
                                         placeholder="Nhập số điện thoại"
-                                        required
                                         disabled={method === 'phone'}
+                                        error={profilePhoneError}
                                     />
-                                    {method === 'phone' && (
+                                    {method === 'phone' && !profilePhoneError && (
                                         <small className="text-muted">
                                             Số điện thoại này đã được sử dụng để đăng ký
                                         </small>
@@ -1022,20 +1155,25 @@ const Register: React.FC = () => {
                                         <input
                                             type="date"
                                             value={birthday}
-                                            onChange={(e) => setBirthday(e.target.value)}
+                                            onChange={(e) => handleBirthdayChange(e.target.value)}
                                             className={clsx(
                                                 'form-control rounded-3',
-                                                styles.inputCustom
+                                                styles.inputCustom,
+                                                birthdayError && 'is-invalid'
                                             )}
                                             style={{
                                                 paddingLeft: 16,
                                                 paddingRight: 16,
                                                 height: '45px',
                                             }}
-                                            required
                                             max={new Date().toISOString().split('T')[0]}
                                         />
                                     </div>
+                                    {birthdayError && (
+                                        <div className="invalid-feedback d-block">
+                                            {birthdayError}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Email */}
@@ -1046,13 +1184,13 @@ const Register: React.FC = () => {
                                         type="email"
                                         leftIcon={<i className="feather-mail" />}
                                         value={profileEmail}
-                                        onChange={(e) => setProfileEmail(e.target.value)}
+                                        onChange={(e) => handleProfileEmailChange(e.target.value)}
                                         className={clsx('rounded-3')}
                                         placeholder="Nhập địa chỉ email"
-                                        required
                                         disabled={method === 'email'}
+                                        error={profileEmailError}
                                     />
-                                    {method === 'email' && (
+                                    {method === 'email' && !profileEmailError && (
                                         <small className="text-muted">
                                             Email này đã được sử dụng để đăng ký
                                         </small>
@@ -1066,14 +1204,14 @@ const Register: React.FC = () => {
                                     </label>
                                     <textarea
                                         value={address}
-                                        onChange={(e) => setAddress(e.target.value)}
+                                        onChange={(e) => handleAddressChange(e.target.value)}
                                         className={clsx(
                                             'form-control rounded-3',
-                                            styles.inputCustom
+                                            styles.inputCustom,
+                                            addressError && 'is-invalid'
                                         )}
                                         rows={2}
                                         placeholder="Nhập địa chỉ đầy đủ"
-                                        required
                                         style={{
                                             paddingLeft: 16,
                                             paddingRight: 16,
@@ -1081,6 +1219,11 @@ const Register: React.FC = () => {
                                             paddingBottom: 12,
                                         }}
                                     />
+                                    {addressError && (
+                                        <div className="invalid-feedback d-block">
+                                            {addressError}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -1094,13 +1237,8 @@ const Register: React.FC = () => {
 
                         <button
                             type="submit"
-                            disabled={!canCompleteRegistration || isSubmitting || isLoading}
-                            className={clsx(
-                                'btn w-100 fw-medium',
-                                canCompleteRegistration && !isSubmitting && !isLoading
-                                    ? 'btn-primary-gradient'
-                                    : 'btn-secondary disabled'
-                            )}
+                            disabled={isSubmitting || isLoading}
+                            className={clsx('btn w-100 fw-medium btn-primary-gradient')}
                         >
                             {isSubmitting || isLoading ? (
                                 <>

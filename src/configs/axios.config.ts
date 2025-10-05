@@ -1,5 +1,21 @@
 import axios, { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { API_CONFIG } from './api.config';
+import { resetAuthState } from '@/store/slices/authSlice';
+import { clearUserProfile } from '@/store/slices/userSlice';
+import { AuthService } from '@/services/auth.service';
+
+// Type for Redux store
+type ReduxStore = {
+    dispatch: (action: any) => void;
+};
+
+// ⚠️ Tạo biến lưu store, ban đầu là null
+let reduxStore: ReduxStore | null = null;
+
+// ✅ Hàm để inject store từ bên ngoài
+export const injectStore = (_store: ReduxStore) => {
+    reduxStore = _store;
+};
 
 // Extend Axios config to include metadata
 interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
@@ -75,6 +91,32 @@ const queueFailedRequest = (originalRequest: ExtendedAxiosRequestConfig) => {
         });
 };
 
+/**
+ * Force logout when refresh token fails
+ * Clears all auth data, Redux state, and redirects to login
+ *
+ * Note: We don't call logoutAsync() here because:
+ * 1. Token is already expired, so API call would fail
+ * 2. We just need to clear local state, not call backend
+ */
+const handleForceLogout = () => {
+    // 1. Clear auth data (cookies, localStorage)
+    AuthService.clearAuthData();
+
+    // 2. Clear Redux state IMMEDIATELY (before redirect)
+    try {
+        reduxStore?.dispatch(resetAuthState()); // Reset authSlice to initialState
+        reduxStore?.dispatch(clearUserProfile()); // Clear userSlice
+    } catch (error) {
+        console.error('Error clearing Redux state:', error);
+    }
+
+    // 3. Redirect to login (only in browser environment)
+    if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        window.location.href = '/login';
+    }
+};
+
 const handleTokenRefresh = async (originalRequest: ExtendedAxiosRequestConfig) => {
     try {
         const refreshResponse: any = await instance.post('/auth/refresh-token');
@@ -87,15 +129,9 @@ const handleTokenRefresh = async (originalRequest: ExtendedAxiosRequestConfig) =
         processQueue(refreshError as any, null);
         isRefreshing = false;
 
-        try {
-            localStorage.removeItem('persist:booking-care-root');
-        } catch {
-            // Ignore localStorage errors
-        }
+        // Force logout: clear all auth data and redirect
+        handleForceLogout();
 
-        if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-            window.location.href = '/login';
-        }
         throw new Error(String(refreshError));
     }
 };
