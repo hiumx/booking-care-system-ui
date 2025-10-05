@@ -362,87 +362,87 @@
 }
 
 // Dark theme support
-@media (prefers-color-scheme: dark) {
-    .dateRangePicker {
-        .trigger {
-            background-color: #2a2a2a;
-            border-color: #404040;
-            color: #fff;
+// @media (prefers-color-scheme: dark) {
+//     .dateRangePicker {
+//         .trigger {
+//             background-color: #f5f5f5;
+//             border-color: #404040;
+//             color: #fff;
 
-            &:hover {
-                border-color: #3d91ff;
-            }
+//             &:hover {
+//                 border-color: #3d91ff;
+//             }
 
-            &.disabled {
-                background-color: #1a1a1a;
-                border-color: #404040;
-            }
+//             &.disabled {
+//                 background-color: #1a1a1a;
+//                 border-color: #404040;
+//             }
 
-            .triggerContent {
-                .dateText {
-                    color: #fff;
-                }
+//             .triggerContent {
+//                 .dateText {
+//                     color: #fff;
+//                 }
 
-                .actions {
-                    .clearButton {
-                        color: #ccc;
+//                 .actions {
+//                     .clearButton {
+//                         color: #ccc;
 
-                        &:hover {
-                            background-color: #404040;
-                            color: #fff;
-                        }
-                    }
+//                         &:hover {
+//                             background-color: #404040;
+//                             color: #fff;
+//                         }
+//                     }
 
-                    .chevron {
-                        color: #ccc;
-                    }
-                }
-            }
-        }
+//                     .chevron {
+//                         color: #ccc;
+//                     }
+//                 }
+//             }
+//         }
 
-        .dropdown {
-            background: #2a2a2a;
-            border-color: #404040;
+//         .dropdown {
+//             background: #2a2a2a;
+//             border-color: #404040;
 
-            .pickerContainer {
-                :global(.rdrDefinedRangesWrapper) {
-                    background: #1a1a1a;
-                    border-color: #404040;
-                }
+//             .pickerContainer {
+//                 :global(.rdrDefinedRangesWrapper) {
+//                     background: #1a1a1a;
+//                     border-color: #404040;
+//                 }
 
-                :global(.rdrDateDisplayWrapper) {
-                    background: #1a1a1a;
-                    border-color: #404040;
-                }
+//                 :global(.rdrDateDisplayWrapper) {
+//                     background: #1a1a1a;
+//                     border-color: #404040;
+//                 }
 
-                :global(.rdrDateDisplay) {
-                    color: #fff;
-                }
+//                 :global(.rdrDateDisplay) {
+//                     color: #fff;
+//                 }
 
-                :global(.rdrDateDisplayItem) {
-                    background: #2a2a2a;
-                    border-color: #404040;
-                    color: #fff;
-                }
+//                 :global(.rdrDateDisplayItem) {
+//                     background: #2a2a2a;
+//                     border-color: #404040;
+//                     color: #fff;
+//                 }
 
-                :global(.rdrMonthAndYearWrapper) {
-                    background: #2a2a2a;
-                    border-color: #404040;
-                }
+//                 :global(.rdrMonthAndYearWrapper) {
+//                     background: #2a2a2a;
+//                     border-color: #404040;
+//                 }
 
-                :global(.rdrDays) {
-                    .rdrDay {
-                        .rdrDayNumber {
-                            color: #fff;
-                        }
-                    }
-                }
-            }
+//                 :global(.rdrDays) {
+//                     .rdrDay {
+//                         .rdrDayNumber {
+//                             color: #fff;
+//                         }
+//                     }
+//                 }
+//             }
 
-            .actions {
-                background: #1a1a1a;
-                border-color: #404040;
-            }
-        }
-    }
-}
+//             .actions {
+//                 background: #1a1a1a;
+//                 border-color: #404040;
+//             }
+//         }
+//     }
+// }
