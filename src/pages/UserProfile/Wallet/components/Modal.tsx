@@ -216,7 +216,7 @@ const Modal: React.FC<ModalProps> = ({
                                     aria-label="Close"
                                     whileHover={{
                                         scale: 1.1,
-                                        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                                        backgroundColor: '#FF0000',
                                     }}
                                     whileTap={{ scale: 0.95 }}
                                     transition={{ type: 'spring', stiffness: 400, damping: 17 }}
