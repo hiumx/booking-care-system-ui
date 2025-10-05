@@ -1,4 +1,5 @@
-import { AppointmentDetailData } from '../types/appointmentDetail.types';
+import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
+import { AppointmentDetailData } from '@/types/appointment.types';
 
 export const mockAppointmentDetailData: Record<string, AppointmentDetailData> = {
     upcoming: {
@@ -9,14 +10,14 @@ export const mockAppointmentDetailData: Record<string, AppointmentDetailData> = 
             email: 'edalin.hendry@example.com',
             phone: '+1 504 368 6874',
         },
-        appointmentType: 'direct_visit',
+        appointmentType: AppointmentType.IN_PERSON,
         visitType: 'General',
         appointmentDate: '22 Jul 2023',
         appointmentTime: '12:00 pm',
         consultationFees: 200,
         clinicLocation: "Adrian's Dentistry",
         location: 'Newyork, United States',
-        status: 'upcoming',
+        status: AppointmentStatus.CONFIRMED,
     },
     cancelled: {
         appointmentId: 'Apt0001',
@@ -26,13 +27,13 @@ export const mockAppointmentDetailData: Record<string, AppointmentDetailData> = 
             email: 'edalin.hendry@example.com',
             phone: '+1 504 368 6874',
         },
-        appointmentType: 'video_call',
+        appointmentType: AppointmentType.VIDEO_CALL,
         visitType: 'General',
         appointmentDate: '22 Jul 2023',
         appointmentTime: '12:00 pm',
         consultationFees: 200,
         personWithPatient: 'Andrew',
-        status: 'cancelled',
+        status: AppointmentStatus.CANCELLED,
     },
     completed: {
         appointmentId: 'Apt0001',
@@ -42,12 +43,12 @@ export const mockAppointmentDetailData: Record<string, AppointmentDetailData> = 
             email: 'edalin.hendry@example.com',
             phone: '+1 504 368 6874',
         },
-        appointmentType: 'video_call',
+        appointmentType: AppointmentType.VIDEO_CALL,
         visitType: 'General',
         appointmentDate: '22 Jul 2023',
         appointmentTime: '12:00 pm',
         consultationFees: 200,
         personWithPatient: 'Andrew',
-        status: 'completed',
+        status: AppointmentStatus.COMPLETED,
     },
 };

@@ -1,4 +1,5 @@
 import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import Favourite from './Favourite';
@@ -8,24 +9,11 @@ import AppointmentDetailPage from './Appointments/AppointmentDetailPage';
 import SettingsContainer from './Setting/SettingsContainer/SettingsContainer';
 import Invoices from './Invoices';
 import Wallet from './Wallet';
-
-// Mock user data
-const mockUserData = {
-    id: 'PT254654',
-    fullName: 'Nguyễn Văn An',
-    email: 'hendrita.hayes@example.com',
-    phoneNumber: '+1 234 567 8900',
-    avatarUrl: '/src/assets/img/doctor-grid/doctor-list-01.jpg',
-    gender: 'Nữ',
-    age: '24/02/2003',
-    role: 'Bệnh nhân' as const,
-    isActive: true,
-    createdAt: '2023-01-15',
-    updatedAt: '2024-01-15',
-};
+import { RootState } from '@/store';
 
 const UserProfile = () => {
     const location = useLocation();
+    const { profile } = useSelector((state: RootState) => state.user);
 
     // Get active tab from query parameters
     const getActiveTab = () => {
@@ -153,10 +141,7 @@ const UserProfile = () => {
                     <div className="row">
                         {/* Profile Sidebar */}
                         <div className="col-lg-4 col-xl-3 theiaStickySidebar">
-                            <ProfileSidebar
-                                userData={mockUserData}
-                                activeTab={getActiveSidebarTab()}
-                            />
+                            <ProfileSidebar userData={profile} activeTab={getActiveSidebarTab()} />
                         </div>
 
                         {/* Main Content */}
