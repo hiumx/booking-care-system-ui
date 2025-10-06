@@ -1,48 +1,4 @@
-import { Transaction, BankDetails, WalletBalance, OtherAccount } from '../types/wallet.types';
-
-export const mockWalletBalance: WalletBalance = {
-    totalBalance: '$1200',
-    totalTransaction: '$2300',
-    lastPaymentRequest: '24 Mar 2023',
-};
-
-export const mockBankDetails: BankDetails = {
-    bankName: 'Vietcombank',
-    accountNumber: '5396 5250 1908 XXXX',
-    branch: 'London',
-    accountName: 'Darren',
-    bankCode: 'VCB',
-};
-
-export const mockOtherAccounts: OtherAccount[] = [
-    {
-        id: '1',
-        bankName: 'Ngân hàng TMCP Ngoại Thương Việt Nam',
-        accountNumber: '5396 5250 1908 XXXX',
-        accountName: 'Edalin Hendry',
-        branch: 'London',
-        bankCode: 'VCB',
-        isCurrent: false,
-    },
-    {
-        id: '2',
-        bankName: 'Ngân hàng TMCP Công thương Việt Nam',
-        accountNumber: '7382 4924 4924 XXXX',
-        accountName: 'Edalin Hendry',
-        branch: 'New York',
-        bankCode: 'ICB',
-        isCurrent: false,
-    },
-    {
-        id: '3',
-        bankName: 'Ngân hàng Đầu tư và Phát triển Việt Nam',
-        accountNumber: '8934 4902 9024 XXXX',
-        accountName: 'Edalin Hendry',
-        branch: 'Chicago',
-        bankCode: 'BIDV',
-        isCurrent: true,
-    },
-];
+import { Transaction } from '../types/wallet.types';
 
 export const mockTransactions: Transaction[] = [
     {
