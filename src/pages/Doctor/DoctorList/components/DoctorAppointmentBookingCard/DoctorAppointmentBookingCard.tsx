@@ -1,8 +1,9 @@
 import clsx from 'clsx';
 import styles from './DoctorAppointmentBookingCard.module.scss';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import { PATHS, replacePathParams } from '@/routes/paths';
+import { LanguageResponse } from '@/types/language.types';
 
 interface DoctorAppointmentBookingCardProps {
     doctorId: string; // Từ doctors.id
@@ -16,8 +17,7 @@ interface DoctorAppointmentBookingCardProps {
     yearsOfExperience: number; // Từ doctors.years_of_experience
     fees: number; // Từ prices.amount qua doctor_prices
     isFavorite: boolean; // Từ bảng favourites
-    likeCounts: number; // Số lượng reviews với recommend = 1
-    dislikeCounts: number; // Số lượng reviews với recommend = 0
+    languages: LanguageResponse[]; // Danh sách ngôn ngữ của bác sĩ
     nextAvailableTime: string; // Từ doctor_schedule_times và appointment_times.start_time
     image: string; // Từ doctors.avatar_url
 }
@@ -44,13 +44,17 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
         yearsOfExperience,
         fees,
         isFavorite,
-        likeCounts,
-        dislikeCounts,
+        languages,
         nextAvailableTime,
         image,
     } = props;
 
     const [isSelected, setIsSelected] = useState(isFavorite);
+
+    // Sync favorite state with prop when it changes
+    useEffect(() => {
+        setIsSelected(isFavorite);
+    }, [isFavorite]);
 
     // Xử lý bật/tắt yêu thích (có thể gọi API để cập nhật bảng favourites)
     const handleFavoriteToggle = () => {
@@ -80,10 +84,12 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                 'd-flex align-items-center justify-content-between'
                             )}
                         >
-                            <span className={clsx(styles.badge, styles.bgOrange, 'badge')}>
-                                <i className="fa-solid fa-star me-1"></i>
-                                {rating.toFixed(1)}
-                            </span>
+                            <div className="d-flex flex-column gap-1">
+                                <span className={clsx(styles.badge, styles.bgOrange, 'badge')}>
+                                    <i className="fa-solid fa-star me-1"></i>
+                                    {rating > 0 ? rating.toFixed(1) : 'Chưa có đánh giá'}
+                                </span>
+                            </div>
                             <span
                                 className={clsx(styles.favIcon, {
                                     [styles.isSelected]: isSelected,
@@ -151,13 +157,15 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                         <div>
                                             <p className="d-flex align-items-center mb-0 fs-14 mb-2">
                                                 <i className="isax isax-user-tick text-dark me-2"></i>
-                                                {bookCounts} lượt đặt
+                                                {bookCounts > 0
+                                                    ? `${bookCounts} lượt đặt`
+                                                    : 'Chưa có lượt đặt'}
                                             </p>
                                             <p className="d-flex align-items-center mb-0 fs-14 mb-2">
-                                                <i className="isax isax-like-1 text-dark me-2"></i>
-                                                {likeCounts + dislikeCounts > 0
-                                                    ? `${((likeCounts / (likeCounts + dislikeCounts)) * 100).toFixed(0)}% (${likeCounts} / ${likeCounts + dislikeCounts} Đánh giá)`
-                                                    : 'Chưa có đánh giá'}
+                                                <i className="isax isax-language-square text-dark me-2"></i>
+                                                {languages && languages.length > 0
+                                                    ? languages.map((lang) => lang.name).join(', ')
+                                                    : 'Không xác định ngôn ngữ'}
                                             </p>
                                             <p className="d-flex align-items-center mb-0 fs-14">
                                                 <i className="isax isax-calendar text-dark me-2"></i>
@@ -174,7 +182,7 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                     <div className="me-3">
                                         <p className={clsx(styles.fs15, 'mb-1')}>Phí khám</p>
                                         <h3 className="text-orange">
-                                            {fees ? formatVND(fees) : 'Không xác định'}
+                                            {fees > 0 ? formatVND(fees) : 'Liên hệ để biết giá'}
                                         </h3>
                                     </div>
                                     <p className={clsx(styles.fs15, 'mb-0')}>

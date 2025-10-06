@@ -11,6 +11,92 @@
     box-shadow: none !important;
 }
 
+/* Multi-line input styling */
+.multiLineInput {
+    white-space: pre-wrap !important; /* Cho phép xuống dòng */
+    word-wrap: break-word !important; /* Tự động xuống dòng khi quá dài */
+    overflow-wrap: break-word !important; /* Tương tự word-wrap */
+    min-height: 50px !important; /* Tăng chiều cao tối thiểu */
+    height: auto !important; /* Tự động điều chỉnh chiều cao */
+    line-height: 1.6 !important; /* Line height phù hợp */
+    resize: none !important; /* Không cho resize thủ công */
+    overflow: hidden !important; /* Ẩn scrollbar */
+    outline: none !important; /* Bỏ outline khi focus */
+    border: none !important; /* Bỏ border */
+    background: transparent !important; /* Background trong suốt */
+    padding: 12px 36px 12px 36px !important; /* Thêm padding dọc để text không bị cắt */
+    margin: 0 !important; /* Bỏ margin */
+    display: block !important; /* Sử dụng block thay vì flex để tránh xung đột */
+    box-sizing: border-box !important; /* Đảm bảo padding được tính đúng */
+
+    /* Font styling giống input thông thường - y hệt form-control */
+    font-family: inherit !important; /* Font giống input */
+    font-size: 1rem !important; /* Font size 1rem như yêu cầu */
+    font-weight: 400 !important; /* Font weight giống input */
+    color: #012047 !important; /* Màu chữ giống input */
+    font-style: normal !important; /* Không in nghiêng */
+
+    /* Placeholder styling - giống y hệt input placeholder */
+    &[data-placeholder]:empty:before {
+        content: attr(data-placeholder);
+        color: #8894ae !important; /* Màu placeholder giống input */
+        font-style: normal !important; /* Không in nghiêng */
+        pointer-events: none;
+        font-family: inherit !important;
+        font-size: 1rem !important;
+        font-weight: 400 !important; /* Font weight giống input */
+    }
+
+    &[data-placeholder]:empty:focus:before {
+        content: '';
+    }
+}
+
+/* Tag styling - CSS tùy chỉnh với màu sắc giống Bootstrap badge */
+.tag {
+    display: block; /* Block để mỗi tag 1 dòng */
+    width: 100%; /* Width full để tự động xuống dòng */
+    white-space: normal; /* Cho phép xuống dòng */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word; /* Force wrap cho text dài */
+    hyphens: auto; /* Tự động ngắt từ */
+    font-size: 0.875rem; /* Font size nhỏ hơn (14px) */
+    line-height: 1.4;
+    margin: 2px 0 4px 0; /* Tăng margin bottom để cách bottom */
+    text-align: center; /* Căn giữa text trong tag */
+    box-sizing: border-box; /* Đảm bảo padding được tính đúng */
+    overflow: visible; /* Đảm bảo text không bị ẩn */
+    min-height: auto; /* Cho phép chiều cao tự động */
+    height: auto; /* Chiều cao tự động */
+
+    /* Màu sắc giống Bootstrap badge-soft-primary */
+    background-color: #e7f3ff; /* Light blue background */
+    color: #0d6efd; /* Primary blue text */
+    padding: 6px 12px; /* Padding phù hợp */
+    border-radius: 0.375rem; /* Rounded corners */
+    font-weight: 500; /* Medium font weight */
+
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* Override custom.css padding for search-input */
+.search-input.search-map-line .multiLineInput {
+    padding: 12px 36px 12px 36px !important;
+}
+
+@media (max-width: 767.96px) {
+    .search-input.search-map-line .multiLineInput {
+        padding: 12px 25px 12px 25px !important;
+    }
+}
+
 .customWidthSearch {
     width: 100%;
 }
