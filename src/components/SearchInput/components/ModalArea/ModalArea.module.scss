@@ -34,11 +34,31 @@
     flex-shrink: 0; /* Ngăn header co lại */
 }
 
+.modalTitleSection {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .modalTitle {
     font-size: 18px;
     font-weight: 600;
     color: #111827;
     margin: 0;
+}
+
+.currentSelection {
+    display: flex;
+    align-items: center;
+}
+
+.selectionText {
+    font-size: 14px;
+    color: #2563eb;
+    background-color: #eff6ff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 500;
 }
 
 .modalActions {
@@ -155,6 +175,9 @@
     font-weight: 600;
     line-height: 1.5;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     &:hover {
         background-color: #f3f4f6;
@@ -176,6 +199,17 @@
             background-color: #2563eb;
         }
     }
+}
+
+.provinceName,
+.districtName {
+    flex: 1;
+}
+
+.checkIcon {
+    color: #2563eb;
+    margin-left: 8px;
+    flex-shrink: 0;
 }
 
 .modalFooter {

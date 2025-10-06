@@ -9,6 +9,7 @@ interface ModalItemProps {
     color?: string;
     isSelected: boolean;
     onToggle: (id: string) => void;
+    itemType?: 'hospital' | 'specialty';
 }
 
 const ModalItem: React.FC<ModalItemProps> = ({
@@ -19,6 +20,7 @@ const ModalItem: React.FC<ModalItemProps> = ({
     color,
     isSelected,
     onToggle,
+    itemType = 'specialty',
 }) => {
     return (
         <button
@@ -30,7 +32,11 @@ const ModalItem: React.FC<ModalItemProps> = ({
                     <IconComponent className="w-5 h-5" />
                 </div>
             ) : imageUrl ? (
-                <img src={imageUrl} alt={name} className={styles.imageIcon} />
+                <img
+                    src={imageUrl}
+                    alt={name}
+                    className={`${styles.imageIcon} ${itemType === 'hospital' ? styles.imageIconHospital : styles.imageIconSpecialty}`}
+                />
             ) : (
                 <div className="w-5 h-5 bg-gray-200" />
             )}

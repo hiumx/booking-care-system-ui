@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { X, Search } from 'lucide-react';
+import { X, Search, Check } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './ModalArea.module.scss';
+import LocationService, { Province, District } from '@/services/location.service';
 
-interface District {
-    id: string;
-    name: string;
-    provinceId: string;
-}
-
-interface Province {
-    id: string;
-    name: string;
-}
+// Remove duplicate interfaces as they are now imported from LocationService
 
 interface ModalAreaProps {
     isOpen: boolean;
     onClose: () => void;
-    onApply: (selectedProvince: string, selectedDistrict: string) => void;
+    onApply: (areaDisplay: string, locationId: string, provinceId?: string) => void;
+    selectedProvinceId?: string;
+    selectedDistrictId?: string;
 }
 
-const ModalArea: React.FC<ModalAreaProps> = ({ isOpen, onClose, onApply }) => {
+const ModalArea: React.FC<ModalAreaProps> = ({
+    isOpen,
+    onClose,
+    onApply,
+    selectedProvinceId: initialProvinceId,
+    selectedDistrictId: initialDistrictId,
+}) => {
     const [provinces, setProvinces] = useState<Province[]>([]);
     const [districts, setDistricts] = useState<District[]>([]);
     const [selectedProvinceId, setSelectedProvinceId] = useState<string>('');
@@ -30,41 +30,35 @@ const ModalArea: React.FC<ModalAreaProps> = ({ isOpen, onClose, onApply }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        setIsLoading(true);
-        fetch('https://provinces.open-api.vn/api/?depth=1')
-            .then((response) => response.json())
-            .then((data) => {
-                const provinceData = data.map((item: any) => ({
-                    id: item.code.toString(),
-                    name: item.name,
-                }));
-                setProvinces(provinceData);
-                fetch('https://provinces.open-api.vn/api/?depth=2')
-                    .then((response) => response.json())
-                    .then((data) => {
-                        const districtData = data.flatMap((province: any) =>
-                            province.districts.map((district: any) => ({
-                                id: district.code.toString(),
-                                name: district.name,
-                                provinceId: province.code.toString(),
-                            }))
-                        );
-                        setDistricts(districtData);
-                        if (provinceData.length > 0) {
-                            setSelectedProvinceId(provinceData[0].id);
-                        }
-                        setIsLoading(false);
-                    })
-                    .catch((error) => {
-                        console.error('Lỗi khi lấy quận/huyện:', error);
-                        setIsLoading(false);
-                    });
-            })
-            .catch((error) => {
-                console.error('Lỗi khi lấy tỉnh/thành:', error);
+        const loadLocationData = async () => {
+            setIsLoading(true);
+            try {
+                // Load provinces
+                const provincesResponse = await LocationService.getProvinces();
+                if (provincesResponse.success && provincesResponse.data) {
+                    setProvinces(provincesResponse.data);
+
+                    // Load all districts
+                    const districtsResponse = await LocationService.getAllDistricts();
+                    if (districtsResponse.success && districtsResponse.data) {
+                        setDistricts(districtsResponse.data);
+                    }
+
+                    // Don't set any default selection - start with empty state
+                } else {
+                    console.error('Failed to load provinces:', provincesResponse.message);
+                }
+            } catch (error) {
+                console.error('Error loading location data:', error);
+            } finally {
                 setIsLoading(false);
-            });
-    }, []);
+            }
+        };
+
+        if (isOpen) {
+            loadLocationData();
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         if (isOpen) {
@@ -77,9 +71,15 @@ const ModalArea: React.FC<ModalAreaProps> = ({ isOpen, onClose, onApply }) => {
         };
     }, [isOpen]);
 
+    // Update state when props change
+    useEffect(() => {
+        setSelectedProvinceId(initialProvinceId || '');
+        setSelectedDistrictId(initialDistrictId || '');
+    }, [initialProvinceId, initialDistrictId]);
+
     // Xử lý sự kiện bàn phím cho modalOverlay
     const handleOverlayKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === 'Enter') {
             e.preventDefault();
             onClose();
         }
@@ -109,6 +109,69 @@ const ModalArea: React.FC<ModalAreaProps> = ({ isOpen, onClose, onApply }) => {
         }
     };
 
+    // Helper function to find first matching district
+    const findFirstMatchingDistrict = (searchTerm: string) => {
+        return districts
+            .filter((district) => district.provinceId === selectedProvinceId)
+            .filter((district) => district.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    };
+
+    // Xử lý sự kiện bàn phím cho search input
+    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSearchEnter();
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            onClose();
+        }
+    };
+
+    // Handle Enter key in search
+    const handleSearchEnter = () => {
+        if (!searchTerm) return;
+
+        const filteredProvinces = filterProvincesBySearch(provinces, searchTerm);
+        if (filteredProvinces.length > 0) {
+            handleProvinceClick(filteredProvinces[0].id);
+            return;
+        }
+
+        const filteredDistricts = findFirstMatchingDistrict(searchTerm);
+        if (filteredDistricts.length > 0) {
+            handleDistrictClick(filteredDistricts[0].id);
+        }
+    };
+
+    // Helper function to get selection text
+    const getSelectionText = () => {
+        if (selectedProvince && selectedDistrict) {
+            return `Đã chọn: ${selectedProvince.name} - ${selectedDistrict.name}`;
+        }
+        if (selectedProvince) {
+            return `Đã chọn: ${selectedProvince.name}`;
+        }
+        return null;
+    };
+
+    // Helper function to render current selection
+    const renderCurrentSelection = () => {
+        const hasSelection =
+            selectedProvinceId &&
+            selectedProvinceId !== '' &&
+            (selectedProvince || selectedDistrict);
+        if (!hasSelection) return null;
+
+        const selectionText = getSelectionText();
+        if (!selectionText) return null;
+
+        return (
+            <div className={styles.currentSelection}>
+                <span className={styles.selectionText}>{selectionText}</span>
+            </div>
+        );
+    };
+
     if (!isOpen) return null;
 
     if (isLoading) {
@@ -122,13 +185,54 @@ const ModalArea: React.FC<ModalAreaProps> = ({ isOpen, onClose, onApply }) => {
         );
     }
 
-    const filteredProvinces = provinces.filter((province) =>
-        province.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Helper function to sort provinces
+    const sortProvinces = (provinces: Province[]) => {
+        return provinces.sort((a, b) => {
+            // Nếu có tỉnh đã chọn, đưa nó lên đầu
+            if (selectedProvinceId && selectedProvinceId !== '') {
+                if (a.id === selectedProvinceId) return -1;
+                if (b.id === selectedProvinceId) return 1;
+            }
+            // Sắp xếp theo tên
+            return a.name.localeCompare(b.name);
+        });
+    };
 
-    const filteredDistricts = districts
-        .filter((district) => district.provinceId === selectedProvinceId)
-        .filter((district) => district.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    // Helper function to sort districts
+    const sortDistricts = (districts: District[]) => {
+        return districts.sort((a, b) => {
+            // Nếu có quận đã chọn, đưa nó lên đầu
+            if (selectedDistrictId && selectedDistrictId !== '') {
+                if (a.id === selectedDistrictId) return -1;
+                if (b.id === selectedDistrictId) return 1;
+            }
+            // Sắp xếp theo tên
+            return a.name.localeCompare(b.name);
+        });
+    };
+
+    // Helper function to filter provinces by search term
+    const filterProvincesBySearch = (provinces: Province[], searchTerm: string) => {
+        return provinces.filter((province) =>
+            province.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    };
+
+    // Helper function to filter districts by search term
+    const filterDistrictsBySearch = (districts: District[], searchTerm: string) => {
+        return districts.filter((district) =>
+            district.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    };
+
+    const filteredProvinces = sortProvinces(filterProvincesBySearch(provinces, searchTerm));
+
+    const filteredDistricts = sortDistricts(
+        filterDistrictsBySearch(
+            districts.filter((district) => district.provinceId === selectedProvinceId),
+            searchTerm
+        )
+    );
 
     const selectedProvince = provinces.find((p) => p.id === selectedProvinceId);
     const selectedDistrict = districts.find((d) => d.id === selectedDistrictId);
@@ -145,13 +249,17 @@ const ModalArea: React.FC<ModalAreaProps> = ({ isOpen, onClose, onApply }) => {
 
     const handleClearFilter = () => {
         setSearchTerm('');
-        setSelectedProvinceId(provinces.length > 0 ? provinces[0].id : '');
+        setSelectedProvinceId('');
         setSelectedDistrictId('');
     };
 
     const handleApply = () => {
         if (selectedProvince && selectedDistrict) {
-            onApply(`${selectedProvince.name} - ${selectedDistrict.name}`, selectedDistrictId);
+            onApply(
+                `${selectedProvince.name} - ${selectedDistrict.name}`,
+                selectedDistrictId,
+                selectedProvinceId
+            );
         } else if (selectedProvince) {
             onApply(selectedProvince.name, selectedProvinceId);
         }
@@ -176,7 +284,10 @@ const ModalArea: React.FC<ModalAreaProps> = ({ isOpen, onClose, onApply }) => {
                 aria-modal="true"
             >
                 <div className={styles.modalHeader}>
-                    <h3 className={styles.modalTitle}>Chọn khu vực</h3>
+                    <div className={styles.modalTitleSection}>
+                        <h3 className={styles.modalTitle}>Chọn khu vực</h3>
+                        {renderCurrentSelection()}
+                    </div>
                     <div className={styles.modalActions}>
                         <button className={styles.clearButton} onClick={handleClearFilter}>
                             Xóa bộ lọc
@@ -192,9 +303,10 @@ const ModalArea: React.FC<ModalAreaProps> = ({ isOpen, onClose, onApply }) => {
                         <Search className={styles.searchIcon} />
                         <input
                             type="text"
-                            placeholder="Tìm theo tên"
+                            placeholder="Tìm theo tên (Enter để chọn, Esc để đóng)"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            onKeyDown={handleSearchKeyDown}
                             className={styles.searchInput}
                         />
                     </div>
@@ -212,7 +324,10 @@ const ModalArea: React.FC<ModalAreaProps> = ({ isOpen, onClose, onApply }) => {
                                     key={province.id}
                                     className={clsx(
                                         styles.provinceItem,
-                                        selectedProvinceId === province.id && styles.active
+                                        selectedProvinceId &&
+                                            selectedProvinceId !== '' &&
+                                            selectedProvinceId === province.id &&
+                                            styles.active
                                     )}
                                     onClick={() => handleProvinceClick(province.id)}
                                     onKeyDown={(e) => handleProvinceKeyDown(e, province.id)}
@@ -220,7 +335,12 @@ const ModalArea: React.FC<ModalAreaProps> = ({ isOpen, onClose, onApply }) => {
                                     role="option"
                                     aria-selected={selectedProvinceId === province.id}
                                 >
-                                    {province.name}
+                                    <span className={styles.provinceName}>{province.name}</span>
+                                    {selectedProvinceId &&
+                                        selectedProvinceId !== '' &&
+                                        selectedProvinceId === province.id && (
+                                            <Check className={styles.checkIcon} size={16} />
+                                        )}
                                 </div>
                             ))
                         ) : (
@@ -233,14 +353,17 @@ const ModalArea: React.FC<ModalAreaProps> = ({ isOpen, onClose, onApply }) => {
                         role="listbox"
                         aria-label="Danh sách quận/huyện"
                     >
-                        {selectedProvinceId ? (
+                        {selectedProvinceId && selectedProvinceId !== '' ? (
                             filteredDistricts.length > 0 ? (
                                 filteredDistricts.map((district) => (
                                     <div
                                         key={district.id}
                                         className={clsx(
                                             styles.districtItem,
-                                            selectedDistrictId === district.id && styles.active
+                                            selectedDistrictId &&
+                                                selectedDistrictId !== '' &&
+                                                selectedDistrictId === district.id &&
+                                                styles.active
                                         )}
                                         onClick={() => handleDistrictClick(district.id)}
                                         onKeyDown={(e) => handleDistrictKeyDown(e, district.id)}
@@ -248,7 +371,12 @@ const ModalArea: React.FC<ModalAreaProps> = ({ isOpen, onClose, onApply }) => {
                                         role="option"
                                         aria-selected={selectedDistrictId === district.id}
                                     >
-                                        {district.name}
+                                        <span className={styles.districtName}>{district.name}</span>
+                                        {selectedDistrictId &&
+                                            selectedDistrictId !== '' &&
+                                            selectedDistrictId === district.id && (
+                                                <Check className={styles.checkIcon} size={16} />
+                                            )}
                                     </div>
                                 ))
                             ) : (
