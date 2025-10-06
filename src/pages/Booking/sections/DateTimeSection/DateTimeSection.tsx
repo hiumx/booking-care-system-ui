@@ -4,23 +4,24 @@ import SlotCategory from './components/SlotCategory';
 import styles from './DateTimeSection.module.scss';
 import clsx from 'clsx';
 import BookingSectionWrapper from '../../components/BookingSectionWrapper/BookingSectionWrapper';
-import { mockDoctorInfo, mockAppointmentInfo } from '../../constants/mockData';
-import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import { mockAppointmentInfo } from '../../constants/mockData';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
     setSelectedDate,
     setSelectedDoctor,
     fetchDoctorAvailableSlots,
     setSelectedSlot,
-} from '../../../../store/slices/schedule.slice';
+} from '@/store/slices/schedule.slice';
 import {
     selectScheduleCategories,
     selectAvailableSlotsLoading,
     selectScheduleError,
     selectSelectedDate,
     selectSelectedDoctorId,
-    selectAvailableSlotCount,
-} from '../../../../store/selectors/schedule.selectors';
-import { ScheduleService } from '../../../../services/schedule.service';
+} from '@/store/selectors/schedule.selectors';
+import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
+import { ScheduleService } from '@/services/schedule.service';
+import { useDoctorInfo } from '../../hooks/useDoctorInfo';
 
 interface DateTimeSectionProps {
     nextStep: () => void;
@@ -32,32 +33,33 @@ interface DateTimeSectionProps {
 const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     nextStep,
     prevStep,
-    doctorId = 'a38c0460-25c2-41f4-82b9-4233251ca0d9', // Default or from props
+    doctorId,
     medicalServiceId,
 }) => {
     const dispatch = useAppDispatch();
 
-    // Redux state
+    // Redux state - Schedule
     const scheduleCategories = useAppSelector(selectScheduleCategories);
     const isLoadingSlots = useAppSelector(selectAvailableSlotsLoading);
     const scheduleError = useAppSelector(selectScheduleError);
     const selectedDate = useAppSelector(selectSelectedDate);
     const selectedDoctorId = useAppSelector(selectSelectedDoctorId);
-    const availableSlotCount = useAppSelector(selectAvailableSlotCount);
 
-    // Debug logging
-    console.log('Redux State:', {
-        scheduleCategories,
-    });
+    // Get doctor info using custom hook
+    const doctorInfo = useDoctorInfo();
 
     // Local state
     const [date, setDate] = useState<Date | null>(new Date());
     const [slotChecked, setSlotChecked] = useState<Array<number>>([]);
 
-    // Initialize doctor selection
+    // Fetch doctor details when doctorId changes
     useEffect(() => {
         if (doctorId && doctorId !== selectedDoctorId) {
+            // Set selected doctor in schedule slice
             dispatch(setSelectedDoctor(doctorId));
+
+            // Fetch doctor details from API and store in doctor slice
+            dispatch(getDoctorByIdAsync(doctorId));
         }
     }, [doctorId, selectedDoctorId, dispatch]);
 
@@ -68,7 +70,6 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
             if (newDate && doctorId) {
                 const formattedDate = ScheduleService.formatDateForApi(newDate);
-                console.log('Fetching slots for:', { doctorId, formattedDate, medicalServiceId });
 
                 // Update Redux state
                 dispatch(setSelectedDate(formattedDate));
@@ -131,14 +132,14 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
     // Initialize with current date on component mount
     useEffect(() => {
-        if (date && doctorId && !selectedDate) {
+        if (date && doctorId) {
             handleDateChange(date);
         }
     }, [date, doctorId, selectedDate, handleDateChange]);
 
     return (
         <BookingSectionWrapper
-            doctor={mockDoctorInfo}
+            doctor={doctorInfo}
             appointment={mockAppointmentInfo}
             nextStepTitle="Thêm thông tin cơ bản"
             nextStep={nextStep}
@@ -167,10 +168,17 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                             </div>
                         </div>
                         <div className="col-lg-7">
-                            <div className="card booking-wizard-slots">
+                            <div
+                                className={clsx(styles.slotContainer, 'card booking-wizard-slots')}
+                            >
                                 <div className={clsx(styles.timeSlot, 'card-body')}>
                                     {isLoadingSlots && (
-                                        <div className="text-center py-4">
+                                        <div
+                                            className={clsx(
+                                                styles.loadingContainer,
+                                                'text-center py-4'
+                                            )}
+                                        >
                                             <div className="spinner-border" role="status">
                                                 <span className="visually-hidden">Đang tải...</span>
                                             </div>
@@ -204,12 +212,6 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                         !scheduleError &&
                                         scheduleCategories.length > 0 && (
                                             <>
-                                                <div className="mb-3">
-                                                    <small className="text-success">
-                                                        <i className="fas fa-check-circle me-1"></i>
-                                                        Có {availableSlotCount} khung giờ khám
-                                                    </small>
-                                                </div>
                                                 {scheduleCategories.map((category, idx) => (
                                                     <SlotCategory
                                                         key={idx}

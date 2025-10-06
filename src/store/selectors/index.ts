@@ -42,3 +42,4 @@ export const selectLoadingByKey = (key: string) =>
 // Re-export specific selectors
 export * from './discount.selectors';
 export * from './schedule.selectors';
+export * from './doctor.selectors';
