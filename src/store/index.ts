@@ -16,6 +16,7 @@ import { PersistConfig } from 'redux-persist';
 import authReducer from './slices/authSlice';
 import userReducer from './slices/userSlice';
 import discountReducer from './slices/discount.slice';
+import scheduleReducer from './slices/schedule.slice';
 import uiReducer from './slices/uiSlice';
 import doctorReducer from './slices/doctorSlice';
 import hospitalReducer from './slices/hospitalSlice';
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
     auth: authReducer,
     user: userReducer,
     discount: discountReducer,
+    schedule: scheduleReducer,
     ui: uiReducer,
     doctor: doctorReducer,
     hospital: hospitalReducer,

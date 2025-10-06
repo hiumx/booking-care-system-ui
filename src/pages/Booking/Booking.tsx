@@ -8,13 +8,14 @@ import DateTimeSection from './sections/DateTimeSection';
 import PaymentSection from './sections/PaymentSection';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
 
 const Booking: React.FC = () => {
     const [currentStep, setCurrentStep] = useState<number>(1);
 
     const navigate = useNavigate();
+    const { doctorId } = useParams<{ doctorId: string }>();
 
     const nextStep = () => setCurrentStep((prev) => prev + 1);
     const prevStep = () => setCurrentStep((prev) => prev - 1);
@@ -34,7 +35,11 @@ const Booking: React.FC = () => {
                             )}
                             <div className="booking-widget multistep-form">
                                 {currentStep === 1 && (
-                                    <DateTimeSection nextStep={nextStep} prevStep={prevStep} />
+                                    <DateTimeSection
+                                        nextStep={nextStep}
+                                        prevStep={prevStep}
+                                        doctorId={doctorId}
+                                    />
                                 )}
                                 {currentStep === 2 && (
                                     <BasicInfoSection nextStep={nextStep} prevStep={prevStep} />
