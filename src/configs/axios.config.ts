@@ -28,7 +28,7 @@ interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
 
 // Create axios instance
 const instance = axios.create({
-    baseURL: `${API_CONFIG.baseUrl}/api/${API_CONFIG.defaultVersion}`,
+    baseURL: `${API_CONFIG.baseUrl}/${API_CONFIG.defaultVersion}`,
     timeout: API_CONFIG.timeout,
     headers: {
         'Content-Type': 'application/json',
