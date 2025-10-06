@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Calendar from '@/components/Calendar';
-import styles from './ServiceInfo.module.scss';
+import styles from './AvailabilityInfo.module.scss';
 import { PATHS, replacePathParams } from '@/routes/paths';
 
 interface AppointmentTime {

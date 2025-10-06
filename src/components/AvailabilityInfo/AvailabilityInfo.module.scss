@@ -1,0 +1,38 @@
+.navLink {
+    display: inline-block;
+    padding: 8px 16px;
+    color: #007bff;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
+
+    &:hover {
+        color: #0056b3;
+        background: #f8f9fa;
+    }
+
+    &.active {
+        color: #fff !important; // Đảm bảo màu chữ trắng khi active
+        background: #007bff;
+        border-color: #007bff #007bff #fff;
+    }
+}
+
+.paddingLeftZero {
+    padding-left: 0;
+}
+
+.slotsAvailable {
+    cursor: pointer;
+
+    .slotLink {
+        font-weight: 500;
+        font-size: 14px;
+        color: #012047;
+        text-decoration: none;
+    }
+}
