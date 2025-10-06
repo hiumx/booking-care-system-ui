@@ -11,15 +11,23 @@ interface AppointmentTime {
     end_time: string;
 }
 
-interface ServiceScheduleTime {
-    service_schedule_time_id: number;
-    service_id: number;
+interface ScheduleTime {
+    schedule_time_id: number;
+    entity_id: number; // doctor_id hoặc service_id
     appointment_time_id: number;
     appointment_date: string;
     is_available: boolean;
 }
 
-const ServiceInfo: React.FC = () => {
+interface AvailabilityInfoProps {
+    entityId: string;
+    title?: string;
+}
+
+const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
+    entityId,
+    title = 'Chọn Khung Giờ Có Sẵn',
+}) => {
     // Lấy ngày hiện tại
     const today = new Date();
     const [activeTab, setActiveTab] = useState('day1'); // Mặc định bắt đầu từ ngày mai
@@ -55,221 +63,221 @@ const ServiceInfo: React.FC = () => {
         { id: 5, start_time: '11:00', end_time: '11:30' },
     ];
 
-    // Mock data for doctor schedule times (mở rộng cho 30 ngày)
-    const mockScheduleTimes: ServiceScheduleTime[] = [
+    // Mock data for schedule times (generic cho cả doctor và service)
+    const mockScheduleTimes: ScheduleTime[] = [
         // 20/08/2025
         {
-            service_schedule_time_id: 1,
-            service_id: 1,
+            schedule_time_id: 1,
+            entity_id: parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-08-20',
             is_available: true,
         },
         {
-            service_schedule_time_id: 2,
-            service_id: 1,
+            schedule_time_id: 2,
+            entity_id: parseInt(entityId),
             appointment_time_id: 2,
             appointment_date: '2025-08-20',
             is_available: true,
         },
         {
-            service_schedule_time_id: 3,
-            service_id: 1,
+            schedule_time_id: 3,
+            entity_id: parseInt(entityId),
             appointment_time_id: 3,
             appointment_date: '2025-08-20',
             is_available: false,
         },
         // 21/08/2025
         {
-            service_schedule_time_id: 4,
-            service_id: 1,
+            schedule_time_id: 4,
+            entity_id: parseInt(entityId),
             appointment_time_id: 2,
             appointment_date: '2025-08-21',
             is_available: true,
         },
         {
-            service_schedule_time_id: 5,
-            service_id: 1,
+            schedule_time_id: 5,
+            entity_id: parseInt(entityId),
             appointment_time_id: 4,
             appointment_date: '2025-08-21',
             is_available: true,
         },
         // 22/08/2025
         {
-            service_schedule_time_id: 6,
-            service_id: 1,
+            schedule_time_id: 6,
+            entity_id: parseInt(entityId),
             appointment_time_id: 3,
             appointment_date: '2025-08-22',
             is_available: true,
         },
         {
-            service_schedule_time_id: 7,
-            service_id: 1,
+            schedule_time_id: 7,
+            entity_id: parseInt(entityId),
             appointment_time_id: 5,
             appointment_date: '2025-08-22',
             is_available: true,
         },
         // 25/08/2025
         {
-            service_schedule_time_id: 8,
-            service_id: 1,
+            schedule_time_id: 8,
+            entity_id: parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-08-25',
             is_available: true,
         },
         {
-            service_schedule_time_id: 9,
-            service_id: 1,
+            schedule_time_id: 9,
+            entity_id: parseInt(entityId),
             appointment_time_id: 3,
             appointment_date: '2025-08-25',
             is_available: true,
         },
         // 28/08/2025
         {
-            service_schedule_time_id: 10,
-            service_id: 1,
+            schedule_time_id: 10,
+            entity_id: parseInt(entityId),
             appointment_time_id: 2,
             appointment_date: '2025-08-28',
             is_available: true,
         },
         {
-            service_schedule_time_id: 11,
-            service_id: 1,
+            schedule_time_id: 11,
+            entity_id: parseInt(entityId),
             appointment_time_id: 4,
             appointment_date: '2025-08-28',
             is_available: true,
         },
         // 30/08/2025
         {
-            service_schedule_time_id: 12,
-            service_id: 1,
+            schedule_time_id: 12,
+            entity_id: parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-08-30',
             is_available: true,
         },
         {
-            service_schedule_time_id: 13,
-            service_id: 1,
+            schedule_time_id: 13,
+            entity_id: parseInt(entityId),
             appointment_time_id: 5,
             appointment_date: '2025-08-30',
             is_available: true,
         },
         // 01/09/2025
         {
-            service_schedule_time_id: 14,
-            service_id: 1,
+            schedule_time_id: 14,
+            entity_id: parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-09-01',
             is_available: true,
         },
         {
-            service_schedule_time_id: 15,
-            service_id: 1,
+            schedule_time_id: 15,
+            entity_id: parseInt(entityId),
             appointment_time_id: 3,
             appointment_date: '2025-09-01',
             is_available: true,
         },
         // 03/09/2025
         {
-            service_schedule_time_id: 16,
-            service_id: 1,
+            schedule_time_id: 16,
+            entity_id: parseInt(entityId),
             appointment_time_id: 2,
             appointment_date: '2025-09-03',
             is_available: true,
         },
         {
-            service_schedule_time_id: 17,
-            service_id: 1,
+            schedule_time_id: 17,
+            entity_id: parseInt(entityId),
             appointment_time_id: 4,
             appointment_date: '2025-09-03',
             is_available: true,
         },
         // 05/09/2025
         {
-            service_schedule_time_id: 18,
-            service_id: 1,
+            schedule_time_id: 18,
+            entity_id: parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-09-05',
             is_available: true,
         },
         {
-            service_schedule_time_id: 19,
-            service_id: 1,
+            schedule_time_id: 19,
+            entity_id: parseInt(entityId),
             appointment_time_id: 5,
             appointment_date: '2025-09-05',
             is_available: true,
         },
         // 08/09/2025
         {
-            service_schedule_time_id: 20,
-            service_id: 1,
+            schedule_time_id: 20,
+            entity_id: parseInt(entityId),
             appointment_time_id: 2,
             appointment_date: '2025-09-08',
             is_available: true,
         },
         {
-            service_schedule_time_id: 21,
-            service_id: 1,
+            schedule_time_id: 21,
+            entity_id: parseInt(entityId),
             appointment_time_id: 3,
             appointment_date: '2025-09-08',
             is_available: true,
         },
         // 10/09/2025
         {
-            service_schedule_time_id: 22,
-            service_id: 1,
+            schedule_time_id: 22,
+            entity_id: parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-09-10',
             is_available: true,
         },
         {
-            service_schedule_time_id: 23,
-            service_id: 1,
+            schedule_time_id: 23,
+            entity_id: parseInt(entityId),
             appointment_time_id: 4,
             appointment_date: '2025-09-10',
             is_available: true,
         },
         // 12/09/2025
         {
-            service_schedule_time_id: 24,
-            service_id: 1,
+            schedule_time_id: 24,
+            entity_id: parseInt(entityId),
             appointment_time_id: 3,
             appointment_date: '2025-09-12',
             is_available: true,
         },
         {
-            service_schedule_time_id: 25,
-            service_id: 1,
+            schedule_time_id: 25,
+            entity_id: parseInt(entityId),
             appointment_time_id: 5,
             appointment_date: '2025-09-12',
             is_available: true,
         },
         // 15/09/2025
         {
-            service_schedule_time_id: 26,
-            service_id: 1,
+            schedule_time_id: 26,
+            entity_id: parseInt(entityId),
             appointment_time_id: 2,
             appointment_date: '2025-09-15',
             is_available: true,
         },
         {
-            service_schedule_time_id: 27,
-            service_id: 1,
+            schedule_time_id: 27,
+            entity_id: parseInt(entityId),
             appointment_time_id: 4,
             appointment_date: '2025-09-15',
             is_available: true,
         },
         // 18/09/2025
         {
-            service_schedule_time_id: 28,
-            service_id: 1,
+            schedule_time_id: 28,
+            entity_id: parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-09-18',
             is_available: true,
         },
         {
-            service_schedule_time_id: 29,
-            service_id: 1,
+            schedule_time_id: 29,
+            entity_id: parseInt(entityId),
             appointment_time_id: 5,
             appointment_date: '2025-09-18',
             is_available: true,
@@ -330,7 +338,7 @@ const ServiceInfo: React.FC = () => {
             <div className="custom-card">
                 <div className="card-body">
                     <div className="card-header d-flex justify-content-between align-items-center">
-                        <h3 className="header-title">Chọn Khung Giờ Có Sẵn</h3>
+                        <h3 className="header-title">{title}</h3>
                         <div className="date-picker">
                             <button
                                 type="button"
@@ -365,7 +373,9 @@ const ServiceInfo: React.FC = () => {
                     </div>
 
                     <div className="available-tab">
-                        <label className="form-label">Chọn ngày có sẵn</label>
+                        <label className="form-label" htmlFor="date-selector">
+                            Chọn ngày có sẵn
+                        </label>
                         <ul className="nav">
                             {next7Days.map((day) => (
                                 <li key={day.id}>
@@ -418,7 +428,7 @@ const ServiceInfo: React.FC = () => {
                                                             to={replacePathParams(
                                                                 PATHS.BOOKING.ROOT,
                                                                 {
-                                                                    doctorId: '1',
+                                                                    doctorId: entityId,
                                                                 }
                                                             )}
                                                         >
@@ -447,4 +457,4 @@ const ServiceInfo: React.FC = () => {
     );
 };
 
-export default ServiceInfo;
+export default AvailabilityInfo;

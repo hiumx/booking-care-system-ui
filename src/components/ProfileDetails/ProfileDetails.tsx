@@ -1,8 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
-import ServiceInfo from '@/pages/MedicalService/ServiceDetail/components/ServiceInfo/ServiceInfo';
-import DoctorAvailability from '@/pages/Doctor/DoctorProfile/components/DoctorAvailability/DoctorAvailability';
+import AvailabilityInfo from '@/components/AvailabilityInfo';
 import { ProfileType, ProfileData, Hospital, Specialty, Position } from '@/types/profile.types';
 
 // Import images
@@ -279,7 +278,10 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({
                         <div className="detail-title">
                             <h4>{tabLabels.hours}</h4>
                         </div>
-                        {type === 'doctor' ? <DoctorAvailability /> : <ServiceInfo />}
+                        <AvailabilityInfo
+                            entityId={profile.id.toString()}
+                            title="Chọn Khung Giờ Có Sẵn"
+                        />
                     </div>
                 </div>
                 <div ref={reviewRef}>
