@@ -10,7 +10,6 @@ import Pagination from '@/components/Pagination/Pagination';
 import DateRangePicker from '@/components/DateRangePicker';
 import {
     AppointmentUITab,
-    AppointmentType,
     AppointmentQueryRequest,
     AppointmentCardData,
     mapUITabToStatus,
@@ -23,6 +22,7 @@ import { FilterState } from './components/AppointmentFilters/AppointmentTypes';
 import styles from './Appointments.module.scss';
 import { Link } from 'react-router-dom';
 import AppointmentGridCard from './components/AppointmentGridCard/AppointmentGridCard';
+import { AppointmentType } from '@/enums/appointment.enums';
 
 // View mode type
 type ViewMode = 'list' | 'grid';
@@ -397,7 +397,7 @@ const Appointments: React.FC = () => {
                     <button
                         type="button"
                         className="btn btn-primary-gradient rounded-pill"
-                        onClick={() => window.location.reload()}
+                        onClick={() => globalThis.location.reload()}
                     >
                         Thử lại
                     </button>

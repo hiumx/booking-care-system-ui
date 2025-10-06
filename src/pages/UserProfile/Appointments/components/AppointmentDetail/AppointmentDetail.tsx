@@ -3,11 +3,10 @@ import { Link } from 'react-router-dom';
 import {
     AppointmentDetailProps,
     StatusConfig,
-    AppointmentStatus,
-    AppointmentType,
     getAppointmentTypeText as getTypeText,
     getAppointmentTypeIcon,
 } from '@/types/appointment.types';
+import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
 
 const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     appointment,
@@ -88,8 +87,6 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
             case AppointmentType.IN_PERSON:
                 colorClass = 'text-green';
                 break;
-            default:
-                colorClass = '';
         }
 
         return <i className={`${iconClass} ${colorClass}`}></i>;

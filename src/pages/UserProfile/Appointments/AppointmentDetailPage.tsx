@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import AppointmentDetail from './components/AppointmentDetail';
 import { mockAppointmentDetailData } from './data/appointmentDetailMockData';
-import { AppointmentStatus } from '@/types/appointment.types';
+import { AppointmentStatus } from '@/enums/appointment.enums';
 
 const AppointmentDetailPage: React.FC = () => {
     const location = useLocation();

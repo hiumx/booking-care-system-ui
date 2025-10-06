@@ -1,17 +1,18 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { PATHS } from '@/routes/paths';
 import { AppDispatch, RootState } from '@/store';
-import { logout } from '@/store/slices/authSlice';
-import { fetchUserProfile } from '@/store/slices/userSlice';
+import { logoutAsync } from '@/store/slices/authSlice';
+import { fetchUserProfile, clearUserProfile } from '@/store/slices/userSlice';
 interface HeaderProps {
     isHeaderMenu?: boolean;
 }
 
 const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
     const { profile } = useSelector((state: RootState) => state.user);
 
@@ -27,10 +28,12 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
         }
     }, [isAuthenticated, profile]);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         try {
-            dispatch(logout());
+            await dispatch(logoutAsync()).unwrap();
+            dispatch(clearUserProfile()); // Clear user profile from state
             toast.success('Đăng xuất thành công');
+            navigate(PATHS.HOME); // Redirect to home page
         } catch (error: any) {
             console.error('Logout failed:', error);
             toast.error('Không thể đăng xuất. Vui lòng thử lại');
@@ -61,28 +64,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                         <i className="isax isax-moon"></i>
                                     </a>
                                 </li>
-                                {!isAuthenticated ? (
-                                    <>
-                                        <li>
-                                            <Link
-                                                to={PATHS.LOGIN}
-                                                className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
-                                            >
-                                                <i className="isax isax-lock-1 me-1"></i>
-                                                Đăng nhập
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to={PATHS.REGISTER}
-                                                className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
-                                            >
-                                                <i className="isax isax-user-tick me-1"></i>
-                                                Đăng ký
-                                            </Link>
-                                        </li>
-                                    </>
-                                ) : (
+                                {isAuthenticated ? (
                                     <li className="nav-item dropdown has-arrow logged-item">
                                         <Link
                                             to={
@@ -114,7 +96,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                                             profile?.avatarUrl ||
                                                             '/src/assets/img/doctors-dashboard/profile-06.jpg'
                                                         }
-                                                        alt="User Image"
+                                                        alt={`${profile?.fullName || 'User'} avatar`}
                                                         className="avatar-img rounded-circle"
                                                     />
                                                 </div>
@@ -154,6 +136,27 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                             </Link>
                                         </div>
                                     </li>
+                                ) : (
+                                    <>
+                                        <li>
+                                            <Link
+                                                to={PATHS.LOGIN}
+                                                className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
+                                            >
+                                                <i className="isax isax-lock-1 me-1"></i>
+                                                Đăng nhập
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link
+                                                to={PATHS.REGISTER}
+                                                className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
+                                            >
+                                                <i className="isax isax-user-tick me-1"></i>
+                                                Đăng ký
+                                            </Link>
+                                        </li>
+                                    </>
                                 )}
                             </ul>
                         </div>

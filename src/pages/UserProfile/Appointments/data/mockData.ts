@@ -1,4 +1,5 @@
-import { AppointmentCardData, AppointmentType, AppointmentStatus } from '@/types/appointment.types';
+import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
+import { AppointmentCardData } from '@/types/appointment.types';
 
 // Helper function to create doctor data
 const createDoctor = (

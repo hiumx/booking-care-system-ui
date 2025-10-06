@@ -1,8 +1,5 @@
-import {
-    AppointmentDetailData,
-    AppointmentType,
-    AppointmentStatus,
-} from '@/types/appointment.types';
+import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
+import { AppointmentDetailData } from '@/types/appointment.types';
 
 export const mockAppointmentDetailData: Record<string, AppointmentDetailData> = {
     upcoming: {
