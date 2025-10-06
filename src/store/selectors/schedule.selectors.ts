@@ -91,17 +91,3 @@ export const selectAvailableSlotCount = createSelector(
     selectAvailableSlots,
     (slots) => slots.filter((slot) => slot.isAvailable && !slot.isBlocked).length
 );
-
-// export const selectTotalSlotCapacity = createSelector(selectAvailableSlots, (slots) =>
-//     slots.reduce((total, slot) => total + slot.availableCapacity, 0)
-// );
-
-// export const selectScheduleCategoriesWithAvailability = createSelector(
-//     selectScheduleCategories,
-//     (categories) =>
-//         categories.map((category) => ({
-//             ...category,
-//             availableCount: category.timeSlots.filter((slot) => slot.available).length,
-//             totalCount: category.timeSlots.length,
-//         }))
-// );

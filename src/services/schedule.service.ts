@@ -128,21 +128,21 @@ export class ScheduleService {
         console.log('Grouping slots by period:', slots);
 
         const morning = slots.filter((slot) => {
-            const hour = parseInt(slot.startTime.split(':')[0]);
+            const hour = Number.parseInt(slot.startTime.split(':')[0]);
             return hour >= 8 && hour < 12;
         });
 
         console.log('Morning slots:', morning);
 
         const afternoon = slots.filter((slot) => {
-            const hour = parseInt(slot.startTime.split(':')[0]);
+            const hour = Number.parseInt(slot.startTime.split(':')[0]);
             return hour >= 12 && hour < 17;
         });
 
         console.log('Afternoon slots:', afternoon);
 
         const evening = slots.filter((slot) => {
-            const hour = parseInt(slot.startTime.split(':')[0]);
+            const hour = Number.parseInt(slot.startTime.split(':')[0]);
             return hour >= 17 && hour <= 21;
         });
 
