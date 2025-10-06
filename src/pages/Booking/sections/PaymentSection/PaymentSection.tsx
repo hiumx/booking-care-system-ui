@@ -1,5 +1,6 @@
 import BookingSectionWrapper from '../../components/BookingSectionWrapper/BookingSectionWrapper';
-import { mockDoctorInfo, mockAppointmentInfo } from '../../constants/mockData';
+import { mockAppointmentInfo } from '../../constants/mockData';
+import { useDoctorInfo } from '../../hooks/useDoctorInfo';
 
 interface PaymentSectionProps {
     nextStep: () => void;
@@ -7,9 +8,12 @@ interface PaymentSectionProps {
 }
 
 const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) => {
+    // Get doctor info from Redux (already fetched in DateTimeSection)
+    const doctorInfo = useDoctorInfo();
+
     return (
         <BookingSectionWrapper
-            doctor={mockDoctorInfo}
+            doctor={doctorInfo}
             appointment={mockAppointmentInfo}
             nextStepTitle="Xác nhận & Thanh toán"
             nextStep={nextStep}

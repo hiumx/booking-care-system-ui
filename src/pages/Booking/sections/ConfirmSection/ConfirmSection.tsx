@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
 import styles from './ConfirmSection.module.scss';
 import { PATHS } from '@/routes/paths';
+import { useDoctorInfo } from '../../hooks';
 
 interface ConfirmSectionProps {
     handleGoBack: () => void;
 }
 
 const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
+    const doctor = useDoctorInfo();
+
     return (
         <fieldset className="d-block">
             <div className="card booking-card">
@@ -30,8 +33,8 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                         </span>
                                         <p className="mb-0">
                                             Lịch khám của bạn đã được xác nhận với{' '}
-                                            <span className="text-dark">BS. Nguyễn Văn Minh </span>.
-                                            Vui lòng đến trước{' '}
+                                            <span className="text-dark">{doctor.name} </span>. Vui
+                                            lòng đến trước{' '}
                                             <span className="text-dark">15 phút </span> so với giờ
                                             hẹn.
                                         </p>

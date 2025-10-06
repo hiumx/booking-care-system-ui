@@ -16,9 +16,17 @@ interface ModalProps {
         color?: string;
     }>;
     title: string;
+    itemType?: 'hospital' | 'specialty';
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onApply, items, title }) => {
+const Modal: React.FC<ModalProps> = ({
+    isOpen,
+    onClose,
+    onApply,
+    items,
+    title,
+    itemType = 'specialty',
+}) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
@@ -96,6 +104,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onApply, items, title })
                                 color={item.color}
                                 isSelected={selectedItems.includes(item.id)}
                                 onToggle={handleItemToggle}
+                                itemType={itemType}
                             />
                         ))}
                     </div>

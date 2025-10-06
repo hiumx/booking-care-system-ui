@@ -12,721 +12,14 @@ import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import browseCategorie from '@/assets/img/icons/browse-categorie.svg';
 import SearchInput from '@/components/SearchInput';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { searchDoctorsAsync, filterDoctorsAsync } from '@/store/slices/doctorSlice';
+import { Status, Gender } from '@/enums/common.enums';
 
 // Import images
 import docProfile01 from '@/assets/img/doctor-grid/doctor-grid-01.jpg';
-import docProfile02 from '@/assets/img/doctor-grid/doctor-grid-02.jpg';
-import docProfile03 from '@/assets/img/doctor-grid/doctor-grid-03.jpg';
-import docProfile04 from '@/assets/img/doctor-grid/doctor-grid-04.jpg';
-import docProfile05 from '@/assets/img/doctor-grid/doctor-grid-05.jpg';
-import docProfile06 from '@/assets/img/doctor-grid/doctor-grid-06.jpg';
-import docProfile07 from '@/assets/img/doctor-grid/doctor-grid-07.jpg';
-import docProfile08 from '@/assets/img/doctor-grid/doctor-grid-08.jpg';
-import docProfile09 from '@/assets/img/doctor-grid/doctor-grid-09.jpg';
-import docProfile10 from '@/assets/img/doctor-grid/doctor-grid-10.jpg';
-import docProfile11 from '@/assets/img/doctor-grid/doctor-grid-11.jpg';
-import docProfile12 from '@/assets/img/doctor-grid/doctor-grid-12.jpg';
 
-interface Doctor {
-    doctorId: string;
-    name: string;
-    specialty: string;
-    position: string;
-    location: string;
-    consultationTime: string;
-    consultationFee: number;
-    rating: number;
-    available: boolean;
-    image: string;
-    bookCounts: number;
-    yearsOfExperience: number;
-    isFavorite: boolean;
-    likeCounts: number;
-    dislikeCounts: number;
-}
-
-const mockDoctors: Doctor[] = [
-    {
-        doctorId: '1',
-        name: 'BS. Nguyễn Văn Minh',
-        specialty: 'Tâm lý học',
-        position: 'Bác sĩ Tâm lý Cao cấp',
-        location: 'Quận 1, TP. Hồ Chí Minh',
-        consultationTime: '09:00',
-        consultationFee: 650000,
-        rating: 5.0,
-        available: true,
-        image: docProfile01,
-        bookCounts: 25,
-        yearsOfExperience: 15,
-        isFavorite: false,
-        likeCounts: 20,
-        dislikeCounts: 1,
-    },
-    {
-        doctorId: '2',
-        name: 'BS. Trần Thị Hồng',
-        specialty: 'Nhi khoa',
-        position: 'Chuyên gia Nhi khoa',
-        location: 'Quận 3, TP. Hồ Chí Minh',
-        consultationTime: '10:30',
-        consultationFee: 400000,
-        rating: 4.6,
-        available: true,
-        image: docProfile02,
-        bookCounts: 30,
-        yearsOfExperience: 8,
-        isFavorite: true,
-        likeCounts: 15,
-        dislikeCounts: 2,
-    },
-    {
-        doctorId: '3',
-        name: 'BS. Lê Quang Vinh',
-        specialty: 'Thần kinh',
-        position: 'Trưởng khoa Thần kinh',
-        location: 'Quận 7, TP. Hồ Chí Minh',
-        consultationTime: '11:00',
-        consultationFee: 500000,
-        rating: 4.8,
-        available: true,
-        image: docProfile03,
-        bookCounts: 18,
-        yearsOfExperience: 12,
-        isFavorite: false,
-        likeCounts: 22,
-        dislikeCounts: 0,
-    },
-    {
-        doctorId: '4',
-        name: 'BS. Phạm Thị Lan',
-        specialty: 'Tim mạch',
-        position: 'Bác sĩ Tim mạch Cao cấp',
-        location: 'Quận 5, TP. Hồ Chí Minh',
-        consultationTime: '14:00',
-        consultationFee: 550000,
-        rating: 4.8,
-        available: true,
-        image: docProfile04,
-        bookCounts: 40,
-        yearsOfExperience: 10,
-        isFavorite: true,
-        likeCounts: 25,
-        dislikeCounts: 3,
-    },
-    {
-        doctorId: '5',
-        name: 'BS. Hoàng Văn Hùng',
-        specialty: 'Thần kinh',
-        position: 'Tư vấn Thần kinh',
-        location: 'Quận Bình Thạnh, TP. Hồ Chí Minh',
-        consultationTime: '15:30',
-        consultationFee: 600000,
-        rating: 4.2,
-        available: true,
-        image: docProfile05,
-        bookCounts: 12,
-        yearsOfExperience: 7,
-        isFavorite: false,
-        likeCounts: 10,
-        dislikeCounts: 5,
-    },
-    {
-        doctorId: '6',
-        name: 'BS. Nguyễn Thành Đạt',
-        specialty: 'Tim mạch',
-        position: 'Chuyên gia Tim mạch',
-        location: 'Quận 10, TP. Hồ Chí Minh',
-        consultationTime: '08:00',
-        consultationFee: 450000,
-        rating: 4.2,
-        available: true,
-        image: docProfile06,
-        bookCounts: 35,
-        yearsOfExperience: 9,
-        isFavorite: false,
-        likeCounts: 18,
-        dislikeCounts: 2,
-    },
-    {
-        doctorId: '7',
-        name: 'BS. Võ Thị Mai',
-        specialty: 'Tâm lý học',
-        position: 'Bác sĩ Tâm lý Lâm sàng',
-        location: 'Quận Phú Nhuận, TP. Hồ Chí Minh',
-        consultationTime: '13:00',
-        consultationFee: 450000,
-        rating: 4.7,
-        available: true,
-        image: docProfile07,
-        bookCounts: 28,
-        yearsOfExperience: 14,
-        isFavorite: true,
-        likeCounts: 30,
-        dislikeCounts: 1,
-    },
-    {
-        doctorId: '8',
-        name: 'BS. Đặng Thị Thu',
-        specialty: 'Nhi khoa',
-        position: 'Tư vấn Nhi khoa',
-        location: 'Quận Gò Vấp, TP. Hồ Chí Minh',
-        consultationTime: 'Không có lịch',
-        consultationFee: 750000,
-        rating: 4.7,
-        available: false,
-        image: docProfile08,
-        bookCounts: 22,
-        yearsOfExperience: 11,
-        isFavorite: false,
-        likeCounts: 19,
-        dislikeCounts: 4,
-    },
-    {
-        doctorId: '9',
-        name: 'BS. Trần Văn Long',
-        specialty: 'Tâm lý học',
-        position: 'Bác sĩ Tâm lý Cao cấp',
-        location: 'Quận Tân Bình, TP. Hồ Chí Minh',
-        consultationTime: '16:00',
-        consultationFee: 480000,
-        rating: 4.9,
-        available: true,
-        image: docProfile09,
-        bookCounts: 15,
-        yearsOfExperience: 13,
-        isFavorite: false,
-        likeCounts: 21,
-        dislikeCounts: 0,
-    },
-    {
-        doctorId: '10',
-        name: 'BS. Nguyễn Thị Hương',
-        specialty: 'Tiêu hóa',
-        position: 'Chuyên gia Tiêu hóa',
-        location: 'Quận 2, TP. Hồ Chí Minh',
-        consultationTime: '09:30',
-        consultationFee: 520000,
-        rating: 5.0,
-        available: true,
-        image: docProfile10,
-        bookCounts: 33,
-        yearsOfExperience: 16,
-        isFavorite: true,
-        likeCounts: 28,
-        dislikeCounts: 1,
-    },
-    {
-        doctorId: '11',
-        name: 'BS. Lê Văn Tâm',
-        specialty: 'Tim mạch',
-        position: 'Tư vấn Tim mạch',
-        location: 'Quận Thủ Đức, TP. Hồ Chí Minh',
-        consultationTime: 'Không có lịch',
-        consultationFee: 360000,
-        rating: 4.4,
-        available: false,
-        image: docProfile11,
-        bookCounts: 10,
-        yearsOfExperience: 6,
-        isFavorite: false,
-        likeCounts: 12,
-        dislikeCounts: 3,
-    },
-    {
-        doctorId: '12',
-        name: 'BS. Hồ Thị Ngọc',
-        specialty: 'Nhi khoa',
-        position: 'Chuyên gia Nhi khoa',
-        location: 'Quận 1, TP. Hồ Chí Minh',
-        consultationTime: 'Không có lịch',
-        consultationFee: 630000,
-        rating: 4.2,
-        available: false,
-        image: docProfile12,
-        bookCounts: 17,
-        yearsOfExperience: 8,
-        isFavorite: false,
-        likeCounts: 14,
-        dislikeCounts: 2,
-    },
-    {
-        doctorId: '13',
-        name: 'BS. Nguyễn Văn Hùng',
-        specialty: 'Da liễu',
-        position: 'Chuyên gia Da liễu',
-        location: 'Quận Hoàn Kiếm, Hà Nội',
-        consultationTime: '10:00',
-        consultationFee: 550000,
-        rating: 4.9,
-        available: true,
-        image: docProfile01,
-        bookCounts: 20,
-        yearsOfExperience: 10,
-        isFavorite: true,
-        likeCounts: 23,
-        dislikeCounts: 1,
-    },
-    {
-        doctorId: '14',
-        name: 'BS. Trần Thị Mai',
-        specialty: 'Mắt',
-        position: 'Bác sĩ Nhãn khoa',
-        location: 'Quận Ba Đình, Hà Nội',
-        consultationTime: '14:30',
-        consultationFee: 450000,
-        rating: 4.7,
-        available: true,
-        image: docProfile02,
-        bookCounts: 15,
-        yearsOfExperience: 9,
-        isFavorite: false,
-        likeCounts: 18,
-        dislikeCounts: 2,
-    },
-    {
-        doctorId: '15',
-        name: 'BS. Phạm Văn Nam',
-        specialty: 'Tai mũi họng',
-        position: 'Chuyên gia Tai mũi họng',
-        location: 'Quận Hải Châu, Đà Nẵng',
-        consultationTime: '09:00',
-        consultationFee: 400000,
-        rating: 4.6,
-        available: true,
-        image: docProfile03,
-        bookCounts: 22,
-        yearsOfExperience: 7,
-        isFavorite: false,
-        likeCounts: 20,
-        dislikeCounts: 0,
-    },
-    {
-        doctorId: '16',
-        name: 'BS. Lê Thị Hạnh',
-        specialty: 'Nội tiết',
-        position: 'Tư vấn Nội tiết',
-        location: 'Quận Thanh Khê, Đà Nẵng',
-        consultationTime: 'Không có lịch',
-        consultationFee: 500000,
-        rating: 4.5,
-        available: false,
-        image: docProfile04,
-        bookCounts: 12,
-        yearsOfExperience: 8,
-        isFavorite: true,
-        likeCounts: 15,
-        dislikeCounts: 3,
-    },
-    {
-        doctorId: '17',
-        name: 'BS. Võ Văn An',
-        specialty: 'Chỉnh hình',
-        position: 'Bác sĩ Chỉnh hình',
-        location: 'Quận Cẩm Lệ, Đà Nẵng',
-        consultationTime: '11:30',
-        consultationFee: 600000,
-        rating: 4.8,
-        available: true,
-        image: docProfile05,
-        bookCounts: 28,
-        yearsOfExperience: 12,
-        isFavorite: false,
-        likeCounts: 25,
-        dislikeCounts: 2,
-    },
-    {
-        doctorId: '18',
-        name: 'BS. Nguyễn Thị Lan',
-        specialty: 'Phổi',
-        position: 'Chuyên gia Hô hấp',
-        location: 'Quận 4, TP. Hồ Chí Minh',
-        consultationTime: '15:00',
-        consultationFee: 480000,
-        rating: 4.7,
-        available: true,
-        image: docProfile06,
-        bookCounts: 19,
-        yearsOfExperience: 11,
-        isFavorite: true,
-        likeCounts: 22,
-        dislikeCounts: 1,
-    },
-    {
-        doctorId: '19',
-        name: 'BS. Trần Văn Hòa',
-        specialty: 'Tâm lý học',
-        position: 'Bác sĩ Tâm lý',
-        location: 'Quận Cầu Giấy, Hà Nội',
-        consultationTime: '13:30',
-        consultationFee: 700000,
-        rating: 4.9,
-        available: true,
-        image: docProfile07,
-        bookCounts: 30,
-        yearsOfExperience: 15,
-        isFavorite: false,
-        likeCounts: 28,
-        dislikeCounts: 0,
-    },
-    {
-        doctorId: '20',
-        name: 'BS. Phạm Thị Hồng',
-        specialty: 'Nhi khoa',
-        position: 'Tư vấn Nhi khoa',
-        location: 'Quận Hai Bà Trưng, Hà Nội',
-        consultationTime: 'Không có lịch',
-        consultationFee: 420000,
-        rating: 4.3,
-        available: false,
-        image: docProfile08,
-        bookCounts: 14,
-        yearsOfExperience: 6,
-        isFavorite: false,
-        likeCounts: 10,
-        dislikeCounts: 4,
-    },
-    {
-        doctorId: '21',
-        name: 'BS. Nguyễn Văn Bình',
-        specialty: 'Tim mạch',
-        position: 'Chuyên gia Tim mạch',
-        location: 'Quận 9, TP. Hồ Chí Minh',
-        consultationTime: '10:00',
-        consultationFee: 510000,
-        rating: 4.6,
-        available: true,
-        image: docProfile09,
-        bookCounts: 24,
-        yearsOfExperience: 10,
-        isFavorite: true,
-        likeCounts: 20,
-        dislikeCounts: 2,
-    },
-    {
-        doctorId: '22',
-        name: 'BS. Lê Thị Thu',
-        specialty: 'Tiêu hóa',
-        position: 'Bác sĩ Tiêu hóa',
-        location: 'Quận Hồng Bàng, Hải Phòng',
-        consultationTime: '14:00',
-        consultationFee: 470000,
-        rating: 4.5,
-        available: true,
-        image: docProfile10,
-        bookCounts: 18,
-        yearsOfExperience: 9,
-        isFavorite: false,
-        likeCounts: 16,
-        dislikeCounts: 1,
-    },
-    {
-        doctorId: '23',
-        name: 'BS. Trần Văn Tuấn',
-        specialty: 'Da liễu',
-        position: 'Chuyên gia Da liễu',
-        location: 'Quận Lê Chân, Hải Phòng',
-        consultationTime: 'Không có lịch',
-        consultationFee: 530000,
-        rating: 4.7,
-        available: false,
-        image: docProfile11,
-        bookCounts: 16,
-        yearsOfExperience: 11,
-        isFavorite: false,
-        likeCounts: 19,
-        dislikeCounts: 3,
-    },
-    {
-        doctorId: '24',
-        name: 'BS. Phạm Thị Ngọc',
-        specialty: 'Mắt',
-        position: 'Bác sĩ Nhãn khoa',
-        location: 'Quận 6, TP. Hồ Chí Minh',
-        consultationTime: '12:00',
-        consultationFee: 490000,
-        rating: 4.8,
-        available: true,
-        image: docProfile12,
-        bookCounts: 21,
-        yearsOfExperience: 13,
-        isFavorite: true,
-        likeCounts: 24,
-        dislikeCounts: 1,
-    },
-    {
-        doctorId: '25',
-        name: 'BS. Nguyễn Văn Quang',
-        specialty: 'Tai mũi họng',
-        position: 'Tư vấn Tai mũi họng',
-        location: 'Quận Ninh Kiều, Cần Thơ',
-        consultationTime: '09:30',
-        consultationFee: 450000,
-        rating: 4.6,
-        available: true,
-        image: docProfile01,
-        bookCounts: 20,
-        yearsOfExperience: 8,
-        isFavorite: false,
-        likeCounts: 17,
-        dislikeCounts: 2,
-    },
-    {
-        doctorId: '26',
-        name: 'BS. Lê Thị Minh',
-        specialty: 'Nội tiết',
-        position: 'Chuyên gia Nội tiết',
-        location: 'Quận Bình Thủy, Cần Thơ',
-        consultationTime: '15:00',
-        consultationFee: 510000,
-        rating: 4.7,
-        available: true,
-        image: docProfile02,
-        bookCounts: 22,
-        yearsOfExperience: 10,
-        isFavorite: true,
-        likeCounts: 20,
-        dislikeCounts: 1,
-    },
-    {
-        doctorId: '27',
-        name: 'BS. Trần Văn Hùng',
-        specialty: 'Chỉnh hình',
-        position: 'Bác sĩ Chỉnh hình',
-        location: 'Quận Đống Đa, Hà Nội',
-        consultationTime: 'Không có lịch',
-        consultationFee: 600000,
-        rating: 4.5,
-        available: false,
-        image: docProfile03,
-        bookCounts: 15,
-        yearsOfExperience: 9,
-        isFavorite: false,
-        likeCounts: 18,
-        dislikeCounts: 3,
-    },
-    {
-        doctorId: '28',
-        name: 'BS. Phạm Thị Lan',
-        specialty: 'Phổi',
-        position: 'Tư vấn Hô hấp',
-        location: 'Quận 11, TP. Hồ Chí Minh',
-        consultationTime: '10:30',
-        consultationFee: 470000,
-        rating: 4.6,
-        available: true,
-        image: docProfile04,
-        bookCounts: 19,
-        yearsOfExperience: 8,
-        isFavorite: false,
-        likeCounts: 16,
-        dislikeCounts: 2,
-    },
-    {
-        doctorId: '29',
-        name: 'BS. Nguyễn Văn Long',
-        specialty: 'Tâm lý học',
-        position: 'Bác sĩ Tâm lý Lâm sàng',
-        location: 'Quận Thanh Xuân, Hà Nội',
-        consultationTime: '13:00',
-        consultationFee: 650000,
-        rating: 4.9,
-        available: true,
-        image: docProfile05,
-        bookCounts: 25,
-        yearsOfExperience: 14,
-        isFavorite: true,
-        likeCounts: 22,
-        dislikeCounts: 1,
-    },
-    {
-        doctorId: '30',
-        name: 'BS. Trần Thị Hương',
-        specialty: 'Nhi khoa',
-        position: 'Chuyên gia Nhi khoa',
-        location: 'Quận Liên Chiểu, Đà Nẵng',
-        consultationTime: 'Không có lịch',
-        consultationFee: 480000,
-        rating: 4.4,
-        available: false,
-        image: docProfile06,
-        bookCounts: 17,
-        yearsOfExperience: 7,
-        isFavorite: false,
-        likeCounts: 15,
-        dislikeCounts: 3,
-    },
-    {
-        doctorId: '31',
-        name: 'BS. Lê Văn Hòa',
-        specialty: 'Tim mạch',
-        position: 'Bác sĩ Tim mạch',
-        location: 'Quận 8, TP. Hồ Chí Minh',
-        consultationTime: '11:00',
-        consultationFee: 520000,
-        rating: 4.7,
-        available: true,
-        image: docProfile07,
-        bookCounts: 23,
-        yearsOfExperience: 11,
-        isFavorite: true,
-        likeCounts: 20,
-        dislikeCounts: 2,
-    },
-    {
-        doctorId: '32',
-        name: 'BS. Phạm Thị Minh',
-        specialty: 'Tiêu hóa',
-        position: 'Tư vấn Tiêu hóa',
-        location: 'Quận Ngô Quyền, Hải Phòng',
-        consultationTime: '14:30',
-        consultationFee: 490000,
-        rating: 4.6,
-        available: true,
-        image: docProfile08,
-        bookCounts: 20,
-        yearsOfExperience: 9,
-        isFavorite: false,
-        likeCounts: 18,
-        dislikeCounts: 1,
-    },
-    {
-        doctorId: '33',
-        name: 'BS. Nguyễn Văn Tâm',
-        specialty: 'Da liễu',
-        position: 'Bác sĩ Da liễu',
-        location: 'Quận Cái Răng, Cần Thơ',
-        consultationTime: 'Không có lịch',
-        consultationFee: 470000,
-        rating: 4.5,
-        available: false,
-        image: docProfile09,
-        bookCounts: 16,
-        yearsOfExperience: 8,
-        isFavorite: false,
-        likeCounts: 17,
-        dislikeCounts: 2,
-    },
-    {
-        doctorId: '34',
-        name: 'BS. Trần Thị Ngọc',
-        specialty: 'Mắt',
-        position: 'Chuyên gia Nhãn khoa',
-        location: 'Quận Tây Hồ, Hà Nội',
-        consultationTime: '09:00',
-        consultationFee: 510000,
-        rating: 4.8,
-        available: true,
-        image: docProfile10,
-        bookCounts: 22,
-        yearsOfExperience: 12,
-        isFavorite: true,
-        likeCounts: 21,
-        dislikeCounts: 1,
-    },
-    {
-        doctorId: '35',
-        name: 'BS. Lê Văn Quang',
-        specialty: 'Tai mũi họng',
-        position: 'Bác sĩ Tai mũi họng',
-        location: 'Quận Sơn Trà, Đà Nẵng',
-        consultationTime: '12:00',
-        consultationFee: 460000,
-        rating: 4.7,
-        available: true,
-        image: docProfile11,
-        bookCounts: 19,
-        yearsOfExperience: 10,
-        isFavorite: false,
-        likeCounts: 20,
-        dislikeCounts: 2,
-    },
-    {
-        doctorId: '36',
-        name: 'BS. Phạm Thị Hạnh',
-        specialty: 'Nội tiết',
-        position: 'Tư vấn Nội tiết',
-        location: 'Quận 12, TP. Hồ Chí Minh',
-        consultationTime: 'Không có lịch',
-        consultationFee: 480000,
-        rating: 4.4,
-        available: false,
-        image: docProfile12,
-        bookCounts: 15,
-        yearsOfExperience: 7,
-        isFavorite: false,
-        likeCounts: 16,
-        dislikeCounts: 3,
-    },
-    {
-        doctorId: '37',
-        name: 'BS. Nguyễn Văn An',
-        specialty: 'Chỉnh hình',
-        position: 'Chuyên gia Chỉnh hình',
-        location: 'Quận Long Biên, Hà Nội',
-        consultationTime: '10:30',
-        consultationFee: 550000,
-        rating: 4.9,
-        available: true,
-        image: docProfile01,
-        bookCounts: 24,
-        yearsOfExperience: 13,
-        isFavorite: true,
-        likeCounts: 22,
-        dislikeCounts: 1,
-    },
-    {
-        doctorId: '38',
-        name: 'BS. Trần Thị Lan',
-        specialty: 'Phổi',
-        position: 'Bác sĩ Hô hấp',
-        location: 'Quận Kiến An, Hải Phòng',
-        consultationTime: '14:00',
-        consultationFee: 470000,
-        rating: 4.6,
-        available: true,
-        image: docProfile02,
-        bookCounts: 20,
-        yearsOfExperience: 9,
-        isFavorite: false,
-        likeCounts: 18,
-        dislikeCounts: 2,
-    },
-    {
-        doctorId: '39',
-        name: 'BS. Lê Văn Long',
-        specialty: 'Tâm lý học',
-        position: 'Bác sĩ Tâm lý Cao cấp',
-        location: 'Quận Thốt Nốt, Cần Thơ',
-        consultationTime: 'Không có lịch',
-        consultationFee: 600000,
-        rating: 4.8,
-        available: false,
-        image: docProfile03,
-        bookCounts: 17,
-        yearsOfExperience: 12,
-        isFavorite: false,
-        likeCounts: 19,
-        dislikeCounts: 3,
-    },
-    {
-        doctorId: '40',
-        name: 'BS. Phạm Thị Hương',
-        specialty: 'Nhi khoa',
-        position: 'Chuyên gia Nhi khoa',
-        location: 'Quận Nam Từ Liêm, Hà Nội',
-        consultationTime: '11:00',
-        consultationFee: 520000,
-        rating: 4.7,
-        available: true,
-        image: docProfile04,
-        bookCounts: 21,
-        yearsOfExperience: 10,
-        isFavorite: true,
-        likeCounts: 20,
-        dislikeCounts: 1,
-    },
-];
+// Mock data removed - using Redux data from backend
 
 const breadcrumbData = {
     title: 'Danh sách bác sĩ',
@@ -737,12 +30,51 @@ const breadcrumbData = {
 };
 
 const DoctorList: React.FC = () => {
+    const dispatch = useAppDispatch();
+    const { doctors, isLoading, pagination, error } = useAppSelector((state) => state.doctor);
+    const { languages } = useAppSelector((state) => state.language);
+    const { serviceTypes } = useAppSelector((state) => state.serviceType);
+
     const [sortOption, setSortOption] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [isLoading, setIsLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [specialtyFilter, setSpecialtyFilter] = useState('');
+    const [specialtyFilters, setSpecialtyFilters] = useState<string[]>([]);
+    const [hospitalFilter, setHospitalFilter] = useState('');
+    const [hospitalFilters, setHospitalFilters] = useState<string[]>([]);
+    const [positionFilter, setPositionFilter] = useState('');
+    const [positionFilters, setPositionFilters] = useState<string[]>([]);
+    const [languageFilter, setLanguageFilter] = useState('');
+    const [languageFilters, setLanguageFilters] = useState<string[]>([]);
+    const [serviceTypeFilter, setServiceTypeFilter] = useState('');
+    const [serviceTypeFilters, setServiceTypeFilters] = useState<string[]>([]);
+    const [ratingFilter, setRatingFilter] = useState<number | undefined>(undefined);
+    const [ratingFilters, setRatingFilters] = useState<number[]>([]);
+    const [experienceFilter, setExperienceFilter] = useState<
+        { min: number; max: number } | undefined
+    >(undefined); // Changed to slider format like price
+    const [experienceFilters, setExperienceFilters] = useState<
+        { MinYears: number; MaxYears: number }[]
+    >([]); // Keep for backward compatibility
+    const [availabilityFilter, setAvailabilityFilter] = useState('');
+    const [consultationTypeFilter, setConsultationTypeFilter] = useState('');
+    const [genderFilter, setGenderFilter] = useState<Gender | undefined>(undefined);
+    const [genderFilters, setGenderFilters] = useState<string[]>([]);
+    const [priceFilter, setPriceFilter] = useState<{ min: number; max: number } | undefined>(
+        undefined
+    );
+    const [areaFilter, setAreaFilter] = useState<
+        | {
+              provinceId?: string;
+              districtId?: string;
+              provinceName?: string;
+              districtName?: string;
+          }
+        | undefined
+    >(undefined);
 
-    const doctorsPerPage = 10; // Cập nhật thành 10 bác sĩ mỗi trang
-    const patientId = '1';
+    const doctorsPerPage = 10;
+    const patientId = '2FC80E8F-D296-42BC-ADDF-EAA6281BF244'; // Valid GUID format
     const skeletonKeys = Array.from({ length: 10 }, (_, i) => `skeleton-${i}`);
 
     const sortOptions = [
@@ -750,44 +82,454 @@ const DoctorList: React.FC = () => {
         { label: 'Giá từ cao đến thấp', value: 'high-to-low' },
     ];
 
-    const totalPages = Math.ceil(mockDoctors.length / doctorsPerPage);
+    // Helper function to get trimmed string or undefined
+    const getTrimmedString = (value: string | undefined): string | undefined => {
+        return value?.trim() || undefined;
+    };
 
-    const sortedDoctors = [...mockDoctors].sort((a, b) => {
-        if (sortOption === 'low-to-high') {
-            return a.consultationFee - b.consultationFee;
-        } else if (sortOption === 'high-to-low') {
-            return b.consultationFee - a.consultationFee;
-        }
-        return 0;
+    // Helper function to get array or undefined if empty
+    const getArrayOrUndefined = (arr: any[]): any[] | undefined => {
+        return arr.length > 0 ? arr : undefined;
+    };
+
+    // Helper function to build basic filter parameters
+    const buildBasicFilters = () => ({
+        pageNumber: currentPage,
+        pageSize: doctorsPerPage,
+        searchTerm: getTrimmedString(searchTerm),
+        ratingFilter: ratingFilter,
+        genderFilter: genderFilter,
+        experienceRange: experienceFilter,
+        priceRange: priceFilter,
+        areaFilter: areaFilter,
+        patientId,
     });
 
-    const indexOfLastDoctor = currentPage * doctorsPerPage;
-    const indexOfFirstDoctor = indexOfLastDoctor - doctorsPerPage;
-    const currentDoctors = sortedDoctors.slice(indexOfFirstDoctor, indexOfLastDoctor);
+    // Helper function to build string filter parameters
+    const buildStringFilters = () => ({
+        specialtyFilter: getTrimmedString(specialtyFilter),
+        hospitalFilter: getTrimmedString(hospitalFilter),
+        positionFilter: getTrimmedString(positionFilter),
+        languageFilter: getTrimmedString(languageFilter),
+        serviceTypeFilter: getTrimmedString(serviceTypeFilter),
+        availabilityFilter: getTrimmedString(availabilityFilter),
+        consultationTypeFilter: getTrimmedString(consultationTypeFilter),
+    });
+
+    // Helper function to build array filter parameters
+    const buildArrayFilters = () => ({
+        specialtyFilters: getArrayOrUndefined(specialtyFilters),
+        hospitalFilters: getArrayOrUndefined(hospitalFilters),
+        positionFilters: getArrayOrUndefined(positionFilters),
+        languageFilters: getArrayOrUndefined(languageFilters),
+        serviceTypeFilters: getArrayOrUndefined(serviceTypeFilters),
+        ratingFilters: getArrayOrUndefined(ratingFilters),
+        experienceFilters: getArrayOrUndefined(experienceFilters),
+        genderFilters: getArrayOrUndefined(genderFilters),
+    });
+
+    // Helper function to build search parameters
+    const buildSearchParams = () => {
+        return {
+            ...buildBasicFilters(),
+            ...buildStringFilters(),
+            ...buildArrayFilters(),
+        };
+    };
+
+    // Helper function to check if advanced filtering is needed
+    const shouldUseAdvancedFiltering = () => {
+        return (
+            positionFilters.length > 0 ||
+            languageFilters.length > 0 ||
+            serviceTypeFilters.length > 0 ||
+            ratingFilters.length > 0 ||
+            experienceFilters.length > 0 ||
+            genderFilters.length > 0 ||
+            specialtyFilters.length > 0 ||
+            hospitalFilters.length > 0 ||
+            experienceFilter ||
+            priceFilter ||
+            areaFilter
+        );
+    };
+
+    // Helper function to render doctor list content
+    const renderDoctorListContent = () => {
+        if (isLoading) {
+            return skeletonKeys.map((key) => (
+                <div className="col-md-12 mb-4" key={key}>
+                    <DoctorAppointmentBookingCardSkeleton />
+                </div>
+            ));
+        }
+
+        if (filteredAndSortedDoctors.length === 0) {
+            return (
+                <div className="col-md-12 mb-4">
+                    <div className="text-center py-5">
+                        <h4>Không tìm thấy bác sĩ nào</h4>
+                        <p>Vui lòng thử lại với từ khóa khác hoặc bộ lọc khác.</p>
+                        {(searchTerm ||
+                            specialtyFilters.length > 0 ||
+                            hospitalFilters.length > 0 ||
+                            areaFilter) && (
+                            <div className="mt-3">
+                                <button
+                                    className="btn btn-outline-primary"
+                                    onClick={() => {
+                                        setSearchTerm('');
+                                        setSpecialtyFilters([]);
+                                        setHospitalFilters([]);
+                                        setAreaFilter(undefined);
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    Xóa tất cả bộ lọc
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        return filteredAndSortedDoctors.map((doctor) => (
+            <DoctorAppointmentBookingCard
+                key={doctor.id}
+                doctorId={doctor.id}
+                patientId={patientId}
+                name={`${doctor.firstName} ${doctor.lastName}`}
+                specialty={doctor.specialty?.name || 'Chưa cập nhật'}
+                position={doctor.position?.name || 'Chưa cập nhật'}
+                bookCounts={doctor.reviewStatistics?.totalReviews || 0}
+                rating={doctor.reviewStatistics?.averageRating || 0}
+                location={doctor.hospital?.name || doctor.address || 'Chưa cập nhật'}
+                yearsOfExperience={doctor.yearsOfExperience}
+                fees={doctor.prices?.[0]?.amount || 0}
+                isFavorite={doctor.isFavorited}
+                languages={doctor.languages || []}
+                nextAvailableTime={
+                    doctor.status === Status.ACTIVE ? 'Có lịch trống' : 'Không có lịch'
+                }
+                image={doctor.avatarUrl || docProfile01}
+            />
+        ));
+    };
+
+    // Load doctors on component mount and when filters change
+    useEffect(() => {
+        const params = buildSearchParams();
+
+        if (shouldUseAdvancedFiltering()) {
+            dispatch(filterDoctorsAsync(params));
+        } else {
+            dispatch(searchDoctorsAsync(params));
+        }
+    }, [
+        dispatch,
+        currentPage,
+        searchTerm,
+        specialtyFilter,
+        specialtyFilters,
+        hospitalFilter,
+        hospitalFilters,
+        positionFilter,
+        positionFilters,
+        languageFilter,
+        languageFilters,
+        serviceTypeFilter,
+        serviceTypeFilters,
+        ratingFilter,
+        ratingFilters,
+        experienceFilter,
+        experienceFilters,
+        availabilityFilter,
+        consultationTypeFilter,
+        genderFilter,
+        genderFilters,
+        priceFilter,
+        areaFilter,
+    ]);
+
+    // Helper function to check if doctor passes availability filter
+    const passesAvailabilityFilter = (doctor: any) => {
+        if (!availabilityFilter) return true;
+        return doctor.status === Status.ACTIVE;
+    };
+
+    // Helper function to check if doctor passes consultation type filter
+    const passesConsultationTypeFilter = (doctor: any) => {
+        if (!consultationTypeFilter) return true;
+        return doctor.prices && doctor.prices.length > 0;
+    };
+
+    // Helper function to check if doctor passes price filter
+    const passesPriceFilter = (doctor: any) => {
+        if (!priceFilter) return true;
+        const doctorPrice = doctor.prices?.[0]?.amount || 0;
+        return doctorPrice >= priceFilter.min && doctorPrice <= priceFilter.max;
+    };
+
+    // Helper function to get doctor price
+    const getDoctorPrice = (doctor: any) => {
+        return doctor.prices?.[0]?.amount || 0;
+    };
+
+    // Helper function to sort doctors by price
+    const sortDoctorsByPrice = (a: any, b: any, order: 'low-to-high' | 'high-to-low') => {
+        const priceA = getDoctorPrice(a);
+        const priceB = getDoctorPrice(b);
+
+        // Doctors without prices go to the end
+        if (priceA === 0 && priceB > 0) return 1;
+        if (priceB === 0 && priceA > 0) return -1;
+
+        return order === 'low-to-high' ? priceA - priceB : priceB - priceA;
+    };
+
+    // Use doctors directly from API - backend handles filtering and pagination
+    // Only apply local filters that are not handled by backend
+    const filteredAndSortedDoctors = [...doctors]
+        .filter((doctor) => {
+            return (
+                passesAvailabilityFilter(doctor) &&
+                passesConsultationTypeFilter(doctor) &&
+                passesPriceFilter(doctor)
+            );
+        })
+        .sort((a, b) => {
+            if (sortOption === 'low-to-high') {
+                return sortDoctorsByPrice(a, b, 'low-to-high');
+            } else if (sortOption === 'high-to-low') {
+                return sortDoctorsByPrice(a, b, 'high-to-low');
+            }
+            return 0;
+        });
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
 
-    useEffect(() => {
-        // Simulate loading delay
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 400);
+    const handleSortChange = (value: string) => {
+        setSortOption(value);
+    };
 
-        return () => clearTimeout(timer);
-    }, []);
+    // Callback functions for SearchInput and SideBar
+    const handleSearchChange = (term: string) => {
+        setSearchTerm(term);
+        setCurrentPage(1); // Reset to first page when searching
+    };
+
+    const handleSpecialtyFilter = (specialtyId: string) => {
+        setSpecialtyFilter(specialtyId);
+        setCurrentPage(1);
+    };
+
+    const handleSpecialtyFilters = (specialtyIds: string[]) => {
+        setSpecialtyFilters(specialtyIds);
+        setCurrentPage(1);
+    };
+
+    const handlePositionFilter = (positionId: string) => {
+        setPositionFilter(positionId);
+        setCurrentPage(1);
+    };
+
+    const handleLanguageFilter = (languageId: string) => {
+        setLanguageFilter(languageId);
+        setCurrentPage(1);
+    };
+
+    const handleServiceTypeFilter = (serviceTypeId: string) => {
+        setServiceTypeFilter(serviceTypeId);
+        setCurrentPage(1);
+    };
+
+    const handleHospitalFilter = (hospitalId: string) => {
+        setHospitalFilter(hospitalId);
+        setSpecialtyFilter(''); // Clear specialty filter when hospital is selected
+        setCurrentPage(1);
+    };
+
+    const handleHospitalFilters = (hospitalIds: string[]) => {
+        setHospitalFilters(hospitalIds);
+        setCurrentPage(1);
+    };
+
+    const handleAreaFilter = (areaInfo: {
+        provinceId?: string;
+        districtId?: string;
+        provinceName?: string;
+        districtName?: string;
+    }) => {
+        setAreaFilter(areaInfo);
+        setCurrentPage(1);
+    };
+
+    const handleRatingFilter = (rating: string) => {
+        if (rating) {
+            // Map rating IDs to numbers: sm46=5, sm47=4, sm48=3, sm49=2, sm50=1
+            const ratingMap: { [key: string]: number } = {
+                'checkebox-sm46': 5,
+                'checkebox-sm47': 4,
+                'checkebox-sm48': 3,
+                'checkebox-sm49': 2,
+                'checkebox-sm50': 1,
+            };
+            setRatingFilter(ratingMap[rating]);
+        } else {
+            setRatingFilter(undefined);
+        }
+        setCurrentPage(1);
+    };
+
+    const handleAvailabilityFilter = (availability: string) => {
+        setAvailabilityFilter(availability);
+        setCurrentPage(1);
+    };
+
+    const handleConsultationTypeFilter = (consultationType: string) => {
+        setConsultationTypeFilter(consultationType);
+        setCurrentPage(1);
+    };
+
+    const handleGenderFilter = (gender: string) => {
+        if (gender) {
+            // Map gender IDs to Gender enum values
+            const genderMap: { [key: string]: Gender } = {
+                'checkebox-sm14': Gender.MALE,
+                'checkebox-sm15': Gender.FEMALE,
+                'checkebox-sm16': Gender.OTHER,
+            };
+            setGenderFilter(genderMap[gender]);
+        } else {
+            setGenderFilter(undefined);
+        }
+        setCurrentPage(1);
+    };
+
+    const handlePriceFilter = (priceRange: { min: number; max: number }) => {
+        setPriceFilter(priceRange);
+        setCurrentPage(1);
+    };
+
+    const handleExperienceFilter = (experienceRange: { min: number; max: number }) => {
+        setExperienceFilter(experienceRange);
+        setCurrentPage(1);
+    };
+
+    // Multi-filter callback functions
+    const handlePositionFilters = (positionIds: string[]) => {
+        setPositionFilters(positionIds);
+        setCurrentPage(1);
+    };
+
+    const handleLanguageFilters = (languageIds: string[]) => {
+        // Convert language IDs to names using Redux store
+        const languageNames = languageIds.map((id) => {
+            const language = languages.find((lang) => lang.id === id);
+            return language ? language.name : id;
+        });
+        setLanguageFilters(languageNames);
+        setCurrentPage(1);
+    };
+
+    const handleServiceTypeFilters = (serviceTypeIds: string[]) => {
+        // Convert service type IDs to names using Redux store
+        const serviceTypeNames = serviceTypeIds.map((id) => {
+            const serviceType = serviceTypes.find((st) => st.id === id);
+            return serviceType ? serviceType.name : id;
+        });
+        setServiceTypeFilters(serviceTypeNames);
+        setCurrentPage(1);
+    };
+
+    const handleRatingFilters = (ratings: string[]) => {
+        if (ratings.length > 0) {
+            // Convert rating strings to numbers
+            setRatingFilters(
+                ratings
+                    .map((rating) => Number.parseInt(rating))
+                    .filter((rating) => !Number.isNaN(rating))
+            );
+        } else {
+            setRatingFilters([]);
+        }
+        setCurrentPage(1);
+    };
+
+    const handleExperienceFilters = (experiences: any[]) => {
+        if (experiences.length > 0) {
+            // Filter valid experience ranges
+            const validExperiences = experiences.filter((exp) => {
+                // Check if it's a valid experience range object
+                if (
+                    typeof exp === 'object' &&
+                    exp !== null &&
+                    typeof exp.MinYears === 'number' &&
+                    typeof exp.MaxYears === 'number'
+                ) {
+                    return true;
+                }
+                console.warn('DoctorList: invalid experience range:', exp);
+                return false;
+            });
+
+            setExperienceFilters(validExperiences);
+        } else {
+            setExperienceFilters([]);
+        }
+        setCurrentPage(1);
+    };
+
+    const handleGenderFilters = (genders: string[]) => {
+        if (genders.length > 0) {
+            // Keep gender strings as they are (MALE, FEMALE, OTHER)
+            // Backend expects string values, not enum
+
+            setGenderFilters(genders);
+        } else {
+            setGenderFilters([]);
+        }
+        setCurrentPage(1);
+    };
 
     return (
         <MainLayout>
             <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
             <div className="container">
-                <SearchInput />
+                <SearchInput
+                    onSearchChange={handleSearchChange}
+                    onSpecialtyFilter={handleSpecialtyFilter}
+                    onSpecialtyFilters={handleSpecialtyFilters}
+                    onHospitalFilter={handleHospitalFilter}
+                    onHospitalFilters={handleHospitalFilters}
+                    onAreaFilter={handleAreaFilter}
+                />
             </div>
             <div className="content mt-5">
                 <div className="container">
                     <div className="row">
-                        <SideBar />
+                        <SideBar
+                            onSearchChange={handleSearchChange}
+                            onSpecialtyFilter={handleSpecialtyFilter}
+                            onPositionFilter={handlePositionFilter}
+                            onPositionFilters={handlePositionFilters}
+                            onLanguageFilter={handleLanguageFilter}
+                            onLanguageFilters={handleLanguageFilters}
+                            onServiceTypeFilter={handleServiceTypeFilter}
+                            onServiceTypeFilters={handleServiceTypeFilters}
+                            onRatingFilter={handleRatingFilter}
+                            onRatingFilters={handleRatingFilters}
+                            onExperienceFilter={handleExperienceFilter}
+                            onExperienceFilters={handleExperienceFilters}
+                            onAvailabilityFilter={handleAvailabilityFilter}
+                            onConsultationTypeFilter={handleConsultationTypeFilter}
+                            onGenderFilter={handleGenderFilter}
+                            onGenderFilters={handleGenderFilters}
+                            onPriceFilter={handlePriceFilter}
+                        />
                         <div className="col-xl-9">
                             <div className="card">
                                 <div className="card-body">
@@ -797,7 +539,7 @@ const DoctorList: React.FC = () => {
                                         <h5 className={styles.h5Custom}>
                                             Hiển thị{' '}
                                             <span className={styles.spanCustom}>
-                                                {mockDoctors.length}
+                                                {pagination.totalCount}
                                             </span>{' '}
                                             Bác sĩ Dành Cho Bạn
                                         </h5>
@@ -805,7 +547,7 @@ const DoctorList: React.FC = () => {
                                             <Select
                                                 title="Sắp xếp theo"
                                                 value={sortOption}
-                                                onChange={setSortOption}
+                                                onChange={handleSortChange}
                                                 items={sortOptions}
                                                 image={browseCategorie}
                                             />
@@ -826,45 +568,56 @@ const DoctorList: React.FC = () => {
                                 </div>
                             </div>
                             <div className="row">
-                                {isLoading
-                                    ? skeletonKeys.map((key) => (
-                                          <div className="col-md-12 mb-4" key={key}>
-                                              <DoctorAppointmentBookingCardSkeleton />
-                                          </div>
-                                      ))
-                                    : currentDoctors.map((doctor) => (
-                                          <DoctorAppointmentBookingCard
-                                              key={doctor.doctorId}
-                                              doctorId={doctor.doctorId}
-                                              patientId={patientId}
-                                              name={doctor.name}
-                                              specialty={doctor.specialty}
-                                              position={doctor.position}
-                                              bookCounts={doctor.bookCounts}
-                                              rating={doctor.rating}
-                                              location={doctor.location}
-                                              yearsOfExperience={doctor.yearsOfExperience}
-                                              fees={doctor.consultationFee}
-                                              isFavorite={doctor.isFavorite}
-                                              likeCounts={doctor.likeCounts}
-                                              dislikeCounts={doctor.dislikeCounts}
-                                              nextAvailableTime={
-                                                  doctor.available
-                                                      ? doctor.consultationTime
-                                                      : 'Không có lịch'
-                                              }
-                                              image={doctor.image}
-                                          />
-                                      ))}
-                                <div className="col-md-12">
-                                    <Pagination
-                                        currentPage={currentPage}
-                                        totalPages={totalPages}
-                                        onPageChange={handlePageChange}
-                                        showPrevNext={true}
-                                        maxVisiblePages={5}
-                                    />
-                                </div>
+                                {error ? (
+                                    <div className="col-md-12 mb-4">
+                                        <div
+                                            className="alert alert-danger border-0 shadow-sm rounded-3"
+                                            role="alert"
+                                        >
+                                            <div className="d-flex align-items-center mb-3">
+                                                <div className="flex-shrink-0 me-3">
+                                                    <i className="fas fa-exclamation-triangle fs-2 text-danger"></i>
+                                                </div>
+                                                <div className="flex-grow-1">
+                                                    <h4 className="alert-heading mb-1 fw-bold">
+                                                        Không thể tải dữ liệu
+                                                    </h4>
+                                                    <p className="mb-0 text-muted">{error}</p>
+                                                </div>
+                                            </div>
+                                            <hr className="my-3" />
+                                            <div className="d-flex gap-2 flex-wrap">
+                                                <button
+                                                    className="btn btn-primary btn-sm px-3 py-2 rounded-pill fw-semibold"
+                                                    onClick={() => globalThis.location.reload()}
+                                                >
+                                                    <i className="fas fa-redo-alt me-2"></i>
+                                                    {'Thử lại'}
+                                                </button>
+                                                <button
+                                                    className="btn btn-outline-secondary btn-sm px-3 py-2 rounded-pill fw-semibold"
+                                                    onClick={() => globalThis.history.back()}
+                                                >
+                                                    <i className="fas fa-arrow-left me-2"></i>
+                                                    {'Quay lại'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    renderDoctorListContent()
+                                )}
+                                {pagination.totalCount > pagination.pageSize && (
+                                    <div className="col-md-12">
+                                        <Pagination
+                                            currentPage={currentPage}
+                                            totalPages={pagination.totalPages}
+                                            onPageChange={handlePageChange}
+                                            showPrevNext={true}
+                                            maxVisiblePages={5}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
