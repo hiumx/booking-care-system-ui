@@ -179,7 +179,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                                 'text-center py-4'
                                             )}
                                         >
-                                            <div className="spinner-border" role="status">
+                                            <div className="spinner-border">
                                                 <span className="visually-hidden">Đang tải...</span>
                                             </div>
                                             <p className="mt-2 text-muted">Đang tải lịch khám...</p>
@@ -197,7 +197,12 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                         !scheduleError &&
                                         scheduleCategories.length === 0 &&
                                         selectedDate && (
-                                            <div className="text-center py-4">
+                                            <div
+                                                className={clsx(
+                                                    styles.noSlotsContainer,
+                                                    'text-center py-4'
+                                                )}
+                                            >
                                                 <i className="fas fa-calendar-times fs-1 text-muted mb-3"></i>
                                                 <p className="text-muted">
                                                     Không có lịch khám cho ngày đã chọn
