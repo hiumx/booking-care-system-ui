@@ -1,25 +1,27 @@
 import React from 'react';
 import clsx from 'clsx';
 
-import { BankDetails } from '../../types/wallet.types';
+import { BankAccount } from '../../types/wallet.types';
 import styles from './WalletSummary.module.scss';
 
 interface WalletSummaryProps {
-    bankDetails: BankDetails | null;
+    defaultAccount: BankAccount | null;
     onAddCard: () => void;
     onEditDetails: () => void;
     onOtherAccounts: () => void;
     accountsCount?: number;
+    loading?: boolean;
 }
 
 const WalletSummary: React.FC<WalletSummaryProps> = ({
-    bankDetails,
+    defaultAccount,
     onAddCard,
     onEditDetails,
     onOtherAccounts,
     accountsCount = 0,
+    loading = false,
 }) => {
-    const hasCardDetails = bankDetails !== null;
+    const hasCardDetails = defaultAccount !== null;
 
     return (
         <div className={clsx(styles.accountDetailsBox, 'account-details-box')}>
@@ -31,25 +33,45 @@ const WalletSummary: React.FC<WalletSummaryProps> = ({
                             <li>
                                 <h6>Tên chủ tài khoản</h6>
                                 <h5>
-                                    {hasCardDetails ? bankDetails.accountName : 'Chưa được thêm'}
+                                    {(() => {
+                                        if (loading) return 'Đang tải...';
+                                        return hasCardDetails
+                                            ? defaultAccount.accountName
+                                            : 'Chưa được thêm';
+                                    })()}
                                 </h5>
                             </li>
                             <li>
                                 <h6>Số tài khoản</h6>
                                 <h5>
-                                    {hasCardDetails ? bankDetails.accountNumber : 'Chưa được thêm'}
+                                    {(() => {
+                                        if (loading) return 'Đang tải...';
+                                        return hasCardDetails
+                                            ? defaultAccount.accountNumber
+                                            : 'Chưa được thêm';
+                                    })()}
                                 </h5>
                             </li>
                             <li>
                                 <h6>Tên ngân hàng</h6>
-                                <h5>{hasCardDetails ? bankDetails.bankName : 'Chưa được thêm'}</h5>
+                                <h5>
+                                    {(() => {
+                                        if (loading) return 'Đang tải...';
+                                        return hasCardDetails
+                                            ? defaultAccount.bankName
+                                            : 'Chưa được thêm';
+                                    })()}
+                                </h5>
                             </li>
                             <li>
-                                <h6>Chi nhánh</h6>
+                                <h6>Mã ngân hàng</h6>
                                 <h5>
-                                    {hasCardDetails && bankDetails.bankCode
-                                        ? bankDetails.bankCode
-                                        : 'Chưa được thêm'}
+                                    {(() => {
+                                        if (loading) return 'Đang tải...';
+                                        if (hasCardDetails && defaultAccount.bankCode)
+                                            return defaultAccount.bankCode;
+                                        return 'Chưa được thêm';
+                                    })()}
                                 </h5>
                             </li>
                         </ul>
@@ -58,12 +80,13 @@ const WalletSummary: React.FC<WalletSummaryProps> = ({
                         <div className="edit-detail-link d-flex align-items-center w-80">
                             <div className={styles.buttonGroup}>
                                 {hasCardDetails && (
-                                    <button onClick={onEditDetails}>Edit Details</button>
+                                    <button onClick={onEditDetails}>Chỉnh sửa chi tiết</button>
                                 )}
-                                <button onClick={onAddCard}>Add Cards</button>
+                                <button onClick={onAddCard}>Thêm tài khoản ngân hàng</button>
                             </div>
                             <button onClick={onOtherAccounts}>
-                                Other Accounts {accountsCount > 0 && `(${accountsCount})`}
+                                Tất cả các tài khoản ngân hàng{' '}
+                                {accountsCount > 0 && `(${accountsCount})`}
                             </button>
                         </div>
                     </div>

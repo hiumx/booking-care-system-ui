@@ -5,33 +5,99 @@ import { motion } from 'framer-motion';
 import Modal from '../Modal';
 import BankSelect from '../BankSelect';
 import NotificationToast from '@/components/NotificationToast';
-import { CardFormData, BankDetails } from '../../types/wallet.types';
+import { BankAccount, CreateBankAccountRequest } from '../../types/wallet.types';
 import { Bank } from '../../types/bank.types';
+import { BankAccountValidator, BankAccountValidation } from '../../utils/bankAccountValidator';
 import styles from '../../Wallet.module.scss';
 import Button from '@/components/Button';
+
+interface AddCardFormData {
+    cardHolderName: string;
+    cardNumber: string;
+    bankName: string;
+    bankCode: string;
+    isDefault: boolean;
+}
+
 interface AddCardModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (data: CardFormData) => void;
-    existingData?: BankDetails | null;
+    onSave: (data: CreateBankAccountRequest) => Promise<void>;
+    onSuccess?: (message: string) => void;
+    existingData?: BankAccount | null;
     mode?: 'add' | 'edit';
+    userId: string;
+    loading?: boolean;
 }
 
 const AddCardModal: React.FC<AddCardModalProps> = ({
     isOpen,
     onClose,
     onSave,
+    onSuccess,
     existingData,
     mode = 'add',
+    userId,
+    loading = false,
 }) => {
-    const [formData, setFormData] = useState<CardFormData>({
+    const [formData, setFormData] = useState<AddCardFormData>({
         cardHolderName: '',
         cardNumber: '',
         bankName: '',
         bankCode: '',
+        isDefault: false,
     });
+    const [validation, setValidation] = useState<BankAccountValidation | null>(null);
     const [showValidationToast, setShowValidationToast] = useState(false);
-    const [showSuccessToast, setShowSuccessToast] = useState(false);
+    const [validationMessage, setValidationMessage] = useState('');
+
+    // Validate form data
+    const validateForm = () => {
+        const validationResult: BankAccountValidation = {
+            bankCode: BankAccountValidator.validateBankCode(formData.bankCode),
+            bankName: BankAccountValidator.validateBankName(formData.bankName),
+            accountNumber: BankAccountValidator.validateAccountNumber(formData.cardNumber),
+            accountName: BankAccountValidator.validateAccountName(formData.cardHolderName),
+            isValid: true,
+        };
+
+        // Check if required validations pass (only accountNumber and accountName need user input validation)
+        validationResult.isValid =
+            validationResult.bankCode.isValid &&
+            validationResult.bankName.isValid &&
+            validationResult.accountNumber.isValid &&
+            validationResult.accountName.isValid;
+
+        setValidation(validationResult);
+
+        if (!validationResult.isValid) {
+            // Show first error message from user input fields only
+            const firstError = [validationResult.accountNumber, validationResult.accountName].find(
+                (rule) => !rule.isValid
+            );
+
+            setValidationMessage(firstError?.message || 'Vui lòng kiểm tra lại thông tin');
+            return false;
+        }
+
+        setValidationMessage('');
+        return true;
+    };
+
+    // Helper function to get error for specific field
+    const getFieldError = (fieldName: keyof BankAccountValidation) => {
+        if (!validation || fieldName === 'isValid') return null;
+        const fieldValidation = validation[fieldName];
+        if (typeof fieldValidation === 'object' && 'isValid' in fieldValidation) {
+            return !fieldValidation.isValid ? fieldValidation.message : null;
+        }
+        return null;
+    };
+
+    // Helper function to check if field has error
+    const hasFieldError = (fieldName: keyof BankAccountValidation) => {
+        return getFieldError(fieldName) !== null;
+    };
 
     // Pre-populate form with existing data when editing
     useEffect(() => {
@@ -41,6 +107,7 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
                 cardNumber: existingData.accountNumber || '',
                 bankName: existingData.bankName || '',
                 bankCode: existingData.bankCode || '',
+                isDefault: existingData.isDefault || false,
             });
         } else if (isOpen) {
             // Reset form when opening for new card
@@ -49,6 +116,7 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
                 cardNumber: '',
                 bankName: '',
                 bankCode: '',
+                isDefault: false,
             });
         }
     }, [existingData, isOpen, mode]);
@@ -68,37 +136,73 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
                 [name]: value,
             }));
         }
+
+        // Clear validation message when user starts typing
+        if (validationMessage) {
+            setValidationMessage('');
+        }
+    };
+
+    const handleInputBlur = () => {
+        // Validate current field on blur
+        const validationResult: BankAccountValidation = {
+            bankCode: BankAccountValidator.validateBankCode(formData.bankCode),
+            bankName: BankAccountValidator.validateBankName(formData.bankName),
+            accountNumber: BankAccountValidator.validateAccountNumber(formData.cardNumber),
+            accountName: BankAccountValidator.validateAccountName(formData.cardHolderName),
+            isValid: true,
+        };
+
+        validationResult.isValid =
+            validationResult.bankCode.isValid &&
+            validationResult.bankName.isValid &&
+            validationResult.accountNumber.isValid &&
+            validationResult.accountName.isValid;
+
+        setValidation(validationResult);
     };
 
     const handleBankChange = (bankCode: string, bank?: Bank) => {
         setFormData((prev) => ({
             ...prev,
-            bankName: bank?.shortName || bankCode,
+            bankName: bank?.name || bankCode,
             bankCode: bankCode,
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validate required fields
-        if (
-            !formData.cardHolderName ||
-            !formData.cardNumber ||
-            !formData.bankName ||
-            !formData.bankCode
-        ) {
+        // Validate form using validator
+        if (!validateForm()) {
             setShowValidationToast(true);
             return;
         }
 
-        onSave(formData);
-        setShowSuccessToast(true);
+        try {
+            const requestData: CreateBankAccountRequest = {
+                userId,
+                bankCode: formData.bankCode,
+                bankName: formData.bankName,
+                accountNumber: formData.cardNumber,
+                accountName: formData.cardHolderName,
+                isDefault: formData.isDefault,
+            };
 
-        // Close modal after showing success toast
-        setTimeout(() => {
+            await onSave(requestData);
+
+            // Notify parent about success and close modal immediately
+            const successMessage =
+                mode === 'edit'
+                    ? 'Cập nhật thông tin tài khoản thành công!'
+                    : 'Thêm tài khoản ngân hàng thành công!';
+
+            onSuccess?.(successMessage);
             onClose();
-        }, 1500);
+        } catch (error) {
+            console.error('Error saving bank account:', error);
+            // Handle error - you might want to show an error toast
+        }
     };
 
     const handleClose = () => {
@@ -108,6 +212,7 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
             cardNumber: '',
             bankName: '',
             bankCode: '',
+            isDefault: false,
         });
         onClose();
     };
@@ -128,15 +233,19 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
                             type="text"
                             id="cardHolderName"
                             name="cardHolderName"
-                            className={styles.formControl}
+                            className={`${styles.formControl} ${hasFieldError('accountName') ? styles.formControlError : ''}`}
                             value={formData.cardHolderName}
                             onChange={handleInputChange}
+                            onBlur={handleInputBlur}
                             required
                             whileFocus={{
                                 scale: 1.02,
                                 transition: { duration: 0.2 },
                             }}
                         />
+                        {getFieldError('accountName') && (
+                            <span className={styles.errorText}>{getFieldError('accountName')}</span>
+                        )}
                     </div>
                     <div className={styles.formGroup}>
                         <label className={styles.formLabel} htmlFor="cardNumber">
@@ -146,16 +255,22 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
                             type="text"
                             id="cardNumber"
                             name="cardNumber"
-                            className={styles.formControl}
+                            className={`${styles.formControl} ${hasFieldError('accountNumber') ? styles.formControlError : ''}`}
                             value={formData.cardNumber}
                             onChange={handleInputChange}
-                            placeholder="1234 5678 9012 3456"
+                            onBlur={handleInputBlur}
+                            placeholder="1234567890123456"
                             required
                             whileFocus={{
                                 scale: 1.02,
                                 transition: { duration: 0.2 },
                             }}
                         />
+                        {getFieldError('accountNumber') && (
+                            <span className={styles.errorText}>
+                                {getFieldError('accountNumber')}
+                            </span>
+                        )}
                     </div>
 
                     <div className={styles.formGroup}>
@@ -171,6 +286,23 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
                             required={true}
                         />
                     </div>
+                    {mode === 'add' && (
+                        <div className={styles.formGroup}>
+                            <div className={styles.checkboxGroup}>
+                                <input
+                                    type="checkbox"
+                                    id="isDefault"
+                                    name="isDefault"
+                                    checked={formData.isDefault}
+                                    onChange={handleInputChange}
+                                    className={styles.checkboxInput}
+                                />
+                                <label htmlFor="isDefault" className={styles.checkboxLabel}>
+                                    Đặt làm tài khoản mặc định
+                                </label>
+                            </div>
+                        </div>
+                    )}
                 </div>
                 <div className={clsx(styles.modalFooter, 'modal-footer')}>
                     <div className={styles.modalActions}>
@@ -184,9 +316,10 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
                             </button>
 
                             <Button
-                                text={submitButtonText}
+                                text={loading ? 'Đang xử lý...' : submitButtonText}
                                 type="submit"
                                 className={styles.btnPrimary}
+                                isDisabled={loading}
                             />
                         </div>
                     </div>
@@ -197,22 +330,10 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
             <NotificationToast
                 isOpen={showValidationToast}
                 onClose={() => setShowValidationToast(false)}
-                message="Vui lòng điền đầy đủ thông tin bắt buộc"
+                message={validationMessage || 'Vui lòng điền đầy đủ thông tin bắt buộc'}
                 type="warning"
                 icon="fa-solid fa-exclamation-triangle"
                 duration={4000}
-            />
-
-            {/* Success Toast */}
-            <NotificationToast
-                isOpen={showSuccessToast}
-                onClose={() => setShowSuccessToast(false)}
-                message={
-                    isEditing ? 'Cập nhật tài khoản thành công!' : 'Thêm tài khoản thành công!'
-                }
-                type="success"
-                icon="fa-solid fa-check-circle"
-                duration={1500}
             />
         </Modal>
     );

@@ -4,21 +4,17 @@ import { motion } from 'framer-motion';
 
 import Modal from '../Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { BankDetails } from '../../types/wallet.types';
+import { BankAccount } from '../../types/wallet.types';
 import styles from './OtherAccountsModal.module.scss';
 import Button from '@/components/Button';
-
-interface OtherAccount extends BankDetails {
-    id: string;
-    isCurrent: boolean;
-}
 
 interface OtherAccountsModalProps {
     isOpen: boolean;
     onClose: () => void;
-    accounts: OtherAccount[];
+    accounts: BankAccount[];
     onSetDefault: (accountId: string) => void;
     onDelete: (accountId: string) => void;
+    loading?: boolean;
 }
 
 const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
@@ -27,6 +23,7 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
     accounts,
     onSetDefault,
     onDelete,
+    loading = false,
 }) => {
     const [showScrollIndicator, setShowScrollIndicator] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -40,7 +37,7 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
 
     const handleDelete = (accountId: string) => {
         const account = accounts.find((acc) => acc.id === accountId);
-        if (account?.isCurrent) {
+        if (account?.isDefault) {
             setShowCannotDeleteAlert(true);
             return;
         }
@@ -102,7 +99,7 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
             <Modal
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Other Accounts"
+                title="Tất cả các tài khoản ngân hàng"
                 width="816px"
                 maxWidth="90vw"
                 minWidth="816px"
@@ -123,49 +120,50 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
                                 >
                                     <ul className="other-bank-info">
                                         <li className={styles.infoRow}>
-                                            <h6 className={styles.infoLabel}>Name</h6>
+                                            <h6 className={styles.infoLabel}>Tên tài khoản</h6>
                                             <span className={styles.infoValue}>
                                                 {account.bankCode}
                                             </span>
                                         </li>
                                         <li className={styles.infoRow}>
-                                            <h6 className={styles.infoLabel}>Account No</h6>
+                                            <h6 className={styles.infoLabel}>Số tài khoản</h6>
                                             <span className={styles.infoValue}>
                                                 {account.accountNumber}
                                             </span>
                                         </li>
                                         <li className={styles.infoRow}>
-                                            <h6 className={styles.infoLabel}>
-                                                Name on Bank Account
-                                            </h6>
+                                            <h6 className={styles.infoLabel}>Tên ngân hàng</h6>
                                             <span className={styles.infoValue}>
                                                 {account.accountName}
                                             </span>
                                         </li>
                                         <li className={styles.actionButtons}>
-                                            {account.isCurrent ? (
-                                                <span className={styles.currentLabel}>Current</span>
+                                            {account.isDefault ? (
+                                                <span className={styles.currentLabel}>
+                                                    Mặc định
+                                                </span>
                                             ) : (
                                                 <button
                                                     type="button"
                                                     className={styles.setDefaultBtn}
                                                     onClick={() => handleSetDefault(account.id)}
+                                                    disabled={loading}
                                                 >
-                                                    Set as default
+                                                    {loading ? 'Đang xử lý...' : 'Đặt làm mặc định'}
                                                 </button>
                                             )}
 
                                             <button
                                                 type="button"
                                                 className={clsx(styles.deleteBtn, {
-                                                    [styles.disabled]: account.isCurrent,
+                                                    [styles.disabled]: account.isDefault || loading,
                                                 })}
                                                 onClick={() => handleDelete(account.id)}
-                                                disabled={account.isCurrent}
+                                                disabled={account.isDefault || loading}
                                                 title={
-                                                    account.isCurrent
-                                                        ? 'Cannot delete current account'
-                                                        : 'Delete account'
+                                                    account.isDefault
+                                                        ? 'Không thể xóa tài khoản mặc định'
+                                                        : 'Xóa tài khoản'
                                                 }
                                             >
                                                 <i className="fa-solid fa-trash"></i>
@@ -178,7 +176,7 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
 
                         {accounts.length === 0 && (
                             <div className={styles.emptyState}>
-                                <p>No other accounts found</p>
+                                <p>Không tìm thấy tài khoản ngân hàng</p>
                             </div>
                         )}
 
@@ -191,7 +189,7 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
 
                 <div className={clsx(styles.modalFooter, 'modal-footer')}>
                     <div className="text-end">
-                        <Button text="Close" type="button" onClick={onClose} />
+                        <Button text="Đóng" type="button" onClick={onClose} />
                     </div>
                 </div>
             </Modal>

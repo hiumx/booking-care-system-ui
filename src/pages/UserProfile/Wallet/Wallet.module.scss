@@ -193,6 +193,11 @@
                 box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
             }
         }
+        .checkboxGroup {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
     }
 }
 
@@ -236,5 +241,19 @@
                 padding: 0.35rem 0.85rem;
             }
         }
+    }
+
+    // Validation error styles
+    .errorText {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+        line-height: 1.2;
+    }
+
+    .formControlError {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
     }
 }
