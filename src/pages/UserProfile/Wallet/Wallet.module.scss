@@ -1,0 +1,259 @@
+.walletContainer {
+    .linkButton {
+        background: none;
+        border: none;
+        color: var(--primary-color, #007bff);
+        cursor: pointer;
+        text-decoration: none;
+        padding: 0;
+        margin-right: 15px;
+        font-size: 14px;
+        transition: color 0.2s ease;
+
+        &:hover {
+            text-decoration: underline;
+            color: var(--primary-color-dark, #0056b3);
+        }
+
+        &:focus {
+            outline: 2px solid var(--primary-color, #007bff);
+            outline-offset: 2px;
+        }
+
+        &:last-child {
+            margin-right: 0;
+        }
+
+        @media (max-width: 576px) {
+            display: block;
+            margin-right: 0;
+            margin-bottom: 8px;
+        }
+    }
+
+    // Responsive table
+    .table-responsive {
+        @media (max-width: 768px) {
+            font-size: 0.875rem;
+        }
+    }
+
+    // Mobile optimizations
+    @media (max-width: 576px) {
+        .payment-amount {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .edit-detail-link {
+            flex-direction: column;
+            gap: 1rem;
+
+            > div {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    }
+}
+
+// Modal overlay styles (Framer Motion handles animations)
+.modalOverlay {
+    // Base styles only, Framer Motion handles positioning and animations
+    .modalBackdrop {
+        cursor: default;
+    }
+}
+
+.modalDialog {
+    // Framer Motion handles transforms and animations
+
+    background: 'white';
+
+    @media (max-width: 768px) {
+        width: 95% !important;
+        max-height: 95vh !important;
+        margin: 1rem;
+        min-width: auto !important;
+        border-radius: 8px !important;
+    }
+
+    @media (max-width: 576px) {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100vh !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+    @media (max-height: 568px) {
+        overflow: auto !important;
+        height: fit-content !important;
+        margin: 1rem;
+        .modalHeader {
+            padding: 0 1.5rem !important;
+        }
+        .modalBody {
+            padding: 0 1.5rem !important;
+        }
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #dee2e6;
+
+    .modalTitle {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+
+    .closeButton {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #6c757d;
+
+        &:hover {
+            color: #000;
+        }
+    }
+}
+
+.modalBody {
+    padding: 1.5rem;
+
+    .formGroup {
+        margin-bottom: 1rem;
+
+        .formLabel {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+
+            .required {
+                color: #dc3545;
+            }
+        }
+
+        .formControl {
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            transition:
+                border-color 0.15s ease-in-out,
+                box-shadow 0.15s ease-in-out;
+
+            &:focus {
+                color: #495057;
+                background-color: #fff;
+                border-color: #80bdff;
+                outline: 0;
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            }
+        }
+
+        .formIcon {
+            position: relative;
+
+            .icon {
+                position: absolute;
+                right: 0.75rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #6c757d;
+            }
+        }
+
+        .formSelect {
+            width: 100%;
+            padding: 0.25rem 0.25rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            cursor: pointer;
+
+            &:focus {
+                border-color: #80bdff;
+                outline: 0;
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            }
+        }
+        .checkboxGroup {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+    }
+}
+
+.modalFooter {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+
+    .modalActions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 1rem;
+        width: 100%;
+
+        .buttonGroup {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            button {
+                font-size: 13px;
+                font-weight: 500;
+            }
+
+            .btnCancel {
+                padding: 0.35rem 0.85rem;
+                background-color: #012047;
+                color: white;
+                border: none;
+                border-radius: 50px;
+
+                cursor: pointer;
+                text-decoration: none;
+
+                &:hover {
+                    background-color: #010811;
+                }
+            }
+
+            .btnPrimary {
+                padding: 0.35rem 0.85rem;
+            }
+        }
+    }
+
+    // Validation error styles
+    .errorText {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+        line-height: 1.2;
+    }
+
+    .formControlError {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+}

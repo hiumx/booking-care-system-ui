@@ -1,0 +1,143 @@
+// Toast container
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    min-width: 320px;
+    max-width: 480px;
+    background: white;
+    border-radius: 12px;
+    box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border-left: 4px solid;
+
+    &.success {
+        border-left-color: #10b981;
+    }
+
+    &.error {
+        border-left-color: #ef4444;
+    }
+
+    &.warning {
+        border-left-color: #f59e0b;
+    }
+
+    &.info {
+        border-left-color: #3b82f6;
+    }
+}
+
+// Content area
+.content {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    gap: 12px;
+}
+
+.iconContainer {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    i {
+        font-size: 12px;
+        color: white;
+    }
+
+    &.success {
+        background: #10b981;
+    }
+
+    &.error {
+        background: #ef4444;
+    }
+
+    &.warning {
+        background: #f59e0b;
+    }
+
+    &.info {
+        background: #3b82f6;
+    }
+}
+
+.message {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    line-height: 1.4;
+    flex: 1;
+}
+
+// Close button
+.closeButton {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #9ca3af;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+}
+
+// Progress bar
+.progressBar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #10b981, #059669);
+
+    .toast.error & {
+        background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    .toast.warning & {
+        background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    .toast.info & {
+        background: linear-gradient(90deg, #3b82f6, #2563eb);
+    }
+}
+
+// Responsive design
+@media (max-width: 480px) {
+    .toast {
+        right: 16px;
+        left: 16px;
+        min-width: unset;
+        max-width: unset;
+        width: calc(100vw - 32px);
+    }
+
+    .content {
+        padding: 14px 16px;
+    }
+
+    .message {
+        font-size: 13px;
+    }
+}
