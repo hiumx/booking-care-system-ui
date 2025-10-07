@@ -175,57 +175,18 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                                 <input
                                                     type="checkbox"
                                                     checked={
-                                                        filterState.appointmentTypeFilters.videoCall
+                                                        filterState.appointmentTypeFilters
+                                                            .telehealth
                                                     }
                                                     onChange={(e) =>
                                                         onAppointmentTypeChange(
-                                                            'videoCall',
+                                                            'telehealth',
                                                             e.target.checked
                                                         )
                                                     }
                                                 />
                                                 <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Gọi video</span>
-                                            </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div className={clsx(styles.filterChecks, 'filter-checks')}>
-                                            <label className={clsx(styles.checkBoxs, 'checkboxs')}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={
-                                                        filterState.appointmentTypeFilters.audioCall
-                                                    }
-                                                    onChange={(e) =>
-                                                        onAppointmentTypeChange(
-                                                            'audioCall',
-                                                            e.target.checked
-                                                        )
-                                                    }
-                                                />
-                                                <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Gọi thoại</span>
-                                            </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div className={clsx(styles.filterChecks, 'filter-checks')}>
-                                            <label className={clsx(styles.checkBoxs, 'checkboxs')}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={
-                                                        filterState.appointmentTypeFilters.chat
-                                                    }
-                                                    onChange={(e) =>
-                                                        onAppointmentTypeChange(
-                                                            'chat',
-                                                            e.target.checked
-                                                        )
-                                                    }
-                                                />
-                                                <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Chat</span>
+                                                <span className="check-title">Trực tuyến</span>
                                             </label>
                                         </div>
                                     </li>
