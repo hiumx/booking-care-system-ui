@@ -86,8 +86,10 @@ const Review: React.FC<ReviewProps> = ({ doctorName, onSubmitReview }) => {
             {/* Write Review Form */}
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                    <label className="mb-2">Đánh giá</label>
-                    <div className={clsx('star-rating', styles.starRating)}>
+                    <label className="mb-2" htmlFor="star-rating">
+                        Đánh giá
+                    </label>
+                    <div className={clsx('star-rating', styles.starRating)} id="star-rating">
                         {[5, 4, 3, 2, 1].map((starValue) => (
                             <React.Fragment key={starValue}>
                                 <input
@@ -110,6 +112,7 @@ const Review: React.FC<ReviewProps> = ({ doctorName, onSubmitReview }) => {
                                         className={clsx('fa fa-star', styles.faStar, {
                                             [styles.active]: getStarClass(starValue) === 'active',
                                         })}
+                                        aria-label={`${starValue} sao`}
                                     ></i>
                                 </label>
                             </React.Fragment>
@@ -118,7 +121,9 @@ const Review: React.FC<ReviewProps> = ({ doctorName, onSubmitReview }) => {
                 </div>
 
                 <div className="mb-3">
-                    <label className="mb-2">Nội dung đánh giá</label>
+                    <label className="mb-2" htmlFor="review_desc">
+                        Nội dung đánh giá
+                    </label>
                     <textarea
                         id="review_desc"
                         maxLength={maxChars}

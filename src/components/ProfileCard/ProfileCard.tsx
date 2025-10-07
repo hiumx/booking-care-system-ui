@@ -170,7 +170,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                                         <span>
                                             <i className="feather-check"></i>
                                         </span>
-                                        Tiếp nhận bệnh nhân mới
+                                        {`Tiếp nhận bệnh nhân mới`}
                                     </h5>
                                 )}
                             </li>
@@ -202,7 +202,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                                                     <span className="bg-violet">
                                                         <i className="feather-phone-forwarded"></i>
                                                     </span>
-                                                    Audio Call
+                                                    {'Audio Call'}
                                                 </Link>
                                             </li>
                                             <li>
@@ -210,7 +210,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                                                     <span className="bg-indigo">
                                                         <i className="fa-solid fa-video"></i>
                                                     </span>
-                                                    Video Call
+                                                    {'Video Call'}
                                                 </Link>
                                             </li>
                                         </>
