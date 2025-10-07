@@ -68,21 +68,21 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 20/08/2025
         {
             schedule_time_id: 1,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-08-20',
             is_available: true,
         },
         {
             schedule_time_id: 2,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 2,
             appointment_date: '2025-08-20',
             is_available: true,
         },
         {
             schedule_time_id: 3,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 3,
             appointment_date: '2025-08-20',
             is_available: false,
@@ -90,14 +90,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 21/08/2025
         {
             schedule_time_id: 4,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 2,
             appointment_date: '2025-08-21',
             is_available: true,
         },
         {
             schedule_time_id: 5,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 4,
             appointment_date: '2025-08-21',
             is_available: true,
@@ -105,14 +105,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 22/08/2025
         {
             schedule_time_id: 6,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 3,
             appointment_date: '2025-08-22',
             is_available: true,
         },
         {
             schedule_time_id: 7,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 5,
             appointment_date: '2025-08-22',
             is_available: true,
@@ -120,14 +120,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 25/08/2025
         {
             schedule_time_id: 8,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-08-25',
             is_available: true,
         },
         {
             schedule_time_id: 9,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 3,
             appointment_date: '2025-08-25',
             is_available: true,
@@ -135,14 +135,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 28/08/2025
         {
             schedule_time_id: 10,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 2,
             appointment_date: '2025-08-28',
             is_available: true,
         },
         {
             schedule_time_id: 11,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 4,
             appointment_date: '2025-08-28',
             is_available: true,
@@ -150,14 +150,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 30/08/2025
         {
             schedule_time_id: 12,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-08-30',
             is_available: true,
         },
         {
             schedule_time_id: 13,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 5,
             appointment_date: '2025-08-30',
             is_available: true,
@@ -165,14 +165,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 01/09/2025
         {
             schedule_time_id: 14,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-09-01',
             is_available: true,
         },
         {
             schedule_time_id: 15,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 3,
             appointment_date: '2025-09-01',
             is_available: true,
@@ -180,14 +180,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 03/09/2025
         {
             schedule_time_id: 16,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 2,
             appointment_date: '2025-09-03',
             is_available: true,
         },
         {
             schedule_time_id: 17,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 4,
             appointment_date: '2025-09-03',
             is_available: true,
@@ -195,14 +195,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 05/09/2025
         {
             schedule_time_id: 18,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-09-05',
             is_available: true,
         },
         {
             schedule_time_id: 19,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 5,
             appointment_date: '2025-09-05',
             is_available: true,
@@ -210,14 +210,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 08/09/2025
         {
             schedule_time_id: 20,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 2,
             appointment_date: '2025-09-08',
             is_available: true,
         },
         {
             schedule_time_id: 21,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 3,
             appointment_date: '2025-09-08',
             is_available: true,
@@ -225,14 +225,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 10/09/2025
         {
             schedule_time_id: 22,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-09-10',
             is_available: true,
         },
         {
             schedule_time_id: 23,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 4,
             appointment_date: '2025-09-10',
             is_available: true,
@@ -240,14 +240,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 12/09/2025
         {
             schedule_time_id: 24,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 3,
             appointment_date: '2025-09-12',
             is_available: true,
         },
         {
             schedule_time_id: 25,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 5,
             appointment_date: '2025-09-12',
             is_available: true,
@@ -255,14 +255,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 15/09/2025
         {
             schedule_time_id: 26,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 2,
             appointment_date: '2025-09-15',
             is_available: true,
         },
         {
             schedule_time_id: 27,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 4,
             appointment_date: '2025-09-15',
             is_available: true,
@@ -270,14 +270,14 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         // 18/09/2025
         {
             schedule_time_id: 28,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 1,
             appointment_date: '2025-09-18',
             is_available: true,
         },
         {
             schedule_time_id: 29,
-            entity_id: parseInt(entityId),
+            entity_id: Number.parseInt(entityId),
             appointment_time_id: 5,
             appointment_date: '2025-09-18',
             is_available: true,
@@ -296,9 +296,9 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
         const daySchedules = mockScheduleTimes.filter(
             (schedule) => schedule.appointment_date === dateStr && schedule.is_available
         );
-        const slotIds = daySchedules.map((schedule) => schedule.appointment_time_id);
+        const slotIds = new Set(daySchedules.map((schedule) => schedule.appointment_time_id));
         return mockAppointmentTimes
-            .filter((time) => slotIds.includes(time.id))
+            .filter((time) => slotIds.has(time.id))
             .map((time) => `${time.start_time} - ${time.end_time}`);
     };
 
@@ -306,7 +306,7 @@ const AvailabilityInfo: React.FC<AvailabilityInfoProps> = ({
 
     // Xử lý chọn ngày từ DateCalendar
     const handleDateChange = (value: Date | null) => {
-        if (!value || !(value instanceof Date) || isNaN(value.getTime())) return; // Bỏ qua nếu không phải Date hợp lệ
+        if (!value || !(value instanceof Date) || Number.isNaN(value.getTime())) return; // Bỏ qua nếu không phải Date hợp lệ
         const oneMonthLater = new Date(today);
         oneMonthLater.setDate(today.getDate() + 30);
         if (
