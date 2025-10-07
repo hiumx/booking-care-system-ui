@@ -5,6 +5,11 @@ import {
     StatusConfig,
     getAppointmentTypeText as getTypeText,
     getAppointmentTypeIcon,
+    getDisplayName,
+    getDisplayAvatar,
+    getDisplayEmail,
+    getDisplayPhone,
+    getDisplayLabel,
 } from '@/types/appointment.types';
 import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
 
@@ -15,11 +20,29 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     onReschedule,
     onDownloadPrescription,
 }) => {
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+    };
     // Configuration cho từng trạng thái
     const getStatusConfig = (): StatusConfig => {
         switch (appointment.status) {
-            case AppointmentStatus.CONFIRMED:
             case AppointmentStatus.PENDING:
+                return {
+                    badge: { className: 'badge bg-warning', text: 'Chờ Xác Nhận' },
+                    showContactInfo: true,
+                    showStartSession: false,
+                    showReschedule: false,
+                    showDownloadPrescription: false,
+                    showCancelButton: true,
+                    showReasonLink: false,
+                    bottomSection: 'waiting_status',
+                };
+            case AppointmentStatus.CONFIRMED:
                 return {
                     badge: { className: 'badge bg-secondary', text: 'Sắp Tới' },
                     showContactInfo: true,
@@ -42,7 +65,6 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     bottomSection: 'reschedule_status',
                 };
             case AppointmentStatus.COMPLETED:
-            case AppointmentStatus.NO_SHOW:
                 return {
                     badge: { className: 'badge bg-green', text: 'Hoàn Thành' },
                     showContactInfo: true,
@@ -75,14 +97,8 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
         // Add custom color classes based on type
         let colorClass = '';
         switch (appointment.appointmentType) {
-            case AppointmentType.VIDEO_CALL:
+            case AppointmentType.TELEHEALTH:
                 colorClass = 'text-indigo';
-                break;
-            case AppointmentType.AUDIO_CALL:
-                colorClass = 'text-success';
-                break;
-            case AppointmentType.CHAT:
-                colorClass = 'text-warning';
                 break;
             case AppointmentType.IN_PERSON:
                 colorClass = 'text-green';
@@ -95,6 +111,17 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     // Render bottom section based on status
     const renderBottomSection = () => {
         switch (config.bottomSection) {
+            case 'waiting_status':
+                return (
+                    <li>
+                        <div className="detail-badge-info">
+                            <span className="badge badge-warning">
+                                <i className="isax isax-clock5 me-2"></i>
+                                Đang chờ xác nhận
+                            </span>
+                        </div>
+                    </li>
+                );
             case 'start_session':
                 return (
                     <li>
@@ -156,24 +183,31 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     <li>
                         <div className="patinet-information">
                             <Link to="#">
-                                <img src={appointment.doctor.image} alt="Doctor" />
+                                <img
+                                    src={getDisplayAvatar(appointment)}
+                                    alt={getDisplayLabel(appointment)}
+                                />
                             </Link>
                             <div className="patient-info">
-                                <p>#{appointment.appointmentId}</p>
+                                <p>{getDisplayLabel(appointment)}</p>
                                 <h6>
-                                    <Link to="#">{appointment.doctor.name}</Link>
+                                    <Link to="#">{getDisplayName(appointment)}</Link>
                                 </h6>
                                 {config.showContactInfo && (
                                     <div className="mail-info-patient">
                                         <ul>
-                                            <li>
-                                                <i className="isax isax-sms5"></i>
-                                                {appointment.doctor.email}
-                                            </li>
-                                            <li>
-                                                <i className="isax isax-call5"></i>
-                                                {appointment.doctor.phone}
-                                            </li>
+                                            {getDisplayEmail(appointment) && (
+                                                <li>
+                                                    <i className="isax isax-sms5"></i>
+                                                    {getDisplayEmail(appointment)}
+                                                </li>
+                                            )}
+                                            {getDisplayPhone(appointment) && (
+                                                <li>
+                                                    <i className="isax isax-call5"></i>
+                                                    {getDisplayPhone(appointment)}
+                                                </li>
+                                            )}
                                         </ul>
                                     </div>
                                 )}
@@ -212,9 +246,11 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                                 </Link>
                             )}
                         </div>
-                        <div className="consult-fees">
-                            <h6>Phí Tư Vấn: ${appointment.consultationFees}</h6>
-                        </div>
+                        {appointment.consultationFees && (
+                            <div className="consult-fees">
+                                <h6>Phí Tư Vấn: ${appointment.consultationFees}</h6>
+                            </div>
+                        )}
                         <ul>
                             <li>
                                 <Link to="#">
@@ -234,9 +270,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                 <ul className="detail-card-bottom-info">
                     <li>
                         <h6>Ngày & Giờ Hẹn</h6>
-                        <span>
-                            {appointment.appointmentDate} - {appointment.appointmentTime}
-                        </span>
+                        <span>{formatDate(appointment.appointmentTime)} - 8h-8h30</span>
                     </li>
                     {appointment.clinicLocation && (
                         <li>
@@ -250,10 +284,12 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                             <span>{appointment.location}</span>
                         </li>
                     )}
-                    <li>
-                        <h6>Loại Thăm Khám</h6>
-                        <span>{appointment.visitType}</span>
-                    </li>
+                    {appointment.visitType && (
+                        <li>
+                            <h6>Loại Thăm Khám</h6>
+                            <span>{appointment.visitType}</span>
+                        </li>
+                    )}
                     {renderBottomSection()}
                 </ul>
             </div>
