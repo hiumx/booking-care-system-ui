@@ -212,7 +212,9 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                 <li className="appointment-info">
                     <p>
                         <i className="isax isax-clock5"></i>
-                        {formatDate(appointment.appointmentDate)} 8h-8h30
+                        {formatDate(appointment.appointmentDate)}
+                        {' | '}
+                        {appointment.appointmentTime}
                     </p>
                     <ul className="d-flex apponitment-types">
                         <li>{displaySpecialty}</li>

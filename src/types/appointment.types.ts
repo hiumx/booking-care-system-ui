@@ -2,7 +2,7 @@
 // API Types (matching backend exactly)
 // ============================================
 
-import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
+import { AppointmentStatus, AppointmentType, AppointmentTime } from '@/enums/appointment.enums';
 
 // Patient Information from API
 export interface PatientInfo {
@@ -50,7 +50,7 @@ export interface HospitalInfo {
 export interface AppointmentResponse {
     id: string;
     appointmentDate: string;
-    appointmentTimeId: string;
+    appointmentTimeId: AppointmentTime;
     appointmentType: AppointmentType;
     status: AppointmentStatus;
     reason?: string;
@@ -133,6 +133,7 @@ export interface AppointmentCardData {
     appointmentId: string;
     appointmentDate: string;
     appointmentTime: string;
+    appointmentTimeId: AppointmentTime;
     appointmentType: AppointmentType;
     status: AppointmentStatus;
     reason?: string;
@@ -232,6 +233,104 @@ export const getAppointmentTypeText = (type: AppointmentType): string => {
 };
 
 /**
+ * Get time range text for appointment time slot
+ */
+export const getAppointmentTimeText = (timeSlot: AppointmentTime): string => {
+    switch (timeSlot) {
+        // 30-minute intervals
+        case AppointmentTime.AT_08_00_08_30:
+            return '08:00 - 08:30';
+        case AppointmentTime.AT_08_30_09_00:
+            return '08:30 - 09:00';
+        case AppointmentTime.AT_09_00_09_30:
+            return '09:00 - 09:30';
+        case AppointmentTime.AT_09_30_10_00:
+            return '09:30 - 10:00';
+        case AppointmentTime.AT_10_00_10_30:
+            return '10:00 - 10:30';
+        case AppointmentTime.AT_10_30_11_00:
+            return '10:30 - 11:00';
+        case AppointmentTime.AT_11_00_11_30:
+            return '11:00 - 11:30';
+        case AppointmentTime.AT_11_30_12_00:
+            return '11:30 - 12:00';
+        case AppointmentTime.AT_13_00_13_30:
+            return '13:00 - 13:30';
+        case AppointmentTime.AT_13_30_14_00:
+            return '13:30 - 14:00';
+        case AppointmentTime.AT_14_00_14_30:
+            return '14:00 - 14:30';
+        case AppointmentTime.AT_14_30_15_00:
+            return '14:30 - 15:00';
+        case AppointmentTime.AT_15_00_15_30:
+            return '15:00 - 15:30';
+        case AppointmentTime.AT_15_30_16_00:
+            return '15:30 - 16:00';
+        case AppointmentTime.AT_16_00_16_30:
+            return '16:00 - 16:30';
+        case AppointmentTime.AT_16_30_17_00:
+            return '16:30 - 17:00';
+        case AppointmentTime.AT_17_00_17_30:
+            return '17:00 - 17:30';
+        case AppointmentTime.AT_17_30_18_00:
+            return '17:30 - 18:00';
+        case AppointmentTime.AT_18_00_18_30:
+            return '18:00 - 18:30';
+        case AppointmentTime.AT_18_30_19_00:
+            return '18:30 - 19:00';
+        case AppointmentTime.AT_19_00_19_30:
+            return '19:00 - 19:30';
+        case AppointmentTime.AT_19_30_20_00:
+            return '19:30 - 20:00';
+        case AppointmentTime.AT_20_00_20_30:
+            return '20:00 - 20:30';
+        case AppointmentTime.AT_20_30_21_00:
+            return '20:30 - 21:00';
+        case AppointmentTime.AT_21_00_21_30:
+            return '21:00 - 21:30';
+        case AppointmentTime.AT_21_30_22_00:
+            return '21:30 - 22:00';
+        case AppointmentTime.AT_22_00_22_30:
+            return '22:00 - 22:30';
+        case AppointmentTime.AT_22_30_23_00:
+            return '22:30 - 23:00';
+
+        // 60-minute intervals
+        case AppointmentTime.AT_08_00_09_00:
+            return '08:00 - 09:00';
+        case AppointmentTime.AT_09_00_10_00:
+            return '09:00 - 10:00';
+        case AppointmentTime.AT_10_00_11_00:
+            return '10:00 - 11:00';
+        case AppointmentTime.AT_11_00_12_00:
+            return '11:00 - 12:00';
+        case AppointmentTime.AT_13_00_14_00:
+            return '13:00 - 14:00';
+        case AppointmentTime.AT_14_00_15_00:
+            return '14:00 - 15:00';
+        case AppointmentTime.AT_15_00_16_00:
+            return '15:00 - 16:00';
+        case AppointmentTime.AT_16_00_17_00:
+            return '16:00 - 17:00';
+        case AppointmentTime.AT_17_00_18_00:
+            return '17:00 - 18:00';
+        case AppointmentTime.AT_18_00_19_00:
+            return '18:00 - 19:00';
+        case AppointmentTime.AT_19_00_20_00:
+            return '19:00 - 20:00';
+        case AppointmentTime.AT_20_00_21_00:
+            return '20:00 - 21:00';
+        case AppointmentTime.AT_21_00_22_00:
+            return '21:00 - 22:00';
+        case AppointmentTime.AT_22_00_23_00:
+            return '22:00 - 23:00';
+
+        default:
+            return 'Chưa xác định';
+    }
+};
+
+/**
  * Map AppointmentStatus to UI Tab
  */
 export const mapStatusToUITab = (status: AppointmentStatus): AppointmentUITab => {
@@ -275,7 +374,8 @@ export const transformToCardData = (apiResponse: AppointmentResponse): Appointme
     return {
         appointmentId: apiResponse.id,
         appointmentDate: apiResponse.appointmentDate,
-        appointmentTime: apiResponse.appointmentDate, // Using same field for time
+        appointmentTime: getAppointmentTimeText(apiResponse.appointmentTimeId),
+        appointmentTimeId: apiResponse.appointmentTimeId,
         appointmentType: apiResponse.appointmentType,
         status: apiResponse.status,
         reason: apiResponse.reason,

@@ -48,7 +48,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                         <ul>
                             <li>
                                 <Link
-                                    to={`/user-profile/appointments/${appointment.appointmentId}`}
+                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                                 >
                                     <i className="isax isax-eye4"></i>
                                 </Link>
@@ -60,7 +60,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                             </li>
                         </ul>
                         <div className="appointment-detail-btn">
-                            <span className="badge badge-warning-gradient w-100 text-center">
+                            <span className="badge badge-warning text-center">
                                 <i className="isax isax-clock5 me-1"></i> Chờ Xác Nhận
                             </span>
                         </div>
@@ -73,7 +73,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                         <ul>
                             <li>
                                 <Link
-                                    to={`/user-profile/appointments/${appointment.appointmentId}`}
+                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                                 >
                                     <i className="isax isax-eye4"></i>
                                 </Link>
@@ -101,10 +101,10 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                 return (
                     <li className="appointment-detail-btn">
                         <Link
-                            to={`/user-profile/appointments/${appointment.appointmentId}`}
+                            to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                             className="start-link w-100"
                         >
-                            View Details
+                            Xem Chi Tiết
                         </Link>
                     </li>
                 );
@@ -121,7 +121,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                         <div className="appointment-grid-head">
                             <div className="patinet-information">
                                 <Link
-                                    to={`/user-profile/appointments/${appointment.appointmentId}`}
+                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                                 >
                                     {displayAvatar ? (
                                         <img
@@ -142,7 +142,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                                     <p>{displayLabel}</p>
                                     <h6>
                                         <Link
-                                            to={`/user-profile/appointments/${appointment.appointmentId}`}
+                                            to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                                         >
                                             {displayName}
                                         </Link>
@@ -176,7 +176,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                             {formatDate(appointment.appointmentDate)}
                         </p>
                         <p>
-                            <i className="isax isax-clock5"></i> 8h-8h30
+                            <i className="isax isax-clock5"></i> {appointment.appointmentTime}
                         </p>
                     </li>
                     {renderActionButtons()}

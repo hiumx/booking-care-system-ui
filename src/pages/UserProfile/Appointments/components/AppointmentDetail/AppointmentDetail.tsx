@@ -270,7 +270,10 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                 <ul className="detail-card-bottom-info">
                     <li>
                         <h6>Ngày & Giờ Hẹn</h6>
-                        <span>{formatDate(appointment.appointmentTime)} - 8h-8h30</span>
+                        <span>
+                            {formatDate(appointment.appointmentDate)} {' | '}
+                            {appointment.appointmentTime}
+                        </span>
                     </li>
                     {appointment.clinicLocation && (
                         <li>
