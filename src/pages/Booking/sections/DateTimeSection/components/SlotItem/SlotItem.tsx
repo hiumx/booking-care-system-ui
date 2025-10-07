@@ -10,7 +10,7 @@ interface SlotItemProps {
 const SlotItem: React.FC<SlotItemProps> = ({ id, rangeTime, handleClickSlot }) => {
     return (
         <div className={clsx(styles.slotItem, 'form-check-inline visits me-0')}>
-            <label className="visit-btns">
+            <label className={clsx(styles.slotLabel, 'visit-btns')}>
                 <input
                     type="checkbox"
                     className="form-check-input"

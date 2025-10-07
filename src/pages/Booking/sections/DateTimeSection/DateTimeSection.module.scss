@@ -2,6 +2,26 @@
     margin-bottom: 24px;
 }
 
-.timeSlot {
-    padding: 19px 16px !important;
+.slotContainer {
+    height: 87% !important;
+
+    .timeSlot {
+        padding: 19px 16px !important;
+
+        .loadingContainer {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+
+    .noSlotsContainer {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 }

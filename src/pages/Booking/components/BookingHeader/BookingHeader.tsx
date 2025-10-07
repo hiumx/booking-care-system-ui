@@ -31,8 +31,8 @@ const BookingHeader: React.FC<BookingHeaderProps> = ({ doctor, appointment }) =>
                                 <img src={doctor.avatar} alt={doctor.name} />
                             </span>
                             <div>
-                                <h4 className="mb-1">
-                                    {doctor.name}{' '}
+                                <h4 className="mb-1 d-flex align-items-center gap-1">
+                                    <span>{doctor.name}</span>
                                     <span className="badge bg-orange fs-12">
                                         <i className="fa-solid fa-star me-1"></i>
                                         {doctor.rating}
