@@ -133,6 +133,34 @@ const AppointmentDetailPage: React.FC = () => {
         // In real app: trigger download or open prescription modal
     };
 
+    // Helper function to render recent appointments - extracted to avoid nested ternary
+    const renderRecentAppointments = () => {
+        if (isLoadingRecent) {
+            return null;
+        }
+
+        if (recentAppointments.length > 0) {
+            return recentAppointments.map((appointment) => (
+                <AppointmentCard
+                    key={appointment.appointmentId}
+                    appointment={appointment}
+                    status={mapStatusToUITab(appointment.status)}
+                    variant="minimal"
+                />
+            ));
+        }
+
+        return (
+            <div className="text-center py-4">
+                <div className="mb-1" style={{ fontSize: '4rem', color: 'var(--bs-gray-400)' }}>
+                    <i className="isax isax-calendar-search"></i>
+                </div>
+                <h4 className="text-muted">Không có lịch hẹn gần đây</h4>
+                <p className="text-muted mb-4">Bạn chưa có lịch hẹn nào trong danh mục này.</p>
+            </div>
+        );
+    };
+
     return (
         <>
             {/* Dashboard Header */}
@@ -176,29 +204,7 @@ const AppointmentDetailPage: React.FC = () => {
                     )}
 
                     {/* Appointment Cards */}
-                    {!isLoadingRecent && recentAppointments.length > 0 ? (
-                        recentAppointments.map((appointment) => (
-                            <AppointmentCard
-                                key={appointment.appointmentId}
-                                appointment={appointment}
-                                status={mapStatusToUITab(appointment.status)}
-                                variant="minimal"
-                            />
-                        ))
-                    ) : !isLoadingRecent ? (
-                        <div className="text-center py-4">
-                            <div
-                                className="mb-1"
-                                style={{ fontSize: '4rem', color: 'var(--bs-gray-400)' }}
-                            >
-                                <i className="isax isax-calendar-search"></i>
-                            </div>
-                            <h4 className="text-muted">Không có lịch hẹn gần đây</h4>
-                            <p className="text-muted mb-4">
-                                Bạn chưa có lịch hẹn nào trong danh mục này.
-                            </p>
-                        </div>
-                    ) : null}
+                    {renderRecentAppointments()}
                 </div>
             )}
 

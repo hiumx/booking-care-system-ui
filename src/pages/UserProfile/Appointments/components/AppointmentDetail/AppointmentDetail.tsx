@@ -116,8 +116,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     <li>
                         <div className="detail-badge-info">
                             <span className="badge badge-warning">
-                                <i className="isax isax-clock5 me-2"></i>
-                                Đang chờ xác nhận
+                                <i className="isax isax-clock5 me-2"></i> Đang chờ xác nhận
                             </span>
                         </div>
                     </li>
