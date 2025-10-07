@@ -7,6 +7,7 @@ import ReplyForm from './components/ReplyForm';
 import EditReviewForm from './components/EditReviewForm';
 import EditReplyForm from './components/EditReplyForm';
 import Button from '@/components/Button';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 interface Reply {
     id: number;
@@ -303,32 +304,17 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                 />
             )}
 
-            {/* Delete Confirmation Modal */}
-            {showDeleteConfirm && (
-                <div className={reviewStyles.deleteConfirmModal}>
-                    <div className={reviewStyles.deleteConfirmContent}>
-                        <h4>Xác nhận xóa đánh giá</h4>
-                        <p>
-                            Bạn có chắc chắn muốn xóa đánh giá này? Hành động này không thể hoàn
-                            tác.
-                        </p>
-                        <div className={reviewStyles.deleteConfirmActions}>
-                            <Button
-                                text="Hủy"
-                                type="button"
-                                className={reviewStyles.cancelButton}
-                                onClick={handleCancelDelete}
-                            />
-                            <Button
-                                text="Xóa"
-                                type="button"
-                                className={reviewStyles.confirmDeleteButton}
-                                onClick={handleConfirmDelete}
-                            />
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Delete Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={showDeleteConfirm}
+                onClose={handleCancelDelete}
+                onConfirm={handleConfirmDelete}
+                title="Xác nhận xóa đánh giá"
+                message="Bạn có chắc chắn muốn xóa đánh giá này? Hành động này không thể hoàn tác."
+                confirmText="Xóa"
+                cancelText="Hủy"
+                type="danger"
+            />
 
             {/* Reply Form for main review */}
             {showReplyForm && replyToReplyId === null && (
@@ -447,31 +433,16 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                             )}
 
                             {/* Delete confirmation for reply */}
-                            {deletingReplyId === reply.id && (
-                                <div className={reviewStyles.deleteConfirmModal}>
-                                    <div className={reviewStyles.deleteConfirmContent}>
-                                        <h4>Xác nhận xóa phản hồi</h4>
-                                        <p>
-                                            Bạn có chắc chắn muốn xóa phản hồi này? Hành động này
-                                            không thể hoàn tác.
-                                        </p>
-                                        <div className={reviewStyles.deleteConfirmActions}>
-                                            <Button
-                                                text="Hủy"
-                                                type="button"
-                                                className={reviewStyles.cancelButton}
-                                                onClick={handleCancelDeleteReply}
-                                            />
-                                            <Button
-                                                text="Xóa"
-                                                type="button"
-                                                className={reviewStyles.confirmDeleteButton}
-                                                onClick={handleConfirmDeleteReply}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
+                            <ConfirmDialog
+                                isOpen={deletingReplyId === reply.id}
+                                onClose={handleCancelDeleteReply}
+                                onConfirm={handleConfirmDeleteReply}
+                                title="Xác nhận xóa phản hồi"
+                                message="Bạn có chắc chắn muốn xóa phản hồi này? Hành động này không thể hoàn tác."
+                                confirmText="Xóa"
+                                cancelText="Hủy"
+                                type="danger"
+                            />
 
                             {/* Reply Form for specific reply */}
                             {showReplyForm && replyToReplyId === reply.id && (

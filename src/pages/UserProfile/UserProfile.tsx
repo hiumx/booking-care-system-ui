@@ -8,6 +8,7 @@ import Appointments from './Appointments';
 import AppointmentDetailPage from './Appointments/AppointmentDetailPage';
 import SettingsContainer from './Setting/SettingsContainer/SettingsContainer';
 import Invoices from './Invoices';
+import Wallet from './Wallet';
 import { RootState } from '@/store';
 
 const UserProfile = () => {
@@ -118,6 +119,9 @@ const UserProfile = () => {
                 return <AppointmentDetailPage />;
             case 'favourites':
                 return <Favourite />;
+
+            case 'wallet':
+                return <Wallet />;
             case 'settings':
                 return <SettingsContainer />;
             case 'invoices':

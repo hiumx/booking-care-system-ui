@@ -1,0 +1,295 @@
+.bankSelect {
+    position: relative;
+    width: 100%;
+}
+
+.selectButton {
+    border: none;
+    width: 100%;
+    padding: 0.25rem 0.25rem;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: #dee2e6;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    &.open {
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    &.hasValue {
+        border-color: #28a745;
+    }
+}
+
+.selectedContent {
+    flex: 1;
+    text-align: left;
+}
+
+.selectedBank {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.bankLogo {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: contain;
+    background: #f8f9fa;
+    padding: 2px;
+}
+
+.bankInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.bankName {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.925rem;
+}
+
+.bankCode {
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.bankFullName {
+    font-size: 0.8rem;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+}
+
+.placeholder {
+    color: #9ca3af;
+    font-size: 0.925rem;
+}
+
+.arrow {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+}
+
+.dropdown {
+    position: relative;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    margin-top: 4px;
+    overflow: hidden;
+}
+
+.searchContainer {
+    position: relative;
+    padding: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+
+    input {
+        width: 100%;
+        padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    i {
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 0.875rem;
+    }
+}
+
+// Search input styles handled by parent container
+
+.bankList {
+    max-height: 300px;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+
+        &:hover {
+            background: #a8a8a8;
+        }
+    }
+}
+
+.bankItem {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+
+    &:hover {
+        background-color: #f9fafb;
+    }
+
+    &.selected {
+        background-color: #eff6ff;
+        border-left: 3px solid #007bff;
+    }
+
+    .bankInfo {
+        flex: 1;
+        min-width: 0; // Allow text truncation
+    }
+}
+
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 1rem;
+    color: #6b7280;
+
+    .spinner {
+        width: 24px;
+        height: 24px;
+        border: 2px solid #f3f4f6;
+        border-top: 2px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    span {
+        font-size: 0.875rem;
+    }
+}
+
+.noResults {
+    padding: 2rem;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .bankLogo {
+        width: 28px;
+        height: 28px;
+    }
+
+    .bankName {
+        font-size: 0.875rem;
+    }
+
+    .bankCode,
+    .bankFullName {
+        font-size: 0.75rem;
+    }
+
+    .dropdown {
+        max-height: 70vh;
+    }
+
+    .bankList {
+        max-height: 250px;
+    }
+}
+
+// Dark mode support (if needed)
+@media (prefers-color-scheme: dark) {
+    .selectButton {
+        background: #374151;
+        border-color: #4b5563;
+        color: white;
+
+        &:hover {
+            border-color: #6b7280;
+        }
+
+        &.open {
+            border-color: #3b82f6;
+        }
+    }
+
+    .dropdown {
+        background: #374151;
+        border-color: #4b5563;
+    }
+
+    .bankItem {
+        background: #374151;
+        color: white;
+
+        &:hover {
+            background: #4b5563;
+        }
+
+        &.selected {
+            background: #1e40af;
+        }
+    }
+
+    .searchContainer input {
+        background: #4b5563;
+        border-color: #6b7280;
+        color: white;
+
+        &::placeholder {
+            color: #9ca3af;
+        }
+    }
+}
