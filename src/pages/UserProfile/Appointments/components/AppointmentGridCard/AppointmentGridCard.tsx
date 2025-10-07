@@ -5,6 +5,10 @@ import {
     AppointmentUITab,
     getAppointmentTypeText,
     getAppointmentTypeIcon,
+    getDisplayName,
+    getDisplayAvatar,
+    getDisplaySpecialty,
+    getDisplayLabel,
 } from '@/types/appointment.types';
 
 interface AppointmentGridCardProps {
@@ -24,23 +28,52 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
 
     const getAppointmentTypeIconColor = (type: string): string => {
         const iconClasses: Record<string, string> = {
-            'Video Call': 'video-icon',
-            'Audio Call': 'telephone-icon',
-            Chat: 'chat-icon',
-            'In Person': 'hospital-icon',
+            'Trực tuyến': 'video-icon',
+            'Trực tiếp': 'hospital-icon',
         };
         return iconClasses[type] || 'video-icon';
     };
 
+    // Get display values using helper functions (priority: Doctor > Service > Hospital)
+    const displayName = getDisplayName(appointment);
+    const displayAvatar = getDisplayAvatar(appointment);
+    const displaySpecialty = getDisplaySpecialty(appointment);
+    const displayLabel = getDisplayLabel(appointment);
+
     const renderActionButtons = () => {
         switch (status) {
+            case 'waiting':
+                return (
+                    <li className="appointment-action">
+                        <ul>
+                            <li>
+                                <Link
+                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
+                                >
+                                    <i className="isax isax-eye4"></i>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="#">
+                                    <i className="isax isax-close-circle5"></i>
+                                </Link>
+                            </li>
+                        </ul>
+                        <div className="appointment-detail-btn">
+                            <span className="badge badge-warning text-center">
+                                <i className="isax isax-clock5 me-1"></i> Chờ Xác Nhận
+                            </span>
+                        </div>
+                    </li>
+                );
+
             case 'upcoming':
                 return (
                     <li className="appointment-action">
                         <ul>
                             <li>
                                 <Link
-                                    to={`/user-profile/appointments/${appointment.appointmentId}`}
+                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                                 >
                                     <i className="isax isax-eye4"></i>
                                 </Link>
@@ -58,7 +91,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                         </ul>
                         <div className="appointment-detail-btn">
                             <Link to="#" className="start-link">
-                                <i className="isax isax-calendar-tick5 me-1"></i> Attend
+                                <i className="isax isax-calendar-tick5 me-1"></i> Tham Gia
                             </Link>
                         </div>
                     </li>
@@ -68,10 +101,10 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                 return (
                     <li className="appointment-detail-btn">
                         <Link
-                            to={`/user-profile/appointments/${appointment.appointmentId}`}
+                            to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                             className="start-link w-100"
                         >
-                            View Details
+                            Xem Chi Tiết
                         </Link>
                     </li>
                 );
@@ -88,30 +121,36 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                         <div className="appointment-grid-head">
                             <div className="patinet-information">
                                 <Link
-                                    to={`/user-profile/appointments/${appointment.appointmentId}`}
+                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                                 >
-                                    <img
-                                        src={appointment.doctor.avatar}
-                                        alt={appointment.doctor.name}
-                                        onError={(e) => {
-                                            e.currentTarget.src =
-                                                '/src/assets/img/doctors/doctor-thumb-01.jpg';
-                                        }}
-                                    />
+                                    {displayAvatar ? (
+                                        <img
+                                            src={displayAvatar}
+                                            alt={displayName}
+                                            onError={(e) => {
+                                                e.currentTarget.src =
+                                                    '/src/assets/img/doctors/doctor-thumb-01.jpg';
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className="avatar-placeholder">
+                                            <i className="isax isax-user"></i>
+                                        </div>
+                                    )}
                                 </Link>
                                 <div className="patient-info">
-                                    <p>#{appointment.appointmentId.slice(0, 8)}</p>
+                                    <p>{displayLabel}</p>
                                     <h6>
                                         <Link
-                                            to={`/user-profile/appointments/${appointment.appointmentId}`}
+                                            to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                                         >
-                                            {appointment.doctor.name}
+                                            {displayName}
                                         </Link>
                                         {appointment.isNew && (
-                                            <span className="badge new-tag">New</span>
+                                            <span className="badge new-tag">Mới</span>
                                         )}
                                     </h6>
-                                    <p className="visit">{appointment.visitType}</p>
+                                    <p className="visit">{displaySpecialty}</p>
                                 </div>
                             </div>
                             <div className="grid-user-msg">
@@ -137,7 +176,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                             {formatDate(appointment.appointmentDate)}
                         </p>
                         <p>
-                            <i className="isax isax-clock5"></i> 8h-8h30
+                            <i className="isax isax-clock5"></i> {appointment.appointmentTime}
                         </p>
                     </li>
                     {renderActionButtons()}

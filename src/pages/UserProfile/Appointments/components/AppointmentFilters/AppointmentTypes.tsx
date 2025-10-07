@@ -2,9 +2,7 @@ export interface FilterState {
     filterSearchTerm: string;
     appointmentTypeFilters: {
         allType: boolean;
-        videoCall: boolean;
-        audioCall: boolean;
-        chat: boolean;
+        telehealth: boolean;
         directVisit: boolean;
     };
     visitTypeFilters: {

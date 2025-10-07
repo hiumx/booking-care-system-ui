@@ -1,25 +1,114 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import AppointmentDetail from './components/AppointmentDetail';
-import { mockAppointmentDetailData } from './data/appointmentDetailMockData';
-import { AppointmentStatus } from '@/enums/appointment.enums';
+import AppointmentDetailSkeleton from './components/AppointmentDetail/AppointmentDetailSkeleton';
+import AppointmentCard from './components/AppointmentCard/AppointmentCard';
+import AppointmentCardSkeleton from './components/AppointmentCard/AppointmentCardSkeleton';
+import { AppointmentService } from '@/services/appointment.service';
+import { RootState } from '@/store';
+import {
+    transformToDetailData,
+    transformToCardData,
+    isNewAppointment,
+    mapStatusToUITab,
+    AppointmentDetailData,
+    AppointmentCardData,
+    AppointmentQueryRequest,
+} from '@/types/appointment.types';
 
 const AppointmentDetailPage: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const userProfile = useSelector((state: RootState) => state.user.profile);
 
-    // Get appointment ID and status from URL params
-    const getUrlParams = () => {
+    const [appointmentData, setAppointmentData] = useState<AppointmentDetailData | null>(null);
+    const [recentAppointments, setRecentAppointments] = useState<AppointmentCardData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingRecent, setIsLoadingRecent] = useState(false);
+
+    // Get appointment ID from URL params
+    const getAppointmentId = () => {
         const urlParams = new URLSearchParams(location.search);
-        const appointmentId = urlParams.get('id') || '';
-        const status = (urlParams.get('status') as AppointmentStatus) || 'upcoming';
-        return { appointmentId, status };
+        return urlParams.get('id') || '';
     };
 
-    const { status } = getUrlParams();
+    const appointmentId = getAppointmentId();
 
-    // Get appointment data (in real app, this would be fetched from API)
-    const appointmentData = mockAppointmentDetailData[status];
+    // Fetch appointment detail from API
+    useEffect(() => {
+        const fetchAppointmentDetail = async () => {
+            if (!appointmentId) {
+                toast.error('Không tìm thấy ID cuộc hẹn');
+                navigate('/user/profile?tab=appointments');
+                return;
+            }
+
+            setIsLoading(true);
+            try {
+                const response = await AppointmentService.getAppointmentById(appointmentId);
+
+                if (response.success && response.data) {
+                    const detailData = transformToDetailData(response.data);
+                    detailData.isNew = isNewAppointment(response.data.createdAt);
+                    setAppointmentData(detailData);
+                } else {
+                    throw new Error(response.message || 'Không thể tải thông tin cuộc hẹn');
+                }
+            } catch (error: any) {
+                console.error('Error fetching appointment detail:', error);
+                toast.error(error.message || 'Không thể tải thông tin cuộc hẹn');
+                navigate('/user/profile?tab=appointments');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchAppointmentDetail();
+    }, [appointmentId, navigate]);
+
+    // Fetch recent appointments (2 most recent)
+    useEffect(() => {
+        const fetchRecentAppointments = async () => {
+            if (!userProfile?.id) {
+                return;
+            }
+
+            setIsLoadingRecent(true);
+            try {
+                const query: AppointmentQueryRequest = {
+                    patientId: userProfile.id,
+                    pageNumber: 1,
+                    pageSize: 3, // Fetch 3 to ensure 2 after filtering out current
+                    sortBy: 'CreatedAt',
+                    sortDescending: true,
+                };
+
+                const response = await AppointmentService.getAppointmentsByPatient(query);
+
+                if (response.success && response.data) {
+                    const transformedAppointments = response.data.appointments
+                        .filter((apt) => apt.id !== appointmentId) // Exclude current appointment
+                        .slice(0, 2) // Take max 2 appointments
+                        .map((apt) => {
+                            const cardData = transformToCardData(apt);
+                            cardData.isNew = isNewAppointment(apt.createdAt);
+                            return cardData;
+                        });
+
+                    setRecentAppointments(transformedAppointments);
+                }
+            } catch (error: any) {
+                console.error('Error fetching recent appointments:', error);
+                // Don't show error toast for recent appointments - not critical
+            } finally {
+                setIsLoadingRecent(false);
+            }
+        };
+
+        fetchRecentAppointments();
+    }, [userProfile, appointmentId]);
 
     const handleStartSession = () => {
         alert('Bắt đầu phiên tư vấn');
@@ -44,20 +133,33 @@ const AppointmentDetailPage: React.FC = () => {
         // In real app: trigger download or open prescription modal
     };
 
-    const handleBackToList = () => {
-        navigate('/user/profile?tab=appointments');
-    };
+    // Helper function to render recent appointments - extracted to avoid nested ternary
+    const renderRecentAppointments = () => {
+        if (isLoadingRecent) {
+            return null;
+        }
 
-    if (!appointmentData) {
+        if (recentAppointments.length > 0) {
+            return recentAppointments.map((appointment) => (
+                <AppointmentCard
+                    key={appointment.appointmentId}
+                    appointment={appointment}
+                    status={mapStatusToUITab(appointment.status)}
+                    variant="minimal"
+                />
+            ));
+        }
+
         return (
-            <div className="text-center py-5">
-                <h4>Không tìm thấy thông tin cuộc hẹn</h4>
-                <button type="button" className="btn btn-primary mt-3" onClick={handleBackToList}>
-                    Quay lại danh sách
-                </button>
+            <div className="text-center py-4">
+                <div className="mb-1" style={{ fontSize: '4rem', color: 'var(--bs-gray-400)' }}>
+                    <i className="isax isax-calendar-search"></i>
+                </div>
+                <h4 className="text-muted">Không có lịch hẹn gần đây</h4>
+                <p className="text-muted mb-4">Bạn chưa có lịch hẹn nào trong danh mục này.</p>
             </div>
         );
-    }
+    };
 
     return (
         <>
@@ -72,118 +174,39 @@ const AppointmentDetailPage: React.FC = () => {
                 </div>
             </div>
 
+            {/* Loading State - Skeleton */}
+            {isLoading && <AppointmentDetailSkeleton />}
+
             {/* Appointment Detail Component */}
-            <AppointmentDetail
-                appointment={appointmentData}
-                onStartSession={handleStartSession}
-                onCancel={handleCancel}
-                onReschedule={handleReschedule}
-                onDownloadPrescription={handleDownloadPrescription}
-            />
+            {!isLoading && appointmentData && (
+                <AppointmentDetail
+                    appointment={appointmentData}
+                    onStartSession={handleStartSession}
+                    onCancel={handleCancel}
+                    onReschedule={handleReschedule}
+                    onDownloadPrescription={handleDownloadPrescription}
+                />
+            )}
+
+            {/* Error State - handled by redirect in useEffect */}
 
             {/* Recent Appointments Section */}
-            <div className="recent-appointments">
-                <h5 className="head-text">Lịch Hẹn Gần Đây</h5>
+            {!isLoading && (
+                <div className="recent-appointments">
+                    <h5 className="head-text">Lịch Hẹn Gần Đây</h5>
 
-                {/* Appointment List */}
-                <div className="appointment-wrap">
-                    <ul>
-                        <li>
-                            <div className="patinet-information">
-                                <Link to="#">
-                                    <img src="/src/assets/img/doctors/doctor-15.jpg" alt="Doctor" />
-                                </Link>
-                                <div className="patient-info">
-                                    <p>#Apt0002</p>
-                                    <h6>
-                                        <Link to="#">Dr.Shanta Nesmith</Link>
-                                    </h6>
-                                </div>
-                            </div>
-                        </li>
-                        <li className="appointment-info">
-                            <p>
-                                <i className="isax isax-clock5"></i>11 Nov 2024 10.45 AM
-                            </p>
-                            <ul className="d-flex apponitment-types">
-                                <li>General Visit</li>
-                                <li>Chat</li>
-                            </ul>
-                        </li>
-                        <li className="mail-info-patient">
-                            <ul>
-                                <li>
-                                    <i className="isax isax-sms5"></i>
-                                    <Link to="mailto:doctor@example.com">doctor@example.com</Link>
-                                </li>
-                                <li>
-                                    <i className="isax isax-call5"></i> +1 504 368 6874
-                                </li>
-                            </ul>
-                        </li>
-                        <li className="appointment-action">
-                            <ul>
-                                <li>
-                                    <Link to="#">
-                                        <i className="isax isax-eye4"></i>
-                                    </Link>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
+                    {/* Loading State - Skeleton */}
+                    {isLoadingRecent && (
+                        <>
+                            <AppointmentCardSkeleton />
+                            <AppointmentCardSkeleton />
+                        </>
+                    )}
 
-                {/* Another Appointment List */}
-                <div className="appointment-wrap">
-                    <ul>
-                        <li>
-                            <div className="patinet-information">
-                                <Link to="#">
-                                    <img
-                                        src="/src/assets/img/doctors/doctor-thumb-02.jpg"
-                                        alt="Doctor"
-                                    />
-                                </Link>
-                                <div className="patient-info">
-                                    <p>#Apt0003</p>
-                                    <h6>
-                                        <Link to="#">Dr.John Ewel</Link>
-                                    </h6>
-                                </div>
-                            </div>
-                        </li>
-                        <li className="appointment-info">
-                            <p>
-                                <i className="isax isax-clock5"></i>27 Oct 2024 09.30 AM
-                            </p>
-                            <ul className="d-flex apponitment-types">
-                                <li>General Visit</li>
-                                <li>Video Call</li>
-                            </ul>
-                        </li>
-                        <li className="mail-info-patient">
-                            <ul>
-                                <li>
-                                    <i className="isax isax-sms5"></i>
-                                    <Link to="mailto:doctor2@example.com">doctor2@example.com</Link>
-                                </li>
-                                <li>
-                                    <i className="isax isax-call5"></i> +1 749 104 6291
-                                </li>
-                            </ul>
-                        </li>
-                        <li className="appointment-action">
-                            <ul>
-                                <li>
-                                    <Link to="#">
-                                        <i className="isax isax-eye4"></i>
-                                    </Link>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+                    {/* Appointment Cards */}
+                    {renderRecentAppointments()}
                 </div>
-            </div>
+            )}
 
             {/* Appointment Cancel Reason Modal */}
             <div className="modal fade custom-modal custom-modal-two" id="reject_reason">

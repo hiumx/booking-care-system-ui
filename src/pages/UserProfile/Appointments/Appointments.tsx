@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { RangeKeyDict } from 'react-date-range';
 import clsx from 'clsx';
 import { useSelector } from 'react-redux';
@@ -32,7 +32,7 @@ const Appointments: React.FC = () => {
     const userProfile = useSelector((state: RootState) => state.user.profile);
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState<AppointmentUITab>('upcoming');
+    const [activeTab, setActiveTab] = useState<AppointmentUITab>('waiting');
     const [viewMode, setViewMode] = useState<ViewMode>('list');
     const [selectedFilters, setSelectedFilters] = useState({
         appointmentType: [] as AppointmentType[],
@@ -48,15 +48,21 @@ const Appointments: React.FC = () => {
     const [totalCount, setTotalCount] = useState(0);
     const [apiError, setApiError] = useState<string | null>(null);
 
+    // Counts for all tabs
+    const [tabCounts, setTabCounts] = useState({
+        waiting: 0,
+        upcoming: 0,
+        cancelled: 0,
+        completed: 0,
+    });
+
     // Filter states for AppointmentFilters component
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [filterState, setFilterState] = useState<FilterState>({
         filterSearchTerm: '',
         appointmentTypeFilters: {
             allType: true,
-            videoCall: false,
-            audioCall: false,
-            chat: false,
+            telehealth: false,
             directVisit: false,
         },
         visitTypeFilters: {
@@ -102,6 +108,8 @@ const Appointments: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // No longer need separate useEffect for counts - will get from main API call
+
     // Fetch appointments from API
     useEffect(() => {
         const fetchAppointments = async () => {
@@ -115,17 +123,19 @@ const Appointments: React.FC = () => {
             setApiError(null);
 
             try {
-                // Build query request using new helper functions
+                // Build query request
                 const query: AppointmentQueryRequest = {
                     patientId: userProfile.id,
                     status: mapUITabToStatus(activeTab),
-                    searchTerm: searchTerm || filterState.filterSearchTerm || undefined,
+                    // Don't send searchTerm to API - we'll filter client-side
+                    // This allows searching doctor/hospital/service names from gRPC
                     fromDate: selectedFilters.dateRange.from || undefined,
                     toDate: selectedFilters.dateRange.to || undefined,
                     pageNumber: currentPage,
                     pageSize: itemsPerPage,
                     sortBy: 'CreatedAt',
                     sortDescending: true,
+                    includeStatusCounts: true, // Always include counts
                 };
 
                 // Add appointment type filter if selected
@@ -148,9 +158,14 @@ const Appointments: React.FC = () => {
                     setAppointments(transformedAppointments);
                     setTotalCount(response.data.totalCount || 0);
 
-                    // Show info toast only when no results found
-                    if (response.data.totalCount === 0) {
-                        toast.info('Không tìm thấy lịch hẹn nào');
+                    // Update counts from statusCounts if available
+                    if (response.data.statusCounts) {
+                        setTabCounts({
+                            waiting: response.data.statusCounts.pending || 0,
+                            upcoming: response.data.statusCounts.confirmed || 0,
+                            cancelled: response.data.statusCounts.cancelled || 0,
+                            completed: response.data.statusCounts.completed || 0,
+                        });
                     }
                 } else {
                     throw new Error(response.message || 'Không thể tải danh sách lịch hẹn');
@@ -171,9 +186,10 @@ const Appointments: React.FC = () => {
     }, [
         userProfile,
         activeTab,
-        searchTerm,
-        filterState.filterSearchTerm,
-        selectedFilters,
+        // searchTerm and filterSearchTerm removed - using client-side search only
+        selectedFilters.dateRange.from,
+        selectedFilters.dateRange.to,
+        selectedFilters.appointmentType,
         currentPage,
         itemsPerPage,
     ]);
@@ -198,26 +214,77 @@ const Appointments: React.FC = () => {
                     to: selection.endDate.toISOString().split('T')[0],
                 },
             });
+
+            // Reset to first page when date range changes
+            setCurrentPage(1);
         }
     };
 
-    // Appointments are already transformed to UI format, no need to map
-    const filteredAppointments = appointments;
+    // Apply client-side search - comprehensive search across all fields
+    const filteredAppointments = useMemo(() => {
+        if (!searchTerm && !filterState.filterSearchTerm) {
+            return appointments;
+        }
 
-    // Pagination - use totalCount from API
-    const totalPages = Math.ceil(totalCount / itemsPerPage);
-    const currentAppointments = filteredAppointments;
+        const term = (searchTerm || filterState.filterSearchTerm || '').toLowerCase().trim();
 
-    // Get appointment counts for tabs
-    // Note: This is a simple display count. For accurate counts per tab,
-    // we'd need separate API calls or a summary endpoint
-    const appointmentCounts = useMemo(() => {
-        return {
-            upcoming: activeTab === 'upcoming' ? totalCount : 0,
-            cancelled: activeTab === 'cancelled' ? totalCount : 0,
-            completed: activeTab === 'completed' ? totalCount : 0,
-        };
-    }, [activeTab, totalCount]);
+        return appointments.filter((apt) => {
+            // Search across ALL available fields
+
+            // 1. Appointment ID (full or partial)
+            const appointmentId = apt.appointmentId.toLowerCase();
+
+            // 2. Doctor info
+            const doctorName =
+                apt.doctorInfo?.fullName?.toLowerCase() ||
+                `${apt.doctorInfo?.firstName || ''} ${apt.doctorInfo?.lastName || ''}`
+                    .toLowerCase()
+                    .trim();
+            const specialty = apt.doctorInfo?.specialtyName?.toLowerCase() || '';
+            const position = apt.doctorInfo?.positionName?.toLowerCase() || '';
+
+            // 3. Hospital info
+            const hospitalName = apt.hospitalInfo?.name?.toLowerCase() || '';
+
+            // 4. Service info
+            const serviceName = apt.serviceInfo?.name?.toLowerCase() || '';
+
+            // 5. Appointment details
+            const reason = apt.reason?.toLowerCase() || '';
+            const result = apt.result?.toLowerCase() || '';
+
+            return (
+                appointmentId.includes(term) ||
+                doctorName.includes(term) ||
+                specialty.includes(term) ||
+                position.includes(term) ||
+                hospitalName.includes(term) ||
+                serviceName.includes(term) ||
+                reason.includes(term) ||
+                result.includes(term)
+            );
+        });
+    }, [appointments, searchTerm, filterState.filterSearchTerm]);
+
+    // Pagination - adjust for client-side filtering
+    const actualTotalCount =
+        filteredAppointments.length < appointments.length
+            ? filteredAppointments.length // Client-side filtered
+            : totalCount; // Use API count
+
+    const totalPages = Math.ceil(actualTotalCount / itemsPerPage);
+
+    // Apply client-side pagination if we did client-side filtering
+    const currentAppointments =
+        filteredAppointments.length < appointments.length
+            ? filteredAppointments.slice(
+                  (currentPage - 1) * itemsPerPage,
+                  currentPage * itemsPerPage
+              )
+            : filteredAppointments; // Already paginated by API
+
+    // Get appointment counts for tabs - using tabCounts state
+    const appointmentCounts = tabCounts;
 
     const handleTabChange = (tab: AppointmentUITab) => {
         setActiveTab(tab);
@@ -227,7 +294,10 @@ const Appointments: React.FC = () => {
 
     const handleSearchChange = (value: string) => {
         setSearchTerm(value);
-        setCurrentPage(1); // Reset to first page when searching
+        // Reset to first page when searching (client-side filter)
+        if (value !== searchTerm) {
+            setCurrentPage(1);
+        }
     };
 
     const handlePageChange = (page: number) => {
@@ -245,9 +315,7 @@ const Appointments: React.FC = () => {
             filterSearchTerm: '',
             appointmentTypeFilters: {
                 allType: true,
-                videoCall: false,
-                audioCall: false,
-                chat: false,
+                telehealth: false,
                 directVisit: false,
             },
             visitTypeFilters: {
@@ -268,6 +336,10 @@ const Appointments: React.FC = () => {
             ...filterState,
             filterSearchTerm: value,
         });
+        // Reset to first page when filter search changes
+        if (value !== filterState.filterSearchTerm) {
+            setCurrentPage(1);
+        }
     };
 
     const handleAppointmentTypeChange = (type: string, checked: boolean) => {
@@ -276,9 +348,7 @@ const Appointments: React.FC = () => {
                 ...filterState,
                 appointmentTypeFilters: {
                     allType: checked,
-                    videoCall: checked ? filterState.appointmentTypeFilters.videoCall : false,
-                    audioCall: checked ? filterState.appointmentTypeFilters.audioCall : false,
-                    chat: checked ? filterState.appointmentTypeFilters.chat : false,
+                    telehealth: checked ? filterState.appointmentTypeFilters.telehealth : false,
                     directVisit: checked ? filterState.appointmentTypeFilters.directVisit : false,
                 },
             });
@@ -350,9 +420,7 @@ const Appointments: React.FC = () => {
         const appointmentTypeFilters = filterState.appointmentTypeFilters;
         if (appointmentTypeFilters.allType === false) {
             const appointmentTypeMap = {
-                videoCall: AppointmentType.VIDEO_CALL,
-                audioCall: AppointmentType.AUDIO_CALL,
-                chat: AppointmentType.CHAT,
+                telehealth: AppointmentType.TELEHEALTH,
                 directVisit: AppointmentType.IN_PERSON,
             };
 
@@ -468,11 +536,11 @@ const Appointments: React.FC = () => {
 
         return (
             <div className="text-center py-5">
-                <div className="mb-4" style={{ fontSize: '4rem', color: 'var(--bs-gray-400)' }}>
+                <div className="mb-1" style={{ fontSize: '4rem', color: 'var(--bs-gray-400)' }}>
                     <i className="isax isax-calendar-search"></i>
                 </div>
                 <h4 className="text-muted">Không có lịch hẹn nào</h4>
-                <p className="text-muted mb-4">
+                <p className="text-muted mb-3">
                     {hasActiveFilters
                         ? 'Không tìm thấy lịch hẹn nào phù hợp với bộ lọc của bạn.'
                         : 'Bạn chưa có lịch hẹn nào trong danh mục này.'}
@@ -545,6 +613,15 @@ const Appointments: React.FC = () => {
             <div className="appointment-tab-head">
                 <div className="appointment-tabs">
                     <ul className="nav nav-pills inner-tab" id="pills-tab">
+                        <li className="nav-item">
+                            <button
+                                className={`nav-link ${activeTab === 'waiting' ? 'active' : ''}`}
+                                type="button"
+                                onClick={() => handleTabChange('waiting')}
+                            >
+                                Chờ Xác Nhận <span>{appointmentCounts.waiting}</span>
+                            </button>
+                        </li>
                         <li className="nav-item">
                             <button
                                 className={`nav-link ${activeTab === 'upcoming' ? 'active' : ''}`}

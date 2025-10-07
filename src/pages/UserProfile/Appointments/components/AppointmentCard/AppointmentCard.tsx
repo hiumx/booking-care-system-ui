@@ -4,14 +4,25 @@ import {
     AppointmentCardData,
     AppointmentUITab,
     getAppointmentTypeText,
+    getDisplayName,
+    getDisplayAvatar,
+    getDisplayEmail,
+    getDisplayPhone,
+    getDisplaySpecialty,
+    getDisplayLabel,
 } from '@/types/appointment.types';
 
 interface AppointmentCardProps {
     appointment: AppointmentCardData;
     status: AppointmentUITab;
+    variant?: 'full' | 'minimal'; // 'full' shows all actions, 'minimal' only shows view icon
 }
 
-const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }) => {
+const AppointmentCard: React.FC<AppointmentCardProps> = ({
+    appointment,
+    status,
+    variant = 'full',
+}) => {
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('vi-VN', {
@@ -21,8 +32,63 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }
         });
     };
 
+    // Get display values using helper functions (priority: Doctor > Service > Hospital)
+    const displayName = getDisplayName(appointment);
+    const displayAvatar = getDisplayAvatar(appointment);
+    const displayEmail = getDisplayEmail(appointment);
+    const displayPhone = getDisplayPhone(appointment);
+    const displaySpecialty = getDisplaySpecialty(appointment);
+    const displayLabel = getDisplayLabel(appointment);
+
     const renderActionButtons = () => {
+        // Minimal variant - only show view icon
+        if (variant === 'minimal') {
+            return (
+                <li className="appointment-action">
+                    <ul>
+                        <li>
+                            <Link
+                                to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
+                                title="Xem chi tiết"
+                            >
+                                <i className="isax isax-eye4"></i>
+                            </Link>
+                        </li>
+                    </ul>
+                </li>
+            );
+        }
+
+        // Full variant - show all actions based on status
         switch (status) {
+            case 'waiting':
+                return (
+                    <>
+                        <li className="appointment-action">
+                            <ul>
+                                <li>
+                                    <Link
+                                        to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
+                                        title="Xem chi tiết"
+                                    >
+                                        <i className="isax isax-eye4"></i>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="#" title="Hủy lịch hẹn">
+                                        <i className="isax isax-close-circle5"></i>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </li>
+                        <li className="appointment-detail-btn">
+                            <span className="badge badge-warning">
+                                <i className="isax isax-clock5 me-1"></i> Chờ Xác Nhận
+                            </span>
+                        </li>
+                    </>
+                );
+
             case 'upcoming':
                 return (
                     <>
@@ -114,21 +180,27 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }
     return (
         <div className="appointment-wrap">
             <ul>
-                {/* Doctor Information */}
+                {/* Display Information - Priority: Doctor > Service > Hospital */}
                 <li>
                     <div className="patinet-information">
                         <Link
                             to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                         >
-                            <img src={appointment.doctor.avatar} alt={appointment.doctor.name} />
+                            {displayAvatar ? (
+                                <img src={displayAvatar} alt={displayName} />
+                            ) : (
+                                <div className="avatar-placeholder">
+                                    <i className="isax isax-user"></i>
+                                </div>
+                            )}
                         </Link>
                         <div className="patient-info">
-                            <p>Bác sĩ</p>
+                            <p>{displayLabel}</p>
                             <h6>
                                 <Link
                                     to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                                 >
-                                    {appointment.doctor.name}
+                                    {displayName}
                                 </Link>
                                 {appointment.isNew && <span className="badge new-tag">Mới</span>}
                             </h6>
@@ -140,30 +212,32 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, status }
                 <li className="appointment-info">
                     <p>
                         <i className="isax isax-clock5"></i>
-                        {formatDate(appointment.appointmentDate)} 8h-8h30
+                        {formatDate(appointment.appointmentDate)}
+                        {' | '}
+                        {appointment.appointmentTime}
                     </p>
                     <ul className="d-flex apponitment-types">
-                        <li>{appointment.visitType}</li>
+                        <li>{displaySpecialty}</li>
                         <li>{getAppointmentTypeText(appointment.appointmentType)}</li>
                     </ul>
                 </li>
 
-                {/* Contact Information - Only show for upcoming and cancelled */}
-                {(status === 'upcoming' || status === 'cancelled') && (
+                {/* Contact Information - Show for waiting, upcoming and cancelled */}
+                {(status === 'waiting' || status === 'upcoming' || status === 'cancelled') && (
                     <li className="mail-info-patient">
                         <ul>
-                            <li>
-                                <i className="isax isax-sms5"></i>
-                                <Link to={`mailto:${appointment.doctor.email}`}>
-                                    {appointment.doctor.email}
-                                </Link>
-                            </li>
-                            <li>
-                                <i className="isax isax-call5"></i>
-                                <Link to={`tel:${appointment.doctor.phone}`}>
-                                    {appointment.doctor.phone || '0763583081'}
-                                </Link>
-                            </li>
+                            {displayEmail && (
+                                <li>
+                                    <i className="isax isax-sms5"></i>
+                                    <Link to={`mailto:${displayEmail}`}>{displayEmail}</Link>
+                                </li>
+                            )}
+                            {displayPhone && (
+                                <li>
+                                    <i className="isax isax-call5"></i>
+                                    <Link to={`tel:${displayPhone}`}>{displayPhone}</Link>
+                                </li>
+                            )}
                         </ul>
                     </li>
                 )}

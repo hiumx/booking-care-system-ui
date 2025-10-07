@@ -54,7 +54,8 @@ export class AppointmentService {
     }
 
     /**
-     * Get appointment by ID
+     * Get appointment by ID for patient with enriched data
+     * Includes doctor, service, and hospital information via gRPC
      */
     static async getAppointmentById(id: string): Promise<ApiResponse<AppointmentResponse>> {
         try {
