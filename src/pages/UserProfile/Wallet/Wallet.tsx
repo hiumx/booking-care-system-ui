@@ -8,7 +8,8 @@ import TransactionTable from './components/TransactionTable';
 import OtherAccountsModal from './components/OtherAccountsModal';
 import NotificationToast from '../../../components/NotificationToast';
 import { useBankAccounts } from './hooks/useBankAccounts';
-import { mockTransactions } from './data/mockData';
+import { useRefundHistory } from './hooks/useRefundHistory';
+import { transformRefundHistoriesToTransactions } from './utils/transformers';
 import { CreateBankAccountRequest } from './types/wallet.types';
 import { RootState } from '@/store';
 
@@ -29,6 +30,12 @@ const Wallet: React.FC = () => {
         deleteAccount,
         updateAccount,
     } = useBankAccounts(userId || '');
+
+    const {
+        refundHistories,
+        loading: refundLoading,
+        error: refundError,
+    } = useRefundHistory(userId);
 
     const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
     const [isOtherAccountsModalOpen, setIsOtherAccountsModalOpen] = useState(false);
@@ -156,7 +163,11 @@ const Wallet: React.FC = () => {
                 loading={loading}
             />
 
-            <TransactionTable transactions={mockTransactions} />
+            <TransactionTable
+                transactions={transformRefundHistoriesToTransactions(refundHistories)}
+                loading={refundLoading}
+                error={refundError}
+            />
 
             <AddCardModal
                 isOpen={isAddCardModalOpen}

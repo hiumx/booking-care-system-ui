@@ -5,9 +5,11 @@ import { Transaction } from '../../types/wallet.types';
 
 interface TransactionTableProps {
     transactions: Transaction[];
+    loading?: boolean;
+    error?: string | null;
 }
 
-const TransactionTable: React.FC<TransactionTableProps> = ({ transactions }) => {
+const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loading, error }) => {
     const renderStatusBadge = (status: string) => {
         const isCompleted = status === 'completed';
         return (
@@ -28,6 +30,68 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions }) => 
         // Handle transaction detail navigation here
     };
 
+    // Loading state
+    if (loading) {
+        return (
+            <div className="row">
+                <div className="col-sm-12">
+                    <div className="account-detail-table">
+                        <div className="custom-new-table">
+                            <div className="text-center p-4">
+                                <div
+                                    className="spinner-border text-primary"
+                                    aria-hidden="true"
+                                ></div>
+                                <p className="mt-2 mb-0">Đang tải lịch sử giao dịch...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Error state
+    if (error) {
+        return (
+            <div className="row">
+                <div className="col-sm-12">
+                    <div className="account-detail-table">
+                        <div className="custom-new-table">
+                            <div className="text-center p-4">
+                                <div className="alert alert-danger" role="alert">
+                                    <i className="fa-solid fa-exclamation-triangle me-2"></i>
+                                    {error}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Empty state
+    if (!transactions || transactions.length === 0) {
+        return (
+            <div className="row">
+                <div className="col-sm-12">
+                    <div className="account-detail-table">
+                        <div className="custom-new-table">
+                            <div className="text-center p-4">
+                                <div className="text-muted">
+                                    <i className="fa-solid fa-receipt fa-3x mb-3 d-block"></i>
+                                    <h5>Chưa có giao dịch nào</h5>
+                                    <p>Lịch sử hoàn tiền của bạn sẽ được hiển thị tại đây.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="row">
             <div className="col-sm-12">
@@ -37,11 +101,11 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions }) => 
                             <table className="table table-center mb-0">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
+                                        <th>Refund ID</th>
                                         <th>Account No</th>
-                                        <th>Reason</th>
-                                        <th>Debited / Credited On</th>
-                                        <th>Amount</th>
+                                        <th>Refund Reason</th>
+                                        <th>Updated Date</th>
+                                        <th>Refund Amount</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>

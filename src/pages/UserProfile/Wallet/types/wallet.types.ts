@@ -7,6 +7,16 @@ export interface Transaction {
     status: 'completed' | 'pending';
 }
 
+// New interface for mapped transaction from RefundHistory
+export interface RefundTransaction {
+    id: string;
+    accountNumber: string;
+    refundReason: string;
+    updatedAt: string;
+    refundAmount: number;
+    status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'REJECTED';
+}
+
 export interface BankDetails {
     bankName: string;
     accountNumber: string;
@@ -73,4 +83,43 @@ export interface CardFormData {
 export interface OtherAccount extends BankDetails {
     id: string;
     isCurrent: boolean;
+}
+
+export interface Payment {
+    id: string;
+    appointmentId: string;
+    clinicId: string | null;
+    patientId: string;
+    subscriptionId: string | null;
+    amount: number;
+    transactionType: string;
+    paymentMethodId: string;
+    paymentMethodName: string;
+    status: string;
+    createdAt: string;
+}
+
+export interface RefundHistory {
+    id: string;
+    bankAccountId: string;
+    bankAccount: BankAccount;
+    userId: string;
+    status: 'PENDING' | 'COMPLETED';
+    transferDate: string | null;
+    paymentId: string;
+    payment: Payment;
+    refundAmount: number;
+    refundReason: string | null;
+    staffNotes: string | null;
+    processedByStaffId: string | null;
+    createdAt: string;
+    updatedAt: string;
+    daysFromCreated: number;
+    canProcess: boolean;
+    canUpdateBankAccount: boolean;
+}
+
+export interface RefundHistoryResponse {
+    refundHistories: RefundHistory[];
+    count: number;
 }
