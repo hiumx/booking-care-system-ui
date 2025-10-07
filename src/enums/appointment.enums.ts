@@ -3,22 +3,12 @@
  */
 export enum AppointmentType {
     /**
-     * Appointment conducted via video call.
+     * Appointment conducted via telehealth (video call, audio call, or chat).
      */
-    VIDEO_CALL = 'VIDEO_CALL',
+    TELEHEALTH = 'TELEHEALTH',
 
     /**
-     * Appointment conducted via audio call.
-     */
-    AUDIO_CALL = 'AUDIO_CALL',
-
-    /**
-     * Appointment conducted via chat messaging.
-     */
-    CHAT = 'CHAT',
-
-    /**
-     * Appointment conducted in person.
+     * Appointment conducted in person at the hospital/clinic.
      */
     IN_PERSON = 'IN_PERSON',
 }
@@ -47,9 +37,4 @@ export enum AppointmentStatus {
      * The appointment has been completed successfully.
      */
     COMPLETED = 'COMPLETED',
-
-    /**
-     * The appointment was missed and marked as no-show.
-     */
-    NO_SHOW = 'NO_SHOW',
 }

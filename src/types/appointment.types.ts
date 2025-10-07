@@ -17,20 +17,14 @@ export interface PatientInfo {
 // Doctor Information from API
 export interface DoctorInfo {
     id: string;
-    accountId: string;
     email?: string;
     firstName?: string;
     lastName?: string;
     fullName?: string;
-    gender?: string;
-    address?: string;
-    specialtyId?: string;
-    positionId?: string;
+    specialtyName?: string;
+    positionName?: string;
     hospitalId?: string;
-    bio?: string;
-    yearsOfExperience: number;
     avatarUrl?: string;
-    status?: string;
 }
 
 // Service Information from API
@@ -47,8 +41,9 @@ export interface HospitalInfo {
     id: string;
     name?: string;
     address?: string;
-    phoneNumber?: string;
+    phone?: string;
     email?: string;
+    avatarUrl?: string;
 }
 
 // Appointment Response from API
@@ -68,6 +63,15 @@ export interface AppointmentResponse {
     hospitalInfo?: HospitalInfo;
 }
 
+// Status counts for all appointment statuses
+export interface AppointmentStatusCounts {
+    pending: number;
+    confirmed: number;
+    cancelled: number;
+    completed: number;
+    total: number;
+}
+
 // Appointment List Response with Pagination
 export interface AppointmentListResponse {
     appointments: AppointmentResponse[];
@@ -77,6 +81,7 @@ export interface AppointmentListResponse {
     totalPages: number;
     hasPreviousPage: boolean;
     hasNextPage: boolean;
+    statusCounts?: AppointmentStatusCounts;
 }
 
 // Appointment Query Request (for filtering and pagination)
@@ -94,6 +99,7 @@ export interface AppointmentQueryRequest {
     pageSize?: number;
     sortBy?: string;
     sortDescending?: boolean;
+    includeStatusCounts?: boolean;
 }
 
 // Create Appointment Request
@@ -120,51 +126,33 @@ export interface UpdateAppointmentStatusRequest {
 // ============================================
 
 // UI Tab Status (for filtering in UI)
-export type AppointmentUITab = 'upcoming' | 'cancelled' | 'completed';
-
-// Simplified Doctor Info for UI Cards
-export interface AppointmentDoctorUI {
-    id: string;
-    name: string;
-    avatar: string;
-    email: string;
-    phone: string;
-    specialty?: string;
-}
+export type AppointmentUITab = 'waiting' | 'upcoming' | 'cancelled' | 'completed';
 
 // Appointment Card Data (optimized for UI display)
 export interface AppointmentCardData {
     appointmentId: string;
-    doctor: AppointmentDoctorUI;
     appointmentDate: string;
     appointmentTime: string;
     appointmentType: AppointmentType;
-    visitType: string;
     status: AppointmentStatus;
-    price?: string;
-    notes?: string;
+    reason?: string;
+    result?: string;
     isNew?: boolean;
     hasReview?: boolean;
+    // Separate info sections - use priority: Doctor > Service > Hospital in components
+    doctorInfo?: DoctorInfo;
+    serviceInfo?: ServiceInfo;
+    hospitalInfo?: HospitalInfo;
 }
 
 // Appointment Detail Data (for detail page)
-export interface AppointmentDetailData {
-    appointmentId: string;
-    doctor: {
-        name: string;
-        image: string;
-        email: string;
-        phone: string;
-    };
-    appointmentType: AppointmentType;
-    visitType: string;
-    appointmentDate: string;
-    appointmentTime: string;
-    consultationFees: number;
+// Now uses same structure as AppointmentCardData with priority logic
+export interface AppointmentDetailData extends AppointmentCardData {
+    visitType?: string;
+    consultationFees?: number;
     clinicLocation?: string;
     location?: string;
     personWithPatient?: string;
-    status: AppointmentStatus;
 }
 
 // Props for AppointmentDetail component
@@ -190,7 +178,11 @@ export interface StatusConfig {
     showDownloadPrescription: boolean;
     showCancelButton: boolean;
     showReasonLink: boolean;
-    bottomSection?: 'start_session' | 'reschedule_status' | 'prescription_reschedule';
+    bottomSection?:
+        | 'waiting_status'
+        | 'start_session'
+        | 'reschedule_status'
+        | 'prescription_reschedule';
 }
 
 // Filter Options for UI
@@ -220,8 +212,6 @@ export const getAppointmentStatusText = (status: AppointmentStatus): string => {
             return 'Đã hủy';
         case AppointmentStatus.COMPLETED:
             return 'Hoàn thành';
-        case AppointmentStatus.NO_SHOW:
-            return 'Không đến';
         default:
             return 'Không xác định';
     }
@@ -232,12 +222,8 @@ export const getAppointmentStatusText = (status: AppointmentStatus): string => {
  */
 export const getAppointmentTypeText = (type: AppointmentType): string => {
     switch (type) {
-        case AppointmentType.VIDEO_CALL:
-            return 'Video Call';
-        case AppointmentType.AUDIO_CALL:
-            return 'Audio Call';
-        case AppointmentType.CHAT:
-            return 'Chat';
+        case AppointmentType.TELEHEALTH:
+            return 'Trực tuyến';
         case AppointmentType.IN_PERSON:
             return 'Trực tiếp';
         default:
@@ -250,13 +236,13 @@ export const getAppointmentTypeText = (type: AppointmentType): string => {
  */
 export const mapStatusToUITab = (status: AppointmentStatus): AppointmentUITab => {
     switch (status) {
-        case AppointmentStatus.CONFIRMED:
         case AppointmentStatus.PENDING:
+            return 'waiting';
+        case AppointmentStatus.CONFIRMED:
             return 'upcoming';
         case AppointmentStatus.CANCELLED:
             return 'cancelled';
         case AppointmentStatus.COMPLETED:
-        case AppointmentStatus.NO_SHOW:
             return 'completed';
         default:
             return 'upcoming';
@@ -268,6 +254,8 @@ export const mapStatusToUITab = (status: AppointmentStatus): AppointmentUITab =>
  */
 export const mapUITabToStatus = (tab: AppointmentUITab): AppointmentStatus => {
     switch (tab) {
+        case 'waiting':
+            return AppointmentStatus.PENDING;
         case 'upcoming':
             return AppointmentStatus.CONFIRMED;
         case 'cancelled':
@@ -281,27 +269,38 @@ export const mapUITabToStatus = (tab: AppointmentUITab): AppointmentStatus => {
 
 /**
  * Transform API AppointmentResponse to UI AppointmentCardData
+ * Maps data as-is, components will handle display priority
  */
 export const transformToCardData = (apiResponse: AppointmentResponse): AppointmentCardData => {
     return {
         appointmentId: apiResponse.id,
-        doctor: {
-            id: apiResponse.doctorInfo?.id || '',
-            name: apiResponse.doctorInfo?.fullName || 'N/A',
-            avatar: apiResponse.doctorInfo?.avatarUrl || '',
-            email: apiResponse.doctorInfo?.email || '',
-            phone: '', // Phone not in API response yet
-            specialty: '', // Specialty needs to be fetched separately
-        },
         appointmentDate: apiResponse.appointmentDate,
         appointmentTime: apiResponse.appointmentDate, // Using same field for time
         appointmentType: apiResponse.appointmentType,
-        visitType: apiResponse.serviceInfo?.category || 'General Visit',
         status: apiResponse.status,
-        price: apiResponse.serviceInfo?.price?.toString(),
-        notes: apiResponse.reason,
+        reason: apiResponse.reason,
+        result: apiResponse.result,
         isNew: false, // Can be calculated based on createdAt
         hasReview: false, // Needs review data from another endpoint
+        // Map info sections directly from API response
+        doctorInfo: apiResponse.doctorInfo,
+        serviceInfo: apiResponse.serviceInfo,
+        hospitalInfo: apiResponse.hospitalInfo,
+    };
+};
+
+/**
+ * Transform API AppointmentResponse to UI AppointmentDetailData
+ * Includes additional detail fields
+ */
+export const transformToDetailData = (apiResponse: AppointmentResponse): AppointmentDetailData => {
+    return {
+        ...transformToCardData(apiResponse),
+        visitType: undefined, // TODO: Add visitType to API response
+        consultationFees: undefined, // TODO: Add consultationFees to API response
+        clinicLocation: undefined, // TODO: Add clinicLocation to API response
+        location: apiResponse.hospitalInfo?.address, // Use hospital address as location
+        personWithPatient: undefined, // TODO: Add personWithPatient to API response
     };
 };
 
@@ -313,6 +312,92 @@ export const isNewAppointment = (createdAt: string): boolean => {
     const now = new Date();
     const diffHours = (now.getTime() - created.getTime()) / (1000 * 60 * 60);
     return diffHours <= 24;
+};
+
+/**
+ * Get display name based on priority: Doctor > Service > Hospital
+ */
+export const getDisplayName = (appointment: AppointmentCardData): string => {
+    if (appointment.doctorInfo?.id) {
+        return (
+            appointment.doctorInfo.fullName ||
+            `${appointment.doctorInfo.firstName || ''} ${appointment.doctorInfo.lastName || ''}`.trim() ||
+            'Bác sĩ'
+        );
+    }
+    if (appointment.serviceInfo?.id) {
+        return appointment.serviceInfo.name || 'Dịch vụ';
+    }
+    if (appointment.hospitalInfo?.id) {
+        return appointment.hospitalInfo.name || 'Bệnh viện';
+    }
+    return 'Chưa xác định';
+};
+
+/**
+ * Get display avatar based on priority: Doctor > Service > Hospital
+ */
+export const getDisplayAvatar = (appointment: AppointmentCardData): string => {
+    if (appointment.doctorInfo?.avatarUrl) {
+        return appointment.doctorInfo.avatarUrl;
+    }
+    if (appointment.hospitalInfo?.avatarUrl) {
+        return appointment.hospitalInfo.avatarUrl;
+    }
+    return ''; // No avatar for service
+};
+
+/**
+ * Get display email based on priority: Doctor > Hospital
+ */
+export const getDisplayEmail = (appointment: AppointmentCardData): string => {
+    if (appointment.doctorInfo?.email) {
+        return appointment.doctorInfo.email;
+    }
+    if (appointment.hospitalInfo?.email) {
+        return appointment.hospitalInfo.email;
+    }
+    return '';
+};
+
+/**
+ * Get display phone - only show hospital phone when there's no doctor and no service
+ */
+export const getDisplayPhone = (appointment: AppointmentCardData): string => {
+    // Only show hospital phone if there's no doctor info and no service info
+    if (!appointment.doctorInfo?.id && appointment.hospitalInfo?.phone) {
+        return appointment.hospitalInfo.phone;
+    }
+    return '';
+};
+
+/**
+ * Get display specialty/category
+ */
+export const getDisplaySpecialty = (appointment: AppointmentCardData): string => {
+    if (appointment.doctorInfo?.specialtyName) {
+        return appointment.doctorInfo.specialtyName;
+    }
+    if (appointment.serviceInfo?.category) {
+        return appointment.serviceInfo.category;
+    }
+    return '';
+};
+
+/**
+ * Get display label (Bác sĩ, Dịch vụ, Bệnh viện)
+ */
+export const getDisplayLabel = (appointment: AppointmentCardData): string => {
+    if (appointment.doctorInfo?.id) {
+        return appointment.doctorInfo.positionName || 'Bác sĩ';
+    }
+    if (appointment.serviceInfo?.id) {
+        return 'Dịch vụ';
+    }
+    if (appointment.hospitalInfo?.id) {
+        return 'Bệnh viện';
+    }
+    return 'Chưa xác định';
 };
 
 /**
@@ -328,8 +413,6 @@ export const getStatusBadgeClass = (status: AppointmentStatus): string => {
             return 'badge-danger';
         case AppointmentStatus.COMPLETED:
             return 'badge-info';
-        case AppointmentStatus.NO_SHOW:
-            return 'badge-secondary';
         default:
             return 'badge-secondary';
     }
@@ -340,12 +423,8 @@ export const getStatusBadgeClass = (status: AppointmentStatus): string => {
  */
 export const getAppointmentTypeIcon = (type: AppointmentType): string => {
     switch (type) {
-        case AppointmentType.VIDEO_CALL:
-            return 'isax isax-video';
-        case AppointmentType.AUDIO_CALL:
-            return 'isax isax-call';
-        case AppointmentType.CHAT:
-            return 'isax isax-messages';
+        case AppointmentType.TELEHEALTH:
+            return 'isax isax-video5';
         case AppointmentType.IN_PERSON:
             return 'isax isax-hospital5';
         default:

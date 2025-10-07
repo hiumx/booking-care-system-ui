@@ -2,6 +2,23 @@ import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
 import { AppointmentDetailData } from '@/types/appointment.types';
 
 export const mockAppointmentDetailData: Record<string, AppointmentDetailData> = {
+    waiting: {
+        appointmentId: 'Apt0001',
+        doctor: {
+            name: 'Dr Edalin Hendry',
+            image: '/src/assets/img/doctors-dashboard/doctor-profile-img.jpg',
+            email: 'edalin.hendry@example.com',
+            phone: '+1 504 368 6874',
+        },
+        appointmentType: AppointmentType.IN_PERSON,
+        visitType: 'General',
+        appointmentDate: '22 Jul 2023',
+        appointmentTime: '12:00 pm',
+        consultationFees: 200,
+        clinicLocation: "Adrian's Dentistry",
+        location: 'Newyork, United States',
+        status: AppointmentStatus.PENDING,
+    },
     upcoming: {
         appointmentId: 'Apt0001',
         doctor: {
@@ -27,7 +44,7 @@ export const mockAppointmentDetailData: Record<string, AppointmentDetailData> = 
             email: 'edalin.hendry@example.com',
             phone: '+1 504 368 6874',
         },
-        appointmentType: AppointmentType.VIDEO_CALL,
+        appointmentType: AppointmentType.TELEHEALTH,
         visitType: 'General',
         appointmentDate: '22 Jul 2023',
         appointmentTime: '12:00 pm',
@@ -43,7 +60,7 @@ export const mockAppointmentDetailData: Record<string, AppointmentDetailData> = 
             email: 'edalin.hendry@example.com',
             phone: '+1 504 368 6874',
         },
-        appointmentType: AppointmentType.VIDEO_CALL,
+        appointmentType: AppointmentType.TELEHEALTH,
         visitType: 'General',
         appointmentDate: '22 Jul 2023',
         appointmentTime: '12:00 pm',
