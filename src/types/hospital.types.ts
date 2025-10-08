@@ -1,4 +1,5 @@
 import { Status } from '../enums/common.enums';
+import { HospitalSimpleResponse } from './simple.types';
 
 // Hospital Response DTOs
 export interface HospitalResponse {
@@ -129,6 +130,7 @@ export interface HospitalSearchParams {
 // Hospital State
 export interface HospitalState {
     hospitals: HospitalResponse[];
+    simpleHospitals: HospitalSimpleResponse[]; // For optimized API
     selectedHospital: HospitalResponse | null;
     isLoading: boolean;
     error: string | null;

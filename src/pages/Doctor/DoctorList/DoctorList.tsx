@@ -202,17 +202,24 @@ const DoctorList: React.FC = () => {
                 name={`${doctor.firstName} ${doctor.lastName}`}
                 specialty={doctor.specialty?.name || 'Chưa cập nhật'}
                 position={doctor.position?.name || 'Chưa cập nhật'}
-                bookCounts={doctor.reviewStatistics?.totalReviews || 0}
+                prices={
+                    doctor.prices?.map((price) => ({
+                        id: price.id,
+                        serviceTypeId: price.serviceTypeId,
+                        serviceTypeName: price.serviceTypeName,
+                        amount: price.amount,
+                    })) || []
+                }
                 rating={doctor.reviewStatistics?.averageRating || 0}
                 location={doctor.hospital?.name || doctor.address || 'Chưa cập nhật'}
                 yearsOfExperience={doctor.yearsOfExperience}
-                fees={doctor.prices?.[0]?.amount || 0}
                 isFavorite={doctor.isFavorited}
                 languages={doctor.languages || []}
                 nextAvailableTime={
                     doctor.status === Status.ACTIVE ? 'Có lịch trống' : 'Không có lịch'
                 }
                 image={doctor.avatarUrl || docProfile01}
+                serviceTypeFilters={serviceTypeFilters}
             />
         ));
     };

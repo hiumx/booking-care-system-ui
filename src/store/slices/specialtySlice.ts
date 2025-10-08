@@ -1,6 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { DoctorService } from '@/services/doctor.service';
-import { SpecialtyState } from '@/types/specialty.types';
+import { SpecialtySimpleResponse } from '@/types/simple.types';
+
+export interface SpecialtyState {
+    specialties: SpecialtySimpleResponse[];
+    isLoading: boolean;
+    error: string | null;
+}
 
 const initialState: SpecialtyState = {
     specialties: [],
@@ -33,7 +39,7 @@ const specialtySlice = createSlice({
             })
             .addCase(getSpecialtiesAsync.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.specialties = action.payload.specialties || action.payload;
+                state.specialties = action.payload;
                 state.error = null;
             })
             .addCase(getSpecialtiesAsync.rejected, (state, action) => {

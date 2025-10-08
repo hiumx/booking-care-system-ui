@@ -6,6 +6,7 @@ import {
     HospitalDetailResponse,
     HospitalSearchParams,
 } from '@/types/hospital.types';
+import { HospitalSimpleResponse } from '@/types/simple.types';
 
 // Base API endpoint for hospital service
 const HOSPITAL_ENDPOINTS = {
@@ -13,6 +14,7 @@ const HOSPITAL_ENDPOINTS = {
     HEALTH: '/hospitals/health',
     GET_HOSPITAL: (id: string) => `/hospitals/${id}`,
     GET_HOSPITALS: '/hospitals',
+    GET_ALL_HOSPITALS: '/hospitals/all',
 } as const;
 
 export class HospitalService {
@@ -67,10 +69,26 @@ export class HospitalService {
             throw new Error(error.message || 'Failed to retrieve hospitals');
         }
     }
+
+    /**
+     * Get all hospitals (optimized for performance)
+     */
+    static async getAllHospitals(): Promise<ApiResponse<HospitalSimpleResponse[]>> {
+        try {
+            const response: any = await axiosInstance.get(HOSPITAL_ENDPOINTS.GET_ALL_HOSPITALS);
+            return {
+                success: response.success ?? true,
+                data: response.data || response,
+                message: response.message || 'Hospitals retrieved successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to retrieve hospitals');
+        }
+    }
 }
 
 // Export individual methods for convenience
-export const { healthCheck, getHospitalById, getHospitals } = HospitalService;
+export const { healthCheck, getHospitalById, getHospitals, getAllHospitals } = HospitalService;
 
 // Default export
 export default HospitalService;
