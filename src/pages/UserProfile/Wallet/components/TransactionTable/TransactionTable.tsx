@@ -39,7 +39,15 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
     };
     // Loading state - Skeleton
     if (loading) {
-        const skeletonRows = Array.from({ length: 5 }, (_, i) => `skeleton-row-${i}`);
+        // Predefined widths to avoid Math.random() SonarQube warning and ensure consistent skeleton appearance
+        const skeletonWidths = [
+            { key: 'skeleton-row-1', id: 85, account: 120, reason: 150, date: 95, amount: 90 },
+            { key: 'skeleton-row-2', id: 75, account: 110, reason: 140, date: 100, amount: 85 },
+            { key: 'skeleton-row-3', id: 90, account: 115, reason: 135, date: 90, amount: 95 },
+            { key: 'skeleton-row-4', id: 80, account: 125, reason: 145, date: 105, amount: 80 },
+            { key: 'skeleton-row-5', id: 95, account: 105, reason: 130, date: 85, amount: 100 },
+        ];
+
         return (
             <div className="row">
                 <div className="col-sm-12">
@@ -58,8 +66,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {skeletonRows.map((rowId) => (
-                                            <tr key={rowId}>
+                                        {skeletonWidths.map((widths) => (
+                                            <tr key={widths.key}>
                                                 <td>
                                                     <div
                                                         className={clsx(
@@ -68,7 +76,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                                                         )}
                                                         style={{
                                                             height: 20,
-                                                            width: `${Math.random() * 30 + 70}px`,
+                                                            width: `${widths.id}px`,
                                                         }}
                                                     />
                                                 </td>
@@ -80,7 +88,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                                                         )}
                                                         style={{
                                                             height: 20,
-                                                            width: `${Math.random() * 40 + 90}px`,
+                                                            width: `${widths.account}px`,
                                                         }}
                                                     />
                                                 </td>
@@ -92,7 +100,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                                                         )}
                                                         style={{
                                                             height: 20,
-                                                            width: `${Math.random() * 60 + 100}px`,
+                                                            width: `${widths.reason}px`,
                                                         }}
                                                     />
                                                 </td>
@@ -104,7 +112,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                                                         )}
                                                         style={{
                                                             height: 20,
-                                                            width: `${Math.random() * 20 + 85}px`,
+                                                            width: `${widths.date}px`,
                                                         }}
                                                     />
                                                 </td>
@@ -116,7 +124,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                                                         )}
                                                         style={{
                                                             height: 20,
-                                                            width: `${Math.random() * 30 + 70}px`,
+                                                            width: `${widths.amount}px`,
                                                         }}
                                                     />
                                                 </td>
