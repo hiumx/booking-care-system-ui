@@ -120,7 +120,7 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
                                 >
                                     <ul className="other-bank-info">
                                         <li className={styles.infoRow}>
-                                            <h6 className={styles.infoLabel}>Tên tài khoản</h6>
+                                            <h6 className={styles.infoLabel}>Tên ngân hàng</h6>
                                             <span className={styles.infoValue}>
                                                 {account.bankCode}
                                             </span>
@@ -132,7 +132,7 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
                                             </span>
                                         </li>
                                         <li className={styles.infoRow}>
-                                            <h6 className={styles.infoLabel}>Tên ngân hàng</h6>
+                                            <h6 className={styles.infoLabel}>Tên tài khoản</h6>
                                             <span className={styles.infoValue}>
                                                 {account.accountName}
                                             </span>
