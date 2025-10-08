@@ -2,6 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 
 import { Transaction } from '../../types/wallet.types';
+import styles from './TransactionTable.module.scss';
 
 interface TransactionTableProps {
     transactions: Transaction[];
@@ -30,19 +31,108 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
         // Handle transaction detail navigation here
     };
 
-    // Loading state
+    // Format GUID to a shorter, readable form while keeping full id in tooltip
+    const formatTransactionId = (id: string, prefixLen = 8, suffixLen = 4) => {
+        if (!id) return '';
+        if (id.length <= prefixLen + suffixLen + 3) return id;
+        return `${id.slice(0, prefixLen)}...${id.slice(-suffixLen)}`;
+    };
+    // Loading state - Skeleton
     if (loading) {
+        const skeletonRows = Array.from({ length: 5 }, (_, i) => `skeleton-row-${i}`);
         return (
             <div className="row">
                 <div className="col-sm-12">
                     <div className="account-detail-table">
                         <div className="custom-new-table">
-                            <div className="text-center p-4">
-                                <div
-                                    className="spinner-border text-primary"
-                                    aria-hidden="true"
-                                ></div>
-                                <p className="mt-2 mb-0">Đang tải lịch sử giao dịch...</p>
+                            <div className="table-responsive">
+                                <table className="table table-center mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Số tài khoản</th>
+                                            <th>Lý do hoàn tiền</th>
+                                            <th>Cập nhật vào lúc</th>
+                                            <th>Số tiền hoàn trả</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {skeletonRows.map((rowId) => (
+                                            <tr key={rowId}>
+                                                <td>
+                                                    <div
+                                                        className={clsx(
+                                                            styles.skeleton,
+                                                            styles.skeletonText
+                                                        )}
+                                                        style={{
+                                                            height: 20,
+                                                            width: `${Math.random() * 30 + 70}px`,
+                                                        }}
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <div
+                                                        className={clsx(
+                                                            styles.skeleton,
+                                                            styles.skeletonText
+                                                        )}
+                                                        style={{
+                                                            height: 20,
+                                                            width: `${Math.random() * 40 + 90}px`,
+                                                        }}
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <div
+                                                        className={clsx(
+                                                            styles.skeleton,
+                                                            styles.skeletonText
+                                                        )}
+                                                        style={{
+                                                            height: 20,
+                                                            width: `${Math.random() * 60 + 100}px`,
+                                                        }}
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <div
+                                                        className={clsx(
+                                                            styles.skeleton,
+                                                            styles.skeletonText
+                                                        )}
+                                                        style={{
+                                                            height: 20,
+                                                            width: `${Math.random() * 20 + 85}px`,
+                                                        }}
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <div
+                                                        className={clsx(
+                                                            styles.skeleton,
+                                                            styles.skeletonText
+                                                        )}
+                                                        style={{
+                                                            height: 20,
+                                                            width: `${Math.random() * 30 + 70}px`,
+                                                        }}
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <div
+                                                        className={clsx(
+                                                            styles.skeleton,
+                                                            styles.skeletonBadge
+                                                        )}
+                                                        style={{ height: 28, width: 90 }}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -101,12 +191,12 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                             <table className="table table-center mb-0">
                                 <thead>
                                     <tr>
-                                        <th>Refund ID</th>
-                                        <th>Account No</th>
-                                        <th>Refund Reason</th>
-                                        <th>Updated Date</th>
-                                        <th>Refund Amount</th>
-                                        <th>Status</th>
+                                        <th>ID</th>
+                                        <th>Số tài khoản</th>
+                                        <th>Lý do hoàn tiền</th>
+                                        <th>Cập nhật vào lúc</th>
+                                        <th>Số tiền hoàn trả</th>
+                                        <th>Trạng thái</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -125,7 +215,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                                                         handleTransactionClick(transaction.id)
                                                     }
                                                 >
-                                                    {transaction.id}
+                                                    {formatTransactionId(transaction.id)}
                                                 </button>
                                             </td>
                                             <td className="text-gray-9">{transaction.accountNo}</td>

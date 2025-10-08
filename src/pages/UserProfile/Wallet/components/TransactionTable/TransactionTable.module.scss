@@ -1,0 +1,37 @@
+// Skeleton animation styles
+@keyframes skeletonLoading {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.skeleton {
+    display: inline-block;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: skeletonLoading 1.5s infinite;
+    border-radius: 4px;
+}
+
+.skeletonText {
+    border-radius: 4px;
+}
+
+.skeletonBadge {
+    border-radius: 16px;
+}
+
+// Responsive skeleton sizes
+@media (max-width: 768px) {
+    .skeletonText {
+        height: 16px !important;
+    }
+
+    .skeletonBadge {
+        height: 24px !important;
+        width: 70px !important;
+    }
+}
