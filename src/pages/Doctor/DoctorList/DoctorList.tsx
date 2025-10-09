@@ -215,9 +215,6 @@ const DoctorList: React.FC = () => {
                 yearsOfExperience={doctor.yearsOfExperience}
                 isFavorite={doctor.isFavorited}
                 languages={doctor.languages || []}
-                nextAvailableTime={
-                    doctor.status === Status.ACTIVE ? 'Có lịch trống' : 'Không có lịch'
-                }
                 image={doctor.avatarUrl || docProfile01}
                 serviceTypeFilters={serviceTypeFilters}
             />

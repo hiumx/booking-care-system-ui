@@ -24,7 +24,6 @@ interface DoctorAppointmentBookingCardProps {
     yearsOfExperience: number; // Từ doctors.years_of_experience
     isFavorite: boolean; // Từ bảng favourites
     languages: LanguageResponse[]; // Danh sách ngôn ngữ của bác sĩ
-    nextAvailableTime: string; // Từ doctor_schedule_times và appointment_times.start_time
     image: string; // Từ doctors.avatar_url
     serviceTypeFilters?: string[]; // Service types đang được filter
 }
@@ -51,7 +50,6 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
         yearsOfExperience,
         isFavorite,
         languages,
-        nextAvailableTime,
         image,
         serviceTypeFilters = [],
     } = props;
@@ -222,10 +220,6 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                                 : 'Liên hệ để biết giá'}
                                         </h3>
                                     </div>
-                                    <p className={clsx(styles.fs15, 'mb-0')}>
-                                        Lịch trống tiếp theo <br />
-                                        {nextAvailableTime || 'Không có lịch'}
-                                    </p>
                                 </div>
                                 <div className={styles.bookingButtonContainer}>
                                     <Link
