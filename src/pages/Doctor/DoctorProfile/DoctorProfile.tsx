@@ -254,11 +254,24 @@ const DoctorProfile: React.FC = () => {
     const doctor = selectedDoctor;
     const limit = 300;
     const isLongText = doctor?.bio ? doctor.bio.length > limit : false;
-    const displayText = doctor?.bio
-        ? expanded || !isLongText
-            ? doctor.bio
-            : doctor.bio.slice(0, limit) + '...'
-        : '';
+
+    // Function to get display text for bio
+    const getDisplayText = (
+        bio: string | undefined,
+        isExpanded: boolean,
+        isLong: boolean,
+        textLimit: number
+    ) => {
+        if (!bio) {
+            return '';
+        }
+        if (isExpanded || !isLong) {
+            return bio;
+        }
+        return bio.slice(0, textLimit) + '...';
+    };
+
+    const displayText = getDisplayText(doctor?.bio, expanded, isLongText, limit);
 
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 2;
@@ -283,8 +296,8 @@ const DoctorProfile: React.FC = () => {
                 <div className="content">
                     <div className="container">
                         <div className="text-center py-5">
-                            <div className="spinner-border" role="status">
-                                <span className="visually-hidden">Loading...</span>
+                            <div className="spinner-border">
+                                <output className="visually-hidden">Loading...</output>
                             </div>
                             <p className="mt-3">Đang tải thông tin bác sĩ...</p>
                         </div>
@@ -357,9 +370,20 @@ const DoctorProfile: React.FC = () => {
         return stars;
     };
 
+    // Function to get gender display text
+    const getGenderDisplayText = (gender: any) => {
+        if (String(gender) === 'FEMALE') {
+            return 'Nữ';
+        }
+        if (String(gender) === 'MALE') {
+            return 'Nam';
+        }
+        return 'Khác';
+    };
+
     // Count completed appointments (mock data for now)
     const appointmentCount = mockAppointments.filter(
-        (apt) => apt.doctor_id === parseInt(doctor.id || '1')
+        (apt) => apt.doctor_id === Number.parseInt(doctor.id || '1', 10)
     ).length;
 
     // Get price range from doctor data
@@ -512,12 +536,7 @@ const DoctorProfile: React.FC = () => {
                                                     <img src={genderIcon} alt="Icon" />
                                                 </span>
                                                 <p>
-                                                    Giới tính:{' '}
-                                                    {String(doctor.gender) === 'FEMALE'
-                                                        ? 'Nữ'
-                                                        : String(doctor.gender) === 'MALE'
-                                                          ? 'Nam'
-                                                          : 'Khác'}
+                                                    Giới tính: {getGenderDisplayText(doctor.gender)}
                                                 </p>
                                             </div>
                                             <h5 className="accept-text">
@@ -529,7 +548,7 @@ const DoctorProfile: React.FC = () => {
                                         </li>
                                         <li>
                                             <div className="rating">
-                                                {renderStars(parseFloat(averageRating))}
+                                                {renderStars(Number.parseFloat(averageRating))}
                                                 <span>{averageRating}</span>
                                                 <Link
                                                     to="#reviews"
@@ -768,8 +787,8 @@ const DoctorProfile: React.FC = () => {
                                     </div>
                                     <ul className={clsx('special-links', styles.marginLeftZero)}>
                                         {doctor.prices && doctor.prices.length > 0 ? (
-                                            doctor.prices.map((price, index) => (
-                                                <li key={index}>
+                                            doctor.prices.map((price) => (
+                                                <li key={price.id}>
                                                     <Link to={`/service/${price.id}`}>
                                                         {price.serviceTypeName}
                                                         <span>
