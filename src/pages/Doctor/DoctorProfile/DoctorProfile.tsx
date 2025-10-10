@@ -1,5 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
 import styles from './DoctorProfile.module.scss';
 import Pagination from '@/components/Pagination';
@@ -8,105 +9,31 @@ import Button from '@/components/Button';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import WriteReview from './components/WriteReview';
+import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
+import {
+    selectSelectedDoctor,
+    selectDoctorLoading,
+    selectDoctorError,
+} from '@/store/selectors/doctor.selectors';
+import { AppDispatch } from '@/store';
 
 // Import images for DoctorProfileCard
 import doctorImg from '@/assets/img/doctors/doc-profile-02.jpg';
 import badgeCheck from '@/assets/img/icons/badge-check.svg';
 import watchIcon from '@/assets/img/icons/watch-icon.svg';
-import thumbIcon from '@/assets/img/icons/thumb-icon.svg';
-import buildingIcon from '@/assets/img/icons/building-icon.svg';
+import thumbIcon from '@/assets/img/icons/gmail-icon.svg';
+import genderIcon from '@/assets/img/icons/gender-icon.svg';
 import deviceMessageIcon from '@/assets/img/icons/device-message2.svg';
 import calendarIcon from '@/assets/img/icons/calendar3.svg';
 import bullseyeIcon from '@/assets/img/icons/bullseye.svg';
 
 // Import images for DoctorDetails
 import experienceLogo1 from '@/assets/img/icons/experience-logo-01.svg';
-import clinicImg1 from '@/assets/img/clinic/clinic-11.jpg';
 
 // Icon CSS
 import '@/assets/css/feather.css';
 import DoctorAvailability from './components/DoctorAvailability';
 import { PATHS, replacePathParams } from '@/routes/paths';
-
-// Mock data for Doctor
-const mockDoctor = {
-    id: 1,
-    account_id: 1,
-    email: 'nguyenvana@example.com',
-    address: 'Võ Chí Công, Đà Nẵng',
-    first_name: 'Nguyễn',
-    last_name: 'Văn A',
-    gender: 'MALE',
-    position_id: 1,
-    specialty_id: 1,
-    clinic_id: 1,
-    bio: 'Bác sĩ giàu kinh nghiệm và đầy nhiệt huyết, luôn tận tâm chăm sóc bệnh nhân. Có kinh nghiệm trong nhiều môi trường y tế, đặc biệt am hiểu về chẩn đoán, chăm sóc ban đầu và y học cấp cứu. Thành thạo trong việc sử dụng công nghệ mới nhất để tối ưu hóa quá trình điều trị. Luôn cam kết mang đến sự quan tâm, chăm sóc cá nhân hóa và đầy nhân ái cho từng bệnh nhân...',
-    avatar_url: doctorImg,
-    years_of_experience: 21,
-    created_at: '2020-01-15 10:00:00',
-    updated_at: '2025-08-18 14:00:00',
-};
-
-// Mock data for Specialty
-const mockSpecialty = {
-    id: 1,
-    name: 'Nha khoa',
-    image_url: 'https://example.com/specialty-dental.jpg',
-    status: 'ACTIVE',
-    created_at: '2020-01-01 09:00:00',
-    updated_at: '2025-08-18 13:00:00',
-};
-
-// Mock data for Clinic
-const mockClinic = {
-    id: 1,
-    account_id: 1,
-    name: 'Bệnh viện Đà Nẵng',
-    address: 'Võ Chí Công, Đà Nẵng, Việt Nam',
-    phone: '0236-123-456',
-    email: 'info@dananghospital.vn',
-    description: 'Bệnh viện hàng đầu tại Đà Nẵng với đội ngũ y bác sĩ chuyên nghiệp.',
-    background_url: clinicImg1,
-    avatar_url: clinicImg1,
-    status: 'ACTIVE',
-    created_at: '2019-12-01 08:00:00',
-    updated_at: '2025-08-18 15:00:00',
-};
-
-// Mock data for Position
-const mockPosition = {
-    id: 1,
-    name: 'Tiến sĩ',
-    description: 'Bác sĩ có trình độ tiến sĩ y khoa.',
-    created_at: '2020-01-01 09:00:00',
-    updated_at: '2025-08-18 13:00:00',
-};
-
-// Mock data for Prices
-const mockPrices = [
-    {
-        id: 1,
-        amount: 300000,
-    },
-    {
-        id: 2,
-        amount: 500000,
-    },
-];
-
-// Mock data for Doctor Prices
-const mockDoctorPrices = [
-    {
-        doctor_id: 1,
-        price_id: 1,
-        description: 'Standard consultation',
-    },
-    {
-        doctor_id: 1,
-        price_id: 2,
-        description: 'Premium consultation',
-    },
-];
 
 // Mock data for Appointments
 const mockAppointments = Array.from({ length: 200 }, (_, index) => ({
@@ -282,9 +209,25 @@ const reviews = Array.from({ length: 150 }, (_, index) => {
 });
 
 const DoctorProfile: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { id } = useParams<{ id: string }>();
+
+    // Redux selectors
+    const selectedDoctor = useSelector(selectSelectedDoctor);
+    const isLoading = useSelector(selectDoctorLoading);
+    const error = useSelector(selectDoctorError);
+
+    // Fetch doctor data when component mounts or id changes
+    useEffect(() => {
+        if (id) {
+            dispatch(getDoctorByIdAsync(id));
+        }
+    }, [dispatch, id]);
+
     const bioRef = useRef<HTMLDivElement>(null);
     const expRef = useRef<HTMLDivElement>(null);
     const specialityRef = useRef<HTMLDivElement>(null);
+    const servicesRef = useRef<HTMLDivElement>(null);
     const clinicRef = useRef<HTMLDivElement>(null);
     const hoursRef = useRef<HTMLDivElement>(null);
     const reviewRef = useRef<HTMLDivElement>(null);
@@ -294,12 +237,28 @@ const DoctorProfile: React.FC = () => {
     };
 
     const [expanded, setExpanded] = useState(false);
-    const { id } = useParams<{ id: string }>();
 
+    // Function to generate Google Maps embed URL from address
+    const generateMapUrl = (address: string) => {
+        if (!address) {
+            // Fallback to default location if no address
+            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3193.7301009561315!2d-76.13077892422932!3d36.82498697224007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89bae976cfe9f8af%3A0xa61eac05156fbdb9!2sBeachStreet%20USA!5e0!3m2!1sen!2sin!4v1669777904208!5m2!1sen!2sin';
+        }
+
+        // Encode the address for URL - using simple Google Maps embed
+        const encodedAddress = encodeURIComponent(address);
+        return `https://maps.google.com/maps?q=${encodedAddress}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+    };
+
+    // Use selectedDoctor data instead of mock data
+    const doctor = selectedDoctor;
     const limit = 300;
-    const isLongText = mockDoctor.bio.length > limit;
-    const displayText =
-        expanded || !isLongText ? mockDoctor.bio : mockDoctor.bio.slice(0, limit) + '...';
+    const isLongText = doctor?.bio ? doctor.bio.length > limit : false;
+    const displayText = doctor?.bio
+        ? expanded || !isLongText
+            ? doctor.bio
+            : doctor.bio.slice(0, limit) + '...'
+        : '';
 
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 2;
@@ -308,30 +267,108 @@ const DoctorProfile: React.FC = () => {
 
     const [showWriteReview, setShowWriteReview] = useState(false);
 
-    // Calculate average rating
-    const averageRating =
-        reviews.length > 0
-            ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
-            : '0.0';
+    // Breadcrumb data
+    const breadcrumbData = {
+        items: [
+            { label: '', path: '/', isActive: false },
+            { label: 'Hồ sơ bác sĩ', isActive: true },
+        ],
+        title: 'Hồ sơ bác sĩ',
+    };
 
-    // Calculate recommendation percentage
-    const recommendCount = reviews.filter((review) => review.recommend).length;
-    const recommendPercentage =
-        reviews.length > 0 ? Math.round((recommendCount / reviews.length) * 100) : 0;
+    // Loading and error states
+    if (isLoading) {
+        return (
+            <MainLayout>
+                <div className="content">
+                    <div className="container">
+                        <div className="text-center py-5">
+                            <div className="spinner-border" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                            <p className="mt-3">Đang tải thông tin bác sĩ...</p>
+                        </div>
+                    </div>
+                </div>
+            </MainLayout>
+        );
+    }
 
-    // Count completed appointments
+    if (error) {
+        return (
+            <MainLayout>
+                <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
+                <div className="content">
+                    <div className="container">
+                        <div className="text-center py-5">
+                            <h4 className="fw-semibold mb-2">Đã xảy ra lỗi!</h4>
+                            <p className="text-muted mb-4">Đã có lỗi xảy ra khi tải dữ liệu.</p>
+                            <Link to={PATHS.HOME} className="btn btn-outline-primary px-4">
+                                Quay về trang chủ
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </MainLayout>
+        );
+    }
+
+    if (!doctor) {
+        return (
+            <MainLayout>
+                <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
+                <div className="content">
+                    <div className="container">
+                        <div className="text-center py-5">
+                            <h4 className="fw-semibold mb-2">Không tìm thấy bác sĩ!</h4>
+                            <p className="text-muted mb-4">
+                                Bác sĩ bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
+                            </p>
+                            <Link to={PATHS.HOME} className="btn btn-outline-primary px-4">
+                                Quay về trang chủ
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </MainLayout>
+        );
+    }
+
+    // Calculate average rating from review statistics
+    const averageRating = doctor.reviewStatistics?.averageRating
+        ? doctor.reviewStatistics.averageRating.toFixed(1)
+        : '0.0';
+
+    // Function to render stars based on rating
+    const renderStars = (rating: number) => {
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+
+        for (let i = 1; i <= 5; i++) {
+            if (i <= fullStars) {
+                stars.push(<i key={i} className="fas fa-star filled"></i>);
+            } else if (i === fullStars + 1 && hasHalfStar) {
+                stars.push(<i key={i} className="fas fa-star-half-alt filled"></i>);
+            } else {
+                stars.push(<i key={i} className="fas fa-star"></i>);
+            }
+        }
+        return stars;
+    };
+
+    // Count completed appointments (mock data for now)
     const appointmentCount = mockAppointments.filter(
-        (apt) => apt.doctor_id === mockDoctor.id
+        (apt) => apt.doctor_id === parseInt(doctor.id || '1')
     ).length;
 
-    // Get price range
-    const prices = mockDoctorPrices
-        .filter((dp) => dp.doctor_id === mockDoctor.id)
-        .map((dp) => mockPrices.find((p) => p.id === dp.price_id)?.amount)
-        .filter((amount): amount is number => amount !== undefined);
+    // Get price range from doctor data
+    const prices = doctor.prices?.map((price) => price.amount) || [];
+
+    const allPrices = prices;
     const priceRange =
-        prices.length > 0
-            ? `${Math.min(...prices).toLocaleString('vi-VN')}đ - ${Math.max(...prices).toLocaleString('vi-VN')}đ`
+        allPrices.length > 0
+            ? `${Math.min(...allPrices).toLocaleString('vi-VN')}đ - ${Math.max(...allPrices).toLocaleString('vi-VN')}đ`
             : 'N/A';
 
     // Handle review submission
@@ -394,14 +431,6 @@ const DoctorProfile: React.FC = () => {
     // Mock current user ID for demo purposes
     const currentUserId = 101; // Giả sử user hiện tại có ID là 101
 
-    const breadcrumbData = {
-        items: [
-            { label: '', path: '/', isActive: false },
-            { label: 'Hồ sơ bác sĩ', isActive: true },
-        ],
-        title: 'Hồ sơ bác sĩ',
-    };
-
     return (
         <MainLayout>
             <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
@@ -413,7 +442,7 @@ const DoctorProfile: React.FC = () => {
                                 <div className="doc-info-left">
                                     <div className="doctor-img">
                                         <img
-                                            src={mockDoctor.avatar_url}
+                                            src={doctor.avatarUrl || doctorImg}
                                             className="img-fluid"
                                             alt="User"
                                         />
@@ -423,20 +452,21 @@ const DoctorProfile: React.FC = () => {
                                             <i className="fa-solid fa-circle"></i> Sẵn sàng phục vụ
                                         </span>
                                         <h4 className="doc-name">
-                                            {mockDoctor.last_name} {mockDoctor.first_name}{' '}
+                                            {doctor.lastName} {doctor.firstName}{' '}
                                             <img src={badgeCheck} alt="Badge" />
                                             <span className="badge doctor-role-badge">
                                                 <i className="fa-solid fa-circle"></i>{' '}
-                                                {mockSpecialty.name}
+                                                {doctor.specialty?.name}
                                             </span>
                                         </h4>
-                                        <p>{mockClinic.name}</p>
-                                        <p>Trình độ: {mockPosition.name}</p>
+                                        <p>Học vị: {doctor.position?.name}</p>
+                                        <p>{doctor.hospital?.name}</p>
+
                                         <p className="address-detail">
                                             <span className="loc-icon">
                                                 <i className="feather-map-pin"></i>
                                             </span>
-                                            {mockClinic.address}{' '}
+                                            {doctor.hospital?.address}{' '}
                                             <span className="view-text">( Xem vị trí )</span>
                                         </p>
                                     </div>
@@ -473,17 +503,22 @@ const DoctorProfile: React.FC = () => {
                                                 <span className="list-icon">
                                                     <img src={thumbIcon} alt="Icon" />
                                                 </span>
-                                                <p>
-                                                    <b>{recommendPercentage}%</b> được đề xuất
-                                                </p>
+                                                <p>Email: {doctor.email}</p>
                                             </div>
                                         </li>
                                         <li>
                                             <div className="hospital-info">
                                                 <span className="list-icon">
-                                                    <img src={buildingIcon} alt="Icon" />
+                                                    <img src={genderIcon} alt="Icon" />
                                                 </span>
-                                                <p>{mockClinic.name}</p>
+                                                <p>
+                                                    Giới tính:{' '}
+                                                    {String(doctor.gender) === 'FEMALE'
+                                                        ? 'Nữ'
+                                                        : String(doctor.gender) === 'MALE'
+                                                          ? 'Nam'
+                                                          : 'Khác'}
+                                                </p>
                                             </div>
                                             <h5 className="accept-text">
                                                 <span>
@@ -494,17 +529,14 @@ const DoctorProfile: React.FC = () => {
                                         </li>
                                         <li>
                                             <div className="rating">
-                                                <i className="fas fa-star filled"></i>
-                                                <i className="fas fa-star filled"></i>
-                                                <i className="fas fa-star filled"></i>
-                                                <i className="fas fa-star filled"></i>
-                                                <i className="fas fa-star filled"></i>
+                                                {renderStars(parseFloat(averageRating))}
                                                 <span>{averageRating}</span>
                                                 <Link
-                                                    to="#"
+                                                    to="#reviews"
                                                     className="d-inline-block average-rating"
                                                 >
-                                                    {reviews.length} Đánh giá
+                                                    {doctor.reviewStatistics?.totalReviews || 0}{' '}
+                                                    Đánh giá
                                                 </Link>
                                             </div>
                                             <ul className="contact-doctors">
@@ -552,7 +584,7 @@ const DoctorProfile: React.FC = () => {
                                         <span className="bg-dark-blue">
                                             <img src={bullseyeIcon} alt="Target" />
                                         </span>
-                                        {mockDoctor.years_of_experience} năm kinh nghiệm
+                                        {doctor.yearsOfExperience} năm kinh nghiệm
                                     </li>
                                 </ul>
                                 <div className="bottom-book-btn">
@@ -613,10 +645,21 @@ const DoctorProfile: React.FC = () => {
                                     to="#"
                                     onClick={(e) => {
                                         e.preventDefault();
+                                        scrollToSection(servicesRef.current);
+                                    }}
+                                >
+                                    Dịch vụ
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="#"
+                                    onClick={(e) => {
+                                        e.preventDefault();
                                         scrollToSection(clinicRef.current);
                                     }}
                                 >
-                                    Phòng khám
+                                    Bệnh viện
                                 </Link>
                             </li>
                             <li>
@@ -681,20 +724,24 @@ const DoctorProfile: React.FC = () => {
                                             </span>
                                         </div>
                                         <div className="experience-content">
-                                            <h5>{mockClinic.name}</h5>
+                                            <h5>{doctor.hospital?.name || 'Bệnh viện'}</h5>
                                             <p>
-                                                <strong>Chuyên khoa:</strong> {mockSpecialty.name}
+                                                <strong>Chuyên khoa:</strong>{' '}
+                                                {doctor.specialty?.name || 'Chuyên khoa'}
                                             </p>
                                             <p>
-                                                <strong>Trình độ:</strong> {mockPosition.name}
+                                                <strong>Trình độ:</strong>{' '}
+                                                {doctor.position?.name || 'Bác sĩ'}
                                             </p>
                                             <p>
                                                 <strong>Kinh nghiệm:</strong>{' '}
-                                                {mockDoctor.years_of_experience} năm kinh nghiệm
+                                                {doctor.yearsOfExperience} năm kinh nghiệm
                                             </p>
                                             <p>
                                                 <strong>Mô tả:</strong>{' '}
-                                                {mockDoctor.bio.substring(0, 100)}...
+                                                {doctor.bio
+                                                    ? doctor.bio.substring(0, 100) + '...'
+                                                    : 'Không có thông tin giới thiệu'}
                                             </p>
                                         </div>
                                     </div>
@@ -707,15 +754,59 @@ const DoctorProfile: React.FC = () => {
                                     </div>
                                     <ul className={clsx('special-links', styles.marginLeftZero)}>
                                         <li>
-                                            <Link to="#">{mockSpecialty.name}</Link>
+                                            <Link to={`/specialty/${doctor.specialty?.id || ''}`}>
+                                                {doctor.specialty?.name || 'Chuyên khoa'}
+                                            </Link>
                                         </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div ref={servicesRef}>
+                                <div className="doc-information-details" id="services">
+                                    <div className="detail-title">
+                                        <h4>Dịch vụ & Giá</h4>
+                                    </div>
+                                    <ul className={clsx('special-links', styles.marginLeftZero)}>
+                                        {doctor.prices && doctor.prices.length > 0 ? (
+                                            doctor.prices.map((price, index) => (
+                                                <li key={index}>
+                                                    <Link to={`/service/${price.id}`}>
+                                                        {price.serviceTypeName}
+                                                        <span>
+                                                            {price.amount.toLocaleString('vi-VN')}đ
+                                                        </span>
+                                                    </Link>
+                                                </li>
+                                            ))
+                                        ) : (
+                                            <>
+                                                <li>
+                                                    <Link to="/service/basic-consultation">
+                                                        Tư vấn cơ bản
+                                                        <span>300.000đ</span>
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link to="/service/specialty-examination">
+                                                        Khám chuyên khoa
+                                                        <span>500.000đ</span>
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link to="/service/advanced-consultation">
+                                                        Tư vấn nâng cao
+                                                        <span>800.000đ</span>
+                                                    </Link>
+                                                </li>
+                                            </>
+                                        )}
                                     </ul>
                                 </div>
                             </div>
                             <div ref={clinicRef}>
                                 <div className="doc-information-details" id="clinic">
                                     <div className="detail-title">
-                                        <h4>Clinics & Locations</h4>
+                                        <h4>Bệnh viện & Vị trí</h4>
                                     </div>
                                     <div className="clinic-loc">
                                         <div className="row align-items-center">
@@ -723,30 +814,42 @@ const DoctorProfile: React.FC = () => {
                                                 <div className="clinic-info">
                                                     <div className="clinic-img">
                                                         <img
-                                                            src={mockClinic.background_url}
-                                                            alt={mockClinic.name}
+                                                            src={
+                                                                doctor.hospital?.avatarUrl ||
+                                                                '/assets/img/clinic/clinic-11.jpg'
+                                                            }
+                                                            alt={
+                                                                doctor.hospital?.name || 'Bệnh viện'
+                                                            }
                                                         />
                                                     </div>
                                                     <div className="detail-clinic">
-                                                        <h5>{mockClinic.name}</h5>
+                                                        <h5>
+                                                            {doctor.hospital?.name || 'Bệnh viện'}
+                                                        </h5>
                                                         <Link
-                                                            to="/phong-kham/da-nang"
+                                                            to={`/hospital/${doctor.hospital?.id || ''}`}
                                                             className="clinic-link"
                                                         >
-                                                            Xem thông tin phòng khám
+                                                            Xem thông tin bệnh viện
                                                         </Link>
-                                                        <p>{mockClinic.address}</p>
+                                                        <p>
+                                                            <i className="feather-map-pin me-2"></i>
+                                                            {doctor.hospital?.address ||
+                                                                doctor.address ||
+                                                                'Địa chỉ bệnh viện'}
+                                                        </p>
                                                     </div>
                                                 </div>
                                                 <div className="d-flex align-items-center avail-time-slot">
                                                     {[
                                                         {
-                                                            day: 'Monday',
-                                                            time: '07:00 AM - 09:00 PM',
+                                                            day: 'Thứ 2',
+                                                            time: '07:00 AM - 17:00 PM',
                                                         },
                                                         {
-                                                            day: 'Tuesday',
-                                                            time: '07:00 AM - 09:00 PM',
+                                                            day: 'Thứ 7',
+                                                            time: '07:00 AM - 17:00 PM',
                                                         },
                                                     ].map((slot, idx) => (
                                                         <div
@@ -764,11 +867,15 @@ const DoctorProfile: React.FC = () => {
                                             <div className="col-lg-5">
                                                 <div className="contact-map d-flex">
                                                     <iframe
-                                                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3193.7301009561315!2d-76.13077892422932!3d36.82498697224007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89bae976cfe9f8af%3A0xa61eac05156fbdb9!2sBeachStreet%20USA!5e0!3m2!1sen!2sin!4v1669777904208!5m2!1sen!2sin"
+                                                        src={generateMapUrl(
+                                                            doctor.hospital?.address ||
+                                                                doctor.address ||
+                                                                'Địa chỉ bệnh viện'
+                                                        )}
                                                         allowFullScreen
                                                         loading="lazy"
                                                         referrerPolicy="no-referrer-when-downgrade"
-                                                        title={`Map for ${mockClinic.name}`}
+                                                        title={`Map for ${doctor.hospital?.name || 'Bệnh viện'}`}
                                                     ></iframe>
                                                 </div>
                                             </div>
@@ -802,7 +909,7 @@ const DoctorProfile: React.FC = () => {
                                             />
                                         ) : (
                                             <WriteReview
-                                                doctorName={`${mockDoctor.last_name} ${mockDoctor.first_name}`}
+                                                doctorName={`${doctor.lastName} ${doctor.firstName}`}
                                                 onSubmitReview={handleSubmitReview}
                                             />
                                         )}
