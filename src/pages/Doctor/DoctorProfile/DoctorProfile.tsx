@@ -743,14 +743,13 @@ const DoctorProfile: React.FC = () => {
                                             </span>
                                         </div>
                                         <div className="experience-content">
-                                            <h5>{doctor.hospital?.name || 'Bệnh viện'}</h5>
+                                            <h5>{doctor.hospital?.name}</h5>
                                             <p>
                                                 <strong>Chuyên khoa:</strong>{' '}
-                                                {doctor.specialty?.name || 'Chuyên khoa'}
+                                                {doctor.specialty?.name}
                                             </p>
                                             <p>
-                                                <strong>Trình độ:</strong>{' '}
-                                                {doctor.position?.name || 'Bác sĩ'}
+                                                <strong>Trình độ:</strong> {doctor.position?.name}
                                             </p>
                                             <p>
                                                 <strong>Kinh nghiệm:</strong>{' '}
@@ -760,7 +759,7 @@ const DoctorProfile: React.FC = () => {
                                                 <strong>Mô tả:</strong>{' '}
                                                 {doctor.bio
                                                     ? doctor.bio.substring(0, 100) + '...'
-                                                    : 'Không có thông tin giới thiệu'}
+                                                    : 'Không có thông tin tiểu sử'}
                                             </p>
                                         </div>
                                     </div>
@@ -774,7 +773,7 @@ const DoctorProfile: React.FC = () => {
                                     <ul className={clsx('special-links', styles.marginLeftZero)}>
                                         <li>
                                             <Link to={`/specialty/${doctor.specialty?.id || ''}`}>
-                                                {doctor.specialty?.name || 'Chuyên khoa'}
+                                                {doctor.specialty?.name}
                                             </Link>
                                         </li>
                                     </ul>
@@ -798,26 +797,9 @@ const DoctorProfile: React.FC = () => {
                                                 </li>
                                             ))
                                         ) : (
-                                            <>
-                                                <li>
-                                                    <Link to="/service/basic-consultation">
-                                                        Tư vấn cơ bản
-                                                        <span>300.000đ</span>
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link to="/service/specialty-examination">
-                                                        Khám chuyên khoa
-                                                        <span>500.000đ</span>
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link to="/service/advanced-consultation">
-                                                        Tư vấn nâng cao
-                                                        <span>800.000đ</span>
-                                                    </Link>
-                                                </li>
-                                            </>
+                                            <li>
+                                                <span className="text-muted">Chưa có dịch vụ</span>
+                                            </li>
                                         )}
                                     </ul>
                                 </div>
@@ -833,19 +815,12 @@ const DoctorProfile: React.FC = () => {
                                                 <div className="clinic-info">
                                                     <div className="clinic-img">
                                                         <img
-                                                            src={
-                                                                doctor.hospital?.avatarUrl ||
-                                                                '/assets/img/clinic/clinic-11.jpg'
-                                                            }
-                                                            alt={
-                                                                doctor.hospital?.name || 'Bệnh viện'
-                                                            }
+                                                            src={doctor.hospital?.avatarUrl}
+                                                            alt={doctor.hospital?.name}
                                                         />
                                                     </div>
                                                     <div className="detail-clinic">
-                                                        <h5>
-                                                            {doctor.hospital?.name || 'Bệnh viện'}
-                                                        </h5>
+                                                        <h5>{doctor.hospital?.name}</h5>
                                                         <Link
                                                             to={`/hospital/${doctor.hospital?.id || ''}`}
                                                             className="clinic-link"
@@ -894,7 +869,7 @@ const DoctorProfile: React.FC = () => {
                                                         allowFullScreen
                                                         loading="lazy"
                                                         referrerPolicy="no-referrer-when-downgrade"
-                                                        title={`Map for ${doctor.hospital?.name || 'Bệnh viện'}`}
+                                                        title={`Map for ${doctor.hospital?.name}`}
                                                     ></iframe>
                                                 </div>
                                             </div>
