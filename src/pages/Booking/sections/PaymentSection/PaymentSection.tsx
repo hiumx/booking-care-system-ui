@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import BookingSectionWrapper from '../../components/BookingSectionWrapper';
 import { mockAppointmentInfo } from '../../constants/mockData';
-import { useDoctorInfo } from '../../hooks/useDoctorInfo';
+import { useDoctorInfo } from '../../hooks';
 import { useAppSelector } from '@/store/hooks';
 import { selectSelectedDate, selectSelectedSlots } from '@/store/selectors/schedule.selectors';
-import { useMemo } from 'react';
 import TimeSlotBadge from '../../components/TimeSlotBadge';
 
 interface PaymentSectionProps {
@@ -74,12 +73,8 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                         <div className="card-body">
                             <h6 className="mb-3">Cổng thanh toán</h6>
                             <div className="payment-tabs">
-                                <ul
-                                    className="nav nav-pills mb-3 row"
-                                    id="pills-tab"
-                                    role="tablist"
-                                >
-                                    <li className="nav-item col-sm-6" role="presentation">
+                                <ul className="nav nav-pills mb-3 row" id="pills-tab">
+                                    <li className="nav-item col-sm-6">
                                         <button
                                             className={`nav-link ${selectedPayment === 'payos' ? 'active' : ''}`}
                                             id="pills-payos-tab"
@@ -94,11 +89,11 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                                                 className="me-2"
                                                 alt="PayOS"
                                                 style={{ width: '24px', height: '24px' }}
-                                            />
+                                            />{' '}
                                             PayOS
                                         </button>
                                     </li>
-                                    <li className="nav-item col-sm-6" role="presentation">
+                                    <li className="nav-item col-sm-6">
                                         <button
                                             className={`nav-link ${selectedPayment === 'vnpay' ? 'active' : ''}`}
                                             id="pills-vnpay-tab"
@@ -113,7 +108,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                                                 className="me-2"
                                                 alt="VNPay"
                                                 style={{ width: '24px', height: '24px' }}
-                                            />
+                                            />{' '}
                                             VNPay
                                         </button>
                                     </li>
@@ -127,8 +122,8 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                                         <div className="payment-method-info">
                                             <div className="alert alert-info">
                                                 <h6 className="mb-2">
-                                                    <i className="bi bi-info-circle me-2"></i>
-                                                    Thanh toán qua PayOS
+                                                    <i className="bi bi-info-circle me-2"></i> Thanh
+                                                    toán qua PayOS
                                                 </h6>
                                                 <p className="mb-0">
                                                     Bạn sẽ được chuyển đến cổng thanh toán PayOS để
@@ -186,8 +181,8 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                                         <div className="payment-method-info">
                                             <div className="alert alert-info">
                                                 <h6 className="mb-2">
-                                                    <i className="bi bi-info-circle me-2"></i>
-                                                    Thanh toán qua VNPay
+                                                    <i className="bi bi-info-circle me-2"></i> Thanh
+                                                    toán qua VNPay
                                                 </h6>
                                                 <p className="mb-0">
                                                     Bạn sẽ được chuyển đến cổng thanh toán VNPay để
@@ -261,9 +256,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                                         khung - {formattedAppointmentInfo.totalDuration} phút)
                                     </div>
                                     <div className="d-flex flex-wrap gap-2">
-                                        {formattedAppointmentInfo.slots.map((slot, index) => (
+                                        {formattedAppointmentInfo.slots.map((slot) => (
                                             <TimeSlotBadge
-                                                key={index}
+                                                key={`${slot.startTime}-${slot.endTime}`}
                                                 startTime={slot.startTime}
                                                 endTime={slot.endTime}
                                                 minWidth="136px"
@@ -275,13 +270,13 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
                                 <div className="mb-3">
                                     <div className="fw-medium">Giờ khám</div>
                                     <div className="form-plain-text text-warning">
-                                        <i className="bi bi-exclamation-triangle me-1"></i>
-                                        Chưa chọn giờ khám
+                                        <i className="bi bi-exclamation-triangle me-1"></i> Chưa
+                                        chọn giờ khám
                                     </div>
                                 </div>
                             )}
 
-                            {doctorInfo && doctorInfo.name && (
+                            {doctorInfo?.name && (
                                 <>
                                     <div className="mb-3">
                                         <div className="fw-medium">Bác sĩ</div>

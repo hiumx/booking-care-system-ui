@@ -66,12 +66,12 @@ const CustomFileInput: React.FC<CustomFileInputProps> = ({
         inputRef.current?.click();
     };
 
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    const handleDragOver = (e: React.DragEvent<HTMLButtonElement>) => {
         e.preventDefault();
         e.stopPropagation();
     };
 
-    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    const handleDrop = (e: React.DragEvent<HTMLButtonElement>) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -124,11 +124,13 @@ const CustomFileInput: React.FC<CustomFileInputProps> = ({
                 onChange={handleFileSelect}
             />
 
-            <div
+            <button
+                type="button"
                 className={styles.dropzone}
                 onClick={handleClick}
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
+                aria-label="Chọn tệp để tải lên"
             >
                 <Upload className={styles.icon} size={48} />
                 <div className={styles.text}>
@@ -140,7 +142,7 @@ const CustomFileInput: React.FC<CustomFileInputProps> = ({
                         Hỗ trợ: Ảnh, PDF, DOC, DOCX (Tối đa {maxSize}MB)
                     </p>
                 </div>
-            </div>
+            </button>
 
             {files.length > 0 && (
                 <div className={styles.list}>

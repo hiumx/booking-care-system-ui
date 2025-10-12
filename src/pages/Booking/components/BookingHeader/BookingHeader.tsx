@@ -110,13 +110,13 @@ const BookingHeader: React.FC<BookingHeaderProps> = ({
                                             <>
                                                 <h6 className="fs-14 fw-medium mb-2 mt-2">
                                                     Giờ khám{' '}
-                                                    {`(${timeSlots.length > 0 ? timeSlots.length : 0} khung)`}
+                                                    {`${Math.max(timeSlots.length, 0)} khung`}
                                                 </h6>
                                                 <div className="d-flex flex-wrap gap-1">
                                                     {timeSlots.length > 0 ? (
-                                                        timeSlots.map((slot, index) => (
+                                                        timeSlots.map((slot) => (
                                                             <span
-                                                                key={index}
+                                                                key={`${slot}-${timeSlots.indexOf(slot)}`}
                                                                 className={clsx(
                                                                     styles.slotBadge,
                                                                     'badge bg-primary-transparent mb-1 me-1'
