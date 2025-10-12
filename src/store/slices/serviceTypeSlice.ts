@@ -1,6 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { DoctorService } from '@/services/doctor.service';
-import { ServiceTypeState } from '@/types/serviceType.types';
+import { ServiceTypeSimpleResponse } from '@/types/simple.types';
+
+export interface ServiceTypeState {
+    serviceTypes: ServiceTypeSimpleResponse[];
+    isLoading: boolean;
+    error: string | null;
+}
 
 const initialState: ServiceTypeState = {
     serviceTypes: [],

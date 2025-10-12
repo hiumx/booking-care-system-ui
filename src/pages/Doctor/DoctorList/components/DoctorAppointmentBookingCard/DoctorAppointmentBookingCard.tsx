@@ -1,9 +1,16 @@
 import clsx from 'clsx';
 import styles from './DoctorAppointmentBookingCard.module.scss';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import { PATHS, replacePathParams } from '@/routes/paths';
 import { LanguageResponse } from '@/types/language.types';
+
+interface DoctorPrice {
+    id: string;
+    serviceTypeId: string;
+    serviceTypeName: string;
+    amount: number;
+}
 
 interface DoctorAppointmentBookingCardProps {
     doctorId: string; // Từ doctors.id
@@ -11,15 +18,14 @@ interface DoctorAppointmentBookingCardProps {
     name: string; // Nối first_name và last_name từ bảng doctors
     specialty: string; // Từ specialties.name
     position: string; // Từ positions.name
-    bookCounts: number; // Số lượng lịch hẹn (COMPLETED hoặc CONFIRMED)
+    prices: DoctorPrice[]; // Danh sách giá theo service type
     rating: number; // Trung bình từ reviews.rating
     location: string; // Từ clinics.address
     yearsOfExperience: number; // Từ doctors.years_of_experience
-    fees: number; // Từ prices.amount qua doctor_prices
     isFavorite: boolean; // Từ bảng favourites
     languages: LanguageResponse[]; // Danh sách ngôn ngữ của bác sĩ
-    nextAvailableTime: string; // Từ doctor_schedule_times và appointment_times.start_time
     image: string; // Từ doctors.avatar_url
+    serviceTypeFilters?: string[]; // Service types đang được filter
 }
 
 // Hàm định dạng số tiền theo VND
@@ -38,18 +44,47 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
         name,
         specialty,
         position,
-        bookCounts,
+        prices,
         rating,
         location,
         yearsOfExperience,
-        fees,
         isFavorite,
         languages,
-        nextAvailableTime,
         image,
+        serviceTypeFilters = [],
     } = props;
 
     const [isSelected, setIsSelected] = useState(isFavorite);
+
+    // Tính toán service type và giá hiển thị dựa trên filter
+    const displayServiceInfo = useMemo(() => {
+        // Nếu có filter service type, tìm giá tương ứng
+        if (serviceTypeFilters.length > 0 && prices.length > 0) {
+            // Tìm giá của service type đầu tiên trong filter
+            const filteredPrice = prices.find((p) =>
+                serviceTypeFilters.includes(p.serviceTypeName)
+            );
+            if (filteredPrice) {
+                return {
+                    serviceTypeName: filteredPrice.serviceTypeName,
+                    amount: filteredPrice.amount,
+                };
+            }
+        }
+
+        // Mặc định: hiển thị giá đầu tiên
+        if (prices.length > 0) {
+            return {
+                serviceTypeName: prices[0].serviceTypeName,
+                amount: prices[0].amount,
+            };
+        }
+
+        return {
+            serviceTypeName: 'Chưa cập nhật',
+            amount: 0,
+        };
+    }, [prices, serviceTypeFilters]);
 
     // Sync favorite state with prop when it changes
     useEffect(() => {
@@ -156,10 +191,8 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                     <div className="col-sm-6">
                                         <div>
                                             <p className="d-flex align-items-center mb-0 fs-14 mb-2">
-                                                <i className="isax isax-user-tick text-dark me-2"></i>
-                                                {bookCounts > 0
-                                                    ? `${bookCounts} lượt đặt`
-                                                    : 'Chưa có lượt đặt'}
+                                                <i className="isax isax-health text-dark me-2"></i>
+                                                {displayServiceInfo.serviceTypeName}
                                             </p>
                                             <p className="d-flex align-items-center mb-0 fs-14 mb-2">
                                                 <i className="isax isax-language-square text-dark me-2"></i>
@@ -182,13 +215,11 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                     <div className="me-3">
                                         <p className={clsx(styles.fs15, 'mb-1')}>Phí khám</p>
                                         <h3 className="text-orange">
-                                            {fees > 0 ? formatVND(fees) : 'Liên hệ để biết giá'}
+                                            {displayServiceInfo.amount > 0
+                                                ? formatVND(displayServiceInfo.amount)
+                                                : 'Liên hệ để biết giá'}
                                         </h3>
                                     </div>
-                                    <p className={clsx(styles.fs15, 'mb-0')}>
-                                        Lịch trống tiếp theo <br />
-                                        {nextAvailableTime || 'Không có lịch'}
-                                    </p>
                                 </div>
                                 <div className={styles.bookingButtonContainer}>
                                     <Link
