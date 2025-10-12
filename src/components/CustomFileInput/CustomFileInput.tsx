@@ -152,7 +152,7 @@ const CustomFileInput: React.FC<CustomFileInputProps> = ({
                     </div>
                     <div className={styles.items}>
                         {files.map((file, index) => (
-                            <div key={index} className={styles.item}>
+                            <div key={`${file.name}-${file.size}-${index}`} className={styles.item}>
                                 <div className={styles.itemInfo}>
                                     <span className={styles.itemIcon}>
                                         {getFileIcon(file.name)}

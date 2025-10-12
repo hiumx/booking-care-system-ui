@@ -265,7 +265,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
                                                     return (
                                                         <SlotCategory
-                                                            key={categoryIdx}
+                                                            key={category.title}
                                                             title={category.title}
                                                             timeSlots={category.timeSlots.map(
                                                                 (slot, slotIdx) => ({

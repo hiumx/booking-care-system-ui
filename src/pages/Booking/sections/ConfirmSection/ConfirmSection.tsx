@@ -102,13 +102,11 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                         </div>
                                         <div className="row">
                                             {/* Doctor Information */}
-                                            {doctor && doctor.name && (
+                                            {doctor?.name && (
                                                 <>
                                                     <div className="col-md-6">
                                                         <div className="mb-3">
-                                                            <label className="form-label">
-                                                                Bác sĩ
-                                                            </label>
+                                                            <div className="form-label">Bác sĩ</div>
                                                             <div className="form-plain-text">
                                                                 {doctor.name}
                                                             </div>
@@ -116,9 +114,9 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                                     </div>
                                                     <div className="col-md-6">
                                                         <div className="mb-3">
-                                                            <label className="form-label">
+                                                            <div className="form-label">
                                                                 Chuyên khoa
-                                                            </label>
+                                                            </div>
                                                             <div className="form-plain-text">
                                                                 {doctor.specialty ||
                                                                     'Chưa cập nhật'}
@@ -131,7 +129,7 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                             {/* Date */}
                                             <div className="col-md-6">
                                                 <div className="mb-3">
-                                                    <label className="form-label">Ngày khám</label>
+                                                    <div className="form-label">Ngày khám</div>
                                                     <div className="form-plain-text">
                                                         {formattedAppointmentInfo.date}
                                                     </div>
@@ -141,9 +139,9 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                             {/* Time Slots */}
                                             <div className="col-md-6">
                                                 <div className="mb-3">
-                                                    <label className="form-label">
+                                                    <div className="form-label">
                                                         Tổng thời gian khám
-                                                    </label>
+                                                    </div>
                                                     <div className="form-plain-text">
                                                         {formattedAppointmentInfo.totalDuration > 0
                                                             ? `${formattedAppointmentInfo.totalDuration} phút (${formattedAppointmentInfo.slots.length} khung giờ)`
@@ -156,14 +154,14 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                             {formattedAppointmentInfo.slots.length > 0 && (
                                                 <div className="col-md-12">
                                                     <div className="mb-3">
-                                                        <label className="form-label mb-2">
+                                                        <div className="form-label mb-2">
                                                             Các khung giờ đã đặt
-                                                        </label>
+                                                        </div>
                                                         <div className="d-flex flex-wrap gap-2">
                                                             {formattedAppointmentInfo.slots.map(
-                                                                (slot, index) => (
+                                                                (slot) => (
                                                                     <TimeSlotBadge
-                                                                        key={index}
+                                                                        key={`${slot.startTime}-${slot.endTime}`}
                                                                         startTime={slot.startTime}
                                                                         endTime={slot.endTime}
                                                                         type="success"
