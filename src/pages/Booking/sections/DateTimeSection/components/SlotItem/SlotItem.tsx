@@ -15,7 +15,7 @@ const SlotItem: React.FC<SlotItemProps> = ({ id, rangeTime, handleClickSlot }) =
                     type="checkbox"
                     className="form-check-input"
                     name="appointment"
-                    onClick={() => handleClickSlot(id)}
+                    onChange={() => handleClickSlot(id)}
                 />
                 <span className={clsx(styles.visitRsn, 'visit-rsn')}>{rangeTime}</span>
             </label>

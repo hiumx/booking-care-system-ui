@@ -18,13 +18,7 @@ export const useDoctorInfo = (): DoctorInfo => {
               location: selectedDoctor.hospital?.name || selectedDoctor.address || 'Địa chỉ',
               avatar: selectedDoctor.avatarUrl || '/assets/img/default-avatar.jpg',
           }
-        : {
-              name: 'Đang tải...',
-              specialty: '',
-              rating: 0,
-              location: '',
-              avatar: '/assets/img/default-avatar.jpg',
-          };
+        : (new Object() as DoctorInfo);
 
     return doctorInfo;
 };

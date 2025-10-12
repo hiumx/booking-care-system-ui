@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import BookingHeader, {
     type DoctorInfo,
     type AppointmentInfo,
 } from '../BookingHeader/BookingHeader';
-import BookingAction from '../BookingAction/BookingAction';
+import BookingAction from '../BookingAction';
+import { BookingHeaderSkeleton } from '../BookingHeader';
+import { useFormattedDateTime } from '../../hooks/useFormattedDateTime';
 
 interface BookingSectionWrapperProps {
     doctor: DoctorInfo;
@@ -14,6 +16,7 @@ interface BookingSectionWrapperProps {
     children: React.ReactNode;
     className?: string;
     fieldsetId?: string;
+    isShowInfoHeader?: boolean;
 }
 
 const BookingSectionWrapper: React.FC<BookingSectionWrapperProps> = ({
@@ -25,11 +28,32 @@ const BookingSectionWrapper: React.FC<BookingSectionWrapperProps> = ({
     children,
     className = 'd-block',
     fieldsetId,
+    isShowInfoHeader,
 }) => {
+    // Get formatted date and time from Redux state
+    const formattedDateTime = useFormattedDateTime();
+
+    // Update appointment info with selected date and time
+    const updatedAppointment = useMemo(
+        () => ({
+            ...appointment,
+            dateTime: formattedDateTime,
+        }),
+        [appointment, formattedDateTime]
+    );
+
     return (
         <fieldset className={className} id={fieldsetId}>
             <div className="card booking-card mb-0">
-                <BookingHeader doctor={doctor} appointment={appointment} />
+                {Object.keys(doctor).length > 0 ? (
+                    <BookingHeader
+                        doctor={doctor}
+                        appointment={updatedAppointment}
+                        isShowInfo={isShowInfoHeader}
+                    />
+                ) : (
+                    <BookingHeaderSkeleton />
+                )}
                 <div className="card-body booking-body">{children}</div>
                 <BookingAction
                     nextStepTitle={nextStepTitle}

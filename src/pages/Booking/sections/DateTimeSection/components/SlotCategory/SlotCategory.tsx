@@ -4,6 +4,7 @@ interface SlotCategoryProps {
     title: string;
     timeSlots: { id: number; time: string }[];
     handleClickSlot: (idx: number) => void;
+    checkedSlots?: number[]; // Add checkedSlots prop
 }
 
 const SlotCategory: React.FC<SlotCategoryProps> = ({ title, timeSlots, handleClickSlot }) => {

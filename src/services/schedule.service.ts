@@ -64,17 +64,14 @@ export class ScheduleService {
                 request.doctorId
             );
             const fullUrl = `${endpoint}?${queryParams.toString()}`;
-            console.log('API Request URL:', fullUrl);
 
             const response: any = await axiosInstance.get(fullUrl);
-            console.log('API Raw Response:', response);
 
             const result = {
                 success: response.success ?? true,
                 data: response.data || response,
                 message: response.message,
             };
-            console.log('API Processed Response:', result);
 
             return result;
         } catch (error: any) {
@@ -125,21 +122,15 @@ export class ScheduleService {
      * Helper method to group slots by time periods
      */
     static groupSlotsByPeriod(slots: AvailableSlot[]) {
-        console.log('Grouping slots by period:', slots);
-
         const morning = slots.filter((slot) => {
             const hour = Number.parseInt(slot.startTime.split(':')[0]);
             return hour >= 8 && hour < 12;
         });
 
-        console.log('Morning slots:', morning);
-
         const afternoon = slots.filter((slot) => {
             const hour = Number.parseInt(slot.startTime.split(':')[0]);
             return hour >= 12 && hour < 17;
         });
-
-        console.log('Afternoon slots:', afternoon);
 
         const evening = slots.filter((slot) => {
             const hour = Number.parseInt(slot.startTime.split(':')[0]);

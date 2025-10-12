@@ -107,7 +107,7 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
             <div className={styles.card}>
                 <div className={clsx(styles.cardContainer, 'd-md-flex align-items-stretch')}>
                     <div className={styles.cardImg}>
-                        <Link to={`/doctor-profile/${doctorId}`}>
+                        <Link to={replacePathParams(PATHS.DOCTOR.PROFILE, { id: doctorId })}>
                             <img
                                 src={image || 'https://bookingcaree.com/user-avatar-default.png'}
                                 alt="hình ảnh bác sĩ"
@@ -166,7 +166,9 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                         <div>
                                             <h6 className="d-flex align-items-center mb-1">
                                                 <Link
-                                                    to={`/doctor-profile/${doctorId}`}
+                                                    to={replacePathParams(PATHS.DOCTOR.PROFILE, {
+                                                        id: doctorId,
+                                                    })}
                                                     className={styles.doctorInfoName}
                                                 >
                                                     {name || 'Bác sĩ Không xác định'}
