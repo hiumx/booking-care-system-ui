@@ -78,7 +78,7 @@ const UserProfile = () => {
             case 'wallet':
                 return {
                     items: [...baseItems, { label: 'Wallet', isActive: true }],
-                    title: 'Wallet',
+                    title: 'Lịch sử hoàn tiền',
                 };
             case 'invoices':
                 return {
