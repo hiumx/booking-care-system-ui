@@ -1,8 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
+import { Skeleton } from '@mui/material';
 
 import { Transaction } from '../../types/wallet.types';
-import styles from './TransactionTable.module.scss';
 
 interface TransactionTableProps {
     transactions: Transaction[];
@@ -69,72 +69,54 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                                         {skeletonWidths.map((widths) => (
                                             <tr key={widths.key}>
                                                 <td>
-                                                    <div
-                                                        className={clsx(
-                                                            styles.skeleton,
-                                                            styles.skeletonText
-                                                        )}
-                                                        style={{
-                                                            height: 20,
-                                                            width: `${widths.id}px`,
-                                                        }}
+                                                    <Skeleton
+                                                        variant="text"
+                                                        width={widths.id}
+                                                        height={20}
+                                                        sx={{ bgcolor: 'grey.200' }}
                                                     />
                                                 </td>
                                                 <td>
-                                                    <div
-                                                        className={clsx(
-                                                            styles.skeleton,
-                                                            styles.skeletonText
-                                                        )}
-                                                        style={{
-                                                            height: 20,
-                                                            width: `${widths.account}px`,
-                                                        }}
+                                                    <Skeleton
+                                                        variant="text"
+                                                        width={widths.account}
+                                                        height={20}
+                                                        sx={{ bgcolor: 'grey.200' }}
                                                     />
                                                 </td>
                                                 <td>
-                                                    <div
-                                                        className={clsx(
-                                                            styles.skeleton,
-                                                            styles.skeletonText
-                                                        )}
-                                                        style={{
-                                                            height: 20,
-                                                            width: `${widths.reason}px`,
-                                                        }}
+                                                    <Skeleton
+                                                        variant="text"
+                                                        width={widths.reason}
+                                                        height={20}
+                                                        sx={{ bgcolor: 'grey.200' }}
                                                     />
                                                 </td>
                                                 <td>
-                                                    <div
-                                                        className={clsx(
-                                                            styles.skeleton,
-                                                            styles.skeletonText
-                                                        )}
-                                                        style={{
-                                                            height: 20,
-                                                            width: `${widths.date}px`,
-                                                        }}
+                                                    <Skeleton
+                                                        variant="text"
+                                                        width={widths.date}
+                                                        height={20}
+                                                        sx={{ bgcolor: 'grey.200' }}
                                                     />
                                                 </td>
                                                 <td>
-                                                    <div
-                                                        className={clsx(
-                                                            styles.skeleton,
-                                                            styles.skeletonText
-                                                        )}
-                                                        style={{
-                                                            height: 20,
-                                                            width: `${widths.amount}px`,
-                                                        }}
+                                                    <Skeleton
+                                                        variant="text"
+                                                        width={widths.amount}
+                                                        height={20}
+                                                        sx={{ bgcolor: 'grey.200' }}
                                                     />
                                                 </td>
                                                 <td>
-                                                    <div
-                                                        className={clsx(
-                                                            styles.skeleton,
-                                                            styles.skeletonBadge
-                                                        )}
-                                                        style={{ height: 28, width: 90 }}
+                                                    <Skeleton
+                                                        variant="rounded"
+                                                        width={90}
+                                                        height={28}
+                                                        sx={{
+                                                            bgcolor: 'grey.200',
+                                                            borderRadius: '16px',
+                                                        }}
                                                     />
                                                 </td>
                                             </tr>
