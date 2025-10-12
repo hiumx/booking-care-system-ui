@@ -1,16 +1,16 @@
-import Calendar from '@/components/Calendar';
 import React, { useState, useEffect, useCallback } from 'react';
+import Calendar from '@/components/Calendar';
 import SlotCategory from './components/SlotCategory';
 import styles from './DateTimeSection.module.scss';
 import clsx from 'clsx';
-import BookingSectionWrapper from '../../components/BookingSectionWrapper/BookingSectionWrapper';
+import BookingSectionWrapper from '../../components/BookingSectionWrapper';
 import { mockAppointmentInfo } from '../../constants/mockData';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
     setSelectedDate,
     setSelectedDoctor,
     fetchDoctorAvailableSlots,
-    setSelectedSlot,
+    toggleSlotSelection,
 } from '@/store/slices/schedule.slice';
 import {
     selectScheduleCategories,
@@ -18,6 +18,7 @@ import {
     selectScheduleError,
     selectSelectedDate,
     selectSelectedDoctorId,
+    selectSelectedSlots,
 } from '@/store/selectors/schedule.selectors';
 import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
 import { ScheduleService } from '@/services/schedule.service';
@@ -26,8 +27,8 @@ import { useDoctorInfo } from '../../hooks/useDoctorInfo';
 interface DateTimeSectionProps {
     nextStep: () => void;
     prevStep: () => void;
-    doctorId?: string; // Pass doctorId as prop or get from URL params
-    medicalServiceId?: string; // Pass medicalServiceId as prop or get from context
+    doctorId?: string;
+    medicalServiceId?: string;
 }
 
 const DateTimeSection: React.FC<DateTimeSectionProps> = ({
@@ -44,6 +45,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     const scheduleError = useAppSelector(selectScheduleError);
     const selectedDate = useAppSelector(selectSelectedDate);
     const selectedDoctorId = useAppSelector(selectSelectedDoctorId);
+    const selectedSlots = useAppSelector(selectSelectedSlots); // Get selected slots array
 
     // Get doctor info using custom hook
     const doctorInfo = useDoctorInfo();
@@ -76,14 +78,13 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
                 // Fetch available slots for the selected date and doctor
                 try {
-                    const result = await dispatch(
+                    await dispatch(
                         fetchDoctorAvailableSlots({
                             doctorId,
                             date: formattedDate,
                             ...(medicalServiceId && { medicalServiceId }),
                         })
                     ).unwrap();
-                    console.log('API Response:', result);
                 } catch (error) {
                     console.error('Failed to fetch available slots:', error);
                 }
@@ -92,39 +93,43 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         [doctorId, medicalServiceId, dispatch]
     );
 
-    // Handle slot click
+    // Handle slot click - support multiple slot selection
     const handleClickSlot = useCallback(
         (slotIndex: number) => {
-            // Toggle slot selection
+            // Toggle slot selection in local state (for UI highlighting)
             if (slotChecked.includes(slotIndex)) {
                 setSlotChecked((prev) => prev.filter((idx) => idx !== slotIndex));
-                // Clear selected slot in Redux if this was the selected one
-                // You might want to implement multi-slot selection or single selection
             } else {
-                setSlotChecked([slotIndex]); // Single selection mode
+                setSlotChecked((prev) => [...prev, slotIndex]); // Multiple selection mode
+            }
 
-                // Find the corresponding slot and update Redux
-                const allSlots = scheduleCategories.flatMap((category) =>
-                    category.timeSlots.map((slot, idx) => ({
+            // Find the corresponding slot data
+            // Create a flat array with correct globalIndex for each slot
+            let globalIdx = 0;
+            const allSlots = scheduleCategories.flatMap((category, catIdx) =>
+                category.timeSlots.map((slot, slotIdx) => {
+                    const slotData = {
                         ...slot,
-                        categoryIndex: scheduleCategories.indexOf(category),
-                        slotIndex: idx,
-                        globalIndex: slotIndex,
-                    }))
-                );
+                        categoryIndex: catIdx,
+                        slotIndex: slotIdx,
+                        globalIndex: globalIdx++, // ✅ Increment for each slot
+                    };
+                    return slotData;
+                })
+            );
 
-                const selectedSlotData = allSlots.find((slot) => slot.globalIndex === slotIndex);
-                if (selectedSlotData) {
-                    // Create AvailableSlot object for Redux
-                    dispatch(
-                        setSelectedSlot({
-                            startTime: selectedSlotData.startTime,
-                            endTime: selectedSlotData.endTime,
-                            isAvailable: true,
-                            isBlocked: false,
-                        })
-                    );
-                }
+            const selectedSlotData = allSlots.find((slot) => slot.globalIndex === slotIndex);
+
+            if (selectedSlotData) {
+                const slotPayload = {
+                    startTime: selectedSlotData.startTime,
+                    endTime: selectedSlotData.endTime,
+                    isAvailable: true,
+                    isBlocked: false,
+                };
+
+                // Toggle slot in Redux (add or remove)
+                dispatch(toggleSlotSelection(slotPayload));
             }
         },
         [slotChecked, scheduleCategories, dispatch]
@@ -136,6 +141,25 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             handleDateChange(date);
         }
     }, [date, doctorId, selectedDate, handleDateChange]);
+
+    // Sync local slotChecked state with Redux selectedSlots for UI highlighting
+    useEffect(() => {
+        if (selectedSlots.length > 0 && scheduleCategories.length > 0) {
+            const allSlots = scheduleCategories.flatMap((category) => category.timeSlots);
+            const checkedIndices = selectedSlots
+                .map((selectedSlot) =>
+                    allSlots.findIndex(
+                        (slot) =>
+                            slot.startTime === selectedSlot.startTime &&
+                            slot.endTime === selectedSlot.endTime
+                    )
+                )
+                .filter((index) => index !== -1);
+            setSlotChecked(checkedIndices);
+        } else {
+            setSlotChecked([]);
+        }
+    }, [selectedSlots, scheduleCategories]);
 
     return (
         <BookingSectionWrapper
@@ -217,42 +241,51 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                         !scheduleError &&
                                         scheduleCategories.length > 0 && (
                                             <>
-                                                {scheduleCategories.map((category, idx) => (
-                                                    <SlotCategory
-                                                        key={idx}
-                                                        title={category.title}
-                                                        timeSlots={category.timeSlots.map(
-                                                            (slot, slotIdx) => ({
-                                                                id:
-                                                                    scheduleCategories
-                                                                        .slice(0, idx)
-                                                                        .reduce(
-                                                                            (acc, cat) =>
-                                                                                acc +
-                                                                                cat.timeSlots
-                                                                                    .length,
-                                                                            0
-                                                                        ) +
-                                                                    slotIdx +
-                                                                    1,
-                                                                time: `${slot.startTime} - ${slot.endTime}`,
-                                                            })
-                                                        )}
-                                                        handleClickSlot={(slotIdx) => {
-                                                            // Calculate global index based on previous categories
-                                                            const globalIndex =
-                                                                scheduleCategories
-                                                                    .slice(0, idx)
-                                                                    .reduce(
-                                                                        (acc, cat) =>
-                                                                            acc +
-                                                                            cat.timeSlots.length,
-                                                                        0
-                                                                    ) + slotIdx;
-                                                            handleClickSlot(globalIndex);
-                                                        }}
-                                                    />
-                                                ))}
+                                                {scheduleCategories.map((category, categoryIdx) => {
+                                                    // Calculate checked slot IDs for this category
+                                                    const categoryStartIndex = scheduleCategories
+                                                        .slice(0, categoryIdx)
+                                                        .reduce(
+                                                            (acc, cat) =>
+                                                                acc + cat.timeSlots.length,
+                                                            0
+                                                        );
+                                                    const checkedSlotIds = slotChecked
+                                                        .filter(
+                                                            (checkedIdx) =>
+                                                                checkedIdx >= categoryStartIndex &&
+                                                                checkedIdx <
+                                                                    categoryStartIndex +
+                                                                        category.timeSlots.length
+                                                        )
+                                                        .map(
+                                                            (checkedIdx) =>
+                                                                checkedIdx - categoryStartIndex + 1
+                                                        );
+
+                                                    return (
+                                                        <SlotCategory
+                                                            key={categoryIdx}
+                                                            title={category.title}
+                                                            timeSlots={category.timeSlots.map(
+                                                                (slot, slotIdx) => ({
+                                                                    id: slotIdx + 1, // 1-based ID for display
+                                                                    time: `${slot.startTime} - ${slot.endTime}`,
+                                                                })
+                                                            )}
+                                                            handleClickSlot={(slotId) => {
+                                                                // slotId is 1-based, convert to global 0-based index
+                                                                // slotId - 1 converts to 0-based index within category
+                                                                // categoryStartIndex is the global offset
+                                                                const globalIndex =
+                                                                    categoryStartIndex +
+                                                                    (slotId - 1);
+                                                                handleClickSlot(globalIndex);
+                                                            }}
+                                                            checkedSlots={checkedSlotIds}
+                                                        />
+                                                    );
+                                                })}
                                             </>
                                         )}
 

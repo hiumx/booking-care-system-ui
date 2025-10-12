@@ -41,6 +41,11 @@ export const selectSelectedSlot = createSelector(
     (schedule) => schedule.selectedSlot
 );
 
+export const selectSelectedSlots = createSelector(
+    selectScheduleState,
+    (schedule) => schedule.selectedSlots
+);
+
 // Loading state selectors
 export const selectScheduleLoading = createSelector(
     selectScheduleState,

@@ -43,3 +43,4 @@ export const selectLoadingByKey = (key: string) =>
 export * from './discount.selectors';
 export * from './schedule.selectors';
 export * from './doctor.selectors';
+export * from './user.selectors';

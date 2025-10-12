@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom';
+import { useMemo } from 'react';
 import styles from './ConfirmSection.module.scss';
 import { PATHS } from '@/routes/paths';
 import { useDoctorInfo } from '../../hooks';
+import { useAppSelector } from '@/store/hooks';
+import { selectSelectedDate, selectSelectedSlots } from '@/store/selectors/schedule.selectors';
+import TimeSlotBadge from '../../components/TimeSlotBadge';
 
 interface ConfirmSectionProps {
     handleGoBack: () => void;
@@ -9,6 +13,52 @@ interface ConfirmSectionProps {
 
 const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
     const doctor = useDoctorInfo();
+
+    // Get selected date and time slots
+    const selectedDate = useAppSelector(selectSelectedDate);
+    const selectedSlots = useAppSelector(selectSelectedSlots);
+
+    // Format date and time for display
+    const formattedAppointmentInfo = useMemo(() => {
+        if (!selectedDate) {
+            return {
+                date: 'Chưa chọn',
+                dateTime: 'Chưa chọn',
+                slots: [],
+                totalDuration: 0,
+            };
+        }
+
+        const date = new Date(selectedDate);
+        const formattedDate = date.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+        });
+
+        let formattedDateTime = formattedDate;
+        let sortedSlots: typeof selectedSlots = [];
+        let totalDuration = 0;
+
+        if (selectedSlots && selectedSlots.length > 0) {
+            // Sort slots by start time
+            sortedSlots = [...selectedSlots].sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+            const firstSlot = sortedSlots[0];
+            const lastSlot = sortedSlots[sortedSlots.length - 1];
+            formattedDateTime = `${firstSlot.startTime} - ${lastSlot.endTime}, ${formattedDate}`;
+
+            // Calculate total duration (assuming each slot is 30 minutes)
+            totalDuration = sortedSlots.length * 30;
+        }
+
+        return {
+            date: formattedDate,
+            dateTime: formattedDateTime,
+            slots: sortedSlots,
+            totalDuration,
+        };
+    }, [selectedDate, selectedSlots]);
 
     return (
         <fieldset className="d-block">
@@ -51,32 +101,82 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                             </Link>
                                         </div>
                                         <div className="row">
+                                            {/* Doctor Information */}
+                                            {doctor && doctor.name && (
+                                                <>
+                                                    <div className="col-md-6">
+                                                        <div className="mb-3">
+                                                            <label className="form-label">
+                                                                Bác sĩ
+                                                            </label>
+                                                            <div className="form-plain-text">
+                                                                {doctor.name}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-6">
+                                                        <div className="mb-3">
+                                                            <label className="form-label">
+                                                                Chuyên khoa
+                                                            </label>
+                                                            <div className="form-plain-text">
+                                                                {doctor.specialty ||
+                                                                    'Chưa cập nhật'}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            {/* Date */}
                                             <div className="col-md-6">
                                                 <div className="mb-3">
-                                                    <label className="form-label">Dịch vụ</label>
+                                                    <label className="form-label">Ngày khám</label>
                                                     <div className="form-plain-text">
-                                                        Tim mạch (30 phút)
+                                                        {formattedAppointmentInfo.date}
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            {/* Time Slots */}
                                             <div className="col-md-6">
                                                 <div className="mb-3">
                                                     <label className="form-label">
-                                                        Dịch vụ bổ sung
+                                                        Tổng thời gian khám
                                                     </label>
                                                     <div className="form-plain-text">
-                                                        Siêu âm tim
+                                                        {formattedAppointmentInfo.totalDuration > 0
+                                                            ? `${formattedAppointmentInfo.totalDuration} phút (${formattedAppointmentInfo.slots.length} khung giờ)`
+                                                            : 'Chưa chọn'}
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="col-md-6">
-                                                <div className="mb-3">
-                                                    <label className="form-label">Ngày & Giờ</label>
-                                                    <div className="form-plain-text">
-                                                        10:00 - 11:00, 15 Tháng 10, 2025
+
+                                            {/* Time Slots Detail */}
+                                            {formattedAppointmentInfo.slots.length > 0 && (
+                                                <div className="col-md-12">
+                                                    <div className="mb-3">
+                                                        <label className="form-label mb-2">
+                                                            Các khung giờ đã đặt
+                                                        </label>
+                                                        <div className="d-flex flex-wrap gap-2">
+                                                            {formattedAppointmentInfo.slots.map(
+                                                                (slot, index) => (
+                                                                    <TimeSlotBadge
+                                                                        key={index}
+                                                                        startTime={slot.startTime}
+                                                                        endTime={slot.endTime}
+                                                                        type="success"
+                                                                        minWidth="136px"
+                                                                    />
+                                                                )
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            )}
+
+                                            {/* Clinic Information */}
                                             <div className="col-md-6">
                                                 <div className="mb-3">
                                                     <label className="form-label">
@@ -90,16 +190,18 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                             <div className="col-md-6">
                                                 <div className="mb-3">
                                                     <label className="form-label">
-                                                        Tên & Địa chỉ phòng khám
+                                                        Địa điểm khám
                                                     </label>
                                                     <div className="form-plain-text">
-                                                        Wellness Path{' '}
-                                                        <a
-                                                            href="javascript:void(0);"
-                                                            className="text-primary"
-                                                        >
-                                                            Xem vị trí
-                                                        </a>
+                                                        {doctor.location || 'Chưa cập nhật'}{' '}
+                                                        {doctor.location && (
+                                                            <a
+                                                                href="javascript:void(0);"
+                                                                className="text-primary"
+                                                            >
+                                                                Xem vị trí
+                                                            </a>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
