@@ -490,13 +490,34 @@ const SideBar: React.FC<SideBarProps> = ({
     };
 
     const handleCheckboxChange = (id: string, sectionTitle: string): void => {
-        const isChecked = !checkedOptions[id];
+        let newCheckedOptions: { [key: string]: boolean };
+        let isChecked: boolean;
 
-        // Update checked options state first
-        const newCheckedOptions = {
-            ...checkedOptions,
-            [id]: isChecked,
-        };
+        // Special handling for Service Type - radio button behavior (single selection)
+        if (sectionTitle === 'Loại hình dịch vụ') {
+            // For radio buttons, uncheck all options in this section first
+            const section = dynamicFilterData.find((s) => s.title === sectionTitle);
+            newCheckedOptions = { ...checkedOptions };
+
+            // Uncheck all service type options
+            if (section) {
+                section.options.forEach((option) => {
+                    newCheckedOptions[option.id] = false;
+                });
+            }
+
+            // Check the selected option
+            newCheckedOptions[id] = true;
+            isChecked = true;
+        } else {
+            // Normal checkbox behavior (toggle)
+            isChecked = !checkedOptions[id];
+            newCheckedOptions = {
+                ...checkedOptions,
+                [id]: isChecked,
+            };
+        }
+
         setCheckedOptions(newCheckedOptions);
 
         // Get checked values for this section
@@ -650,12 +671,18 @@ const SideBar: React.FC<SideBarProps> = ({
     const renderOptionList = (section: FilterSection) => {
         const optionsToShow = getOptionsToShow(section);
 
+        // Use radio buttons for Service Type (single selection)
+        const isServiceType = section.title === 'Loại hình dịch vụ';
+        const inputType = isServiceType ? 'radio' : 'checkbox';
+        const inputName = isServiceType ? 'service-type-filter' : undefined;
+
         return optionsToShow.map((option) => (
             <div className="d-flex align-items-center justify-content-between mb-2" key={option.id}>
                 <div className="form-check">
                     <input
                         className="form-check-input"
-                        type="checkbox"
+                        type={inputType}
+                        name={inputName}
                         value=""
                         id={option.id}
                         checked={checkedOptions[option.id] || false}

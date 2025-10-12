@@ -1,6 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { DoctorService } from '@/services/doctor.service';
-import { LanguageState } from '@/types/language.types';
+import { LanguageSimpleResponse } from '@/types/simple.types';
+
+export interface LanguageState {
+    languages: LanguageSimpleResponse[];
+    isLoading: boolean;
+    error: string | null;
+}
 
 const initialState: LanguageState = {
     languages: [],
