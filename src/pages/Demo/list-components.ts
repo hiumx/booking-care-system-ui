@@ -48,7 +48,6 @@ const COMPONENTS: Array<{
                     updatedAt: '',
                 },
             ],
-            nextAvailableTime: '10:00 AM - 15 Oct, Tue',
             image: './src/assets/img/doctor-grid/doctor-list-01.jpg',
         },
     },

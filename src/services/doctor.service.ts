@@ -7,10 +7,13 @@ import {
     DoctorDetailResponse,
     DoctorSearchParams,
 } from '@/types/doctor.types';
-import { PositionResponse } from '@/types/position.types';
-import { LanguageResponse } from '@/types/language.types';
-import { ServiceTypeResponse } from '@/types/serviceType.types';
-import { SpecialtyListResponse } from '@/types/specialty.types';
+// Removed unused imports for performance optimization
+import {
+    SpecialtySimpleResponse,
+    PositionSimpleResponse,
+    LanguageSimpleResponse,
+    ServiceTypeSimpleResponse,
+} from '@/types/simple.types';
 
 // Base API endpoint for doctor service
 const DOCTOR_ENDPOINTS = {
@@ -77,9 +80,9 @@ export class DoctorService {
     }
 
     /**
-     * Get all specialties
+     * Get all specialties (optimized for performance)
      */
-    static async getSpecialties(): Promise<ApiResponse<SpecialtyListResponse>> {
+    static async getSpecialties(): Promise<ApiResponse<SpecialtySimpleResponse[]>> {
         try {
             const response: any = await axiosInstance.get(DOCTOR_ENDPOINTS.GET_SPECIALTIES);
             return {
@@ -93,9 +96,9 @@ export class DoctorService {
     }
 
     /**
-     * Get all positions
+     * Get all positions (optimized for performance)
      */
-    static async getPositions(): Promise<ApiResponse<PositionResponse[]>> {
+    static async getPositions(): Promise<ApiResponse<PositionSimpleResponse[]>> {
         try {
             const response: any = await axiosInstance.get('/positions/all');
             return {
@@ -109,9 +112,9 @@ export class DoctorService {
     }
 
     /**
-     * Get all languages
+     * Get all languages (optimized for performance)
      */
-    static async getLanguages(): Promise<ApiResponse<LanguageResponse[]>> {
+    static async getLanguages(): Promise<ApiResponse<LanguageSimpleResponse[]>> {
         try {
             const response: any = await axiosInstance.get('/languages/all');
             return {
@@ -125,9 +128,9 @@ export class DoctorService {
     }
 
     /**
-     * Get all service types
+     * Get all service types (optimized for performance)
      */
-    static async getServiceTypes(): Promise<ApiResponse<ServiceTypeResponse[]>> {
+    static async getServiceTypes(): Promise<ApiResponse<ServiceTypeSimpleResponse[]>> {
         try {
             const response: any = await axiosInstance.get('/servicetypes/all');
             return {
