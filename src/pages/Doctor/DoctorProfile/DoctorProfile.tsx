@@ -8,7 +8,7 @@ import ReviewCard from '@/components/ReviewCard';
 import Button from '@/components/Button';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
-import WriteReview from './components/WriteReview';
+import WriteReview from '@/components/WriteReview';
 import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
 import {
     selectSelectedDoctor,
