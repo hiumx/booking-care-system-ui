@@ -112,6 +112,8 @@ export interface CreateAppointmentRequest {
     hospitalId?: string;
     appointmentType: AppointmentType;
     reason?: string;
+    symptoms?: string;
+    attachmentUrls?: string;
 }
 
 // Update Appointment Status Request

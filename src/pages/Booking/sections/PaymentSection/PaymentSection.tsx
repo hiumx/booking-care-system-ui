@@ -9,9 +9,14 @@ import TimeSlotBadge from '../../components/TimeSlotBadge';
 interface PaymentSectionProps {
     nextStep: () => void;
     prevStep: () => void;
+    isCreatingAppointment?: boolean;
 }
 
-const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) => {
+const PaymentSection: React.FC<PaymentSectionProps> = ({
+    nextStep,
+    prevStep,
+    isCreatingAppointment = false,
+}) => {
     // Get doctor info from Redux (already fetched in DateTimeSection)
     const doctorInfo = useDoctorInfo();
 
@@ -62,10 +67,11 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ nextStep, prevStep }) =
         <BookingSectionWrapper
             doctor={doctorInfo}
             appointment={mockAppointmentInfo}
-            nextStepTitle="Xác nhận & Thanh toán"
+            nextStepTitle={isCreatingAppointment ? 'Đang xử lý...' : 'Xác nhận & Thanh toán'}
             nextStep={nextStep}
             prevStep={prevStep}
             isShowInfoHeader={false}
+            disabled={isCreatingAppointment}
         >
             <div className="row">
                 <div className="col-lg-6 d-flex">

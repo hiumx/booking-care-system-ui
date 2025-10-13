@@ -24,6 +24,7 @@ import positionReducer from './slices/positionSlice';
 import languageReducer from './slices/languageSlice';
 import serviceTypeReducer from './slices/serviceTypeSlice';
 import specialtyReducer from './slices/specialtySlice';
+import bookingReducer from './slices/bookingSlice';
 
 // Root reducer
 const rootReducer = combineReducers({
@@ -38,6 +39,7 @@ const rootReducer = combineReducers({
     language: languageReducer,
     serviceType: serviceTypeReducer,
     specialty: specialtyReducer,
+    booking: bookingReducer,
 });
 
 // Redux persist configuration
