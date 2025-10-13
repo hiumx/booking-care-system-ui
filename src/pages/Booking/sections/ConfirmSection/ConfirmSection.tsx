@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
-import styles from './ConfirmSection.module.scss';
+
 import { PATHS } from '@/routes/paths';
 import { useDoctorInfo } from '../../hooks';
 import { useAppSelector } from '@/store/hooks';
