@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import styles from './SearchInput.module.scss';
 // Removed unused icon imports as we now use images from backend
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { getHospitalsAsync } from '@/store/slices/hospitalSlice';
+import { getAllHospitalsAsync } from '@/store/slices/hospitalSlice';
 import { getSpecialtiesAsync } from '@/store/slices/specialtySlice';
 
 // Removed specialtyIconMap as we now use images from backend
@@ -38,7 +38,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
     onAreaFilter,
 }) => {
     const dispatch = useAppDispatch();
-    const { hospitals } = useAppSelector((state) => state.hospital);
+    const { simpleHospitals } = useAppSelector((state) => state.hospital);
     const { specialties } = useAppSelector((state) => state.specialty);
 
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -65,8 +65,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
     // Load data on component mount
     useEffect(() => {
-        // Load hospitals
-        dispatch(getHospitalsAsync({ page: 1, pageSize: 100 }));
+        // Load hospitals (optimized API)
+        dispatch(getAllHospitalsAsync());
 
         // Load specialties
         dispatch(getSpecialtiesAsync());
@@ -125,12 +125,12 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
     // Transform hospitals data for modal - filter based on area or specialty selection
     const getFilteredHospitals = () => {
-        let filteredHospitals = hospitals;
+        let filteredHospitals = simpleHospitals;
 
         // If area is selected first, filter hospitals by location
         if (selectedAreaInfo.provinceId || selectedAreaInfo.districtId) {
             // Filter hospitals by location (province or district)
-            filteredHospitals = hospitals.filter((hospital) => {
+            filteredHospitals = simpleHospitals.filter((hospital) => {
                 // Check if hospital has location data and matches selected area
                 if ((hospital as any).provinceId && selectedAreaInfo.provinceId) {
                     return (hospital as any).provinceId === selectedAreaInfo.provinceId;
@@ -172,7 +172,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         id: hospital.id,
         name: hospital.name,
         imageUrl: hospital.avatarUrl || '',
-        address: hospital.address,
+        address: '', // Simple response doesn't include address
     }));
 
     const specialtyItems = getFilteredSpecialties().map((specialty) => ({

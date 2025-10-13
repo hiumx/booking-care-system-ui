@@ -116,7 +116,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                         <li className={isActive('wallet') ? 'active' : ''}>
                             <Link to="/user/profile?tab=wallet">
                                 <i className="isax isax-wallet-2"></i>
-                                <span>Số dư tài khoản</span>
+                                <span>Lịch sử hoàn tiền</span>
                             </Link>
                         </li>
                         <li className={isActive('invoices') ? 'active' : ''}>

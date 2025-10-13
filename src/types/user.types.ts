@@ -17,6 +17,23 @@ export interface UserProfile {
     updatedAt: string;
 }
 
+// Example mock JSON data for UserProfile
+export const mockUserProfile: UserProfile = {
+    id: '1',
+    accountId: 'acc_123',
+    firstName: 'Nguyen',
+    lastName: 'Van A',
+    fullName: 'Nguyen Van A',
+    email: 'nguyenvana@example.com',
+    phone: '0901234567',
+    avatarUrl: 'https://example.com/avatar.jpg',
+    gender: Gender.MALE,
+    dateOfBirth: '1990-01-01',
+    address: '123 Đường ABC, Quận 1, TP.HCM',
+    createdAt: '2024-06-01T10:00:00Z',
+    updatedAt: '2024-06-10T12:00:00Z',
+};
+
 // User state interface for Redux
 export interface UserState {
     profile: UserProfile | null;

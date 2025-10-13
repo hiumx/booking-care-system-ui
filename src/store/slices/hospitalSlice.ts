@@ -5,6 +5,7 @@ import { HospitalState, HospitalFilterRequest, HospitalSearchParams } from '@/ty
 // Initial state
 const initialState: HospitalState = {
     hospitals: [],
+    simpleHospitals: [], // For optimized API
     selectedHospital: null,
     isLoading: false,
     error: null,
@@ -46,6 +47,19 @@ export const getHospitalByIdAsync = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to get hospital');
+        }
+    }
+);
+
+// New async thunk for optimized API
+export const getAllHospitalsAsync = createAsyncThunk(
+    'hospital/getAllHospitals',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await HospitalService.getAllHospitals();
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Failed to get all hospitals');
         }
     }
 );
@@ -116,6 +130,20 @@ const hospitalSlice = createSlice({
                 state.error = null;
             })
             .addCase(getHospitalByIdAsync.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+            })
+            // Get all hospitals (optimized) cases
+            .addCase(getAllHospitalsAsync.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getAllHospitalsAsync.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.simpleHospitals = action.payload;
+                state.error = null;
+            })
+            .addCase(getAllHospitalsAsync.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload as string;
             });

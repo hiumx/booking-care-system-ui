@@ -20,7 +20,8 @@ export interface ScheduleState {
     selectedDate: string | null; // ISO date string
     selectedDoctorId: string | null;
     selectedMedicalServiceId: string | null;
-    selectedSlot: AvailableSlot | null;
+    selectedSlot: AvailableSlot | null; // Keep for backward compatibility
+    selectedSlots: AvailableSlot[]; // Multiple slots support
 
     // Loading states
     loading: {
@@ -45,6 +46,7 @@ const initialState: ScheduleState = {
     selectedDoctorId: null,
     selectedMedicalServiceId: null,
     selectedSlot: null,
+    selectedSlots: [], // Initialize empty array
     loading: {
         schedule: false,
         availableSlots: false,
@@ -103,7 +105,6 @@ export const fetchDoctorScheduleWithSlots = createAsyncThunk(
 // Helper function to group slots into categories
 const groupSlotsIntoCategories = (slots: AvailableSlot[]): ScheduleCategory[] => {
     const grouped = ScheduleService.groupSlotsByPeriod(slots);
-    console.log('groupSlotsIntoCategories - Grouped slots:', grouped);
 
     const categories: ScheduleCategory[] = [];
 
@@ -117,7 +118,6 @@ const groupSlotsIntoCategories = (slots: AvailableSlot[]): ScheduleCategory[] =>
             })),
         };
         categories.push(morningCategory);
-        console.log('Added morning category:', morningCategory);
     }
 
     if (grouped.afternoon.length > 0) {
@@ -130,7 +130,6 @@ const groupSlotsIntoCategories = (slots: AvailableSlot[]): ScheduleCategory[] =>
             })),
         };
         categories.push(afternoonCategory);
-        console.log('Added afternoon category:', afternoonCategory);
     }
 
     if (grouped.evening.length > 0) {
@@ -143,10 +142,7 @@ const groupSlotsIntoCategories = (slots: AvailableSlot[]): ScheduleCategory[] =>
             })),
         };
         categories.push(eveningCategory);
-        console.log('Added evening category:', eveningCategory);
     }
-
-    console.log('groupSlotsIntoCategories - Final categories:', categories);
     return categories;
 };
 
@@ -161,6 +157,7 @@ const scheduleSlice = createSlice({
             state.isDateSelected = true;
             // Reset slot selection when date changes
             state.selectedSlot = null;
+            state.selectedSlots = [];
             state.isSlotSelected = false;
         },
 
@@ -172,6 +169,7 @@ const scheduleSlice = createSlice({
             state.availableSlots = [];
             state.scheduleCategories = [];
             state.selectedSlot = null;
+            state.selectedSlots = [];
             state.isSlotSelected = false;
         },
 
@@ -183,18 +181,58 @@ const scheduleSlice = createSlice({
             state.availableSlots = [];
             state.scheduleCategories = [];
             state.selectedSlot = null;
+            state.selectedSlots = []; // Clear multiple slots too
             state.isSlotSelected = false;
         },
 
-        // Set selected slot
+        // Set selected slot (single - for backward compatibility)
         setSelectedSlot: (state, action: PayloadAction<AvailableSlot>) => {
             state.selectedSlot = action.payload;
+            state.selectedSlots = [action.payload]; // Also update array
             state.isSlotSelected = true;
+        },
+
+        // Toggle slot selection (add or remove from selectedSlots array)
+        toggleSlotSelection: (state, action: PayloadAction<AvailableSlot>) => {
+            const slot = action.payload;
+            const existingIndex = state.selectedSlots.findIndex(
+                (s) => s.startTime === slot.startTime && s.endTime === slot.endTime
+            );
+
+            if (existingIndex >= 0) {
+                // Remove slot if already selected
+                state.selectedSlots.splice(existingIndex, 1);
+            } else {
+                // Add slot if not selected
+                state.selectedSlots.push(slot);
+            }
+
+            // Update single slot and flag for backward compatibility
+            if (state.selectedSlots.length > 0) {
+                state.selectedSlot = state.selectedSlots[state.selectedSlots.length - 1];
+                state.isSlotSelected = true;
+            } else {
+                state.selectedSlot = null;
+                state.isSlotSelected = false;
+            }
+        },
+
+        // Set multiple slots at once
+        setSelectedSlots: (state, action: PayloadAction<AvailableSlot[]>) => {
+            state.selectedSlots = action.payload;
+            if (action.payload.length > 0) {
+                state.selectedSlot = action.payload[action.payload.length - 1];
+                state.isSlotSelected = true;
+            } else {
+                state.selectedSlot = null;
+                state.isSlotSelected = false;
+            }
         },
 
         // Clear selected slot
         clearSelectedSlot: (state) => {
             state.selectedSlot = null;
+            state.selectedSlots = [];
             state.isSlotSelected = false;
         },
 
@@ -204,6 +242,7 @@ const scheduleSlice = createSlice({
             state.selectedDoctorId = null;
             state.selectedMedicalServiceId = null;
             state.selectedSlot = null;
+            state.selectedSlots = [];
             state.isDateSelected = false;
             state.isSlotSelected = false;
         },
@@ -243,14 +282,9 @@ const scheduleSlice = createSlice({
                 state.error = null;
             })
             .addCase(fetchDoctorAvailableSlots.fulfilled, (state, action) => {
-                console.log('Redux - fetchDoctorAvailableSlots.fulfilled:', action.payload);
                 state.loading.availableSlots = false;
                 state.availableSlots = action.payload.data;
                 state.scheduleCategories = groupSlotsIntoCategories(action.payload.data);
-                console.log('Redux - Updated state:', {
-                    availableSlots: state.availableSlots,
-                    scheduleCategories: state.scheduleCategories,
-                });
                 state.error = null;
             })
             .addCase(fetchDoctorAvailableSlots.rejected, (state, action) => {
@@ -286,6 +320,8 @@ export const {
     setSelectedDoctor,
     setSelectedMedicalService,
     setSelectedSlot,
+    toggleSlotSelection,
+    setSelectedSlots,
     clearSelectedSlot,
     clearSelections,
     clearError,
