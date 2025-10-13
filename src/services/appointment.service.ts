@@ -14,6 +14,8 @@ const APPOINTMENT_ENDPOINTS = {
     PATIENT: '/appointments/patient',
     STATUS: (id: string) => `/appointments/status/${id}`,
     BY_ID: (id: string) => `/appointments/${id}`,
+    UPLOAD_ATTACHMENT: '/attachment/upload',
+    DELETE_ATTACHMENT: '/attachment',
 } as const;
 
 /**
@@ -109,6 +111,56 @@ export class AppointmentService {
             throw new Error(error.message || 'Failed to update appointment status');
         }
     }
+
+    /**
+     * Upload appointment attachment
+     */
+    static async uploadAttachment(file: File): Promise<ApiResponse<{ fileUrl: string }>> {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response: any = await axiosInstance.post(
+                APPOINTMENT_ENDPOINTS.UPLOAD_ATTACHMENT,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Attachment uploaded successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to upload attachment');
+        }
+    }
+
+    /**
+     * Delete appointment attachment
+     */
+    static async deleteAttachment(fileUrl: string): Promise<ApiResponse<void>> {
+        try {
+            const response: any = await axiosInstance.delete(
+                APPOINTMENT_ENDPOINTS.DELETE_ATTACHMENT,
+                {
+                    params: { fileUrl },
+                }
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Attachment deleted successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to delete attachment');
+        }
+    }
 }
 
 // Export individual methods for convenience
@@ -118,6 +170,8 @@ export const {
     getAppointmentById,
     getAppointmentsByPatient,
     updateAppointmentStatus,
+    uploadAttachment,
+    deleteAttachment,
 } = AppointmentService;
 
 // Default export
