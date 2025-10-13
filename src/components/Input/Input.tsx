@@ -99,6 +99,10 @@ const Input: React.FC<InputProps> = ({
                         outline: 'none',
                         boxShadow: 'none',
                         borderColor: error ? '#dc3545' : undefined,
+                        backgroundColor: rest.disabled ? '#f8f9fa' : undefined,
+                        color: rest.disabled ? '#6c757d' : undefined,
+                        cursor: rest.disabled ? 'not-allowed' : undefined,
+                        opacity: rest.disabled ? 0.7 : undefined,
                         ...rest.style,
                     }}
                     {...rest}
