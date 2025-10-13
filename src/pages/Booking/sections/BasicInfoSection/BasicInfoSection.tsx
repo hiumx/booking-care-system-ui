@@ -180,8 +180,8 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep 
                                 />
                                 {attachments.length > 0 && (
                                     <small className="text-muted mt-1 d-block">
-                                        <i className="fa fa-info-circle me-1"></i>
-                                        Tệp sẽ được tải lên khi bạn chuyển sang bước tiếp theo
+                                        <i className="fa fa-info-circle me-1"></i> Tệp sẽ được tải
+                                        lên khi bạn chuyển sang bước tiếp theo
                                     </small>
                                 )}
                             </div>
