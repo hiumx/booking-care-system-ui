@@ -2,7 +2,8 @@
 // API Types (matching backend exactly)
 // ============================================
 
-import { AppointmentStatus, AppointmentType, AppointmentTime } from '@/enums/appointment.enums';
+import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
+import { AppointmentTime } from '@/enums/schedule.enums';
 
 // Patient Information from API
 export interface PatientInfo {
