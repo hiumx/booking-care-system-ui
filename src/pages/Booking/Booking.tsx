@@ -81,7 +81,6 @@ const Booking: React.FC = () => {
 
             if (!appointmentId) {
                 setIsCreatingAppointment(true);
-                toast.info('Đang tạo lịch hẹn...');
 
                 // Get first selected slot
                 const firstSlot = scheduleState.selectedSlots[0];
@@ -104,7 +103,6 @@ const Booking: React.FC = () => {
                     appointmentId = (response.data as any).appointmentId;
                     if (appointmentId) {
                         dispatch(setCreatedAppointmentId(appointmentId));
-                        toast.success('Tạo lịch hẹn thành công!');
                     } else {
                         throw new Error('Không nhận được ID cuộc hẹn');
                     }
@@ -116,7 +114,7 @@ const Booking: React.FC = () => {
             }
 
             // Step 2: Create payment URL
-            toast.info('Đang tạo liên kết thanh toán...');
+            // toast.info('Đang tạo liên kết thanh toán...');
 
             const paymentRequest: CreatePaymentRequest = {
                 appointmentId: appointmentId,
