@@ -130,7 +130,7 @@ const Booking: React.FC = () => {
                 toast.success('Đang chuyển hướng đến cổng thanh toán...');
                 // Add a small delay to show the toast
                 setTimeout(() => {
-                    window.location.href = paymentResponse.paymentUrl;
+                    globalThis.location.href = paymentResponse.paymentUrl;
                 }, 1000);
             } else {
                 throw new Error('Không nhận được URL thanh toán');

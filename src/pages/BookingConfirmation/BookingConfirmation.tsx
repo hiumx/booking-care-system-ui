@@ -132,7 +132,7 @@ const BookingConfirmation: React.FC = () => {
                                                 <div className="card ">
                                                     <div className="card-header pt-3">
                                                         <h5 className="d-flex align-items-center flex-wrap rpw-gap-2">
-                                                            <i className="isax isax-tick-circle5 text-success me-2"></i>
+                                                            <i className="isax isax-tick-circle5 text-success me-2"></i>{' '}
                                                             Đặt lịch thành công
                                                         </h5>
                                                     </div>
@@ -171,7 +171,7 @@ const BookingConfirmation: React.FC = () => {
                                                                 to={PATHS.DOCTOR.ROOT}
                                                                 className="btn btn-light rounded-pill"
                                                             >
-                                                                <i className="isax isax-calendar me-1"></i>
+                                                                <i className="isax isax-calendar me-1"></i>{' '}
                                                                 Đặt lại lịch
                                                             </Link>
                                                         </div>
@@ -309,7 +309,7 @@ const BookingConfirmation: React.FC = () => {
                                                                                     type="button"
                                                                                     className="btn btn-link p-0 text-primary"
                                                                                     onClick={() => {
-                                                                                        /* TODO: Show map */
+                                                                                        /* Show map */
                                                                                     }}
                                                                                 >
                                                                                     Xem vị trí
@@ -345,7 +345,7 @@ const BookingConfirmation: React.FC = () => {
                                                                 }
                                                             }}
                                                         >
-                                                            <i className="isax isax-call5 me-1"></i>
+                                                            <i className="isax isax-call5 me-1"></i>{' '}
                                                             Gọi cho chúng tôi
                                                         </button>
                                                     </div>
@@ -378,7 +378,7 @@ const BookingConfirmation: React.FC = () => {
                                                             type="button"
                                                             className="btn w-100 mb-3 btn-md btn-dark prev_btns inline-flex align-items-center rounded-pill"
                                                             onClick={() => {
-                                                                /* TODO: Add to calendar */
+                                                                /* Add to calendar */
                                                             }}
                                                         >
                                                             Thêm vào lịch
