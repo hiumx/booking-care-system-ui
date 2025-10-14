@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Calendar from '@/components/Calendar';
-import styles from './ServiceInfo.module.scss';
+import styles from './ScheduleAvailability.module.scss';
 import { PATHS, replacePathParams } from '@/routes/paths';
 
 interface AppointmentTime {
@@ -11,15 +11,15 @@ interface AppointmentTime {
     end_time: string;
 }
 
-interface ServiceScheduleTime {
-    service_schedule_time_id: number;
-    service_id: number;
+interface DoctorScheduleTime {
+    doctor_schedule_time_id: number;
+    doctor_id: number;
     appointment_time_id: number;
     appointment_date: string;
     is_available: boolean;
 }
 
-const ServiceInfo: React.FC = () => {
+const ScheduleAvailability: React.FC = () => {
     // Lấy ngày hiện tại
     const today = new Date();
     const [activeTab, setActiveTab] = useState('day1'); // Mặc định bắt đầu từ ngày mai
@@ -27,7 +27,7 @@ const ServiceInfo: React.FC = () => {
         new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
     ); // Ngày bắt đầu cho 7 ngày
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const anchorRef = useRef<HTMLButtonElement>(null); // Ref cho icon lịch
+    const anchorRef = useRef<HTMLButtonElement>(null); // Ref cho button lịch
 
     // Tạo danh sách 7 ngày từ startDate
     const generateNext7Days = (start: Date) => {
@@ -56,220 +56,220 @@ const ServiceInfo: React.FC = () => {
     ];
 
     // Mock data for doctor schedule times (mở rộng cho 30 ngày)
-    const mockScheduleTimes: ServiceScheduleTime[] = [
+    const mockScheduleTimes: DoctorScheduleTime[] = [
         // 20/08/2025
         {
-            service_schedule_time_id: 1,
-            service_id: 1,
+            doctor_schedule_time_id: 1,
+            doctor_id: 1,
             appointment_time_id: 1,
             appointment_date: '2025-08-20',
             is_available: true,
         },
         {
-            service_schedule_time_id: 2,
-            service_id: 1,
+            doctor_schedule_time_id: 2,
+            doctor_id: 1,
             appointment_time_id: 2,
             appointment_date: '2025-08-20',
             is_available: true,
         },
         {
-            service_schedule_time_id: 3,
-            service_id: 1,
+            doctor_schedule_time_id: 3,
+            doctor_id: 1,
             appointment_time_id: 3,
             appointment_date: '2025-08-20',
             is_available: false,
         },
         // 21/08/2025
         {
-            service_schedule_time_id: 4,
-            service_id: 1,
+            doctor_schedule_time_id: 4,
+            doctor_id: 1,
             appointment_time_id: 2,
             appointment_date: '2025-08-21',
             is_available: true,
         },
         {
-            service_schedule_time_id: 5,
-            service_id: 1,
+            doctor_schedule_time_id: 5,
+            doctor_id: 1,
             appointment_time_id: 4,
             appointment_date: '2025-08-21',
             is_available: true,
         },
         // 22/08/2025
         {
-            service_schedule_time_id: 6,
-            service_id: 1,
+            doctor_schedule_time_id: 6,
+            doctor_id: 1,
             appointment_time_id: 3,
             appointment_date: '2025-08-22',
             is_available: true,
         },
         {
-            service_schedule_time_id: 7,
-            service_id: 1,
+            doctor_schedule_time_id: 7,
+            doctor_id: 1,
             appointment_time_id: 5,
             appointment_date: '2025-08-22',
             is_available: true,
         },
         // 25/08/2025
         {
-            service_schedule_time_id: 8,
-            service_id: 1,
+            doctor_schedule_time_id: 8,
+            doctor_id: 1,
             appointment_time_id: 1,
             appointment_date: '2025-08-25',
             is_available: true,
         },
         {
-            service_schedule_time_id: 9,
-            service_id: 1,
+            doctor_schedule_time_id: 9,
+            doctor_id: 1,
             appointment_time_id: 3,
             appointment_date: '2025-08-25',
             is_available: true,
         },
         // 28/08/2025
         {
-            service_schedule_time_id: 10,
-            service_id: 1,
+            doctor_schedule_time_id: 10,
+            doctor_id: 1,
             appointment_time_id: 2,
             appointment_date: '2025-08-28',
             is_available: true,
         },
         {
-            service_schedule_time_id: 11,
-            service_id: 1,
+            doctor_schedule_time_id: 11,
+            doctor_id: 1,
             appointment_time_id: 4,
             appointment_date: '2025-08-28',
             is_available: true,
         },
         // 30/08/2025
         {
-            service_schedule_time_id: 12,
-            service_id: 1,
+            doctor_schedule_time_id: 12,
+            doctor_id: 1,
             appointment_time_id: 1,
             appointment_date: '2025-08-30',
             is_available: true,
         },
         {
-            service_schedule_time_id: 13,
-            service_id: 1,
+            doctor_schedule_time_id: 13,
+            doctor_id: 1,
             appointment_time_id: 5,
             appointment_date: '2025-08-30',
             is_available: true,
         },
         // 01/09/2025
         {
-            service_schedule_time_id: 14,
-            service_id: 1,
+            doctor_schedule_time_id: 14,
+            doctor_id: 1,
             appointment_time_id: 1,
             appointment_date: '2025-09-01',
             is_available: true,
         },
         {
-            service_schedule_time_id: 15,
-            service_id: 1,
+            doctor_schedule_time_id: 15,
+            doctor_id: 1,
             appointment_time_id: 3,
             appointment_date: '2025-09-01',
             is_available: true,
         },
         // 03/09/2025
         {
-            service_schedule_time_id: 16,
-            service_id: 1,
+            doctor_schedule_time_id: 16,
+            doctor_id: 1,
             appointment_time_id: 2,
             appointment_date: '2025-09-03',
             is_available: true,
         },
         {
-            service_schedule_time_id: 17,
-            service_id: 1,
+            doctor_schedule_time_id: 17,
+            doctor_id: 1,
             appointment_time_id: 4,
             appointment_date: '2025-09-03',
             is_available: true,
         },
         // 05/09/2025
         {
-            service_schedule_time_id: 18,
-            service_id: 1,
+            doctor_schedule_time_id: 18,
+            doctor_id: 1,
             appointment_time_id: 1,
             appointment_date: '2025-09-05',
             is_available: true,
         },
         {
-            service_schedule_time_id: 19,
-            service_id: 1,
+            doctor_schedule_time_id: 19,
+            doctor_id: 1,
             appointment_time_id: 5,
             appointment_date: '2025-09-05',
             is_available: true,
         },
         // 08/09/2025
         {
-            service_schedule_time_id: 20,
-            service_id: 1,
+            doctor_schedule_time_id: 20,
+            doctor_id: 1,
             appointment_time_id: 2,
             appointment_date: '2025-09-08',
             is_available: true,
         },
         {
-            service_schedule_time_id: 21,
-            service_id: 1,
+            doctor_schedule_time_id: 21,
+            doctor_id: 1,
             appointment_time_id: 3,
             appointment_date: '2025-09-08',
             is_available: true,
         },
         // 10/09/2025
         {
-            service_schedule_time_id: 22,
-            service_id: 1,
+            doctor_schedule_time_id: 22,
+            doctor_id: 1,
             appointment_time_id: 1,
             appointment_date: '2025-09-10',
             is_available: true,
         },
         {
-            service_schedule_time_id: 23,
-            service_id: 1,
+            doctor_schedule_time_id: 23,
+            doctor_id: 1,
             appointment_time_id: 4,
             appointment_date: '2025-09-10',
             is_available: true,
         },
         // 12/09/2025
         {
-            service_schedule_time_id: 24,
-            service_id: 1,
+            doctor_schedule_time_id: 24,
+            doctor_id: 1,
             appointment_time_id: 3,
             appointment_date: '2025-09-12',
             is_available: true,
         },
         {
-            service_schedule_time_id: 25,
-            service_id: 1,
+            doctor_schedule_time_id: 25,
+            doctor_id: 1,
             appointment_time_id: 5,
             appointment_date: '2025-09-12',
             is_available: true,
         },
         // 15/09/2025
         {
-            service_schedule_time_id: 26,
-            service_id: 1,
+            doctor_schedule_time_id: 26,
+            doctor_id: 1,
             appointment_time_id: 2,
             appointment_date: '2025-09-15',
             is_available: true,
         },
         {
-            service_schedule_time_id: 27,
-            service_id: 1,
+            doctor_schedule_time_id: 27,
+            doctor_id: 1,
             appointment_time_id: 4,
             appointment_date: '2025-09-15',
             is_available: true,
         },
         // 18/09/2025
         {
-            service_schedule_time_id: 28,
-            service_id: 1,
+            doctor_schedule_time_id: 28,
+            doctor_id: 1,
             appointment_time_id: 1,
             appointment_date: '2025-09-18',
             is_available: true,
         },
         {
-            service_schedule_time_id: 29,
-            service_id: 1,
+            doctor_schedule_time_id: 29,
+            doctor_id: 1,
             appointment_time_id: 5,
             appointment_date: '2025-09-18',
             is_available: true,
@@ -337,8 +337,9 @@ const ServiceInfo: React.FC = () => {
                                 className="isax isax-calendar-tick calendar-icon"
                                 onClick={() => setShowDatePicker(!showDatePicker)}
                                 ref={anchorRef}
+                                aria-label="Chọn ngày"
+                                style={{ background: 'none', border: 'none', padding: 0 }}
                             />
-
                             <Calendar
                                 value={activeDay}
                                 onChange={handleDateChange}
@@ -365,8 +366,10 @@ const ServiceInfo: React.FC = () => {
                     </div>
 
                     <div className="available-tab">
-                        <label className="form-label">Chọn ngày có sẵn</label>
-                        <ul className="nav">
+                        <label className="form-label" htmlFor="date-selector">
+                            Chọn ngày có sẵn
+                        </label>
+                        <ul className="nav" id="date-selector">
                             {next7Days.map((day) => (
                                 <li key={day.id}>
                                     <Link
@@ -447,4 +450,4 @@ const ServiceInfo: React.FC = () => {
     );
 };
 
-export default ServiceInfo;
+export default ScheduleAvailability;

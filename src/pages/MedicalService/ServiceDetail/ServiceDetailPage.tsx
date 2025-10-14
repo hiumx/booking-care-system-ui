@@ -7,26 +7,25 @@ import ReviewCard from '@/components/ReviewCard';
 import Button from '@/components/Button';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
-import Review from './components/Review/Review';
+import WriteReview from '@/components/WriteReview';
+import ScheduleAvailability from '@/components/ScheduleAvailability';
 
 // Import images for DoctorProfileCard
 import serviceImg from '@/assets/img/doctors/doc-profile-02.jpg';
 import badgeCheck from '@/assets/img/icons/badge-check.svg';
 import watchIcon from '@/assets/img/icons/watch-icon.svg';
-import thumbIcon from '@/assets/img/icons/thumb-icon.svg';
+import thumbIcon from '@/assets/img/icons/gmail-icon.svg';
 import buildingIcon from '@/assets/img/icons/building-icon.svg';
 import deviceMessageIcon from '@/assets/img/icons/device-message2.svg';
 import calendarIcon from '@/assets/img/icons/calendar3.svg';
-import bullseyeIcon from '@/assets/img/icons/bullseye.svg';
 
 // Import images for DoctorDetails
-import experienceLogo1 from '@/assets/img/icons/experience-logo-01.svg';
 import clinicImg1 from '@/assets/img/clinic/clinic-11.jpg';
 
 // Icon CSS
 import '@/assets/css/feather.css';
-import ServiceInfo from './components/ServiceInfo/ServiceInfo';
 import { buildPath, PATHS, replacePathParams } from '@/routes/paths';
+import { HospitalCarousel } from '@/components/SimpleCarousel';
 
 // Mock data for Doctor
 const mockDoctor = {
@@ -46,16 +45,6 @@ const mockDoctor = {
     updated_at: '2025-08-18 14:00:00',
 };
 
-// Mock data for Specialty
-const mockSpecialty = {
-    id: 1,
-    name: 'Nha khoa',
-    image_url: 'https://example.com/specialty-dental.jpg',
-    status: 'ACTIVE',
-    created_at: '2020-01-01 09:00:00',
-    updated_at: '2025-08-18 13:00:00',
-};
-
 // Mock data for Clinic
 const mockClinic = {
     id: 1,
@@ -71,15 +60,7 @@ const mockClinic = {
     created_at: '2019-12-01 08:00:00',
     updated_at: '2025-08-18 15:00:00',
 };
-
-// Mock data for Position
-const mockPosition = {
-    id: 1,
-    name: 'Tiến sĩ',
-    description: 'Bác sĩ có trình độ tiến sĩ y khoa.',
-    created_at: '2020-01-01 09:00:00',
-    updated_at: '2025-08-18 13:00:00',
-};
+const listmockClinic = [mockClinic, mockClinic, mockClinic, mockClinic];
 
 // Mock data for Prices
 const mockPrices = [
@@ -282,8 +263,6 @@ const reviews = Array.from({ length: 150 }, (_, index) => {
 
 const ServiceDetailPage: React.FC = () => {
     const bioRef = useRef<HTMLDivElement>(null);
-    const expRef = useRef<HTMLDivElement>(null);
-    const specialityRef = useRef<HTMLDivElement>(null);
     const clinicRef = useRef<HTMLDivElement>(null);
     const hoursRef = useRef<HTMLDivElement>(null);
     const reviewRef = useRef<HTMLDivElement>(null);
@@ -312,11 +291,6 @@ const ServiceDetailPage: React.FC = () => {
         reviews.length > 0
             ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
             : '0.0';
-
-    // Calculate recommendation percentage
-    const recommendCount = reviews.filter((review) => review.recommend).length;
-    const recommendPercentage =
-        reviews.length > 0 ? Math.round((recommendCount / reviews.length) * 100) : 0;
 
     // Count completed appointments
     const appointmentCount = mockAppointments.filter(
@@ -446,8 +420,7 @@ const ServiceDetailPage: React.FC = () => {
                                                 {mockSpecialty.name}
                                             </span> */}
                                         </h4>
-                                        <p>{mockClinic.name}</p>
-                                        <p>Dịch vụ: Khám chuyên khoa</p>
+                                        <p>Loại Dịch vụ: Khám chuyên khoa</p>
                                         <p className="address-detail">
                                             <span className="loc-icon">
                                                 <i className="feather-map-pin"></i>
@@ -466,32 +439,13 @@ const ServiceDetailPage: React.FC = () => {
                                                 </span>
                                                 <p>Toàn thời gian, Liệu pháp trực tuyến sẵn có</p>
                                             </div>
-                                            {/* <ul className="sub-links">
-                                                <li>
-                                                    <Link to="#">
-                                                        <i className="feather-heart"></i>
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link to="#">
-                                                        <i className="feather-share-2"></i>
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link to="#">
-                                                        <i className="feather-link"></i>
-                                                    </Link>
-                                                </li>
-                                            </ul> */}
                                         </li>
                                         <li>
                                             <div className="hospital-info">
                                                 <span className="list-icon">
                                                     <img src={thumbIcon} alt="Icon" />
                                                 </span>
-                                                <p>
-                                                    <b>{recommendPercentage}%</b> được đề xuất
-                                                </p>
+                                                <p>Email: {mockDoctor.email}</p>
                                             </div>
                                         </li>
                                         <li>
@@ -501,12 +455,6 @@ const ServiceDetailPage: React.FC = () => {
                                                 </span>
                                                 <p>{mockClinic.name}</p>
                                             </div>
-                                            {/* <h5 className="accept-text">
-                                                <span>
-                                                    <i className="feather-check"></i>
-                                                </span>
-                                                Tiếp nhận bệnh nhân mới
-                                            </h5> */}
                                         </li>
                                         <li>
                                             <div className="rating">
@@ -532,7 +480,7 @@ const ServiceDetailPage: React.FC = () => {
                                                                 alt="Chat"
                                                             />
                                                         </span>
-                                                        Chat
+                                                        {'Chat'}
                                                     </Link>
                                                 </li>
                                             </ul>
@@ -547,12 +495,6 @@ const ServiceDetailPage: React.FC = () => {
                                             <img src={calendarIcon} alt="Calendar" />
                                         </span>
                                         Gần {appointmentCount}+ cuộc hẹn đã được đặt
-                                    </li>
-                                    <li>
-                                        <span className="bg-dark-blue">
-                                            <img src={bullseyeIcon} alt="Target" />
-                                        </span>
-                                        {mockDoctor.years_of_experience} năm kinh nghiệm
                                     </li>
                                 </ul>
                                 <div className="bottom-book-btn">
@@ -591,21 +533,10 @@ const ServiceDetailPage: React.FC = () => {
                                     to="#"
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        scrollToSection(expRef.current);
+                                        scrollToSection(hoursRef.current);
                                     }}
                                 >
-                                    Kinh nghiệm
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="#"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        scrollToSection(specialityRef.current);
-                                    }}
-                                >
-                                    Chuyên khoa
+                                    Lịch làm việc
                                 </Link>
                             </li>
                             <li>
@@ -616,18 +547,7 @@ const ServiceDetailPage: React.FC = () => {
                                         scrollToSection(clinicRef.current);
                                     }}
                                 >
-                                    Phòng khám
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="#"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        scrollToSection(hoursRef.current);
-                                    }}
-                                >
-                                    Lịch làm việc
+                                    Các Bệnh Viện Cung Cấp Chung Dịch Vụ
                                 </Link>
                             </li>
                             <li>
@@ -669,137 +589,29 @@ const ServiceDetailPage: React.FC = () => {
                                     )}
                                 </div>
                             </div>
-                            <div ref={expRef}>
-                                <div className="doc-information-details" id="experience">
-                                    <div className="detail-title">
-                                        <h4>Kinh nghiệm</h4>
-                                    </div>
-                                    <div className="experience-info">
-                                        <div className="experience-logo">
-                                            <span>
-                                                <img src={experienceLogo1} alt="Experience Logo" />
-                                            </span>
-                                        </div>
-                                        <div className="experience-content">
-                                            <h5>{mockClinic.name}</h5>
-                                            <p>
-                                                <strong>Trình độ:</strong> {mockPosition.name}
-                                            </p>
-                                            <p>
-                                                <strong>Kinh nghiệm:</strong>{' '}
-                                                {mockDoctor.years_of_experience} năm kinh nghiệm
-                                            </p>
-                                            <p>
-                                                <strong>Mô tả:</strong>{' '}
-                                                {mockDoctor.bio.substring(0, 100)}...
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div ref={specialityRef}>
-                                <div className="doc-information-details" id="speciality">
-                                    <div className="detail-title">
-                                        <h4>Chuyên khoa</h4>
-                                    </div>
-                                    <ul className={clsx('special-links', styles.marginLeftZero)}>
-                                        <li>
-                                            <Link to="#">{mockSpecialty.name}</Link>
-                                        </li>
-                                        <li>
-                                            <Link to="#">{mockSpecialty.name}</Link>
-                                        </li>
-                                        <li>
-                                            <Link to="#">{mockSpecialty.name}</Link>
-                                        </li>
-                                        <li>
-                                            <Link to="#">{mockSpecialty.name}</Link>
-                                        </li>
-                                        <li>
-                                            <Link to="#">{mockSpecialty.name}</Link>
-                                        </li>
-                                        <li>
-                                            <Link to="#">{mockSpecialty.name}</Link>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div ref={clinicRef}>
-                                <div className="doc-information-details" id="clinic">
-                                    <div className="detail-title">
-                                        <h4>Clinics & Locations</h4>
-                                    </div>
-                                    <div className="clinic-loc">
-                                        <div className="row align-items-center">
-                                            <div className="col-lg-7">
-                                                <div className="clinic-info">
-                                                    <div className="clinic-img">
-                                                        <img
-                                                            src={mockClinic.background_url}
-                                                            alt={mockClinic.name}
-                                                        />
-                                                    </div>
-                                                    <div className="detail-clinic">
-                                                        <h5>{mockClinic.name}</h5>
-                                                        <Link
-                                                            to="/phong-kham/da-nang"
-                                                            className="clinic-link"
-                                                        >
-                                                            Xem thông tin phòng khám
-                                                        </Link>
-                                                        <p>{mockClinic.address}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="d-flex align-items-center avail-time-slot">
-                                                    {[
-                                                        {
-                                                            day: 'Monday',
-                                                            time: '07:00 AM - 09:00 PM',
-                                                        },
-                                                        {
-                                                            day: 'Tuesday',
-                                                            time: '07:00 AM - 09:00 PM',
-                                                        },
-                                                    ].map((slot, idx) => (
-                                                        <div
-                                                            className="availability-date"
-                                                            key={idx}
-                                                        >
-                                                            <div className="book-date">
-                                                                <h6>{slot.day}</h6>
-                                                                <span>{slot.time}</span>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <div className="col-lg-5">
-                                                <div className="contact-map d-flex">
-                                                    <iframe
-                                                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3193.7301009561315!2d-76.13077892422932!3d36.82498697224007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89bae976cfe9f8af%3A0xa61eac05156fbdb9!2sBeachStreet%20USA!5e0!3m2!1sen!2sin!4v1669777904208!5m2!1sen!2sin"
-                                                        allowFullScreen
-                                                        loading="lazy"
-                                                        referrerPolicy="no-referrer-when-downgrade"
-                                                        title={`Map for ${mockClinic.name}`}
-                                                    ></iframe>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            {/* ----------------------- */}
                             <div ref={hoursRef}>
                                 <div className="doc-information-details" id="bussiness_hour">
                                     <div className="detail-title">
                                         <h4>Lịch làm việc</h4>
                                     </div>
-                                    <ServiceInfo />
+                                    <ScheduleAvailability />
                                 </div>
                             </div>
+                            {/* ----------------------- */}
+                            <div ref={clinicRef}>
+                                <div className="doc-information-details" id="clinic">
+                                    <div className="detail-title">
+                                        <h4>Các Bệnh Viện Cung Cấp Chung Dịch Vụ</h4>
+                                    </div>
+                                    <HospitalCarousel hospitals={listmockClinic} />
+                                </div>
+                            </div>
+                            {/* ----------------------- */}
                             {/* Write Review  */}
                             <div ref={reviewRef}>
                                 <div id="review">
-                                    <div className="detail-title">
+                                    <div className="detail-title mb-3">
                                         <h4>Đánh giá ({reviews.length})</h4>
                                     </div>
 
@@ -813,7 +625,7 @@ const ServiceDetailPage: React.FC = () => {
                                                 onClick={() => setShowWriteReview(true)}
                                             />
                                         ) : (
-                                            <Review
+                                            <WriteReview
                                                 doctorName={`${mockDoctor.name}`}
                                                 onSubmitReview={handleSubmitReview}
                                             />

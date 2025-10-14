@@ -8,7 +8,7 @@ import ReviewCard from '@/components/ReviewCard';
 import Button from '@/components/Button';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
-import WriteReview from './components/WriteReview';
+import WriteReview from '@/components/WriteReview';
 import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
 import {
     selectSelectedDoctor,
@@ -32,7 +32,9 @@ import experienceLogo1 from '@/assets/img/icons/experience-logo-01.svg';
 
 // Icon CSS
 import '@/assets/css/feather.css';
-import DoctorAvailability from './components/DoctorAvailability';
+import ScheduleAvailability from '@/components/ScheduleAvailability';
+import HospitalInfo from '@/components/HospitalInfo';
+import { Gender } from '@/enums/common.enums';
 import { PATHS, replacePathParams } from '@/routes/paths';
 
 // Mock data for Appointments
@@ -238,18 +240,6 @@ const DoctorProfile: React.FC = () => {
 
     const [expanded, setExpanded] = useState(false);
 
-    // Function to generate Google Maps embed URL from address
-    const generateMapUrl = (address: string) => {
-        if (!address) {
-            // Fallback to default location if no address
-            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3193.7301009561315!2d-76.13077892422932!3d36.82498697224007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89bae976cfe9f8af%3A0xa61eac05156fbdb9!2sBeachStreet%20USA!5e0!3m2!1sen!2sin!4v1669777904208!5m2!1sen!2sin';
-        }
-
-        // Encode the address for URL - using simple Google Maps embed
-        const encodedAddress = encodeURIComponent(address);
-        return `https://maps.google.com/maps?q=${encodedAddress}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
-    };
-
     // Use selectedDoctor data instead of mock data
     const doctor = selectedDoctor;
     const limit = 300;
@@ -371,11 +361,11 @@ const DoctorProfile: React.FC = () => {
     };
 
     // Function to get gender display text
-    const getGenderDisplayText = (gender: any) => {
-        if (String(gender) === 'FEMALE') {
+    const getGenderDisplayText = (gender: Gender | undefined) => {
+        if (gender === Gender.FEMALE) {
             return 'Nữ';
         }
-        if (String(gender) === 'MALE') {
+        if (gender === Gender.MALE) {
             return 'Nam';
         }
         return 'Khác';
@@ -542,7 +532,7 @@ const DoctorProfile: React.FC = () => {
                                             <h5 className="accept-text">
                                                 <span>
                                                     <i className="feather-check"></i>
-                                                </span>
+                                                </span>{' '}
                                                 Tiếp nhận bệnh nhân mới
                                             </h5>
                                         </li>
@@ -566,7 +556,7 @@ const DoctorProfile: React.FC = () => {
                                                                 src={deviceMessageIcon}
                                                                 alt="Chat"
                                                             />
-                                                        </span>
+                                                        </span>{' '}
                                                         Chat
                                                     </Link>
                                                 </li>
@@ -574,7 +564,7 @@ const DoctorProfile: React.FC = () => {
                                                     <Link to="/voice-call">
                                                         <span className="bg-violet">
                                                             <i className="feather-phone-forwarded"></i>
-                                                        </span>
+                                                        </span>{' '}
                                                         Audio Call
                                                     </Link>
                                                 </li>
@@ -582,7 +572,7 @@ const DoctorProfile: React.FC = () => {
                                                     <Link to="/video-call">
                                                         <span className="bg-indigo">
                                                             <i className="fa-solid fa-video"></i>
-                                                        </span>
+                                                        </span>{' '}
                                                         Video Call
                                                     </Link>
                                                 </li>
@@ -809,72 +799,27 @@ const DoctorProfile: React.FC = () => {
                                     <div className="detail-title">
                                         <h4>Bệnh viện & Vị trí</h4>
                                     </div>
-                                    <div className="clinic-loc">
-                                        <div className="row align-items-center">
-                                            <div className="col-lg-7">
-                                                <div className="clinic-info">
-                                                    <div className="clinic-img">
-                                                        <img
-                                                            src={doctor.hospital?.avatarUrl}
-                                                            alt={doctor.hospital?.name}
-                                                        />
-                                                    </div>
-                                                    <div className="detail-clinic">
-                                                        <h5>{doctor.hospital?.name}</h5>
-                                                        <Link
-                                                            to={`/hospital/${doctor.hospital?.id || ''}`}
-                                                            className="clinic-link"
-                                                        >
-                                                            Xem thông tin bệnh viện
-                                                        </Link>
-                                                        <p>
-                                                            <i className="feather-map-pin me-2"></i>
-                                                            {doctor.hospital?.address ||
-                                                                doctor.address ||
-                                                                'Địa chỉ bệnh viện'}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="d-flex align-items-center avail-time-slot">
-                                                    {[
-                                                        {
-                                                            day: 'Thứ 2',
-                                                            time: '07:00 AM - 17:00 PM',
-                                                        },
-                                                        {
-                                                            day: 'Thứ 7',
-                                                            time: '07:00 AM - 17:00 PM',
-                                                        },
-                                                    ].map((slot, idx) => (
-                                                        <div
-                                                            className="availability-date"
-                                                            key={idx}
-                                                        >
-                                                            <div className="book-date">
-                                                                <h6>{slot.day}</h6>
-                                                                <span>{slot.time}</span>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <div className="col-lg-5">
-                                                <div className="contact-map d-flex">
-                                                    <iframe
-                                                        src={generateMapUrl(
-                                                            doctor.hospital?.address ||
-                                                                doctor.address ||
-                                                                'Địa chỉ bệnh viện'
-                                                        )}
-                                                        allowFullScreen
-                                                        loading="lazy"
-                                                        referrerPolicy="no-referrer-when-downgrade"
-                                                        title={`Map for ${doctor.hospital?.name}`}
-                                                    ></iframe>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <HospitalInfo
+                                        hospital={{
+                                            id: Number(doctor.hospital?.id) || 1,
+                                            name: doctor.hospital?.name || 'Bệnh viện',
+                                            address:
+                                                doctor.hospital?.address ||
+                                                doctor.address ||
+                                                'Địa chỉ bệnh viện',
+                                            background_url: doctor.hospital?.avatarUrl || doctorImg,
+                                        }}
+                                        availabilitySlots={[
+                                            {
+                                                day: 'Thứ 2',
+                                                time: '07:00 AM - 17:00 PM',
+                                            },
+                                            {
+                                                day: 'Thứ 7',
+                                                time: '07:00 AM - 17:00 PM',
+                                            },
+                                        ]}
+                                    />
                                 </div>
                             </div>
                             <div ref={hoursRef}>
@@ -882,7 +827,7 @@ const DoctorProfile: React.FC = () => {
                                     <div className="detail-title">
                                         <h4>Lịch làm việc</h4>
                                     </div>
-                                    <DoctorAvailability />
+                                    <ScheduleAvailability />
                                 </div>
                             </div>
                             {/* Write Review  */}
