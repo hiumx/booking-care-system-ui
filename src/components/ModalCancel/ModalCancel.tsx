@@ -86,14 +86,13 @@ const ModalCancel: React.FC<ModalCancelProps> = ({
                 className={`modal-backdrop fade ${show ? 'show' : ''}`}
                 onClick={loading ? undefined : onHide}
                 onKeyDown={(e) => {
-                    if (!loading && (e.key === 'Enter' || e.key === ' ')) {
+                    if (!loading && e.key === 'Escape') {
                         e.preventDefault();
                         onHide();
                     }
                 }}
-                role="button"
-                tabIndex={0}
-                aria-label="Close modal"
+                tabIndex={-1}
+                aria-hidden="true"
             />
 
             {/* Modal */}
