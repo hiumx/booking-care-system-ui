@@ -8,6 +8,7 @@ import AppointmentCardSkeleton from './components/AppointmentCard/AppointmentCar
 import AppointmentFilters from './components/AppointmentFilters/AppointmentFilters';
 import Pagination from '@/components/Pagination/Pagination';
 import DateRangePicker from '@/components/DateRangePicker';
+import ModalCancel from '@/components/ModalCancel';
 import {
     AppointmentUITab,
     AppointmentQueryRequest,
@@ -19,10 +20,11 @@ import {
 import { AppointmentService } from '@/services/appointment.service';
 import { RootState } from '@/store';
 import { FilterState } from './components/AppointmentFilters/AppointmentTypes';
+import { getRefundInfo } from '@/utils/refund-policy.util';
 import styles from './Appointments.module.scss';
 import { Link } from 'react-router-dom';
 import AppointmentGridCard from './components/AppointmentGridCard/AppointmentGridCard';
-import { AppointmentType } from '@/enums/appointment.enums';
+import { AppointmentType, AppointmentStatus } from '@/enums/appointment.enums';
 
 // View mode type
 type ViewMode = 'list' | 'grid';
@@ -42,6 +44,15 @@ const Appointments: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const itemsPerPage = 5;
+
+    // Cancel modal states
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [selectedAppointmentToCancel, setSelectedAppointmentToCancel] =
+        useState<AppointmentCardData | null>(null);
+    const [isCancelling, setIsCancelling] = useState(false);
+
+    // Refresh trigger để fetch lại data sau khi cancel
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     // API data state
     const [appointments, setAppointments] = useState<AppointmentCardData[]>([]);
@@ -192,6 +203,7 @@ const Appointments: React.FC = () => {
         selectedFilters.appointmentType,
         currentPage,
         itemsPerPage,
+        refreshTrigger, // Thêm refreshTrigger để fetch lại data sau khi cancel
     ]);
 
     // Handle date range change
@@ -411,6 +423,72 @@ const Appointments: React.FC = () => {
         // Loading state will be handled by useEffect when fetching
     };
 
+    // Handle cancel appointment click
+    const handleCancelClick = (appointment: AppointmentCardData) => {
+        // Validate status - only allow cancellation for PENDING or CONFIRMED
+        if (
+            appointment.status !== AppointmentStatus.PENDING &&
+            appointment.status !== AppointmentStatus.CONFIRMED
+        ) {
+            toast.warning('Chỉ có thể hủy lịch hẹn ở trạng thái Chờ xử lý hoặc Sắp tới');
+            return;
+        }
+
+        setSelectedAppointmentToCancel(appointment);
+        setShowCancelModal(true);
+    };
+
+    // Handle cancel appointment confirm
+    const handleCancelConfirm = async (cancellationReason: string) => {
+        if (!selectedAppointmentToCancel || !userProfile?.id) return;
+
+        setIsCancelling(true);
+        try {
+            // Call API to cancel appointment
+            await AppointmentService.cancelAppointment(
+                selectedAppointmentToCancel.appointmentId,
+                cancellationReason,
+                userProfile.id
+            );
+
+            // Calculate refund percentage for success message (patient cancellation)
+            const refundInfo = getRefundInfo(
+                selectedAppointmentToCancel.appointmentDate,
+                undefined,
+                false
+            );
+
+            // Show success message with refund info
+            if (refundInfo.refundPercentage === 100) {
+                toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 100% chi phí.');
+            } else if (refundInfo.refundPercentage === 50) {
+                toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 50% chi phí.');
+            } else {
+                toast.success(
+                    'Hủy lịch hẹn thành công. Do hủy muộn, bạn sẽ không được hoàn lại chi phí.'
+                );
+            }
+
+            // Close modal and reset state
+            setShowCancelModal(false);
+            setSelectedAppointmentToCancel(null);
+
+            // Fetch lại data để cập nhật UI với thông tin mới nhất
+            // Reset về trang đầu nếu đang ở trang khác
+            if (currentPage > 1) {
+                setCurrentPage(1);
+            }
+
+            // Trigger useEffect để fetch lại data
+            setRefreshTrigger((prev) => prev + 1);
+        } catch (error: any) {
+            console.error('Error cancelling appointment:', error);
+            toast.error(error.message || 'Không thể hủy lịch hẹn. Vui lòng thử lại.');
+        } finally {
+            setIsCancelling(false);
+        }
+    };
+
     // Extract complex logic to separate function to reduce cognitive complexity
     const convertFilterStateToSelectedFilters = () => {
         const appointmentTypes: AppointmentType[] = [];
@@ -495,6 +573,7 @@ const Appointments: React.FC = () => {
                                     key={appointment.appointmentId}
                                     appointment={appointment}
                                     status={activeTab}
+                                    onCancel={handleCancelClick}
                                 />
                             ))}
                         </>
@@ -505,6 +584,7 @@ const Appointments: React.FC = () => {
                                     key={appointment.appointmentId}
                                     appointment={appointment}
                                     status={activeTab}
+                                    onCancel={handleCancelClick}
                                 />
                             ))}
                         </div>
@@ -936,6 +1016,35 @@ const Appointments: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Cancel Appointment Modal */}
+            <ModalCancel
+                show={showCancelModal}
+                onHide={() => {
+                    if (!isCancelling) {
+                        setShowCancelModal(false);
+                        setSelectedAppointmentToCancel(null);
+                    }
+                }}
+                onConfirm={handleCancelConfirm}
+                title="Xác Nhận Hủy Lịch Hẹn"
+                message="Bạn có chắc chắn muốn hủy lịch hẹn"
+                confirmText="Xác nhận hủy"
+                cancelText="Đóng"
+                loading={isCancelling}
+                reasonLabel="Lý do hủy"
+                reasonPlaceholder="Vui lòng nhập lý do hủy lịch hẹn (tối thiểu 10 ký tự)..."
+                minReasonLength={10}
+                refundInfo={
+                    selectedAppointmentToCancel
+                        ? getRefundInfo(
+                              selectedAppointmentToCancel.appointmentDate,
+                              undefined,
+                              false
+                          ) // Patient cancellation
+                        : undefined
+                }
+            />
         </>
     );
 };

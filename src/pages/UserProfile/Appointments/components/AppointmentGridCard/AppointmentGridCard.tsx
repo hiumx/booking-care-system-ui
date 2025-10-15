@@ -10,13 +10,19 @@ import {
     getDisplaySpecialty,
     getDisplayLabel,
 } from '@/types/appointment.types';
+import { AppointmentStatus } from '@/enums/appointment.enums';
 
 interface AppointmentGridCardProps {
     appointment: AppointmentCardData;
     status: AppointmentUITab;
+    onCancel?: (appointment: AppointmentCardData) => void; // Callback for cancel action
 }
 
-const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, status }) => {
+const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
+    appointment,
+    status,
+    onCancel,
+}) => {
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('vi-VN', {
@@ -53,11 +59,22 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                                     <i className="isax isax-eye4"></i>
                                 </Link>
                             </li>
-                            <li>
-                                <Link to="#">
-                                    <i className="isax isax-close-circle5"></i>
-                                </Link>
-                            </li>
+                            {/* Only show cancel button for PENDING and CONFIRMED appointments */}
+                            {(appointment.status === AppointmentStatus.PENDING ||
+                                appointment.status === AppointmentStatus.CONFIRMED) && (
+                                <li>
+                                    <a
+                                        href="#"
+                                        title="Hủy lịch hẹn"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            onCancel?.(appointment);
+                                        }}
+                                    >
+                                        <i className="isax isax-close-circle5"></i>
+                                    </a>
+                                </li>
+                            )}
                         </ul>
                         <div className="appointment-detail-btn">
                             <span className="badge badge-warning text-center">
@@ -83,11 +100,22 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({ appointment, 
                                     <i className="isax isax-messages-25"></i>
                                 </Link>
                             </li>
-                            <li>
-                                <Link to="#">
-                                    <i className="isax isax-close-circle5"></i>
-                                </Link>
-                            </li>
+                            {/* Only show cancel button for PENDING and CONFIRMED appointments */}
+                            {(appointment.status === AppointmentStatus.PENDING ||
+                                appointment.status === AppointmentStatus.CONFIRMED) && (
+                                <li>
+                                    <a
+                                        href="#"
+                                        title="Hủy lịch hẹn"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            onCancel?.(appointment);
+                                        }}
+                                    >
+                                        <i className="isax isax-close-circle5"></i>
+                                    </a>
+                                </li>
+                            )}
                         </ul>
                         <div className="appointment-detail-btn">
                             <Link to="#" className="start-link">

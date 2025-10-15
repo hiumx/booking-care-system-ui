@@ -16,12 +16,14 @@ interface AppointmentCardProps {
     appointment: AppointmentCardData;
     status: AppointmentUITab;
     variant?: 'full' | 'minimal'; // 'full' shows all actions, 'minimal' only shows view icon
+    onCancel?: (appointment: AppointmentCardData) => void; // Callback for cancel action
 }
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({
     appointment,
     status,
     variant = 'full',
+    onCancel,
 }) => {
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -75,9 +77,16 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="#" title="Hủy lịch hẹn">
+                                    <a
+                                        href="#"
+                                        title="Hủy lịch hẹn"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            onCancel?.(appointment);
+                                        }}
+                                    >
                                         <i className="isax isax-close-circle5"></i>
-                                    </Link>
+                                    </a>
                                 </li>
                             </ul>
                         </li>
@@ -108,9 +117,16 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="#" title="Hủy lịch hẹn">
+                                    <a
+                                        href="#"
+                                        title="Hủy lịch hẹn"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            onCancel?.(appointment);
+                                        }}
+                                    >
                                         <i className="isax isax-close-circle5"></i>
-                                    </Link>
+                                    </a>
                                 </li>
                             </ul>
                         </li>
