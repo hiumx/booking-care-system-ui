@@ -15,6 +15,18 @@ export interface RefundInfo {
 }
 
 /**
+ * Helper function to parse appointment date consistently
+ * @param appointmentDate - The appointment date (string or Date)
+ * @returns Parsed Date object
+ */
+const parseAppointmentDate = (appointmentDate: string | Date): Date => {
+    if (typeof appointmentDate === 'string') {
+        return new Date(appointmentDate.endsWith('Z') ? appointmentDate : appointmentDate + 'Z');
+    }
+    return appointmentDate;
+};
+
+/**
  * Calculate refund percentage based on time between cancellation and appointment
  * Uses UTC time to match backend calculation
  * Note: This is for PATIENT cancellation only. Staff cancellation always gets 100% refund.
@@ -30,10 +42,7 @@ export const calculateRefundPercentage = (
     }
 
     // Parse appointment date and ensure it's treated as UTC (same as backend)
-    const appointmentDateTime =
-        typeof appointmentDate === 'string'
-            ? new Date(appointmentDate.endsWith('Z') ? appointmentDate : appointmentDate + 'Z')
-            : appointmentDate;
+    const appointmentDateTime = parseAppointmentDate(appointmentDate);
 
     // Use current UTC time (same as backend)
     const cancelTime = cancellationDate || new Date();
@@ -89,10 +98,7 @@ export const getRefundInfo = (
     isStaffCancellation: boolean = false
 ): RefundInfo => {
     // Use same parsing logic as calculateRefundPercentage for consistency
-    const appointmentDateTime =
-        typeof appointmentDate === 'string'
-            ? new Date(appointmentDate.endsWith('Z') ? appointmentDate : appointmentDate + 'Z')
-            : appointmentDate;
+    const appointmentDateTime = parseAppointmentDate(appointmentDate);
 
     const cancelTime = cancellationDate || new Date();
     const hoursUntilAppointment =

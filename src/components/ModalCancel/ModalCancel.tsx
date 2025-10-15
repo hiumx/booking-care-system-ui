@@ -9,7 +9,6 @@ interface ModalCancelProps {
     confirmText?: string;
     cancelText?: string;
     loading?: boolean;
-    itemName?: string;
     reasonLabel?: string;
     reasonPlaceholder?: string;
     minReasonLength?: number;
@@ -35,6 +34,20 @@ const ModalCancel: React.FC<ModalCancelProps> = ({
 }) => {
     const [cancelReason, setCancelReason] = useState('');
     const [error, setError] = useState('');
+
+    // Helper function to get alert class based on refund percentage
+    const getAlertClass = (refundPercentage: number): string => {
+        if (refundPercentage === 100) return 'alert-success';
+        if (refundPercentage > 0) return 'alert-warning';
+        return 'alert-danger';
+    };
+
+    // Helper function to get icon class based on refund percentage
+    const getIconClass = (refundPercentage: number): string => {
+        if (refundPercentage === 100) return 'isax-tick-circle';
+        if (refundPercentage > 0) return 'isax-info-circle';
+        return 'isax-close-circle';
+    };
 
     // Reset state when modal is closed
     useEffect(() => {
@@ -72,14 +85,23 @@ const ModalCancel: React.FC<ModalCancelProps> = ({
             <div
                 className={`modal-backdrop fade ${show ? 'show' : ''}`}
                 onClick={loading ? undefined : onHide}
+                onKeyDown={(e) => {
+                    if (!loading && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault();
+                        onHide();
+                    }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label="Close modal"
             />
 
             {/* Modal */}
             <div
                 className={`modal fade ${show ? 'show d-block' : ''}`}
                 tabIndex={-1}
-                role="dialog"
                 aria-hidden={!show}
+                aria-modal="true"
             >
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
@@ -102,23 +124,11 @@ const ModalCancel: React.FC<ModalCancelProps> = ({
                             {/* Refund Info */}
                             {refundInfo && (
                                 <div
-                                    className={`alert ${
-                                        refundInfo.refundPercentage === 100
-                                            ? 'alert-success'
-                                            : refundInfo.refundPercentage > 0
-                                              ? 'alert-warning'
-                                              : 'alert-danger'
-                                    } mb-3`}
+                                    className={`alert ${getAlertClass(refundInfo.refundPercentage)} mb-3`}
                                 >
                                     <div className="d-flex align-items-center">
                                         <i
-                                            className={`isax ${
-                                                refundInfo.refundPercentage === 100
-                                                    ? 'isax-tick-circle'
-                                                    : refundInfo.refundPercentage > 0
-                                                      ? 'isax-info-circle'
-                                                      : 'isax-close-circle'
-                                            } me-2 fs-5`}
+                                            className={`isax ${getIconClass(refundInfo.refundPercentage)} me-2 fs-5`}
                                         />
                                         <div>
                                             <strong>Chính sách hoàn tiền:</strong>
@@ -174,10 +184,9 @@ const ModalCancel: React.FC<ModalCancelProps> = ({
                                     <>
                                         <span
                                             className="spinner-border spinner-border-sm me-2"
-                                            role="status"
                                             aria-hidden="true"
                                         />
-                                        Đang xử lý...
+                                        <span>Đang xử lý...</span>
                                     </>
                                 ) : (
                                     confirmText
