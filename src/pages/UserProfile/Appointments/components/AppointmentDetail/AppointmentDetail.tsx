@@ -35,6 +35,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                 return {
                     badge: { className: 'badge bg-warning', text: 'Chờ Xác Nhận' },
                     showContactInfo: true,
+                    showLocation: true,
                     showStartSession: false,
                     showReschedule: false,
                     showDownloadPrescription: false,
@@ -46,6 +47,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                 return {
                     badge: { className: 'badge bg-secondary', text: 'Sắp Tới' },
                     showContactInfo: true,
+                    showLocation: true,
                     showStartSession: true,
                     showReschedule: false,
                     showDownloadPrescription: false,
@@ -58,6 +60,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     badge: { className: 'badge bg-red me-2', text: 'Đã Hủy' },
                     showContactInfo: true,
                     showStartSession: false,
+                    showLocation: false,
                     showReschedule: true,
                     showDownloadPrescription: false,
                     showCancelButton: false,
@@ -69,6 +72,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     badge: { className: 'badge bg-green', text: 'Hoàn Thành' },
                     showContactInfo: true,
                     showStartSession: false,
+                    showLocation: false,
                     showReschedule: true,
                     showDownloadPrescription: true,
                     showCancelButton: false,
@@ -80,10 +84,12 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     badge: { className: 'badge bg-secondary', text: 'Không xác định' },
                     showContactInfo: false,
                     showStartSession: false,
+                    showLocation: false,
                     showReschedule: false,
                     showDownloadPrescription: false,
                     showCancelButton: false,
                     showReasonLink: false,
+                    bottomSection: 'waiting_status',
                 };
         }
     };
@@ -245,11 +251,15 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                                 </Link>
                             )}
                         </div>
-                        {appointment.consultationFees && (
-                            <div className="consult-fees">
-                                <h6>Phí Tư Vấn: ${appointment.consultationFees}</h6>
-                            </div>
-                        )}
+                        {/* Hiển thị phí tư vấn cho tất cả trạng thái */}
+                        <div className="consult-fees">
+                            <h6>
+                                Phí Tư Vấn:{' '}
+                                {appointment.consultationFees
+                                    ? `${appointment.consultationFees.toLocaleString('vi-VN')} VNĐ`
+                                    : 'Đang cập nhật...'}
+                            </h6>
+                        </div>
                         <ul>
                             <li>
                                 <Link to="#">
@@ -258,7 +268,14 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                             </li>
                             {config.showCancelButton && (
                                 <li>
-                                    <Link to="#" onClick={onCancel}>
+                                    <Link
+                                        to="#"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            onCancel?.();
+                                        }}
+                                        title="Hủy lịch hẹn"
+                                    >
                                         <i className="isax isax-close-circle5"></i>
                                     </Link>
                                 </li>
@@ -274,15 +291,9 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                             {appointment.appointmentTime}
                         </span>
                     </li>
-                    {appointment.clinicLocation && (
+                    {config.showLocation && (
                         <li>
-                            <h6>Địa Điểm Phòng Khám</h6>
-                            <span>{appointment.clinicLocation}</span>
-                        </li>
-                    )}
-                    {appointment.location && (
-                        <li>
-                            <h6>Vị Trí</h6>
+                            <h6>Vị trí</h6>
                             <span>{appointment.location}</span>
                         </li>
                     )}
