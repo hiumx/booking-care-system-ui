@@ -6,8 +6,11 @@ import AppointmentDetail from './components/AppointmentDetail';
 import AppointmentDetailSkeleton from './components/AppointmentDetail/AppointmentDetailSkeleton';
 import AppointmentCard from './components/AppointmentCard/AppointmentCard';
 import AppointmentCardSkeleton from './components/AppointmentCard/AppointmentCardSkeleton';
+import ModalCancel from '@/components/ModalCancel';
 import { AppointmentService } from '@/services/appointment.service';
 import { RootState } from '@/store';
+import { getRefundInfo } from '@/utils/refund-policy.util';
+import { AppointmentStatus } from '@/enums/appointment.enums';
 import {
     transformToDetailData,
     transformToCardData,
@@ -17,8 +20,18 @@ import {
     AppointmentCardData,
     AppointmentQueryRequest,
 } from '@/types/appointment.types';
+import { PATHS } from '@/routes/paths';
 
 const AppointmentDetailPage: React.FC = () => {
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+    };
+
     const location = useLocation();
     const navigate = useNavigate();
     const userProfile = useSelector((state: RootState) => state.user.profile);
@@ -27,6 +40,10 @@ const AppointmentDetailPage: React.FC = () => {
     const [recentAppointments, setRecentAppointments] = useState<AppointmentCardData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingRecent, setIsLoadingRecent] = useState(false);
+
+    // Cancel modal states
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [isCancelling, setIsCancelling] = useState(false);
 
     // Get appointment ID from URL params
     const getAppointmentId = () => {
@@ -116,10 +133,57 @@ const AppointmentDetailPage: React.FC = () => {
     };
 
     const handleCancel = () => {
-        if (globalThis.confirm('Bạn có chắc chắn muốn hủy cuộc hẹn này?')) {
-            alert('Cuộc hẹn đã được hủy');
-            // In real app: call API to cancel appointment
-            navigate('/user-profile?tab=appointments');
+        // Validate status - only allow cancellation for PENDING or CONFIRMED
+        if (!appointmentData) return;
+
+        if (
+            appointmentData.status !== AppointmentStatus.PENDING &&
+            appointmentData.status !== AppointmentStatus.CONFIRMED
+        ) {
+            toast.warning('Chỉ có thể hủy lịch hẹn ở trạng thái Chờ xử lý hoặc Sắp tới');
+            return;
+        }
+
+        setShowCancelModal(true);
+    };
+
+    // Handle cancel appointment confirm
+    const handleCancelConfirm = async (cancellationReason: string) => {
+        if (!appointmentData || !userProfile?.id) return;
+
+        setIsCancelling(true);
+        try {
+            // Call API to cancel appointment
+            await AppointmentService.cancelAppointment(
+                appointmentData.appointmentId,
+                cancellationReason,
+                userProfile.id
+            );
+
+            // Calculate refund percentage for success message (patient cancellation)
+            const refundInfo = getRefundInfo(appointmentData.appointmentDate, undefined, false);
+
+            // Show success message with refund info
+            if (refundInfo.refundPercentage === 100) {
+                toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 100% chi phí.');
+            } else if (refundInfo.refundPercentage === 50) {
+                toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 50% chi phí.');
+            } else {
+                toast.success(
+                    'Hủy lịch hẹn thành công. Do hủy muộn, bạn sẽ không được hoàn lại chi phí.'
+                );
+            }
+
+            // Close modal and navigate back to appointments list
+            setShowCancelModal(false);
+
+            // Navigate back to appointments with cancelled tab
+            navigate(PATHS.USER.ROOT + '/' + PATHS.USER.PROFILE + '?tab=appointments');
+        } catch (error: any) {
+            console.error('Error cancelling appointment:', error);
+            toast.error(error.message || 'Không thể hủy lịch hẹn. Vui lòng thử lại.');
+        } finally {
+            setIsCancelling(false);
         }
     };
 
@@ -223,17 +287,43 @@ const AppointmentDetailPage: React.FC = () => {
                         <div className="modal-body">
                             <div className="reason-of-rejection">
                                 <p>
-                                    Tôi có ca phẫu thuật khẩn cấp trong thời gian cuộc hẹn nên tôi
-                                    phải hủy cuộc hẹn này. Bạn có thể đặt lại lịch hẹn vào tuần tới.
+                                    {appointmentData?.reason ||
+                                        'Không có lý do cụ thể được cung cấp.'}
                                 </p>
                                 <span className="text-danger">
-                                    Đã hủy bởi bạn vào ngày 23 tháng 3 năm 2023
+                                    Đã hủy bởi{' '}
+                                    {appointmentData?.cancelledBy === 'Patient'
+                                        ? 'bạn'
+                                        : 'bệnh viện'}{' '}
+                                    vào ngày {formatDate(appointmentData?.cancelledAt || '')}
                                 </span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Cancel Appointment Modal */}
+            {appointmentData && (
+                <ModalCancel
+                    show={showCancelModal}
+                    onHide={() => {
+                        if (!isCancelling) {
+                            setShowCancelModal(false);
+                        }
+                    }}
+                    onConfirm={handleCancelConfirm}
+                    title="Xác Nhận Hủy Lịch Hẹn"
+                    message="Bạn có chắc chắn muốn hủy lịch hẹn"
+                    confirmText="Xác nhận hủy"
+                    cancelText="Đóng"
+                    loading={isCancelling}
+                    reasonLabel="Lý do hủy"
+                    reasonPlaceholder="Vui lòng nhập lý do hủy lịch hẹn (tối thiểu 10 ký tự)..."
+                    minReasonLength={10}
+                    refundInfo={getRefundInfo(appointmentData.appointmentDate, undefined, false)} // Patient cancellation
+                />
+            )}
         </>
     );
 };

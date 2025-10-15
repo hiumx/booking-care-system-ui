@@ -12,6 +12,7 @@ const APPOINTMENT_ENDPOINTS = {
     BASE: '/appointments',
     HEALTH: '/appointments/health',
     PATIENT: '/appointments/patient',
+    CANCEL_APPOINTMENT: (id: string) => `/appointments/cancel/${id}`,
     STATUS: (id: string) => `/appointments/status/${id}`,
     BY_ID: (id: string) => `/appointments/${id}`,
     UPLOAD_ATTACHMENT: '/attachment/upload',
@@ -161,6 +162,38 @@ export class AppointmentService {
             throw new Error(error.message || 'Failed to delete attachment');
         }
     }
+
+    /**
+     * Cancel an appointment (Patient)
+     * Refund percentage depends on cancellation time:
+     * - >= 24 hours before: 100% refund
+     * - 12-24 hours before: 50% refund
+     * - < 12 hours before: 0% refund
+     */
+    static async cancelAppointment(
+        appointmentId: string,
+        cancellationReason: string,
+        cancelledByPatientId?: string
+    ): Promise<ApiResponse<void>> {
+        try {
+            const response: any = await axiosInstance.post(
+                APPOINTMENT_ENDPOINTS.CANCEL_APPOINTMENT(appointmentId),
+                {
+                    appointmentId,
+                    cancellationReason,
+                    cancelledByPatientId,
+                }
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Appointment cancelled successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to cancel appointment');
+        }
+    }
 }
 
 // Export individual methods for convenience
@@ -172,6 +205,7 @@ export const {
     updateAppointmentStatus,
     uploadAttachment,
     deleteAttachment,
+    cancelAppointment,
 } = AppointmentService;
 
 // Default export
