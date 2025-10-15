@@ -59,6 +59,7 @@ export const PATHS = {
     // Booking
     BOOKING: {
         ROOT: '/booking/:doctorId',
+        CONFIRMATION: '/booking/confirmation/:appointmentId',
     },
 
     // Dashboard paths
