@@ -26,6 +26,7 @@ import AboutUs from '@/pages/AboutUs/AboutUs';
 import DoctorList from '@/pages/Doctor/DoctorList';
 import ContactUs from '@/pages/ContactUs';
 import Booking from '@/pages/Booking/Booking';
+import BookingConfirmation from '@/pages/BookingConfirmation';
 import ServiceTypes from '@/pages/MedicalService/ServiceTypes/ServiceTypesPage';
 import SmartBooking from '@/pages/SmartBooking';
 
@@ -143,6 +144,10 @@ const routes: RouteObject[] = [
     {
         path: PATHS.BOOKING.ROOT,
         element: <Booking />,
+    },
+    {
+        path: PATHS.BOOKING.CONFIRMATION,
+        element: <BookingConfirmation />,
     },
     {
         path: PATHS.DASHBOARD.ROOT,
