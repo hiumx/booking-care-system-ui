@@ -49,12 +49,15 @@ export interface HospitalInfo {
 // Appointment Response from API
 export interface AppointmentResponse {
     id: string;
+    cancelledBy?: string;
+    cancelledAt?: string;
     appointmentDate: string;
     appointmentTimeId: AppointmentTime;
     appointmentType: AppointmentType;
     status: AppointmentStatus;
     reason?: string;
     result?: string;
+    consultationFees: number;
     createdAt: string;
     updatedAt: string;
     patientInfo?: PatientInfo;
@@ -142,6 +145,11 @@ export interface AppointmentCardData {
     result?: string;
     isNew?: boolean;
     hasReview?: boolean;
+    consultationFees: number;
+
+    // Cancellation information
+    cancelledBy?: string;
+    cancelledAt?: string;
     // Separate info sections - use priority: Doctor > Service > Hospital in components
     doctorInfo?: DoctorInfo;
     serviceInfo?: ServiceInfo;
@@ -152,7 +160,7 @@ export interface AppointmentCardData {
 // Now uses same structure as AppointmentCardData with priority logic
 export interface AppointmentDetailData extends AppointmentCardData {
     visitType?: string;
-    consultationFees?: number;
+    consultationFees: number;
     clinicLocation?: string;
     location?: string;
     personWithPatient?: string;
@@ -176,6 +184,7 @@ export interface StatusConfig {
         text: string;
     };
     showContactInfo: boolean;
+    showLocation: boolean;
     showStartSession: boolean;
     showReschedule: boolean;
     showDownloadPrescription: boolean;
@@ -343,6 +352,9 @@ export const transformToCardData = (apiResponse: AppointmentResponse): Appointme
         result: apiResponse.result,
         isNew: false, // Can be calculated based on createdAt
         hasReview: false, // Needs review data from another endpoint
+        consultationFees: apiResponse.consultationFees,
+        cancelledBy: apiResponse.cancelledBy,
+        cancelledAt: apiResponse.cancelledAt,
         // Map info sections directly from API response
         doctorInfo: apiResponse.doctorInfo,
         serviceInfo: apiResponse.serviceInfo,
@@ -359,7 +371,7 @@ export const transformToDetailData = (apiResponse: AppointmentResponse): Appoint
         ...transformToCardData(apiResponse),
         // Note: These fields will be added in future API updates
         visitType: undefined,
-        consultationFees: undefined,
+        consultationFees: apiResponse.consultationFees,
         clinicLocation: undefined,
         location: apiResponse.hospitalInfo?.address, // Use hospital address as location
         personWithPatient: undefined,
