@@ -39,7 +39,11 @@ const DoctorCardSkeleton = () => (
     </div>
 );
 
-const Favourite = () => {
+interface FavouriteProps {
+    patientId?: string;
+}
+
+const Favourite: React.FC<FavouriteProps> = ({ patientId }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [doctors, setDoctors] = useState<DoctorResponse[]>([]);
@@ -49,12 +53,14 @@ const Favourite = () => {
     const [error, setError] = useState<string | null>(null);
 
     const itemsPerPage = 9; // API default page size
-    // NOTE: In production, patientId should be retrieved from auth context or user profile
-    // For now, using hardcoded value for testing purposes
-    const patientId = '2D0E20D4-AEE9-4758-9EAC-45E682BC611A';
 
     // Fetch favorite doctors
     const fetchFavoriteDoctors = async (page: number = 1, search: string = '') => {
+        if (!patientId) {
+            setError('Patient ID is required to load favorite doctors');
+            return;
+        }
+
         try {
             setLoading(true);
             setError(null);
@@ -79,8 +85,10 @@ const Favourite = () => {
 
     // Load data on component mount and when dependencies change
     useEffect(() => {
-        fetchFavoriteDoctors(currentPage, searchTerm);
-    }, [currentPage, searchTerm]);
+        if (patientId) {
+            fetchFavoriteDoctors(currentPage, searchTerm);
+        }
+    }, [currentPage, searchTerm, patientId]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -117,6 +125,15 @@ const Favourite = () => {
             setTotalCount((prev) => Math.max(0, prev - 1));
         }
     };
+
+    // Early return if no patientId
+    if (!patientId) {
+        return (
+            <div className="text-center my-4">
+                <p>Vui lòng đăng nhập để xem danh sách bác sĩ yêu thích.</p>
+            </div>
+        );
+    }
 
     return (
         <>
