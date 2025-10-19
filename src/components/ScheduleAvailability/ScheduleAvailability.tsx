@@ -288,9 +288,9 @@ const ScheduleAvailability: React.FC = () => {
         const daySchedules = mockScheduleTimes.filter(
             (schedule) => schedule.appointment_date === dateStr && schedule.is_available
         );
-        const slotIds = daySchedules.map((schedule) => schedule.appointment_time_id);
+        const slotIds = new Set(daySchedules.map((schedule) => schedule.appointment_time_id));
         return mockAppointmentTimes
-            .filter((time) => slotIds.includes(time.id))
+            .filter((time) => slotIds.has(time.id))
             .map((time) => `${time.start_time} - ${time.end_time}`);
     };
 
@@ -298,7 +298,7 @@ const ScheduleAvailability: React.FC = () => {
 
     // Xử lý chọn ngày từ DateCalendar
     const handleDateChange = (value: Date | null) => {
-        if (!value || !(value instanceof Date) || isNaN(value.getTime())) return; // Bỏ qua nếu không phải Date hợp lệ
+        if (!value || !(value instanceof Date) || Number.isNaN(value.getTime())) return; // Bỏ qua nếu không phải Date hợp lệ
         const oneMonthLater = new Date(today);
         oneMonthLater.setDate(today.getDate() + 30);
         if (
