@@ -410,18 +410,16 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                     className={clsx(styles.btn, 'btn p-0 avatar-sm btn-light')}
                                     type="button"
                                 >
-                                    <i
-                                        className={`isax ${isFullscreen ? 'X' : 'isax-maximize-3'}`}
-                                    ></i>
+                                    <i className={`isax isax-maximize-3`}></i>
                                 </button>
                             </div>
 
                             {/* Call Controls */}
-                            <div className="d-flex justify-content-center align-items-center flex-wrap w-100 position-absolute bottom-0 z-2 p-3">
+                            <div className="d-flex justify-content-center align-items-center flex-wrap w-100 position-fixed fixed-bottom bottom-0 z-2 p-3">
                                 <div
                                     className={clsx(
                                         styles.buttonItems,
-                                        'bg-light bg-opacity-50 px-4 py-3 rounded-pill d-flex justify-content-center align-items-center gap-2'
+                                        'bg-light bg-opacity-50 px-4 py-2 rounded-pill d-flex justify-content-center align-items-center gap-2'
                                     )}
                                 >
                                     {/* Microphone Toggle */}
