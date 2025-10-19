@@ -218,15 +218,13 @@ const SmartBooking: React.FC = () => {
                                                             id: (item as Hospital).id,
                                                             name: (item as Hospital).name,
                                                             image: (item as Hospital).logo,
-                                                            rating: (item as Hospital).rating,
-                                                            reviewCount: (item as Hospital)
-                                                                .reviewCount,
                                                             specialties: (item as Hospital)
                                                                 .specialties,
                                                             location: (item as Hospital).address,
                                                             distance: (item as Hospital).distance,
-                                                            priceRange: '200.000đ - 500.000đ',
-                                                            availableSlots: 5,
+                                                            specialtyCount:
+                                                                (item as Hospital).specialties
+                                                                    ?.length || 0,
                                                         }}
                                                     />
                                                 )}

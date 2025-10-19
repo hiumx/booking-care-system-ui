@@ -54,7 +54,7 @@ $font-weight-bold: 700;
         overflow: hidden;
         position: relative;
         background: $white;
-        min-height: 400px;
+        min-height: 320px;
         display: flex;
         flex-direction: column;
 
@@ -125,7 +125,7 @@ $font-weight-bold: 700;
             }
         }
 
-        .slotsIndicator {
+        .specialtyIndicator {
             position: absolute;
             bottom: 12px;
             right: 12px;
@@ -136,14 +136,14 @@ $font-weight-bold: 700;
             text-align: center;
             backdrop-filter: blur(10px);
 
-            .slotsCount {
+            .specialtyCount {
                 display: block;
                 font-size: $font-size-lg;
                 font-weight: $font-weight-bold;
                 line-height: 1;
             }
 
-            .slotsText {
+            .specialtyText {
                 display: block;
                 font-size: 10px;
                 text-transform: uppercase;
@@ -155,64 +155,23 @@ $font-weight-bold: 700;
 
     // Card Body
     .clinicBody {
-        padding: 20px;
+        padding: 10px;
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
         background-color: $white;
-        justify-content: space-between;
+        justify-content: flex-start;
 
         .clinicName {
             display: flex;
             align-items: center;
-            min-height: 48px;
+            min-height: 32px;
             font-size: $font-size-lg;
             font-weight: $font-weight-semibold;
             color: #124992;
             margin: 0;
             line-height: 1.3;
-            flex: 1;
-        }
-
-        .priceContainer {
-            display: flex;
-            justify-content: flex-end;
-
-            .priceRange {
-                width: fit-content;
-                background: $light-color;
-                color: $primary-color;
-                padding: 4px 8px;
-                border-radius: $border-radius-sm;
-                font-size: $font-size-sm;
-                font-weight: $font-weight-medium;
-                white-space: nowrap;
-                margin-bottom: 0;
-            }
-        }
-
-        .ratingSection {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: flex-end;
-            margin: 8px 0;
-
-            .stars {
-                display: flex;
-                gap: 2px;
-
-                i {
-                    font-size: 14px;
-                }
-            }
-
-            .ratingText {
-                font-size: $font-size-sm;
-                color: $secondary-color;
-                font-weight: $font-weight-medium;
-            }
         }
 
         .locationSection {
@@ -220,8 +179,8 @@ $font-weight-bold: 700;
             align-items: center;
             gap: 6px;
             color: $secondary-color;
-            min-height: 40px;
-            margin: 8px 0;
+            min-height: 20px;
+            margin: 0;
 
             .locationIcon {
                 font-size: 14px;
@@ -235,8 +194,8 @@ $font-weight-bold: 700;
         }
 
         .specialtiesSection {
-            min-height: 58px;
-            margin-top: auto;
+            min-height: 40px;
+            margin-top: 4px;
 
             .specialtiesContainer {
                 display: flex;

@@ -8,13 +8,10 @@ export interface HospitalCardProps {
         id: string;
         name: string;
         image: string;
-        rating: number;
-        reviewCount: number;
         specialties: string[];
         location: string;
         distance?: string;
-        priceRange: string;
-        availableSlots: number;
+        specialtyCount: number;
         description?: string;
     };
     className?: string;
@@ -25,51 +22,23 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
         id: '1',
         name: 'City Medical Center',
         image: '/src/assets/img/clinic-1.jpg',
-        rating: 4.5,
-        reviewCount: 128,
-        specialties: ['Cardiology', 'Neurology', 'Orthopedics'],
+        specialties: [
+            'Cardiology',
+            'Neurology',
+            'Orthopedics',
+            'Dermatology',
+            'Pediatrics',
+            'Ophthalmology',
+        ],
         location: 'Downtown, City Center',
         distance: '2.5 km',
-        priceRange: '$50 - $200',
-        availableSlots: 5,
+        specialtyCount: 6,
         description:
             'Leading healthcare facility with state-of-the-art equipment and experienced medical professionals.',
     },
     className,
 }) => {
-    const {
-        id,
-        name,
-        image,
-        rating,
-        reviewCount,
-        specialties,
-        location,
-        distance,
-        priceRange,
-        availableSlots,
-    } = clinic;
-
-    const renderStars = (rating: number) => {
-        const stars = [];
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 !== 0;
-
-        for (let i = 0; i < fullStars; i++) {
-            stars.push(<i key={i} className="fas fa-star text-warning"></i>);
-        }
-
-        if (hasHalfStar) {
-            stars.push(<i key="half" className="fas fa-star-half-alt text-warning"></i>);
-        }
-
-        const emptyStars = 5 - Math.ceil(rating);
-        for (let i = 0; i < emptyStars; i++) {
-            stars.push(<i key={`empty-${i}`} className="far fa-star text-muted"></i>);
-        }
-
-        return stars;
-    };
+    const { id, name, image, specialties, location, distance, specialtyCount } = clinic;
 
     return (
         <Link to={`${PATHS.HOSPITAL.ROOT}/${id}`} className={styles.clinicCarouselItem}>
@@ -93,11 +62,11 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                         )}
                     </div>
 
-                    {/* Available Slots Indicator */}
-                    {availableSlots > 0 && (
-                        <div className={styles.slotsIndicator}>
-                            <span className={styles.slotsCount}>{availableSlots}</span>
-                            <span className={styles.slotsText}>slots today</span>
+                    {/* Specialty Count Indicator */}
+                    {specialtyCount > 0 && (
+                        <div className={styles.specialtyIndicator}>
+                            <span className={styles.specialtyCount}>{specialtyCount}</span>
+                            <span className={styles.specialtyText}>specialties</span>
                         </div>
                     )}
                 </div>
@@ -106,22 +75,11 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                 <div className={`card-body ${styles.clinicBody}`}>
                     {/* Header Section */}
                     <h5 className={styles.clinicName}>{name}</h5>
-                    <div className={styles.priceContainer}>
-                        <p className={styles.priceRange}>{priceRange}</p>
-                    </div>
 
                     {/* Location */}
                     <div className={styles.locationSection}>
                         <i className={`fas fa-map-marker-alt ${styles.locationIcon}`}></i>
                         <span className={styles.locationText}>{location}</span>
-                    </div>
-
-                    {/* Rating Section */}
-                    <div className={styles.ratingSection}>
-                        <div className={styles.stars}>{renderStars(rating)}</div>
-                        <span className={styles.ratingText}>
-                            {rating.toFixed(1)} ({reviewCount} reviews)
-                        </span>
                     </div>
 
                     {/* Specialties */}
@@ -134,7 +92,7 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                             ))}
                             {specialties.length > 3 && (
                                 <span className={`${styles.specialtyTag} ${styles.more}`}>
-                                    +{specialties.length - 3} more
+                                    +{specialties.length - 3} chuyên khoa
                                 </span>
                             )}
                         </div>

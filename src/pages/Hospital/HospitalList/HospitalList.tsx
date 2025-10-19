@@ -1,181 +1,90 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
-import HospitalCard from './components/HospitalCard';
+import HospitalCard from '@/components/HospitalCard';
 import ModalArea from '@/components/ModalArea';
 import Modal from '@/components/Modal';
-import { useAppDispatch } from '@/store/hooks';
+import Pagination from '@/components/Pagination';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getSpecialtiesAsync } from '@/store/slices/specialtySlice';
+import { getOptimizedHospitalListAsync } from '@/store/slices/hospitalSlice';
+import { HospitalListOptimizedFilterRequest } from '@/types/hospital.types';
 import styles from './HospitalList.module.scss';
-
-import hospital01 from '@/assets/img/hospitals/hospital-01.svg';
-import hospital03 from '@/assets/img/hospitals/hospital-03.svg';
-import hospital05 from '@/assets/img/hospitals/hospital-05.svg';
 
 const HospitalList: React.FC = () => {
     const dispatch = useAppDispatch();
-    // const { specialties } = useAppSelector((state) => state.specialty); // Using mock data instead
-
-    // Mock data for 40 hospitals matching the hospitals table schema
-    const images = [hospital01, hospital03, hospital05];
-    const cities = ['Hà Nội', 'TP. Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ'];
-    const hospitalTypes = ['Bệnh viện'];
-    const baseNames = [
-        'Bạch Mai',
-        'Hồng Ngọc',
-        'Chợ Rẫy',
-        'Family Medical',
-        'Đà Nẵng',
-        'Việt Pháp',
-        'Hải Phòng',
-        'Cần Thơ',
-        'Từ Dũ',
-        'Nhi Đồng',
-        'Vinmec',
-        'Hoàn Mỹ',
-        'Quân Y',
-        'Tư vấn Sức khỏe',
-        'Đa khoa Quốc tế',
-        'Chuyên khoa Mắt',
-        'Phụ sản',
-        'Răng Hàm Mặt',
-        'Tràng An',
-        'Hồng Phúc',
-    ];
-    const hospitals = Array.from({ length: 40 }, (_, i) => ({
-        id: i + 1,
-        account_id: i + 1,
-        name: `${hospitalTypes[0]} ${baseNames[i % baseNames.length]}${i >= baseNames.length ? ` ${Math.floor(i / baseNames.length) + 1}` : ''}`,
-        address: `${Math.floor(Math.random() * 100) + 1} ${['Giải Phóng', 'Yên Ninh', 'Nguyễn Chí Thanh', 'Lê Duẩn', 'Hải Phòng', 'Trần Phú', 'Nguyễn Văn Cừ', 'Lý Thường Kiệt', 'Hùng Vương'][i % 9]}, ${cities[i % cities.length]}`,
-        phone: `0${Math.floor(100000000 + Math.random() * 900000000)}`,
-        email: `contact${i + 1}@${baseNames[i % baseNames.length].toLowerCase().replace(/\s/g, '')}.com`,
-        description: `${hospitalTypes[0]} chất lượng cao tại ${cities[i % cities.length]}. Cung cấp dịch vụ y tế chuyên nghiệp và hiện đại.`,
-        background_url: `https://example.com/images/hospital${i + 1}-bg.jpg`,
-        avatar_url: images[i % images.length],
-        status: 'ACTIVE',
-        created_at: '2025-01-01T00:00:00',
-        updated_at: '2025-01-01T00:00:00',
-    }));
+    const { specialties } = useAppSelector((state) => state.specialty);
+    const { optimizedHospitals, isLoading, pagination } = useAppSelector((state) => state.hospital);
 
     // State for filtering and pagination
-    const [location, setLocation] = useState('');
+    const [provinceId, setProvinceId] = useState<string>('');
+    const [districtId, setDistrictId] = useState<string>('');
     const [search, setSearch] = useState('');
-    const [visibleCount, setVisibleCount] = useState(5);
+    const [currentPage, setCurrentPage] = useState(1);
     const [isAreaModalOpen, setIsAreaModalOpen] = useState(false);
     const [selectedAreaDisplay, setSelectedAreaDisplay] = useState('');
     const [showSpecialtyModal, setShowSpecialtyModal] = useState(false);
     const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
 
-    // Mock specialties data
-    const mockSpecialties = [
-        {
-            id: '1',
-            name: 'Tim mạch',
-            imageUrl: 'https://via.placeholder.com/40x40/FF6B6B/FFFFFF?text=❤️',
-            color: '#FF6B6B',
-        },
-        {
-            id: '2',
-            name: 'Thần kinh',
-            imageUrl: 'https://via.placeholder.com/40x40/4ECDC4/FFFFFF?text=🧠',
-            color: '#4ECDC4',
-        },
-        {
-            id: '3',
-            name: 'Tiêu hóa',
-            imageUrl: 'https://via.placeholder.com/40x40/45B7D1/FFFFFF?text=🫀',
-            color: '#45B7D1',
-        },
-        {
-            id: '4',
-            name: 'Nhi khoa',
-            imageUrl: 'https://via.placeholder.com/40x40/96CEB4/FFFFFF?text=👶',
-            color: '#96CEB4',
-        },
-        {
-            id: '5',
-            name: 'Sản phụ khoa',
-            imageUrl: 'https://via.placeholder.com/40x40/FFEAA7/FFFFFF?text=🤱',
-            color: '#FFEAA7',
-        },
-        {
-            id: '6',
-            name: 'Mắt',
-            imageUrl: 'https://via.placeholder.com/40x40/DDA0DD/FFFFFF?text=👁️',
-            color: '#DDA0DD',
-        },
-        {
-            id: '7',
-            name: 'Tai mũi họng',
-            imageUrl: 'https://via.placeholder.com/40x40/98D8C8/FFFFFF?text=👂',
-            color: '#98D8C8',
-        },
-        {
-            id: '8',
-            name: 'Da liễu',
-            imageUrl: 'https://via.placeholder.com/40x40/F7DC6F/FFFFFF?text=🦋',
-            color: '#F7DC6F',
-        },
-        {
-            id: '9',
-            name: 'Xương khớp',
-            imageUrl: 'https://via.placeholder.com/40x40/BB8FCE/FFFFFF?text=🦴',
-            color: '#BB8FCE',
-        },
-        {
-            id: '10',
-            name: 'Ung bướu',
-            imageUrl: 'https://via.placeholder.com/40x40/85C1E9/FFFFFF?text=🎗️',
-            color: '#85C1E9',
-        },
-        {
-            id: '11',
-            name: 'Tâm thần',
-            imageUrl: 'https://via.placeholder.com/40x40/F8C471/FFFFFF?text=🧘',
-            color: '#F8C471',
-        },
-        {
-            id: '12',
-            name: 'Nội tiết',
-            imageUrl: 'https://via.placeholder.com/40x40/82E0AA/FFFFFF?text=⚕️',
-            color: '#82E0AA',
-        },
-    ];
+    // Function to load hospitals with current filters
+    const loadHospitals = async () => {
+        const filter: HospitalListOptimizedFilterRequest = {
+            search: search || undefined,
+            specialtyIds: selectedSpecialties.length > 0 ? selectedSpecialties : undefined,
+            provinceId: provinceId || undefined,
+            districtId: districtId || undefined,
+            page: currentPage,
+            pageSize: 12, // Increased page size for better grid display
+            sortBy: 'Name',
+            sortOrder: 'asc',
+        };
 
-    // Load specialties on component mount
+        console.log('Loading hospitals with filter:', filter);
+        dispatch(getOptimizedHospitalListAsync(filter));
+    };
+
+    // Load specialties and hospitals on component mount
     useEffect(() => {
         dispatch(getSpecialtiesAsync());
+        loadHospitals();
     }, [dispatch]);
 
-    // Filter data - only show hospitals
-    const filteredData = hospitals.filter((item) => {
-        const city = item.address.split(',').pop()?.trim() || '';
-        const isLocationMatch = location === '' || city === location;
-        const isSearchMatch =
-            search === '' || item.name.toLowerCase().includes(search.toLowerCase());
-        return item.status === 'ACTIVE' && isLocationMatch && isSearchMatch;
-    });
+    // Reload hospitals when filters change
+    useEffect(() => {
+        loadHospitals();
+    }, [search, selectedSpecialties, provinceId, districtId, currentPage]);
 
-    // Displayed data
-    const displayedData = filteredData.slice(0, visibleCount);
-
-    // Load more handler
-    const handleLoadMore = () => {
-        setVisibleCount((prev) => prev + 10);
+    // Handle page change for pagination
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
     };
 
     // Modal handlers
-    const handleAreaSelect = (areaDisplay: string, locationId: string) => {
+    const handleAreaSelect = (areaDisplay: string, locationId: string, provinceId?: string) => {
+        console.log('Area selected:', { areaDisplay, locationId, provinceId });
         setSelectedAreaDisplay(areaDisplay);
-        setLocation(locationId);
+
+        // Parse area info from the display string and locationId
+        if (areaDisplay.includes(' - ')) {
+            // District selected: locationId is districtId, provinceId is provided
+            setDistrictId(locationId);
+            setProvinceId(provinceId || '');
+        } else {
+            // Province selected: locationId is provinceId
+            setProvinceId(locationId);
+            setDistrictId('');
+        }
+
+        setCurrentPage(1); // Reset to first page when filter changes
         setIsAreaModalOpen(false);
     };
 
     const handleClearArea = () => {
         setSelectedAreaDisplay('');
-        setLocation('');
+        setProvinceId('');
+        setDistrictId('');
+        setCurrentPage(1); // Reset to first page when filter changes
     };
 
     // Specialty modal handlers
@@ -185,20 +94,22 @@ const HospitalList: React.FC = () => {
 
     const handleSpecialtyApply = (selectedItems: string[], _searchTerm: string) => {
         // _searchTerm is required by Modal interface but not used in this context
+        console.log('Specialties selected:', selectedItems);
         setSelectedSpecialties(selectedItems);
+        setCurrentPage(1); // Reset to first page when filter changes
         setShowSpecialtyModal(false);
     };
 
     const handleClearSpecialty = () => {
         setSelectedSpecialties([]);
+        setCurrentPage(1); // Reset to first page when filter changes
     };
 
-    // Prepare specialty items for modal (using mock data for now)
-    const specialtyItems = mockSpecialties.map((specialty) => ({
+    // Prepare specialty items for modal
+    const specialtyItems = specialties.map((specialty) => ({
         id: specialty.id,
         name: specialty.name,
         imageUrl: specialty.imageUrl,
-        color: specialty.color,
     }));
 
     // Breadcrumb data
@@ -229,9 +140,12 @@ const HospitalList: React.FC = () => {
                                 <h5 className={clsx(styles.customh5)}>
                                     Hiển thị{' '}
                                     <span className={clsx(styles.resultCount)}>
-                                        {filteredData.length}
+                                        {pagination.totalCount}
                                     </span>{' '}
-                                    Bệnh viện cho bạn
+                                    Bệnh viện
+                                    {(selectedAreaDisplay ||
+                                        selectedSpecialties.length > 0 ||
+                                        search) && <span className="text-muted"> (đã lọc)</span>}
                                 </h5>
                                 <div
                                     className={clsx(
@@ -256,6 +170,16 @@ const HospitalList: React.FC = () => {
                                                 ></i>
                                                 <span className={styles.locationText}>
                                                     {selectedAreaDisplay || 'Chọn khu vực'}
+                                                    {provinceId && !districtId && (
+                                                        <span className={styles.filterBadge}>
+                                                            Tỉnh
+                                                        </span>
+                                                    )}
+                                                    {districtId && (
+                                                        <span className={styles.filterBadge}>
+                                                            Quận/Huyện
+                                                        </span>
+                                                    )}
                                                 </span>
                                                 {selectedAreaDisplay && (
                                                     <button
@@ -320,37 +244,186 @@ const HospitalList: React.FC = () => {
                         </div>
                     </div>
                     {/* /Show Result */}
-                    <div className={clsx('all-facilities')}>
-                        <div className={clsx('row')}>
-                            {displayedData.map((hospital) => (
-                                <HospitalCard
-                                    key={hospital.id}
-                                    id={hospital.id}
-                                    name={hospital.name}
-                                    address={hospital.address}
-                                    avatar_url={hospital.avatar_url}
-                                />
-                            ))}
-                        </div>
-                        {visibleCount < filteredData.length && (
-                            <div className={clsx('loader-item', 'text-center')}>
-                                <Link
-                                    to="#"
+
+                    {/* Active Filters Display */}
+                    {(selectedAreaDisplay || selectedSpecialties.length > 0 || search) && (
+                        <div className={clsx('card', 'mt-3')}>
+                            <div className={clsx('card-body')}>
+                                <div
                                     className={clsx(
-                                        'btn',
-                                        'btn-primary',
-                                        'd-inline-flex',
-                                        'align-items-center'
+                                        'd-flex',
+                                        'align-items-center',
+                                        'gap-3',
+                                        'flex-wrap'
                                     )}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        handleLoadMore();
-                                    }}
                                 >
-                                    <i className={clsx('isax', 'isax-d-cube-scan', 'me-2')}></i>
-                                    Tải thêm {filteredData.length - visibleCount} Bệnh viện
-                                </Link>
+                                    <span className={clsx('text-muted', 'fw-bold')}>
+                                        Bộ lọc đang áp dụng:
+                                    </span>
+
+                                    {selectedAreaDisplay && (
+                                        <span
+                                            className={clsx(
+                                                'badge',
+                                                'bg-primary',
+                                                'd-flex',
+                                                'align-items-center',
+                                                'gap-2'
+                                            )}
+                                        >
+                                            <i className="fa-solid fa-location-dot"></i>
+                                            {selectedAreaDisplay}
+                                            <button
+                                                className="btn-close btn-close-white"
+                                                style={{ fontSize: '0.7em' }}
+                                                onClick={handleClearArea}
+                                                aria-label="Xóa bộ lọc khu vực"
+                                            ></button>
+                                        </span>
+                                    )}
+
+                                    {selectedSpecialties.length > 0 && (
+                                        <span
+                                            className={clsx(
+                                                'badge',
+                                                'bg-success',
+                                                'd-flex',
+                                                'align-items-center',
+                                                'gap-2'
+                                            )}
+                                        >
+                                            <i className="fa-solid fa-briefcase-medical"></i>
+                                            {selectedSpecialties.length} chuyên khoa
+                                            <button
+                                                className="btn-close btn-close-white"
+                                                style={{ fontSize: '0.7em' }}
+                                                onClick={handleClearSpecialty}
+                                                aria-label="Xóa bộ lọc chuyên khoa"
+                                            ></button>
+                                        </span>
+                                    )}
+
+                                    {search && (
+                                        <span
+                                            className={clsx(
+                                                'badge',
+                                                'bg-info',
+                                                'd-flex',
+                                                'align-items-center',
+                                                'gap-2'
+                                            )}
+                                        >
+                                            <i className="fa-solid fa-search"></i>"{search}"
+                                            <button
+                                                className="btn-close btn-close-white"
+                                                style={{ fontSize: '0.7em' }}
+                                                onClick={() => setSearch('')}
+                                                aria-label="Xóa tìm kiếm"
+                                            ></button>
+                                        </span>
+                                    )}
+
+                                    <button
+                                        className={clsx('btn', 'btn-outline-secondary', 'btn-sm')}
+                                        onClick={() => {
+                                            handleClearArea();
+                                            handleClearSpecialty();
+                                            setSearch('');
+                                        }}
+                                    >
+                                        <i className="fa-solid fa-times me-1"></i>
+                                        Xóa tất cả
+                                    </button>
+                                </div>
                             </div>
+                        </div>
+                    )}
+
+                    <div className={clsx('all-facilities')}>
+                        {isLoading ? (
+                            <div className={clsx('text-center', 'py-5')}>
+                                <div className="spinner-border text-primary" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                                <p className="mt-2">
+                                    {selectedAreaDisplay || selectedSpecialties.length > 0 || search
+                                        ? 'Đang lọc danh sách bệnh viện...'
+                                        : 'Đang tải danh sách bệnh viện...'}
+                                </p>
+                            </div>
+                        ) : (
+                            <>
+                                {optimizedHospitals.length === 0 ? (
+                                    <div className={clsx('text-center', 'py-5')}>
+                                        <div className={clsx('mb-4')}>
+                                            <i
+                                                className="fa-solid fa-hospital text-muted"
+                                                style={{ fontSize: '4rem' }}
+                                            ></i>
+                                        </div>
+                                        <h4 className="text-muted mb-3">
+                                            Không tìm thấy bệnh viện nào
+                                        </h4>
+                                        <p className="text-muted mb-4">
+                                            {selectedAreaDisplay ||
+                                            selectedSpecialties.length > 0 ||
+                                            search
+                                                ? 'Không có bệnh viện nào phù hợp với bộ lọc của bạn. Hãy thử điều chỉnh bộ lọc hoặc tìm kiếm khác.'
+                                                : 'Hiện tại chưa có bệnh viện nào trong hệ thống.'}
+                                        </p>
+                                        {(selectedAreaDisplay ||
+                                            selectedSpecialties.length > 0 ||
+                                            search) && (
+                                            <button
+                                                className={clsx('btn', 'btn-outline-primary')}
+                                                onClick={() => {
+                                                    handleClearArea();
+                                                    handleClearSpecialty();
+                                                    setSearch('');
+                                                }}
+                                            >
+                                                <i className="fa-solid fa-times me-2"></i>
+                                                Xóa tất cả bộ lọc
+                                            </button>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className={clsx('row')}>
+                                            {optimizedHospitals.map((hospital) => (
+                                                <HospitalCard
+                                                    key={hospital.id}
+                                                    clinic={{
+                                                        id: hospital.id,
+                                                        name: hospital.name,
+                                                        image:
+                                                            hospital.avatarUrl ||
+                                                            '/default-hospital.png',
+                                                        specialties: [
+                                                            'Khám tổng quát',
+                                                            'Nội khoa',
+                                                            'Ngoại khoa',
+                                                        ], // Default specialties
+                                                        location: hospital.address,
+                                                        specialtyCount: 3, // Default count
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                        {pagination.totalPages > 1 && (
+                                            <div className={clsx('text-center', 'mt-4')}>
+                                                <Pagination
+                                                    currentPage={currentPage}
+                                                    totalPages={pagination.totalPages}
+                                                    onPageChange={handlePageChange}
+                                                    showPrevNext={true}
+                                                    maxVisiblePages={5}
+                                                />
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </>
                         )}
                     </div>
                 </div>
@@ -359,6 +432,8 @@ const HospitalList: React.FC = () => {
                 isOpen={isAreaModalOpen}
                 onClose={() => setIsAreaModalOpen(false)}
                 onApply={handleAreaSelect}
+                selectedProvinceId={provinceId}
+                selectedDistrictId={districtId}
             />
             <Modal
                 isOpen={showSpecialtyModal}

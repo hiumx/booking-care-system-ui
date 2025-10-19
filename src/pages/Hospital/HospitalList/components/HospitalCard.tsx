@@ -4,32 +4,38 @@ import clsx from 'clsx';
 import styles from './HospitalCard.module.scss';
 
 interface HospitalCardProps {
-    id: number;
+    id: string;
     name: string;
     address: string;
-    avatar_url: string;
+    avatar_url?: string;
 }
 
 const HospitalCard: React.FC<HospitalCardProps> = ({ id, name, address, avatar_url }) => {
     return (
-        <div className={clsx('col-lg-3', 'col-md-6')}>
-            <div className={clsx('card', 'hospital-item')}>
-                <div className={clsx('card-body', 'text-center')}>
+        <div className={clsx('col-lg-3', 'col-md-6', 'mb-4')}>
+            <div className={clsx('card', 'hospital-item', styles.hospitalCard)}>
+                <div className={clsx('card-body', 'text-center', styles.hospitalCardBody)}>
                     <Link to={`/hospitals/${id}`} className={clsx('hospital-icon')}>
-                        <img src={avatar_url} alt={name} />
+                        <img
+                            src={avatar_url || '/default-hospital.png'}
+                            alt={name}
+                            className={styles.hospitalImage}
+                        />
                     </Link>
-                    <h6 className="mb-1">
-                        <Link
-                            to={`/hospitals/${id}`}
-                            className={clsx(styles.ellipsis, styles.customLink)}
-                        >
-                            {name}
-                        </Link>
-                    </h6>
-                    <p className={clsx('mb-0', styles.ellipsis, styles.address)}>
-                        <i className={clsx('isax', 'isax-location', 'me-2')}></i>
-                        {address}
-                    </p>
+                    <div>
+                        <h6 className="mb-2">
+                            <Link
+                                to={`/hospitals/${id}`}
+                                className={clsx(styles.hospitalName, styles.customLink)}
+                            >
+                                {name}
+                            </Link>
+                        </h6>
+                        <p className={clsx('mb-0', styles.address)}>
+                            <i className={clsx('isax', 'isax-location', styles.locationIcon)}></i>
+                            {address}
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

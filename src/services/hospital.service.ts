@@ -5,6 +5,8 @@ import {
     HospitalListResponse,
     HospitalDetailResponse,
     HospitalSearchParams,
+    HospitalListOptimizedPaginatedResponse,
+    HospitalListOptimizedFilterRequest,
 } from '@/types/hospital.types';
 import { HospitalSimpleResponse } from '@/types/simple.types';
 
@@ -15,6 +17,7 @@ const HOSPITAL_ENDPOINTS = {
     GET_HOSPITAL: (id: string) => `/hospitals/${id}`,
     GET_HOSPITALS: '/hospitals',
     GET_ALL_HOSPITALS: '/hospitals/all',
+    GET_OPTIMIZED_LIST: '/hospitals/list',
 } as const;
 
 export class HospitalService {
@@ -85,10 +88,39 @@ export class HospitalService {
             throw new Error(error.message || 'Failed to retrieve hospitals');
         }
     }
+
+    /**
+     * Get optimized hospital list with essential fields, filters, and pagination
+     */
+    static async getOptimizedHospitalList(
+        params?: HospitalListOptimizedFilterRequest
+    ): Promise<ApiResponse<HospitalListOptimizedPaginatedResponse>> {
+        try {
+            console.log('Sending hospital list request with params:', params);
+            const response: any = await axiosInstance.get(HOSPITAL_ENDPOINTS.GET_OPTIMIZED_LIST, {
+                params,
+            });
+            console.log('Hospital list response:', response);
+            return {
+                success: response.success ?? true,
+                data: response.data || response,
+                message: response.message || 'Optimized hospital list retrieved successfully',
+            };
+        } catch (error: any) {
+            console.error('Hospital list request error:', error);
+            throw new Error(error.message || 'Failed to retrieve optimized hospital list');
+        }
+    }
 }
 
 // Export individual methods for convenience
-export const { healthCheck, getHospitalById, getHospitals, getAllHospitals } = HospitalService;
+export const {
+    healthCheck,
+    getHospitalById,
+    getHospitals,
+    getAllHospitals,
+    getOptimizedHospitalList,
+} = HospitalService;
 
 // Default export
 export default HospitalService;

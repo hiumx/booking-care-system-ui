@@ -33,6 +33,22 @@ export interface HospitalListResponse {
     totalPages: number;
 }
 
+// Optimized Hospital List Response DTOs
+export interface HospitalListOptimizedResponse {
+    id: string;
+    name: string;
+    address: string;
+    avatarUrl?: string;
+}
+
+export interface HospitalListOptimizedPaginatedResponse {
+    hospitals: HospitalListOptimizedResponse[];
+    totalCount: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+}
+
 export interface HospitalDetailResponse extends HospitalResponse {
     subscriptionHistory?: HospitalSubscriptionResponse[];
 }
@@ -112,6 +128,18 @@ export interface HospitalFilterRequest {
     sortOrder?: 'asc' | 'desc';
 }
 
+// Optimized Hospital List Filter Request
+export interface HospitalListOptimizedFilterRequest {
+    search?: string;
+    specialtyIds?: string[];
+    provinceId?: string;
+    districtId?: string;
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    sortOrder?: string;
+}
+
 // Hospital Search Parameters (for UI)
 export interface HospitalSearchParams {
     page?: number;
@@ -131,6 +159,7 @@ export interface HospitalSearchParams {
 export interface HospitalState {
     hospitals: HospitalResponse[];
     simpleHospitals: HospitalSimpleResponse[]; // For optimized API
+    optimizedHospitals: HospitalListOptimizedResponse[]; // For optimized list API
     selectedHospital: HospitalResponse | null;
     isLoading: boolean;
     error: string | null;
