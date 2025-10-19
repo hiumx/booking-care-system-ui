@@ -1,31 +1,26 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
-import styles from '../MedicalFacility.module.scss';
+import styles from '../Hospital.module.scss';
 
-interface MedicalFacilityCardProps {
+interface HospitalCardProps {
     id: number;
     name: string;
     address: string;
     avatar_url: string;
 }
 
-const MedicalFacilityCard: React.FC<MedicalFacilityCardProps> = ({
-    id,
-    name,
-    address,
-    avatar_url,
-}) => {
+const HospitalCard: React.FC<HospitalCardProps> = ({ id, name, address, avatar_url }) => {
     return (
         <div className={clsx('col-lg-3', 'col-md-6')}>
             <div className={clsx('card', 'hospital-item')}>
                 <div className={clsx('card-body', 'text-center')}>
-                    <Link to={`/medical-facility/${id}`} className={clsx('hospital-icon')}>
+                    <Link to={`/hospitals/${id}`} className={clsx('hospital-icon')}>
                         <img src={avatar_url} alt={name} />
                     </Link>
                     <h6 className="mb-1">
                         <Link
-                            to={`/medical-facility/${id}`}
+                            to={`/hospitals/${id}`}
                             className={clsx(styles.ellipsis, styles.customLink)}
                         >
                             {name}
@@ -41,4 +36,4 @@ const MedicalFacilityCard: React.FC<MedicalFacilityCardProps> = ({
     );
 };
 
-export default MedicalFacilityCard;
+export default HospitalCard;

@@ -176,7 +176,7 @@ export const LIST_HOSPITALS: Clinic[] = [
     },
     {
         id: 3,
-        name: 'Phòng khám Đa khoa Quốc tế Vinmec',
+        name: 'Bệnh viện Đa khoa Quốc tế Vinmec',
         image: '/src/assets/img/features/feature-01.jpg',
         address: '458 Minh Khai, Hai Bà Trưng, Hà Nội',
         rating: 4.8,
@@ -188,7 +188,7 @@ export const LIST_HOSPITALS: Clinic[] = [
     },
     {
         id: 4,
-        name: 'Phòng khám Đa khoa Hoàn Mỹ Sài Gòn',
+        name: 'Bệnh viện Đa khoa Hoàn Mỹ Sài Gòn',
         image: '/src/assets/img/features/feature-02.jpg',
         address: '60-60A Phan Xích Long, Phú Nhuận, TP. Hồ Chí Minh',
         rating: 4.5,
@@ -212,7 +212,7 @@ export const LIST_HOSPITALS: Clinic[] = [
     },
     {
         id: 6,
-        name: 'Phòng khám Quốc tế CarePlus',
+        name: 'Bệnh viện Quốc tế CarePlus',
         image: '/src/assets/img/features/feature-04.jpg',
         address: 'CarePlus, 2 Phan Đăng Lưu, Bình Thạnh, TP. Hồ Chí Minh',
         rating: 4.4,

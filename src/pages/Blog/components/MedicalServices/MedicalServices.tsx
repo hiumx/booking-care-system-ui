@@ -13,7 +13,7 @@ const MedicalServices: React.FC = () => {
         },
         {
             id: 2,
-            name: 'Đặt khám Phòng khám',
+            name: 'Đặt khám Bệnh viện',
             image: 'https://cdn.youmed.vn/tin-tuc/wp-content/themes/herb/images/clinic_doctor.svg',
             description: 'Book Clinic Appointment',
             href: '#',

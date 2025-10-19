@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Breadcrumb from '@/components/Breadcrumb';
-import styles from './MedicalFacilityProfile.module.scss';
+import styles from './HospitalProfile.module.scss';
 import Button from '@/components/Button';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
@@ -31,7 +31,7 @@ import specialityIcon8 from '@/assets/img/specialities/speciality-icon-08.svg';
 import specialityImg8 from '@/assets/img/specialities/speciality-08.jpg';
 import MainLayout from '@/layouts/MainLayout';
 import TestimonialSection from '@/components/TestimonialSection';
-import HeroSection from './components/HeroSection';
+import HeroSection from './components/HeroSection/HeroSection';
 
 interface BreadcrumbItem {
     label: string;
@@ -39,13 +39,13 @@ interface BreadcrumbItem {
     isActive?: boolean;
 }
 
-const MedicalFacilityProfile: React.FC = () => {
+const HospitalProfile: React.FC = () => {
     // const { id } = useParams<{ id: string }>();
 
     const breadcrumbData: { items: BreadcrumbItem[]; title: string } = {
         items: [
             { label: 'Trang Chủ', path: '/', isActive: false },
-            { label: 'Cơ Sở Y Tế', path: '/medical-facility', isActive: false },
+            { label: 'Bệnh viện', path: '/hospitals', isActive: false },
             { label: 'Vinmec Medical Center', isActive: true },
         ],
         title: 'Vinmec Medical Center',
@@ -147,39 +147,39 @@ const MedicalFacilityProfile: React.FC = () => {
     // Mock FAQs
     const faqs: Array<{ q: string; a: string }> = [
         {
-            q: 'MedFit có những chuyên khoa và dịch vụ khám, điều trị nào?',
-            a: 'MedFit cung cấp ba chuyên khoa chính: Nội tiết, Dinh dưỡng và Thẩm mỹ da. Dịch vụ đa dạng gồm giảm cân, giảm mỡ từng vùng bằng công nghệ nội khoa không xâm lấn, trẻ hóa da, tạo đường nét cơ thể kết hợp y khoa và thiết bị chuẩn y khoa.',
+            q: 'Bệnh viện có những chuyên khoa và dịch vụ khám, điều trị nào?',
+            a: 'Bệnh viện cung cấp đa dạng các chuyên khoa: Tim mạch, Nội tiết, Da liễu, Tiêu hóa, Thần kinh, Nhi khoa, Sản phụ khoa, Mắt. Dịch vụ đa dạng gồm khám tổng quát, tư vấn dinh dưỡng, điều trị da liễu, xét nghiệm máu, siêu âm, chụp X-quang và nhiều dịch vụ y tế chuyên nghiệp khác.',
         },
         {
             q: 'Có cần đặt lịch hẹn trước khi đến khám không?',
             a: 'Bạn nên đặt lịch trước qua tổng đài 19002115 hoặc nút "Đặt khám ngay" để chủ động thời gian và giảm thời gian chờ.',
         },
         {
-            q: 'MedFit có hỗ trợ khám ngoài giờ hoặc cuối tuần không?',
-            a: 'Phòng khám hoạt động Thứ 2 – Chủ nhật: 08:00 – 19:00. Vui lòng đặt lịch trước để được phục vụ tốt nhất.',
+            q: 'Bệnh viện có hỗ trợ khám ngoài giờ hoặc cuối tuần không?',
+            a: 'Bệnh viện hoạt động Thứ 2 – Chủ nhật: 08:00 – 19:00. Vui lòng đặt lịch trước để được phục vụ tốt nhất.',
         },
         {
             q: 'Khi đi khám cần mang theo giấy tờ gì?',
             a: 'Vui lòng mang giấy tờ tùy thân và các kết quả khám/chẩn đoán trước đó (nếu có) để bác sĩ tham khảo.',
         },
         {
-            q: 'MedFit có chỗ giữ xe hơi và xe máy không?',
-            a: 'Có. Khu vực gửi xe được bố trí ngay trong khuôn viên phòng khám, có nhân sự hỗ trợ.',
+            q: 'Bệnh viện có chỗ giữ xe hơi và xe máy không?',
+            a: 'Có. Khu vực gửi xe được bố trí ngay trong khuôn viên bệnh viện, có nhân sự hỗ trợ.',
         },
         {
-            q: 'MedFit có áp dụng bảo hiểm y tế hoặc bảo hiểm tư nhân không?',
-            a: 'Phòng khám hỗ trợ xuất hóa đơn để bạn tự quyết toán với bảo hiểm y tế hoặc bảo hiểm tư nhân theo chính sách của bạn.',
+            q: 'Bệnh viện có áp dụng bảo hiểm y tế hoặc bảo hiểm tư nhân không?',
+            a: 'Bệnh viện hỗ trợ xuất hóa đơn để bạn tự quyết toán với bảo hiểm y tế hoặc bảo hiểm tư nhân theo chính sách của bạn.',
         },
         {
-            q: 'Chi phí khám và điều trị tại MedFit là bao nhiêu?',
-            a: 'Chi phí phụ thuộc vào gói dịch vụ và phác đồ điều trị. Vui lòng liên hệ phòng khám để được tư vấn chi tiết.',
+            q: 'Chi phí khám và điều trị tại bệnh viện là bao nhiêu?',
+            a: 'Chi phí phụ thuộc vào gói dịch vụ và phác đồ điều trị. Vui lòng liên hệ bệnh viện để được tư vấn chi tiết.',
         },
         {
             q: 'Thời gian nhận kết quả khám, xét nghiệm mất bao lâu?',
             a: 'Tùy dịch vụ, hầu hết kết quả cơ bản có trong ngày; các xét nghiệm chuyên sâu có thể cần thêm thời gian xử lý.',
         },
         {
-            q: 'Các phương pháp điều trị giảm mỡ và trẻ hóa tại MedFit có cần nghỉ dưỡng không?',
+            q: 'Các phương pháp điều trị tại bệnh viện có cần nghỉ dưỡng không?',
             a: 'Phần lớn liệu trình là xâm lấn tối thiểu hoặc không xâm lấn, bạn có thể sinh hoạt bình thường ngay sau điều trị.',
         },
     ];
@@ -199,11 +199,11 @@ const MedicalFacilityProfile: React.FC = () => {
                             <div className={styles.sectionBlock}>
                                 <h3 className={styles.sectionTitle}>Mô tả</h3>
                                 <p>
-                                    Phòng khám MedFit là phòng khám y học chuyên sâu về giảm cân,
-                                    giảm béo và giảm mỡ, được thành lập bởi đội ngũ bác sĩ và chuyên
-                                    gia vận động, tâm lý. MedFit tiên phong cung cấp các giải pháp
-                                    giúp thon gọn và kiến tạo đường nét cơ thể dựa trên nền tảng y
-                                    học chứng cứ.
+                                    Bệnh viện Vinmec là bệnh viện đa khoa quốc tế chất lượng cao,
+                                    được thành lập với đội ngũ bác sĩ và chuyên gia y tế giàu kinh
+                                    nghiệm. Vinmec tiên phong cung cấp các giải pháp y tế toàn diện
+                                    và hiện đại dựa trên nền tảng y học chứng cứ và công nghệ tiên
+                                    tiến.
                                 </p>
                             </div>
                             {/* Các dịch vụ */}
@@ -370,18 +370,18 @@ const MedicalFacilityProfile: React.FC = () => {
                             <div id="gioi-thieu" className={styles.sectionBlock}>
                                 <h3 className={styles.sectionTitle}>Giới thiệu</h3>
                                 <p>
-                                    Phòng khám điều trị béo phì chuyên sâu chuẩn y khoa MedFit là
-                                    địa chỉ tiên phong tại TP.HCM trong điều trị thừa cân, béo phì
-                                    theo mô hình giảm cân đa mô thức, ứng dụng các phương pháp không
-                                    xâm lấn dựa trên nền tảng y học chứng cứ. Với đội ngũ bác sĩ
-                                    giàu kinh nghiệm trong các lĩnh vực Nội tiết, Dinh dưỡng, Nội
-                                    khoa, Da liễu, chuyên gia dinh dưỡng và huấn luyện viên, MedFit
-                                    mang đến giải pháp giảm cân an toàn, hiệu quả và cá nhân hóa
-                                    theo tình trạng sức khỏe từng người.
+                                    Bệnh viện đa khoa quốc tế Vinmec là địa chỉ tiên phong tại Việt
+                                    Nam trong cung cấp dịch vụ y tế chất lượng cao theo tiêu chuẩn
+                                    quốc tế, ứng dụng các phương pháp điều trị hiện đại dựa trên nền
+                                    tảng y học chứng cứ. Với đội ngũ bác sĩ giàu kinh nghiệm trong
+                                    các lĩnh vực Tim mạch, Nội tiết, Nội khoa, Da liễu, chuyên gia
+                                    dinh dưỡng và các chuyên khoa khác, Vinmec mang đến giải pháp y
+                                    tế an toàn, hiệu quả và cá nhân hóa theo tình trạng sức khỏe
+                                    từng người.
                                 </p>
                                 <p>
                                     Trong bài viết này, Medpro sẽ tổng hợp các thông tin quan trọng
-                                    về MedFit bao gồm thế mạnh chuyên môn, đội ngũ bác sĩ, dịch vụ
+                                    về Vinmec bao gồm thế mạnh chuyên môn, đội ngũ bác sĩ, dịch vụ
                                     nổi bật, chi phí tham khảo và cách đặt lịch khám để bạn đọc có
                                     thể dễ dàng lựa chọn và chủ động chăm sóc sức khỏe một cách toàn
                                     diện.
@@ -473,24 +473,23 @@ const MedicalFacilityProfile: React.FC = () => {
                                     <div className={styles.guideStep}>
                                         <span className={styles.stepLabel}>Bước 2:</span>
                                         <span className={styles.stepContent}>
-                                            Tìm kiếm "Phòng khám Giảm cân chuyên sâu MedFit".
+                                            Tìm kiếm "Bệnh viện Vinmec".
                                         </span>
                                     </div>
 
                                     <div className={styles.guideStep}>
                                         <span className={styles.stepLabel}>Bước 3:</span>
                                         <span className={styles.stepContent}>
-                                            Chọn loại dịch vụ bạn mong muốn như khám giảm cân với
-                                            bác sĩ dinh dưỡng, khám giảm cân với bác sĩ nội tiết,
-                                            khám tăng cơ giảm mỡ công nghệ cao với bác sĩ da liễu...
+                                            Chọn loại dịch vụ bạn mong muốn như khám tổng quát, khám
+                                            chuyên khoa, xét nghiệm, chẩn đoán hình ảnh...
                                         </span>
                                     </div>
 
                                     <div className={styles.guideStep}>
                                         <span className={styles.stepLabel}>Bước 4:</span>
                                         <span className={styles.stepContent}>
-                                            Lựa chọn thời gian, bác sĩ và hình thức khám (tại phòng
-                                            khám hoặc tư vấn online).
+                                            Lựa chọn thời gian, bác sĩ và hình thức khám (tại bệnh
+                                            viện hoặc tư vấn online).
                                         </span>
                                     </div>
 
@@ -561,7 +560,7 @@ const MedicalFacilityProfile: React.FC = () => {
                             <div className={styles.mapCard}>
                                 <div className={styles.mapBody}>
                                     <iframe
-                                        title="Bản đồ Phòng khám MedFit"
+                                        title="Bản đồ Bệnh viện Vinmec"
                                         src="https://www.google.com/maps?q=462/9+Nguyen+Tri+Phuong,+Ho+Chi+Minh&output=embed"
                                         loading="lazy"
                                         referrerPolicy="no-referrer-when-downgrade"
@@ -606,4 +605,4 @@ const MedicalFacilityProfile: React.FC = () => {
     );
 };
 
-export default MedicalFacilityProfile;
+export default HospitalProfile;

@@ -98,14 +98,14 @@ const HeroSection: React.FC = () => {
                                 <div className={styles.brand}>
                                     <img
                                         src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F4e23e3de-5c90-48f4-bd0c-2dd7624b7903-logo_medfit_fix.png&w=3840&q=75"
-                                        alt="MedFit"
+                                        alt="Vinmec"
                                         className={styles.logo}
                                     />
                                 </div>
 
                                 <div className={styles.titleSection}>
                                     <h1 className={styles.title}>
-                                        Phòng khám MedFit - Phòng khám giảm cân chuyên sâu
+                                        Bệnh viện Vinmec - Bệnh viện đa khoa quốc tế
                                         <i
                                             className={`fa-solid fa-circle-check ${styles.verified}`}
                                             aria-hidden="true"
@@ -148,9 +148,7 @@ const HeroSection: React.FC = () => {
                                 <div className={styles.infoItem}>
                                     <h5>
                                         <strong>Địa chỉ: </strong>
-                                        462/2 Nguyễn Tri Phương, Phường Vườn Lài, TP. Hồ Chí Minh
-                                        (Địa chỉ cũ: Số 462/2 đường Nguyễn Tri Phương, Phường 09,
-                                        Quận 10, Thành phố Hồ Chí Minh)
+                                        458 Minh Khai, Vĩnh Tuy, Hai Bà Trưng, Hà Nội
                                     </h5>
                                 </div>
                                 <div className={styles.infoItem}>
@@ -181,7 +179,7 @@ const HeroSection: React.FC = () => {
                                 {/* Main large banner (left) */}
                                 <img
                                     src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2Fd37704cd-6281-4a57-8688-179369172fef-1.png&w=1920&q=75"
-                                    alt="MedFit banner"
+                                    alt="Vinmec banner"
                                     className={styles.mainLarge}
                                 />
 
@@ -192,7 +190,7 @@ const HeroSection: React.FC = () => {
                                         <div className={styles.sideStack}>
                                             <img
                                                 src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2Ffb51587e-7c38-4380-a151-fe0778ef42c1-2.png&w=640&q=75"
-                                                alt="Clinic"
+                                                alt="Hospital"
                                                 className={styles.sideItem}
                                             />
                                             <img
@@ -271,7 +269,7 @@ const HeroSection: React.FC = () => {
                     >
                         <div className={styles.lightboxHeader}>
                             <span className={styles.lightboxTitle}>
-                                Phòng khám MedFit - Phòng khám giảm cân chuyên sâu
+                                Bệnh viện Vinmec - Bệnh viện đa khoa quốc tế
                             </span>
                             {/* <span className={styles.lightboxBadge}>{mockImages.length} ảnh</span> */}
                             <button
