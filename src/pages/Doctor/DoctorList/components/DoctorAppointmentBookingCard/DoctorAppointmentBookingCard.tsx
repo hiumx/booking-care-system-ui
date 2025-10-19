@@ -166,7 +166,9 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                         <div>
                                             <h6 className="d-flex align-items-center mb-1">
                                                 <Link
-                                                    to={`/doctor-profile/${doctorId}`}
+                                                    to={replacePathParams(PATHS.DOCTOR.PROFILE, {
+                                                        id: doctorId,
+                                                    })}
                                                     className={styles.doctorInfoName}
                                                 >
                                                     {name || 'Bác sĩ Không xác định'}
