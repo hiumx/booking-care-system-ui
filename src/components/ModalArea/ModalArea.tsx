@@ -5,8 +5,6 @@ import clsx from 'clsx';
 import styles from './ModalArea.module.scss';
 import LocationService, { Province, District } from '@/services/location.service';
 
-// Remove duplicate interfaces as they are now imported from LocationService
-
 interface ModalAreaProps {
     isOpen: boolean;
     onClose: () => void;

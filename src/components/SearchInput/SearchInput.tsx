@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Calendar from '@/components/Calendar';
 import Modal from '@/components/Modal';
-import ModalArea from './components/ModalArea';
+import ModalArea from '@/components/ModalArea';
 import clsx from 'clsx';
 import styles from './SearchInput.module.scss';
 // Removed unused icon imports as we now use images from backend

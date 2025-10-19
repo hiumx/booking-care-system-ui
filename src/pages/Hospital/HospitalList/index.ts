@@ -1,1 +1,1 @@
-export { default } from './Hospital';
+export { default } from './HospitalList';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
-import styles from '../Hospital.module.scss';
+import styles from './HospitalCard.module.scss';
 
 interface HospitalCardProps {
     id: number;
