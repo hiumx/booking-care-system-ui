@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
-import HospitalCard from '@/components/HospitalCard';
+import HospitalCard, { HospitalCardSkeleton } from '@/components/HospitalCard';
 import ModalArea from '@/components/ModalArea';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
@@ -363,17 +363,12 @@ const HospitalList: React.FC = () => {
 
                     <div className={clsx('all-facilities')}>
                         {isLoading ? (
-                            <div className={clsx('text-center', 'py-5')}>
-                                <div className="spinner-border text-primary">
-                                    <span className="visually-hidden">Loading...</span>
-                                </div>
-                                <p className="mt-2">
-                                    {selectedAreaDisplay ||
-                                    selectedSpecialties.length > 0 ||
-                                    debouncedSearch
-                                        ? 'Đang lọc danh sách bệnh viện...'
-                                        : 'Đang tải danh sách bệnh viện...'}
-                                </p>
+                            <div className={clsx('row', 'g-4', styles.hospitalGrid)}>
+                                {Array.from({ length: 12 }).map((_, index) => (
+                                    <div key={`skeleton-${index}`} className={styles.hospitalCard}>
+                                        <HospitalCardSkeleton />
+                                    </div>
+                                ))}
                             </div>
                         ) : (
                             <>

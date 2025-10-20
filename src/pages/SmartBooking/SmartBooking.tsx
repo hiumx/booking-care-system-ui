@@ -6,7 +6,7 @@ import Breadcrumb from '@/components/Breadcrumb';
 import SearchBox from './components/SearchBox';
 import TabNavigation from './components/TabNavigation';
 import DoctorCard from '@/components/DoctorCard';
-import HospitalCard from '@/components/HospitalCard';
+import HospitalCard, { HospitalCardSkeleton } from '@/components/HospitalCard';
 import ServiceCard from '@/components/ServiceCard';
 import EmptyState from './components/EmptyState';
 import { Brain, CalendarCheck, Sparkles, Stethoscope, ShieldCheck } from 'lucide-react';
@@ -171,8 +171,25 @@ const SmartBooking: React.FC = () => {
                         {/* Loading */}
                         {isLoading && (
                             <div className={styles.content90}>
-                                <div className={styles.loadingWrapper}>
-                                    <div className={styles.spinner} />
+                                <div
+                                    className={`${styles.cardGrid} ${activeTab === 'services' ? styles.services : ''}`}
+                                >
+                                    {Array.from({ length: 6 }).map((_, index) => (
+                                        <div key={`skeleton-${index}`} className={styles.cardCol}>
+                                            {activeTab === 'hospitals' ? (
+                                                <HospitalCardSkeleton />
+                                            ) : (
+                                                <div className={styles.skeletonCard}>
+                                                    <div className={styles.skeletonImage} />
+                                                    <div className={styles.skeletonContent}>
+                                                        <div className={styles.skeletonTitle} />
+                                                        <div className={styles.skeletonSubtitle} />
+                                                        <div className={styles.skeletonText} />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}

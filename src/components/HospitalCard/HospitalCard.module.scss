@@ -392,3 +392,11 @@ $font-weight-bold: 700;
         }
     }
 }
+
+// Skeleton specific styles
+.skeletonIndicator {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    backdrop-filter: none !important;
+}
