@@ -1,0 +1,431 @@
+// VideoCallWindow.module.scss
+.videoCallOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    &.fullscreen {
+        .videoCallContainer {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+        }
+    }
+}
+
+.videoCallContainer {
+    width: 90vw;
+    height: 80vh;
+    max-width: 1200px;
+    max-height: 90vh;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.videoCallArea {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.singleVideo {
+    width: 100%;
+    height: 100%;
+}
+
+.joinVideo {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.remoteVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: #000;
+    display: block;
+}
+
+.videoPlaceholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    &.hidden {
+        display: none;
+    }
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+}
+
+.localVideoContainer {
+    width: 200px;
+    height: 150px;
+    transition: transform 0.3s ease;
+    user-select: none;
+    z-index: 1000;
+
+    &.dragging {
+        transition: none; // Disable transitions while dragging for real-time movement
+    }
+
+    .localVideo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    &.draggable {
+        cursor: grab;
+
+        &:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        &.dragging {
+            cursor: grabbing;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            z-index: 1001;
+        }
+    }
+}
+
+.dragIndicator {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+
+    .localVideoContainer:hover & {
+        opacity: 1;
+    }
+
+    .localVideoContainer.dragging & {
+        opacity: 1;
+    }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+    .videoCallOverlay {
+        padding: 8px;
+    }
+
+    .videoCallContainer {
+        width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .localVideoContainer {
+        width: 120px;
+        height: 90px;
+
+        &.draggable {
+            &:hover {
+                transform: scale(1.05);
+            }
+
+            &.dragging {
+                transform: scale(1.08);
+            }
+        }
+    }
+
+    .header {
+        padding: 0.5rem;
+
+        h4 {
+            font-size: 1rem !important;
+        }
+    }
+
+    .dragIndicator {
+        font-size: 10px;
+        padding: 2px;
+    }
+
+    // Call controls responsive
+    .joinVideo .position-absolute.bottom-0 {
+        padding: 12px !important;
+
+        .buttonItems {
+            padding: 8px 12px !important;
+            gap: 6px !important;
+        }
+
+        .btnIcon {
+            width: 36px !important;
+            height: 36px !important;
+
+            &.btnLg {
+                width: 48px !important;
+                height: 48px !important;
+            }
+
+            i {
+                font-size: 14px !important;
+            }
+
+            &.btnLg i {
+                font-size: 16px !important;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .videoCallOverlay {
+        padding: 0;
+    }
+
+    .videoCallContainer {
+        width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .localVideoContainer {
+        width: 100px;
+        height: 75px;
+
+        &.draggable {
+            &:hover {
+                transform: scale(1.03);
+            }
+
+            &.dragging {
+                transform: scale(1.06);
+            }
+        }
+    }
+
+    .dragIndicator {
+        font-size: 8px;
+        padding: 1px 2px;
+        top: 4px;
+        right: 4px;
+    }
+
+    // More compact controls on very small screens
+    .joinVideo .position-absolute.bottom-0 {
+        padding: 8px !important;
+
+        .buttonItems {
+            padding: 6px 8px !important;
+            gap: 4px !important;
+        }
+
+        .btnIcon {
+            width: 32px !important;
+            height: 32px !important;
+
+            &.btnLg {
+                width: 40px !important;
+                height: 40px !important;
+            }
+
+            i {
+                font-size: 12px !important;
+            }
+
+            &.btnLg i {
+                font-size: 14px !important;
+            }
+        }
+    }
+
+    // Call duration badge smaller
+    .position-absolute.start-0.top-0 {
+        padding: 4px !important;
+
+        .badge {
+            font-size: 10px;
+            padding: 4px 6px !important;
+        }
+
+        .btn {
+            width: 28px;
+            height: 28px;
+
+            i {
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+// Button styling
+.btnIcon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
+    margin: 0 4px !important; // Add margin between buttons
+
+    &:hover {
+        transform: scale(1.1) !important;
+    }
+
+    &.btnLg {
+        width: 56px !important;
+        height: 56px !important;
+        margin: 0 8px !important; // Larger margin for larger button
+    }
+
+    &.btnSm {
+        width: 36px !important;
+        height: 36px !important;
+        margin: 0 3px !important; // Smaller margin for smaller buttons
+    }
+
+    // Icon styling
+    i {
+        font-size: 16px !important;
+        line-height: 1 !important;
+    }
+
+    &.btnLg i {
+        font-size: 20px !important;
+    }
+
+    &.btnSm i {
+        font-size: 14px !important;
+    }
+}
+
+.buttonItems {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    // Use flexbox gap for better spacing
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important; // Consistent gap between all buttons
+
+    button {
+        border: 0 !important;
+        flex-shrink: 0 !important; // Prevent buttons from shrinking
+    }
+}
+// Call controls container
+.joinVideo .position-absolute.bottom-0 {
+    .bg-light.bg-opacity-50 {
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+}
+
+// Animation for call duration
+.badge {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+// Landscape orientation on mobile
+@media (max-width: 768px) and (orientation: landscape) {
+    .videoCallContainer {
+        height: 100vh;
+        max-height: 100vh;
+    }
+
+    .localVideoContainer {
+        width: 140px;
+        height: 105px;
+    }
+
+    .joinVideo .position-absolute.bottom-0 {
+        padding: 6px !important;
+    }
+}
+
+// Handle very short screens
+@media (max-height: 500px) {
+    .videoCallContainer {
+        height: 100vh;
+        max-height: 100vh;
+    }
+
+    .joinVideo .position-absolute.bottom-0 {
+        padding: 4px !important;
+
+        .buttonItems {
+            padding: 4px 8px !important;
+            gap: 3px !important;
+        }
+
+        .btnIcon {
+            width: 28px !important;
+            height: 28px !important;
+
+            &.btnLg {
+                width: 36px !important;
+                height: 36px !important;
+            }
+
+            i {
+                font-size: 10px !important;
+            }
+
+            &.btnLg i {
+                font-size: 12px !important;
+            }
+        }
+    }
+}
