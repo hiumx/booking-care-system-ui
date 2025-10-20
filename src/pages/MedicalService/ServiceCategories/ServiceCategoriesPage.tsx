@@ -2,13 +2,13 @@ import React from 'react';
 import clsx from 'clsx';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
-import ServiceTypeCard from './components/ServiceTypeCard';
-import styles from './ServiceTypesPage.module.scss';
+import ServiceCategoryCard from './components/ServiceCategoryCard';
+import styles from './ServiceCategoriesPage.module.scss';
 import { replacePathParams, PATHS } from '@/routes/paths';
 
 // 🔹 Mock data (sau này có thể fetch từ API)
-const serviceTypes = {
-    title: 'Các Chuyên Khoa Trong Gói Khám',
+const serviceCategories = {
+    title: 'Khám Chuyên Khoa',
     data: [
         { id: 1, name: 'Cơ Xương Khớp', image: '/src/assets/img/specialities/specialities-04.svg' },
         { id: 2, name: 'Thần kinh', image: '/src/assets/img/specialities/speciality-icon-03.svg' },
@@ -30,12 +30,12 @@ const serviceTypes = {
 const breadcrumbData = {
     items: [
         { label: 'Trang chủ', path: '/', isActive: false },
-        { label: serviceTypes.title, isActive: true },
+        { label: serviceCategories.title, isActive: true },
     ],
-    title: 'Các Dịch Vụ Trong ' + serviceTypes.title,
+    title: 'Các Dịch Vụ Trong ' + serviceCategories.title,
 };
 
-const ServiceTypesPage: React.FC = () => {
+const ServiceCategoriesPage: React.FC = () => {
     return (
         <MainLayout>
             <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
@@ -43,14 +43,14 @@ const ServiceTypesPage: React.FC = () => {
             <div className={clsx('content')}>
                 <div className={clsx('container')}>
                     <div className={styles.grid}>
-                        {serviceTypes.data.map((service) => (
-                            <ServiceTypeCard
+                        {serviceCategories.data.map((service) => (
+                            <ServiceCategoryCard
                                 key={service.id}
-                                id={service.id}
                                 name={service.name}
                                 image={service.image}
-                                link={replacePathParams(PATHS.SPECIALTIES.PROFILE, {
-                                    id: service.id,
+                                link={replacePathParams(PATHS.Service.HOSPITALS, {
+                                    servicesparentId: service.id,
+                                    serviceschildId: service.id,
                                 })}
                             />
                         ))}
@@ -61,4 +61,4 @@ const ServiceTypesPage: React.FC = () => {
     );
 };
 
-export default ServiceTypesPage;
+export default ServiceCategoriesPage;

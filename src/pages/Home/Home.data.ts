@@ -115,6 +115,23 @@ export const CAROUSEL_HOSPITALS_BREAKPOINTS = {
         slidesPerView: 1, // điện thoại nhỏ
     },
 };
+export const CAROUSEL_HOSPITALS1_BREAKPOINTS = {
+    1280: {
+        slidesPerView: 1, // máy tính để bàn
+    },
+    1024: {
+        slidesPerView: 1, // laptop
+    },
+    768: {
+        slidesPerView: 1, // máy tính bảng
+    },
+    480: {
+        slidesPerView: 1, // điện thoại
+    },
+    0: {
+        slidesPerView: 1, // điện thoại nhỏ
+    },
+};
 
 export const CAROUSEL_DOCTORS_BREAKPOINTS = {
     1204: {
