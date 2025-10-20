@@ -246,16 +246,15 @@ const HeroSection: React.FC = () => {
                 </div>
             </section>
             {isLightboxOpen && (
-                <div
+                <button
+                    type="button"
                     className={styles.lightbox}
                     onClick={() => setIsLightboxOpen(false)}
                     onKeyDown={(e) => {
-                        if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+                        if (e.key === 'Escape') {
                             setIsLightboxOpen(false);
                         }
                     }}
-                    tabIndex={0}
-                    role="button"
                     aria-label="Đóng lightbox"
                 >
                     <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
@@ -283,7 +282,7 @@ const HeroSection: React.FC = () => {
                             ))}
                         </div>
                     </div>
-                </div>
+                </button>
             )}
         </>
     );

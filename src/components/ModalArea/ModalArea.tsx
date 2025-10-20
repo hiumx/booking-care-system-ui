@@ -301,22 +301,12 @@ const ModalArea: React.FC<ModalAreaProps> = ({
     };
 
     return ReactDOM.createPortal(
-        <div
-            className={styles.modalOverlay}
-            onClick={onClose}
-            onKeyDown={(e) => {
-                if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onClose();
-                }
-            }}
-            role="button"
-            tabIndex={0}
-            aria-label="Đóng modal"
-        >
+        <div className={styles.modalOverlay} aria-label="Đóng modal">
             <dialog
                 className={styles.modalContent}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) onClose();
+                }}
                 onKeyDown={handleContentKeyDown}
                 aria-modal="true"
                 ref={dialogRef}
