@@ -121,7 +121,10 @@ const HeroSection: React.FC = () => {
                                                 const fillPct =
                                                     Math.max(0, Math.min(1, rating - i)) * 100;
                                                 return (
-                                                    <span key={idx} className={styles.starWrap}>
+                                                    <span
+                                                        key={`star-${idx}`}
+                                                        className={styles.starWrap}
+                                                    >
                                                         <i
                                                             className="fa-regular fa-star"
                                                             aria-hidden="true"
@@ -221,16 +224,10 @@ const HeroSection: React.FC = () => {
                                                 alt="Ảnh 3"
                                                 className={styles.thumb}
                                             />
-                                            <div
+                                            <button
                                                 className={styles.thumbOverlay}
                                                 onClick={() => setIsLightboxOpen(true)}
-                                                role="button"
-                                                tabIndex={0}
                                                 aria-label="Xem thêm hình ảnh"
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter' || e.key === ' ')
-                                                        setIsLightboxOpen(true);
-                                                }}
                                             >
                                                 <img
                                                     src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F3a1707fe-17e1-46af-870d-6f11135963d9-5.png&w=640&q=75"
@@ -240,7 +237,7 @@ const HeroSection: React.FC = () => {
                                                 <div className={styles.overlay}>
                                                     +{remainingCount} hình
                                                 </div>
-                                            </div>
+                                            </button>
                                         </div>
                                     </>
                                 )}
@@ -258,7 +255,6 @@ const HeroSection: React.FC = () => {
                             setIsLightboxOpen(false);
                         }
                     }}
-                    role="button"
                     tabIndex={0}
                     aria-label="Đóng lightbox"
                 >
@@ -283,7 +279,7 @@ const HeroSection: React.FC = () => {
                         <div className={styles.lightboxGrid}>
                             {mockImages.map((src, idx) => (
                                 <img
-                                    key={idx}
+                                    key={`lightbox-img-${idx}`}
                                     src={src}
                                     alt={`Hình ${idx + 1}`}
                                     className={styles.lightboxImg}

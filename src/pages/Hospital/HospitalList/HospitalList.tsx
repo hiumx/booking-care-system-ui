@@ -364,7 +364,7 @@ const HospitalList: React.FC = () => {
                     <div className={clsx('all-facilities')}>
                         {isLoading ? (
                             <div className={clsx('text-center', 'py-5')}>
-                                <div className="spinner-border text-primary" role="status">
+                                <div className="spinner-border text-primary">
                                     <span className="visually-hidden">Loading...</span>
                                 </div>
                                 <p className="mt-2">

@@ -103,9 +103,9 @@ export class HospitalService {
             if (params?.specialtyIds && params.specialtyIds.length > 0) {
                 // Remove specialtyIds from params and add individual parameters
                 delete requestParams.specialtyIds;
-                params.specialtyIds.forEach((id, index) => {
+                for (const [index, id] of params.specialtyIds.entries()) {
                     requestParams[`specialtyIds[${index}]`] = id;
-                });
+                }
             }
 
             const response: any = await axiosInstance.get(HOSPITAL_ENDPOINTS.GET_OPTIMIZED_LIST, {

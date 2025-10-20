@@ -40,8 +40,6 @@ interface BreadcrumbItem {
 }
 
 const HospitalProfile: React.FC = () => {
-    // const { id } = useParams<{ id: string }>();
-
     const breadcrumbData: { items: BreadcrumbItem[]; title: string } = {
         items: [
             { label: 'Trang Chủ', path: '/', isActive: false },
@@ -75,14 +73,14 @@ const HospitalProfile: React.FC = () => {
             // Show header logic:
             // 1. If haven't reached tabs yet: show when scrollY < tabsTop - 10
             // 2. If have reached tabs: only show when back to top (scrollY <= 0)
-            if (!hasReachedTabs) {
-                setShowHeader(scrollY < tabsTop - 10);
-            } else {
+            if (hasReachedTabs) {
                 setShowHeader(scrollY <= 0);
                 // Reset state when back to top
                 if (scrollY <= 0) {
                     setHasReachedTabs(false);
                 }
+            } else {
+                setShowHeader(scrollY < tabsTop - 10);
             }
 
             // Do not auto-change active tab by scroll; only via user click
@@ -514,9 +512,9 @@ const HospitalProfile: React.FC = () => {
 
                             <div id="faq" className={styles.sectionBlock}>
                                 <h3 className={styles.sectionTitle}>Câu hỏi thường gặp</h3>
-                                <div className={styles.faqList} role="list">
+                                <div className={styles.faqList}>
                                     {faqs.map((item, idx) => (
-                                        <div key={idx} className={styles.faqItem} role="listitem">
+                                        <div key={`faq-${idx}`} className={styles.faqItem}>
                                             <button
                                                 className={clsx(
                                                     styles.faqQuestion,

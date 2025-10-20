@@ -264,13 +264,49 @@ const ModalArea: React.FC<ModalAreaProps> = ({
         onClose();
     };
 
+    const renderDistrictList = () => {
+        if (!selectedProvinceId || selectedProvinceId === '') {
+            return <div className={styles.noResults}>Vui lòng chọn tỉnh/thành</div>;
+        }
+
+        if (filteredDistricts.length === 0) {
+            const message = searchTerm
+                ? 'Không tìm thấy quận/huyện'
+                : 'Không có quận/huyện cho tỉnh/thành này';
+            return <div className={styles.noResults}>{message}</div>;
+        }
+
+        return filteredDistricts.map((district) => (
+            <div
+                key={district.id}
+                className={clsx(
+                    styles.districtItem,
+                    selectedDistrictId &&
+                        selectedDistrictId !== '' &&
+                        selectedDistrictId === district.id &&
+                        styles.active
+                )}
+                onClick={() => handleDistrictClick(district.id)}
+                onKeyDown={(e) => handleDistrictKeyDown(e, district.id)}
+                tabIndex={0}
+                aria-selected={selectedDistrictId === district.id}
+            >
+                <span className={styles.districtName}>{district.name}</span>
+                {selectedDistrictId &&
+                    selectedDistrictId !== '' &&
+                    selectedDistrictId === district.id && (
+                        <Check className={styles.checkIcon} size={16} />
+                    )}
+            </div>
+        ));
+    };
+
     return ReactDOM.createPortal(
         <div
             className={styles.modalOverlay}
             onClick={onClose}
             onKeyDown={handleOverlayKeyDown}
             tabIndex={0}
-            role="button"
             aria-label="Đóng modal"
         >
             <div
@@ -278,7 +314,6 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={handleContentKeyDown}
                 tabIndex={0}
-                role="dialog"
                 aria-modal="true"
             >
                 <div className={styles.modalHeader}>
@@ -311,11 +346,7 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                 </div>
 
                 <div className={styles.modalBody}>
-                    <div
-                        className={styles.provinceList}
-                        role="listbox"
-                        aria-label="Danh sách tỉnh/thành"
-                    >
+                    <div className={styles.provinceList} aria-label="Danh sách tỉnh/thành">
                         {filteredProvinces.length > 0 ? (
                             filteredProvinces.map((province) => (
                                 <div
@@ -330,7 +361,6 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                                     onClick={() => handleProvinceClick(province.id)}
                                     onKeyDown={(e) => handleProvinceKeyDown(e, province.id)}
                                     tabIndex={0}
-                                    role="option"
                                     aria-selected={selectedProvinceId === province.id}
                                 >
                                     <span className={styles.provinceName}>{province.name}</span>
@@ -346,47 +376,8 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                         )}
                     </div>
 
-                    <div
-                        className={styles.districtList}
-                        role="listbox"
-                        aria-label="Danh sách quận/huyện"
-                    >
-                        {selectedProvinceId && selectedProvinceId !== '' ? (
-                            filteredDistricts.length > 0 ? (
-                                filteredDistricts.map((district) => (
-                                    <div
-                                        key={district.id}
-                                        className={clsx(
-                                            styles.districtItem,
-                                            selectedDistrictId &&
-                                                selectedDistrictId !== '' &&
-                                                selectedDistrictId === district.id &&
-                                                styles.active
-                                        )}
-                                        onClick={() => handleDistrictClick(district.id)}
-                                        onKeyDown={(e) => handleDistrictKeyDown(e, district.id)}
-                                        tabIndex={0}
-                                        role="option"
-                                        aria-selected={selectedDistrictId === district.id}
-                                    >
-                                        <span className={styles.districtName}>{district.name}</span>
-                                        {selectedDistrictId &&
-                                            selectedDistrictId !== '' &&
-                                            selectedDistrictId === district.id && (
-                                                <Check className={styles.checkIcon} size={16} />
-                                            )}
-                                    </div>
-                                ))
-                            ) : (
-                                <div className={styles.noResults}>
-                                    {searchTerm
-                                        ? 'Không tìm thấy quận/huyện'
-                                        : 'Không có quận/huyện cho tỉnh/thành này'}
-                                </div>
-                            )
-                        ) : (
-                            <div className={styles.noResults}>Vui lòng chọn tỉnh/thành</div>
-                        )}
+                    <div className={styles.districtList} aria-label="Danh sách quận/huyện">
+                        {renderDistrictList()}
                     </div>
                 </div>
 
