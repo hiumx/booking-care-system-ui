@@ -105,7 +105,7 @@ const HeroSection: React.FC = () => {
 
                                 <div className={styles.titleSection}>
                                     <h1 className={styles.title}>
-                                        Bệnh viện Vinmec - Bệnh viện đa khoa quốc tế
+                                        Bệnh viện Vinmec - Bệnh viện đa khoa quốc tế{' '}
                                         <i
                                             className={`fa-solid fa-circle-check ${styles.verified}`}
                                             aria-hidden="true"

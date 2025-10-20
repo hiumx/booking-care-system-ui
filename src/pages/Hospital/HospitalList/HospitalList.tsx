@@ -417,8 +417,8 @@ const HospitalList: React.FC = () => {
                                                     setSearch('');
                                                 }}
                                             >
-                                                <i className="fa-solid fa-times me-2"></i>
-                                                Xóa tất cả bộ lọc
+                                                <i className="fa-solid fa-times me-2"></i> Xóa tất
+                                                cả bộ lọc
                                             </button>
                                         )}
                                     </div>
