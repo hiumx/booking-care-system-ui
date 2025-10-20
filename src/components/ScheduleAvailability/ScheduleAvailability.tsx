@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Calendar from '@/components/Calendar';
-import styles from './DoctorAvailability.module.scss';
+import styles from './ScheduleAvailability.module.scss';
 import { PATHS, replacePathParams } from '@/routes/paths';
 
 interface AppointmentTime {
@@ -19,7 +19,7 @@ interface DoctorScheduleTime {
     is_available: boolean;
 }
 
-const DoctorAvailability: React.FC = () => {
+const ScheduleAvailability: React.FC = () => {
     // Lấy ngày hiện tại
     const today = new Date();
     const [activeTab, setActiveTab] = useState('day1'); // Mặc định bắt đầu từ ngày mai
@@ -27,7 +27,7 @@ const DoctorAvailability: React.FC = () => {
         new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
     ); // Ngày bắt đầu cho 7 ngày
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const anchorRef = useRef<HTMLLIElement>(null); // Ref cho icon lịch
+    const anchorRef = useRef<HTMLButtonElement>(null); // Ref cho button lịch
 
     // Tạo danh sách 7 ngày từ startDate
     const generateNext7Days = (start: Date) => {
@@ -288,9 +288,9 @@ const DoctorAvailability: React.FC = () => {
         const daySchedules = mockScheduleTimes.filter(
             (schedule) => schedule.appointment_date === dateStr && schedule.is_available
         );
-        const slotIds = daySchedules.map((schedule) => schedule.appointment_time_id);
+        const slotIds = new Set(daySchedules.map((schedule) => schedule.appointment_time_id));
         return mockAppointmentTimes
-            .filter((time) => slotIds.includes(time.id))
+            .filter((time) => slotIds.has(time.id))
             .map((time) => `${time.start_time} - ${time.end_time}`);
     };
 
@@ -298,7 +298,7 @@ const DoctorAvailability: React.FC = () => {
 
     // Xử lý chọn ngày từ DateCalendar
     const handleDateChange = (value: Date | null) => {
-        if (!value || !(value instanceof Date) || isNaN(value.getTime())) return; // Bỏ qua nếu không phải Date hợp lệ
+        if (!value || !(value instanceof Date) || Number.isNaN(value.getTime())) return; // Bỏ qua nếu không phải Date hợp lệ
         const oneMonthLater = new Date(today);
         oneMonthLater.setDate(today.getDate() + 30);
         if (
@@ -332,10 +332,13 @@ const DoctorAvailability: React.FC = () => {
                     <div className="card-header d-flex justify-content-between align-items-center">
                         <h3 className="header-title">Chọn Khung Giờ Có Sẵn</h3>
                         <div className="date-picker">
-                            <i
+                            <button
+                                type="button"
                                 className="isax isax-calendar-tick calendar-icon"
                                 onClick={() => setShowDatePicker(!showDatePicker)}
                                 ref={anchorRef}
+                                aria-label="Chọn ngày"
+                                style={{ background: 'none', border: 'none', padding: 0 }}
                             />
                             <Calendar
                                 value={activeDay}
@@ -363,8 +366,10 @@ const DoctorAvailability: React.FC = () => {
                     </div>
 
                     <div className="available-tab">
-                        <label className="form-label">Chọn ngày có sẵn</label>
-                        <ul className="nav">
+                        <label className="form-label" htmlFor="date-selector">
+                            Chọn ngày có sẵn
+                        </label>
+                        <ul className="nav" id="date-selector">
                             {next7Days.map((day) => (
                                 <li key={day.id}>
                                     <Link
@@ -445,4 +450,4 @@ const DoctorAvailability: React.FC = () => {
     );
 };
 
-export default DoctorAvailability;
+export default ScheduleAvailability;

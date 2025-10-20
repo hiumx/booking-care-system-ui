@@ -3,12 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
 import styles from './DoctorProfile.module.scss';
-import Pagination from '@/components/Pagination';
-import ReviewCard from '@/components/ReviewCard';
-import Button from '@/components/Button';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
-import WriteReview from './components/WriteReview';
+import ReviewSection, { generateReviews } from '@/components/ReviewSection';
 import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
 import {
     selectSelectedDoctor,
@@ -16,6 +13,14 @@ import {
     selectDoctorError,
 } from '@/store/selectors/doctor.selectors';
 import { AppDispatch } from '@/store';
+import {
+    mockAppointments,
+    getDisplayText,
+    scrollToSection,
+    calculatePriceRange,
+    countAppointments,
+    createReviewHandlers,
+} from '@/utils/profileUtils';
 
 // Import images for DoctorProfileCard
 import doctorImg from '@/assets/img/doctors/doc-profile-02.jpg';
@@ -32,181 +37,13 @@ import experienceLogo1 from '@/assets/img/icons/experience-logo-01.svg';
 
 // Icon CSS
 import '@/assets/css/feather.css';
-import DoctorAvailability from './components/DoctorAvailability';
+import ScheduleAvailability from '@/components/ScheduleAvailability';
+import HospitalInfo from '@/components/HospitalInfo';
+import { Gender } from '@/enums/common.enums';
 import { PATHS, replacePathParams } from '@/routes/paths';
 
-// Mock data for Appointments
-const mockAppointments = Array.from({ length: 200 }, (_, index) => ({
-    id: 201 + index,
-    patient_id: 100 + (index % 50) + 1,
-    doctor_id: 1,
-    clinic_id: 1,
-    appointment_time_id: 1,
-    appointment_date: new Date(Date.now() - index * 86400000).toISOString(),
-    price_id: index % 2 === 0 ? 1 : 2,
-    status: 'COMPLETED',
-    type: 'IN_PERSON',
-    reason: `Check-up ${index + 1}`,
-    result: `Successful visit ${index + 1}`,
-    created_at: new Date(Date.now() - index * 86400000).toISOString(),
-    updated_at: new Date(Date.now() - index * 86400000).toISOString(),
-}));
-
-// Mock data for Reviews
-const baseReviews = [
-    {
-        id: 1,
-        patient_id: 101,
-        doctor_id: 1,
-        appointment_id: 201,
-        rating: 5,
-        comment: 'Cảm ơn bác sĩ vì sự tận tâm! Dịch vụ rất tốt.',
-        recommend: true,
-        parent_review_id: null,
-        created_at: '2025-08-17 14:03:00',
-        updated_at: '2025-08-17 14:03:00',
-        timeAgo: '2 days ago',
-        user: {
-            id: 101,
-            account_id: 101,
-            email: 'patient1@example.com',
-            first_name: 'Nguyễn',
-            last_name: 'Thị B',
-            gender: 'FEMALE',
-            address: 'Hải Châu, Đà Nẵng',
-            phone: '0905-123-456',
-            avatar_url: doctorImg,
-            created_at: '2025-01-01 10:00:00',
-            updated_at: '2025-08-17 14:00:00',
-        },
-    },
-    {
-        id: 2,
-        patient_id: 102,
-        doctor_id: 1,
-        appointment_id: 202,
-        rating: 5,
-        comment: 'Bác sĩ rất chuyên nghiệp, tôi rất hài lòng!',
-        recommend: true,
-        parent_review_id: null,
-        created_at: '2025-07-19 14:03:00',
-        updated_at: '2025-07-19 14:03:00',
-        timeAgo: '31 days ago',
-        user: {
-            id: 102,
-            account_id: 102,
-            email: 'patient2@example.com',
-            first_name: 'Trần',
-            last_name: 'Văn C',
-            gender: 'MALE',
-            address: 'Sơn Trà, Đà Nẵng',
-            phone: '0905-654-321',
-            avatar_url: doctorImg,
-            created_at: '2025-02-01 10:00:00',
-            updated_at: '2025-07-19 14:00:00',
-        },
-    },
-    {
-        id: 3,
-        patient_id: 103,
-        doctor_id: 1,
-        appointment_id: 203,
-        rating: 5,
-        comment: 'Dịch vụ tuyệt vời, sẽ quay lại!',
-        recommend: true,
-        parent_review_id: null,
-        created_at: '2025-08-04 14:03:00',
-        updated_at: '2025-08-04 14:03:00',
-        timeAgo: '15 days ago',
-        user: {
-            id: 103,
-            account_id: 103,
-            email: 'patient3@example.com',
-            first_name: 'Lê',
-            last_name: 'Thị D',
-            gender: 'FEMALE',
-            address: 'Ngũ Hành Sơn, Đà Nẵng',
-            phone: '0905-789-123',
-            avatar_url: doctorImg,
-            created_at: '2025-03-01 10:00:00',
-            updated_at: '2025-08-04 14:00:00',
-        },
-        replies: [
-            {
-                id: 4,
-                patient_id: 104,
-                doctor_id: 1,
-                appointment_id: null,
-                rating: null,
-                comment: 'Cảm ơn ý kiến của bạn, chúng tôi sẽ cải thiện!',
-                recommend: false,
-                parent_review_id: 3,
-                created_at: '2025-08-05 14:03:00',
-                updated_at: '2025-08-05 14:03:00',
-                user: {
-                    id: 104,
-                    account_id: 104,
-                    email: 'reply1@example.com',
-                    first_name: 'Phan',
-                    last_name: 'Văn E',
-                    gender: 'MALE',
-                    address: 'Liên Chiểu, Đà Nẵng',
-                    phone: '0905-456-789',
-                    avatar_url: doctorImg,
-                    created_at: '2025-04-01 10:00:00',
-                    updated_at: '2025-08-05 14:00:00',
-                },
-            },
-        ],
-    },
-];
-
-// Generate 150 reviews to match "150 Đánh giá" and achieve 94% recommendation
-const reviews = Array.from({ length: 150 }, (_, index) => {
-    const baseIndex = index % baseReviews.length;
-    const baseReview = baseReviews[baseIndex];
-    const recommend = index < 141;
-    return {
-        ...baseReview,
-        id: index + 1,
-        patient_id: 100 + index + 1,
-        appointment_id: 201 + index,
-        rating: 5,
-        comment: `${baseReview.comment} (Review ${index + 1})`,
-        recommend,
-        created_at: new Date(Date.now() - index * 86400000).toISOString(),
-        updated_at: new Date(Date.now() - index * 86400000).toISOString(),
-        timeAgo: `${(index % 30) + 1} days ago`,
-        userId: baseReview.user.id, // Add userId for edit/delete permission check
-        user: {
-            ...baseReview.user,
-            id: 100 + index + 1,
-            account_id: 100 + index + 1,
-            email: `patient${index + 1}@example.com`,
-            first_name: baseReview.user.first_name,
-            last_name: `${baseReview.user.last_name}${index + 1}`,
-            created_at: new Date(Date.now() - index * 86400000).toISOString(),
-            updated_at: new Date(Date.now() - index * 86400000).toISOString(),
-        },
-        replies: baseReview.replies?.map((reply) => ({
-            ...reply,
-            id: reply.id + index,
-            patient_id: 100 + index + 2,
-            recommend: false,
-            userId: reply.user.id, // Add userId for edit/delete permission
-            user: {
-                ...reply.user,
-                id: 100 + index + 2,
-                account_id: 100 + index + 2,
-                email: `reply${index + 1}@example.com`,
-                first_name: reply.user.first_name,
-                last_name: `${reply.user.last_name}${index + 1}`,
-                created_at: new Date(Date.now() - (index + 1) * 86400000).toISOString(),
-                updated_at: new Date(Date.now() - (index + 1) * 86400000).toISOString(),
-            },
-        })),
-    };
-});
+// Generate reviews using shared utility
+const reviews = generateReviews(150, doctorImg);
 
 const DoctorProfile: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -232,53 +69,14 @@ const DoctorProfile: React.FC = () => {
     const hoursRef = useRef<HTMLDivElement>(null);
     const reviewRef = useRef<HTMLDivElement>(null);
 
-    const scrollToSection = (el: HTMLDivElement | null) => {
-        el?.scrollIntoView({ behavior: 'smooth' });
-    };
-
     const [expanded, setExpanded] = useState(false);
-
-    // Function to generate Google Maps embed URL from address
-    const generateMapUrl = (address: string) => {
-        if (!address) {
-            // Fallback to default location if no address
-            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3193.7301009561315!2d-76.13077892422932!3d36.82498697224007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89bae976cfe9f8af%3A0xa61eac05156fbdb9!2sBeachStreet%20USA!5e0!3m2!1sen!2sin!4v1669777904208!5m2!1sen!2sin';
-        }
-
-        // Encode the address for URL - using simple Google Maps embed
-        const encodedAddress = encodeURIComponent(address);
-        return `https://maps.google.com/maps?q=${encodedAddress}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
-    };
 
     // Use selectedDoctor data instead of mock data
     const doctor = selectedDoctor;
     const limit = 300;
     const isLongText = doctor?.bio ? doctor.bio.length > limit : false;
 
-    // Function to get display text for bio
-    const getDisplayText = (
-        bio: string | undefined,
-        isExpanded: boolean,
-        isLong: boolean,
-        textLimit: number
-    ) => {
-        if (!bio) {
-            return '';
-        }
-        if (isExpanded || !isLong) {
-            return bio;
-        }
-        return bio.slice(0, textLimit) + '...';
-    };
-
     const displayText = getDisplayText(doctor?.bio, expanded, isLongText, limit);
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 2;
-    const totalPages = Math.ceil(reviews.length / pageSize);
-    const displayedReviews = reviews.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
-    const [showWriteReview, setShowWriteReview] = useState(false);
 
     // Breadcrumb data
     const breadcrumbData = {
@@ -371,86 +169,28 @@ const DoctorProfile: React.FC = () => {
     };
 
     // Function to get gender display text
-    const getGenderDisplayText = (gender: any) => {
-        if (String(gender) === 'FEMALE') {
+    const getGenderDisplayText = (gender: Gender | undefined) => {
+        if (gender === Gender.FEMALE) {
             return 'Nữ';
         }
-        if (String(gender) === 'MALE') {
+        if (gender === Gender.MALE) {
             return 'Nam';
         }
         return 'Khác';
     };
 
     // Count completed appointments (mock data for now)
-    const appointmentCount = mockAppointments.filter(
-        (apt) => apt.doctor_id === Number.parseInt(doctor.id || '1', 10)
-    ).length;
+    const appointmentCount = countAppointments(
+        mockAppointments,
+        Number.parseInt(doctor.id || '1', 10)
+    );
 
     // Get price range from doctor data
     const prices = doctor.prices?.map((price) => price.amount) || [];
+    const priceRange = calculatePriceRange(prices.map((amount) => ({ amount })));
 
-    const allPrices = prices;
-    const priceRange =
-        allPrices.length > 0
-            ? `${Math.min(...allPrices).toLocaleString('vi-VN')}đ - ${Math.max(...allPrices).toLocaleString('vi-VN')}đ`
-            : 'N/A';
-
-    // Handle review submission
-    const handleSubmitReview = (reviewData: {
-        rating: number;
-        description: string;
-        termsAccepted: boolean;
-    }) => {
-        console.log('New review submitted:', reviewData);
-        // Trong thực tế, sẽ gọi API để submit review
-        alert('Đánh giá của bạn đã được gửi thành công!');
-        setShowWriteReview(false);
-    };
-
-    // Handle reply submission
-    const handleReplySubmission = (replyData: { reviewId: number; text: string }) => {
-        console.log('New reply submitted:', replyData);
-        // Trong thực tế, sẽ gọi API để submit reply
-        alert('Phản hồi của bạn đã được gửi thành công!');
-        // Có thể refresh reviews hoặc update state local
-    };
-
-    // Handle edit review
-    const handleEditReview = (reviewData: {
-        reviewId: number;
-        rating: number;
-        description: string;
-        recommend?: boolean;
-    }) => {
-        console.log('Review edited:', reviewData);
-        // Trong thực tế, sẽ gọi API để update review
-        alert('Đánh giá của bạn đã được cập nhật thành công!');
-        // Có thể refresh reviews hoặc update state local
-    };
-
-    // Handle delete review
-    const handleDeleteReview = (reviewId: number) => {
-        console.log('Review deleted:', reviewId);
-        // Trong thực tế, sẽ gọi API để delete review
-        alert('Đánh giá đã được xóa thành công!');
-        // Có thể refresh reviews hoặc update state local
-    };
-
-    // Handle edit reply
-    const handleEditReply = (replyData: { replyId: number; text: string }) => {
-        console.log('Reply edited:', replyData);
-        // Trong thực tế, sẽ gọi API để update reply
-        alert('Phản hồi đã được cập nhật thành công!');
-        // Có thể refresh reviews hoặc update state local
-    };
-
-    // Handle delete reply
-    const handleDeleteReply = (replyId: number) => {
-        console.log('Reply deleted:', replyId);
-        // Trong thực tế, sẽ gọi API để delete reply
-        alert('Phản hồi đã được xóa thành công!');
-        // Có thể refresh reviews hoặc update state local
-    };
+    // Use shared review handlers
+    const reviewHandlers = createReviewHandlers();
 
     // Mock current user ID for demo purposes
     const currentUserId = 101; // Giả sử user hiện tại có ID là 101
@@ -541,7 +281,7 @@ const DoctorProfile: React.FC = () => {
                                             <h5 className="accept-text">
                                                 <span>
                                                     <i className="feather-check"></i>
-                                                </span>
+                                                </span>{' '}
                                                 Tiếp nhận bệnh nhân mới
                                             </h5>
                                         </li>
@@ -565,7 +305,7 @@ const DoctorProfile: React.FC = () => {
                                                                 src={deviceMessageIcon}
                                                                 alt="Chat"
                                                             />
-                                                        </span>
+                                                        </span>{' '}
                                                         Chat
                                                     </Link>
                                                 </li>
@@ -573,7 +313,7 @@ const DoctorProfile: React.FC = () => {
                                                     <Link to="/voice-call">
                                                         <span className="bg-violet">
                                                             <i className="feather-phone-forwarded"></i>
-                                                        </span>
+                                                        </span>{' '}
                                                         Audio Call
                                                     </Link>
                                                 </li>
@@ -581,7 +321,7 @@ const DoctorProfile: React.FC = () => {
                                                     <Link to="/video-call">
                                                         <span className="bg-indigo">
                                                             <i className="fa-solid fa-video"></i>
-                                                        </span>
+                                                        </span>{' '}
                                                         Video Call
                                                     </Link>
                                                 </li>
@@ -808,72 +548,27 @@ const DoctorProfile: React.FC = () => {
                                     <div className="detail-title">
                                         <h4>Bệnh viện & Vị trí</h4>
                                     </div>
-                                    <div className="clinic-loc">
-                                        <div className="row align-items-center">
-                                            <div className="col-lg-7">
-                                                <div className="clinic-info">
-                                                    <div className="clinic-img">
-                                                        <img
-                                                            src={doctor.hospital?.avatarUrl}
-                                                            alt={doctor.hospital?.name}
-                                                        />
-                                                    </div>
-                                                    <div className="detail-clinic">
-                                                        <h5>{doctor.hospital?.name}</h5>
-                                                        <Link
-                                                            to={`/hospital/${doctor.hospital?.id || ''}`}
-                                                            className="clinic-link"
-                                                        >
-                                                            Xem thông tin bệnh viện
-                                                        </Link>
-                                                        <p>
-                                                            <i className="feather-map-pin me-2"></i>
-                                                            {doctor.hospital?.address ||
-                                                                doctor.address ||
-                                                                'Địa chỉ bệnh viện'}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="d-flex align-items-center avail-time-slot">
-                                                    {[
-                                                        {
-                                                            day: 'Thứ 2',
-                                                            time: '07:00 AM - 17:00 PM',
-                                                        },
-                                                        {
-                                                            day: 'Thứ 7',
-                                                            time: '07:00 AM - 17:00 PM',
-                                                        },
-                                                    ].map((slot, idx) => (
-                                                        <div
-                                                            className="availability-date"
-                                                            key={idx}
-                                                        >
-                                                            <div className="book-date">
-                                                                <h6>{slot.day}</h6>
-                                                                <span>{slot.time}</span>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <div className="col-lg-5">
-                                                <div className="contact-map d-flex">
-                                                    <iframe
-                                                        src={generateMapUrl(
-                                                            doctor.hospital?.address ||
-                                                                doctor.address ||
-                                                                'Địa chỉ bệnh viện'
-                                                        )}
-                                                        allowFullScreen
-                                                        loading="lazy"
-                                                        referrerPolicy="no-referrer-when-downgrade"
-                                                        title={`Map for ${doctor.hospital?.name}`}
-                                                    ></iframe>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <HospitalInfo
+                                        hospital={{
+                                            id: Number(doctor.hospital?.id) || 1,
+                                            name: doctor.hospital?.name || 'Bệnh viện',
+                                            address:
+                                                doctor.hospital?.address ||
+                                                doctor.address ||
+                                                'Địa chỉ bệnh viện',
+                                            background_url: doctor.hospital?.avatarUrl || doctorImg,
+                                        }}
+                                        availabilitySlots={[
+                                            {
+                                                day: 'Thứ 2',
+                                                time: '07:00 AM - 17:00 PM',
+                                            },
+                                            {
+                                                day: 'Thứ 7',
+                                                time: '07:00 AM - 17:00 PM',
+                                            },
+                                        ]}
+                                    />
                                 </div>
                             </div>
                             <div ref={hoursRef}>
@@ -881,80 +576,22 @@ const DoctorProfile: React.FC = () => {
                                     <div className="detail-title">
                                         <h4>Lịch làm việc</h4>
                                     </div>
-                                    <DoctorAvailability />
+                                    <ScheduleAvailability />
                                 </div>
                             </div>
                             {/* Write Review  */}
                             <div ref={reviewRef}>
-                                <div id="review">
-                                    <div className="detail-title mb-3">
-                                        <h4>Đánh giá ({reviews.length})</h4>
-                                    </div>
-
-                                    {/* Write Review Section */}
-                                    <div className="write-review-section mb-4">
-                                        {!showWriteReview ? (
-                                            <Button
-                                                text="Viết đánh giá"
-                                                type="button"
-                                                className="btn-primary"
-                                                onClick={() => setShowWriteReview(true)}
-                                            />
-                                        ) : (
-                                            <WriteReview
-                                                doctorName={`${doctor.lastName} ${doctor.firstName}`}
-                                                onSubmitReview={handleSubmitReview}
-                                            />
-                                        )}
-
-                                        {showWriteReview && (
-                                            <Button
-                                                text="Hủy"
-                                                type="button"
-                                                className={clsx('mt-2', styles.cancelButton)}
-                                                onClick={() => setShowWriteReview(false)}
-                                            />
-                                        )}
-                                    </div>
-
-                                    {displayedReviews.map((review, index) => (
-                                        <ReviewCard
-                                            key={review.id}
-                                            review={{
-                                                id: review.id,
-                                                name: `${review.user.first_name} ${review.user.last_name}`,
-                                                avatar: review.user.avatar_url,
-                                                rating: review.rating,
-                                                timeAgo: review.timeAgo, // Fixed: Changed from timesworth to timeAgo
-                                                text: review.comment,
-                                                recommend: review.recommend,
-                                                userId: review.userId,
-                                                isEditable: true, // Mock: reviews can be edited within 24h
-                                                replies: review.replies?.map((reply) => ({
-                                                    id: reply.id,
-                                                    name: `${reply.user.first_name} ${reply.user.last_name}`,
-                                                    avatar: reply.user.avatar_url,
-                                                    text: reply.comment,
-                                                    userId: reply.userId, // Add userId for edit/delete permission
-                                                })),
-                                            }}
-                                            isLast={index === displayedReviews.length - 1}
-                                            onReply={handleReplySubmission}
-                                            canEdit={true}
-                                            canDelete={true}
-                                            currentUserId={currentUserId}
-                                            onEdit={handleEditReview}
-                                            onDelete={handleDeleteReview}
-                                            onEditReply={handleEditReply}
-                                            onDeleteReply={handleDeleteReply}
-                                        />
-                                    ))}
-                                    <Pagination
-                                        currentPage={currentPage}
-                                        totalPages={totalPages}
-                                        onPageChange={setCurrentPage}
-                                    />
-                                </div>
+                                <ReviewSection
+                                    reviews={reviews}
+                                    doctorName={`${doctor.lastName} ${doctor.firstName}`}
+                                    currentUserId={currentUserId}
+                                    onSubmitReview={reviewHandlers.handleSubmitReview}
+                                    onReplySubmission={reviewHandlers.handleReplySubmission}
+                                    onEditReview={reviewHandlers.handleEditReview}
+                                    onDeleteReview={reviewHandlers.handleDeleteReview}
+                                    onEditReply={reviewHandlers.handleEditReply}
+                                    onDeleteReply={reviewHandlers.handleDeleteReply}
+                                />
                             </div>
                         </div>
                     </div>
