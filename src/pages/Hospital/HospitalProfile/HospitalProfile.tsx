@@ -40,8 +40,6 @@ interface BreadcrumbItem {
 }
 
 const HospitalProfile: React.FC = () => {
-    // const { id } = useParams<{ id: string }>();
-
     const breadcrumbData: { items: BreadcrumbItem[]; title: string } = {
         items: [
             { label: 'Trang Chủ', path: '/', isActive: false },

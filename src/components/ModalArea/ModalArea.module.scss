@@ -9,6 +9,7 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    padding: 20px; /* Thêm padding để tránh modal sát mép màn hình */
 }
 
 .modalContent {
@@ -23,6 +24,9 @@
         0 20px 25px -5px rgba(0, 0, 0, 0.1),
         0 10px 10px -5px rgba(0, 0, 0, 0.04);
     overflow: auto; /* Cho phép cuộn để hiển thị footer */
+    border: none; /* Loại bỏ border mặc định của dialog */
+    margin: auto; /* Đảm bảo căn giữa */
+    position: relative; /* Đảm bảo positioning đúng */
 }
 
 .modalHeader {
@@ -178,9 +182,18 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
+    border: none;
+    background: none;
+    text-align: left;
 
     &:hover {
         background-color: #f3f4f6;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px #2563eb;
     }
 
     &.active {

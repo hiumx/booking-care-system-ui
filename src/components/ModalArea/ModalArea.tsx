@@ -75,35 +75,11 @@ const ModalArea: React.FC<ModalAreaProps> = ({
         setSelectedDistrictId(initialDistrictId || '');
     }, [initialProvinceId, initialDistrictId]);
 
-    // Xử lý sự kiện bàn phím cho modalOverlay
-    const handleOverlayKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            onClose();
-        }
-    };
-
     // Xử lý sự kiện bàn phím cho modalContent
-    const handleContentKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const handleContentKeyDown = (e: React.KeyboardEvent<HTMLDialogElement>) => {
         if (e.key === 'Escape') {
             e.preventDefault();
             onClose();
-        }
-    };
-
-    // Xử lý sự kiện bàn phím cho province
-    const handleProvinceKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, provinceId: string) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleProvinceClick(provinceId);
-        }
-    };
-
-    // Xử lý sự kiện bàn phím cho district
-    const handleDistrictKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, districtId: string) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleDistrictClick(districtId);
         }
     };
 
@@ -265,20 +241,12 @@ const ModalArea: React.FC<ModalAreaProps> = ({
     };
 
     return ReactDOM.createPortal(
-        <div
-            className={styles.modalOverlay}
-            onClick={onClose}
-            onKeyDown={handleOverlayKeyDown}
-            tabIndex={0}
-            role="button"
-            aria-label="Đóng modal"
-        >
-            <div
+        <div className={styles.modalOverlay} onClick={onClose}>
+            <dialog
                 className={styles.modalContent}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={handleContentKeyDown}
-                tabIndex={0}
-                role="dialog"
+                open
                 aria-modal="true"
             >
                 <div className={styles.modalHeader}>
@@ -311,72 +279,64 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                 </div>
 
                 <div className={styles.modalBody}>
-                    <div
-                        className={styles.provinceList}
-                        role="listbox"
-                        aria-label="Danh sách tỉnh/thành"
-                    >
+                    <div className={styles.provinceList} aria-label="Danh sách tỉnh/thành">
                         {filteredProvinces.length > 0 ? (
-                            filteredProvinces.map((province) => (
-                                <div
-                                    key={province.id}
-                                    className={clsx(
-                                        styles.provinceItem,
-                                        selectedProvinceId &&
-                                            selectedProvinceId !== '' &&
-                                            selectedProvinceId === province.id &&
-                                            styles.active
-                                    )}
-                                    onClick={() => handleProvinceClick(province.id)}
-                                    onKeyDown={(e) => handleProvinceKeyDown(e, province.id)}
-                                    tabIndex={0}
-                                    role="option"
-                                    aria-selected={selectedProvinceId === province.id}
-                                >
-                                    <span className={styles.provinceName}>{province.name}</span>
-                                    {selectedProvinceId &&
-                                        selectedProvinceId !== '' &&
-                                        selectedProvinceId === province.id && (
+                            filteredProvinces.map((province) => {
+                                const isSelected =
+                                    selectedProvinceId &&
+                                    selectedProvinceId !== '' &&
+                                    selectedProvinceId === province.id;
+                                return (
+                                    <button
+                                        key={province.id}
+                                        type="button"
+                                        className={clsx(
+                                            styles.provinceItem,
+                                            isSelected && styles.active
+                                        )}
+                                        onClick={() => handleProvinceClick(province.id)}
+                                        aria-selected={!!isSelected}
+                                    >
+                                        <span className={styles.provinceName}>{province.name}</span>
+                                        {isSelected && (
                                             <Check className={styles.checkIcon} size={16} />
                                         )}
-                                </div>
-                            ))
+                                    </button>
+                                );
+                            })
                         ) : (
                             <div className={styles.noResults}>Không tìm thấy tỉnh/thành</div>
                         )}
                     </div>
 
-                    <div
-                        className={styles.districtList}
-                        role="listbox"
-                        aria-label="Danh sách quận/huyện"
-                    >
+                    <div className={styles.districtList} aria-label="Danh sách quận/huyện">
                         {selectedProvinceId && selectedProvinceId !== '' ? (
                             filteredDistricts.length > 0 ? (
-                                filteredDistricts.map((district) => (
-                                    <div
-                                        key={district.id}
-                                        className={clsx(
-                                            styles.districtItem,
-                                            selectedDistrictId &&
-                                                selectedDistrictId !== '' &&
-                                                selectedDistrictId === district.id &&
-                                                styles.active
-                                        )}
-                                        onClick={() => handleDistrictClick(district.id)}
-                                        onKeyDown={(e) => handleDistrictKeyDown(e, district.id)}
-                                        tabIndex={0}
-                                        role="option"
-                                        aria-selected={selectedDistrictId === district.id}
-                                    >
-                                        <span className={styles.districtName}>{district.name}</span>
-                                        {selectedDistrictId &&
-                                            selectedDistrictId !== '' &&
-                                            selectedDistrictId === district.id && (
+                                filteredDistricts.map((district) => {
+                                    const isSelected =
+                                        selectedDistrictId &&
+                                        selectedDistrictId !== '' &&
+                                        selectedDistrictId === district.id;
+                                    return (
+                                        <button
+                                            key={district.id}
+                                            type="button"
+                                            className={clsx(
+                                                styles.districtItem,
+                                                isSelected && styles.active
+                                            )}
+                                            onClick={() => handleDistrictClick(district.id)}
+                                            aria-selected={!!isSelected}
+                                        >
+                                            <span className={styles.districtName}>
+                                                {district.name}
+                                            </span>
+                                            {isSelected && (
                                                 <Check className={styles.checkIcon} size={16} />
                                             )}
-                                    </div>
-                                ))
+                                        </button>
+                                    );
+                                })
                             ) : (
                                 <div className={styles.noResults}>
                                     {searchTerm
@@ -397,7 +357,7 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                         </button>
                     </div>
                 )}
-            </div>
+            </dialog>
         </div>,
         document.body
     );
