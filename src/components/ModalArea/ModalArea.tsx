@@ -97,14 +97,6 @@ const ModalArea: React.FC<ModalAreaProps> = ({
         setSelectedDistrictId(initialDistrictId || '');
     }, [initialProvinceId, initialDistrictId]);
 
-    // Xử lý sự kiện bàn phím cho modalContent
-    const handleContentKeyDown = (e: React.KeyboardEvent<HTMLDialogElement>) => {
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            onClose();
-        }
-    };
-
     // Native buttons will handle keyboard activation
 
     // Helper function to find first matching district
@@ -301,13 +293,17 @@ const ModalArea: React.FC<ModalAreaProps> = ({
     };
 
     return ReactDOM.createPortal(
-        <div className={styles.modalOverlay} aria-label="Đóng modal">
+        <button
+            type="button"
+            className={styles.modalOverlay}
+            onClick={(e) => {
+                if (e.target === e.currentTarget) onClose();
+            }}
+            aria-label="Đóng modal"
+        >
             <dialog
                 className={styles.modalContent}
-                onClick={(e) => {
-                    if (e.target === e.currentTarget) onClose();
-                }}
-                onKeyDown={handleContentKeyDown}
+                onClose={onClose}
                 aria-modal="true"
                 ref={dialogRef}
             >
@@ -383,7 +379,7 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                     </div>
                 )}
             </dialog>
-        </div>,
+        </button>,
         document.body
     );
 };

@@ -249,7 +249,9 @@ const HeroSection: React.FC = () => {
                 <button
                     type="button"
                     className={styles.lightbox}
-                    onClick={() => setIsLightboxOpen(false)}
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) setIsLightboxOpen(false);
+                    }}
                     onKeyDown={(e) => {
                         if (e.key === 'Escape') {
                             setIsLightboxOpen(false);
@@ -257,7 +259,7 @@ const HeroSection: React.FC = () => {
                     }}
                     aria-label="Đóng lightbox"
                 >
-                    <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
+                    <div className={styles.lightboxContent}>
                         <div className={styles.lightboxHeader}>
                             <span className={styles.lightboxTitle}>
                                 Bệnh viện Vinmec - Bệnh viện đa khoa quốc tế
