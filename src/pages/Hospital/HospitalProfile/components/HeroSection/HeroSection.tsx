@@ -149,8 +149,8 @@ const HeroSection: React.FC = () => {
 
                                 <div className={styles.infoItem}>
                                     <h5>
-                                        <strong>Địa chỉ: </strong>
-                                        458 Minh Khai, Vĩnh Tuy, Hai Bà Trưng, Hà Nội
+                                        <strong>Địa chỉ: </strong> 458 Minh Khai, Vĩnh Tuy, Hai Bà
+                                        Trưng, Hà Nội
                                     </h5>
                                 </div>
                                 <div className={styles.infoItem}>
@@ -255,13 +255,10 @@ const HeroSection: React.FC = () => {
                         }
                     }}
                     tabIndex={0}
+                    role="button"
                     aria-label="Đóng lightbox"
                 >
-                    <div
-                        className={styles.lightboxContent}
-                        onClick={(e) => e.stopPropagation()}
-                        onKeyDown={(e) => e.stopPropagation()}
-                    >
+                    <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
                         <div className={styles.lightboxHeader}>
                             <span className={styles.lightboxTitle}>
                                 Bệnh viện Vinmec - Bệnh viện đa khoa quốc tế

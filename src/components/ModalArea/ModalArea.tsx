@@ -81,7 +81,7 @@ const ModalArea: React.FC<ModalAreaProps> = ({
             }
         }
         return () => {
-            if (dialogEl && dialogEl.open) {
+            if (dialogEl?.open) {
                 try {
                     dialogEl.close();
                 } catch (err) {
@@ -301,7 +301,19 @@ const ModalArea: React.FC<ModalAreaProps> = ({
     };
 
     return ReactDOM.createPortal(
-        <div className={styles.modalOverlay} onClick={onClose} aria-label="Đóng modal">
+        <div
+            className={styles.modalOverlay}
+            onClick={onClose}
+            onKeyDown={(e) => {
+                if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onClose();
+                }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Đóng modal"
+        >
             <dialog
                 className={styles.modalContent}
                 onClick={(e) => e.stopPropagation()}
