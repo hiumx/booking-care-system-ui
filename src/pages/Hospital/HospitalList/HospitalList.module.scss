@@ -160,3 +160,42 @@
     text-align: left;
     margin-right: 10px;
 }
+
+// Hospital Grid Layout
+.hospitalGrid {
+    .row {
+        margin: 0 -15px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .hospitalCard {
+        padding: 0 15px;
+        margin-bottom: 30px;
+        box-sizing: border-box;
+
+        // Large screens (1200px+): 4 cards per row
+        @media (min-width: 1200px) {
+            flex: 0 0 25%;
+            max-width: 25%;
+        }
+
+        // Medium-large screens (992px - 1199px): 3 cards per row
+        @media (max-width: 1199px) and (min-width: 992px) {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+        }
+
+        // Medium screens (768px - 991px): 2 cards per row
+        @media (max-width: 991px) and (min-width: 768px) {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        // Small screens (below 768px): 1 card per row
+        @media (max-width: 767px) {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+}

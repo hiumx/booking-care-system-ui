@@ -39,6 +39,14 @@ export interface HospitalListOptimizedResponse {
     name: string;
     address: string;
     avatarUrl?: string;
+    specialties?: HospitalSpecialtyOptimizedResponse[];
+    totalSpecialties: number;
+}
+
+export interface HospitalSpecialtyOptimizedResponse {
+    id: string;
+    name: string;
+    imageUrl?: string;
 }
 
 export interface HospitalListOptimizedPaginatedResponse {
@@ -131,7 +139,7 @@ export interface HospitalFilterRequest {
 // Optimized Hospital List Filter Request
 export interface HospitalListOptimizedFilterRequest {
     search?: string;
-    specialtyIds?: string[];
+    specialtyIds?: string[]; // Keep as string[] for frontend, will be converted to Guid[] in backend
     provinceId?: string;
     districtId?: string;
     page?: number;

@@ -66,7 +66,7 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                     {specialtyCount > 0 && (
                         <div className={styles.specialtyIndicator}>
                             <span className={styles.specialtyCount}>{specialtyCount}</span>
-                            <span className={styles.specialtyText}>specialties</span>
+                            <span className={styles.specialtyText}>chuyên khoa</span>
                         </div>
                     )}
                 </div>
@@ -84,16 +84,28 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
 
                     {/* Specialties */}
                     <div className={styles.specialtiesSection}>
+                        <div className={styles.specialtiesLabel}>
+                            <i className="fa-solid fa-stethoscope"></i>
+                            <span>Chuyên khoa</span>
+                        </div>
                         <div className={styles.specialtiesContainer}>
-                            {specialties.slice(0, 3).map((specialty) => (
-                                <span key={specialty} className={styles.specialtyTag}>
-                                    {specialty}
-                                </span>
-                            ))}
-                            {specialties.length > 3 && (
+                            {specialties.length === 0 ? (
                                 <span className={`${styles.specialtyTag} ${styles.more}`}>
-                                    +{specialties.length - 3} chuyên khoa
+                                    Chưa có chuyên khoa nào
                                 </span>
+                            ) : (
+                                <>
+                                    {specialties.slice(0, 3).map((specialty) => (
+                                        <span key={specialty} className={styles.specialtyTag}>
+                                            {specialty}
+                                        </span>
+                                    ))}
+                                    {specialties.length > 3 && (
+                                        <span className={`${styles.specialtyTag} ${styles.more}`}>
+                                            +{specialties.length - 3} chuyên khoa
+                                        </span>
+                                    )}
+                                </>
                             )}
                         </div>
                     </div>

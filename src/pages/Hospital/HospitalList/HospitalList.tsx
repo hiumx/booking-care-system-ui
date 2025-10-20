@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
@@ -21,6 +21,7 @@ const HospitalList: React.FC = () => {
     const [provinceId, setProvinceId] = useState<string>('');
     const [districtId, setDistrictId] = useState<string>('');
     const [search, setSearch] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [isAreaModalOpen, setIsAreaModalOpen] = useState(false);
     const [selectedAreaDisplay, setSelectedAreaDisplay] = useState('');
@@ -28,9 +29,9 @@ const HospitalList: React.FC = () => {
     const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
 
     // Function to load hospitals with current filters
-    const loadHospitals = async () => {
+    const loadHospitals = useCallback(async () => {
         const filter: HospitalListOptimizedFilterRequest = {
-            search: search || undefined,
+            search: debouncedSearch || undefined,
             specialtyIds: selectedSpecialties.length > 0 ? selectedSpecialties : undefined,
             provinceId: provinceId || undefined,
             districtId: districtId || undefined,
@@ -42,18 +43,27 @@ const HospitalList: React.FC = () => {
 
         console.log('Loading hospitals with filter:', filter);
         dispatch(getOptimizedHospitalListAsync(filter));
-    };
+    }, [debouncedSearch, selectedSpecialties, provinceId, districtId, currentPage, dispatch]);
+
+    // Debounce search input
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 500); // 500ms delay
+
+        return () => clearTimeout(timer);
+    }, [search]);
 
     // Load specialties and hospitals on component mount
     useEffect(() => {
         dispatch(getSpecialtiesAsync());
         loadHospitals();
-    }, [dispatch]);
+    }, [dispatch, loadHospitals]);
 
     // Reload hospitals when filters change
     useEffect(() => {
         loadHospitals();
-    }, [search, selectedSpecialties, provinceId, districtId, currentPage]);
+    }, [loadHospitals]);
 
     // Handle page change for pagination
     const handlePageChange = (page: number) => {
@@ -145,7 +155,9 @@ const HospitalList: React.FC = () => {
                                     Bệnh viện
                                     {(selectedAreaDisplay ||
                                         selectedSpecialties.length > 0 ||
-                                        search) && <span className="text-muted"> (đã lọc)</span>}
+                                        debouncedSearch) && (
+                                        <span className="text-muted"> (đã lọc)</span>
+                                    )}
                                 </h5>
                                 <div
                                     className={clsx(
@@ -246,93 +258,103 @@ const HospitalList: React.FC = () => {
                     {/* /Show Result */}
 
                     {/* Active Filters Display */}
-                    {(selectedAreaDisplay || selectedSpecialties.length > 0 || search) && (
+                    {(selectedAreaDisplay || selectedSpecialties.length > 0 || debouncedSearch) && (
                         <div className={clsx('card', 'mt-3')}>
                             <div className={clsx('card-body')}>
                                 <div
                                     className={clsx(
                                         'd-flex',
                                         'align-items-center',
+                                        'justify-content-between',
                                         'gap-3',
                                         'flex-wrap'
                                     )}
                                 >
-                                    <span className={clsx('text-muted', 'fw-bold')}>
-                                        Bộ lọc đang áp dụng:
-                                    </span>
-
-                                    {selectedAreaDisplay && (
-                                        <span
-                                            className={clsx(
-                                                'badge',
-                                                'bg-primary',
-                                                'd-flex',
-                                                'align-items-center',
-                                                'gap-2'
-                                            )}
-                                        >
-                                            <i className="fa-solid fa-location-dot"></i>
-                                            {selectedAreaDisplay}
-                                            <button
-                                                className="btn-close btn-close-white"
-                                                style={{ fontSize: '0.7em' }}
-                                                onClick={handleClearArea}
-                                                aria-label="Xóa bộ lọc khu vực"
-                                            ></button>
+                                    <div
+                                        className={clsx(
+                                            'd-flex',
+                                            'align-items-center',
+                                            'gap-3',
+                                            'flex-wrap'
+                                        )}
+                                    >
+                                        <span className={clsx('text-muted', 'fw-bold')}>
+                                            Bộ lọc đang áp dụng:
                                         </span>
-                                    )}
 
-                                    {selectedSpecialties.length > 0 && (
-                                        <span
-                                            className={clsx(
-                                                'badge',
-                                                'bg-success',
-                                                'd-flex',
-                                                'align-items-center',
-                                                'gap-2'
-                                            )}
-                                        >
-                                            <i className="fa-solid fa-briefcase-medical"></i>
-                                            {selectedSpecialties.length} chuyên khoa
-                                            <button
-                                                className="btn-close btn-close-white"
-                                                style={{ fontSize: '0.7em' }}
-                                                onClick={handleClearSpecialty}
-                                                aria-label="Xóa bộ lọc chuyên khoa"
-                                            ></button>
-                                        </span>
-                                    )}
+                                        {selectedAreaDisplay && (
+                                            <span
+                                                className={clsx(
+                                                    'badge',
+                                                    'bg-primary',
+                                                    'd-flex',
+                                                    'align-items-center',
+                                                    'gap-2'
+                                                )}
+                                            >
+                                                <i className="fa-solid fa-location-dot"></i>
+                                                {selectedAreaDisplay}
+                                                <button
+                                                    className="btn-close btn-close-white"
+                                                    style={{ fontSize: '0.7em' }}
+                                                    onClick={handleClearArea}
+                                                    aria-label="Xóa bộ lọc khu vực"
+                                                ></button>
+                                            </span>
+                                        )}
 
-                                    {search && (
-                                        <span
-                                            className={clsx(
-                                                'badge',
-                                                'bg-info',
-                                                'd-flex',
-                                                'align-items-center',
-                                                'gap-2'
-                                            )}
-                                        >
-                                            <i className="fa-solid fa-search"></i>"{search}"
-                                            <button
-                                                className="btn-close btn-close-white"
-                                                style={{ fontSize: '0.7em' }}
-                                                onClick={() => setSearch('')}
-                                                aria-label="Xóa tìm kiếm"
-                                            ></button>
-                                        </span>
-                                    )}
+                                        {selectedSpecialties.length > 0 && (
+                                            <span
+                                                className={clsx(
+                                                    'badge',
+                                                    'bg-success',
+                                                    'd-flex',
+                                                    'align-items-center',
+                                                    'gap-2'
+                                                )}
+                                            >
+                                                <i className="fa-solid fa-briefcase-medical"></i>
+                                                {selectedSpecialties.length} chuyên khoa
+                                                <button
+                                                    className="btn-close btn-close-white"
+                                                    style={{ fontSize: '0.7em' }}
+                                                    onClick={handleClearSpecialty}
+                                                    aria-label="Xóa bộ lọc chuyên khoa"
+                                                ></button>
+                                            </span>
+                                        )}
+
+                                        {debouncedSearch && (
+                                            <span
+                                                className={clsx(
+                                                    'badge',
+                                                    'bg-info',
+                                                    'd-flex',
+                                                    'align-items-center',
+                                                    'gap-2'
+                                                )}
+                                            >
+                                                <i className="fa-solid fa-search"></i>"
+                                                {debouncedSearch}"
+                                                <button
+                                                    className="btn-close btn-close-white"
+                                                    style={{ fontSize: '0.7em' }}
+                                                    onClick={() => setSearch('')}
+                                                    aria-label="Xóa tìm kiếm"
+                                                ></button>
+                                            </span>
+                                        )}
+                                    </div>
 
                                     <button
-                                        className={clsx('btn', 'btn-outline-secondary', 'btn-sm')}
+                                        className={clsx('btn', 'btn-outline-primary', 'btn-sm')}
                                         onClick={() => {
                                             handleClearArea();
                                             handleClearSpecialty();
                                             setSearch('');
                                         }}
                                     >
-                                        <i className="fa-solid fa-times me-1"></i>
-                                        Xóa tất cả
+                                        Xóa tất cả bộ lọc
                                     </button>
                                 </div>
                             </div>
@@ -346,7 +368,9 @@ const HospitalList: React.FC = () => {
                                     <span className="visually-hidden">Loading...</span>
                                 </div>
                                 <p className="mt-2">
-                                    {selectedAreaDisplay || selectedSpecialties.length > 0 || search
+                                    {selectedAreaDisplay ||
+                                    selectedSpecialties.length > 0 ||
+                                    debouncedSearch
                                         ? 'Đang lọc danh sách bệnh viện...'
                                         : 'Đang tải danh sách bệnh viện...'}
                                 </p>
@@ -367,13 +391,13 @@ const HospitalList: React.FC = () => {
                                         <p className="text-muted mb-4">
                                             {selectedAreaDisplay ||
                                             selectedSpecialties.length > 0 ||
-                                            search
+                                            debouncedSearch
                                                 ? 'Không có bệnh viện nào phù hợp với bộ lọc của bạn. Hãy thử điều chỉnh bộ lọc hoặc tìm kiếm khác.'
                                                 : 'Hiện tại chưa có bệnh viện nào trong hệ thống.'}
                                         </p>
                                         {(selectedAreaDisplay ||
                                             selectedSpecialties.length > 0 ||
-                                            search) && (
+                                            debouncedSearch) && (
                                             <button
                                                 className={clsx('btn', 'btn-outline-primary')}
                                                 onClick={() => {
@@ -389,26 +413,57 @@ const HospitalList: React.FC = () => {
                                     </div>
                                 ) : (
                                     <>
-                                        <div className={clsx('row')}>
-                                            {optimizedHospitals.map((hospital) => (
-                                                <HospitalCard
-                                                    key={hospital.id}
-                                                    clinic={{
-                                                        id: hospital.id,
-                                                        name: hospital.name,
-                                                        image:
-                                                            hospital.avatarUrl ||
-                                                            '/default-hospital.png',
-                                                        specialties: [
-                                                            'Khám tổng quát',
-                                                            'Nội khoa',
-                                                            'Ngoại khoa',
-                                                        ], // Default specialties
-                                                        location: hospital.address,
-                                                        specialtyCount: 3, // Default count
-                                                    }}
-                                                />
-                                            ))}
+                                        <div className={clsx('row', 'g-4', styles.hospitalGrid)}>
+                                            {optimizedHospitals.map((hospital) => {
+                                                // Sort specialties to prioritize selected ones
+                                                const sortedSpecialties =
+                                                    hospital.specialties?.map((s) => s.name) || [];
+                                                if (
+                                                    selectedSpecialties.length > 0 &&
+                                                    sortedSpecialties.length > 0
+                                                ) {
+                                                    // Get selected specialty names from the hospital's specialties
+                                                    const selectedSpecialtyNames =
+                                                        hospital.specialties
+                                                            ?.filter((s) =>
+                                                                selectedSpecialties.includes(s.id)
+                                                            )
+                                                            ?.map((s) => s.name) || [];
+
+                                                    // Sort: selected specialties first, then others
+                                                    sortedSpecialties.sort((a, b) => {
+                                                        const aIsSelected =
+                                                            selectedSpecialtyNames.includes(a);
+                                                        const bIsSelected =
+                                                            selectedSpecialtyNames.includes(b);
+
+                                                        if (aIsSelected && !bIsSelected) return -1;
+                                                        if (!aIsSelected && bIsSelected) return 1;
+                                                        return 0;
+                                                    });
+                                                }
+
+                                                return (
+                                                    <div
+                                                        key={hospital.id}
+                                                        className={styles.hospitalCard}
+                                                    >
+                                                        <HospitalCard
+                                                            clinic={{
+                                                                id: hospital.id,
+                                                                name: hospital.name,
+                                                                image:
+                                                                    hospital.avatarUrl ||
+                                                                    '/default-hospital.png',
+                                                                specialties: sortedSpecialties,
+                                                                location: hospital.address,
+                                                                specialtyCount:
+                                                                    hospital.totalSpecialties || 0,
+                                                            }}
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                         {pagination.totalPages > 1 && (
                                             <div className={clsx('text-center', 'mt-4')}>

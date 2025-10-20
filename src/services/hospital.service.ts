@@ -97,8 +97,19 @@ export class HospitalService {
     ): Promise<ApiResponse<HospitalListOptimizedPaginatedResponse>> {
         try {
             console.log('Sending hospital list request with params:', params);
+
+            // Convert specialtyIds from string[] to individual query parameters
+            const requestParams: any = { ...params };
+            if (params?.specialtyIds && params.specialtyIds.length > 0) {
+                // Remove specialtyIds from params and add individual parameters
+                delete requestParams.specialtyIds;
+                params.specialtyIds.forEach((id, index) => {
+                    requestParams[`specialtyIds[${index}]`] = id;
+                });
+            }
+
             const response: any = await axiosInstance.get(HOSPITAL_ENDPOINTS.GET_OPTIMIZED_LIST, {
-                params,
+                params: requestParams,
             });
             console.log('Hospital list response:', response);
             return {
