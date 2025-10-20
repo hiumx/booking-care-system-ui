@@ -12,6 +12,22 @@ import { getOptimizedHospitalListAsync } from '@/store/slices/hospitalSlice';
 import { HospitalListOptimizedFilterRequest } from '@/types/hospital.types';
 import styles from './HospitalList.module.scss';
 
+// Precomputed stable keys for skeleton items to avoid using array index as key
+const HOSPITAL_SKELETON_KEYS: string[] = [
+    's-0',
+    's-1',
+    's-2',
+    's-3',
+    's-4',
+    's-5',
+    's-6',
+    's-7',
+    's-8',
+    's-9',
+    's-10',
+    's-11',
+];
+
 const HospitalList: React.FC = () => {
     const dispatch = useAppDispatch();
     const { specialties } = useAppSelector((state) => state.specialty);
@@ -334,8 +350,8 @@ const HospitalList: React.FC = () => {
                                                     'gap-2'
                                                 )}
                                             >
-                                                <i className="fa-solid fa-search"></i>"
-                                                {debouncedSearch}"
+                                                <i className="fa-solid fa-search"></i>
+                                                {debouncedSearch}
                                                 <button
                                                     className="btn-close btn-close-white"
                                                     style={{ fontSize: '0.7em' }}
@@ -364,8 +380,8 @@ const HospitalList: React.FC = () => {
                     <div className={clsx('all-facilities')}>
                         {isLoading ? (
                             <div className={clsx('row', 'g-4', styles.hospitalGrid)}>
-                                {Array.from({ length: 12 }).map((_, index) => (
-                                    <div key={`skeleton-${index}`} className={styles.hospitalCard}>
+                                {HOSPITAL_SKELETON_KEYS.map((key) => (
+                                    <div key={key} className={styles.hospitalCard}>
                                         <HospitalCardSkeleton />
                                     </div>
                                 ))}

@@ -174,8 +174,8 @@ const SmartBooking: React.FC = () => {
                                 <div
                                     className={`${styles.cardGrid} ${activeTab === 'services' ? styles.services : ''}`}
                                 >
-                                    {Array.from({ length: 6 }).map((_, index) => (
-                                        <div key={`skeleton-${index}`} className={styles.cardCol}>
+                                    {['s-0', 's-1', 's-2', 's-3', 's-4', 's-5'].map((key) => (
+                                        <div key={key} className={styles.cardCol}>
                                             {activeTab === 'hospitals' ? (
                                                 <HospitalCardSkeleton />
                                             ) : (
@@ -213,7 +213,10 @@ const SmartBooking: React.FC = () => {
                                         className={`${styles.cardGrid} ${activeTab === 'services' ? styles.services : ''}`}
                                     >
                                         {searchResults[activeTab].map((item) => (
-                                            <div key={item.id} className={styles.cardCol}>
+                                            <div
+                                                key={`${activeTab}-${item.id}`}
+                                                className={styles.cardCol}
+                                            >
                                                 {activeTab === 'doctors' && (
                                                     <DoctorCard
                                                         image={(item as Doctor).avatar}

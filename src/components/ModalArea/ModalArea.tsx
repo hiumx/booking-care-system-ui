@@ -289,6 +289,7 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                 onClick={() => handleDistrictClick(district.id)}
                 onKeyDown={(e) => handleDistrictKeyDown(e, district.id)}
                 tabIndex={0}
+                role="button"
                 aria-selected={selectedDistrictId === district.id}
             >
                 <span className={styles.districtName}>{district.name}</span>
@@ -307,13 +308,14 @@ const ModalArea: React.FC<ModalAreaProps> = ({
             onClick={onClose}
             onKeyDown={handleOverlayKeyDown}
             tabIndex={0}
+            role="button"
             aria-label="Đóng modal"
         >
             <div
                 className={styles.modalContent}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={handleContentKeyDown}
-                tabIndex={0}
+                role="dialog"
                 aria-modal="true"
             >
                 <div className={styles.modalHeader}>
@@ -361,6 +363,7 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                                     onClick={() => handleProvinceClick(province.id)}
                                     onKeyDown={(e) => handleProvinceKeyDown(e, province.id)}
                                     tabIndex={0}
+                                    role="button"
                                     aria-selected={selectedProvinceId === province.id}
                                 >
                                     <span className={styles.provinceName}>{province.name}</span>

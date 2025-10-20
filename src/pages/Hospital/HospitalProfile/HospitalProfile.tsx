@@ -514,7 +514,7 @@ const HospitalProfile: React.FC = () => {
                                 <h3 className={styles.sectionTitle}>Câu hỏi thường gặp</h3>
                                 <div className={styles.faqList}>
                                     {faqs.map((item, idx) => (
-                                        <div key={`faq-${idx}`} className={styles.faqItem}>
+                                        <div key={`faq-${item.q}`} className={styles.faqItem}>
                                             <button
                                                 className={clsx(
                                                     styles.faqQuestion,

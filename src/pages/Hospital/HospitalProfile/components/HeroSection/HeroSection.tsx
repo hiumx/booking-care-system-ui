@@ -117,12 +117,11 @@ const HeroSection: React.FC = () => {
                                         </span>
                                         <span className={styles.stars}>
                                             {Array.from({ length: 5 }).map((_, i) => {
-                                                const idx = i + 1;
                                                 const fillPct =
                                                     Math.max(0, Math.min(1, rating - i)) * 100;
                                                 return (
                                                     <span
-                                                        key={`star-${idx}`}
+                                                        key={`star-${i}-${fillPct}`}
                                                         className={styles.starWrap}
                                                     >
                                                         <i
@@ -279,7 +278,7 @@ const HeroSection: React.FC = () => {
                         <div className={styles.lightboxGrid}>
                             {mockImages.map((src, idx) => (
                                 <img
-                                    key={`lightbox-img-${idx}`}
+                                    key={`lightbox-img-${src}-${idx}`}
                                     src={src}
                                     alt={`Hình ${idx + 1}`}
                                     className={styles.lightboxImg}
