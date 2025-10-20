@@ -147,7 +147,7 @@ const HospitalList: React.FC = () => {
                                     styles.resultWrap
                                 )}
                             >
-                                <h5 className={clsx(styles.customh5)}>
+                                <h6 className={clsx(styles.customh5)}>
                                     Hiển thị{' '}
                                     <span className={clsx(styles.resultCount)}>
                                         {pagination.totalCount}
@@ -158,7 +158,7 @@ const HospitalList: React.FC = () => {
                                         debouncedSearch) && (
                                         <span className="text-muted"> (đã lọc)</span>
                                     )}
-                                </h5>
+                                </h6>
                                 <div
                                     className={clsx(
                                         'd-flex',
