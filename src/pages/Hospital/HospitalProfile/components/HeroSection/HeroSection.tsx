@@ -98,14 +98,14 @@ const HeroSection: React.FC = () => {
                                 <div className={styles.brand}>
                                     <img
                                         src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F4e23e3de-5c90-48f4-bd0c-2dd7624b7903-logo_medfit_fix.png&w=3840&q=75"
-                                        alt="MedFit"
+                                        alt="Vinmec"
                                         className={styles.logo}
                                     />
                                 </div>
 
                                 <div className={styles.titleSection}>
                                     <h1 className={styles.title}>
-                                        Phòng khám MedFit - Phòng khám giảm cân chuyên sâu
+                                        Bệnh viện Vinmec - Bệnh viện đa khoa quốc tế{' '}
                                         <i
                                             className={`fa-solid fa-circle-check ${styles.verified}`}
                                             aria-hidden="true"
@@ -117,11 +117,13 @@ const HeroSection: React.FC = () => {
                                         </span>
                                         <span className={styles.stars}>
                                             {Array.from({ length: 5 }).map((_, i) => {
-                                                const idx = i + 1;
                                                 const fillPct =
                                                     Math.max(0, Math.min(1, rating - i)) * 100;
                                                 return (
-                                                    <span key={idx} className={styles.starWrap}>
+                                                    <span
+                                                        key={`star-${i}-${fillPct}`}
+                                                        className={styles.starWrap}
+                                                    >
                                                         <i
                                                             className="fa-regular fa-star"
                                                             aria-hidden="true"
@@ -147,10 +149,8 @@ const HeroSection: React.FC = () => {
 
                                 <div className={styles.infoItem}>
                                     <h5>
-                                        <strong>Địa chỉ: </strong>
-                                        462/2 Nguyễn Tri Phương, Phường Vườn Lài, TP. Hồ Chí Minh
-                                        (Địa chỉ cũ: Số 462/2 đường Nguyễn Tri Phương, Phường 09,
-                                        Quận 10, Thành phố Hồ Chí Minh)
+                                        <strong>Địa chỉ: </strong> 458 Minh Khai, Vĩnh Tuy, Hai Bà
+                                        Trưng, Hà Nội
                                     </h5>
                                 </div>
                                 <div className={styles.infoItem}>
@@ -181,7 +181,7 @@ const HeroSection: React.FC = () => {
                                 {/* Main large banner (left) */}
                                 <img
                                     src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2Fd37704cd-6281-4a57-8688-179369172fef-1.png&w=1920&q=75"
-                                    alt="MedFit banner"
+                                    alt="Vinmec banner"
                                     className={styles.mainLarge}
                                 />
 
@@ -192,7 +192,7 @@ const HeroSection: React.FC = () => {
                                         <div className={styles.sideStack}>
                                             <img
                                                 src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2Ffb51587e-7c38-4380-a151-fe0778ef42c1-2.png&w=640&q=75"
-                                                alt="Clinic"
+                                                alt="Hospital"
                                                 className={styles.sideItem}
                                             />
                                             <img
@@ -223,16 +223,10 @@ const HeroSection: React.FC = () => {
                                                 alt="Ảnh 3"
                                                 className={styles.thumb}
                                             />
-                                            <div
+                                            <button
                                                 className={styles.thumbOverlay}
                                                 onClick={() => setIsLightboxOpen(true)}
-                                                role="button"
-                                                tabIndex={0}
                                                 aria-label="Xem thêm hình ảnh"
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter' || e.key === ' ')
-                                                        setIsLightboxOpen(true);
-                                                }}
                                             >
                                                 <img
                                                     src="https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F3a1707fe-17e1-46af-870d-6f11135963d9-5.png&w=640&q=75"
@@ -242,7 +236,7 @@ const HeroSection: React.FC = () => {
                                                 <div className={styles.overlay}>
                                                     +{remainingCount} hình
                                                 </div>
-                                            </div>
+                                            </button>
                                         </div>
                                     </>
                                 )}
@@ -252,26 +246,23 @@ const HeroSection: React.FC = () => {
                 </div>
             </section>
             {isLightboxOpen && (
-                <div
+                <button
+                    type="button"
                     className={styles.lightbox}
-                    onClick={() => setIsLightboxOpen(false)}
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) setIsLightboxOpen(false);
+                    }}
                     onKeyDown={(e) => {
-                        if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+                        if (e.key === 'Escape') {
                             setIsLightboxOpen(false);
                         }
                     }}
-                    role="button"
-                    tabIndex={0}
                     aria-label="Đóng lightbox"
                 >
-                    <div
-                        className={styles.lightboxContent}
-                        onClick={(e) => e.stopPropagation()}
-                        onKeyDown={(e) => e.stopPropagation()}
-                    >
+                    <div className={styles.lightboxContent}>
                         <div className={styles.lightboxHeader}>
                             <span className={styles.lightboxTitle}>
-                                Phòng khám MedFit - Phòng khám giảm cân chuyên sâu
+                                Bệnh viện Vinmec - Bệnh viện đa khoa quốc tế
                             </span>
                             {/* <span className={styles.lightboxBadge}>{mockImages.length} ảnh</span> */}
                             <button
@@ -285,7 +276,7 @@ const HeroSection: React.FC = () => {
                         <div className={styles.lightboxGrid}>
                             {mockImages.map((src, idx) => (
                                 <img
-                                    key={idx}
+                                    key={`lightbox-img-${src}-${idx}`}
                                     src={src}
                                     alt={`Hình ${idx + 1}`}
                                     className={styles.lightboxImg}
@@ -293,7 +284,7 @@ const HeroSection: React.FC = () => {
                             ))}
                         </div>
                     </div>
-                </div>
+                </button>
             )}
         </>
     );

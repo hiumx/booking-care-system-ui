@@ -44,7 +44,7 @@ const Benefits: React.FC = () => {
                     </div>
                     <div className={styles.statItem}>
                         <div className={styles.statNumber}>+89</div>
-                        <div className={styles.statLabel}>Phòng khám</div>
+                        <div className={styles.statLabel}>Bệnh viện</div>
                     </div>
                 </div>
 

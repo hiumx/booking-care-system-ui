@@ -13,6 +13,7 @@
 
 .modalContent {
     background: white;
+    border: none;
     border-radius: 12px;
     width: 600px;
     max-width: 90vw;
@@ -23,6 +24,17 @@
         0 20px 25px -5px rgba(0, 0, 0, 0.1),
         0 10px 10px -5px rgba(0, 0, 0, 0.04);
     overflow: auto; /* Cho phép cuộn để hiển thị footer */
+    /* Center the dialog in viewport */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    z-index: 1001;
+}
+
+.modalContent::backdrop {
+    background: transparent;
 }
 
 .modalHeader {
@@ -168,6 +180,9 @@
 
 .provinceItem,
 .districtItem {
+    appearance: none;
+    background: transparent;
+    border: 0;
     padding: 16px 24px;
     cursor: pointer;
     color: #374151;
@@ -178,6 +193,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
+    text-align: left;
+    outline: none;
 
     &:hover {
         background-color: #f3f4f6;

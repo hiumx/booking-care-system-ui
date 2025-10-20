@@ -6,7 +6,7 @@ import Breadcrumb from '@/components/Breadcrumb';
 import SearchBox from './components/SearchBox';
 import TabNavigation from './components/TabNavigation';
 import DoctorCard from '@/components/DoctorCard';
-import HospitalCard from '@/components/HospitalCard';
+import HospitalCard, { HospitalCardSkeleton } from '@/components/HospitalCard';
 import ServiceCard from '@/components/ServiceCard';
 import EmptyState from './components/EmptyState';
 import { Brain, CalendarCheck, Sparkles, Stethoscope, ShieldCheck } from 'lucide-react';
@@ -171,8 +171,25 @@ const SmartBooking: React.FC = () => {
                         {/* Loading */}
                         {isLoading && (
                             <div className={styles.content90}>
-                                <div className={styles.loadingWrapper}>
-                                    <div className={styles.spinner} />
+                                <div
+                                    className={`${styles.cardGrid} ${activeTab === 'services' ? styles.services : ''}`}
+                                >
+                                    {['s-0', 's-1', 's-2', 's-3', 's-4', 's-5'].map((key) => (
+                                        <div key={key} className={styles.cardCol}>
+                                            {activeTab === 'hospitals' ? (
+                                                <HospitalCardSkeleton />
+                                            ) : (
+                                                <div className={styles.skeletonCard}>
+                                                    <div className={styles.skeletonImage} />
+                                                    <div className={styles.skeletonContent}>
+                                                        <div className={styles.skeletonTitle} />
+                                                        <div className={styles.skeletonSubtitle} />
+                                                        <div className={styles.skeletonText} />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}
@@ -196,7 +213,10 @@ const SmartBooking: React.FC = () => {
                                         className={`${styles.cardGrid} ${activeTab === 'services' ? styles.services : ''}`}
                                     >
                                         {searchResults[activeTab].map((item) => (
-                                            <div key={item.id} className={styles.cardCol}>
+                                            <div
+                                                key={`${activeTab}-${item.id}`}
+                                                className={styles.cardCol}
+                                            >
                                                 {activeTab === 'doctors' && (
                                                     <DoctorCard
                                                         image={(item as Doctor).avatar}
@@ -218,15 +238,13 @@ const SmartBooking: React.FC = () => {
                                                             id: (item as Hospital).id,
                                                             name: (item as Hospital).name,
                                                             image: (item as Hospital).logo,
-                                                            rating: (item as Hospital).rating,
-                                                            reviewCount: (item as Hospital)
-                                                                .reviewCount,
                                                             specialties: (item as Hospital)
                                                                 .specialties,
                                                             location: (item as Hospital).address,
                                                             distance: (item as Hospital).distance,
-                                                            priceRange: '200.000đ - 500.000đ',
-                                                            availableSlots: 5,
+                                                            specialtyCount:
+                                                                (item as Hospital).specialties
+                                                                    ?.length || 0,
                                                         }}
                                                     />
                                                 )}

@@ -230,8 +230,7 @@ const DoctorProfile: React.FC = () => {
                                             <span className="loc-icon">
                                                 <i className="feather-map-pin"></i>
                                             </span>
-                                            {doctor.hospital?.address}{' '}
-                                            <span className="view-text">( Xem vị trí )</span>
+                                            {doctor.hospital?.address}
                                         </p>
                                     </div>
                                 </div>

@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { X, Search, Check } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './ModalArea.module.scss';
 import LocationService, { Province, District } from '@/services/location.service';
-
-// Remove duplicate interfaces as they are now imported from LocationService
 
 interface ModalAreaProps {
     isOpen: boolean;
@@ -71,43 +69,35 @@ const ModalArea: React.FC<ModalAreaProps> = ({
         };
     }, [isOpen]);
 
+    // Ensure native <dialog> is centered using showModal()
+    const dialogRef = useRef<HTMLDialogElement | null>(null);
+    useEffect(() => {
+        const dialogEl = dialogRef.current;
+        if (!isLoading && isOpen && dialogEl && !dialogEl.open) {
+            try {
+                dialogEl.showModal();
+            } catch (err) {
+                console.warn('showModal failed', err);
+            }
+        }
+        return () => {
+            if (dialogEl?.open) {
+                try {
+                    dialogEl.close();
+                } catch (err) {
+                    console.warn('dialog close failed', err);
+                }
+            }
+        };
+    }, [isOpen, isLoading]);
+
     // Update state when props change
     useEffect(() => {
         setSelectedProvinceId(initialProvinceId || '');
         setSelectedDistrictId(initialDistrictId || '');
     }, [initialProvinceId, initialDistrictId]);
 
-    // Xử lý sự kiện bàn phím cho modalOverlay
-    const handleOverlayKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            onClose();
-        }
-    };
-
-    // Xử lý sự kiện bàn phím cho modalContent
-    const handleContentKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            onClose();
-        }
-    };
-
-    // Xử lý sự kiện bàn phím cho province
-    const handleProvinceKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, provinceId: string) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleProvinceClick(provinceId);
-        }
-    };
-
-    // Xử lý sự kiện bàn phím cho district
-    const handleDistrictKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, districtId: string) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleDistrictClick(districtId);
-        }
-    };
+    // Native buttons will handle keyboard activation
 
     // Helper function to find first matching district
     const findFirstMatchingDistrict = (searchTerm: string) => {
@@ -266,22 +256,56 @@ const ModalArea: React.FC<ModalAreaProps> = ({
         onClose();
     };
 
+    const renderDistrictList = () => {
+        if (!selectedProvinceId || selectedProvinceId === '') {
+            return <div className={styles.noResults}>Vui lòng chọn tỉnh/thành</div>;
+        }
+
+        if (filteredDistricts.length === 0) {
+            const message = searchTerm
+                ? 'Không tìm thấy quận/huyện'
+                : 'Không có quận/huyện cho tỉnh/thành này';
+            return <div className={styles.noResults}>{message}</div>;
+        }
+
+        return filteredDistricts.map((district) => (
+            <button
+                key={district.id}
+                type="button"
+                className={clsx(
+                    styles.districtItem,
+                    selectedDistrictId &&
+                        selectedDistrictId !== '' &&
+                        selectedDistrictId === district.id &&
+                        styles.active
+                )}
+                onClick={() => handleDistrictClick(district.id)}
+                aria-pressed={selectedDistrictId === district.id}
+            >
+                <span className={styles.districtName}>{district.name}</span>
+                {selectedDistrictId &&
+                    selectedDistrictId !== '' &&
+                    selectedDistrictId === district.id && (
+                        <Check className={styles.checkIcon} size={16} />
+                    )}
+            </button>
+        ));
+    };
+
     return ReactDOM.createPortal(
-        <div
+        <button
+            type="button"
             className={styles.modalOverlay}
-            onClick={onClose}
-            onKeyDown={handleOverlayKeyDown}
-            tabIndex={0}
-            role="button"
+            onClick={(e) => {
+                if (e.target === e.currentTarget) onClose();
+            }}
             aria-label="Đóng modal"
         >
-            <div
+            <dialog
                 className={styles.modalContent}
-                onClick={(e) => e.stopPropagation()}
-                onKeyDown={handleContentKeyDown}
-                tabIndex={0}
-                role="dialog"
+                onClose={onClose}
                 aria-modal="true"
+                ref={dialogRef}
             >
                 <div className={styles.modalHeader}>
                     <div className={styles.modalTitleSection}>
@@ -313,15 +337,12 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                 </div>
 
                 <div className={styles.modalBody}>
-                    <div
-                        className={styles.provinceList}
-                        role="listbox"
-                        aria-label="Danh sách tỉnh/thành"
-                    >
+                    <div className={styles.provinceList} aria-label="Danh sách tỉnh/thành">
                         {filteredProvinces.length > 0 ? (
                             filteredProvinces.map((province) => (
-                                <div
+                                <button
                                     key={province.id}
+                                    type="button"
                                     className={clsx(
                                         styles.provinceItem,
                                         selectedProvinceId &&
@@ -330,10 +351,7 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                                             styles.active
                                     )}
                                     onClick={() => handleProvinceClick(province.id)}
-                                    onKeyDown={(e) => handleProvinceKeyDown(e, province.id)}
-                                    tabIndex={0}
-                                    role="option"
-                                    aria-selected={selectedProvinceId === province.id}
+                                    aria-pressed={selectedProvinceId === province.id}
                                 >
                                     <span className={styles.provinceName}>{province.name}</span>
                                     {selectedProvinceId &&
@@ -341,54 +359,15 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                                         selectedProvinceId === province.id && (
                                             <Check className={styles.checkIcon} size={16} />
                                         )}
-                                </div>
+                                </button>
                             ))
                         ) : (
                             <div className={styles.noResults}>Không tìm thấy tỉnh/thành</div>
                         )}
                     </div>
 
-                    <div
-                        className={styles.districtList}
-                        role="listbox"
-                        aria-label="Danh sách quận/huyện"
-                    >
-                        {selectedProvinceId && selectedProvinceId !== '' ? (
-                            filteredDistricts.length > 0 ? (
-                                filteredDistricts.map((district) => (
-                                    <div
-                                        key={district.id}
-                                        className={clsx(
-                                            styles.districtItem,
-                                            selectedDistrictId &&
-                                                selectedDistrictId !== '' &&
-                                                selectedDistrictId === district.id &&
-                                                styles.active
-                                        )}
-                                        onClick={() => handleDistrictClick(district.id)}
-                                        onKeyDown={(e) => handleDistrictKeyDown(e, district.id)}
-                                        tabIndex={0}
-                                        role="option"
-                                        aria-selected={selectedDistrictId === district.id}
-                                    >
-                                        <span className={styles.districtName}>{district.name}</span>
-                                        {selectedDistrictId &&
-                                            selectedDistrictId !== '' &&
-                                            selectedDistrictId === district.id && (
-                                                <Check className={styles.checkIcon} size={16} />
-                                            )}
-                                    </div>
-                                ))
-                            ) : (
-                                <div className={styles.noResults}>
-                                    {searchTerm
-                                        ? 'Không tìm thấy quận/huyện'
-                                        : 'Không có quận/huyện cho tỉnh/thành này'}
-                                </div>
-                            )
-                        ) : (
-                            <div className={styles.noResults}>Vui lòng chọn tỉnh/thành</div>
-                        )}
+                    <div className={styles.districtList} aria-label="Danh sách quận/huyện">
+                        {renderDistrictList()}
                     </div>
                 </div>
 
@@ -399,8 +378,8 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                         </button>
                     </div>
                 )}
-            </div>
-        </div>,
+            </dialog>
+        </button>,
         document.body
     );
 };
