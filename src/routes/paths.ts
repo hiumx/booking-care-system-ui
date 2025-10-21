@@ -60,6 +60,10 @@ export const PATHS = {
     BOOKING: {
         ROOT: '/booking/:doctorId',
         CONFIRMATION: '/booking/confirmation/:appointmentId',
+        RESCHEDULE: '/booking/reschedule/:appointmentId',
+        CONFIRM_NEW_DOCTOR: '/booking/confirm-doctor/:appointmentId',
+        REQUEST_REFUND: '/booking/refund/:appointmentId',
+        CHOOSE_NEW_DOCTOR: '/booking/:doctorId/choose-new-doctor',
     },
 
     // Dashboard paths
