@@ -61,6 +61,20 @@ export interface HospitalDetailResponse extends HospitalResponse {
     subscriptionHistory?: HospitalSubscriptionResponse[];
 }
 
+// Hospital Profile (get by id) - trimmed fields for UI
+export interface HospitalProfileResponse {
+    id: string;
+    name: string;
+    address: string;
+    phone?: string;
+    email: string;
+    description: string;
+    backgroundUrl?: string;
+    avatarUrl?: string;
+    images: Array<{ id: string; imageUrl: string }>;
+    specialties: Array<{ id: string; name: string; imageUrl?: string }>;
+}
+
 // Hospital Image Response DTOs
 export interface HospitalImageResponse {
     id: string;
@@ -168,7 +182,7 @@ export interface HospitalState {
     hospitals: HospitalResponse[];
     simpleHospitals: HospitalSimpleResponse[]; // For optimized API
     optimizedHospitals: HospitalListOptimizedResponse[]; // For optimized list API
-    selectedHospital: HospitalResponse | null;
+    selectedHospital: HospitalProfileResponse | null;
     isLoading: boolean;
     error: string | null;
     pagination: {

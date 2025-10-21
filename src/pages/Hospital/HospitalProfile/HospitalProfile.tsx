@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import clsx from 'clsx';
 import Breadcrumb from '@/components/Breadcrumb';
 import styles from './HospitalProfile.module.scss';
@@ -13,25 +13,14 @@ import medicalImg1 from '@/assets/img/medical-img1.jpg';
 import patientImg from '@/assets/img/patients/patient.jpg';
 import patientImg1 from '@/assets/img/patients/patient1.jpg';
 import patientImg2 from '@/assets/img/patients/patient2.jpg';
-import specialityIcon from '@/assets/img/specialities/speciality-icon-01.svg';
-import specialityImg from '@/assets/img/specialities/speciality-01.jpg';
-import specialityIcon1 from '@/assets/img/specialities/speciality-icon-02.svg';
-import specialityImg1 from '@/assets/img/specialities/speciality-02.jpg';
-import specialityIcon3 from '@/assets/img/specialities/speciality-icon-03.svg';
-import specialityImg3 from '@/assets/img/specialities/speciality-03.jpg';
-import specialityIcon4 from '@/assets/img/specialities/speciality-icon-04.svg';
-import specialityImg4 from '@/assets/img/specialities/speciality-04.jpg';
-import specialityIcon5 from '@/assets/img/specialities/speciality-icon-05.svg';
-import specialityImg5 from '@/assets/img/specialities/speciality-05.jpg';
-import specialityIcon6 from '@/assets/img/specialities/speciality-icon-06.svg';
-import specialityImg6 from '@/assets/img/specialities/speciality-06.jpg';
-import specialityIcon7 from '@/assets/img/specialities/speciality-icon-07.svg';
-import specialityImg7 from '@/assets/img/specialities/speciality-07.jpg';
-import specialityIcon8 from '@/assets/img/specialities/speciality-icon-08.svg';
-import specialityImg8 from '@/assets/img/specialities/speciality-08.jpg';
 import MainLayout from '@/layouts/MainLayout';
 import TestimonialSection from '@/components/TestimonialSection';
 import HeroSection from './components/HeroSection/HeroSection';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '@/store';
+import { getHospitalByIdAsync } from '@/store/slices/hospitalSlice';
+import { HospitalProfileResponse } from '@/types/hospital.types';
+import { RootState } from '@/store';
 
 interface BreadcrumbItem {
     label: string;
@@ -40,13 +29,18 @@ interface BreadcrumbItem {
 }
 
 const HospitalProfile: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
+    const dispatch = useDispatch<AppDispatch>();
+    const selectedHospital = useSelector(
+        (state: RootState) => state.hospital.selectedHospital
+    ) as HospitalProfileResponse | null;
     const breadcrumbData: { items: BreadcrumbItem[]; title: string } = {
         items: [
             { label: 'Trang Chủ', path: '/', isActive: false },
             { label: 'Bệnh viện', path: '/hospitals', isActive: false },
-            { label: 'Vinmec Medical Center', isActive: true },
+            { label: selectedHospital?.name || 'Bệnh viện', isActive: true },
         ],
-        title: 'Vinmec Medical Center',
+        title: selectedHospital?.name || 'Bệnh viện',
     };
 
     // Show map CTA and hide header when reaching tabs
@@ -58,6 +52,9 @@ const HospitalProfile: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'gioi-thieu' | 'bang-gia' | 'huong-dan' | 'faq'>();
 
     useEffect(() => {
+        if (id) {
+            dispatch(getHospitalByIdAsync(id));
+        }
         const handle = () => {
             if (!tabsRef.current) return;
             const tabsTop = window.scrollY + tabsRef.current.getBoundingClientRect().top;
@@ -92,7 +89,7 @@ const HospitalProfile: React.FC = () => {
             window.removeEventListener('scroll', handle as any);
             window.removeEventListener('resize', handle as any);
         };
-    }, [hasReachedTabs]);
+    }, [hasReachedTabs, dispatch, id]);
 
     // Mock services
     const services = [
@@ -105,23 +102,23 @@ const HospitalProfile: React.FC = () => {
         { id: 7, name: 'Chụp X-quang', img: patientImg2 },
     ];
 
-    // Mock specialties
-    const specialties = [
-        { id: 1, name: 'Tim mạch', icon: specialityIcon, img: specialityImg, doctorCount: 12 },
-        { id: 2, name: 'Nội tiết', icon: specialityIcon1, img: specialityImg1, doctorCount: 8 },
-        { id: 3, name: 'Da liễu', icon: specialityIcon3, img: specialityImg3, doctorCount: 15 },
-        { id: 4, name: 'Tiêu hóa', icon: specialityIcon4, img: specialityImg4, doctorCount: 10 },
-        { id: 5, name: 'Thần kinh', icon: specialityIcon5, img: specialityImg5, doctorCount: 6 },
-        { id: 6, name: 'Nhi khoa', icon: specialityIcon6, img: specialityImg6, doctorCount: 20 },
-        {
-            id: 7,
-            name: 'Sản phụ khoa',
-            icon: specialityIcon7,
-            img: specialityImg7,
-            doctorCount: 14,
-        },
-        { id: 8, name: 'Mắt', icon: specialityIcon8, img: specialityImg8, doctorCount: 9 },
-    ];
+    // Function to get random image from hospital images
+    const getRandomHospitalImage = () => {
+        if (selectedHospital?.images && selectedHospital.images.length > 0) {
+            const randomIndex = Math.floor(Math.random() * selectedHospital.images.length);
+            return selectedHospital.images[randomIndex].imageUrl;
+        }
+        return '';
+    };
+
+    // Specialties from API (fallback to empty)
+    const specialties = (selectedHospital?.specialties || []).map((s) => ({
+        id: s.id,
+        name: s.name,
+        icon: s.imageUrl || '', // Icon chuyên khoa (foreground)
+        img: getRandomHospitalImage(), // Random ảnh từ hospital images (background)
+        doctorCount: 0,
+    }));
 
     // Mock ads
     const ads = [
@@ -185,25 +182,18 @@ const HospitalProfile: React.FC = () => {
 
     return (
         <MainLayout hasHeader={showHeader}>
-            <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
+            <Breadcrumb
+                items={breadcrumbData.items}
+                title={selectedHospital?.name || breadcrumbData.title}
+            />
             {/* Hero Section */}
-            <HeroSection />
+            <HeroSection hospital={selectedHospital || undefined} />
             {/* Content Section: left details, right sticky sidebar */}
             <section className={styles.content}>
                 <div className={styles.container}>
                     <div className={styles.contentGrid}>
                         {/* LEFT: main content */}
                         <div className={styles.mainContent}>
-                            <div className={styles.sectionBlock}>
-                                <h3 className={styles.sectionTitle}>Mô tả</h3>
-                                <p>
-                                    Bệnh viện Vinmec là bệnh viện đa khoa quốc tế chất lượng cao,
-                                    được thành lập với đội ngũ bác sĩ và chuyên gia y tế giàu kinh
-                                    nghiệm. Vinmec tiên phong cung cấp các giải pháp y tế toàn diện
-                                    và hiện đại dựa trên nền tảng y học chứng cứ và công nghệ tiên
-                                    tiến.
-                                </p>
-                            </div>
                             {/* Các dịch vụ */}
                             <div className={styles.sectionBlock}>
                                 <h3 className={styles.sectionTitle}>Dịch vụ</h3>
@@ -273,7 +263,12 @@ const HospitalProfile: React.FC = () => {
                                                                 styles.specialityIcon
                                                             )}
                                                         >
-                                                            <img src={specialty.icon} alt="icon" />
+                                                            {specialty.icon && (
+                                                                <img
+                                                                    src={specialty.icon}
+                                                                    alt="icon"
+                                                                />
+                                                            )}
                                                         </span>
                                                     </div>
                                                     <h6 className={styles.specialityTitle}>
@@ -290,7 +285,7 @@ const HospitalProfile: React.FC = () => {
                                                             styles.specialityMeta
                                                         )}
                                                     >
-                                                        {specialty.doctorCount} Bác sĩ
+                                                        {specialty.doctorCount || 0} Bác sĩ
                                                     </p>
                                                 </Link>
                                             </SwiperSlide>
@@ -307,14 +302,16 @@ const HospitalProfile: React.FC = () => {
                                             className={styles.specialtyItem}
                                         >
                                             <div className={styles.specialtyIcon}>
-                                                <img src={specialty.icon} alt="icon" />
+                                                {specialty.icon && (
+                                                    <img src={specialty.icon} alt="icon" />
+                                                )}
                                             </div>
                                             <div className={styles.specialtyText}>
                                                 <h6 className={styles.specialtyTitle}>
                                                     {specialty.name}
                                                 </h6>
                                                 <p className={styles.specialtyMeta}>
-                                                    {specialty.doctorCount} Bác sĩ
+                                                    {specialty.doctorCount || 0} Bác sĩ
                                                 </p>
                                             </div>
                                         </Link>
@@ -367,23 +364,7 @@ const HospitalProfile: React.FC = () => {
 
                             <div id="gioi-thieu" className={styles.sectionBlock}>
                                 <h3 className={styles.sectionTitle}>Giới thiệu</h3>
-                                <p>
-                                    Bệnh viện đa khoa quốc tế Vinmec là địa chỉ tiên phong tại Việt
-                                    Nam trong cung cấp dịch vụ y tế chất lượng cao theo tiêu chuẩn
-                                    quốc tế, ứng dụng các phương pháp điều trị hiện đại dựa trên nền
-                                    tảng y học chứng cứ. Với đội ngũ bác sĩ giàu kinh nghiệm trong
-                                    các lĩnh vực Tim mạch, Nội tiết, Nội khoa, Da liễu, chuyên gia
-                                    dinh dưỡng và các chuyên khoa khác, Vinmec mang đến giải pháp y
-                                    tế an toàn, hiệu quả và cá nhân hóa theo tình trạng sức khỏe
-                                    từng người.
-                                </p>
-                                <p>
-                                    Trong bài viết này, Medpro sẽ tổng hợp các thông tin quan trọng
-                                    về Vinmec bao gồm thế mạnh chuyên môn, đội ngũ bác sĩ, dịch vụ
-                                    nổi bật, chi phí tham khảo và cách đặt lịch khám để bạn đọc có
-                                    thể dễ dàng lựa chọn và chủ động chăm sóc sức khỏe một cách toàn
-                                    diện.
-                                </p>
+                                <p>{selectedHospital?.description || 'Đang tải mô tả...'}</p>
                             </div>
 
                             <div id="bang-gia" className={styles.sectionBlock}>
@@ -558,8 +539,8 @@ const HospitalProfile: React.FC = () => {
                             <div className={styles.mapCard}>
                                 <div className={styles.mapBody}>
                                     <iframe
-                                        title="Bản đồ Bệnh viện Vinmec"
-                                        src="https://www.google.com/maps?q=462/9+Nguyen+Tri+Phuong,+Ho+Chi+Minh&output=embed"
+                                        title={`Bản đồ ${selectedHospital?.name || 'Bệnh viện'}`}
+                                        src={`https://www.google.com/maps?q=${encodeURIComponent(selectedHospital?.address || '462/9 Nguyen Tri Phuong, Ho Chi Minh')}&output=embed&markers=color:red|label:H|${encodeURIComponent(selectedHospital?.address || '462/9 Nguyen Tri Phuong, Ho Chi Minh')}`}
                                         loading="lazy"
                                         referrerPolicy="no-referrer-when-downgrade"
                                     ></iframe>
