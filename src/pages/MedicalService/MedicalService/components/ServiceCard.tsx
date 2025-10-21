@@ -3,16 +3,19 @@ import { Link } from 'react-router-dom';
 import { buildPath, PATHS, replacePathParams } from '@/routes/paths';
 
 interface ServiceCardProps {
-    id: number;
+    id: string | number;
     name: string;
     image: string;
     servicecategories: number;
+    link?: string;
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ id, name, image, servicecategories }) => {
-    const fullLink = replacePathParams(buildPath(PATHS.Service.CATEGORIES), {
-        servicesparentId: id.toString(),
-    });
+const ServiceCard: React.FC<ServiceCardProps> = ({ id, name, image, servicecategories, link }) => {
+    const fullLink =
+        link ||
+        replacePathParams(buildPath(PATHS.Service.CATEGORIES), {
+            servicesparentId: id.toString(),
+        });
 
     return (
         <div className="col-lg-4 col-md-6">

@@ -6,7 +6,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 interface Service {
-    id: number;
+    id: string;
     name: string;
     image: string;
 }
