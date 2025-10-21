@@ -154,3 +154,25 @@
         background: none !important;
     }
 }
+
+// Address detail styles
+:global(.address-detail) {
+    max-width: 400px;
+    word-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.4;
+    overflow-wrap: break-word;
+
+    .loc-icon {
+        margin-right: 8px;
+        display: inline;
+    }
+
+    .view-text {
+        color: #007bff;
+        text-decoration: underline;
+        cursor: pointer;
+        white-space: nowrap;
+        margin-left: 4px;
+    }
+}

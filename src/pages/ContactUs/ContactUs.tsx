@@ -21,7 +21,6 @@ const ContactUs: React.FC = () => {
     });
 
     const facilityTypeOptions = [
-        { label: 'Phòng khám', value: 'clinic' },
         { label: 'Bệnh viện', value: 'hospital' },
         { label: 'Khác', value: 'other' },
     ];

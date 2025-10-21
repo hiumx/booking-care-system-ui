@@ -1,0 +1,925 @@
+/* Content section below hero */
+.content {
+    background: #fff;
+    padding: 8px 0 48px;
+
+    .container {
+        max-width: 1380px;
+        margin: 0 auto;
+
+        .contentGrid {
+            display: grid;
+            grid-template-columns: 1fr 310px; /* left content, right sidebar */
+            gap: 24px;
+            align-items: start;
+        }
+
+        .mainContent {
+            background: #ffffff;
+            border: 1px solid #e6e9ef;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 30px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 9999999;
+            padding-top: 6px;
+            height: 60px; /* Match button height for alignment */
+            align-items: center;
+            font-size: 20px;
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            .tabItem {
+                display: inline-block;
+                padding: 12px 0;
+                color: #0c1a2a;
+                text-decoration: none;
+                font-weight: 600;
+                position: relative;
+                white-space: nowrap;
+                flex-shrink: 0;
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    bottom: 0px;
+                    height: 2px;
+                    background: transparent;
+                    border-radius: 999px;
+                    transition: background 0.2s ease;
+                }
+
+                &:hover {
+                    color: #0ea5e9;
+                }
+            }
+
+            .tabActive {
+                color: #083856;
+
+                &::after {
+                    background: #10b4f0;
+                }
+            }
+        }
+
+        .sectionBlock {
+            margin: 16px 0;
+            /* Ensure titles are visible when navigating via anchors under sticky tabs */
+            scroll-margin-top: 70px;
+
+            /* Thêm không gian cho pagination ở các section có swiper */
+            &:has(.serviceSwiper) {
+                padding-bottom: 10px;
+            }
+        }
+
+        .sectionTitle {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #0c1a2a;
+        }
+
+        /* Service Slider */
+        .serviceSwiper {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 0;
+            overflow: hidden;
+            :global(.swiper-wrapper) {
+                align-items: stretch;
+                display: flex;
+            }
+            :global(.swiper-slide) {
+                height: auto;
+                display: inline-flex;
+                width: auto; /* allow slidesPerView: 'auto' */
+            }
+
+            /* Custom navigation buttons similar to BlogSlider */
+            :global(.swiper-button-prev),
+            :global(.swiper-button-next) {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 36px;
+                height: 36px;
+                background: #fff;
+                border: 1px solid #e6e9ef;
+                border-radius: 50%;
+                color: #666;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+                z-index: 5;
+
+                &:hover {
+                    border-color: #0ea5e9;
+                    color: #0ea5e9;
+                    background: #f8fafc;
+                }
+
+                &::after {
+                    font-size: 16px; /* shrink chevron icon */
+                    font-weight: bold;
+                }
+            }
+            /* hide nav when locked by Swiper (watchOverflow) */
+            :global(.swiper-button-lock) {
+                display: none !important;
+            }
+            :global(.swiper-button-prev) {
+                left: 6px;
+            }
+            :global(.swiper-button-next) {
+                right: 6px;
+            }
+            :global(.swiper-button-disabled) {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+
+            /* Pagination with top spacing placed below content */
+            :global(.swiper-pagination) {
+                position: static;
+                margin-top: 30px;
+                display: flex;
+                justify-content: center;
+                gap: 8px;
+                width: fit-content;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            /* hide pagination when locked */
+            :global(.swiper-pagination-lock) {
+                display: none !important;
+            }
+            :global(.swiper-pagination-bullet) {
+                background: #cbd5e1;
+                opacity: 1;
+            }
+            :global(.swiper-pagination-bullet-active) {
+                background: #0ea5e9;
+            }
+        }
+
+        .serviceCard {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+            width: 100%; /* consistent card width */
+            text-decoration: none;
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+            cursor: default;
+
+            &:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            }
+
+            .serviceImg {
+                width: 200px;
+                height: 150px; /* consistent image height */
+                object-fit: cover;
+                display: block;
+                cursor: pointer; /* pointer only on image */
+            }
+
+            .serviceName {
+                padding: 12px;
+                font-weight: 600;
+                color: #0c1a2a;
+                font-size: 15px;
+                transition: color 0.15s ease;
+                cursor: pointer; /* pointer only on text */
+                /* wrap when width reached, no truncation */
+                display: block;
+                white-space: normal;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+                max-width: 200px; /* match image width so text wraps */
+                margin-left: auto;
+                margin-right: auto;
+                text-align: center;
+                &:hover {
+                    color: #0ea5e9;
+                }
+            }
+        }
+
+        /* Speciality: keep legacy classes but normalize sizing to match service card */
+
+        .specialityImgEl {
+            width: 144px;
+            height: 190px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .specialityIcon {
+            display: inline-flex;
+        }
+
+        .specialityTitle {
+            margin: 8px 0 4px;
+            font-weight: 700;
+        }
+
+        .specialityTitleLink {
+            color: #0c1a2a;
+            text-decoration: none;
+            &:hover {
+                color: #0ea5e9;
+            }
+        }
+
+        .specialityMeta {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        /* Desktop Slider - Show on desktop, hide on mobile */
+        .desktopSlider {
+            display: block;
+            width: 100%;
+        }
+
+        .mobileSpecialtyList {
+            display: none;
+            width: 100%;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .specialtyItem {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            min-height: 80px;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                text-decoration: none;
+                color: inherit;
+            }
+
+            &:visited {
+                color: inherit;
+                text-decoration: none;
+            }
+        }
+
+        .specialtyIcon {
+            width: 40px;
+            height: 40px;
+            background: #f8fafc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            img {
+                width: 24px;
+                height: 24px;
+            }
+        }
+
+        .specialtyText {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .specialtyTitle {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0c1a2a;
+            margin: 0 0 4px 0;
+            line-height: 1.3;
+        }
+
+        .specialtyMeta {
+            font-size: 12px;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        /* Price Table Styles */
+        .priceTable {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .priceItem {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s ease;
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            &:hover {
+                background-color: #f8fafc;
+            }
+        }
+
+        .priceNumber {
+            font-weight: 700;
+            font-size: 16px;
+            min-width: 24px;
+        }
+
+        .priceService {
+            color: #0c1a2a;
+            font-weight: 500;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .priceAmount {
+            color: #0ea5e9;
+            font-weight: 700;
+            font-size: 16px;
+            text-align: right;
+        }
+
+        /* Guide Content Styles */
+        .guideContent {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .guideStep {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            line-height: 1.6;
+        }
+
+        .stepLabel {
+            color: #0ea5e9;
+            font-weight: 700;
+            font-size: 16px;
+            min-width: 60px;
+            flex-shrink: 0;
+        }
+
+        .stepContent {
+            color: #0c1a2a;
+            font-size: 16px;
+            flex: 1;
+        }
+
+        .guideLink {
+            color: #0ea5e9;
+            text-decoration: none;
+            font-weight: 500;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        .guideNote {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            line-height: 1.6;
+            margin-top: 8px;
+            padding: 12px 16px;
+            background-color: #f8fafc;
+            border-left: 4px solid #0ea5e9;
+            border-radius: 4px;
+        }
+
+        .noteLabel {
+            color: #0ea5e9;
+            font-weight: 700;
+            font-size: 16px;
+            min-width: 50px;
+            flex-shrink: 0;
+        }
+
+        .noteContent {
+            color: #0c1a2a;
+            font-size: 16px;
+            flex: 1;
+        }
+
+        /* FAQ accordion */
+        .faqList {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .faqItem {
+            border-top: 1px solid #e5e7eb;
+        }
+        .faqItem:last-child {
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .faqQuestion {
+            width: 100%;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 0;
+            background: transparent;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            color: #0c1a2a;
+            font-weight: 600;
+        }
+        .faqQuestion i {
+            transition: transform 0.2s ease;
+            color: #64748b;
+        }
+        .faqOpen i {
+            transform: rotate(90deg);
+            color: #0ea5e9;
+        }
+        .faqIndex {
+            font-weight: 700;
+        }
+        .faqText {
+            line-height: 1.5;
+        }
+        .faqAnswer {
+            padding: 0 0 16px 28px; /* indent to align with text after index */
+            color: #1f2937;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: padding-top 0.2s ease;
+
+            /* Button positioned in reserved space above sidebar */
+            .mapCtaBar {
+                position: absolute;
+                top: -20px;
+                left: 0;
+                right: 0;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+                pointer-events: none;
+                z-index: 2;
+                background: transparent;
+            }
+
+            .mapCtaBar.visible {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            /* Add padding when button is visible */
+            &:has(.mapCtaBar.visible) {
+                padding-top: 40px;
+            }
+
+            .mapCard,
+            .adCard {
+                border-radius: 15px;
+                overflow: visible; /* allow floating button to appear above */
+                position: sticky; /* pin card inside sidebar */
+                z-index: 1000001;
+            }
+
+            .mapBody {
+                position: relative;
+                iframe {
+                    width: 100%;
+                    height: 430px;
+                    border-radius: 15px;
+                    border: 0;
+                }
+            }
+
+            .mapBookBtn {
+                background: #0ea5e9;
+                color: #fff;
+                border: none;
+                border-radius: 999px;
+                font-weight: 700;
+                font-size: 16px;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(2, 44, 74, 0.18);
+                transition:
+                    background 0.2s ease,
+                    transform 0.1s ease;
+            }
+            .mapBookBtn:hover {
+                background: #0284c7;
+            }
+            .mapBookBtn:active {
+                transform: translateY(1px);
+            }
+
+            .adCard {
+                position: relative;
+                overflow: visible;
+                padding-bottom: 30px; /* Tạo không gian cho pagination */
+
+                .adSwiper {
+                    width: 100%;
+                    height: 180px;
+                    overflow: hidden;
+
+                    :global(.swiper-slide) {
+                        height: 100%;
+                    }
+                }
+
+                .adImg {
+                    width: 100%;
+                    height: 160px;
+                    border-radius: 15px;
+                    object-fit: cover;
+                    display: block;
+                }
+
+                .adBadge {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    background: rgba(13, 23, 38, 0.72);
+                    color: #fff;
+                    border-radius: 999px;
+                    padding: 2px 8px;
+                    font-size: 12px;
+                    z-index: 2;
+                }
+
+                /* Hide navigation buttons, only show pagination */
+                :global(.swiper-button-prev),
+                :global(.swiper-button-next) {
+                    display: none !important;
+                }
+
+                /* Custom pagination - đặt ngoài adSwiper để không bị overflow: hidden */
+                .adPagination {
+                    position: absolute !important;
+                    top: 80% !important;
+                    left: 50% !important;
+                    transform: translateX(-50%) !important;
+                    display: flex !important;
+                    justify-content: center !important;
+                    gap: 8px !important;
+                    z-index: 2 !important;
+                    width: auto !important;
+                    height: auto !important;
+                }
+
+                .adPagination :global(.swiper-pagination-bullet) {
+                    background: #cbd5e1 !important;
+                    opacity: 1 !important;
+                    width: 6px !important;
+                    height: 6px !important;
+                    border-radius: 50% !important;
+                    margin: 0 !important;
+                    cursor: pointer !important;
+                }
+
+                .adPagination :global(.swiper-pagination-bullet-active) {
+                    background: #0ea5e9 !important;
+                }
+            }
+        }
+    }
+}
+
+.testimonialSection {
+    padding: 8px 0 48px;
+}
+
+/* Swiper stability: keep layout intact across breakpoints (non-destructive) */
+.serviceSwiper {
+    max-width: 100%;
+    overflow: hidden;
+    :global(.swiper-wrapper) {
+        display: flex !important;
+        align-items: stretch;
+    }
+    :global(.swiper-slide) {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        box-sizing: border-box;
+        height: auto;
+    }
+}
+
+@supports (overflow: clip) {
+    .content .container {
+        overflow-x: clip; /* avoid horizontal push when content overflows */
+    }
+}
+@media (max-width: 1024px) {
+    .content {
+        .container {
+            .contentGrid {
+                grid-template-columns: 1fr; /* stack */
+            }
+
+            .sidebar {
+                position: static;
+            }
+        }
+    }
+}
+
+/* Responsive for Services and Specialties Sections */
+@media (max-width: 576px) {
+    .content {
+        .container {
+            /* Hide desktop slider, show mobile list for specialties */
+            .desktopSlider {
+                display: none !important;
+            }
+
+            .mobileSpecialtyList {
+                display: grid !important;
+            }
+
+            /* Service cards - smaller on mobile */
+            .serviceCard {
+                width: 100%;
+
+                .serviceImg {
+                    width: 140px !important;
+                    height: 110px !important; /* Smaller image height */
+                }
+
+                .serviceName {
+                    padding: 8px !important;
+                    font-size: 13px !important;
+                    max-width: 140px !important;
+                }
+            }
+
+            /* Service Swiper adjustments */
+            .serviceSwiper {
+                padding: 8px 0 !important;
+
+                :global(.swiper-button-prev),
+                :global(.swiper-button-next) {
+                    width: 28px !important;
+                    height: 28px !important;
+
+                    &::after {
+                        font-size: 12px !important;
+                    }
+                }
+
+                :global(.swiper-button-prev) {
+                    left: 4px !important;
+                }
+                :global(.swiper-button-next) {
+                    right: 4px !important;
+                }
+
+                :global(.swiper-pagination) {
+                    margin-top: 20px !important;
+                }
+            }
+
+            /* Price table mobile adjustments */
+            .priceItem {
+                padding: 12px 16px !important;
+                gap: 12px !important;
+            }
+
+            .priceNumber {
+                font-size: 14px !important;
+            }
+
+            .priceService {
+                font-size: 14px !important;
+            }
+
+            .priceAmount {
+                font-size: 14px !important;
+            }
+
+            /* Tabs mobile adjustments */
+            .tabs {
+                gap: 16px !important;
+                font-size: 16px !important;
+                height: 50px !important;
+                padding-top: 13px !important;
+                margin-bottom: 20px !important;
+
+                .tabItem {
+                    padding: 8px 0 !important;
+                    font-size: 14px !important;
+                }
+            }
+
+            /* Guide content mobile adjustments */
+            .guideStep {
+                gap: 6px !important;
+            }
+
+            .stepLabel {
+                font-size: 14px !important;
+                min-width: 55px !important;
+            }
+
+            .stepContent {
+                font-size: 14px !important;
+            }
+
+            .guideNote {
+                padding: 10px 12px !important;
+                gap: 6px !important;
+            }
+
+            .noteLabel {
+                font-size: 14px !important;
+                min-width: 45px !important;
+            }
+
+            .noteContent {
+                font-size: 14px !important;
+            }
+
+            /* Hide ads on mobile */
+            .adCard {
+                display: none !important;
+            }
+        }
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .content {
+        .container {
+            /* Keep mobile grid for tablet, hide desktop slider */
+            .desktopSlider {
+                display: none !important;
+            }
+
+            .mobileSpecialtyList {
+                display: grid !important;
+            }
+
+            /* Show ads on tablet and desktop */
+            .adCard {
+                display: none !important;
+            }
+
+            /* Tabs tablet adjustments */
+            .tabs {
+                gap: 20px !important;
+                font-size: 18px !important;
+                height: 55px !important;
+                padding-top: 12px !important;
+                margin-bottom: 25px !important;
+
+                .tabItem {
+                    padding: 10px 0 !important;
+                    font-size: 15px !important;
+                }
+            }
+
+            /* Service and Specialty cards - medium size on small tablets */
+            .serviceCard {
+                width: 100% !important;
+
+                .serviceImg {
+                    width: 160px !important;
+                    height: 120px !important;
+                }
+
+                .serviceName {
+                    padding: 10px !important;
+                    font-size: 14px !important;
+                    max-width: 160px !important;
+                }
+            }
+        }
+    }
+}
+
+@media (min-width: 769px) and (max-width: 992px) {
+    .content {
+        .container {
+            /* Keep mobile grid for medium tablet, hide desktop slider */
+            .desktopSlider {
+                display: none !important;
+            }
+
+            .mobileSpecialtyList {
+                display: grid !important;
+            }
+
+            /* Show ads on tablet and desktop */
+            .adCard {
+                display: none !important;
+            }
+
+            /* Service and Specialty cards - larger size on medium tablets */
+            .serviceCard {
+                width: 100% !important;
+
+                .serviceImg {
+                    width: 180px !important;
+                    height: 135px !important;
+                }
+
+                .serviceName {
+                    max-width: 180px !important;
+                }
+            }
+
+            :global(.spaciality-item) {
+                width: 180px !important;
+            }
+
+            .specialityImgEl {
+                width: 130px !important;
+                height: 175px !important;
+            }
+        }
+    }
+}
+
+/* Desktop large screens */
+@media (min-width: 993px) {
+    .content {
+        .container {
+            /* Show desktop slider only on large desktop */
+            .desktopSlider {
+                display: block !important;
+            }
+
+            .mobileSpecialtyList {
+                display: none !important;
+            }
+        }
+    }
+}

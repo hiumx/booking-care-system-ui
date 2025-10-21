@@ -179,3 +179,17 @@ export interface DoctorState {
         pageSize: number;
     };
 }
+
+// UI Specific Types for Doctor Cards
+export interface FavouriteDoctor {
+    id: string;
+    name: string;
+    specialty: string;
+    image: string;
+    rating: number;
+    numberOfReviews: number;
+    level: string;
+    location: string;
+    experience: string;
+    isVerified: boolean;
+}
