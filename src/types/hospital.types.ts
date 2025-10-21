@@ -72,7 +72,7 @@ export interface HospitalProfileResponse {
     backgroundUrl?: string;
     avatarUrl?: string;
     images: Array<{ id: string; imageUrl: string }>;
-    specialties: Array<{ id: string; name: string; imageUrl?: string }>;
+    specialties: Array<{ id: string; name: string; imageUrl?: string; doctorCount?: number }>;
 }
 
 // Hospital Image Response DTOs

@@ -34,6 +34,7 @@ const HospitalProfile: React.FC = () => {
     const selectedHospital = useSelector(
         (state: RootState) => state.hospital.selectedHospital
     ) as HospitalProfileResponse | null;
+    const isLoading = useSelector((state: RootState) => state.hospital.isLoading);
     const breadcrumbData: { items: BreadcrumbItem[]; title: string } = {
         items: [
             { label: 'Trang Chủ', path: '/', isActive: false },
@@ -51,10 +52,15 @@ const HospitalProfile: React.FC = () => {
     const [hasReachedTabs, setHasReachedTabs] = useState(false);
     const [activeTab, setActiveTab] = useState<'gioi-thieu' | 'bang-gia' | 'huong-dan' | 'faq'>();
 
+    // Separate useEffect for API call - only runs when id changes
     useEffect(() => {
         if (id) {
             dispatch(getHospitalByIdAsync(id));
         }
+    }, [dispatch, id]);
+
+    // Separate useEffect for scroll handling - no API calls
+    useEffect(() => {
         const handle = () => {
             if (!tabsRef.current) return;
             const tabsTop = window.scrollY + tabsRef.current.getBoundingClientRect().top;
@@ -89,7 +95,7 @@ const HospitalProfile: React.FC = () => {
             window.removeEventListener('scroll', handle as any);
             window.removeEventListener('resize', handle as any);
         };
-    }, [hasReachedTabs, dispatch, id]);
+    }, [hasReachedTabs]); // Only depend on hasReachedTabs, not dispatch or id
 
     // Mock services
     const services = [
@@ -117,7 +123,7 @@ const HospitalProfile: React.FC = () => {
         name: s.name,
         icon: s.imageUrl || '', // Icon chuyên khoa (foreground)
         img: getRandomHospitalImage(), // Random ảnh từ hospital images (background)
-        doctorCount: 0,
+        doctorCount: s.doctorCount || 0,
     }));
 
     // Mock ads
@@ -179,6 +185,23 @@ const HospitalProfile: React.FC = () => {
         },
     ];
     const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+    // Loading state
+    if (isLoading) {
+        return (
+            <MainLayout hasHeader={showHeader}>
+                <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
+                <div className="container">
+                    <div className="text-center py-5">
+                        <div className="spinner-border" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <p className="mt-3">Đang tải thông tin bệnh viện...</p>
+                    </div>
+                </div>
+            </MainLayout>
+        );
+    }
 
     return (
         <MainLayout hasHeader={showHeader}>

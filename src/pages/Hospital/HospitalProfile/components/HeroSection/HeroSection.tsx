@@ -154,7 +154,7 @@ const HeroSection: React.FC<Props> = ({ hospital }) => {
                                                             <img src={phoneIcon} alt="Icon" />
                                                         </span>
                                                         <p className={styles.hospitalInfoText}>
-                                                            Tổng đài đặt khám nhanh:{' '}
+                                                            Số điện thoại:{' '}
                                                             {hospital?.phone || 'Số điện thoại'}
                                                         </p>
                                                     </div>
