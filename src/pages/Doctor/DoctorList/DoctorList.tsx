@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import SideBar from './components/SideBar';
 import {
     DoctorAppointmentBookingCard,
@@ -34,6 +34,14 @@ const DoctorList: React.FC = () => {
     const { doctors, isLoading, pagination, error } = useAppSelector((state) => state.doctor);
     const { languages } = useAppSelector((state) => state.language);
     const { serviceTypes } = useAppSelector((state) => state.serviceType);
+    const [searchParams] = useSearchParams();
+
+    // Check if this is a reschedule flow (Option 3: Choose new doctor)
+    const isRescheduleFlow = searchParams.get('rescheduleFor') !== null;
+    const rescheduleAppointmentId = searchParams.get('rescheduleFor');
+    const rescheduleToken = searchParams.get('token');
+    const rescheduleHospitalId = searchParams.get('hospitalId');
+    const rescheduleSpecialtyId = searchParams.get('specialtyId');
 
     const [sortOption, setSortOption] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -76,6 +84,22 @@ const DoctorList: React.FC = () => {
     const doctorsPerPage = 10;
     const patientId = '2FC80E8F-D296-42BC-ADDF-EAA6281BF244'; // Valid GUID format
     const skeletonKeys = Array.from({ length: 10 }, (_, i) => `skeleton-${i}`);
+
+    // Initialize filters from URL params for reschedule flow - ONLY ONCE
+    // Use ref to prevent re-initialization on every render
+    const hasInitializedRescheduleFilters = useRef(false);
+
+    useEffect(() => {
+        if (isRescheduleFlow && !hasInitializedRescheduleFilters.current) {
+            if (rescheduleHospitalId) {
+                setHospitalFilters([rescheduleHospitalId]);
+            }
+            if (rescheduleSpecialtyId) {
+                setSpecialtyFilters([rescheduleSpecialtyId]);
+            }
+            hasInitializedRescheduleFilters.current = true;
+        }
+    }, [isRescheduleFlow, rescheduleHospitalId, rescheduleSpecialtyId]);
 
     const sortOptions = [
         { label: 'Giá từ thấp đến cao', value: 'low-to-high' },
@@ -217,15 +241,40 @@ const DoctorList: React.FC = () => {
                 languages={doctor.languages || []}
                 image={doctor.avatarUrl || docProfile01}
                 serviceTypeFilters={serviceTypeFilters}
+                isRescheduleMode={isRescheduleFlow}
+                rescheduleParams={
+                    isRescheduleFlow
+                        ? {
+                              appointmentId: rescheduleAppointmentId!,
+                              token: rescheduleToken!,
+                              rescheduleSpecialtyId: rescheduleSpecialtyId!,
+                              rescheduleHospitalId: rescheduleHospitalId!,
+                          }
+                        : undefined
+                }
             />
         ));
     };
 
     // Load doctors on component mount and when filters change
     useEffect(() => {
-        const params = buildSearchParams();
+        // If in reschedule flow, wait until filters are actually set in state before fetching
+        // This prevents the initial fetch with empty filters
+        const isWaitingForRescheduleFilters =
+            isRescheduleFlow &&
+            hasInitializedRescheduleFilters.current &&
+            hospitalFilters.length === 0 &&
+            specialtyFilters.length === 0 &&
+            (rescheduleHospitalId || rescheduleSpecialtyId);
 
-        if (shouldUseAdvancedFiltering()) {
+        if (isWaitingForRescheduleFilters) {
+            return;
+        }
+
+        const params = buildSearchParams();
+        const useAdvancedFiltering = shouldUseAdvancedFiltering();
+
+        if (useAdvancedFiltering) {
             dispatch(filterDoctorsAsync(params));
         } else {
             dispatch(searchDoctorsAsync(params));
@@ -510,6 +559,8 @@ const DoctorList: React.FC = () => {
                     onHospitalFilter={handleHospitalFilter}
                     onHospitalFilters={handleHospitalFilters}
                     onAreaFilter={handleAreaFilter}
+                    rescheduleHospitalId={rescheduleHospitalId}
+                    rescheduleSpecialtyId={rescheduleSpecialtyId}
                 />
             </div>
             <div className="content mt-5">

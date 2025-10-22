@@ -26,6 +26,8 @@ type SearchInputProps = {
         provinceName?: string;
         districtName?: string;
     }) => void; // Callback for area filter
+    rescheduleHospitalId?: string | null; // Hospital ID from reschedule flow (Option 3)
+    rescheduleSpecialtyId?: string | null; // Specialty ID from reschedule flow (Option 3)
 };
 
 const SearchInput: React.FC<SearchInputProps> = ({
@@ -36,6 +38,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
     onHospitalFilter,
     onHospitalFilters,
     onAreaFilter,
+    rescheduleHospitalId,
+    rescheduleSpecialtyId,
 }) => {
     const dispatch = useAppDispatch();
     const { simpleHospitals } = useAppSelector((state) => state.hospital);
@@ -63,6 +67,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
     const clinicRef = useRef<HTMLButtonElement>(null);
     const specialtyRef = useRef<HTMLButtonElement>(null);
 
+    // Ref to track if reschedule filters have been initialized
+    const rescheduleInitialized = useRef(false);
+
     // Load data on component mount
     useEffect(() => {
         // Load hospitals (optimized API)
@@ -71,6 +78,23 @@ const SearchInput: React.FC<SearchInputProps> = ({
         // Load specialties
         dispatch(getSpecialtiesAsync());
     }, [dispatch]);
+
+    // Handle reschedule parameters from URL (Option 3: Choose new doctor)
+    // Initialize selected filters from reschedule params (for display only)
+    // Only run ONCE when component mounts with reschedule params
+    useEffect(() => {
+        if (!rescheduleInitialized.current && (rescheduleHospitalId || rescheduleSpecialtyId)) {
+            if (rescheduleHospitalId) {
+                setSelectedClinics([rescheduleHospitalId]);
+            }
+            if (rescheduleSpecialtyId) {
+                setSelectedSpecialties([rescheduleSpecialtyId]);
+            }
+            rescheduleInitialized.current = true;
+        }
+        // Note: Don't call onHospitalFilters/onSpecialtyFilters here
+        // DoctorList already handles the filtering via its own useEffect
+    }, [rescheduleHospitalId, rescheduleSpecialtyId]);
 
     // Auto-resize function
     const autoResize = (element: HTMLDivElement) => {
