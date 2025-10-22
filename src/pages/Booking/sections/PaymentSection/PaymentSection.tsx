@@ -550,7 +550,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                         </div>
                                     </div>
                                     <div className="mb-3">
-                                        <div className="fw-medium">Phòng khám</div>
+                                        <div className="fw-medium">Bệnh viện</div>
                                         <div className="form-plain-text">
                                             {doctorInfo.location || 'Chưa cập nhật'}
                                         </div>

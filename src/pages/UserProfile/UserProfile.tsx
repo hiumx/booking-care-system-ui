@@ -118,7 +118,7 @@ const UserProfile = () => {
             case 'appointment-detail':
                 return <AppointmentDetailPage />;
             case 'favourites':
-                return <Favourite />;
+                return <Favourite patientId={profile?.id} />;
 
             case 'wallet':
                 return <Wallet />;
@@ -127,7 +127,7 @@ const UserProfile = () => {
             case 'invoices':
                 return <Invoices />;
             default:
-                return <Favourite />; // Default to favourites
+                return <Favourite patientId={profile?.id} />; // Default to favourites
         }
     };
 

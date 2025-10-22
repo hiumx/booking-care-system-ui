@@ -28,7 +28,7 @@ const FeaturedBlog: React.FC = () => {
         {
             id: 3,
             image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2025/08/benh-an-dien-tu-768x401.jpg',
-            title: 'Triển khai bệnh án điện tử đạt chuẩn Bộ Y tế: Phòng khám Bác sĩ cần lưu ý gì?',
+            title: 'Triển khai bệnh án điện tử đạt chuẩn Bộ Y tế: Bệnh viện Bác sĩ cần lưu ý gì?',
             description:
                 'Bệnh án điện tử là chủ đề nhận được nhiều sự quan tâm trong bối cảnh ngành y tế đẩy mạnh chuyển đổi số. Dù không còn xa lạ, việc triển khai đúng chuẩn vẫn còn nhiều thách thức.',
             source: 'YouMed',

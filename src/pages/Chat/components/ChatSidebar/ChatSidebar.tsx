@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 
-import OnlineContacts from './components/OnlineContacts';
 import ChatList from './components/ChatList';
 import styles from './ChatSidebar.module.scss';
 const ChatSidebar = () => {
@@ -35,8 +34,6 @@ const ChatSidebar = () => {
             </div>
             {/* /Left Chat Title */}
             <div className={clsx(styles.sidebarScroll, 'slimscroll-active-sidebar')}>
-                {/* Top Online Contacts */}
-                <OnlineContacts />
                 <div className="sidebar-body chat-body" id="chatsidebar">
                     <ChatList searchTerm={searchTerm} />
                 </div>

@@ -13,7 +13,7 @@ import ResetPassword from '@/pages/Authentication/ResetPassword';
 import DoctorProfile from '@/pages/Doctor/DoctorProfile';
 import SpecialtiesList from '@/pages/Specialties/SpecialtiesList';
 import SubscriptionPlans from '@/pages/SubscriptionPlans';
-import MedicalFacility from '@/pages/MedicalFacility/MedicalFacilityList';
+import Hospital from '@/pages/Hospital/HospitalList';
 import { PATHS } from './paths';
 import FAQ from '@/pages/FAQ';
 import Blog from '@/pages/Blog';
@@ -21,7 +21,7 @@ import BlogDetail from '@/pages/BlogDetail';
 import MedicalTerms from '@/pages/MedicalTerms';
 import CategoryArticles from '@/pages/CategoryBlogs';
 import CategoryArticlesDemo from '@/pages/CategoryBlogsDemo';
-import MedicalFacilityProfile from '@/pages/MedicalFacility/MedicalFacilityProfile';
+import HospitalProfile from '@/pages/Hospital/HospitalProfile';
 import AboutUs from '@/pages/AboutUs/AboutUs';
 import DoctorList from '@/pages/Doctor/DoctorList';
 import ContactUs from '@/pages/ContactUs';
@@ -31,8 +31,11 @@ import RescheduleAppointment from '@/pages/Booking/RescheduleAppointment';
 import ConfirmNewDoctor from '@/pages/Booking/ConfirmNewDoctor';
 import RequestRefund from '@/pages/Booking/RequestRefund';
 import ChooseNewDoctor from '@/pages/Booking/ChooseNewDoctor';
-import ServiceTypes from '@/pages/MedicalService/ServiceTypes/ServiceTypesPage';
+import ServiceCategories from '@/pages/MedicalService/ServiceCategories/ServiceCategoriesPage';
 import SmartBooking from '@/pages/SmartBooking';
+import ServiceList from '@/pages/MedicalService/MedicalService/MedicalServicePage';
+import ServiceHospitals from '@/pages/MedicalService/ServiceHospital/ServiceHospitalPage';
+import ServiceDetail from '@/pages/MedicalService/ServiceDetail/ServiceDetailPage';
 
 const routes: RouteObject[] = [
     {
@@ -116,8 +119,8 @@ const routes: RouteObject[] = [
     {
         path: PATHS.HOSPITAL.ROOT,
         children: [
-            { index: true, element: <MedicalFacility /> },
-            { path: PATHS.HOSPITAL.DETAIL, element: <MedicalFacilityProfile /> },
+            { index: true, element: <Hospital /> },
+            { path: PATHS.HOSPITAL.DETAIL, element: <HospitalProfile /> },
         ],
     },
     {
@@ -125,14 +128,27 @@ const routes: RouteObject[] = [
         element: <SpecialtiesList />,
         // children: [{ path: PATHS.SPECIALTIES.PROFILE, element: <SpecialtiesProfile /> }],
     },
+
     {
-        path: PATHS.Service.Service_Types,
-        element: <ServiceTypes />,
+        path: PATHS.Service.ROOT,
+        element: <ServiceList />,
+    },
+    {
+        path: PATHS.Service.CATEGORIES,
+        element: <ServiceCategories />,
+    },
+    {
+        path: PATHS.Service.HOSPITALS,
+        element: <ServiceHospitals />,
+    },
+    {
+        path: PATHS.Service.DETAIL,
+        element: <ServiceDetail />,
     },
     {
         path: PATHS.HOSPITAL.ROOT,
-        element: <MedicalFacility />,
-        // children: [{ path: PATHS.HOSPITAL.DETAIL, element: <MedicalFacilityProfile /> }],
+        element: <Hospital />,
+        // children: [{ path: PATHS.HOSPITAL.DETAIL, element: <HospitalProfile /> }],
     },
     {
         path: PATHS.CHAT,

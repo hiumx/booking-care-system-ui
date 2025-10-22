@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Calendar from '@/components/Calendar';
 import Modal from '@/components/Modal';
-import ModalArea from './components/ModalArea';
+import ModalArea from '@/components/ModalArea';
 import clsx from 'clsx';
 import styles from './SearchInput.module.scss';
 // Removed unused icon imports as we now use images from backend
@@ -355,9 +355,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                         styles.formControlCustom,
                                         styles.multiLineInput
                                     )}
-                                    data-placeholder="Chọn cơ sở y tế"
+                                    data-placeholder="Chọn bệnh viện"
                                     onClick={handleClinicClick}
-                                    aria-label="Chọn cơ sở y tế"
+                                    aria-label="Chọn bệnh viện"
                                     style={{ minHeight: '50px', textAlign: 'left' }}
                                 >
                                     {selectedClinics.length > 0
@@ -494,7 +494,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     onClose={handleClinicModalClose}
                     onApply={handleClinicApply}
                     items={hospitalItems}
-                    title="Tìm theo cơ sở y tế"
+                    title="Tìm theo Bệnh viện"
                     itemType="hospital"
                 />
                 <ModalArea

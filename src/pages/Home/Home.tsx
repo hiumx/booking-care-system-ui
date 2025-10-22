@@ -42,13 +42,10 @@ const Home: React.FC = () => {
                         id: hospital.id.toString(),
                         name: hospital.name,
                         image: hospital.image,
-                        rating: hospital.rating,
-                        reviewCount: hospital.reviewCount,
                         specialties: hospital.specialties,
                         location: hospital.address,
                         distance: hospital.distance,
-                        priceRange: hospital.priceRange || '$100-300',
-                        availableSlots: hospital.availableSlots || 0,
+                        specialtyCount: hospital.specialties?.length || 0,
                     }}
                 />
             ),

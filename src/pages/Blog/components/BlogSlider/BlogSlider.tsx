@@ -7,7 +7,7 @@ const BlogSlide: React.FC = () => {
         {
             id: 1,
             image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2024/12/lomexin-1000-mg-1-1-768x401.jpg',
-            title: 'Bắt buộc kê toa điện tử: Phòng khám và Bác sĩ cần lưu ý gì?',
+            title: 'Bắt buộc kê toa điện tử: Bệnh viện và Bác sĩ cần lưu ý gì?',
             tag: 'Tin tức YouMed',
             source: 'YouMed',
             date: 'Ngày đăng: 08 Th8, 2025',
