@@ -226,7 +226,7 @@ const Invoices: React.FC<InvoicesProps> = ({ patientId, profile }) => {
                             </thead>
                             <tbody>
                                 {Array.from({ length: 5 }).map((_, index) => (
-                                    <tr key={index}>
+                                    <tr key={`skeleton-row-${index}-${Date.now()}`}>
                                         <td>
                                             <Skeleton variant="text" width="80px" height={16} />
                                         </td>
