@@ -360,7 +360,10 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                         <div className="card">
                             <div className="card-body">
                                 <h5 className="card-title mb-4">
-                                    <i className="isax isax-wallet-money me-2"></i>
+                                    <i
+                                        className="isax isax-wallet-money me-2"
+                                        aria-hidden="true"
+                                    ></i>
                                     Chọn phương thức đặt lịch
                                 </h5>
 
@@ -370,6 +373,16 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                         <div
                                             className={`payment-option-card ${paymentOption === 'deposit' ? 'active' : ''}`}
                                             onClick={() => setPaymentOption('deposit')}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault();
+                                                    setPaymentOption('deposit');
+                                                }
+                                            }}
+                                            role="button"
+                                            tabIndex={0}
+                                            aria-label="Đặt cọc và thanh toán ngay - Giảm ngay 10% tổng chi phí khi khám"
+                                            aria-pressed={paymentOption === 'deposit'}
                                         >
                                             <div className="payment-option-header">
                                                 <div className="form-check">
@@ -398,14 +411,20 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                             <div className="payment-option-content">
                                                 <div className="benefits-list">
                                                     <div className="benefit-item">
-                                                        <i className="isax isax-tick-circle text-success me-2"></i>
+                                                        <i
+                                                            className="isax isax-tick-circle text-success me-2"
+                                                            aria-hidden="true"
+                                                        ></i>
                                                         <span>
                                                             Giảm ngay <strong>10%</strong> tổng chi
                                                             phí khi khám
                                                         </span>
                                                     </div>
                                                     <div className="benefit-item">
-                                                        <i className="isax isax-tick-circle text-success me-2"></i>
+                                                        <i
+                                                            className="isax isax-tick-circle text-success me-2"
+                                                            aria-hidden="true"
+                                                        ></i>
                                                         <span>Đảm bảo giữ chỗ khám bệnh</span>
                                                     </div>
                                                 </div>
@@ -430,6 +449,16 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                         <div
                                             className={`payment-option-card ${paymentOption === 'no-payment' ? 'active' : ''}`}
                                             onClick={() => setPaymentOption('no-payment')}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault();
+                                                    setPaymentOption('no-payment');
+                                                }
+                                            }}
+                                            role="button"
+                                            tabIndex={0}
+                                            aria-label="Đặt lịch không cọc - Thanh toán toàn bộ khi khám"
+                                            aria-pressed={paymentOption === 'no-payment'}
                                         >
                                             <div className="payment-option-header">
                                                 <div className="form-check">
@@ -455,11 +484,17 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                             <div className="payment-option-content">
                                                 <div className="benefits-list">
                                                     <div className="benefit-item">
-                                                        <i className="isax isax-info-circle text-warning me-2"></i>
+                                                        <i
+                                                            className="isax isax-info-circle text-warning me-2"
+                                                            aria-hidden="true"
+                                                        ></i>
                                                         <span>Thanh toán toàn bộ khi khám</span>
                                                     </div>
                                                     <div className="benefit-item">
-                                                        <i className="isax isax-info-circle text-warning me-2"></i>
+                                                        <i
+                                                            className="isax isax-info-circle text-warning me-2"
+                                                            aria-hidden="true"
+                                                        ></i>
                                                         <span>Không được giảm giá</span>
                                                     </div>
                                                 </div>
@@ -610,7 +645,10 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                     </>
                                 ) : (
                                     <div className="alert alert-warning">
-                                        <i className="bi bi-exclamation-triangle me-2"></i>
+                                        <i
+                                            className="bi bi-exclamation-triangle me-2"
+                                            aria-hidden="true"
+                                        ></i>
                                         Không tìm thấy thông tin giá khám. Vui lòng quay lại và chọn
                                         lại bác sĩ.
                                     </div>

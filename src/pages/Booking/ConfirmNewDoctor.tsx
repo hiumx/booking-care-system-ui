@@ -463,14 +463,14 @@ const ConfirmNewDoctor: React.FC = () => {
                                         >
                                             {isConfirming ? (
                                                 <>
-                                                    <span
+                                                    <output
                                                         className="spinner-border spinner-border-sm me-2"
-                                                        role="status"
+                                                        aria-label="Đang xử lý"
                                                     >
                                                         <span className="visually-hidden">
-                                                            Loading...
+                                                            Đang xử lý...
                                                         </span>
-                                                    </span>
+                                                    </output>
                                                     Đang xử lý...
                                                 </>
                                             ) : (

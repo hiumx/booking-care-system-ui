@@ -12,10 +12,10 @@ import { PATHS } from '@/routes/paths';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { toast } from 'react-toastify';
 import { AppointmentService } from '@/services/appointment.service';
-import { CreateAppointmentRequest } from '@/types/appointment.types';
 import { AppointmentType } from '@/enums/appointment.enums';
 import { setCreatedAppointmentId } from '@/store/slices/bookingSlice';
 import PaymentService, { CreatePaymentRequest } from '@/services/payment.service';
+import { createAppointmentTimeId, createAppointmentRequest } from '@/utils/appointment-utils';
 
 const Booking: React.FC = () => {
     const [currentStep, setCurrentStep] = useState<number>(1);
@@ -84,19 +84,19 @@ const Booking: React.FC = () => {
 
                 // Get first selected slot
                 const firstSlot = scheduleState.selectedSlots[0];
-                const appointmentTimeId = `AT_${firstSlot.startTime.replace(':', '_')}_${firstSlot.endTime.replace(':', '_')}`;
+                const appointmentTimeId = createAppointmentTimeId(firstSlot);
 
-                const request: CreateAppointmentRequest = {
-                    patientId: userState.profile.id,
-                    doctorId: doctorId,
-                    specialtyId: doctorState.selectedDoctor?.specialtyId,
-                    appointmentDate: scheduleState.selectedDate,
-                    appointmentTimeId: appointmentTimeId,
-                    hospitalId: doctorState.selectedDoctor?.hospital?.id,
-                    appointmentType: bookingState.appointmentType || AppointmentType.IN_PERSON,
-                    symptoms: bookingState.symptoms,
-                    attachmentUrls: bookingState.attachmentUrls.join(','),
-                };
+                const request = createAppointmentRequest(
+                    userState.profile.id,
+                    doctorId || '',
+                    doctorState.selectedDoctor?.specialtyId,
+                    scheduleState.selectedDate,
+                    appointmentTimeId,
+                    doctorState.selectedDoctor?.hospital?.id,
+                    bookingState.appointmentType || AppointmentType.IN_PERSON,
+                    bookingState.symptoms,
+                    bookingState.attachmentUrls
+                );
 
                 const response = await AppointmentService.createAppointment(request);
 
@@ -161,19 +161,19 @@ const Booking: React.FC = () => {
         try {
             // Get first selected slot
             const firstSlot = scheduleState.selectedSlots[0];
-            const appointmentTimeId = `AT_${firstSlot.startTime.replace(':', '_')}_${firstSlot.endTime.replace(':', '_')}`;
+            const appointmentTimeId = createAppointmentTimeId(firstSlot);
 
-            const request: CreateAppointmentRequest = {
-                patientId: userState.profile.id,
-                doctorId: doctorId,
-                specialtyId: doctorState.selectedDoctor?.specialtyId,
-                appointmentDate: scheduleState.selectedDate,
-                appointmentTimeId: appointmentTimeId,
-                hospitalId: doctorState.selectedDoctor?.hospital?.id,
-                appointmentType: bookingState.appointmentType || AppointmentType.IN_PERSON,
-                symptoms: bookingState.symptoms,
-                attachmentUrls: bookingState.attachmentUrls.join(','),
-            };
+            const request = createAppointmentRequest(
+                userState.profile.id,
+                doctorId || '',
+                doctorState.selectedDoctor?.specialtyId,
+                scheduleState.selectedDate,
+                appointmentTimeId,
+                doctorState.selectedDoctor?.hospital?.id,
+                bookingState.appointmentType || AppointmentType.IN_PERSON,
+                bookingState.symptoms,
+                bookingState.attachmentUrls
+            );
 
             const response = await AppointmentService.createAppointment(request);
 

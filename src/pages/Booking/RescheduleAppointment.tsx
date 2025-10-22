@@ -11,6 +11,7 @@ import { PATHS } from '@/routes/paths';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
 import FullScreenSpinner from '@/components/FullScreenSpinner';
+import { loadAppointmentData, validateAppointmentParams } from '@/utils/appointment-utils';
 
 /**
  * RescheduleAppointment Page - Option 1
@@ -30,35 +31,14 @@ const RescheduleAppointment: React.FC = () => {
     const doctorId = searchParams.get('doctorId');
 
     useEffect(() => {
-        if (!appointmentId || !rescheduleToken) {
-            toast.error('Thông tin không hợp lệ');
-            navigate(PATHS.HOME);
+        if (!validateAppointmentParams(appointmentId || null, rescheduleToken, navigate)) {
             return;
         }
 
-        loadAppointmentData();
-    }, [appointmentId]);
-
-    const loadAppointmentData = async () => {
-        if (!appointmentId) return;
-
-        try {
-            setIsLoading(true);
-            const response = await AppointmentService.getAppointmentById(appointmentId);
-
-            if (response.success && response.data) {
-                setAppointmentData(response.data);
-            } else {
-                throw new Error('Không thể tải thông tin lịch hẹn');
-            }
-        } catch (error: any) {
-            console.error('Error loading appointment:', error);
-            toast.error(error.message || 'Không thể tải thông tin lịch hẹn');
-            navigate(PATHS.HOME);
-        } finally {
-            setIsLoading(false);
+        if (appointmentId) {
+            loadAppointmentData(appointmentId, setAppointmentData, setIsLoading, navigate);
         }
-    };
+    }, [appointmentId, rescheduleToken, navigate]);
 
     const handleReschedule = async () => {
         if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0) {

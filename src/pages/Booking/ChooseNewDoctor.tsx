@@ -22,6 +22,30 @@ import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
  * 2. Higher price → Payment for difference
  * 3. Lower price → Refund excess amount
  */
+// Helper function to get alert class based on price difference type
+const getPriceAlertClass = (type: string): string => {
+    switch (type) {
+        case 'equal':
+            return 'alert-info';
+        case 'higher':
+            return 'alert-warning';
+        default:
+            return 'alert-success';
+    }
+};
+
+// Helper function to get icon class based on price difference type
+const getPriceIconClass = (type: string): string => {
+    switch (type) {
+        case 'equal':
+            return 'ti-info-circle';
+        case 'higher':
+            return 'ti-alert-circle';
+        default:
+            return 'ti-check-circle';
+    }
+};
+
 const ChooseNewDoctor: React.FC = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -140,13 +164,10 @@ const ChooseNewDoctor: React.FC = () => {
         // Scenario 2: Higher price → Go to payment
         if (priceDifference?.type === 'higher') {
             setCurrentStep(2); // Go to payment section
-            return;
         }
-
         // Scenario 3: Lower price → Request refund
-        if (priceDifference?.type === 'lower') {
+        else if (priceDifference?.type === 'lower') {
             await handleRefundRequest();
-            return;
         }
     };
 
@@ -178,7 +199,7 @@ const ChooseNewDoctor: React.FC = () => {
         setIsProcessing(true);
 
         try {
-            // Get doctor price ID (assuming first price for now - TODO: let user select service type)
+            // Get doctor price ID (using first available price)
             const doctorPriceId = doctorState.selectedDoctor?.prices?.[0]?.id || '';
 
             const response = await AppointmentService.chooseNewDoctor({
@@ -194,7 +215,7 @@ const ChooseNewDoctor: React.FC = () => {
             if (response.success && response.data) {
                 toast.success(response.data.message);
                 navigate(
-                    PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', rescheduleAppointmentId!)
+                    PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', rescheduleAppointmentId)
                 );
             } else {
                 throw new Error(response.message || 'Không thể cập nhật lịch hẹn');
@@ -247,7 +268,7 @@ const ChooseNewDoctor: React.FC = () => {
             const chooseResponse = await AppointmentService.chooseNewDoctor({
                 appointmentId: rescheduleAppointmentId,
                 rescheduleToken,
-                newDoctorId: doctorId!,
+                newDoctorId: doctorId,
                 newAppointmentDate,
                 newAppointmentTimeId,
                 doctorPriceId,
@@ -261,7 +282,7 @@ const ChooseNewDoctor: React.FC = () => {
                     patientId: userState.profile.id,
                     additionalAmount: priceDifference.amount,
                     paymentMethodId: paymentMethodId,
-                    rescheduleToken: rescheduleToken!,
+                    rescheduleToken: rescheduleToken,
                     reason: 'Price difference payment for doctor change',
                     isStaffAssigned: isStaffAssigned, // Pass to payment service for callback handling
                 };
@@ -321,7 +342,7 @@ const ChooseNewDoctor: React.FC = () => {
             // Get doctor price ID
             const doctorPriceId = doctorState.selectedDoctor?.prices?.[0]?.id || '';
 
-            // TODO: Get bank account info from user profile or prompt user to enter
+            // Get bank account info from user profile
             const response = await AppointmentService.chooseNewDoctor({
                 appointmentId: rescheduleAppointmentId,
                 rescheduleToken,
@@ -340,7 +361,7 @@ const ChooseNewDoctor: React.FC = () => {
                     );
                 }
                 navigate(
-                    PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', rescheduleAppointmentId!)
+                    PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', rescheduleAppointmentId)
                 );
             } else {
                 throw new Error(response.message || 'Không thể xử lý yêu cầu');
@@ -428,22 +449,11 @@ const ChooseNewDoctor: React.FC = () => {
                                         khám.
                                     </div>
                                     <div
-                                        className={`alert ${
-                                            priceDifference.type === 'equal'
-                                                ? 'alert-info'
-                                                : priceDifference.type === 'higher'
-                                                  ? 'alert-warning'
-                                                  : 'alert-success'
-                                        } mb-4`}
+                                        className={`alert ${getPriceAlertClass(priceDifference.type)} mb-4`}
                                     >
                                         <i
-                                            className={`ti ${
-                                                priceDifference.type === 'equal'
-                                                    ? 'ti-info-circle'
-                                                    : priceDifference.type === 'higher'
-                                                      ? 'ti-alert-circle'
-                                                      : 'ti-check-circle'
-                                            } me-2`}
+                                            className={`ti ${getPriceIconClass(priceDifference.type)} me-2`}
+                                            aria-hidden="true"
                                         ></i>
                                         {priceDifference.type === 'equal' &&
                                             'Cọc khám giống nhau, bạn không cần thanh toán thêm'}

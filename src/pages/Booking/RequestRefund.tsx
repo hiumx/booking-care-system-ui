@@ -8,6 +8,11 @@ import { PATHS } from '@/routes/paths';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
 import FullScreenSpinner from '@/components/FullScreenSpinner';
+import {
+    loadAppointmentData,
+    validateAppointmentParams,
+    formatAppointmentTime,
+} from '@/utils/appointment-utils';
 
 /**
  * RequestRefund Page - Option 4
@@ -24,46 +29,17 @@ const RequestRefund: React.FC = () => {
 
     const rescheduleToken = searchParams.get('token');
 
-    // Format appointment time from appointmentTimeId
-    const formatAppointmentTime = (timeId: string): string => {
-        const timeMatch = timeId.match(/AT_(\d+)_(\d+)_(\d+)_(\d+)/);
-        if (timeMatch) {
-            const [, startHour, startMin, endHour, endMin] = timeMatch;
-            return `${startHour.padStart(2, '0')}:${startMin.padStart(2, '0')} - ${endHour.padStart(2, '0')}:${endMin.padStart(2, '0')}`;
-        }
-        return 'N/A';
-    };
+    // Use the utility function from appointment-utils
 
     useEffect(() => {
-        if (!appointmentId || !rescheduleToken) {
-            toast.error('Thông tin không hợp lệ');
-            navigate(PATHS.HOME);
+        if (!validateAppointmentParams(appointmentId || null, rescheduleToken, navigate)) {
             return;
         }
 
-        loadAppointmentData();
-    }, [appointmentId]);
-
-    const loadAppointmentData = async () => {
-        if (!appointmentId) return;
-
-        try {
-            setIsLoading(true);
-            const response = await AppointmentService.getAppointmentById(appointmentId);
-
-            if (response.success && response.data) {
-                setAppointmentData(response.data);
-            } else {
-                throw new Error('Không thể tải thông tin lịch hẹn');
-            }
-        } catch (error: any) {
-            console.error('Error loading appointment:', error);
-            toast.error(error.message || 'Không thể tải thông tin lịch hẹn');
-            navigate(PATHS.HOME);
-        } finally {
-            setIsLoading(false);
+        if (appointmentId) {
+            loadAppointmentData(appointmentId, setAppointmentData, setIsLoading, navigate);
         }
-    };
+    }, [appointmentId, rescheduleToken, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -163,7 +139,10 @@ const RequestRefund: React.FC = () => {
                                                         'Bác sĩ'}
                                                 </h6>
                                                 <p className="text-muted mb-0">
-                                                    <i className="isax isax-health me-1"></i>
+                                                    <i
+                                                        className="isax isax-health me-1"
+                                                        aria-hidden="true"
+                                                    ></i>
                                                     {appointmentData?.doctorInfo?.specialtyName ||
                                                         'Chưa cập nhật'}
                                                 </p>
@@ -174,7 +153,10 @@ const RequestRefund: React.FC = () => {
                                         <div className="row g-3">
                                             <div className="col-md-6">
                                                 <div className="d-flex align-items-start">
-                                                    <i className="isax isax-calendar-2 text-primary me-2 mt-1"></i>
+                                                    <i
+                                                        className="isax isax-calendar-2 text-primary me-2 mt-1"
+                                                        aria-hidden="true"
+                                                    ></i>
                                                     <div>
                                                         <small className="text-muted d-block">
                                                             Ngày khám
@@ -196,7 +178,10 @@ const RequestRefund: React.FC = () => {
 
                                             <div className="col-md-6">
                                                 <div className="d-flex align-items-start">
-                                                    <i className="isax isax-clock text-primary me-2 mt-1"></i>
+                                                    <i
+                                                        className="isax isax-clock text-primary me-2 mt-1"
+                                                        aria-hidden="true"
+                                                    ></i>
                                                     <div>
                                                         <small className="text-muted d-block">
                                                             Giờ khám
@@ -280,19 +265,22 @@ const RequestRefund: React.FC = () => {
                                             >
                                                 {isSubmitting ? (
                                                     <>
-                                                        <span
+                                                        <output
                                                             className="spinner-border spinner-border-sm me-2"
-                                                            role="status"
+                                                            aria-label="Đang xử lý"
                                                         >
                                                             <span className="visually-hidden">
-                                                                Loading...
+                                                                Đang xử lý...
                                                             </span>
-                                                        </span>
+                                                        </output>
                                                         Đang xử lý...
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <i className="isax isax-send-2 me-2"></i>
+                                                        <i
+                                                            className="isax isax-send-2 me-2"
+                                                            aria-hidden="true"
+                                                        ></i>
                                                         Gửi yêu cầu
                                                     </>
                                                 )}
