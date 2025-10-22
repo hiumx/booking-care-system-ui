@@ -80,6 +80,38 @@ const Booking: React.FC = () => {
         });
     };
 
+    // Helper function to ensure appointment is created and return appointmentId
+    const ensureAppointmentCreated = async (): Promise<string> => {
+        // Return existing appointment ID if available
+        if (bookingState.createdAppointmentId) {
+            return bookingState.createdAppointmentId;
+        }
+
+        // Create new appointment
+        setIsCreatingAppointment(true);
+
+        const request = createAppointmentFromSchedule();
+        if (!request) {
+            throw new Error('Không thể tạo yêu cầu đặt lịch');
+        }
+
+        const response = await AppointmentService.createAppointment(request);
+
+        if (!response.success) {
+            throw new Error(response.message || 'Không thể tạo lịch hẹn');
+        }
+
+        const appointmentId = (response.data as any)?.appointmentId;
+        if (!appointmentId) {
+            throw new Error('Không nhận được ID cuộc hẹn');
+        }
+
+        dispatch(setCreatedAppointmentId(appointmentId));
+        setIsCreatingAppointment(false);
+
+        return appointmentId;
+    };
+
     // Handle appointment creation and payment (Option 1: Deposit)
     const handleCreateAppointmentAndPayment = async (
         paymentMethodId: string,
@@ -98,58 +130,28 @@ const Booking: React.FC = () => {
         setIsProcessingPayment(true);
 
         try {
-            // Step 1: Create appointment first
-            let appointmentId = bookingState.createdAppointmentId;
+            // Step 1: Ensure appointment is created
+            const appointmentId = await ensureAppointmentCreated();
 
-            if (!appointmentId) {
-                setIsCreatingAppointment(true);
-
-                // Create appointment request from schedule
-                const request = createAppointmentFromSchedule();
-                if (!request) {
-                    toast.error('Không thể tạo yêu cầu đặt lịch');
-                    setIsCreatingAppointment(false);
-                    return;
-                }
-
-                const response = await AppointmentService.createAppointment(request);
-
-                if (response.success && response.data) {
-                    appointmentId = (response.data as any).appointmentId;
-                    if (appointmentId) {
-                        dispatch(setCreatedAppointmentId(appointmentId));
-                    } else {
-                        throw new Error('Không nhận được ID cuộc hẹn');
-                    }
-                } else {
-                    throw new Error(response.message || 'Không thể tạo lịch hẹn');
-                }
-
-                setIsCreatingAppointment(false);
-            }
-
-            // Step 2: Create payment URL
-            // toast.info('Đang tạo liên kết thanh toán...');
-
+            // Step 2: Create payment request
             const paymentRequest: CreatePaymentRequest = {
-                appointmentId: appointmentId,
+                appointmentId,
                 patientId: userState.profile.id,
                 amount: depositAmount,
-                paymentMethodId: paymentMethodId,
+                paymentMethodId,
             };
 
             const paymentResponse = await PaymentService.createAppointmentPayment(paymentRequest);
 
             // Step 3: Redirect to payment gateway
-            if (paymentResponse.paymentUrl) {
-                toast.success('Đang chuyển hướng đến cổng thanh toán...');
-                // Add a small delay to show the toast
-                setTimeout(() => {
-                    globalThis.location.href = paymentResponse.paymentUrl;
-                }, 1000);
-            } else {
+            if (!paymentResponse.paymentUrl) {
                 throw new Error('Không nhận được URL thanh toán');
             }
+
+            toast.success('Đang chuyển hướng đến cổng thanh toán...');
+            setTimeout(() => {
+                globalThis.location.href = paymentResponse.paymentUrl;
+            }, 1000);
         } catch (error: any) {
             console.error('Process failed:', error);
             toast.error(error.message || 'Không thể hoàn tất quy trình');
@@ -170,36 +172,13 @@ const Booking: React.FC = () => {
             return;
         }
 
-        setIsCreatingAppointment(true);
-
         try {
-            // Create appointment request from schedule
-            const request = createAppointmentFromSchedule();
-            if (!request) {
-                toast.error('Không thể tạo yêu cầu đặt lịch');
-                setIsCreatingAppointment(false);
-                return;
-            }
-
-            const response = await AppointmentService.createAppointment(request);
-
-            if (response.success && response.data) {
-                const appointmentId = (response.data as any).appointmentId;
-                if (appointmentId) {
-                    dispatch(setCreatedAppointmentId(appointmentId));
-                    toast.success('Đặt lịch thành công! Vui lòng thanh toán khi đến khám.');
-                    // Navigate to confirmation page
-                    navigate(PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', appointmentId));
-                } else {
-                    throw new Error('Không nhận được ID cuộc hẹn');
-                }
-            } else {
-                throw new Error(response.message || 'Không thể tạo lịch hẹn');
-            }
+            const appointmentId = await ensureAppointmentCreated();
+            toast.success('Đặt lịch thành công! Vui lòng thanh toán khi đến khám.');
+            navigate(PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', appointmentId));
         } catch (error: any) {
             console.error('Create appointment failed:', error);
             toast.error(error.message || 'Không thể tạo lịch hẹn');
-        } finally {
             setIsCreatingAppointment(false);
         }
     };

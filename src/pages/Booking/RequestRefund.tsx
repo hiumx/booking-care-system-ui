@@ -84,7 +84,10 @@ const RequestRefund: React.FC = () => {
                             <div className="card shadow-sm">
                                 <div className="card-header bg-primary text-white">
                                     <h4 className="mb-0 d-flex align-items-center">
-                                        <i className="isax isax-receipt-2 me-2"></i>
+                                        <i
+                                            className="isax isax-receipt-2 me-2"
+                                            aria-hidden="true"
+                                        ></i>{' '}
                                         Yêu cầu hoàn tiền
                                     </h4>
                                 </div>
@@ -92,7 +95,10 @@ const RequestRefund: React.FC = () => {
                                     {/* Appointment Information Card */}
                                     <div className="bg-light rounded-3 p-4 mb-4">
                                         <h5 className="mb-3 d-flex align-items-center text-dark">
-                                            <i className="isax isax-calendar-1 me-2"></i>
+                                            <i
+                                                className="isax isax-calendar-1 me-2"
+                                                aria-hidden="true"
+                                            ></i>{' '}
                                             Thông tin lịch hẹn
                                         </h5>
 
@@ -237,7 +243,10 @@ const RequestRefund: React.FC = () => {
                                                 onClick={() => navigate(PATHS.HOME)}
                                                 disabled={isSubmitting}
                                             >
-                                                <i className="isax isax-arrow-left-2 me-2"></i>
+                                                <i
+                                                    className="isax isax-arrow-left-2 me-2"
+                                                    aria-hidden="true"
+                                                ></i>{' '}
                                                 Hủy
                                             </button>
                                             <button
