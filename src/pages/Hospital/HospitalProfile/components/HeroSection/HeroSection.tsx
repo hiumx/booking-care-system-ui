@@ -202,7 +202,7 @@ const HeroSection: React.FC<Props> = ({ hospital }) => {
                                         <div className={styles.sideStack}>
                                             {galleryImages.slice(1, 4).map((src, idx) => (
                                                 <img
-                                                    key={`side-${idx}`}
+                                                    key={`side-${src}-${idx}`}
                                                     src={src}
                                                     alt={hospital?.name || 'Hospital'}
                                                     className={styles.sideItem}
@@ -213,7 +213,7 @@ const HeroSection: React.FC<Props> = ({ hospital }) => {
                                         <div className={styles.bottomRow}>
                                             {galleryImages.slice(4, 7).map((src, idx) => (
                                                 <img
-                                                    key={`thumb-${idx}`}
+                                                    key={`thumb-${src}-${idx}`}
                                                     src={src}
                                                     alt={hospital?.name || 'Ảnh'}
                                                     className={styles.thumb}

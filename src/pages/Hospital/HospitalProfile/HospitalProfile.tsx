@@ -109,6 +109,7 @@ const HospitalProfile: React.FC = () => {
     ];
 
     // Function to get random image from hospital images
+    // Using Math.random() is safe here as it's only for UI display purposes, not security-sensitive operations
     const getRandomHospitalImage = () => {
         if (selectedHospital?.images && selectedHospital.images.length > 0) {
             const randomIndex = Math.floor(Math.random() * selectedHospital.images.length);
@@ -193,8 +194,8 @@ const HospitalProfile: React.FC = () => {
                 <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
                 <div className="container">
                     <div className="text-center py-5">
-                        <div className="spinner-border" role="status">
-                            <span className="visually-hidden">Loading...</span>
+                        <div className="spinner-border">
+                            <output className="visually-hidden">Loading...</output>
                         </div>
                         <p className="mt-3">Đang tải thông tin bệnh viện...</p>
                     </div>
