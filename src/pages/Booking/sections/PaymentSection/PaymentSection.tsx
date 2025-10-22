@@ -363,7 +363,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                     <i
                                         className="isax isax-wallet-money me-2"
                                         aria-hidden="true"
-                                    ></i>
+                                    ></i>{' '}
                                     Chọn phương thức đặt lịch
                                 </h5>
 
@@ -648,7 +648,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                         <i
                                             className="bi bi-exclamation-triangle me-2"
                                             aria-hidden="true"
-                                        ></i>
+                                        ></i>{' '}
                                         Không tìm thấy thông tin giá khám. Vui lòng quay lại và chọn
                                         lại bác sĩ.
                                     </div>

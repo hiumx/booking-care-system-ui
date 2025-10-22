@@ -192,8 +192,8 @@ const ConfirmNewDoctor: React.FC = () => {
                             <div className="card shadow-sm">
                                 <div className="card-header bg-success text-white">
                                     <h4 className="mb-0 d-flex align-items-center">
-                                        <i className="isax isax-user-tick me-2"></i>
-                                        Xác nhận bác sĩ được bệnh viện gán
+                                        <i className="isax isax-user-tick me-2"></i> Xác nhận bác sĩ
+                                        được bệnh viện gán
                                     </h4>
                                 </div>
                                 <div className="card-body p-4">
@@ -215,8 +215,8 @@ const ConfirmNewDoctor: React.FC = () => {
                                     {/* Original Appointment Info */}
                                     <div className="bg-light rounded-3 p-4 mb-4">
                                         <h5 className="mb-3 d-flex align-items-center text-dark">
-                                            <i className="isax isax-calendar-1 me-2"></i>
-                                            Thông tin lịch hẹn gốc
+                                            <i className="isax isax-calendar-1 me-2"></i> Thông tin
+                                            lịch hẹn gốc
                                         </h5>
 
                                         {/* Original Doctor Info */}
@@ -316,8 +316,8 @@ const ConfirmNewDoctor: React.FC = () => {
                                     {newDoctor && (
                                         <div className="bg-success bg-opacity-10 rounded-3 p-4 mb-4 border border-success">
                                             <h5 className="mb-3 d-flex align-items-center text-success">
-                                                <i className="isax isax-user-tick me-2"></i>
-                                                Bác sĩ được gán mới
+                                                <i className="isax isax-user-tick me-2"></i> Bác sĩ
+                                                được gán mới
                                             </h5>
 
                                             <div className="d-flex align-items-start">
@@ -361,7 +361,7 @@ const ConfirmNewDoctor: React.FC = () => {
                                                         priceDifference.type !== 'none' && (
                                                             <div className="mt-3 p-3 bg-light rounded-3 border">
                                                                 <h6 className="mb-2 text-dark">
-                                                                    <i className="isax isax-money-2 me-2"></i>
+                                                                    <i className="isax isax-money-2 me-2"></i>{' '}
                                                                     So sánh giá khám
                                                                 </h6>
                                                                 <div className="row g-2">

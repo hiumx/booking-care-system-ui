@@ -58,6 +58,28 @@ const Booking: React.FC = () => {
         setCurrentStep((prev) => prev + 1);
     };
 
+    // Helper function to create appointment request from schedule
+    const createAppointmentFromSchedule = () => {
+        if (!scheduleState.selectedSlots[0] || !userState.profile || !scheduleState.selectedDate) {
+            return null;
+        }
+
+        const firstSlot = scheduleState.selectedSlots[0];
+        const appointmentTimeId = createAppointmentTimeId(firstSlot);
+
+        return createAppointmentRequest({
+            patientId: userState.profile.id,
+            doctorId: doctorId || '',
+            specialtyId: doctorState.selectedDoctor?.specialtyId,
+            appointmentDate: scheduleState.selectedDate,
+            appointmentTimeId,
+            hospitalId: doctorState.selectedDoctor?.hospital?.id,
+            appointmentType: bookingState.appointmentType || AppointmentType.IN_PERSON,
+            symptoms: bookingState.symptoms,
+            attachmentUrls: bookingState.attachmentUrls,
+        });
+    };
+
     // Handle appointment creation and payment (Option 1: Deposit)
     const handleCreateAppointmentAndPayment = async (
         paymentMethodId: string,
@@ -82,21 +104,13 @@ const Booking: React.FC = () => {
             if (!appointmentId) {
                 setIsCreatingAppointment(true);
 
-                // Get first selected slot
-                const firstSlot = scheduleState.selectedSlots[0];
-                const appointmentTimeId = createAppointmentTimeId(firstSlot);
-
-                const request = createAppointmentRequest({
-                    patientId: userState.profile.id,
-                    doctorId: doctorId || '',
-                    specialtyId: doctorState.selectedDoctor?.specialtyId,
-                    appointmentDate: scheduleState.selectedDate,
-                    appointmentTimeId,
-                    hospitalId: doctorState.selectedDoctor?.hospital?.id,
-                    appointmentType: bookingState.appointmentType || AppointmentType.IN_PERSON,
-                    symptoms: bookingState.symptoms,
-                    attachmentUrls: bookingState.attachmentUrls,
-                });
+                // Create appointment request from schedule
+                const request = createAppointmentFromSchedule();
+                if (!request) {
+                    toast.error('Không thể tạo yêu cầu đặt lịch');
+                    setIsCreatingAppointment(false);
+                    return;
+                }
 
                 const response = await AppointmentService.createAppointment(request);
 
@@ -159,21 +173,13 @@ const Booking: React.FC = () => {
         setIsCreatingAppointment(true);
 
         try {
-            // Get first selected slot
-            const firstSlot = scheduleState.selectedSlots[0];
-            const appointmentTimeId = createAppointmentTimeId(firstSlot);
-
-            const request = createAppointmentRequest({
-                patientId: userState.profile.id,
-                doctorId: doctorId || '',
-                specialtyId: doctorState.selectedDoctor?.specialtyId,
-                appointmentDate: scheduleState.selectedDate,
-                appointmentTimeId,
-                hospitalId: doctorState.selectedDoctor?.hospital?.id,
-                appointmentType: bookingState.appointmentType || AppointmentType.IN_PERSON,
-                symptoms: bookingState.symptoms,
-                attachmentUrls: bookingState.attachmentUrls,
-            });
+            // Create appointment request from schedule
+            const request = createAppointmentFromSchedule();
+            if (!request) {
+                toast.error('Không thể tạo yêu cầu đặt lịch');
+                setIsCreatingAppointment(false);
+                return;
+            }
 
             const response = await AppointmentService.createAppointment(request);
 

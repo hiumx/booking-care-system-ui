@@ -172,6 +172,24 @@ const ChooseNewDoctor: React.FC = () => {
         }
     };
 
+    // Helper function to call chooseNewDoctor API
+    const callChooseNewDoctorAPI = async (
+        newAppointmentDate: string,
+        newAppointmentTimeId: string
+    ) => {
+        const doctorPriceId = doctorState.selectedDoctor?.prices?.[0]?.id || '';
+
+        return await AppointmentService.chooseNewDoctor({
+            appointmentId: rescheduleAppointmentId || '',
+            rescheduleToken: rescheduleToken || '',
+            newDoctorId: doctorId || '',
+            newAppointmentDate,
+            newAppointmentTimeId,
+            doctorPriceId,
+            isStaffAssigned,
+        });
+    };
+
     const handleDirectUpdate = async () => {
         if (!rescheduleAppointmentId || !rescheduleToken || !doctorId) {
             toast.error('Thông tin không hợp lệ');
@@ -192,18 +210,7 @@ const ChooseNewDoctor: React.FC = () => {
         setIsProcessing(true);
 
         try {
-            // Get doctor price ID (using first available price)
-            const doctorPriceId = doctorState.selectedDoctor?.prices?.[0]?.id || '';
-
-            const response = await AppointmentService.chooseNewDoctor({
-                appointmentId: rescheduleAppointmentId,
-                rescheduleToken,
-                newDoctorId: doctorId,
-                newAppointmentDate,
-                newAppointmentTimeId,
-                doctorPriceId,
-                isStaffAssigned, // Tell backend to use ConfirmNewDoctor or UpdateAppointment
-            });
+            const response = await callChooseNewDoctorAPI(newAppointmentDate, newAppointmentTimeId);
 
             if (response.success && response.data) {
                 toast.success(response.data.message);
@@ -316,19 +323,7 @@ const ChooseNewDoctor: React.FC = () => {
         setIsProcessing(true);
 
         try {
-            // Get doctor price ID
-            const doctorPriceId = doctorState.selectedDoctor?.prices?.[0]?.id || '';
-
-            // Get bank account info from user profile
-            const response = await AppointmentService.chooseNewDoctor({
-                appointmentId: rescheduleAppointmentId,
-                rescheduleToken,
-                newDoctorId: doctorId,
-                newAppointmentDate,
-                newAppointmentTimeId,
-                doctorPriceId,
-                isStaffAssigned, // Tell backend to use ConfirmNewDoctor or UpdateAppointment
-            });
+            const response = await callChooseNewDoctorAPI(newAppointmentDate, newAppointmentTimeId);
 
             if (response.success && response.data) {
                 toast.success(response.data.message);
