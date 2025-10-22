@@ -47,6 +47,7 @@ export const generateInvoicePDF = async (
     patientName?: string
 ): Promise<void> => {
     const timestamp = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
     const cleanPatientName = patientName?.replace(/[^a-zA-Z0-9]/g, '_') || 'Patient';
     const filename = `HoaDon_${invoiceId.slice(0, 8)}_${cleanPatientName}_${timestamp}.pdf`;
 
@@ -87,7 +88,7 @@ export const printInvoice = (element: HTMLElement): void => {
         })
         .join('');
 
-    printWindow.document.write(`
+    const htmlContent = `
         <!DOCTYPE html>
         <html>
             <head>
@@ -104,8 +105,10 @@ export const printInvoice = (element: HTMLElement): void => {
                 ${element.outerHTML}
             </body>
         </html>
-    `);
+    `;
 
+    printWindow.document.open();
+    printWindow.document.documentElement.innerHTML = htmlContent;
     printWindow.document.close();
     printWindow.focus();
 
