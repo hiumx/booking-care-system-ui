@@ -108,22 +108,21 @@ const HospitalProfile: React.FC = () => {
         { id: 7, name: 'Chụp X-quang', img: patientImg2 },
     ];
 
-    // Function to get random image from hospital images
-    // Using Math.random() is safe here as it's only for UI display purposes, not security-sensitive operations
-    const getRandomHospitalImage = () => {
+    // Function to get hospital image for specialty using round-robin distribution
+    const getHospitalImageForSpecialty = (specialtyIndex: number) => {
         if (selectedHospital?.images && selectedHospital.images.length > 0) {
-            const randomIndex = Math.floor(Math.random() * selectedHospital.images.length);
-            return selectedHospital.images[randomIndex].imageUrl;
+            const imageIndex = specialtyIndex % selectedHospital.images.length;
+            return selectedHospital.images[imageIndex].imageUrl;
         }
         return '';
     };
 
     // Specialties from API (fallback to empty)
-    const specialties = (selectedHospital?.specialties || []).map((s) => ({
+    const specialties = (selectedHospital?.specialties || []).map((s, index) => ({
         id: s.id,
         name: s.name,
         icon: s.imageUrl || '', // Icon chuyên khoa (foreground)
-        img: getRandomHospitalImage(), // Random ảnh từ hospital images (background)
+        img: getHospitalImageForSpecialty(index), // Round-robin ảnh từ hospital images (background)
         doctorCount: s.doctorCount || 0,
     }));
 
