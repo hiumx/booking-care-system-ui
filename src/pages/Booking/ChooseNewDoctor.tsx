@@ -11,8 +11,9 @@ import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { PATHS, replacePathParams } from '@/routes/paths';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
-import FullScreenSpinner from '@/components/FullScreenSpinner';
+import BookingLoadingSpinner from '@/components/BookingLoadingSpinner';
 import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
+import { getAppointmentDateTime } from '@/utils/appointment-utils';
 
 /**
  * ChooseNewDoctor Page - Option 3
@@ -178,23 +179,15 @@ const ChooseNewDoctor: React.FC = () => {
         }
 
         // Get date/time from original appointment if skipDateTime, otherwise from schedule state
-        let newAppointmentDate: string;
-        let newAppointmentTimeId: string;
+        const dateTime = getAppointmentDateTime(skipDateTime, originalAppointment, scheduleState);
 
-        if (skipDateTime && originalAppointment) {
-            // Use original appointment date/time (hospital already selected)
-            newAppointmentDate = originalAppointment.appointmentDate;
-            newAppointmentTimeId = originalAppointment.appointmentTimeId;
-        } else {
-            // Use user-selected date/time
-            if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0) {
-                toast.error('Vui lòng chọn ngày và giờ khám');
-                return;
-            }
-            const firstSlot = scheduleState.selectedSlots[0];
-            newAppointmentDate = scheduleState.selectedDate;
-            newAppointmentTimeId = `AT_${firstSlot.startTime.replace(':', '_')}_${firstSlot.endTime.replace(':', '_')}`;
+        if (!dateTime) {
+            toast.error('Vui lòng chọn ngày và giờ khám');
+            return;
         }
+
+        const { appointmentDate: newAppointmentDate, appointmentTimeId: newAppointmentTimeId } =
+            dateTime;
 
         setIsProcessing(true);
 
@@ -241,23 +234,15 @@ const ChooseNewDoctor: React.FC = () => {
         }
 
         // Get date/time from original appointment if skipDateTime, otherwise from schedule state
-        let newAppointmentDate: string;
-        let newAppointmentTimeId: string;
+        const dateTime = getAppointmentDateTime(skipDateTime, originalAppointment, scheduleState);
 
-        if (skipDateTime && originalAppointment) {
-            // Use original appointment date/time (hospital already selected)
-            newAppointmentDate = originalAppointment.appointmentDate;
-            newAppointmentTimeId = originalAppointment.appointmentTimeId;
-        } else {
-            // Use user-selected date/time
-            if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0) {
-                toast.error('Vui lòng chọn ngày và giờ khám');
-                return;
-            }
-            const firstSlot = scheduleState.selectedSlots[0];
-            newAppointmentDate = scheduleState.selectedDate;
-            newAppointmentTimeId = `AT_${firstSlot.startTime.replace(':', '_')}_${firstSlot.endTime.replace(':', '_')}`;
+        if (!dateTime) {
+            toast.error('Vui lòng chọn ngày và giờ khám');
+            return;
         }
+
+        const { appointmentDate: newAppointmentDate, appointmentTimeId: newAppointmentTimeId } =
+            dateTime;
 
         setIsProcessing(true);
 
@@ -318,23 +303,15 @@ const ChooseNewDoctor: React.FC = () => {
         }
 
         // Get date/time from original appointment if skipDateTime, otherwise from schedule state
-        let newAppointmentDate: string;
-        let newAppointmentTimeId: string;
+        const dateTime = getAppointmentDateTime(skipDateTime, originalAppointment, scheduleState);
 
-        if (skipDateTime && originalAppointment) {
-            // Use original appointment date/time (hospital already selected)
-            newAppointmentDate = originalAppointment.appointmentDate;
-            newAppointmentTimeId = originalAppointment.appointmentTimeId;
-        } else {
-            // Use user-selected date/time
-            if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0) {
-                toast.error('Vui lòng chọn ngày và giờ khám');
-                return;
-            }
-            const firstSlot = scheduleState.selectedSlots[0];
-            newAppointmentDate = scheduleState.selectedDate;
-            newAppointmentTimeId = `AT_${firstSlot.startTime.replace(':', '_')}_${firstSlot.endTime.replace(':', '_')}`;
+        if (!dateTime) {
+            toast.error('Vui lòng chọn ngày và giờ khám');
+            return;
         }
+
+        const { appointmentDate: newAppointmentDate, appointmentTimeId: newAppointmentTimeId } =
+            dateTime;
 
         setIsProcessing(true);
 
@@ -412,25 +389,7 @@ const ChooseNewDoctor: React.FC = () => {
     };
 
     if (isLoading) {
-        return (
-            <BookingLayout>
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-10 mx-auto">
-                            <div
-                                className="d-flex flex-column align-items-center justify-content-center"
-                                style={{ minHeight: '60vh' }}
-                            >
-                                <FullScreenSpinner
-                                    isVisible={true}
-                                    message="Đang tải thông tin..."
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </BookingLayout>
-        );
+        return <BookingLoadingSpinner />;
     }
 
     return (

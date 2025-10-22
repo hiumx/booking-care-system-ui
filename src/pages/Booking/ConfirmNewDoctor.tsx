@@ -10,6 +10,7 @@ import { PATHS } from '@/routes/paths';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
 import FullScreenSpinner from '@/components/FullScreenSpinner';
+import { formatAppointmentTime } from '@/utils/appointment-utils';
 
 /**
  * ConfirmNewDoctor Page - Option 2
@@ -35,15 +36,7 @@ const ConfirmNewDoctor: React.FC = () => {
     const rescheduleToken = searchParams.get('token');
     const newDoctorId = searchParams.get('newDoctorId');
 
-    // Format appointment time from appointmentTimeId
-    const formatAppointmentTime = (timeId: string): string => {
-        const timeMatch = timeId.match(/AT_(\d+)_(\d+)_(\d+)_(\d+)/);
-        if (timeMatch) {
-            const [, startHour, startMin, endHour, endMin] = timeMatch;
-            return `${startHour.padStart(2, '0')}:${startMin.padStart(2, '0')} - ${endHour.padStart(2, '0')}:${endMin.padStart(2, '0')}`;
-        }
-        return 'N/A';
-    };
+    // Use formatAppointmentTime from utils
 
     // Calculate price difference between original and new doctor
     const calculatePriceDifference = () => {

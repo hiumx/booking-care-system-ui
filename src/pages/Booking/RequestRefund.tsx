@@ -7,7 +7,7 @@ import { AppointmentResponse } from '@/types/appointment.types';
 import { PATHS } from '@/routes/paths';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
-import FullScreenSpinner from '@/components/FullScreenSpinner';
+import BookingLoadingSpinner from '@/components/BookingLoadingSpinner';
 import {
     loadAppointmentData,
     validateAppointmentParams,
@@ -72,25 +72,7 @@ const RequestRefund: React.FC = () => {
     };
 
     if (isLoading) {
-        return (
-            <BookingLayout>
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-10 mx-auto">
-                            <div
-                                className="d-flex flex-column align-items-center justify-content-center"
-                                style={{ minHeight: '60vh' }}
-                            >
-                                <FullScreenSpinner
-                                    isVisible={true}
-                                    message="Đang tải thông tin..."
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </BookingLayout>
-        );
+        return <BookingLoadingSpinner />;
     }
 
     return (

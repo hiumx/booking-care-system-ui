@@ -86,17 +86,17 @@ const Booking: React.FC = () => {
                 const firstSlot = scheduleState.selectedSlots[0];
                 const appointmentTimeId = createAppointmentTimeId(firstSlot);
 
-                const request = createAppointmentRequest(
-                    userState.profile.id,
-                    doctorId || '',
-                    doctorState.selectedDoctor?.specialtyId,
-                    scheduleState.selectedDate,
+                const request = createAppointmentRequest({
+                    patientId: userState.profile.id,
+                    doctorId: doctorId || '',
+                    specialtyId: doctorState.selectedDoctor?.specialtyId,
+                    appointmentDate: scheduleState.selectedDate,
                     appointmentTimeId,
-                    doctorState.selectedDoctor?.hospital?.id,
-                    bookingState.appointmentType || AppointmentType.IN_PERSON,
-                    bookingState.symptoms,
-                    bookingState.attachmentUrls
-                );
+                    hospitalId: doctorState.selectedDoctor?.hospital?.id,
+                    appointmentType: bookingState.appointmentType || AppointmentType.IN_PERSON,
+                    symptoms: bookingState.symptoms,
+                    attachmentUrls: bookingState.attachmentUrls,
+                });
 
                 const response = await AppointmentService.createAppointment(request);
 
@@ -163,17 +163,17 @@ const Booking: React.FC = () => {
             const firstSlot = scheduleState.selectedSlots[0];
             const appointmentTimeId = createAppointmentTimeId(firstSlot);
 
-            const request = createAppointmentRequest(
-                userState.profile.id,
-                doctorId || '',
-                doctorState.selectedDoctor?.specialtyId,
-                scheduleState.selectedDate,
+            const request = createAppointmentRequest({
+                patientId: userState.profile.id,
+                doctorId: doctorId || '',
+                specialtyId: doctorState.selectedDoctor?.specialtyId,
+                appointmentDate: scheduleState.selectedDate,
                 appointmentTimeId,
-                doctorState.selectedDoctor?.hospital?.id,
-                bookingState.appointmentType || AppointmentType.IN_PERSON,
-                bookingState.symptoms,
-                bookingState.attachmentUrls
-            );
+                hospitalId: doctorState.selectedDoctor?.hospital?.id,
+                appointmentType: bookingState.appointmentType || AppointmentType.IN_PERSON,
+                symptoms: bookingState.symptoms,
+                attachmentUrls: bookingState.attachmentUrls,
+            });
 
             const response = await AppointmentService.createAppointment(request);
 

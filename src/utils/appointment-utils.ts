@@ -72,28 +72,67 @@ export const createAppointmentTimeId = (slot: { startTime: string; endTime: stri
 };
 
 /**
+ * Get appointment date and time for reschedule
+ * Returns from original appointment if skipDateTime, otherwise from schedule state
+ */
+export const getAppointmentDateTime = (
+    skipDateTime: boolean,
+    originalAppointment: any,
+    scheduleState: {
+        selectedDate: string | null;
+        selectedSlots: Array<{ startTime: string; endTime: string }>;
+    }
+): { appointmentDate: string; appointmentTimeId: string } | null => {
+    if (skipDateTime && originalAppointment) {
+        // Use original appointment date/time (hospital already selected)
+        return {
+            appointmentDate: originalAppointment.appointmentDate,
+            appointmentTimeId: originalAppointment.appointmentTimeId,
+        };
+    }
+
+    // Use user-selected date/time
+    if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0) {
+        return null;
+    }
+
+    const firstSlot = scheduleState.selectedSlots[0];
+    return {
+        appointmentDate: scheduleState.selectedDate,
+        appointmentTimeId: createAppointmentTimeId(firstSlot),
+    };
+};
+
+/**
+ * Parameters for creating an appointment request
+ */
+export interface CreateAppointmentParams {
+    patientId: string;
+    doctorId: string;
+    specialtyId: string | undefined;
+    appointmentDate: string;
+    appointmentTimeId: string;
+    hospitalId: string | undefined;
+    appointmentType: AppointmentType;
+    symptoms: string;
+    attachmentUrls: string[];
+}
+
+/**
  * Utility function to create appointment request object
  */
 export const createAppointmentRequest = (
-    patientId: string,
-    doctorId: string,
-    specialtyId: string | undefined,
-    appointmentDate: string,
-    appointmentTimeId: string,
-    hospitalId: string | undefined,
-    appointmentType: AppointmentType,
-    symptoms: string,
-    attachmentUrls: string[]
+    params: CreateAppointmentParams
 ): CreateAppointmentRequest => {
     return {
-        patientId,
-        doctorId,
-        specialtyId,
-        appointmentDate,
-        appointmentTimeId,
-        hospitalId,
-        appointmentType: appointmentType || AppointmentType.IN_PERSON,
-        symptoms,
-        attachmentUrls: attachmentUrls.join(','),
+        patientId: params.patientId,
+        doctorId: params.doctorId,
+        specialtyId: params.specialtyId,
+        appointmentDate: params.appointmentDate,
+        appointmentTimeId: params.appointmentTimeId,
+        hospitalId: params.hospitalId,
+        appointmentType: params.appointmentType || AppointmentType.IN_PERSON,
+        symptoms: params.symptoms,
+        attachmentUrls: params.attachmentUrls.join(','),
     };
 };
