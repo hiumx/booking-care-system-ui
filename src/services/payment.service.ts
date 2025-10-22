@@ -127,6 +127,41 @@ export class PaymentService {
     }
 
     /**
+     * Create supplementary payment for appointment price difference
+     * Used when patient chooses new doctor with higher price (Option 3)
+     */
+    static async createSupplementaryPayment(request: {
+        appointmentId: string;
+        patientId: string;
+        additionalAmount: number;
+        paymentMethodId: string;
+        rescheduleToken: string;
+        reason?: string;
+        isStaffAssigned?: boolean; // For callback handling
+    }): Promise<{
+        appointmentId: string;
+        additionalAmount: number;
+        paymentUrl: string;
+        paymentGateway: string;
+        expireAt?: string;
+        paymentReference?: string;
+        supplementaryPaymentId: string;
+    }> {
+        try {
+            const result: any = await axiosInstance.post('/payments/supplementary', request);
+
+            if (!result.success) {
+                throw new Error(result.message || 'Failed to create supplementary payment URL');
+            }
+
+            return result.data;
+        } catch (error: any) {
+            console.error('Error creating supplementary payment:', error);
+            throw new Error(error.message || 'Failed to create supplementary payment URL');
+        }
+    }
+
+    /**
      * Lấy danh sách hóa đơn theo patient ID với đầy đủ query parameters
      */
     static async getPatientInvoices(

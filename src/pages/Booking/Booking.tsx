@@ -12,10 +12,10 @@ import { PATHS } from '@/routes/paths';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { toast } from 'react-toastify';
 import { AppointmentService } from '@/services/appointment.service';
-import { CreateAppointmentRequest } from '@/types/appointment.types';
 import { AppointmentType } from '@/enums/appointment.enums';
 import { setCreatedAppointmentId } from '@/store/slices/bookingSlice';
 import PaymentService, { CreatePaymentRequest } from '@/services/payment.service';
+import { createAppointmentTimeId, createAppointmentRequest } from '@/utils/appointment-utils';
 
 const Booking: React.FC = () => {
     const [currentStep, setCurrentStep] = useState<number>(1);
@@ -58,7 +58,61 @@ const Booking: React.FC = () => {
         setCurrentStep((prev) => prev + 1);
     };
 
-    // Handle appointment creation and payment
+    // Helper function to create appointment request from schedule
+    const createAppointmentFromSchedule = () => {
+        if (!scheduleState.selectedSlots[0] || !userState.profile || !scheduleState.selectedDate) {
+            return null;
+        }
+
+        const firstSlot = scheduleState.selectedSlots[0];
+        const appointmentTimeId = createAppointmentTimeId(firstSlot);
+
+        return createAppointmentRequest({
+            patientId: userState.profile.id,
+            doctorId: doctorId || '',
+            specialtyId: doctorState.selectedDoctor?.specialtyId,
+            appointmentDate: scheduleState.selectedDate,
+            appointmentTimeId,
+            hospitalId: doctorState.selectedDoctor?.hospital?.id,
+            appointmentType: bookingState.appointmentType || AppointmentType.IN_PERSON,
+            symptoms: bookingState.symptoms,
+            attachmentUrls: bookingState.attachmentUrls,
+        });
+    };
+
+    // Helper function to ensure appointment is created and return appointmentId
+    const ensureAppointmentCreated = async (): Promise<string> => {
+        // Return existing appointment ID if available
+        if (bookingState.createdAppointmentId) {
+            return bookingState.createdAppointmentId;
+        }
+
+        // Create new appointment
+        setIsCreatingAppointment(true);
+
+        const request = createAppointmentFromSchedule();
+        if (!request) {
+            throw new Error('Không thể tạo yêu cầu đặt lịch');
+        }
+
+        const response = await AppointmentService.createAppointment(request);
+
+        if (!response.success) {
+            throw new Error(response.message || 'Không thể tạo lịch hẹn');
+        }
+
+        const appointmentId = (response.data as any)?.appointmentId;
+        if (!appointmentId) {
+            throw new Error('Không nhận được ID cuộc hẹn');
+        }
+
+        dispatch(setCreatedAppointmentId(appointmentId));
+        setIsCreatingAppointment(false);
+
+        return appointmentId;
+    };
+
+    // Handle appointment creation and payment (Option 1: Deposit)
     const handleCreateAppointmentAndPayment = async (
         paymentMethodId: string,
         depositAmount: number
@@ -76,70 +130,56 @@ const Booking: React.FC = () => {
         setIsProcessingPayment(true);
 
         try {
-            // Step 1: Create appointment first
-            let appointmentId = bookingState.createdAppointmentId;
+            // Step 1: Ensure appointment is created
+            const appointmentId = await ensureAppointmentCreated();
 
-            if (!appointmentId) {
-                setIsCreatingAppointment(true);
-
-                // Get first selected slot
-                const firstSlot = scheduleState.selectedSlots[0];
-                const appointmentTimeId = `AT_${firstSlot.startTime.replace(':', '_')}_${firstSlot.endTime.replace(':', '_')}`;
-
-                const request: CreateAppointmentRequest = {
-                    patientId: userState.profile.id,
-                    doctorId: doctorId,
-                    appointmentDate: scheduleState.selectedDate,
-                    appointmentTimeId: appointmentTimeId,
-                    hospitalId: doctorState.selectedDoctor?.hospital?.id,
-                    appointmentType: bookingState.appointmentType || AppointmentType.IN_PERSON,
-                    symptoms: bookingState.symptoms,
-                    attachmentUrls: bookingState.attachmentUrls.join(','),
-                };
-
-                const response = await AppointmentService.createAppointment(request);
-
-                if (response.success && response.data) {
-                    appointmentId = (response.data as any).appointmentId;
-                    if (appointmentId) {
-                        dispatch(setCreatedAppointmentId(appointmentId));
-                    } else {
-                        throw new Error('Không nhận được ID cuộc hẹn');
-                    }
-                } else {
-                    throw new Error(response.message || 'Không thể tạo lịch hẹn');
-                }
-
-                setIsCreatingAppointment(false);
-            }
-
-            // Step 2: Create payment URL
-            // toast.info('Đang tạo liên kết thanh toán...');
-
+            // Step 2: Create payment request
             const paymentRequest: CreatePaymentRequest = {
-                appointmentId: appointmentId,
+                appointmentId,
                 patientId: userState.profile.id,
                 amount: depositAmount,
-                paymentMethodId: paymentMethodId,
+                paymentMethodId,
             };
 
             const paymentResponse = await PaymentService.createAppointmentPayment(paymentRequest);
 
             // Step 3: Redirect to payment gateway
-            if (paymentResponse.paymentUrl) {
-                toast.success('Đang chuyển hướng đến cổng thanh toán...');
-                // Add a small delay to show the toast
-                setTimeout(() => {
-                    globalThis.location.href = paymentResponse.paymentUrl;
-                }, 1000);
-            } else {
+            if (!paymentResponse.paymentUrl) {
                 throw new Error('Không nhận được URL thanh toán');
             }
+
+            toast.success('Đang chuyển hướng đến cổng thanh toán...');
+            setTimeout(() => {
+                globalThis.location.href = paymentResponse.paymentUrl;
+            }, 1000);
         } catch (error: any) {
             console.error('Process failed:', error);
             toast.error(error.message || 'Không thể hoàn tất quy trình');
             setIsCreatingAppointment(false);
             setIsProcessingPayment(false);
+        }
+    };
+
+    // Handle appointment creation without payment (Option 2: No Payment)
+    const handleCreateAppointmentOnly = async () => {
+        if (!userState.profile?.id) {
+            toast.error('Không tìm thấy thông tin người dùng');
+            return;
+        }
+
+        if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0) {
+            toast.error('Vui lòng chọn ngày và giờ khám');
+            return;
+        }
+
+        try {
+            const appointmentId = await ensureAppointmentCreated();
+            toast.success('Đặt lịch thành công! Vui lòng thanh toán khi đến khám.');
+            navigate(PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', appointmentId));
+        } catch (error: any) {
+            console.error('Create appointment failed:', error);
+            toast.error(error.message || 'Không thể tạo lịch hẹn');
+            setIsCreatingAppointment(false);
         }
     };
 
@@ -177,6 +217,7 @@ const Booking: React.FC = () => {
                                         onCreateAppointmentAndPayment={
                                             handleCreateAppointmentAndPayment
                                         }
+                                        onCreateAppointmentOnly={handleCreateAppointmentOnly}
                                         isProcessingPayment={isProcessingPayment}
                                     />
                                 )}

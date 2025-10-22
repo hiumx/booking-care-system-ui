@@ -26,12 +26,16 @@ import AboutUs from '@/pages/AboutUs/AboutUs';
 import DoctorList from '@/pages/Doctor/DoctorList';
 import ContactUs from '@/pages/ContactUs';
 import Booking from '@/pages/Booking/Booking';
+import BookingConfirmation from '@/pages/BookingConfirmation';
+import RescheduleAppointment from '@/pages/Booking/RescheduleAppointment';
+import ConfirmNewDoctor from '@/pages/Booking/ConfirmNewDoctor';
+import RequestRefund from '@/pages/Booking/RequestRefund';
+import ChooseNewDoctor from '@/pages/Booking/ChooseNewDoctor';
 import ServiceCategories from '@/pages/MedicalService/ServiceCategories/ServiceCategoriesPage';
 import SmartBooking from '@/pages/SmartBooking';
 import ServiceList from '@/pages/MedicalService/MedicalService/MedicalServicePage';
 import ServiceHospitals from '@/pages/MedicalService/ServiceHospital/ServiceHospitalPage';
 import ServiceDetail from '@/pages/MedicalService/ServiceDetail/ServiceDetailPage';
-import BookingConfirmation from '@/pages/BookingConfirmation';
 
 const routes: RouteObject[] = [
     {
@@ -164,6 +168,22 @@ const routes: RouteObject[] = [
     {
         path: PATHS.BOOKING.CONFIRMATION,
         element: <BookingConfirmation />,
+    },
+    {
+        path: PATHS.BOOKING.RESCHEDULE,
+        element: <RescheduleAppointment />,
+    },
+    {
+        path: PATHS.BOOKING.CONFIRM_NEW_DOCTOR,
+        element: <ConfirmNewDoctor />,
+    },
+    {
+        path: PATHS.BOOKING.REQUEST_REFUND,
+        element: <RequestRefund />,
+    },
+    {
+        path: PATHS.BOOKING.CHOOSE_NEW_DOCTOR,
+        element: <ChooseNewDoctor />,
     },
     {
         path: PATHS.DASHBOARD.ROOT,

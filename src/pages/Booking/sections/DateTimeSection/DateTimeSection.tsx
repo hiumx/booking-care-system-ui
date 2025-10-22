@@ -29,6 +29,7 @@ interface DateTimeSectionProps {
     prevStep: () => void;
     doctorId?: string;
     medicalServiceId?: string;
+    isRescheduleMode?: boolean;
 }
 
 const DateTimeSection: React.FC<DateTimeSectionProps> = ({
@@ -36,6 +37,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     prevStep,
     doctorId,
     medicalServiceId,
+    isRescheduleMode = false,
 }) => {
     const dispatch = useAppDispatch();
 
@@ -165,7 +167,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         <BookingSectionWrapper
             doctor={doctorInfo}
             appointment={mockAppointmentInfo}
-            nextStepTitle="Thêm thông tin cơ bản"
+            nextStepTitle={isRescheduleMode ? 'Xác nhận đổi lịch' : 'Thêm thông tin cơ bản'}
             nextStep={nextStep}
             prevStep={prevStep}
             fieldsetId="first"
