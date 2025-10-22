@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Skeleton } from '@mui/material';
 import InvoiceModal from './InvoiceModal';
 import Pagination from '../../../components/Pagination/Pagination';
-import TableSkeleton from './TableSkeleton';
 import { PaymentService, InvoiceItem } from '../../../services/payment.service';
 import clsx from 'clsx';
 
@@ -200,10 +200,69 @@ const Invoices: React.FC<InvoicesProps> = ({ patientId, profile }) => {
 
             <div className="custom-table">
                 {loading ? (
-                    <TableSkeleton rows={5} columns={6} />
+                    <div className="table-responsive">
+                        <table className="text-center table table-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <Skeleton variant="text" width="60px" height={20} />
+                                    </th>
+                                    <th>
+                                        <Skeleton variant="text" width="120px" height={20} />
+                                    </th>
+                                    <th>
+                                        <Skeleton variant="text" width="100px" height={20} />
+                                    </th>
+                                    <th>
+                                        <Skeleton variant="text" width="110px" height={20} />
+                                    </th>
+                                    <th>
+                                        <Skeleton variant="text" width="80px" height={20} />
+                                    </th>
+                                    <th>
+                                        <Skeleton variant="text" width="90px" height={20} />
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {Array.from({ length: 5 }).map((_, index) => (
+                                    <tr key={index}>
+                                        <td>
+                                            <Skeleton variant="text" width="80px" height={16} />
+                                        </td>
+                                        <td>
+                                            <Skeleton
+                                                variant="rectangular"
+                                                width="100px"
+                                                height={24}
+                                                sx={{ borderRadius: '12px' }}
+                                            />
+                                        </td>
+                                        <td>
+                                            <Skeleton variant="text" width="90px" height={16} />
+                                        </td>
+                                        <td>
+                                            <Skeleton variant="text" width="90px" height={16} />
+                                        </td>
+                                        <td>
+                                            <Skeleton variant="text" width="100px" height={16} />
+                                        </td>
+                                        <td>
+                                            <Skeleton
+                                                variant="rectangular"
+                                                width="80px"
+                                                height={20}
+                                                sx={{ borderRadius: '8px' }}
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 ) : (
                     <div className="table-responsive">
-                        <table className="table table-center mb-0">
+                        <table className="text-center table table-center mb-0">
                             <thead>
                                 <tr>
                                     <th>ID</th>
