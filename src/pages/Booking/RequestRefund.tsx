@@ -271,7 +271,7 @@ const RequestRefund: React.FC = () => {
                                                         <i
                                                             className="isax isax-send-2 me-2"
                                                             aria-hidden="true"
-                                                        ></i>
+                                                        ></i>{' '}
                                                         Gửi yêu cầu
                                                     </>
                                                 )}
