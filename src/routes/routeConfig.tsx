@@ -31,6 +31,7 @@ import SmartBooking from '@/pages/SmartBooking';
 import ServiceList from '@/pages/MedicalService/MedicalService/MedicalServicePage';
 import ServiceHospitals from '@/pages/MedicalService/ServiceHospital/ServiceHospitalPage';
 import ServiceDetail from '@/pages/MedicalService/ServiceDetail/ServiceDetailPage';
+import BookingConfirmation from '@/pages/BookingConfirmation';
 
 const routes: RouteObject[] = [
     {
@@ -159,6 +160,10 @@ const routes: RouteObject[] = [
     {
         path: PATHS.BOOKING.ROOT,
         element: <Booking />,
+    },
+    {
+        path: PATHS.BOOKING.CONFIRMATION,
+        element: <BookingConfirmation />,
     },
     {
         path: PATHS.DASHBOARD.ROOT,

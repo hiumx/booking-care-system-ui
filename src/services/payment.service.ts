@@ -51,6 +51,38 @@ export interface CreatePaymentResponse {
     timestamp: string;
 }
 
+// Types for Invoice/Payment History API
+export interface InvoiceItem {
+    id: string;
+    appointmentId: string;
+    clinicId: string | null;
+    patientId: string;
+    subscriptionId: string | null;
+    amount: number;
+    transactionType: string;
+    paymentMethodId: string;
+    paymentMethodName: string;
+    status: string;
+    createdAt: string;
+    appointmentDate: string;
+    appointmentType: string;
+}
+
+export interface InvoiceResponse {
+    success: boolean;
+    message: string;
+    data: {
+        items: InvoiceItem[];
+        totalCount: number;
+        pageNumber: number;
+        pageSize: number;
+        totalPages: number;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+    };
+    timestamp: string;
+}
+
 export class PaymentService {
     /**
      * Lấy danh sách các phương thức thanh toán đang hoạt động
@@ -91,6 +123,44 @@ export class PaymentService {
         } catch (error: any) {
             console.error('Error creating payment:', error);
             throw new Error(error.message || 'Failed to create payment URL');
+        }
+    }
+
+    /**
+     * Lấy danh sách hóa đơn theo patient ID với đầy đủ query parameters
+     */
+    static async getPatientInvoices(
+        patientId: string,
+        pageNumber: number = 1,
+        pageSize: number = 10,
+        searchTerm?: string,
+        sortBy: string = 'CreatedAt',
+        sortOrder: string = 'desc'
+    ): Promise<InvoiceResponse['data']> {
+        try {
+            const params = new URLSearchParams({
+                pageNumber: pageNumber.toString(),
+                pageSize: pageSize.toString(),
+                sortBy,
+                sortOrder,
+            });
+
+            if (searchTerm?.trim()) {
+                params.append('searchTerm', searchTerm.trim());
+            }
+
+            const result: InvoiceResponse = await axiosInstance.get(
+                `/payments/patient/${patientId}?${params.toString()}`
+            );
+
+            if (!result.success) {
+                throw new Error(result.message || 'Failed to fetch patient invoices');
+            }
+
+            return result.data;
+        } catch (error: any) {
+            console.error('Error fetching patient invoices:', error);
+            throw new Error(error.message || 'Failed to fetch patient invoices');
         }
     }
 }
