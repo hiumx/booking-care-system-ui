@@ -6,6 +6,7 @@ import {
     MedicalServiceState,
     ServiceCategoryQueryParams,
     MedicalServiceQueryParams,
+    ServiceWithHospitalQueryParams,
 } from '@/types/medicalService.types';
 
 // Initial state for service categories
@@ -13,6 +14,7 @@ const initialServiceCategoryState: ServiceCategoryState = {
     serviceCategories: [],
     parentServiceCategories: [],
     selectedServiceCategory: null,
+    servicesWithHospital: null,
     isLoading: false,
     error: null,
     pagination: {
@@ -84,6 +86,24 @@ export const getServiceCategoryByIdAsync = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to get service category');
+        }
+    }
+);
+
+export const getServicesWithHospitalAsync = createAsyncThunk(
+    'medicalService/getServicesWithHospital',
+    async (
+        { categoryId, params }: { categoryId: string; params?: ServiceWithHospitalQueryParams },
+        { rejectWithValue }
+    ) => {
+        try {
+            const response = await MedicalServiceCategoriesService.getServicesWithHospital(
+                categoryId,
+                params
+            );
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Failed to fetch services with hospital');
         }
     }
 );
@@ -220,6 +240,20 @@ const medicalServiceSlice = createSlice({
                 state.serviceCategories.error = null;
             })
             .addCase(getServiceCategoryByIdAsync.rejected, (state, action) => {
+                state.serviceCategories.isLoading = false;
+                state.serviceCategories.error = action.payload as string;
+            })
+            // Get services with hospital cases
+            .addCase(getServicesWithHospitalAsync.pending, (state) => {
+                state.serviceCategories.isLoading = true;
+                state.serviceCategories.error = null;
+            })
+            .addCase(getServicesWithHospitalAsync.fulfilled, (state, action) => {
+                state.serviceCategories.isLoading = false;
+                state.serviceCategories.servicesWithHospital = action.payload;
+                state.serviceCategories.error = null;
+            })
+            .addCase(getServicesWithHospitalAsync.rejected, (state, action) => {
                 state.serviceCategories.isLoading = false;
                 state.serviceCategories.error = action.payload as string;
             })

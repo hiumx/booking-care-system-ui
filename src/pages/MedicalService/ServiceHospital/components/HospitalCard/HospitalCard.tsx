@@ -6,12 +6,11 @@ type HospitalCardProps = {
     image: string;
     rating: number;
     available: boolean;
-    name: string;
-    degrees: string;
+    name: string; // Service name
+    degrees: string; // Hospital name
     location: string;
-    languages: string[];
     votes: { positive: number; total: number };
-    experience: number;
+    experience: number; // Duration
     fees: number;
     nextAvailable: string;
     linkDetail: string;
@@ -26,7 +25,6 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
     name,
     degrees,
     location,
-    languages,
     votes,
     experience,
     fees,
@@ -67,19 +65,22 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                             <div className="doctor-info-detail pb-3">
                                 <div className="row align-items-center gy-3">
                                     {/* Left */}
-                                    <div className="col-sm-6">
+                                    <div className="col-sm-7">
                                         <div>
                                             <h6 className="d-flex align-items-center mb-1">
                                                 <Link to={linkProfileHospital}>{name}</Link>
-                                                <i className="isax isax-tick-circle5 text-success ms-2"></i>
                                             </h6>
-                                            <p className="mb-2">{degrees}</p>
+                                            <p className="mb-2 d-flex align-items-center">
+                                                {degrees}
+                                                <i className="isax isax-tick-circle5 text-success ms-2"></i>
+                                            </p>
                                             <p className="d-flex align-items-center mb-0 fs-14">
                                                 <i className="isax isax-location me-2"></i>
-                                                {location}
+                                                <span className="flex-grow-1">{location}</span>
                                                 <Link
                                                     to="#"
                                                     className="text-primary text-decoration-underline ms-2"
+                                                    style={{ whiteSpace: 'nowrap' }}
                                                 >
                                                     {'Chỉ đường'}
                                                 </Link>
@@ -87,12 +88,8 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                                         </div>
                                     </div>
                                     {/* Right */}
-                                    <div className="col-sm-6">
+                                    <div className="col-sm-5">
                                         <div>
-                                            <p className="d-flex align-items-center mb-0 fs-14 mb-2">
-                                                <i className="isax isax-language-circle text-dark me-2"></i>
-                                                {languages.join(', ')}
-                                            </p>
                                             <p className="d-flex align-items-center mb-0 fs-14 mb-2">
                                                 <i className="isax isax-like-1 text-dark me-2"></i>
                                                 {Math.round((votes.positive / votes.total) * 100)}%
@@ -100,7 +97,7 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                                             </p>
                                             <p className="d-flex align-items-center mb-0 fs-14">
                                                 <i className="isax isax-archive-14 text-dark me-2"></i>
-                                                {experience} Năm kinh nghiệm
+                                                {experience} phút
                                             </p>
                                         </div>
                                     </div>

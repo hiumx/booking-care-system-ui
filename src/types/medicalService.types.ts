@@ -61,11 +61,54 @@ export interface MedicalServiceQueryParams {
     serviceCategoryId?: string;
 }
 
+// Service with Hospital Response DTOs
+export interface HospitalResponse {
+    id: string;
+    name: string;
+    address: string;
+    phone: string;
+    email: string;
+    avatarUrl: string;
+}
+
+export interface ServiceWithHospitalResponse {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    imageUrl: string;
+    hospitalId: string;
+    serviceCategoryId: string;
+    durationTime: number;
+    status: Status;
+    parentCategoryName: string;
+    hospital: HospitalResponse;
+}
+
+export interface ServiceWithHospitalListResponse {
+    serviceCategoryId: string;
+    serviceCategoryName: string;
+    serviceCategoryDescription: string;
+    parentCategoryName: string;
+    totalServices: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    services: ServiceWithHospitalResponse[];
+}
+
+export interface ServiceWithHospitalQueryParams {
+    page?: number;
+    pageSize?: number;
+    includeInactive?: boolean;
+}
+
 // State interfaces
 export interface ServiceCategoryState {
     serviceCategories: ServiceCategoryResponse[];
     parentServiceCategories: ServiceCategoryParentsResponse[];
     selectedServiceCategory: ServiceCategoryResponse | null;
+    servicesWithHospital: ServiceWithHospitalListResponse | null;
     isLoading: boolean;
     error: string | null;
     pagination: {

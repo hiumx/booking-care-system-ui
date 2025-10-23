@@ -108,9 +108,9 @@ const ServiceCategoriesPage: React.FC = () => {
                         key={service.id}
                         name={service.name}
                         image={service.imageUrl}
-                        link={replacePathParams(PATHS.Service.HOSPITALS, {
+                        link={replacePathParams(PATHS.Service.SERVICES, {
                             servicesparentId: servicesparentId!,
-                            serviceschildId: service.id,
+                            serviceschildId: service.id.toString(),
                         })}
                     />
                 ))}

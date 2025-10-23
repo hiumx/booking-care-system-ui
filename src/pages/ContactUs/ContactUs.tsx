@@ -263,6 +263,12 @@ const ContactUs: React.FC = () => {
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
                         title="Google Maps - Đà Nẵng, Việt Nam"
+                        onError={(e) => {
+                            console.warn(
+                                'Google Maps iframe failed to load, likely blocked by ad blocker'
+                            );
+                            e.currentTarget.style.display = 'none';
+                        }}
                     ></iframe>
                 </div>
                 {/* /Contact Map */}

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import HospitalCard from './components/HospitalCard/HospitalCard';
@@ -7,59 +8,18 @@ import Pagination from './components/Pagination/Pagination';
 import HeroSection from './components/HeroSection/HeroSection';
 import { replacePathParams, PATHS, buildPath } from '@/routes/paths';
 import SearchSection from './components/SearchSection/SearchSection';
+import { getServicesWithHospitalAsync } from '@/store/slices/medicalServiceSlice';
 
-// 🔹 Mock data cho danh sách bệnh viện theo chuyên khoa
-const hospitalData = {
-    idservice: 1,
-    title: 'Bệnh Viện',
+// 🔹 Mock data fallback
+const mockHospitalData = {
     specialtyName: 'Chuyên khoa Tiêu hóa',
     specialtyDescription:
         'Chuyên khoa Tiêu hóa cung cấp dịch vụ khám, chẩn đoán và điều trị toàn diện các bệnh lý liên quan đến dạ dày, ruột, gan, mật và tụy, giúp phát hiện sớm, phòng ngừa biến chứng và nâng cao sức khỏe tiêu hóa.',
-    data: [
-        {
-            hospital: {
-                id: 1,
-                idservice: 1,
-                image: '/src/assets/img/doctor-grid/doctor-list-01.jpg',
-                rating: 4.8,
-                specialty: 'Neurologist',
-                specialtyColor: 'text-teal',
-                available: true,
-                name: 'Bệnh Viện Đa KHoa Đà Nẵng',
-                degrees: 'MBBS, DNB - Neurology',
-                location: 'Đà Nẵng, Việt Nam',
-                languages: ['English', 'French'],
-                votes: { positive: 252, total: 287 },
-                experience: 20,
-                fees: 600,
-                nextAvailable: '10:00 AM - 15 Oct, Tue',
-            },
-        },
-        {
-            hospital: {
-                id: 2,
-                idservice: 2,
-                image: '/src/assets/img/doctor-grid/doctor-list-02.jpg',
-                rating: 4.3,
-                specialty: 'Cardiologist',
-                specialtyColor: 'text-info',
-                available: false,
-                name: 'Bệnh Viện Đa KHoa Hà Nội',
-                degrees: 'MBBS, MD - Cardiology',
-                location: 'Hà Nội, Việt Nam',
-                languages: ['English', 'Spanish'],
-                votes: { positive: 270, total: 300 },
-                experience: 30,
-                fees: 450,
-                nextAvailable: '11:00 AM - 19 Oct, Sat',
-            },
-        },
-    ],
+    data: [],
 };
 
-// 🔹 Breadcrumb config sẽ được tạo trong component để sử dụng params
-
 const ServiceHospitalPage: React.FC = () => {
+    const dispatch = useAppDispatch();
     const { servicesparentId, serviceschildId } = useParams<{
         servicesparentId: string;
         serviceschildId: string;
@@ -67,13 +27,65 @@ const ServiceHospitalPage: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 4;
 
+    // Redux selectors
+    const servicesData = useAppSelector(
+        (state) => state.medicalService.serviceCategories.servicesWithHospital
+    );
+    const isLoading = useAppSelector((state) => state.medicalService.serviceCategories.isLoading);
+    const error = useAppSelector((state) => state.medicalService.serviceCategories.error);
+
+    // Fetch services data
+    useEffect(() => {
+        if (serviceschildId) {
+            dispatch(
+                getServicesWithHospitalAsync({
+                    categoryId: serviceschildId,
+                    params: {
+                        page: currentPage,
+                        pageSize: itemsPerPage,
+                        includeInactive: false,
+                    },
+                })
+            );
+        }
+    }, [dispatch, serviceschildId, currentPage, itemsPerPage]);
+
+    // Use API data or fallback to mock data
+    const hospitalData = servicesData
+        ? {
+              specialtyName: servicesData.serviceCategoryName,
+              specialtyDescription: servicesData.serviceCategoryDescription,
+              data: servicesData.services.map((service) => ({
+                  hospital: {
+                      id: service.hospital.id,
+                      idservice: service.id,
+                      image: service.imageUrl,
+                      rating: 4.5, // Default rating since not in API
+                      specialty: service.name,
+                      available: service.status === ('ACTIVE' as any),
+                      name: service.hospital.name,
+                      location: service.hospital.address,
+                      votes: { positive: 250, total: 300 }, // Default votes
+                      experience: service.durationTime,
+                      fees: service.price,
+                      nextAvailable: '10:00 AM - 15 Oct, Tue', // Default time
+                  },
+              })),
+          }
+        : mockHospitalData;
+
     // 🔹 Breadcrumb config với params
     const breadcrumbData = {
         items: [
             { label: 'Trang chủ', path: '/', isActive: false },
             {
                 label: 'Dịch Vụ Y Tế',
-                path: replacePathParams(buildPath(PATHS.Service.CATEGORIES), {
+                path: replacePathParams(buildPath(PATHS.Service.ROOT), {}),
+                isActive: false,
+            },
+            {
+                label: servicesData?.parentCategoryName || 'Chuyên Khoa',
+                path: replacePathParams(PATHS.Service.CATEGORIES, {
                     servicesparentId: servicesparentId!.toString(),
                 }),
                 isActive: false,
@@ -84,14 +96,68 @@ const ServiceHospitalPage: React.FC = () => {
     };
 
     // Tính toán phân trang
-    const totalPages = Math.ceil(hospitalData.data.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentHospitals = hospitalData.data.slice(startIndex, endIndex);
+    const totalPages =
+        servicesData?.totalPages || Math.ceil(hospitalData.data.length / itemsPerPage);
+    const currentHospitals = hospitalData.data;
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
+
+    // Show loading state
+    if (isLoading) {
+        return (
+            <MainLayout>
+                <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
+                <HeroSection
+                    title={hospitalData.specialtyName}
+                    description={hospitalData.specialtyDescription}
+                />
+                <SearchSection />
+                <div className="content">
+                    <div className="container">
+                        <div
+                            className="d-flex justify-content-center align-items-center"
+                            style={{ minHeight: '400px' }}
+                        >
+                            <div className="spinner-border text-primary">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </MainLayout>
+        );
+    }
+
+    // Show error state
+    if (error) {
+        return (
+            <MainLayout>
+                <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
+                <HeroSection
+                    title={hospitalData.specialtyName}
+                    description={hospitalData.specialtyDescription}
+                />
+                <SearchSection />
+                <div className="content">
+                    <div className="container">
+                        <div className="alert alert-danger" role="alert">
+                            <h4 className="alert-heading">Lỗi!</h4>
+                            <p>{error}</p>
+                            <hr />
+                            <button
+                                className="btn btn-outline-danger"
+                                onClick={() => globalThis.location.reload()}
+                            >
+                                Thử lại
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </MainLayout>
+        );
+    }
 
     return (
         <MainLayout>
@@ -109,9 +175,9 @@ const ServiceHospitalPage: React.FC = () => {
                                 <h3>
                                     Showing{' '}
                                     <span className="text-secondary">
-                                        {hospitalData.data.length}
+                                        {servicesData?.totalServices || hospitalData.data.length}
                                     </span>{' '}
-                                    Hospitals For You
+                                    Services For You
                                 </h3>
                             </div>
                         </div>
@@ -121,16 +187,15 @@ const ServiceHospitalPage: React.FC = () => {
                         {currentHospitals.map((hospital) => (
                             <HospitalCard
                                 key={hospital.hospital.id}
-                                name={hospital.hospital.name}
+                                name={hospital.hospital.specialty} // Service name
                                 location={hospital.hospital.location}
                                 fees={hospital.hospital.fees}
                                 rating={hospital.hospital.rating}
                                 image={hospital.hospital.image}
                                 nextAvailable={hospital.hospital.nextAvailable}
-                                degrees={hospital.hospital.degrees}
-                                languages={hospital.hospital.languages}
+                                degrees={hospital.hospital.name} // Hospital name
                                 votes={hospital.hospital.votes}
-                                experience={hospital.hospital.experience}
+                                experience={hospital.hospital.experience} // Duration in minutes
                                 available={hospital.hospital.available}
                                 linkDetail={replacePathParams(PATHS.Service.DETAIL, {
                                     servicesparentId: servicesparentId!.toString(),

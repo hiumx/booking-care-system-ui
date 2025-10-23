@@ -6,6 +6,8 @@ import {
     ServiceCategoryListResponse,
     ServiceCategoryParentsResponse,
     ServiceCategoryQueryParams,
+    ServiceWithHospitalListResponse,
+    ServiceWithHospitalQueryParams,
 } from '@/types/medicalService.types';
 
 // Base API endpoints for service categories
@@ -14,6 +16,8 @@ const SERVICE_CATEGORY_ENDPOINTS = {
     PARENTS: '/medical-services/servicecategories/parents',
     HEALTH: '/medical-services/servicecategories/health',
     BY_ID: (id: string) => `/medical-services/servicecategories/${id}`,
+    SERVICES_WITH_HOSPITAL: (categoryId: string) =>
+        `/medical-services/services/category/${categoryId}/with-hospital`,
 } as const;
 
 /**
@@ -160,6 +164,40 @@ export class MedicalServiceCategoriesService {
             };
         } catch (error: any) {
             throw new Error(error.message || 'Failed to delete service category');
+        }
+    }
+
+    /**
+     * Get services with hospital by category ID
+     */
+    static async getServicesWithHospital(
+        categoryId: string,
+        params?: ServiceWithHospitalQueryParams
+    ): Promise<ApiResponse<ServiceWithHospitalListResponse>> {
+        try {
+            const queryParams = new URLSearchParams();
+
+            if (params?.page) queryParams.append('page', params.page.toString());
+            if (params?.pageSize) queryParams.append('pageSize', params.pageSize.toString());
+            if (params?.includeInactive !== undefined) {
+                queryParams.append('includeInactive', params.includeInactive.toString());
+            }
+
+            const url = `${SERVICE_CATEGORY_ENDPOINTS.SERVICES_WITH_HOSPITAL(categoryId)}?${queryParams.toString()}`;
+            const response: any = await axiosInstance.get(url);
+
+            // API trả về trực tiếp data, không wrap trong response.data
+            const apiData = response.data || response;
+
+            return {
+                success: true,
+                data: apiData,
+                message: 'Services with hospital retrieved successfully',
+            };
+        } catch (error: any) {
+            throw new Error(
+                error.response?.data?.message || 'Failed to fetch services with hospital'
+            );
         }
     }
 }
