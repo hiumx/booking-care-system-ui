@@ -53,8 +53,8 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                 {/* Reschedule with same doctor - only show if has doctor */}
                 {appointment.doctorInfo?.id && (
                     <li>
-                        <a
-                            href="#"
+                        <Link
+                            to="#"
                             title="Đổi lịch với cùng bác sĩ"
                             onClick={(e) => {
                                 e.preventDefault();
@@ -62,13 +62,13 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                             }}
                         >
                             <i className="isax isax-calendar-edit"></i>
-                        </a>
+                        </Link>
                     </li>
                 )}
                 {/* Choose new doctor */}
                 <li>
-                    <a
-                        href="#"
+                    <Link
+                        to="#"
                         title="Chọn bác sĩ mới"
                         onClick={(e) => {
                             e.preventDefault();
@@ -76,12 +76,12 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                         }}
                     >
                         <i className="isax isax-user-search"></i>
-                    </a>
+                    </Link>
                 </li>
                 {/* Cancel appointment */}
                 <li>
-                    <a
-                        href="#"
+                    <Link
+                        to="#"
                         title="Hủy lịch hẹn"
                         onClick={(e) => {
                             e.preventDefault();
@@ -89,7 +89,7 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                         }}
                     >
                         <i className="isax isax-close-circle5"></i>
-                    </a>
+                    </Link>
                 </li>
             </>
         );
