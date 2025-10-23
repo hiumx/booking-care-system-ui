@@ -21,6 +21,7 @@ const APPOINTMENT_ENDPOINTS = {
     CONFIRM_NEW_DOCTOR: (id: string) => `/appointments/${id}/confirm-new-doctor`,
     REQUEST_REFUND: (id: string) => `/appointments/${id}/request-refund`,
     CHOOSE_NEW_DOCTOR: (id: string) => `/appointments/${id}/choose-new-doctor`,
+    GENERATE_RESCHEDULE_TOKEN: (id: string) => `/appointments/${id}/generate-reschedule-token`,
     STATUS: (id: string) => `/appointments/status/${id}`,
     BY_ID: (id: string) => `/appointments/${id}`,
     UPLOAD_ATTACHMENT: '/attachment/upload',
@@ -307,12 +308,44 @@ export class AppointmentService {
             throw new Error(error.message || 'Failed to choose new doctor');
         }
     }
+
+    /**
+     * Generate reschedule token without cancelling appointment (lazy token generation)
+     * Used when patient clicks reschedule/choose new doctor button
+     */
+    static async generateRescheduleToken(request: {
+        appointmentId: string;
+        rescheduleAction: 'SAME_DOCTOR' | 'NEW_DOCTOR';
+        patientId: string;
+    }): Promise<
+        ApiResponse<{
+            rescheduleToken: string;
+            tokenExpiry: string;
+            redirectUrl: string;
+            message: string;
+        }>
+    > {
+        try {
+            const response: any = await axiosInstance.post(
+                APPOINTMENT_ENDPOINTS.GENERATE_RESCHEDULE_TOKEN(request.appointmentId),
+                request
+            );
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Token generated successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to generate reschedule token');
+        }
+    }
 }
 
 // Export individual methods for convenience
 export const {
     healthCheck,
     createAppointment,
+    generateRescheduleToken,
     getAppointmentById,
     getAppointmentsByPatient,
     updateAppointmentStatus,

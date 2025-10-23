@@ -157,7 +157,7 @@ const ChooseNewDoctor: React.FC = () => {
         }
 
         // Scenario 1: Same price or no payment → Update directly
-        if (priceDifference?.type === 'equal') {
+        if (priceDifference?.type === 'equal' || priceDifference?.type === 'none') {
             await handleDirectUpdate();
             return;
         }
@@ -394,7 +394,7 @@ const ChooseNewDoctor: React.FC = () => {
                     <div className="row">
                         <div className="col-lg-10 mx-auto">
                             {/* Show price difference info */}
-                            {priceDifference && (
+                            {priceDifference && priceDifference.type !== 'none' && (
                                 <>
                                     <div className="alert alert-light mb-3">
                                         <i className="ti ti-info-circle me-2"></i>

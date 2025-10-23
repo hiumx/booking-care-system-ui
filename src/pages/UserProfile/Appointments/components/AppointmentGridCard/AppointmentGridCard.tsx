@@ -10,18 +10,20 @@ import {
     getDisplaySpecialty,
     getDisplayLabel,
 } from '@/types/appointment.types';
-import { AppointmentStatus } from '@/enums/appointment.enums';
+import AppointmentActionButtons from '../AppointmentActionButtons/AppointmentActionButtons';
 
 interface AppointmentGridCardProps {
     appointment: AppointmentCardData;
     status: AppointmentUITab;
     onCancel?: (appointment: AppointmentCardData) => void; // Callback for cancel action
+    onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void; // Callback for reschedule actions
 }
 
 const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
     appointment,
     status,
     onCancel,
+    onReschedule,
 }) => {
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -47,83 +49,23 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
     const displayLabel = getDisplayLabel(appointment);
 
     const renderActionButtons = () => {
-        switch (status) {
-            case 'waiting':
-                return (
-                    <li className="appointment-action">
-                        <ul>
-                            <li>
-                                <Link
-                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                >
-                                    <i className="isax isax-eye4"></i>
-                                </Link>
-                            </li>
-                            {/* Only show cancel button for PENDING and CONFIRMED appointments */}
-                            {(appointment.status === AppointmentStatus.PENDING ||
-                                appointment.status === AppointmentStatus.CONFIRMED) && (
-                                <li>
-                                    <a
-                                        href="#"
-                                        title="Hủy lịch hẹn"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            onCancel?.(appointment);
-                                        }}
-                                    >
-                                        <i className="isax isax-close-circle5"></i>
-                                    </a>
-                                </li>
-                            )}
-                        </ul>
-                        <div className="appointment-detail-btn">
-                            <span className="badge badge-warning text-center">
-                                <i className="isax isax-clock5 me-1"></i> Chờ Xác Nhận
-                            </span>
-                        </div>
-                    </li>
-                );
+        // Use AppointmentActionButtons component for waiting and upcoming status
+        if (status === 'waiting' || status === 'upcoming') {
+            return (
+                <li className="appointment-action">
+                    <AppointmentActionButtons
+                        appointment={appointment}
+                        status={status}
+                        variant="full"
+                        onReschedule={onReschedule}
+                        onCancel={onCancel}
+                    />
+                </li>
+            );
+        }
 
-            case 'upcoming':
-                return (
-                    <li className="appointment-action">
-                        <ul>
-                            <li>
-                                <Link
-                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                >
-                                    <i className="isax isax-eye4"></i>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="#">
-                                    <i className="isax isax-messages-25"></i>
-                                </Link>
-                            </li>
-                            {/* Only show cancel button for PENDING and CONFIRMED appointments */}
-                            {(appointment.status === AppointmentStatus.PENDING ||
-                                appointment.status === AppointmentStatus.CONFIRMED) && (
-                                <li>
-                                    <a
-                                        href="#"
-                                        title="Hủy lịch hẹn"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            onCancel?.(appointment);
-                                        }}
-                                    >
-                                        <i className="isax isax-close-circle5"></i>
-                                    </a>
-                                </li>
-                            )}
-                        </ul>
-                        <div className="appointment-detail-btn">
-                            <Link to="#" className="start-link">
-                                <i className="isax isax-calendar-tick5 me-1"></i> Tham Gia
-                            </Link>
-                        </div>
-                    </li>
-                );
+        // Handle other status cases
+        switch (status) {
             case 'cancelled':
             case 'completed':
                 return (
