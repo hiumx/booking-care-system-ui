@@ -10,7 +10,7 @@ import {
     getDisplaySpecialty,
     getDisplayLabel,
 } from '@/types/appointment.types';
-import { AppointmentStatus } from '@/enums/appointment.enums';
+import AppointmentActionButtons from '../AppointmentActionButtons/AppointmentActionButtons';
 
 interface AppointmentGridCardProps {
     appointment: AppointmentCardData;
@@ -49,136 +49,23 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
     const displayLabel = getDisplayLabel(appointment);
 
     const renderActionButtons = () => {
-        switch (status) {
-            case 'waiting':
-                return (
-                    <li className="appointment-action">
-                        <ul>
-                            <li>
-                                <Link
-                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                    title="Xem chi tiết"
-                                >
-                                    <i className="isax isax-eye4"></i>
-                                </Link>
-                            </li>
-                            {/* Reschedule with same doctor - only show if has doctor */}
-                            {appointment.doctorInfo?.id && (
-                                <li>
-                                    <a
-                                        href="#"
-                                        title="Đổi lịch với cùng bác sĩ"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            onReschedule?.(appointment, 'SAME_DOCTOR');
-                                        }}
-                                    >
-                                        <i className="isax isax-calendar-edit"></i>
-                                    </a>
-                                </li>
-                            )}
-                            {/* Choose new doctor */}
-                            <li>
-                                <a
-                                    href="#"
-                                    title="Chọn bác sĩ mới"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        onReschedule?.(appointment, 'NEW_DOCTOR');
-                                    }}
-                                >
-                                    <i className="isax isax-user-search"></i>
-                                </a>
-                            </li>
-                            {/* Only show cancel button for PENDING and CONFIRMED appointments */}
-                            {(appointment.status === AppointmentStatus.PENDING ||
-                                appointment.status === AppointmentStatus.CONFIRMED) && (
-                                <li>
-                                    <a
-                                        href="#"
-                                        title="Hủy lịch hẹn"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            onCancel?.(appointment);
-                                        }}
-                                    >
-                                        <i className="isax isax-close-circle5"></i>
-                                    </a>
-                                </li>
-                            )}
-                        </ul>
-                        <div className="appointment-detail-btn">
-                            <span className="badge badge-warning text-center">
-                                <i className="isax isax-clock5 me-1"></i> Chờ Xác Nhận
-                            </span>
-                        </div>
-                    </li>
-                );
+        // Use AppointmentActionButtons component for waiting and upcoming status
+        if (status === 'waiting' || status === 'upcoming') {
+            return (
+                <li className="appointment-action">
+                    <AppointmentActionButtons
+                        appointment={appointment}
+                        status={status}
+                        variant="full"
+                        onReschedule={onReschedule}
+                        onCancel={onCancel}
+                    />
+                </li>
+            );
+        }
 
-            case 'upcoming':
-                return (
-                    <li className="appointment-action">
-                        <ul>
-                            <li>
-                                <Link
-                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                    title="Xem chi tiết"
-                                >
-                                    <i className="isax isax-eye4"></i>
-                                </Link>
-                            </li>
-                            {/* Reschedule with same doctor - only show if has doctor */}
-                            {appointment.doctorInfo?.id && (
-                                <li>
-                                    <a
-                                        href="#"
-                                        title="Đổi lịch với cùng bác sĩ"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            onReschedule?.(appointment, 'SAME_DOCTOR');
-                                        }}
-                                    >
-                                        <i className="isax isax-calendar-edit"></i>
-                                    </a>
-                                </li>
-                            )}
-                            {/* Choose new doctor */}
-                            <li>
-                                <a
-                                    href="#"
-                                    title="Chọn bác sĩ mới"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        onReschedule?.(appointment, 'NEW_DOCTOR');
-                                    }}
-                                >
-                                    <i className="isax isax-user-search"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <Link to="#" title="Nhắn tin">
-                                    <i className="isax isax-messages-25"></i>
-                                </Link>
-                            </li>
-                            {/* Only show cancel button for PENDING and CONFIRMED appointments */}
-                            {(appointment.status === AppointmentStatus.PENDING ||
-                                appointment.status === AppointmentStatus.CONFIRMED) && (
-                                <li>
-                                    <a
-                                        href="#"
-                                        title="Hủy lịch hẹn"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            onCancel?.(appointment);
-                                        }}
-                                    >
-                                        <i className="isax isax-close-circle5"></i>
-                                    </a>
-                                </li>
-                            )}
-                        </ul>
-                    </li>
-                );
+        // Handle other status cases
+        switch (status) {
             case 'cancelled':
             case 'completed':
                 return (
