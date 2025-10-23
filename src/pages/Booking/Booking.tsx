@@ -137,6 +137,7 @@ const Booking: React.FC = () => {
             const paymentRequest: CreatePaymentRequest = {
                 appointmentId,
                 patientId: userState.profile.id,
+                hospitalId: doctorState.selectedDoctor?.hospital?.id,
                 amount: depositAmount,
                 paymentMethodId,
             };
