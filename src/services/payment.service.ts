@@ -20,6 +20,7 @@ export interface PaymentMethodsResponse {
 export interface CreatePaymentRequest {
     appointmentId: string;
     patientId: string;
+    hospitalId?: string;
     amount: number;
     paymentMethodId: string;
 }
