@@ -187,9 +187,55 @@ const AppointmentDetailPage: React.FC = () => {
         }
     };
 
-    const handleReschedule = () => {
-        alert('Chuyển đến trang đặt lại lịch hẹn');
-        // In real app: navigate to booking page with pre-filled data
+    // Handle reschedule (lazy token generation for Options 1 & 3)
+    const handleReschedule = async (
+        appointment?: AppointmentCardData,
+        action?: 'SAME_DOCTOR' | 'NEW_DOCTOR'
+    ) => {
+        // If called without parameters (from old reschedule buttons in CANCELLED/COMPLETED status)
+        if (!action || !appointment) {
+            alert('Chuyển đến trang đặt lại lịch hẹn');
+            return;
+        }
+
+        if (!userProfile?.id) {
+            toast.error('Không tìm thấy thông tin người dùng');
+            return;
+        }
+
+        // Validate status
+        if (
+            appointment.status !== AppointmentStatus.PENDING &&
+            appointment.status !== AppointmentStatus.CONFIRMED
+        ) {
+            toast.warning('Chỉ có thể đổi lịch hẹn ở trạng thái Chờ xử lý hoặc Sắp tới');
+            return;
+        }
+
+        try {
+            // Call API to generate reschedule token (lazy token generation)
+            const response = await AppointmentService.generateRescheduleToken({
+                appointmentId: appointment.appointmentId,
+                rescheduleAction: action,
+                patientId: userProfile.id,
+            });
+
+            if (response.success && response.data) {
+                const actionText =
+                    action === 'SAME_DOCTOR' ? 'đổi lịch với cùng bác sĩ' : 'chọn bác sĩ mới';
+                toast.success(`Token đã được tạo! Đang chuyển hướng để ${actionText}...`);
+
+                // Navigate to the redirect URL
+                setTimeout(() => {
+                    globalThis.location.href = response.data.redirectUrl;
+                }, 1000);
+            } else {
+                throw new Error(response.message || 'Không thể tạo token đổi lịch');
+            }
+        } catch (error: any) {
+            console.error('Error generating reschedule token:', error);
+            toast.error(error.message || 'Không thể tạo token đổi lịch. Vui lòng thử lại.');
+        }
     };
 
     const handleDownloadPrescription = () => {
