@@ -16,12 +16,14 @@ interface AppointmentGridCardProps {
     appointment: AppointmentCardData;
     status: AppointmentUITab;
     onCancel?: (appointment: AppointmentCardData) => void; // Callback for cancel action
+    onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void; // Callback for reschedule actions
 }
 
 const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
     appointment,
     status,
     onCancel,
+    onReschedule,
 }) => {
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -55,9 +57,38 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
                             <li>
                                 <Link
                                     to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
+                                    title="Xem chi tiết"
                                 >
                                     <i className="isax isax-eye4"></i>
                                 </Link>
+                            </li>
+                            {/* Reschedule with same doctor - only show if has doctor */}
+                            {appointment.doctorInfo?.id && (
+                                <li>
+                                    <a
+                                        href="#"
+                                        title="Đổi lịch với cùng bác sĩ"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            onReschedule?.(appointment, 'SAME_DOCTOR');
+                                        }}
+                                    >
+                                        <i className="isax isax-calendar-edit"></i>
+                                    </a>
+                                </li>
+                            )}
+                            {/* Choose new doctor */}
+                            <li>
+                                <a
+                                    href="#"
+                                    title="Chọn bác sĩ mới"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        onReschedule?.(appointment, 'NEW_DOCTOR');
+                                    }}
+                                >
+                                    <i className="isax isax-user-search"></i>
+                                </a>
                             </li>
                             {/* Only show cancel button for PENDING and CONFIRMED appointments */}
                             {(appointment.status === AppointmentStatus.PENDING ||
@@ -91,12 +122,41 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
                             <li>
                                 <Link
                                     to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
+                                    title="Xem chi tiết"
                                 >
                                     <i className="isax isax-eye4"></i>
                                 </Link>
                             </li>
+                            {/* Reschedule with same doctor - only show if has doctor */}
+                            {appointment.doctorInfo?.id && (
+                                <li>
+                                    <a
+                                        href="#"
+                                        title="Đổi lịch với cùng bác sĩ"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            onReschedule?.(appointment, 'SAME_DOCTOR');
+                                        }}
+                                    >
+                                        <i className="isax isax-calendar-edit"></i>
+                                    </a>
+                                </li>
+                            )}
+                            {/* Choose new doctor */}
                             <li>
-                                <Link to="#">
+                                <a
+                                    href="#"
+                                    title="Chọn bác sĩ mới"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        onReschedule?.(appointment, 'NEW_DOCTOR');
+                                    }}
+                                >
+                                    <i className="isax isax-user-search"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <Link to="#" title="Nhắn tin">
                                     <i className="isax isax-messages-25"></i>
                                 </Link>
                             </li>
@@ -117,11 +177,6 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
                                 </li>
                             )}
                         </ul>
-                        <div className="appointment-detail-btn">
-                            <Link to="#" className="start-link">
-                                <i className="isax isax-calendar-tick5 me-1"></i> Tham Gia
-                            </Link>
-                        </div>
                     </li>
                 );
             case 'cancelled':
