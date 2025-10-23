@@ -10,6 +10,7 @@ import ModalCancel from '@/components/ModalCancel';
 import { AppointmentService } from '@/services/appointment.service';
 import { RootState } from '@/store';
 import { getRefundInfo } from '@/utils/refund-policy.util';
+import { handleRescheduleAction } from '@/utils/reschedule-utils';
 import { AppointmentStatus } from '@/enums/appointment.enums';
 import {
     transformToDetailData,
@@ -187,9 +188,19 @@ const AppointmentDetailPage: React.FC = () => {
         }
     };
 
-    const handleReschedule = () => {
-        alert('Chuyển đến trang đặt lại lịch hẹn');
-        // In real app: navigate to booking page with pre-filled data
+    // Handle reschedule (lazy token generation for Options 1 & 3)
+    const handleReschedule = async (
+        appointment?: AppointmentCardData,
+        action?: 'SAME_DOCTOR' | 'NEW_DOCTOR'
+    ) => {
+        // If called without parameters (from old reschedule buttons in CANCELLED/COMPLETED status)
+        if (!action || !appointment) {
+            alert('Chuyển đến trang đặt lại lịch hẹn');
+            return;
+        }
+
+        if (!userProfile?.id) return;
+        await handleRescheduleAction(appointment, action, userProfile.id);
     };
 
     const handleDownloadPrescription = () => {

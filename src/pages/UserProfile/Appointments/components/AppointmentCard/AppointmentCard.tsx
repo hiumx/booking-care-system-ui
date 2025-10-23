@@ -11,12 +11,14 @@ import {
     getDisplaySpecialty,
     getDisplayLabel,
 } from '@/types/appointment.types';
+import AppointmentActionButtons from '../AppointmentActionButtons/AppointmentActionButtons';
 
 interface AppointmentCardProps {
     appointment: AppointmentCardData;
     status: AppointmentUITab;
     variant?: 'full' | 'minimal'; // 'full' shows all actions, 'minimal' only shows view icon
     onCancel?: (appointment: AppointmentCardData) => void; // Callback for cancel action
+    onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void; // Callback for reschedule actions
 }
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({
@@ -24,6 +26,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     status,
     variant = 'full',
     onCancel,
+    onReschedule,
 }) => {
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -43,101 +46,21 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     const displayLabel = getDisplayLabel(appointment);
 
     const renderActionButtons = () => {
-        // Minimal variant - only show view icon
-        if (variant === 'minimal') {
+        // Use AppointmentActionButtons component for waiting and upcoming status
+        if (status === 'waiting' || status === 'upcoming') {
             return (
-                <li className="appointment-action">
-                    <ul>
-                        <li>
-                            <Link
-                                to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                title="Xem chi tiết"
-                            >
-                                <i className="isax isax-eye4"></i>
-                            </Link>
-                        </li>
-                    </ul>
-                </li>
+                <AppointmentActionButtons
+                    appointment={appointment}
+                    status={status}
+                    variant={variant}
+                    onReschedule={onReschedule}
+                    onCancel={onCancel}
+                />
             );
         }
 
-        // Full variant - show all actions based on status
+        // Handle other status cases
         switch (status) {
-            case 'waiting':
-                return (
-                    <>
-                        <li className="appointment-action">
-                            <ul>
-                                <li>
-                                    <Link
-                                        to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                        title="Xem chi tiết"
-                                    >
-                                        <i className="isax isax-eye4"></i>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        title="Hủy lịch hẹn"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            onCancel?.(appointment);
-                                        }}
-                                    >
-                                        <i className="isax isax-close-circle5"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li className="appointment-detail-btn">
-                            <span className="badge badge-warning">
-                                <i className="isax isax-clock5 me-1"></i> Chờ Xác Nhận
-                            </span>
-                        </li>
-                    </>
-                );
-
-            case 'upcoming':
-                return (
-                    <>
-                        <li className="appointment-action">
-                            <ul>
-                                <li>
-                                    <Link
-                                        to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                        title="Xem chi tiết"
-                                    >
-                                        <i className="isax isax-eye4"></i>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to="#" title="Nhắn tin">
-                                        <i className="isax isax-messages-25"></i>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        title="Hủy lịch hẹn"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            onCancel?.(appointment);
-                                        }}
-                                    >
-                                        <i className="isax isax-close-circle5"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li className="appointment-detail-btn">
-                            <Link to="#" className="btn btn-md btn-primary-gradient">
-                                <i className="isax isax-calendar-tick5 me-1"></i> Tham Gia
-                            </Link>
-                        </li>
-                    </>
-                );
-
             case 'cancelled':
                 return (
                     <li className="appointment-detail-btn">

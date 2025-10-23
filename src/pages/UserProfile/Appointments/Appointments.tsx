@@ -21,6 +21,7 @@ import { AppointmentService } from '@/services/appointment.service';
 import { RootState } from '@/store';
 import { FilterState } from './components/AppointmentFilters/AppointmentTypes';
 import { getRefundInfo } from '@/utils/refund-policy.util';
+import { handleRescheduleAction } from '@/utils/reschedule-utils';
 import styles from './Appointments.module.scss';
 import { Link } from 'react-router-dom';
 import AppointmentGridCard from './components/AppointmentGridCard/AppointmentGridCard';
@@ -438,6 +439,15 @@ const Appointments: React.FC = () => {
         setShowCancelModal(true);
     };
 
+    // Handle reschedule click (lazy token generation)
+    const handleRescheduleClick = async (
+        appointment: AppointmentCardData,
+        action: 'SAME_DOCTOR' | 'NEW_DOCTOR'
+    ) => {
+        if (!userProfile?.id) return;
+        await handleRescheduleAction(appointment, action, userProfile.id);
+    };
+
     // Handle cancel appointment confirm
     const handleCancelConfirm = async (cancellationReason: string) => {
         if (!selectedAppointmentToCancel || !userProfile?.id) return;
@@ -574,6 +584,7 @@ const Appointments: React.FC = () => {
                                     appointment={appointment}
                                     status={activeTab}
                                     onCancel={handleCancelClick}
+                                    onReschedule={handleRescheduleClick}
                                 />
                             ))}
                         </>
@@ -585,6 +596,7 @@ const Appointments: React.FC = () => {
                                     appointment={appointment}
                                     status={activeTab}
                                     onCancel={handleCancelClick}
+                                    onReschedule={handleRescheduleClick}
                                 />
                             ))}
                         </div>
