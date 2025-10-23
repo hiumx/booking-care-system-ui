@@ -25,6 +25,7 @@ export interface DoctorInfo {
     positionName?: string;
     hospitalId?: string;
     avatarUrl?: string;
+    consultationFee?: number;
 }
 
 // Service Information from API
@@ -241,7 +242,10 @@ export interface AppointmentDetailProps {
     onStartSession?: () => void;
     onMessage?: () => void;
     onCancel?: () => void;
-    onReschedule?: () => void;
+    onReschedule?: (
+        appointment?: AppointmentCardData,
+        action?: 'SAME_DOCTOR' | 'NEW_DOCTOR'
+    ) => void;
     onDownloadPrescription?: () => void;
     onViewReason?: () => void;
 }
