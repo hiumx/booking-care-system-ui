@@ -62,7 +62,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
         <div className="profile-sidebar patient-sidebar profile-sidebar-new">
             <div className="widget-profile pro-widget-content">
                 <div className="profile-info-widget">
-                    <Link to="/profile-settings" className="booking-doc-img">
+                    <Link
+                        to={PATHS.USER.ROOT + '/' + PATHS.USER.PROFILE + '?tab=settings'}
+                        className="booking-doc-img"
+                    >
                         <img
                             src={userData.avatarUrl || '/assets/img/default-avatar-male.png'}
                             alt={`${userData.fullName} avatar`}
@@ -70,7 +73,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                     </Link>
                     <div className="profile-det-info">
                         <h3>
-                            <Link to="/profile-settings" className={styles.textFullName}>
+                            <Link
+                                to={PATHS.USER.ROOT + '/' + PATHS.USER.PROFILE + '?tab=settings'}
+                                className={styles.textFullName}
+                            >
                                 {userData.fullName}
                             </Link>
                         </h3>
