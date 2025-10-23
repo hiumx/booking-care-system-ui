@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import ServiceCard from './components/ServiceCard';
+import ErrorAlert from '@/components/common/ErrorAlert';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { useApiCall } from '@/hooks/useApiCall';
 import { replacePathParams, PATHS } from '@/routes/paths';
 import { MedicalServiceCategoriesService } from '@/services/medicalServiceCategories.service';
-import { ServiceCategoryParentsResponse } from '@/types/medicalService.types';
 
 // 🔹 Constants
 const medicalServices = {
@@ -22,37 +24,19 @@ const breadcrumbData = {
 };
 
 const MedicalServicePage: React.FC = () => {
-    const [parentServiceCategories, setParentServiceCategories] = useState<
-        ServiceCategoryParentsResponse[]
-    >([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const hasFetched = useRef(false);
-
-    // Fetch data on component mount (only once)
-    useEffect(() => {
-        if (!hasFetched.current) {
-            hasFetched.current = true;
-            fetchParentServiceCategories();
-        }
-    }, []);
-
-    const fetchParentServiceCategories = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
+    const {
+        data: parentServiceCategories,
+        isLoading,
+        error,
+        execute,
+        clearError,
+    } = useApiCall(
+        async () => {
             const response = await MedicalServiceCategoriesService.getParentServiceCategories();
-            setParentServiceCategories(response.data);
-        } catch (err: any) {
-            setError(err.message || 'Failed to fetch parent service categories');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const clearError = () => {
-        setError(null);
-    };
+            return response.data;
+        },
+        { immediate: true }
+    );
 
     // Handle error
     useEffect(() => {
@@ -64,40 +48,24 @@ const MedicalServicePage: React.FC = () => {
 
     const renderContent = () => {
         if (isLoading) {
-            return (
-                <div
-                    className="d-flex justify-content-center align-items-center"
-                    style={{ minHeight: '200px' }}
-                >
-                    <div className="spinner-border text-primary">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            );
+            return <LoadingSpinner />;
         }
 
         if (error) {
             return (
-                <div className="alert alert-danger" role="alert">
-                    <h4 className="alert-heading">Lỗi!</h4>
-                    <p>Không thể tải danh sách dịch vụ y tế. Vui lòng thử lại sau.</p>
-                    <hr />
-                    <button
-                        className="btn btn-outline-danger"
-                        onClick={() => {
-                            clearError();
-                            fetchParentServiceCategories();
-                        }}
-                    >
-                        Thử lại
-                    </button>
-                </div>
+                <ErrorAlert
+                    message="Không thể tải danh sách dịch vụ y tế. Vui lòng thử lại sau."
+                    onRetry={() => {
+                        clearError();
+                        execute();
+                    }}
+                />
             );
         }
 
         return (
             <div className="row">
-                {parentServiceCategories.map((service) => (
+                {parentServiceCategories?.map((service) => (
                     <ServiceCard
                         key={service.id}
                         id={service.id}

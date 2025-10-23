@@ -3,6 +3,9 @@ import clsx from 'clsx';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import ServiceCategoryCard from './components/ServiceCategoryCard';
+import ErrorAlert from '@/components/common/ErrorAlert';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import InfoAlert from '@/components/common/InfoAlert';
 import styles from './ServiceCategoriesPage.module.scss';
 import { replacePathParams, PATHS } from '@/routes/paths';
 import { useParams } from 'react-router-dom';
@@ -55,49 +58,35 @@ const ServiceCategoriesPage: React.FC = () => {
 
     const renderContent = () => {
         if (isLoading) {
-            return (
-                <div
-                    className="d-flex justify-content-center align-items-center"
-                    style={{ minHeight: '200px' }}
-                >
-                    <div className="spinner-border text-primary">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            );
+            return <LoadingSpinner />;
         }
 
         if (error) {
             return (
-                <div className="alert alert-danger" role="alert">
-                    <h4 className="alert-heading">Lỗi!</h4>
-                    <p>Không thể tải danh sách chuyên khoa. Vui lòng thử lại sau.</p>
-                    <hr />
-                    <button
-                        className="btn btn-outline-danger"
-                        onClick={() => globalThis.location.reload()}
-                    >
-                        Thử lại
-                    </button>
-                </div>
+                <ErrorAlert
+                    message="Không thể tải danh sách chuyên khoa. Vui lòng thử lại sau."
+                    onRetry={() => globalThis.location.reload()}
+                />
             );
         }
 
         if (!selectedParentCategory) {
             return (
-                <div className="alert alert-warning" role="alert">
-                    <h4 className="alert-heading">Không tìm thấy!</h4>
-                    <p>Không tìm thấy chuyên khoa được yêu cầu.</p>
-                </div>
+                <InfoAlert
+                    type="warning"
+                    title="Không tìm thấy!"
+                    message="Không tìm thấy chuyên khoa được yêu cầu."
+                />
             );
         }
 
         if (childCategories.length === 0) {
             return (
-                <div className="alert alert-info" role="alert">
-                    <h4 className="alert-heading">Thông báo!</h4>
-                    <p>Chuyên khoa này chưa có dịch vụ con.</p>
-                </div>
+                <InfoAlert
+                    type="info"
+                    title="Thông báo!"
+                    message="Chuyên khoa này chưa có dịch vụ con."
+                />
             );
         }
 
