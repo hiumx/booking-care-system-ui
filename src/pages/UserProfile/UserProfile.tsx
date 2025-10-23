@@ -125,7 +125,7 @@ const UserProfile = () => {
             case 'settings':
                 return <SettingsContainer />;
             case 'invoices':
-                return <Invoices />;
+                return <Invoices patientId={profile?.id} profile={profile} />;
             default:
                 return <Favourite patientId={profile?.id} />; // Default to favourites
         }

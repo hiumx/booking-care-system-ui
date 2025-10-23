@@ -28,6 +28,7 @@
         "bootstrap": "^5.3.7",
         "date-fns": "^4.1.0",
         "framer-motion": "^12.23.19",
+        "html2pdf.js": "^0.12.1",
         "jwt-decode": "^4.0.0",
         "lucide-react": "^0.541.0",
         "react": "^19.0.0",

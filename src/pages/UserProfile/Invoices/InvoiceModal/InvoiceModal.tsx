@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import Button from '../../../../components/Button';
 
+import { generateInvoicePDF, printInvoice } from '../pdfGenerator';
 import styles from './InvoiceModal.module.scss';
 
 interface InvoiceModalProps {
+    profile?: any;
     show: boolean;
     onClose: () => void;
     invoice?: {
@@ -13,18 +15,58 @@ interface InvoiceModalProps {
         appointmentDate: string;
         bookedOn: string;
         amount: string;
+        appointmentType: string;
     };
     isClosing?: boolean; // Optional prop to handle closing animation
     onAnimationEnd?: () => void; // Callback for animation end
 }
 
 const InvoiceModal: React.FC<InvoiceModalProps> = ({
+    profile,
     show,
     onClose,
     invoice,
     isClosing,
     onAnimationEnd,
 }) => {
+    const invoiceContentRef = useRef<HTMLDivElement>(null);
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [isPrinting, setIsPrinting] = useState(false);
+
+    // Handle PDF download
+    const handleDownloadPDF = async () => {
+        if (!invoiceContentRef.current || !invoice) return;
+
+        try {
+            setIsDownloading(true);
+            await generateInvoicePDF(
+                invoiceContentRef.current,
+                invoice.id,
+                profile?.fullName || 'Patient'
+            );
+        } catch (error) {
+            console.error('Error downloading PDF:', error);
+            alert('Không thể tải xuống PDF. Vui lòng thử lại.');
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
+    // Handle print
+    const handlePrint = () => {
+        if (!invoiceContentRef.current) return;
+
+        try {
+            setIsPrinting(true);
+            printInvoice(invoiceContentRef.current);
+        } catch (error) {
+            console.error('Error printing invoice:', error);
+            alert('Không thể in hóa đơn. Vui lòng thử lại.');
+        } finally {
+            // Reset printing state after a short delay
+            setTimeout(() => setIsPrinting(false), 1000);
+        }
+    };
     // Prevent body scroll when modal is open
     useEffect(() => {
         if (show && !isClosing) {
@@ -59,11 +101,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                 style={{ display: show || isClosing ? 'block' : 'none' }}
                 tabIndex={-1}
                 onAnimationEnd={
-                    isClosing
-                        ? typeof onAnimationEnd === 'function'
-                            ? onAnimationEnd
-                            : undefined
-                        : undefined
+                    isClosing && typeof onAnimationEnd === 'function' ? onAnimationEnd : undefined
                 }
             >
                 <div
@@ -88,14 +126,26 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                 <ul>
                                     <li>
                                         <Button
-                                            text="Tải xuống"
+                                            text={isDownloading ? 'Đang tải...' : 'Tải PDF'}
                                             type="button"
-                                            className="btn-md rounded-pill"
+                                            className="btn-md rounded-pill me-2"
+                                            onClick={handleDownloadPDF}
+                                            isDisabled={isDownloading || isPrinting}
+                                        />
+                                    </li>
+                                    <li>
+                                        <Button
+                                            text={isPrinting ? 'Đang in...' : 'In hóa đơn'}
+                                            type="button"
+                                            className="btn-md rounded-pill btn-outline-primary"
+                                            onClick={handlePrint}
+                                            isDisabled={isDownloading || isPrinting}
                                         />
                                     </li>
                                 </ul>
                             </div>
                             <div
+                                ref={invoiceContentRef}
                                 className={clsx(
                                     'view-prescribe invoice-content mb-0',
                                     styles.invoiceContent
@@ -127,7 +177,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                 {/* Invoice Item */}
                                 <div className="invoice-item">
                                     <div className="row">
-                                        <div className="col-md-4 col-sm-6">
+                                        <div className="col-md-6 col-sm-6">
                                             <div
                                                 className={clsx(styles.invoiceInfo, 'invoice-info')}
                                             >
@@ -138,13 +188,12 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                                         'invoice-details invoice-details-two'
                                                     )}
                                                 >
-                                                    {invoice.doctor.name} <br />
-                                                    806 Twin Willow Lane, <br />
-                                                    Newyork, USA <br />
+                                                    {profile?.fullName} <br />
+                                                    {profile?.phone} <br />
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="col-md-4 col-sm-6">
+                                        <div className="col-md-6 col-sm-6">
                                             <div
                                                 className={clsx(styles.invoiceInfo, 'invoice-info')}
                                             >
@@ -155,34 +204,10 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                                         'invoice-details invoice-details-two'
                                                     )}
                                                 >
-                                                    Richard Wilson <br />
-                                                    299 Star Trek Drive
+                                                    SE33 <br />
+                                                    FPT University
                                                     <br />
-                                                    Florida, 32405, USA
-                                                    <br />
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4 col-12">
-                                            <div
-                                                className={clsx(
-                                                    styles.invoiceInfo,
-                                                    'invoice-info2'
-                                                )}
-                                            >
-                                                <h6
-                                                    className={clsx(
-                                                        styles.paymentMethodText,
-                                                        'customer-text'
-                                                    )}
-                                                >
-                                                    Phương Thức Thanh Toán
-                                                </h6>
-                                                <p className="invoice-details">
-                                                    Debit Card <br />
-                                                    XXXXXXXXXXXX-2541
-                                                    <br />
-                                                    HDFC Bank
+                                                    Nam Kỳ Khởi Nghĩa, Đà Nẵng, Việt Nam
                                                     <br />
                                                 </p>
                                             </div>
@@ -211,27 +236,22 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                                         <thead>
                                                             <tr>
                                                                 <th>Nội dung</th>
-                                                                <th>Số lượng</th>
+
                                                                 <th>VAT</th>
-                                                                <th>Tổng cộng</th>
+                                                                <th>Tiền Cọc</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <tr>
                                                                 <td className="text-gray-9">
-                                                                    General Consultation
+                                                                    {invoice.appointmentType ===
+                                                                    'IN_PERSON'
+                                                                        ? 'Khám Trực Tiếp'
+                                                                        : 'Tư Vấn Từ Xa'}
                                                                 </td>
-                                                                <td>1</td>
-                                                                <td>$0</td>
-                                                                <td>$150</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-gray-9">
-                                                                    Video Call
-                                                                </td>
-                                                                <td>1</td>
-                                                                <td>$0</td>
-                                                                <td>$100</td>
+
+                                                                <td>0 ₫</td>
+                                                                <td>{invoice.amount}</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -245,13 +265,13 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                                         <tr>
                                                             <th>Tổng Phụ:</th>
                                                             <td>
-                                                                <span>$350</span>
+                                                                <span>{invoice.amount}</span>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <th>Giảm Giá:</th>
                                                             <td>
-                                                                <span>-10%</span>
+                                                                <span>0%</span>
                                                             </td>
                                                         </tr>
                                                         <tr>
