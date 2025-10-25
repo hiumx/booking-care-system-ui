@@ -1,19 +1,22 @@
 import React, { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import clsx from 'clsx';
 import styles from './ServiceDetailPage.module.scss';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import ScheduleAvailability from '@/components/ScheduleAvailability';
-import ReviewSection, { generateReviews } from '@/components/ReviewSection';
+import ReviewSection from '@/components/ReviewSection';
+import { useServiceReviews } from '@/hooks/useServiceReviews';
+import { ReviewService } from '@/services/review.service';
+import { TargetType } from '@/types/review.types';
 import {
     mockAppointments,
     getDisplayText,
     scrollToSection,
     calculatePriceRange,
-    calculateAverageRating,
     countAppointments,
-    createReviewHandlers,
 } from '@/utils/profileUtils';
 
 // Import images for DoctorProfileCard
@@ -94,9 +97,6 @@ const mockDoctorPrices = [
     },
 ];
 
-// Generate reviews using shared utility
-const reviews = generateReviews(150, serviceImg);
-
 const ServiceDetailPage: React.FC = () => {
     const bioRef = useRef<HTMLDivElement>(null);
     const clinicRef = useRef<HTMLDivElement>(null);
@@ -106,12 +106,26 @@ const ServiceDetailPage: React.FC = () => {
     const [expanded, setExpanded] = useState(false);
     const { id } = useParams<{ id: string }>();
 
+    // Get current user info
+    const currentUserProfile = useSelector((state: any) => state.user?.profile);
+    const currentUserId = currentUserProfile?.id; // For create review
+    const currentAccountId = currentUserProfile?.accountId; // For create reply
+
+    // Custom hook for service reviews
+    const {
+        reviews,
+        statistics: reviewStatistics,
+        isLoading: reviewLoading,
+        refetchReviews,
+        refetchStatistics,
+    } = useServiceReviews(id);
+
     const limit = 300;
     const isLongText = mockDoctor.bio.length > limit;
     const displayText = getDisplayText(mockDoctor.bio, expanded, isLongText, limit);
 
-    // Calculate average rating
-    const averageRating = calculateAverageRating(reviews);
+    // Calculate average rating from statistics
+    const averageRating = reviewStatistics?.averageRating || 0;
 
     // Count completed appointments
     const appointmentCount = countAppointments(mockAppointments, mockDoctor.id);
@@ -123,11 +137,167 @@ const ServiceDetailPage: React.FC = () => {
         .filter((amount): amount is number => amount !== undefined);
     const priceRange = calculatePriceRange(prices.map((amount) => ({ amount })));
 
-    // Use shared review handlers
-    const reviewHandlers = createReviewHandlers();
+    // Review handlers with API integration
+    const handleSubmitReview = async (reviewData: {
+        rating: number;
+        description: string;
+        termsAccepted: boolean;
+    }) => {
+        if (!id || !currentUserId) return;
 
-    // Mock current user ID for demo purposes
-    const currentUserId = 101; // Giả sử user hiện tại có ID là 101
+        try {
+            await ReviewService.createReview({
+                patientId: currentUserId,
+                targetType: TargetType.SERVICE, // 1 = SERVICE
+                serviceId: id,
+                rating: reviewData.rating,
+                comment: reviewData.description,
+            });
+
+            await refetchReviews();
+            await refetchStatistics();
+
+            toast.success('Đã gửi đánh giá thành công!', {
+                position: 'top-right',
+                autoClose: 2000,
+            });
+        } catch (err: any) {
+            console.error('Error creating review:', err);
+            if (err.message?.includes('appointment')) {
+                toast.error('Bạn cần hoàn thành dịch vụ này trước khi đánh giá.', {
+                    position: 'top-center',
+                    autoClose: 4000,
+                });
+            } else if (err.message?.includes('already reviewed')) {
+                toast.error(
+                    'Bạn đã đánh giá dịch vụ này rồi. Vui lòng cập nhật đánh giá hiện tại.',
+                    {
+                        position: 'top-center',
+                        autoClose: 4000,
+                    }
+                );
+            } else {
+                toast.error('Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.', {
+                    position: 'top-center',
+                    autoClose: 4000,
+                });
+            }
+        }
+    };
+
+    const handleReplySubmission = async (replyData: { reviewId: string; text: string }) => {
+        if (!currentAccountId) return;
+
+        try {
+            await ReviewService.createReply({
+                reviewId: replyData.reviewId,
+                authorId: currentAccountId,
+                content: replyData.text,
+            });
+            await refetchReviews();
+
+            toast.success('Đã gửi phản hồi thành công!', {
+                position: 'top-right',
+                autoClose: 2000,
+            });
+        } catch (err) {
+            console.error('Error creating reply:', err);
+            toast.error('Có lỗi xảy ra khi gửi phản hồi. Vui lòng thử lại.', {
+                position: 'top-center',
+                autoClose: 4000,
+            });
+        }
+    };
+
+    const handleEditReview = async (reviewData: {
+        reviewId: string;
+        rating: number;
+        description: string;
+    }) => {
+        try {
+            await ReviewService.updateReview({
+                id: reviewData.reviewId,
+                rating: reviewData.rating,
+                comment: reviewData.description,
+            });
+            await refetchReviews();
+            await refetchStatistics();
+
+            toast.success('Đã cập nhật đánh giá thành công!', {
+                position: 'top-right',
+                autoClose: 2000,
+            });
+        } catch (err) {
+            console.error('Error updating review:', err);
+            toast.error('Có lỗi xảy ra khi cập nhật đánh giá. Vui lòng thử lại.', {
+                position: 'top-center',
+                autoClose: 4000,
+            });
+        }
+    };
+
+    const handleDeleteReview = async (reviewId: string) => {
+        try {
+            await ReviewService.deleteReview(reviewId);
+            await refetchReviews();
+            await refetchStatistics();
+
+            toast.success('Đã xóa đánh giá thành công!', {
+                position: 'top-right',
+                autoClose: 2000,
+            });
+        } catch (err) {
+            console.error('Error deleting review:', err);
+            toast.error('Có lỗi xảy ra khi xóa đánh giá. Vui lòng thử lại.', {
+                position: 'top-center',
+                autoClose: 4000,
+            });
+        }
+    };
+
+    const handleEditReply = async (replyData: {
+        reviewId: string;
+        replyId: string;
+        text: string;
+    }) => {
+        try {
+            await ReviewService.updateReply({
+                reviewId: replyData.reviewId,
+                replyId: replyData.replyId,
+                content: replyData.text,
+            });
+            await refetchReviews();
+
+            toast.success('Đã cập nhật phản hồi thành công!', {
+                position: 'top-right',
+                autoClose: 2000,
+            });
+        } catch (err) {
+            console.error('Error updating reply:', err);
+            toast.error('Có lỗi xảy ra khi cập nhật phản hồi. Vui lòng thử lại.', {
+                position: 'top-center',
+                autoClose: 4000,
+            });
+        }
+    };
+
+    const handleDeleteReply = async (replyId: string, reviewId: string) => {
+        try {
+            await ReviewService.deleteReply(reviewId, replyId);
+            await refetchReviews();
+
+            toast.success('Đã xóa phản hồi thành công!', {
+                position: 'top-right',
+                autoClose: 2000,
+            });
+        } catch (err) {
+            console.error('Error deleting reply:', err);
+            toast.error('Có lỗi xảy ra khi xóa phản hồi. Vui lòng thử lại.', {
+                position: 'top-center',
+                autoClose: 4000,
+            });
+        }
+    };
     const { servicesparentId, serviceschildId } = useParams<{
         servicesparentId: string;
         serviceschildId: string;
@@ -376,12 +546,14 @@ const ServiceDetailPage: React.FC = () => {
                                     reviews={reviews}
                                     doctorName={mockDoctor.name}
                                     currentUserId={currentUserId}
-                                    onSubmitReview={reviewHandlers.handleSubmitReview}
-                                    onReplySubmission={reviewHandlers.handleReplySubmission}
-                                    onEditReview={reviewHandlers.handleEditReview}
-                                    onDeleteReview={reviewHandlers.handleDeleteReview}
-                                    onEditReply={reviewHandlers.handleEditReply}
-                                    onDeleteReply={reviewHandlers.handleDeleteReply}
+                                    currentAccountId={currentAccountId}
+                                    isLoading={reviewLoading}
+                                    onSubmitReview={handleSubmitReview}
+                                    onReplySubmission={handleReplySubmission}
+                                    onEditReview={handleEditReview}
+                                    onDeleteReview={handleDeleteReview}
+                                    onEditReply={handleEditReply}
+                                    onDeleteReply={handleDeleteReply}
                                 />
                             </div>
                         </div>
