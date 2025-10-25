@@ -22,6 +22,7 @@ import {
     countAppointments,
 } from '@/utils/profileUtils';
 import { useDoctorReviews } from '@/hooks/useDoctorReviews';
+import { useFavoriteDoctor } from '@/hooks/useFavoriteDoctor';
 import { ReviewService } from '@/services/review.service';
 import { TargetType } from '@/types/review.types';
 
@@ -67,6 +68,13 @@ const DoctorProfile: React.FC = () => {
         refetchReviews,
         refetchStatistics,
     } = useDoctorReviews(id);
+
+    // Custom hook for favorite doctor
+    const {
+        isFavorited,
+        isLoading: favoriteLoading,
+        toggleFavorite,
+    } = useFavoriteDoctor(currentUserId, id);
 
     // Fetch doctor data when component mounts
     useEffect(() => {
@@ -419,8 +427,32 @@ const DoctorProfile: React.FC = () => {
                                             </div>
                                             <ul className="sub-links">
                                                 <li>
-                                                    <Link to="#">
-                                                        <i className="feather-heart"></i>
+                                                    <Link
+                                                        to="#"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            toggleFavorite();
+                                                        }}
+                                                        title={
+                                                            isFavorited
+                                                                ? 'Xóa khỏi yêu thích'
+                                                                : 'Thêm vào yêu thích'
+                                                        }
+                                                        className={clsx({
+                                                            'text-danger': isFavorited,
+                                                        })}
+                                                    >
+                                                        {favoriteLoading ? (
+                                                            <i className="feather-loader"></i>
+                                                        ) : (
+                                                            <i
+                                                                className={clsx(
+                                                                    isFavorited
+                                                                        ? 'fas fa-heart'
+                                                                        : 'feather-heart'
+                                                                )}
+                                                            ></i>
+                                                        )}
                                                     </Link>
                                                 </li>
                                                 <li>

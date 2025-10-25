@@ -189,6 +189,7 @@ const Favourite: React.FC<FavouriteProps> = ({ patientId }) => {
                                 doctor={convertToUIDoctor(doctor)}
                                 patientId={patientId}
                                 onFavoriteChange={handleFavoriteChange}
+                                initialIsFavorited={true} // All doctors in this page are already favorited
                             />
                         </div>
                     ))}

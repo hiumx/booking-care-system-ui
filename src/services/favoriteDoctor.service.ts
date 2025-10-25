@@ -53,6 +53,18 @@ export interface ToggleFavoriteResponse {
     timestamp: string;
 }
 
+// Types for check favorite status
+export interface CheckFavoriteStatusData {
+    isFavorited: boolean;
+}
+
+export interface CheckFavoriteStatusResponse {
+    success: boolean;
+    message: string;
+    data: CheckFavoriteStatusData;
+    timestamp: string;
+}
+
 export class FavoriteDoctorService {
     /**
      * Lấy danh sách bác sĩ yêu thích của bệnh nhân
@@ -89,7 +101,32 @@ export class FavoriteDoctorService {
     }
 
     /**
+     * Check if patient has favorited a doctor
+     * GET /api/v1.0/Favorites/check/{patientId}/{doctorId}
+     */
+    static async checkFavoriteStatus(
+        patientId: string,
+        doctorId: string
+    ): Promise<CheckFavoriteStatusData> {
+        try {
+            const response: CheckFavoriteStatusResponse = await axiosInstance.get(
+                `/Favorites/check/${patientId}/${doctorId}`
+            );
+
+            if (!response.success) {
+                throw new Error(response.message || 'Failed to check favorite status');
+            }
+
+            return response.data;
+        } catch (error: any) {
+            console.error('Error checking favorite status:', error);
+            throw new Error(error.message || 'Failed to check favorite status');
+        }
+    }
+
+    /**
      * Toggle favorite status for a doctor
+     * POST /api/v1.0/Favorites/toggle
      */
     static async toggleFavorite({
         patientId,
