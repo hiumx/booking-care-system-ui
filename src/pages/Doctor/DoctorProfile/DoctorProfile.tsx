@@ -2,10 +2,11 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
+import { toast } from 'react-toastify';
 import styles from './DoctorProfile.module.scss';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
-import ReviewSection, { generateReviews } from '@/components/ReviewSection';
+import ReviewSection from '@/components/ReviewSection';
 import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
 import {
     selectSelectedDoctor,
@@ -19,8 +20,10 @@ import {
     scrollToSection,
     calculatePriceRange,
     countAppointments,
-    createReviewHandlers,
 } from '@/utils/profileUtils';
+import { useDoctorReviews } from '@/hooks/useDoctorReviews';
+import { ReviewService } from '@/services/review.service';
+import { TargetType } from '@/types/review.types';
 
 // Import images for DoctorProfileCard
 import doctorImg from '@/assets/img/doctors/doc-profile-02.jpg';
@@ -42,19 +45,30 @@ import HospitalInfo from '@/components/HospitalInfo';
 import { Gender } from '@/enums/common.enums';
 import { PATHS, replacePathParams } from '@/routes/paths';
 
-// Generate reviews using shared utility
-const reviews = generateReviews(150, doctorImg);
-
 const DoctorProfile: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { id } = useParams<{ id: string }>();
 
-    // Redux selectors
+    // Redux selectors - Doctor only (reviews use local state now!)
     const selectedDoctor = useSelector(selectSelectedDoctor);
     const isLoading = useSelector(selectDoctorLoading);
     const error = useSelector(selectDoctorError);
 
-    // Fetch doctor data when component mounts or id changes
+    // Get current user info - MUST be before early returns!
+    const currentUserProfile = useSelector((state: any) => state.user?.profile);
+    const currentUserId = currentUserProfile?.id; // For create review (patientId) & UI comparison
+    const currentAccountId = currentUserProfile?.accountId; // For create reply (authorId)
+
+    // Custom hook for reviews - No Redux needed!
+    const {
+        reviews,
+        statistics: reviewStatistics,
+        isLoading: reviewLoading,
+        refetchReviews,
+        refetchStatistics,
+    } = useDoctorReviews(id);
+
+    // Fetch doctor data when component mounts
     useEffect(() => {
         if (id) {
             dispatch(getDoctorByIdAsync(id));
@@ -145,10 +159,11 @@ const DoctorProfile: React.FC = () => {
         );
     }
 
-    // Calculate average rating from review statistics
-    const averageRating = doctor.reviewStatistics?.averageRating
-        ? doctor.reviewStatistics.averageRating.toFixed(1)
+    // Calculate average rating from review statistics (use Redux state)
+    const averageRating = reviewStatistics?.averageRating
+        ? reviewStatistics.averageRating.toFixed(1)
         : '0.0';
+    const totalReviews = reviewStatistics?.totalReviews || 0;
 
     // Function to render stars based on rating
     const renderStars = (rating: number) => {
@@ -189,11 +204,170 @@ const DoctorProfile: React.FC = () => {
     const prices = doctor.prices?.map((price) => price.amount) || [];
     const priceRange = calculatePriceRange(prices.map((amount) => ({ amount })));
 
-    // Use shared review handlers
-    const reviewHandlers = createReviewHandlers();
+    // Review handlers - Direct API calls, much simpler!
+    const handleSubmitReview = async (reviewData: {
+        rating: number;
+        description: string;
+        termsAccepted: boolean;
+    }) => {
+        if (!id || !currentUserId) return;
 
-    // Mock current user ID for demo purposes
-    const currentUserId = 101; // Giả sử user hiện tại có ID là 101
+        try {
+            await ReviewService.createReview({
+                patientId: currentUserId, // Use id for create review
+                targetType: TargetType.DOCTOR, // 0 = DOCTOR
+                doctorId: id,
+                rating: reviewData.rating,
+                comment: reviewData.description,
+            });
+
+            // Refresh reviews and statistics
+            await refetchReviews();
+            await refetchStatistics();
+
+            // Show success message AFTER API call completes
+            toast.success('Đã gửi đánh giá thành công!', {
+                position: 'top-right',
+                autoClose: 2000,
+            });
+        } catch (err: any) {
+            console.error('Error creating review:', err);
+            // Handle specific errors from API (400: No appointment, 409: Duplicate)
+            if (err.message?.includes('appointment')) {
+                toast.error('Bạn cần hoàn thành lịch hẹn với bác sĩ này trước khi đánh giá.', {
+                    position: 'top-center',
+                    autoClose: 4000,
+                });
+            } else if (err.message?.includes('already reviewed')) {
+                toast.error(
+                    'Bạn đã đánh giá bác sĩ này rồi. Vui lòng cập nhật đánh giá hiện tại.',
+                    {
+                        position: 'top-center',
+                        autoClose: 4000,
+                    }
+                );
+            } else {
+                toast.error('Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.', {
+                    position: 'top-center',
+                    autoClose: 4000,
+                });
+            }
+        }
+    };
+
+    const handleReplySubmission = async (replyData: { reviewId: string; text: string }) => {
+        if (!currentAccountId) return;
+
+        try {
+            await ReviewService.createReply({
+                reviewId: replyData.reviewId,
+                authorId: currentAccountId, // Use accountId for reply author
+                content: replyData.text,
+            });
+            await refetchReviews();
+
+            toast.success('Đã gửi phản hồi thành công!', {
+                position: 'top-right',
+                autoClose: 2000,
+            });
+        } catch (err) {
+            console.error('Error creating reply:', err);
+            toast.error('Có lỗi xảy ra khi gửi phản hồi. Vui lòng thử lại.', {
+                position: 'top-center',
+                autoClose: 4000,
+            });
+        }
+    };
+
+    const handleEditReview = async (reviewData: {
+        reviewId: string;
+        rating: number;
+        description: string;
+    }) => {
+        try {
+            await ReviewService.updateReview({
+                id: reviewData.reviewId, // Already string!
+                rating: reviewData.rating,
+                comment: reviewData.description,
+            });
+            await refetchReviews();
+            await refetchStatistics();
+
+            toast.success('Đã cập nhật đánh giá thành công!', {
+                position: 'top-right',
+                autoClose: 2000,
+            });
+        } catch (err) {
+            console.error('Error updating review:', err);
+            toast.error('Có lỗi xảy ra khi cập nhật đánh giá. Vui lòng thử lại.', {
+                position: 'top-center',
+                autoClose: 4000,
+            });
+        }
+    };
+
+    const handleDeleteReview = async (reviewId: string) => {
+        try {
+            await ReviewService.deleteReview(reviewId); // Already string!
+            await refetchReviews();
+            await refetchStatistics();
+
+            toast.success('Đã xóa đánh giá thành công!', {
+                position: 'top-right',
+                autoClose: 2000,
+            });
+        } catch (err) {
+            console.error('Error deleting review:', err);
+            toast.error('Có lỗi xảy ra khi xóa đánh giá. Vui lòng thử lại.', {
+                position: 'top-center',
+                autoClose: 4000,
+            });
+        }
+    };
+
+    const handleEditReply = async (replyData: {
+        reviewId: string;
+        replyId: string;
+        text: string;
+    }) => {
+        try {
+            await ReviewService.updateReply({
+                reviewId: replyData.reviewId,
+                replyId: replyData.replyId,
+                content: replyData.text,
+            });
+            await refetchReviews();
+
+            toast.success('Đã cập nhật phản hồi thành công!', {
+                position: 'top-right',
+                autoClose: 2000,
+            });
+        } catch (err) {
+            console.error('Error updating reply:', err);
+            toast.error('Có lỗi xảy ra khi cập nhật phản hồi. Vui lòng thử lại.', {
+                position: 'top-center',
+                autoClose: 4000,
+            });
+        }
+    };
+
+    const handleDeleteReply = async (replyId: string, reviewId: string) => {
+        try {
+            await ReviewService.deleteReply(reviewId, replyId); // Both already strings!
+            await refetchReviews();
+
+            toast.success('Đã xóa phản hồi thành công!', {
+                position: 'top-right',
+                autoClose: 2000,
+            });
+        } catch (err) {
+            console.error('Error deleting reply:', err);
+            toast.error('Có lỗi xảy ra khi xóa phản hồi. Vui lòng thử lại.', {
+                position: 'top-center',
+                autoClose: 4000,
+            });
+        }
+    };
 
     return (
         <MainLayout>
@@ -293,8 +467,7 @@ const DoctorProfile: React.FC = () => {
                                                     to="#reviews"
                                                     className="d-inline-block average-rating"
                                                 >
-                                                    {doctor.reviewStatistics?.totalReviews || 0}{' '}
-                                                    Đánh giá
+                                                    {totalReviews} Đánh giá
                                                 </Link>
                                             </div>
                                             <ul className="contact-doctors">
@@ -585,12 +758,14 @@ const DoctorProfile: React.FC = () => {
                                     reviews={reviews}
                                     doctorName={`${doctor.lastName} ${doctor.firstName}`}
                                     currentUserId={currentUserId}
-                                    onSubmitReview={reviewHandlers.handleSubmitReview}
-                                    onReplySubmission={reviewHandlers.handleReplySubmission}
-                                    onEditReview={reviewHandlers.handleEditReview}
-                                    onDeleteReview={reviewHandlers.handleDeleteReview}
-                                    onEditReply={reviewHandlers.handleEditReply}
-                                    onDeleteReply={reviewHandlers.handleDeleteReply}
+                                    currentAccountId={currentAccountId}
+                                    isLoading={reviewLoading}
+                                    onSubmitReview={handleSubmitReview}
+                                    onReplySubmission={handleReplySubmission}
+                                    onEditReview={handleEditReview}
+                                    onDeleteReview={handleDeleteReview}
+                                    onEditReply={handleEditReply}
+                                    onDeleteReply={handleDeleteReply}
                                 />
                             </div>
                         </div>
