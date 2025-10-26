@@ -138,7 +138,7 @@ const routes: RouteObject[] = [
         element: <ServiceCategories />,
     },
     {
-        path: PATHS.Service.HOSPITALS,
+        path: PATHS.Service.SERVICES,
         element: <ServiceHospitals />,
     },
     {

@@ -13,11 +13,47 @@ import {
     LIST_SPECIALTIES,
     LIST_DOCTORS,
     CAROUSEL_DOCTORS_BREAKPOINTS,
-    LIST_SERVICES,
 } from './Home.data';
 import ListServiceCategories from './components/ListServiceCategories';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { getParentServiceCategoriesAsync } from '@/store/slices/medicalServiceSlice';
+import { useEffect, useRef } from 'react';
 
 const Home: React.FC = () => {
+    const dispatch = useAppDispatch();
+    const hasFetched = useRef(false);
+
+    // Get service categories from Redux store
+    const { parentServiceCategories, isLoading } = useAppSelector(
+        (state) => state.medicalService.serviceCategories
+    );
+
+    // Fetch parent service categories if not already loaded
+    useEffect(() => {
+        if (!hasFetched.current && parentServiceCategories.length === 0) {
+            hasFetched.current = true;
+            dispatch(getParentServiceCategoriesAsync());
+        }
+    }, [dispatch, parentServiceCategories.length]);
+
+    // Convert API data to Service format
+    const convertToServiceFormat = (categories: any[]) => {
+        return categories.map((category) => ({
+            id: category.id,
+            name: category.name,
+            image: category.imageUrl,
+        }));
+    };
+
+    // Use Redux data only (no fallback to mock data)
+    const allServices = convertToServiceFormat(parentServiceCategories);
+
+    const leftServices = allServices.slice(0, Math.ceil(allServices.length / 2));
+    const rightServices = allServices.slice(Math.ceil(allServices.length / 2));
+
+    // Show loading or empty state if no data
+    const shouldShowServices = !isLoading && allServices.length > 0;
+
     const listSpecialtyItems: { id: string | number; node: React.ReactNode }[] =
         LIST_SPECIALTIES.map((specialty) => ({
             id: specialty.id,
@@ -51,6 +87,7 @@ const Home: React.FC = () => {
             ),
         })
     );
+
     const listDoctorItems: { id: string | number; node: React.ReactNode }[] = LIST_DOCTORS.map(
         (doctor) => ({
             id: doctor.id,
@@ -76,8 +113,7 @@ const Home: React.FC = () => {
             ),
         })
     );
-    const leftServices = LIST_SERVICES.slice(0, 5); // 0 -> 4
-    const rightServices = LIST_SERVICES.slice(5, 10); // 5 -> 9
+
     return (
         <div>
             <MainLayout>
@@ -113,7 +149,25 @@ const Home: React.FC = () => {
                     viewAllText="Xem tất cả bác sĩ"
                 />
                 {/* Services Section */}
-                <ServiceSection leftServices={leftServices} rightServices={rightServices} />
+                {shouldShowServices ? (
+                    <ServiceSection leftServices={leftServices} rightServices={rightServices} />
+                ) : (
+                    <div
+                        className="d-flex justify-content-center align-items-center"
+                        style={{ minHeight: '200px' }}
+                    >
+                        {isLoading ? (
+                            <div className="spinner-border text-primary">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        ) : (
+                            <div className="alert alert-info">
+                                <h4 className="alert-heading">Thông báo!</h4>
+                                <p>Chưa có dịch vụ nào được cung cấp.</p>
+                            </div>
+                        )}
+                    </div>
+                )}
             </MainLayout>
         </div>
     );

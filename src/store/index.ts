@@ -25,6 +25,7 @@ import languageReducer from './slices/languageSlice';
 import serviceTypeReducer from './slices/serviceTypeSlice';
 import specialtyReducer from './slices/specialtySlice';
 import bookingReducer from './slices/bookingSlice';
+import medicalServiceReducer from './slices/medicalServiceSlice';
 
 // Root reducer
 const rootReducer = combineReducers({
@@ -40,6 +41,7 @@ const rootReducer = combineReducers({
     serviceType: serviceTypeReducer,
     specialty: specialtyReducer,
     booking: bookingReducer,
+    medicalService: medicalServiceReducer,
 });
 
 // Redux persist configuration
@@ -55,6 +57,7 @@ const persistConfig: PersistConfig<RootState> = {
         'language',
         'serviceType',
         'specialty',
+        'medicalService',
     ], // Don't persist these (fetch fresh on app load)
 };
 

@@ -1,183 +1,216 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import clsx from 'clsx';
 import styles from './ServiceDetailPage.module.scss';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import ScheduleAvailability from '@/components/ScheduleAvailability';
 import ReviewSection from '@/components/ReviewSection';
-import { useServiceReviews } from '@/hooks/useServiceReviews';
-import { useReviewHandlers } from '@/hooks/useReviewHandlers';
-import { TargetType } from '@/types/review.types';
 import {
     mockAppointments,
     getDisplayText,
     scrollToSection,
-    calculatePriceRange,
     countAppointments,
 } from '@/utils/profileUtils';
 
 // Import images for DoctorProfileCard
-import serviceImg from '@/assets/img/doctors/doc-profile-02.jpg';
 import badgeCheck from '@/assets/img/icons/badge-check.svg';
 import watchIcon from '@/assets/img/icons/watch-icon.svg';
-import thumbIcon from '@/assets/img/icons/gmail-icon.svg';
+import thumbIcon from '@/assets/img/icons/count-02.svg';
 import buildingIcon from '@/assets/img/icons/building-icon.svg';
 import deviceMessageIcon from '@/assets/img/icons/device-message2.svg';
 import calendarIcon from '@/assets/img/icons/calendar3.svg';
-
-// Import images for DoctorDetails
-import clinicImg1 from '@/assets/img/clinic/clinic-11.jpg';
 
 // Icon CSS
 import '@/assets/css/feather.css';
 import { buildPath, PATHS, replacePathParams } from '@/routes/paths';
 import { HospitalCarousel } from '@/components/SimpleCarousel';
-
-// Mock data for Doctor
-const mockDoctor = {
-    id: 1,
-    account_id: 1,
-    email: 'nguyenvana@example.com',
-    address: 'Võ Chí Công, Đà Nẵng',
-    name: 'Chuyên Khoa Tiêu Hóa Bệnh Viện Đa Khoa Đà Nẵng',
-    gender: 'MALE',
-    position_id: 1,
-    specialty_id: 1,
-    clinic_id: 1,
-    bio: 'Khoa Tiêu hóa tại Bệnh viện Đa khoa Đà Nẵng cung cấp dịch vụ chăm sóc toàn diện cho các bệnh lý về hệ tiêu hóa, bao gồm các bệnh lý dạ dày, ruột, gan, tụy và túi mật. Đội ngũ bác sĩ giàu kinh nghiệm và tận tâm của chúng tôi kết hợp chuyên môn y khoa với công nghệ chẩn đoán tiên tiến để đảm bảo đánh giá chính xác và lên kế hoạch điều trị hiệu quả.Bệnh nhân được tư vấn cá nhân hóa, từ phát hiện sớm và chăm sóc phòng ngừa đến quản lý các bệnh lý đường tiêu hóa phức tạp. Với cam kết về sự tận tâm và chuyên nghiệp, khoa luôn nỗ lực cải thiện chất lượng cuộc sống của bệnh nhân thông qua các biện pháp can thiệp kịp thời, các thủ thuật xâm lấn tối thiểu và chăm sóc theo dõi liên tục.',
-    avatar_url: serviceImg,
-    years_of_experience: 21,
-    created_at: '2020-01-15 10:00:00',
-    updated_at: '2025-08-18 14:00:00',
-};
-
-// Mock data for Clinic
-const mockClinic = {
-    id: 1,
-    account_id: 1,
-    name: 'Bệnh viện Đa Khoa Đà Nẵng',
-    address: 'Võ Chí Công, Đà Nẵng, Việt Nam',
-    phone: '0236-123-456',
-    email: 'info@dananghospital.vn',
-    description: 'Bệnh viện hàng đầu tại Đà Nẵng với đội ngũ y bác sĩ chuyên nghiệp.',
-    background_url: clinicImg1,
-    avatar_url: clinicImg1,
-    status: 'ACTIVE',
-    created_at: '2019-12-01 08:00:00',
-    updated_at: '2025-08-18 15:00:00',
-};
-const listmockClinic = [mockClinic, mockClinic, mockClinic, mockClinic];
-
-// Mock data for Prices
-const mockPrices = [
-    {
-        id: 1,
-        amount: 300000,
-    },
-    {
-        id: 2,
-        amount: 500000,
-    },
-];
-
-// Mock data for Doctor Prices
-const mockDoctorPrices = [
-    {
-        doctor_id: 1,
-        price_id: 1,
-        description: 'Standard consultation',
-    },
-    {
-        doctor_id: 1,
-        price_id: 2,
-        description: 'Premium consultation',
-    },
-];
+import { getServicesWithHospitalAsync } from '@/store/slices/medicalServiceSlice';
 
 const ServiceDetailPage: React.FC = () => {
+    const dispatch = useAppDispatch();
     const bioRef = useRef<HTMLDivElement>(null);
     const clinicRef = useRef<HTMLDivElement>(null);
     const hoursRef = useRef<HTMLDivElement>(null);
     const reviewRef = useRef<HTMLDivElement>(null);
 
     const [expanded, setExpanded] = useState(false);
-    const { id } = useParams<{ id: string }>();
+    const { servicesparentId, serviceschildId, servicesId } = useParams<{
+        servicesparentId: string;
+        serviceschildId: string;
+        servicesId: string;
+    }>();
+
+    // Redux selectors
+    const servicesData = useAppSelector(
+        (state) => state.medicalService.serviceCategories.servicesWithHospital
+    );
+    const isLoading = useAppSelector((state) => state.medicalService.serviceCategories.isLoading);
+    const error = useAppSelector((state) => state.medicalService.serviceCategories.error);
 
     // Get current user info
-    const currentUserProfile = useSelector((state: any) => state.user?.profile);
-    const currentUserId = currentUserProfile?.id; // For create review
-    const currentAccountId = currentUserProfile?.accountId; // For create reply
+    const currentUserProfile = useAppSelector((state: any) => state.user?.profile);
+    const currentUserId = currentUserProfile?.id || 1; // For create review
+    const currentAccountId = currentUserProfile?.accountId || 1; // For create reply
 
-    // Custom hook for service reviews
-    const {
-        reviews,
-        statistics: reviewStatistics,
-        isLoading: reviewLoading,
-        refetchReviews,
-        refetchStatistics,
-    } = useServiceReviews(id);
+    // Mock data for reviews (temporary solution)
+    const reviews: any[] = [];
+    const reviewStatistics = { averageRating: 4.5, totalReviews: 0 };
+    const reviewLoading = false;
+
+    // Mock review handlers (temporary solution)
+    const handleSubmitReview = () => {
+        console.log('Submit review - to be implemented');
+    };
+    const handleReplySubmission = () => {
+        console.log('Reply submission - to be implemented');
+    };
+    const handleEditReview = () => {
+        console.log('Edit review - to be implemented');
+    };
+    const handleDeleteReview = () => {
+        console.log('Delete review - to be implemented');
+    };
+    const handleEditReply = () => {
+        console.log('Edit reply - to be implemented');
+    };
+    const handleDeleteReply = () => {
+        console.log('Delete reply - to be implemented');
+    };
+
+    // Fetch data if not available in Redux
+    useEffect(() => {
+        if (serviceschildId && !servicesData && !isLoading && !error) {
+            dispatch(
+                getServicesWithHospitalAsync({
+                    categoryId: serviceschildId,
+                    params: {
+                        page: 1,
+                        pageSize: 10,
+                        includeInactive: false,
+                    },
+                })
+            );
+        }
+    }, [dispatch, serviceschildId, servicesData, isLoading, error]);
+
+    // Find selected service from Redux data
+    const selectedService =
+        servicesData?.services.find((service) => service.id === servicesId) || null;
+
+    // Use selected service data or show loading/error state
+    const currentService = selectedService;
+
+    // Show loading state
+    if (isLoading) {
+        return (
+            <MainLayout>
+                <Breadcrumb items={[]} title="Đang tải..." />
+                <div className="content">
+                    <div className="container">
+                        <div
+                            className="d-flex justify-content-center align-items-center"
+                            style={{ minHeight: '400px' }}
+                        >
+                            <div className="spinner-border text-primary">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </MainLayout>
+        );
+    }
+
+    // Show error state
+    if (error) {
+        return (
+            <MainLayout>
+                <Breadcrumb items={[]} title="Lỗi" />
+                <div className="content">
+                    <div className="container">
+                        <div className="alert alert-danger" role="alert">
+                            <h4 className="alert-heading">Lỗi!</h4>
+                            <p>{error}</p>
+                            <hr />
+                            <button
+                                className="btn btn-outline-danger"
+                                onClick={() => globalThis.location.reload()}
+                            >
+                                Thử lại
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </MainLayout>
+        );
+    }
+
+    // Show no service found state
+    if (!currentService) {
+        return (
+            <MainLayout>
+                <Breadcrumb items={[]} title="Không tìm thấy dịch vụ" />
+                <div className="content">
+                    <div className="container">
+                        <div className="alert alert-info" role="alert">
+                            <h4 className="alert-heading">Không tìm thấy dịch vụ!</h4>
+                            <p>Dịch vụ bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+                            <hr />
+                            <button
+                                className="btn btn-outline-primary"
+                                onClick={() => globalThis.history.back()}
+                            >
+                                Quay lại
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </MainLayout>
+        );
+    }
 
     const limit = 300;
-    const isLongText = mockDoctor.bio.length > limit;
-    const displayText = getDisplayText(mockDoctor.bio, expanded, isLongText, limit);
+    const isLongText = currentService.description.length > limit;
+    const displayText = getDisplayText(currentService.description, expanded, isLongText, limit);
 
     // Calculate average rating from statistics
     const averageRating = reviewStatistics?.averageRating || 0;
 
-    // Count completed appointments
-    const appointmentCount = countAppointments(mockAppointments, mockDoctor.id);
+    // Count completed appointments (using service ID)
+    const appointmentCount = countAppointments(mockAppointments, Number(currentService.id) || 1);
 
-    // Get price range
-    const prices = mockDoctorPrices
-        .filter((dp) => dp.doctor_id === mockDoctor.id)
-        .map((dp) => mockPrices.find((p) => p.id === dp.price_id)?.amount)
-        .filter((amount): amount is number => amount !== undefined);
-    const priceRange = calculatePriceRange(prices.map((amount) => ({ amount })));
+    // Get price from current service
+    const servicePrice = currentService.price;
+    const priceRange = servicePrice > 0 ? `${servicePrice.toLocaleString('vi-VN')} VNĐ` : 'Liên hệ';
 
-    // Review handlers using custom hook
-    const {
-        handleSubmitReview,
-        handleReplySubmission,
-        handleEditReview,
-        handleDeleteReview,
-        handleEditReply,
-        handleDeleteReply,
-    } = useReviewHandlers({
-        targetType: TargetType.SERVICE,
-        targetId: id,
-        currentUserId,
-        currentAccountId,
-        targetName: mockDoctor.name,
-        refetchReviews,
-        refetchStatistics,
-    });
-    const { servicesparentId, serviceschildId } = useParams<{
-        servicesparentId: string;
-        serviceschildId: string;
-    }>();
     const breadcrumbData = {
         items: [
             { label: 'Trang chủ', path: '/', isActive: false },
             {
                 label: 'Dịch Vụ Y Tế',
+                path: replacePathParams(buildPath(PATHS.Service.ROOT), {}),
+                isActive: false,
+            },
+            {
+                label: servicesData?.parentCategoryName || 'Chuyên Khoa',
                 path: replacePathParams(buildPath(PATHS.Service.CATEGORIES), {
                     servicesparentId: servicesparentId!.toString(),
                 }),
                 isActive: false,
             },
             {
-                label: 'Chuyên Khoa Tiêu Hóa',
-                path: replacePathParams(PATHS.Service.HOSPITALS, {
+                label: servicesData?.serviceCategoryName || 'Chuyên Khoa',
+                path: replacePathParams(PATHS.Service.SERVICES, {
                     servicesparentId: servicesparentId!.toString(),
                     serviceschildId: serviceschildId!.toString(),
                 }),
                 isActive: false,
             },
-            { label: 'Chuyên Khoa Tiêu Hóa', isActive: true },
+            { label: currentService.name, isActive: true },
         ],
-        title: 'Chuyên Khoa Tiêu Hóa',
+        title: currentService.name,
     };
 
     return (
@@ -191,9 +224,9 @@ const ServiceDetailPage: React.FC = () => {
                                 <div className="doc-info-left">
                                     <div className="doctor-img">
                                         <img
-                                            src={mockDoctor.avatar_url}
+                                            src={currentService.imageUrl}
                                             className="img-fluid"
-                                            alt="User"
+                                            alt="Service"
                                         />
                                     </div>
                                     <div className="doc-info-cont">
@@ -201,19 +234,18 @@ const ServiceDetailPage: React.FC = () => {
                                             <i className="fa-solid fa-circle"></i> Sẵn sàng phục vụ
                                         </span>
                                         <h4 className="doc-name">
-                                            {mockDoctor.name} <img src={badgeCheck} alt="Badge" />
-                                            {/* <span className="badge doctor-role-badge">
-                                                <i className="fa-solid fa-circle"></i>{' '}
-                                                {mockSpecialty.name}
-                                            </span> */}
+                                            {currentService.name}{' '}
+                                            <img src={badgeCheck} alt="Badge" />
                                         </h4>
-                                        <p>Loại Dịch vụ: Khám chuyên khoa</p>
+                                        <p>
+                                            Loại Dịch vụ:{' '}
+                                            {servicesData?.serviceCategoryName || 'Dịch vụ y tế'}
+                                        </p>
                                         <p className="address-detail">
                                             <span className="loc-icon">
                                                 <i className="feather-map-pin"></i>
                                             </span>
-                                            {mockClinic.address}{' '}
-                                            <span className="view-text">( Xem vị trí )</span>
+                                            {currentService.hospital.address}{' '}
                                         </p>
                                     </div>
                                 </div>
@@ -222,7 +254,11 @@ const ServiceDetailPage: React.FC = () => {
                                         <li>
                                             <div className="hospital-info">
                                                 <span className="list-icon">
-                                                    <img src={watchIcon} alt="Icon" />
+                                                    <img
+                                                        src={thumbIcon}
+                                                        alt="Icon"
+                                                        style={{ width: '18px' }}
+                                                    />
                                                 </span>
                                                 <p>Toàn thời gian, Liệu pháp trực tuyến sẵn có</p>
                                             </div>
@@ -230,9 +266,11 @@ const ServiceDetailPage: React.FC = () => {
                                         <li>
                                             <div className="hospital-info">
                                                 <span className="list-icon">
-                                                    <img src={thumbIcon} alt="Icon" />
+                                                    <img src={watchIcon} alt="Icon" />
                                                 </span>
-                                                <p>Email: {mockDoctor.email}</p>
+                                                <p>
+                                                    Duration: {currentService.durationTime} minutes
+                                                </p>
                                             </div>
                                         </li>
                                         <li>
@@ -240,7 +278,7 @@ const ServiceDetailPage: React.FC = () => {
                                                 <span className="list-icon">
                                                     <img src={buildingIcon} alt="Icon" />
                                                 </span>
-                                                <p>{mockClinic.name}</p>
+                                                <p>{currentService.hospital.name}</p>
                                             </div>
                                         </li>
                                         <li>
@@ -292,7 +330,7 @@ const ServiceDetailPage: React.FC = () => {
                                         <Link
                                             className="apt-btn"
                                             to={replacePathParams(PATHS.BOOKING.ROOT, {
-                                                doctorId: id || '',
+                                                doctorId: servicesId!.toString() || '',
                                             })}
                                         >
                                             Đặt lịch hẹn
@@ -391,7 +429,20 @@ const ServiceDetailPage: React.FC = () => {
                                     <div className="detail-title">
                                         <h4>Các Bệnh Viện Cung Cấp Chung Dịch Vụ</h4>
                                     </div>
-                                    <HospitalCarousel hospitals={listmockClinic} />
+                                    {servicesData && servicesData.services.length > 0 ? (
+                                        <HospitalCarousel
+                                            hospitals={servicesData.services.map((service) => ({
+                                                id: Number(service.hospital.id) || 1,
+                                                name: service.hospital.name,
+                                                address: service.hospital.address,
+                                                background_url: service.hospital.avatarUrl,
+                                            }))}
+                                        />
+                                    ) : (
+                                        <div className="alert alert-info">
+                                            <p>Không có bệnh viện nào cung cấp dịch vụ này.</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             {/* ----------------------- */}
@@ -399,9 +450,9 @@ const ServiceDetailPage: React.FC = () => {
                             <div ref={reviewRef}>
                                 <ReviewSection
                                     reviews={reviews}
-                                    doctorName={mockDoctor.name}
-                                    currentUserId={currentUserId}
-                                    currentAccountId={currentAccountId}
+                                    doctorName={currentService.name}
+                                    currentUserId={currentUserId || 1}
+                                    currentAccountId={currentAccountId || 1}
                                     isLoading={reviewLoading}
                                     onSubmitReview={handleSubmitReview}
                                     onReplySubmission={handleReplySubmission}
