@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
-import { toast } from 'react-toastify';
 import styles from './DoctorProfile.module.scss';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
@@ -23,7 +22,7 @@ import {
 } from '@/utils/profileUtils';
 import { useDoctorReviews } from '@/hooks/useDoctorReviews';
 import { useFavoriteDoctor } from '@/hooks/useFavoriteDoctor';
-import { ReviewService } from '@/services/review.service';
+import { useReviewHandlers } from '@/hooks/useReviewHandlers';
 import { TargetType } from '@/types/review.types';
 
 // Import images for DoctorProfileCard
@@ -99,6 +98,24 @@ const DoctorProfile: React.FC = () => {
     const isLongText = doctor?.bio ? doctor.bio.length > limit : false;
 
     const displayText = getDisplayText(doctor?.bio, expanded, isLongText, limit);
+
+    // Review handlers using custom hook - MUST be before early returns
+    const {
+        handleSubmitReview,
+        handleReplySubmission,
+        handleEditReview,
+        handleDeleteReview,
+        handleEditReply,
+        handleDeleteReply,
+    } = useReviewHandlers({
+        targetType: TargetType.DOCTOR,
+        targetId: id,
+        currentUserId,
+        currentAccountId,
+        targetName: doctor ? `${doctor.lastName} ${doctor.firstName}` : '',
+        refetchReviews,
+        refetchStatistics,
+    });
 
     // Breadcrumb data
     const breadcrumbData = {
@@ -211,171 +228,6 @@ const DoctorProfile: React.FC = () => {
     // Get price range from doctor data
     const prices = doctor.prices?.map((price) => price.amount) || [];
     const priceRange = calculatePriceRange(prices.map((amount) => ({ amount })));
-
-    // Review handlers - Direct API calls, much simpler!
-    const handleSubmitReview = async (reviewData: {
-        rating: number;
-        description: string;
-        termsAccepted: boolean;
-    }) => {
-        if (!id || !currentUserId) return;
-
-        try {
-            await ReviewService.createReview({
-                patientId: currentUserId, // Use id for create review
-                targetType: TargetType.DOCTOR, // 0 = DOCTOR
-                doctorId: id,
-                rating: reviewData.rating,
-                comment: reviewData.description,
-            });
-
-            // Refresh reviews and statistics
-            await refetchReviews();
-            await refetchStatistics();
-
-            // Show success message AFTER API call completes
-            toast.success('Đã gửi đánh giá thành công!', {
-                position: 'top-right',
-                autoClose: 2000,
-            });
-        } catch (err: any) {
-            console.error('Error creating review:', err);
-            // Handle specific errors from API (400: No appointment, 409: Duplicate)
-            if (err.message?.includes('appointment')) {
-                toast.error('Bạn cần hoàn thành lịch hẹn với bác sĩ này trước khi đánh giá.', {
-                    position: 'top-center',
-                    autoClose: 4000,
-                });
-            } else if (err.message?.includes('already reviewed')) {
-                toast.error(
-                    'Bạn đã đánh giá bác sĩ này rồi. Vui lòng cập nhật đánh giá hiện tại.',
-                    {
-                        position: 'top-center',
-                        autoClose: 4000,
-                    }
-                );
-            } else {
-                toast.error('Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.', {
-                    position: 'top-center',
-                    autoClose: 4000,
-                });
-            }
-        }
-    };
-
-    const handleReplySubmission = async (replyData: { reviewId: string; text: string }) => {
-        if (!currentAccountId) return;
-
-        try {
-            await ReviewService.createReply({
-                reviewId: replyData.reviewId,
-                authorId: currentAccountId, // Use accountId for reply author
-                content: replyData.text,
-            });
-            await refetchReviews();
-
-            toast.success('Đã gửi phản hồi thành công!', {
-                position: 'top-right',
-                autoClose: 2000,
-            });
-        } catch (err) {
-            console.error('Error creating reply:', err);
-            toast.error('Có lỗi xảy ra khi gửi phản hồi. Vui lòng thử lại.', {
-                position: 'top-center',
-                autoClose: 4000,
-            });
-        }
-    };
-
-    const handleEditReview = async (reviewData: {
-        reviewId: string;
-        rating: number;
-        description: string;
-    }) => {
-        try {
-            await ReviewService.updateReview({
-                id: reviewData.reviewId, // Already string!
-                rating: reviewData.rating,
-                comment: reviewData.description,
-            });
-            await refetchReviews();
-            await refetchStatistics();
-
-            toast.success('Đã cập nhật đánh giá thành công!', {
-                position: 'top-right',
-                autoClose: 2000,
-            });
-        } catch (err) {
-            console.error('Error updating review:', err);
-            toast.error('Có lỗi xảy ra khi cập nhật đánh giá. Vui lòng thử lại.', {
-                position: 'top-center',
-                autoClose: 4000,
-            });
-        }
-    };
-
-    const handleDeleteReview = async (reviewId: string) => {
-        try {
-            await ReviewService.deleteReview(reviewId); // Already string!
-            await refetchReviews();
-            await refetchStatistics();
-
-            toast.success('Đã xóa đánh giá thành công!', {
-                position: 'top-right',
-                autoClose: 2000,
-            });
-        } catch (err) {
-            console.error('Error deleting review:', err);
-            toast.error('Có lỗi xảy ra khi xóa đánh giá. Vui lòng thử lại.', {
-                position: 'top-center',
-                autoClose: 4000,
-            });
-        }
-    };
-
-    const handleEditReply = async (replyData: {
-        reviewId: string;
-        replyId: string;
-        text: string;
-    }) => {
-        try {
-            await ReviewService.updateReply({
-                reviewId: replyData.reviewId,
-                replyId: replyData.replyId,
-                content: replyData.text,
-            });
-            await refetchReviews();
-
-            toast.success('Đã cập nhật phản hồi thành công!', {
-                position: 'top-right',
-                autoClose: 2000,
-            });
-        } catch (err) {
-            console.error('Error updating reply:', err);
-            toast.error('Có lỗi xảy ra khi cập nhật phản hồi. Vui lòng thử lại.', {
-                position: 'top-center',
-                autoClose: 4000,
-            });
-        }
-    };
-
-    const handleDeleteReply = async (replyId: string, reviewId: string) => {
-        try {
-            await ReviewService.deleteReply(reviewId, replyId); // Both already strings!
-            await refetchReviews();
-
-            toast.success('Đã xóa phản hồi thành công!', {
-                position: 'top-right',
-                autoClose: 2000,
-            });
-        } catch (err) {
-            console.error('Error deleting reply:', err);
-            toast.error('Có lỗi xảy ra khi xóa phản hồi. Vui lòng thử lại.', {
-                position: 'top-center',
-                autoClose: 4000,
-            });
-        }
-    };
 
     return (
         <MainLayout>

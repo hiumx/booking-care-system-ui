@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
-import { toast } from 'react-toastify';
 import Button from '@/components/Button';
+import { useReviewForm } from '@/hooks/useReviewForm';
+import { useStarRating } from '@/hooks/useStarRating';
 import styles from './EditReviewForm.module.scss';
 
 interface Review {
@@ -23,54 +24,44 @@ interface EditReviewFormProps {
 }
 
 const EditReviewForm: React.FC<EditReviewFormProps> = ({ review, onSubmitEdit, onCancel }) => {
-    const [rating, setRating] = useState<number>(review.rating || 0);
-    const [description, setDescription] = useState<string>(review.text || '');
-    const [recommend, setRecommend] = useState<boolean | undefined>(review.recommend);
-    const [hoveredStar, setHoveredStar] = useState<number>(0);
-    const [descriptionError, setDescriptionError] = useState<string>('');
+    // Use custom hooks for form validation and star rating
+    const {
+        description,
+        setDescription,
+        recommend,
+        descriptionError,
+        setDescriptionError,
+        trimmedLength,
+        remainingChars,
+        maxChars,
+        minChars,
+        validateForm,
+        updateFormValues,
+    } = useReviewForm({
+        initialRating: review.rating || 0,
+        initialDescription: review.text || '',
+        initialRecommend: review.recommend,
+        maxChars: 500,
+        minChars: 5,
+    });
 
-    const maxChars = 500;
-    const minChars = 5;
-    const remainingChars = maxChars - description.length;
-    const trimmedLength = description.trim().length;
+    const { rating, setRating, handleStarClick, handleStarHover, handleStarLeave, isStarActive } =
+        useStarRating(review.rating || 0);
+
+    // Update form when review ID changes (when editing a different review)
 
     useEffect(() => {
+        updateFormValues(review.rating || 0, review.text || '', review.recommend);
         setRating(review.rating || 0);
-        setDescription(review.text || '');
-        setRecommend(review.recommend);
-        setDescriptionError('');
-    }, [review]);
+        // Only depend on review.id to avoid resetting form while user is typing
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [review.id]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Clear previous errors
-        setDescriptionError('');
-
-        if (rating === 0) {
-            toast.warning('Vui lòng chọn đánh giá sao', {
-                position: 'top-center',
-                autoClose: 3000,
-            });
-            return;
-        }
-
-        if (!description.trim()) {
-            setDescriptionError('Vui lòng nhập nội dung review');
-            toast.error('Vui lòng nhập nội dung đánh giá', {
-                position: 'top-center',
-                autoClose: 3000,
-            });
-            return;
-        }
-
-        // Validate minimum length (backend requirement)
-        if (trimmedLength < minChars) {
-            setDescriptionError(`Nội dung review phải có ít nhất ${minChars} ký tự`);
-            toast.error(`Nội dung đánh giá phải có ít nhất ${minChars} ký tự`, {
-                position: 'top-center',
-                autoClose: 3000,
-            });
+        // Validate form (pass rating from useStarRating)
+        if (!validateForm(false, false, rating)) {
             return;
         }
 
@@ -84,24 +75,10 @@ const EditReviewForm: React.FC<EditReviewFormProps> = ({ review, onSubmitEdit, o
         onSubmitEdit(reviewData);
     };
 
-    const handleStarClick = (starValue: number) => {
-        setRating(starValue);
-    };
-
-    const handleStarHover = (starValue: number) => {
-        setHoveredStar(starValue);
-    };
-
-    const handleStarLeave = () => {
-        setHoveredStar(0);
-    };
-
     const renderStars = () => {
         const stars = [];
         for (let i = 1; i <= 5; i++) {
-            const isHovered = hoveredStar > 0 && i <= hoveredStar;
-            const isSelected = hoveredStar === 0 && i <= rating;
-            const isActive = isHovered || isSelected;
+            const isActive = isStarActive(i);
 
             stars.push(
                 <i

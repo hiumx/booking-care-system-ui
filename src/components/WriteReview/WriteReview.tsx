@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
-import { toast } from 'react-toastify';
 import Button from '@/components/Button';
+import { useReviewForm } from '@/hooks/useReviewForm';
+import { useStarRating } from '@/hooks/useStarRating';
 import styles from './WriteReview.module.scss';
 
 interface WriteReviewProps {
@@ -15,55 +16,29 @@ interface WriteReviewProps {
 }
 
 const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview }) => {
-    const [rating, setRating] = useState<number>(0);
-    const [description, setDescription] = useState<string>('');
     const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
-    const [hoveredStar, setHoveredStar] = useState<number>(0);
-    const [descriptionError, setDescriptionError] = useState<string>('');
 
-    const maxChars = 100;
-    const minChars = 5;
-    const remainingChars = maxChars - description.length;
-    const trimmedLength = description.trim().length;
+    // Use custom hooks for form validation and star rating
+    const {
+        description,
+        setDescription,
+        descriptionError,
+        setDescriptionError,
+        trimmedLength,
+        remainingChars,
+        maxChars,
+        minChars,
+        validateForm,
+    } = useReviewForm({ maxChars: 100, minChars: 5 });
+
+    const { rating, setRating, handleStarClick, handleStarHover, handleStarLeave, isStarActive } =
+        useStarRating(0);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Clear previous errors
-        setDescriptionError('');
-
-        if (rating === 0) {
-            toast.warning('Vui lòng chọn đánh giá sao', {
-                position: 'top-center',
-                autoClose: 3000,
-            });
-            return;
-        }
-
-        if (!description.trim()) {
-            setDescriptionError('Vui lòng nhập nội dung review');
-            toast.error('Vui lòng nhập nội dung đánh giá', {
-                position: 'top-center',
-                autoClose: 3000,
-            });
-            return;
-        }
-
-        // Validate minimum length (backend requirement)
-        if (trimmedLength < minChars) {
-            setDescriptionError(`Nội dung review phải có ít nhất ${minChars} ký tự`);
-            toast.error(`Nội dung đánh giá phải có ít nhất ${minChars} ký tự`, {
-                position: 'top-center',
-                autoClose: 3000,
-            });
-            return;
-        }
-
-        if (!termsAccepted) {
-            toast.warning('Vui lòng đồng ý với điều khoản & điều kiện', {
-                position: 'top-center',
-                autoClose: 3000,
-            });
+        // Validate form with terms requirement (pass rating to validateForm)
+        if (!validateForm(true, termsAccepted, rating)) {
             return;
         }
 
@@ -76,30 +51,13 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview })
         onSubmitReview?.(reviewData);
 
         // Reset form
-        setRating(0);
         setDescription('');
+        setRating(0);
         setTermsAccepted(false);
-        setHoveredStar(0);
-        setDescriptionError('');
-    };
-
-    const handleStarClick = (starValue: number) => {
-        setRating(starValue);
-    };
-
-    const handleStarHover = (starValue: number) => {
-        setHoveredStar(starValue);
-    };
-
-    const handleStarLeave = () => {
-        setHoveredStar(0);
     };
 
     const getStarClass = (starValue: number) => {
-        if (hoveredStar > 0) {
-            return starValue <= hoveredStar ? 'active' : '';
-        }
-        return starValue <= rating ? 'active' : '';
+        return isStarActive(starValue) ? 'active' : '';
     };
 
     return (

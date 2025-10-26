@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 import clsx from 'clsx';
 import styles from './ServiceDetailPage.module.scss';
 import MainLayout from '@/layouts/MainLayout';
@@ -9,7 +8,7 @@ import Breadcrumb from '@/components/Breadcrumb';
 import ScheduleAvailability from '@/components/ScheduleAvailability';
 import ReviewSection from '@/components/ReviewSection';
 import { useServiceReviews } from '@/hooks/useServiceReviews';
-import { ReviewService } from '@/services/review.service';
+import { useReviewHandlers } from '@/hooks/useReviewHandlers';
 import { TargetType } from '@/types/review.types';
 import {
     mockAppointments,
@@ -137,167 +136,23 @@ const ServiceDetailPage: React.FC = () => {
         .filter((amount): amount is number => amount !== undefined);
     const priceRange = calculatePriceRange(prices.map((amount) => ({ amount })));
 
-    // Review handlers with API integration
-    const handleSubmitReview = async (reviewData: {
-        rating: number;
-        description: string;
-        termsAccepted: boolean;
-    }) => {
-        if (!id || !currentUserId) return;
-
-        try {
-            await ReviewService.createReview({
-                patientId: currentUserId,
-                targetType: TargetType.SERVICE, // 1 = SERVICE
-                serviceId: id,
-                rating: reviewData.rating,
-                comment: reviewData.description,
-            });
-
-            await refetchReviews();
-            await refetchStatistics();
-
-            toast.success('Đã gửi đánh giá thành công!', {
-                position: 'top-right',
-                autoClose: 2000,
-            });
-        } catch (err: any) {
-            console.error('Error creating review:', err);
-            if (err.message?.includes('appointment')) {
-                toast.error('Bạn cần hoàn thành dịch vụ này trước khi đánh giá.', {
-                    position: 'top-center',
-                    autoClose: 4000,
-                });
-            } else if (err.message?.includes('already reviewed')) {
-                toast.error(
-                    'Bạn đã đánh giá dịch vụ này rồi. Vui lòng cập nhật đánh giá hiện tại.',
-                    {
-                        position: 'top-center',
-                        autoClose: 4000,
-                    }
-                );
-            } else {
-                toast.error('Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.', {
-                    position: 'top-center',
-                    autoClose: 4000,
-                });
-            }
-        }
-    };
-
-    const handleReplySubmission = async (replyData: { reviewId: string; text: string }) => {
-        if (!currentAccountId) return;
-
-        try {
-            await ReviewService.createReply({
-                reviewId: replyData.reviewId,
-                authorId: currentAccountId,
-                content: replyData.text,
-            });
-            await refetchReviews();
-
-            toast.success('Đã gửi phản hồi thành công!', {
-                position: 'top-right',
-                autoClose: 2000,
-            });
-        } catch (err) {
-            console.error('Error creating reply:', err);
-            toast.error('Có lỗi xảy ra khi gửi phản hồi. Vui lòng thử lại.', {
-                position: 'top-center',
-                autoClose: 4000,
-            });
-        }
-    };
-
-    const handleEditReview = async (reviewData: {
-        reviewId: string;
-        rating: number;
-        description: string;
-    }) => {
-        try {
-            await ReviewService.updateReview({
-                id: reviewData.reviewId,
-                rating: reviewData.rating,
-                comment: reviewData.description,
-            });
-            await refetchReviews();
-            await refetchStatistics();
-
-            toast.success('Đã cập nhật đánh giá thành công!', {
-                position: 'top-right',
-                autoClose: 2000,
-            });
-        } catch (err) {
-            console.error('Error updating review:', err);
-            toast.error('Có lỗi xảy ra khi cập nhật đánh giá. Vui lòng thử lại.', {
-                position: 'top-center',
-                autoClose: 4000,
-            });
-        }
-    };
-
-    const handleDeleteReview = async (reviewId: string) => {
-        try {
-            await ReviewService.deleteReview(reviewId);
-            await refetchReviews();
-            await refetchStatistics();
-
-            toast.success('Đã xóa đánh giá thành công!', {
-                position: 'top-right',
-                autoClose: 2000,
-            });
-        } catch (err) {
-            console.error('Error deleting review:', err);
-            toast.error('Có lỗi xảy ra khi xóa đánh giá. Vui lòng thử lại.', {
-                position: 'top-center',
-                autoClose: 4000,
-            });
-        }
-    };
-
-    const handleEditReply = async (replyData: {
-        reviewId: string;
-        replyId: string;
-        text: string;
-    }) => {
-        try {
-            await ReviewService.updateReply({
-                reviewId: replyData.reviewId,
-                replyId: replyData.replyId,
-                content: replyData.text,
-            });
-            await refetchReviews();
-
-            toast.success('Đã cập nhật phản hồi thành công!', {
-                position: 'top-right',
-                autoClose: 2000,
-            });
-        } catch (err) {
-            console.error('Error updating reply:', err);
-            toast.error('Có lỗi xảy ra khi cập nhật phản hồi. Vui lòng thử lại.', {
-                position: 'top-center',
-                autoClose: 4000,
-            });
-        }
-    };
-
-    const handleDeleteReply = async (replyId: string, reviewId: string) => {
-        try {
-            await ReviewService.deleteReply(reviewId, replyId);
-            await refetchReviews();
-
-            toast.success('Đã xóa phản hồi thành công!', {
-                position: 'top-right',
-                autoClose: 2000,
-            });
-        } catch (err) {
-            console.error('Error deleting reply:', err);
-            toast.error('Có lỗi xảy ra khi xóa phản hồi. Vui lòng thử lại.', {
-                position: 'top-center',
-                autoClose: 4000,
-            });
-        }
-    };
+    // Review handlers using custom hook
+    const {
+        handleSubmitReview,
+        handleReplySubmission,
+        handleEditReview,
+        handleDeleteReview,
+        handleEditReply,
+        handleDeleteReply,
+    } = useReviewHandlers({
+        targetType: TargetType.SERVICE,
+        targetId: id,
+        currentUserId,
+        currentAccountId,
+        targetName: mockDoctor.name,
+        refetchReviews,
+        refetchStatistics,
+    });
     const { servicesparentId, serviceschildId } = useParams<{
         servicesparentId: string;
         serviceschildId: string;

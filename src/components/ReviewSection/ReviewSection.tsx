@@ -239,7 +239,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     const stringToNumber = (str: string): number => {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
+            const char = str.codePointAt(i) ?? 0;
             hash = (hash << 5) - hash + char;
             hash = hash & hash; // Convert to 32bit integer
         }
@@ -276,17 +276,23 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
             </div>
 
             {/* Loading State */}
-            {isLoading ? (
+            {isLoading && (
                 <div className="text-center py-4">
-                    <div className="spinner-border" role="status">
+                    <output className="spinner-border">
                         <span className="visually-hidden">Đang tải...</span>
-                    </div>
+                    </output>
                 </div>
-            ) : reviews.length === 0 ? (
+            )}
+
+            {/* Empty State */}
+            {!isLoading && reviews.length === 0 && (
                 <div className="text-center py-4">
                     <p className="text-muted">Chưa có đánh giá nào.</p>
                 </div>
-            ) : (
+            )}
+
+            {/* Reviews List */}
+            {!isLoading && reviews.length > 0 && (
                 <>
                     {displayedReviews.map((review, index) => {
                         // Store original string IDs for callbacks
