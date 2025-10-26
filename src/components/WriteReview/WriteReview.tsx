@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Button from '@/components/Button';
+import { useReviewForm } from '@/hooks/useReviewForm';
+import { useStarRating } from '@/hooks/useStarRating';
 import styles from './WriteReview.module.scss';
 
 interface WriteReviewProps {
@@ -14,36 +16,34 @@ interface WriteReviewProps {
 }
 
 const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview }) => {
-    const [rating, setRating] = useState<number>(0);
-
-    const [description, setDescription] = useState<string>('');
     const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
-    const [hoveredStar, setHoveredStar] = useState<number>(0);
 
-    const maxChars = 100;
-    const remainingChars = maxChars - description.length;
+    // Use custom hooks for form validation and star rating
+    const {
+        description,
+        setDescription,
+        descriptionError,
+        setDescriptionError,
+        trimmedLength,
+        remainingChars,
+        maxChars,
+        minChars,
+        validateForm,
+    } = useReviewForm({ maxChars: 100, minChars: 5 });
+
+    const { rating, setRating, handleStarClick, handleStarHover, handleStarLeave, isStarActive } =
+        useStarRating(0);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (rating === 0) {
-            alert('Vui lòng chọn rating');
-            return;
-        }
-
-        if (!description.trim()) {
-            alert('Vui lòng nhập nội dung review');
-            return;
-        }
-
-        if (!termsAccepted) {
-            alert('Vui lòng đồng ý với điều khoản');
+        // Validate form with terms requirement (pass rating to validateForm)
+        if (!validateForm(true, termsAccepted, rating)) {
             return;
         }
 
         const reviewData = {
             rating,
-
             description: description.trim(),
             termsAccepted,
         };
@@ -51,30 +51,13 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview })
         onSubmitReview?.(reviewData);
 
         // Reset form
-        setRating(0);
-
         setDescription('');
+        setRating(0);
         setTermsAccepted(false);
-        setHoveredStar(0);
-    };
-
-    const handleStarClick = (starValue: number) => {
-        setRating(starValue);
-    };
-
-    const handleStarHover = (starValue: number) => {
-        setHoveredStar(starValue);
-    };
-
-    const handleStarLeave = () => {
-        setHoveredStar(0);
     };
 
     const getStarClass = (starValue: number) => {
-        if (hoveredStar > 0) {
-            return starValue <= hoveredStar ? 'active' : '';
-        }
-        return starValue <= rating ? 'active' : '';
+        return isStarActive(starValue) ? 'active' : '';
     };
 
     return (
@@ -122,19 +105,38 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview })
 
                 <div className="mb-3">
                     <label className="mb-2" htmlFor="review_desc">
-                        Nội dung đánh giá
+                        Nội dung đánh giá <span className="text-danger">*</span>
                     </label>
                     <textarea
                         id="review_desc"
                         maxLength={maxChars}
-                        className={clsx(styles.formControl, 'form-control')}
+                        className={clsx(styles.formControl, 'form-control', {
+                            'is-invalid': descriptionError,
+                        })}
                         rows={4}
-                        placeholder="Chia sẻ trải nghiệm của bạn với bác sĩ..."
+                        placeholder="Chia sẻ trải nghiệm của bạn với bác sĩ... (tối thiểu 5 ký tự)"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={(e) => {
+                            setDescription(e.target.value);
+                            setDescriptionError(''); // Clear error on change
+                        }}
                     />
 
-                    <div className="d-flex justify-content-between mt-3">
+                    {/* Error Message */}
+                    {descriptionError && (
+                        <div className="invalid-feedback d-block">{descriptionError}</div>
+                    )}
+
+                    <div className="d-flex justify-content-between mt-2">
+                        <small
+                            className={clsx({
+                                'text-danger': trimmedLength < minChars && trimmedLength > 0,
+                                'text-success': trimmedLength >= minChars,
+                                'text-muted': trimmedLength === 0,
+                            })}
+                        >
+                            {trimmedLength}/{minChars} ký tự tối thiểu
+                        </small>
                         <small className="text-muted">
                             <span id="chars">{remainingChars}</span> ký tự còn lại
                         </small>

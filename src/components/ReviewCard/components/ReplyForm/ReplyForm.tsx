@@ -17,19 +17,31 @@ const ReplyForm: React.FC<ReplyFormProps> = ({
     placeholder = 'Viết phản hồi của bạn...',
 }) => {
     const [replyText, setReplyText] = useState<string>('');
+    const [error, setError] = useState<string>('');
     const maxChars = 300;
+    const minChars = 3;
     const remainingChars = maxChars - replyText.length;
+    const trimmedLength = replyText.trim().length;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Clear previous errors
+        setError('');
+
         if (!replyText.trim()) {
-            alert('Vui lòng nhập nội dung phản hồi');
+            setError('Vui lòng nhập nội dung phản hồi');
+            return;
+        }
+
+        // Validate minimum length (backend requirement)
+        if (trimmedLength < minChars) {
+            setError(`Nội dung phản hồi phải có ít nhất ${minChars} ký tự`);
             return;
         }
 
         if (replyText.length > maxChars) {
-            alert(`Nội dung phản hồi không được vượt quá ${maxChars} ký tự`);
+            setError(`Nội dung phản hồi không được vượt quá ${maxChars} ký tự`);
             return;
         }
 
@@ -40,6 +52,7 @@ const ReplyForm: React.FC<ReplyFormProps> = ({
 
         // Reset form
         setReplyText('');
+        setError('');
     };
 
     return (
@@ -47,14 +60,32 @@ const ReplyForm: React.FC<ReplyFormProps> = ({
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <textarea
-                        className="form-control"
+                        className={clsx('form-control', {
+                            'is-invalid': error,
+                        })}
                         rows={3}
-                        placeholder={placeholder}
+                        placeholder={`${placeholder} (tối thiểu 3 ký tự)`}
                         value={replyText}
-                        onChange={(e) => setReplyText(e.target.value)}
+                        onChange={(e) => {
+                            setReplyText(e.target.value);
+                            setError(''); // Clear error on change
+                        }}
                         maxLength={maxChars}
                     />
+
+                    {/* Error Message */}
+                    {error && <div className="invalid-feedback d-block">{error}</div>}
+
                     <div className="d-flex justify-content-between mt-2">
+                        <small
+                            className={clsx({
+                                'text-danger': trimmedLength < minChars && trimmedLength > 0,
+                                'text-success': trimmedLength >= minChars,
+                                'text-muted': trimmedLength === 0,
+                            })}
+                        >
+                            {trimmedLength}/{minChars} ký tự tối thiểu
+                        </small>
                         <small className="text-muted">
                             <span>{remainingChars}</span> ký tự còn lại
                         </small>

@@ -41,7 +41,8 @@ interface ReviewCardProps {
     // New props for edit/delete
     canEdit?: boolean;
     canDelete?: boolean;
-    currentUserId?: number;
+    currentUserId?: number; // For review permission check (patientId)
+    currentReplyUserId?: number; // For reply permission check (authorId)
     onEdit?: (reviewData: {
         reviewId: number;
         rating: number;
@@ -63,6 +64,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
     canEdit = false,
     canDelete = false,
     currentUserId,
+    currentReplyUserId,
     onEdit,
     onDelete,
     onEditReply,
@@ -407,8 +409,8 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
 
                                         {/* Edit button for reply owner */}
                                         {canEdit &&
-                                            currentUserId &&
-                                            reply.userId === currentUserId && (
+                                            currentReplyUserId &&
+                                            reply.userId === currentReplyUserId && (
                                                 <Button
                                                     text="Sửa"
                                                     type="button"
@@ -419,8 +421,8 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
 
                                         {/* Delete button for reply owner */}
                                         {canDelete &&
-                                            currentUserId &&
-                                            reply.userId === currentUserId && (
+                                            currentReplyUserId &&
+                                            reply.userId === currentReplyUserId && (
                                                 <Button
                                                     text="Xóa"
                                                     type="button"

@@ -4,6 +4,7 @@ import Pagination from '@/components/Pagination';
 import ReviewCard from '@/components/ReviewCard';
 import Button from '@/components/Button';
 import WriteReview from '@/components/WriteReview';
+import { Review } from '@/types/review.types';
 import styles from './ReviewSection.module.scss';
 
 // Mock data for Reviews (shared)
@@ -167,24 +168,26 @@ export const generateReviews = (count: number = 150, avatarUrl: string = '') => 
 };
 
 interface ReviewSectionProps {
-    reviews: ReturnType<typeof generateReviews>;
+    reviews: Review[];
     doctorName: string;
-    currentUserId: number;
+    currentUserId?: string; // For review permission check (patientId)
+    currentAccountId?: string; // For reply permission check (authorId)
+    isLoading?: boolean;
     onSubmitReview: (reviewData: {
         rating: number;
         description: string;
         termsAccepted: boolean;
     }) => void;
-    onReplySubmission: (replyData: { reviewId: number; text: string }) => void;
+    onReplySubmission: (replyData: { reviewId: string; text: string }) => void;
     onEditReview: (reviewData: {
-        reviewId: number;
+        reviewId: string;
         rating: number;
         description: string;
         recommend?: boolean;
     }) => void;
-    onDeleteReview: (reviewId: number) => void;
-    onEditReply: (replyData: { replyId: number; text: string }) => void;
-    onDeleteReply: (replyId: number) => void;
+    onDeleteReview: (reviewId: string) => void;
+    onEditReply: (replyData: { reviewId: string; replyId: string; text: string }) => void;
+    onDeleteReply: (replyId: string, reviewId: string) => void;
     className?: string;
 }
 
@@ -192,6 +195,8 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     reviews,
     doctorName,
     currentUserId,
+    currentAccountId,
+    isLoading = false,
     onSubmitReview,
     onReplySubmission,
     onEditReview,
@@ -201,7 +206,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     className,
 }) => {
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 2;
+    const pageSize = 10;
     const totalPages = Math.ceil(reviews.length / pageSize);
     const displayedReviews = reviews.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
@@ -214,6 +219,31 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     }) => {
         onSubmitReview(reviewData);
         setShowWriteReview(false);
+    };
+
+    // Helper function to calculate time ago
+    const getTimeAgo = (dateString: string): string => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInMs = now.getTime() - date.getTime();
+        const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+        if (diffInDays === 0) return 'Hôm nay';
+        if (diffInDays === 1) return 'Hôm qua';
+        if (diffInDays < 30) return `${diffInDays} ngày trước`;
+        if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} tháng trước`;
+        return `${Math.floor(diffInDays / 365)} năm trước`;
+    };
+
+    // Helper function to convert MongoDB ObjectId string to number
+    const stringToNumber = (str: string): number => {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.codePointAt(i) ?? 0;
+            hash = (hash << 5) - hash + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return Math.abs(hash);
     };
 
     return (
@@ -245,43 +275,104 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
                 )}
             </div>
 
-            {displayedReviews.map((review, index) => (
-                <ReviewCard
-                    key={review.id}
-                    review={{
-                        id: review.id,
-                        name: `${review.user.first_name} ${review.user.last_name}`,
-                        avatar: review.user.avatar_url,
-                        rating: review.rating,
-                        timeAgo: review.timeAgo,
-                        text: review.comment,
-                        recommend: review.recommend,
-                        userId: review.userId,
-                        isEditable: true,
-                        replies: review.replies?.map((reply) => ({
-                            id: reply.id,
-                            name: `${reply.user.first_name} ${reply.user.last_name}`,
-                            avatar: reply.user.avatar_url,
-                            text: reply.comment,
-                            userId: reply.userId,
-                        })),
-                    }}
-                    isLast={index === displayedReviews.length - 1}
-                    onReply={onReplySubmission}
-                    canEdit={true}
-                    canDelete={true}
-                    currentUserId={currentUserId}
-                    onEdit={onEditReview}
-                    onDelete={onDeleteReview}
-                    onEditReply={onEditReply}
-                    onDeleteReply={onDeleteReply}
-                />
-            ))}
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-            />
+            {/* Loading State */}
+            {isLoading && (
+                <div className="text-center py-4">
+                    <output className="spinner-border">
+                        <span className="visually-hidden">Đang tải...</span>
+                    </output>
+                </div>
+            )}
+
+            {/* Empty State */}
+            {!isLoading && reviews.length === 0 && (
+                <div className="text-center py-4">
+                    <p className="text-muted">Chưa có đánh giá nào.</p>
+                </div>
+            )}
+
+            {/* Reviews List */}
+            {!isLoading && reviews.length > 0 && (
+                <>
+                    {displayedReviews.map((review, index) => {
+                        // Store original string IDs for callbacks
+                        const originalReviewId = review.id;
+                        const replyIdMap = new Map(
+                            review.replies?.map((r) => [stringToNumber(r.id), r.id]) || []
+                        );
+
+                        return (
+                            <ReviewCard
+                                key={review.id}
+                                review={{
+                                    id: stringToNumber(review.id),
+                                    name: review.patientInfo.fullName,
+                                    avatar: review.patientInfo.avatarUrl,
+                                    rating: review.rating,
+                                    timeAgo: getTimeAgo(review.createdAt),
+                                    text: review.comment,
+                                    recommend: true,
+                                    userId: stringToNumber(review.patientId),
+                                    isEditable: true,
+                                    replies: review.replies?.map((reply) => ({
+                                        id: stringToNumber(reply.id),
+                                        name: reply.authorInfo.fullName,
+                                        avatar: reply.authorInfo.avatarUrl,
+                                        text: reply.content,
+                                        userId: stringToNumber(reply.authorId),
+                                    })),
+                                }}
+                                isLast={index === displayedReviews.length - 1}
+                                onReply={(data) =>
+                                    onReplySubmission({
+                                        reviewId: originalReviewId,
+                                        text: data.text,
+                                    })
+                                }
+                                canEdit={true}
+                                canDelete={true}
+                                currentUserId={
+                                    currentUserId ? stringToNumber(currentUserId) : undefined
+                                }
+                                currentReplyUserId={
+                                    currentAccountId ? stringToNumber(currentAccountId) : undefined
+                                }
+                                onEdit={(data) =>
+                                    onEditReview({
+                                        reviewId: originalReviewId,
+                                        rating: data.rating,
+                                        description: data.description,
+                                    })
+                                }
+                                onDelete={() => onDeleteReview(originalReviewId)}
+                                onEditReply={(data) => {
+                                    const originalReplyId = replyIdMap.get(data.replyId);
+                                    if (originalReplyId) {
+                                        onEditReply({
+                                            reviewId: originalReviewId,
+                                            replyId: originalReplyId,
+                                            text: data.text,
+                                        });
+                                    }
+                                }}
+                                onDeleteReply={(replyId) => {
+                                    const originalReplyId = replyIdMap.get(replyId);
+                                    if (originalReplyId) {
+                                        onDeleteReply(originalReplyId, originalReviewId);
+                                    }
+                                }}
+                            />
+                        );
+                    })}
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    )}
+                </>
+            )}
         </div>
     );
 };

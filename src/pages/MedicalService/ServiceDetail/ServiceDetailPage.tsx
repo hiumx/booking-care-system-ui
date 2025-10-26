@@ -1,19 +1,21 @@
 import React, { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 import styles from './ServiceDetailPage.module.scss';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import ScheduleAvailability from '@/components/ScheduleAvailability';
-import ReviewSection, { generateReviews } from '@/components/ReviewSection';
+import ReviewSection from '@/components/ReviewSection';
+import { useServiceReviews } from '@/hooks/useServiceReviews';
+import { useReviewHandlers } from '@/hooks/useReviewHandlers';
+import { TargetType } from '@/types/review.types';
 import {
     mockAppointments,
     getDisplayText,
     scrollToSection,
     calculatePriceRange,
-    calculateAverageRating,
     countAppointments,
-    createReviewHandlers,
 } from '@/utils/profileUtils';
 
 // Import images for DoctorProfileCard
@@ -94,9 +96,6 @@ const mockDoctorPrices = [
     },
 ];
 
-// Generate reviews using shared utility
-const reviews = generateReviews(150, serviceImg);
-
 const ServiceDetailPage: React.FC = () => {
     const bioRef = useRef<HTMLDivElement>(null);
     const clinicRef = useRef<HTMLDivElement>(null);
@@ -106,12 +105,26 @@ const ServiceDetailPage: React.FC = () => {
     const [expanded, setExpanded] = useState(false);
     const { id } = useParams<{ id: string }>();
 
+    // Get current user info
+    const currentUserProfile = useSelector((state: any) => state.user?.profile);
+    const currentUserId = currentUserProfile?.id; // For create review
+    const currentAccountId = currentUserProfile?.accountId; // For create reply
+
+    // Custom hook for service reviews
+    const {
+        reviews,
+        statistics: reviewStatistics,
+        isLoading: reviewLoading,
+        refetchReviews,
+        refetchStatistics,
+    } = useServiceReviews(id);
+
     const limit = 300;
     const isLongText = mockDoctor.bio.length > limit;
     const displayText = getDisplayText(mockDoctor.bio, expanded, isLongText, limit);
 
-    // Calculate average rating
-    const averageRating = calculateAverageRating(reviews);
+    // Calculate average rating from statistics
+    const averageRating = reviewStatistics?.averageRating || 0;
 
     // Count completed appointments
     const appointmentCount = countAppointments(mockAppointments, mockDoctor.id);
@@ -123,11 +136,23 @@ const ServiceDetailPage: React.FC = () => {
         .filter((amount): amount is number => amount !== undefined);
     const priceRange = calculatePriceRange(prices.map((amount) => ({ amount })));
 
-    // Use shared review handlers
-    const reviewHandlers = createReviewHandlers();
-
-    // Mock current user ID for demo purposes
-    const currentUserId = 101; // Giả sử user hiện tại có ID là 101
+    // Review handlers using custom hook
+    const {
+        handleSubmitReview,
+        handleReplySubmission,
+        handleEditReview,
+        handleDeleteReview,
+        handleEditReply,
+        handleDeleteReply,
+    } = useReviewHandlers({
+        targetType: TargetType.SERVICE,
+        targetId: id,
+        currentUserId,
+        currentAccountId,
+        targetName: mockDoctor.name,
+        refetchReviews,
+        refetchStatistics,
+    });
     const { servicesparentId, serviceschildId } = useParams<{
         servicesparentId: string;
         serviceschildId: string;
@@ -376,12 +401,14 @@ const ServiceDetailPage: React.FC = () => {
                                     reviews={reviews}
                                     doctorName={mockDoctor.name}
                                     currentUserId={currentUserId}
-                                    onSubmitReview={reviewHandlers.handleSubmitReview}
-                                    onReplySubmission={reviewHandlers.handleReplySubmission}
-                                    onEditReview={reviewHandlers.handleEditReview}
-                                    onDeleteReview={reviewHandlers.handleDeleteReview}
-                                    onEditReply={reviewHandlers.handleEditReply}
-                                    onDeleteReply={reviewHandlers.handleDeleteReply}
+                                    currentAccountId={currentAccountId}
+                                    isLoading={reviewLoading}
+                                    onSubmitReview={handleSubmitReview}
+                                    onReplySubmission={handleReplySubmission}
+                                    onEditReview={handleEditReview}
+                                    onDeleteReview={handleDeleteReview}
+                                    onEditReply={handleEditReply}
+                                    onDeleteReply={handleDeleteReply}
                                 />
                             </div>
                         </div>

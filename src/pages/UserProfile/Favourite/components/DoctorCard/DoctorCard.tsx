@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PATHS, replacePathParams } from '@/routes/paths';
-import FavoriteDoctorService from '@/services/favoriteDoctor.service';
+import { useFavoriteDoctor } from '@/hooks/useFavoriteDoctor';
 import { FavouriteDoctor } from '@/types/doctor.types';
 import RatingStars from '../RatingStars';
 import clsx from 'clsx';
@@ -11,39 +11,32 @@ interface DoctorCardProps {
     doctor: FavouriteDoctor;
     patientId?: string;
     onFavoriteChange?: (doctorId: string, isFavorited: boolean) => void;
+    initialIsFavorited?: boolean; // Initial favorite status (to skip API check)
 }
 
-const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, patientId, onFavoriteChange }) => {
-    const [isFavourite, setIsFavourite] = useState(true);
-    const [isToggling, setIsToggling] = useState(false);
+const DoctorCard: React.FC<DoctorCardProps> = ({
+    doctor,
+    patientId,
+    onFavoriteChange,
+    initialIsFavorited,
+}) => {
+    // Use custom hook for consistent favorite management
+    // Pass initialIsFavorited to skip unnecessary API check
+    const {
+        isFavorited,
+        isLoading: isToggling,
+        toggleFavorite,
+    } = useFavoriteDoctor(patientId, doctor.id, initialIsFavorited);
+
+    // Notify parent when favorite status changes
+    useEffect(() => {
+        if (onFavoriteChange) {
+            onFavoriteChange(doctor.id, isFavorited);
+        }
+    }, [isFavorited, doctor.id, onFavoriteChange]);
 
     const handleFavouriteToggle = async () => {
-        if (!patientId) {
-            console.warn('Patient ID is required to toggle favorite status');
-            return;
-        }
-
-        if (isToggling) return; // Prevent multiple requests
-
-        try {
-            setIsToggling(true);
-
-            const result = await FavoriteDoctorService.toggleFavorite({
-                patientId,
-                doctorId: doctor.id,
-            });
-
-            const newFavoriteStatus = result.isFavorited;
-            setIsFavourite(newFavoriteStatus);
-
-            // Notify parent component about the change
-            onFavoriteChange?.(doctor.id, newFavoriteStatus);
-        } catch (error) {
-            console.error('Error toggling favorite status:', error);
-            // Could show a toast notification here
-        } finally {
-            setIsToggling(false);
-        }
+        await toggleFavorite();
     };
 
     return (
@@ -55,8 +48,9 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, patientId, onFavoriteCh
                     className={clsx(styles.favDoctorCard, 'fav-btn favourite-btn', {
                         [styles.disabled]: isToggling,
                     })}
+                    title={isFavorited ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'}
                 >
-                    <span className={`favourite-icon ${isFavourite ? 'favourite' : ''}`}>
+                    <span className={`favourite-icon ${isFavorited ? 'favourite' : ''}`}>
                         {isToggling ? (
                             <i className="fa fa-spinner fa-spin"></i>
                         ) : (

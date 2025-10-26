@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import styles from './DoctorProfile.module.scss';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
-import ReviewSection, { generateReviews } from '@/components/ReviewSection';
+import ReviewSection from '@/components/ReviewSection';
 import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
 import {
     selectSelectedDoctor,
@@ -19,8 +19,11 @@ import {
     scrollToSection,
     calculatePriceRange,
     countAppointments,
-    createReviewHandlers,
 } from '@/utils/profileUtils';
+import { useDoctorReviews } from '@/hooks/useDoctorReviews';
+import { useFavoriteDoctor } from '@/hooks/useFavoriteDoctor';
+import { useReviewHandlers } from '@/hooks/useReviewHandlers';
+import { TargetType } from '@/types/review.types';
 
 // Import images for DoctorProfileCard
 import doctorImg from '@/assets/img/doctors/doc-profile-02.jpg';
@@ -42,19 +45,37 @@ import HospitalInfo from '@/components/HospitalInfo';
 import { Gender } from '@/enums/common.enums';
 import { PATHS, replacePathParams } from '@/routes/paths';
 
-// Generate reviews using shared utility
-const reviews = generateReviews(150, doctorImg);
-
 const DoctorProfile: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { id } = useParams<{ id: string }>();
 
-    // Redux selectors
+    // Redux selectors - Doctor only (reviews use local state now!)
     const selectedDoctor = useSelector(selectSelectedDoctor);
     const isLoading = useSelector(selectDoctorLoading);
     const error = useSelector(selectDoctorError);
 
-    // Fetch doctor data when component mounts or id changes
+    // Get current user info - MUST be before early returns!
+    const currentUserProfile = useSelector((state: any) => state.user?.profile);
+    const currentUserId = currentUserProfile?.id; // For create review (patientId) & UI comparison
+    const currentAccountId = currentUserProfile?.accountId; // For create reply (authorId)
+
+    // Custom hook for reviews - No Redux needed!
+    const {
+        reviews,
+        statistics: reviewStatistics,
+        isLoading: reviewLoading,
+        refetchReviews,
+        refetchStatistics,
+    } = useDoctorReviews(id);
+
+    // Custom hook for favorite doctor
+    const {
+        isFavorited,
+        isLoading: favoriteLoading,
+        toggleFavorite,
+    } = useFavoriteDoctor(currentUserId, id);
+
+    // Fetch doctor data when component mounts
     useEffect(() => {
         if (id) {
             dispatch(getDoctorByIdAsync(id));
@@ -77,6 +98,24 @@ const DoctorProfile: React.FC = () => {
     const isLongText = doctor?.bio ? doctor.bio.length > limit : false;
 
     const displayText = getDisplayText(doctor?.bio, expanded, isLongText, limit);
+
+    // Review handlers using custom hook - MUST be before early returns
+    const {
+        handleSubmitReview,
+        handleReplySubmission,
+        handleEditReview,
+        handleDeleteReview,
+        handleEditReply,
+        handleDeleteReply,
+    } = useReviewHandlers({
+        targetType: TargetType.DOCTOR,
+        targetId: id,
+        currentUserId,
+        currentAccountId,
+        targetName: doctor ? `${doctor.lastName} ${doctor.firstName}` : '',
+        refetchReviews,
+        refetchStatistics,
+    });
 
     // Breadcrumb data
     const breadcrumbData = {
@@ -145,10 +184,11 @@ const DoctorProfile: React.FC = () => {
         );
     }
 
-    // Calculate average rating from review statistics
-    const averageRating = doctor.reviewStatistics?.averageRating
-        ? doctor.reviewStatistics.averageRating.toFixed(1)
+    // Calculate average rating from review statistics (use Redux state)
+    const averageRating = reviewStatistics?.averageRating
+        ? reviewStatistics.averageRating.toFixed(1)
         : '0.0';
+    const totalReviews = reviewStatistics?.totalReviews || 0;
 
     // Function to render stars based on rating
     const renderStars = (rating: number) => {
@@ -188,12 +228,6 @@ const DoctorProfile: React.FC = () => {
     // Get price range from doctor data
     const prices = doctor.prices?.map((price) => price.amount) || [];
     const priceRange = calculatePriceRange(prices.map((amount) => ({ amount })));
-
-    // Use shared review handlers
-    const reviewHandlers = createReviewHandlers();
-
-    // Mock current user ID for demo purposes
-    const currentUserId = 101; // Giả sử user hiện tại có ID là 101
 
     return (
         <MainLayout>
@@ -245,8 +279,32 @@ const DoctorProfile: React.FC = () => {
                                             </div>
                                             <ul className="sub-links">
                                                 <li>
-                                                    <Link to="#">
-                                                        <i className="feather-heart"></i>
+                                                    <Link
+                                                        to="#"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            toggleFavorite();
+                                                        }}
+                                                        title={
+                                                            isFavorited
+                                                                ? 'Xóa khỏi yêu thích'
+                                                                : 'Thêm vào yêu thích'
+                                                        }
+                                                        className={clsx({
+                                                            'text-danger': isFavorited,
+                                                        })}
+                                                    >
+                                                        {favoriteLoading ? (
+                                                            <i className="feather-loader"></i>
+                                                        ) : (
+                                                            <i
+                                                                className={clsx(
+                                                                    isFavorited
+                                                                        ? 'fas fa-heart'
+                                                                        : 'feather-heart'
+                                                                )}
+                                                            ></i>
+                                                        )}
                                                     </Link>
                                                 </li>
                                                 <li>
@@ -293,8 +351,7 @@ const DoctorProfile: React.FC = () => {
                                                     to="#reviews"
                                                     className="d-inline-block average-rating"
                                                 >
-                                                    {doctor.reviewStatistics?.totalReviews || 0}{' '}
-                                                    Đánh giá
+                                                    {totalReviews} Đánh giá
                                                 </Link>
                                             </div>
                                             <ul className="contact-doctors">
@@ -585,12 +642,14 @@ const DoctorProfile: React.FC = () => {
                                     reviews={reviews}
                                     doctorName={`${doctor.lastName} ${doctor.firstName}`}
                                     currentUserId={currentUserId}
-                                    onSubmitReview={reviewHandlers.handleSubmitReview}
-                                    onReplySubmission={reviewHandlers.handleReplySubmission}
-                                    onEditReview={reviewHandlers.handleEditReview}
-                                    onDeleteReview={reviewHandlers.handleDeleteReview}
-                                    onEditReply={reviewHandlers.handleEditReply}
-                                    onDeleteReply={reviewHandlers.handleDeleteReply}
+                                    currentAccountId={currentAccountId}
+                                    isLoading={reviewLoading}
+                                    onSubmitReview={handleSubmitReview}
+                                    onReplySubmission={handleReplySubmission}
+                                    onEditReview={handleEditReview}
+                                    onDeleteReview={handleDeleteReview}
+                                    onEditReply={handleEditReply}
+                                    onDeleteReply={handleDeleteReply}
                                 />
                             </div>
                         </div>
