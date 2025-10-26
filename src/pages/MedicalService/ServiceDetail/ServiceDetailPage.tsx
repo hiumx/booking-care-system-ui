@@ -13,6 +13,9 @@ import {
     scrollToSection,
     countAppointments,
 } from '@/utils/profileUtils';
+import { useServiceReviews } from '@/hooks/useServiceReviews';
+import { useReviewHandlers } from '@/hooks/useReviewHandlers';
+import { TargetType } from '@/types/review.types';
 
 // Import images for DoctorProfileCard
 import badgeCheck from '@/assets/img/icons/badge-check.svg';
@@ -49,35 +52,41 @@ const ServiceDetailPage: React.FC = () => {
     const isLoading = useAppSelector((state) => state.medicalService.serviceCategories.isLoading);
     const error = useAppSelector((state) => state.medicalService.serviceCategories.error);
 
-    // Get current user info
+    // Get current user info - MUST be before early returns!
     const currentUserProfile = useAppSelector((state: any) => state.user?.profile);
-    const currentUserId = currentUserProfile?.id || 1; // For create review
-    const currentAccountId = currentUserProfile?.accountId || 1; // For create reply
+    const currentUserId = currentUserProfile?.id; // For create review (patientId) & UI comparison
+    const currentAccountId = currentUserProfile?.accountId; // For create reply (authorId)
 
-    // Mock data for reviews (temporary solution)
-    const reviews: any[] = [];
-    const reviewStatistics = { averageRating: 4.5, totalReviews: 0 };
-    const reviewLoading = false;
+    // Find selected service from Redux data (needed for targetName)
+    const selectedService =
+        servicesData?.services.find((service) => service.id === servicesId) || null;
 
-    // Mock review handlers (temporary solution)
-    const handleSubmitReview = () => {
-        console.log('Submit review - to be implemented');
-    };
-    const handleReplySubmission = () => {
-        console.log('Reply submission - to be implemented');
-    };
-    const handleEditReview = () => {
-        console.log('Edit review - to be implemented');
-    };
-    const handleDeleteReview = () => {
-        console.log('Delete review - to be implemented');
-    };
-    const handleEditReply = () => {
-        console.log('Edit reply - to be implemented');
-    };
-    const handleDeleteReply = () => {
-        console.log('Delete reply - to be implemented');
-    };
+    // Custom hook for service reviews - No Redux needed!
+    const {
+        reviews,
+        statistics: reviewStatistics,
+        isLoading: reviewLoading,
+        refetchReviews,
+        refetchStatistics,
+    } = useServiceReviews(servicesId);
+
+    // Review handlers using custom hook - MUST be before early returns
+    const {
+        handleSubmitReview,
+        handleReplySubmission,
+        handleEditReview,
+        handleDeleteReview,
+        handleEditReply,
+        handleDeleteReply,
+    } = useReviewHandlers({
+        targetType: TargetType.SERVICE,
+        targetId: servicesId,
+        currentUserId,
+        currentAccountId,
+        targetName: selectedService?.name || 'Dịch vụ',
+        refetchReviews,
+        refetchStatistics,
+    });
 
     // Fetch data if not available in Redux
     useEffect(() => {
@@ -94,10 +103,6 @@ const ServiceDetailPage: React.FC = () => {
             );
         }
     }, [dispatch, serviceschildId, servicesData, isLoading, error]);
-
-    // Find selected service from Redux data
-    const selectedService =
-        servicesData?.services.find((service) => service.id === servicesId) || null;
 
     // Use selected service data or show loading/error state
     const currentService = selectedService;
@@ -175,8 +180,11 @@ const ServiceDetailPage: React.FC = () => {
     const isLongText = currentService.description.length > limit;
     const displayText = getDisplayText(currentService.description, expanded, isLongText, limit);
 
-    // Calculate average rating from statistics
-    const averageRating = reviewStatistics?.averageRating || 0;
+    // Calculate average rating from review statistics
+    const averageRating = reviewStatistics?.averageRating
+        ? reviewStatistics.averageRating.toFixed(1)
+        : '0.0';
+    const totalReviews = reviewStatistics?.totalReviews || 0;
 
     // Count completed appointments (using service ID)
     const appointmentCount = countAppointments(mockAppointments, Number(currentService.id) || 1);
@@ -184,6 +192,24 @@ const ServiceDetailPage: React.FC = () => {
     // Get price from current service
     const servicePrice = currentService.price;
     const priceRange = servicePrice > 0 ? `${servicePrice.toLocaleString('vi-VN')} VNĐ` : 'Liên hệ';
+
+    // Function to render stars based on rating
+    const renderStars = (rating: number) => {
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+
+        for (let i = 1; i <= 5; i++) {
+            if (i <= fullStars) {
+                stars.push(<i key={i} className="fas fa-star filled"></i>);
+            } else if (i === fullStars + 1 && hasHalfStar) {
+                stars.push(<i key={i} className="fas fa-star-half-alt filled"></i>);
+            } else {
+                stars.push(<i key={i} className="fas fa-star"></i>);
+            }
+        }
+        return stars;
+    };
 
     const breadcrumbData = {
         items: [
@@ -283,17 +309,13 @@ const ServiceDetailPage: React.FC = () => {
                                         </li>
                                         <li>
                                             <div className="rating">
-                                                <i className="fas fa-star filled"></i>
-                                                <i className="fas fa-star filled"></i>
-                                                <i className="fas fa-star filled"></i>
-                                                <i className="fas fa-star filled"></i>
-                                                <i className="fas fa-star filled"></i>
+                                                {renderStars(Number.parseFloat(averageRating))}
                                                 <span>{averageRating}</span>
                                                 <Link
-                                                    to="#"
+                                                    to="#reviews"
                                                     className="d-inline-block average-rating"
                                                 >
-                                                    {reviews.length} Đánh giá
+                                                    {totalReviews} Đánh giá
                                                 </Link>
                                             </div>
                                             <ul className="contact-doctors">
@@ -451,8 +473,8 @@ const ServiceDetailPage: React.FC = () => {
                                 <ReviewSection
                                     reviews={reviews}
                                     doctorName={currentService.name}
-                                    currentUserId={currentUserId || 1}
-                                    currentAccountId={currentAccountId || 1}
+                                    currentUserId={currentUserId}
+                                    currentAccountId={currentAccountId}
                                     isLoading={reviewLoading}
                                     onSubmitReview={handleSubmitReview}
                                     onReplySubmission={handleReplySubmission}
