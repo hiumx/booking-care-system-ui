@@ -13,6 +13,70 @@ interface UseReviewHandlersProps {
 }
 
 /**
+ * Helper function to get entity type text based on target type
+ */
+const getEntityTypeText = (targetType: TargetType): string => {
+    return targetType === TargetType.DOCTOR ? 'bác sĩ' : 'dịch vụ';
+};
+
+/**
+ * Helper function to build review payload based on target type
+ */
+const buildReviewPayload = (
+    targetType: TargetType,
+    targetId: string,
+    currentUserId: string,
+    reviewData: { rating: number; description: string }
+) => {
+    const payload: any = {
+        patientId: currentUserId,
+        targetType,
+        rating: reviewData.rating,
+        comment: reviewData.description,
+    };
+
+    if (targetType === TargetType.DOCTOR) {
+        payload.doctorId = targetId;
+    } else if (targetType === TargetType.SERVICE) {
+        payload.serviceId = targetId;
+    }
+
+    return payload;
+};
+
+/**
+ * Helper function to handle review creation errors
+ */
+const handleReviewError = (err: any, targetType: TargetType) => {
+    console.error('Error creating review:', err);
+
+    const errorMessage = err.message || '';
+    const entityType = getEntityTypeText(targetType);
+
+    if (errorMessage.includes('appointment')) {
+        const prefix = targetType === TargetType.DOCTOR ? 'lịch hẹn với' : '';
+        toast.error(`Bạn cần hoàn thành ${prefix} ${entityType} này trước khi đánh giá.`, {
+            position: 'top-center',
+            autoClose: 4000,
+        });
+        return;
+    }
+
+    if (errorMessage.includes('already reviewed')) {
+        toast.error(`Bạn đã đánh giá ${entityType} này rồi. Vui lòng cập nhật đánh giá hiện tại.`, {
+            position: 'top-center',
+            autoClose: 4000,
+        });
+        return;
+    }
+
+    toast.error('Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.', {
+        position: 'top-center',
+        autoClose: 4000,
+    });
+};
+
+/**
  * Custom hook to handle review operations (create, update, delete, reply)
  * Reduces code duplication across Doctor and Service profile pages
  */
@@ -32,22 +96,8 @@ export const useReviewHandlers = ({
         if (!targetId || !currentUserId) return;
 
         try {
-            const payload: any = {
-                patientId: currentUserId,
-                targetType,
-                rating: reviewData.rating,
-                comment: reviewData.description,
-            };
-
-            // Add doctorId or serviceId based on targetType
-            if (targetType === TargetType.DOCTOR) {
-                payload.doctorId = targetId;
-            } else if (targetType === TargetType.SERVICE) {
-                payload.serviceId = targetId;
-            }
-
+            const payload = buildReviewPayload(targetType, targetId, currentUserId, reviewData);
             await ReviewService.createReview(payload);
-
             await refetchReviews();
             await refetchStatistics();
 
@@ -56,32 +106,7 @@ export const useReviewHandlers = ({
                 autoClose: 2000,
             });
         } catch (err: any) {
-            console.error('Error creating review:', err);
-
-            if (err.message?.includes('appointment')) {
-                const entityType = targetType === TargetType.DOCTOR ? 'bác sĩ' : 'dịch vụ';
-                toast.error(
-                    `Bạn cần hoàn thành ${targetType === TargetType.DOCTOR ? 'lịch hẹn với' : ''} ${entityType} này trước khi đánh giá.`,
-                    {
-                        position: 'top-center',
-                        autoClose: 4000,
-                    }
-                );
-            } else if (err.message?.includes('already reviewed')) {
-                const entityType = targetType === TargetType.DOCTOR ? 'bác sĩ' : 'dịch vụ';
-                toast.error(
-                    `Bạn đã đánh giá ${entityType} này rồi. Vui lòng cập nhật đánh giá hiện tại.`,
-                    {
-                        position: 'top-center',
-                        autoClose: 4000,
-                    }
-                );
-            } else {
-                toast.error('Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.', {
-                    position: 'top-center',
-                    autoClose: 4000,
-                });
-            }
+            handleReviewError(err, targetType);
         }
     };
 

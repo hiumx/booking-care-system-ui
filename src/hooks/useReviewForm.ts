@@ -43,7 +43,7 @@ export const useReviewForm = ({
         // Clear previous errors
         setDescriptionError('');
 
-        const ratingToValidate = currentRating !== undefined ? currentRating : rating;
+        const ratingToValidate = currentRating ?? rating;
 
         // Validate rating
         if (ratingToValidate === 0) {
@@ -55,7 +55,7 @@ export const useReviewForm = ({
         }
 
         // Validate description is not empty
-        if (!description.trim()) {
+        if (description.trim().length === 0) {
             setDescriptionError('Vui lòng nhập nội dung review');
             toast.error('Vui lòng nhập nội dung đánh giá', {
                 position: 'top-center',
@@ -75,7 +75,7 @@ export const useReviewForm = ({
         }
 
         // Validate terms if required (for WriteReview)
-        if (requireTerms && !termsAccepted) {
+        if (requireTerms && termsAccepted === false) {
             toast.warning('Vui lòng đồng ý với điều khoản & điều kiện', {
                 position: 'top-center',
                 autoClose: 3000,
