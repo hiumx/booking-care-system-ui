@@ -39,6 +39,7 @@ const ServiceDetailPage: React.FC = () => {
     const reviewRef = useRef<HTMLDivElement>(null);
 
     const [expanded, setExpanded] = useState(false);
+    const [reviewPage, setReviewPage] = useState(1);
     const { servicesparentId, serviceschildId, servicesId } = useParams<{
         servicesparentId: string;
         serviceschildId: string;
@@ -49,6 +50,7 @@ const ServiceDetailPage: React.FC = () => {
     const servicesData = useAppSelector(
         (state) => state.medicalService.serviceCategories.servicesWithHospital
     );
+
     const isLoading = useAppSelector((state) => state.medicalService.serviceCategories.isLoading);
     const error = useAppSelector((state) => state.medicalService.serviceCategories.error);
 
@@ -61,14 +63,15 @@ const ServiceDetailPage: React.FC = () => {
     const selectedService =
         servicesData?.services.find((service) => service.id === servicesId) || null;
 
-    // Custom hook for service reviews - No Redux needed!
+    // Custom hook for service reviews with server-side pagination - No Redux needed!
     const {
         reviews,
         statistics: reviewStatistics,
+        pagination: reviewPagination,
         isLoading: reviewLoading,
-        refetchReviews,
+        fetchReviews,
         refetchStatistics,
-    } = useServiceReviews(servicesId);
+    } = useServiceReviews(servicesId, reviewPage, 10);
 
     // Review handlers using custom hook - MUST be before early returns
     const {
@@ -84,7 +87,8 @@ const ServiceDetailPage: React.FC = () => {
         currentUserId,
         currentAccountId,
         targetName: selectedService?.name || 'Dịch vụ',
-        refetchReviews,
+        hospitalId: selectedService?.hospitalId,
+        refetchReviews: () => fetchReviews(reviewPage),
         refetchStatistics,
     });
 
@@ -476,6 +480,13 @@ const ServiceDetailPage: React.FC = () => {
                                     currentUserId={currentUserId}
                                     currentAccountId={currentAccountId}
                                     isLoading={reviewLoading}
+                                    currentPage={reviewPagination?.currentPage || 1}
+                                    totalPages={reviewPagination?.totalPages || 1}
+                                    totalCount={reviewPagination?.totalCount || 0}
+                                    onPageChange={(page) => {
+                                        setReviewPage(page);
+                                        fetchReviews(page);
+                                    }}
                                     onSubmitReview={handleSubmitReview}
                                     onReplySubmission={handleReplySubmission}
                                     onEditReview={handleEditReview}

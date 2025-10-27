@@ -59,14 +59,18 @@ const DoctorProfile: React.FC = () => {
     const currentUserId = currentUserProfile?.id; // For create review (patientId) & UI comparison
     const currentAccountId = currentUserProfile?.accountId; // For create reply (authorId)
 
-    // Custom hook for reviews - No Redux needed!
+    // State for review pagination
+    const [reviewPage, setReviewPage] = useState(1);
+
+    // Custom hook for reviews with server-side pagination - No Redux needed!
     const {
         reviews,
         statistics: reviewStatistics,
+        pagination: reviewPagination,
         isLoading: reviewLoading,
-        refetchReviews,
+        fetchReviews,
         refetchStatistics,
-    } = useDoctorReviews(id);
+    } = useDoctorReviews(id, reviewPage, 10);
 
     // Custom hook for favorite doctor
     const {
@@ -113,7 +117,8 @@ const DoctorProfile: React.FC = () => {
         currentUserId,
         currentAccountId,
         targetName: doctor ? `${doctor.lastName} ${doctor.firstName}` : '',
-        refetchReviews,
+        hospitalId: doctor?.hospital?.id,
+        refetchReviews: () => fetchReviews(reviewPage),
         refetchStatistics,
     });
 
@@ -644,6 +649,13 @@ const DoctorProfile: React.FC = () => {
                                     currentUserId={currentUserId}
                                     currentAccountId={currentAccountId}
                                     isLoading={reviewLoading}
+                                    currentPage={reviewPagination?.currentPage || 1}
+                                    totalPages={reviewPagination?.totalPages || 1}
+                                    totalCount={reviewPagination?.totalCount || 0}
+                                    onPageChange={(page) => {
+                                        setReviewPage(page);
+                                        fetchReviews(page);
+                                    }}
                                     onSubmitReview={handleSubmitReview}
                                     onReplySubmission={handleReplySubmission}
                                     onEditReview={handleEditReview}

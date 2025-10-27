@@ -173,6 +173,12 @@ interface ReviewSectionProps {
     currentUserId?: string; // For review permission check (patientId)
     currentAccountId?: string; // For reply permission check (authorId)
     isLoading?: boolean;
+    // Server-side pagination
+    currentPage?: number;
+    totalPages?: number;
+    totalCount?: number;
+    onPageChange?: (page: number) => void;
+    // Review actions
     onSubmitReview: (reviewData: {
         rating: number;
         description: string;
@@ -197,6 +203,10 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     currentUserId,
     currentAccountId,
     isLoading = false,
+    currentPage = 1,
+    totalPages = 1,
+    totalCount = 0,
+    onPageChange,
     onSubmitReview,
     onReplySubmission,
     onEditReview,
@@ -205,12 +215,10 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     onDeleteReply,
     className,
 }) => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 10;
-    const totalPages = Math.ceil(reviews.length / pageSize);
-    const displayedReviews = reviews.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
     const [showWriteReview, setShowWriteReview] = useState(false);
+
+    // Use reviews directly from props (already paginated by server)
+    const displayedReviews = reviews;
 
     const handleSubmitReview = (reviewData: {
         rating: number;
@@ -249,7 +257,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     return (
         <div className={clsx('review-section', styles.reviewSection, className)}>
             <div className="detail-title mb-3">
-                <h4>Đánh giá ({reviews.length})</h4>
+                <h4>Đánh giá ({totalCount})</h4>
             </div>
 
             {/* Write Review Section */}
@@ -364,11 +372,11 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
                             />
                         );
                     })}
-                    {totalPages > 1 && (
+                    {totalPages > 1 && onPageChange && (
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
-                            onPageChange={setCurrentPage}
+                            onPageChange={onPageChange}
                         />
                     )}
                 </>

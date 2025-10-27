@@ -81,6 +81,7 @@ export interface CreateReviewRequest {
     targetType: TargetType; // 0 = DOCTOR, 1 = SERVICE
     doctorId?: string;
     serviceId?: string;
+    hospitalId?: string;
     rating: number;
     comment: string;
 }
