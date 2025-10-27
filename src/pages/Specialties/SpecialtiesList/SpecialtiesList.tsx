@@ -69,10 +69,10 @@ const SpecialtiesList: React.FC = () => {
                     <div className={clsx('container')}>
                         <div className={clsx('card')}>
                             <div className={clsx('card-body', 'text-center')}>
-                                <div className="spinner-border" role="status">
+                                <div className="spinner-border">
                                     <span className="visually-hidden">Loading...</span>
                                 </div>
-                                <p className="mt-3">Đang tải danh sách chuyên khoa...</p>
+                                <output className="mt-3">Đang tải danh sách chuyên khoa...</output>
                             </div>
                         </div>
                     </div>
