@@ -5,6 +5,7 @@ export interface SpecialtySimpleResponse {
     id: string;
     name: string;
     imageUrl: string;
+    doctorCount: number;
 }
 
 // Position Simple Response DTO

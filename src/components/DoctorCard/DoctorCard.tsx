@@ -7,11 +7,13 @@ export type DoctorCardProps = {
     image: string;
     name: string;
     specialty: string;
-    location: string;
+    hospitalName: string; // Đổi từ location thành hospitalName
     rating: number;
     available?: boolean;
-    fee: number;
-    consultationTime: string;
+    experience: string;
+    positionName?: string; // Thêm position name
+    serviceTypeName?: string; // Thêm service type name
+    amount?: number; // Thêm amount thay cho fee
     profileLink?: string;
     bookingLink?: string;
     specialtiesLink?: string;
@@ -22,11 +24,13 @@ const DoctorCard: FC<DoctorCardProps> = ({
     image,
     name,
     specialty,
-    location,
+    hospitalName, // Đổi từ location thành hospitalName
     rating,
     available = true,
-    fee,
-    consultationTime,
+    experience,
+    positionName,
+    serviceTypeName,
+    amount,
     profileLink = '#',
     bookingLink = '#',
     specialtiesLink = '#',
@@ -74,33 +78,42 @@ const DoctorCard: FC<DoctorCardProps> = ({
                     </span>
                 </div>
 
-                <div className="p-3 pt-0">
-                    <div className="doctor-info-detail mb-3 pb-3">
+                <div className="p-2 pt-0">
+                    <div className="doctor-info-detail mb-2">
                         <div className={styles.doctorName}>
-                            <h3 className="mb-1">
+                            <h4 className="mb-1">
                                 <Link to={profileLink}>{name}</Link>
-                            </h3>
+                            </h4>
+                            {positionName && (
+                                <p className="text-muted fs-14 mb-1">{positionName}</p>
+                            )}
                         </div>
                         <div className="d-flex align-items-center">
                             <p className="d-flex align-items-center mb-0 fs-14">
                                 <i className="isax isax-location me-2"></i>
-                                {location}
+                                {hospitalName}
                             </p>
                             <div className={styles.fsWrapper}>
                                 <i className="fa-solid fa-circle text-primary mx-2 me-1"></i>
                             </div>
-                            <span className="fs-14 fw-medium">{consultationTime}</span>
+                            <span className="fs-14 fw-medium">{experience}</span>
                         </div>
                     </div>
 
-                    <div className="d-flex align-items-center justify-content-between">
-                        <div>
-                            <p className="mb-1">Phí tư vấn</p>
-                            <h3 className="text-orange">${fee}</h3>
-                        </div>
+                    <div className="d-flex align-items-center justify-content-between mt-2">
+                        {amount && (
+                            <div>
+                                <p className="mb-1 fs-14 text-muted">
+                                    {serviceTypeName || 'Phí tư vấn'}
+                                </p>
+                                <h5 className="text-orange mb-0">
+                                    {amount.toLocaleString('vi-VN')} VNĐ
+                                </h5>
+                            </div>
+                        )}
                         <Link
                             to={bookingLink}
-                            className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
+                            className="btn btn-sm btn-dark d-inline-flex align-items-center rounded-pill"
                         >
                             <i className="isax isax-calendar-1 me-2"></i>
                             {'Đặt ngay'}
