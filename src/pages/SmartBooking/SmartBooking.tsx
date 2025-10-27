@@ -222,11 +222,11 @@ const SmartBooking: React.FC = () => {
                                                         image={(item as Doctor).avatar}
                                                         name={(item as Doctor).name}
                                                         specialty={(item as Doctor).specialty}
-                                                        location={(item as Doctor).location}
+                                                        hospitalName={(item as Doctor).location}
                                                         rating={(item as Doctor).rating}
                                                         available={(item as Doctor).availableToday}
-                                                        fee={(item as Doctor).consultationFee}
-                                                        consultationTime="45 phút"
+                                                        experience={`${(item as Doctor).experience} năm kinh nghiệm`}
+                                                        amount={(item as Doctor).consultationFee}
                                                         profileLink={`/doctor/${(item as Doctor).id}`}
                                                         bookingLink={`/booking/doctor/${(item as Doctor).id}`}
                                                         specialtiesLink={`/specialty/${(item as Doctor).specialty}`}
