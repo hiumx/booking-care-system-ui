@@ -15,7 +15,6 @@ import {
 import { AppDispatch } from '@/store';
 import {
     mockAppointments,
-    getDisplayText,
     scrollToSection,
     calculatePriceRange,
     countAppointments,
@@ -43,6 +42,7 @@ import experienceLogo1 from '@/assets/img/icons/experience-logo-01.svg';
 import '@/assets/css/feather.css';
 import ScheduleAvailability from '@/components/ScheduleAvailability';
 import HospitalInfo from '@/components/HospitalInfo';
+import ExpandableText from '@/components/ExpandableText';
 import { Gender } from '@/enums/common.enums';
 import { PATHS, replacePathParams } from '@/routes/paths';
 
@@ -95,14 +95,8 @@ const DoctorProfile: React.FC = () => {
     const hoursRef = useRef<HTMLDivElement>(null);
     const reviewRef = useRef<HTMLDivElement>(null);
 
-    const [expanded, setExpanded] = useState(false);
-
     // Use selectedDoctor data instead of mock data
     const doctor = selectedDoctor;
-    const limit = 300;
-    const isLongText = doctor?.bio ? doctor.bio.length > limit : false;
-
-    const displayText = getDisplayText(doctor?.bio, expanded, isLongText, limit);
 
     // Review handlers using custom hook - MUST be before early returns
     const {
@@ -494,25 +488,7 @@ const DoctorProfile: React.FC = () => {
                                     <div className="detail-title">
                                         <h4>Tiểu sử bác sĩ</h4>
                                     </div>
-                                    <p>{displayText}</p>
-                                    {isLongText && (
-                                        <Link
-                                            to="#"
-                                            className="show-more d-flex align-items-center"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setExpanded((prev) => !prev);
-                                            }}
-                                        >
-                                            {expanded ? 'Thu gọn' : 'Xem thêm'}
-                                            <i
-                                                className={clsx('fa-solid', 'ms-2', {
-                                                    'fa-chevron-up': expanded,
-                                                    'fa-chevron-down': !expanded,
-                                                })}
-                                            ></i>
-                                        </Link>
-                                    )}
+                                    <ExpandableText text={doctor?.bio} limit={300} />
                                 </div>
                             </div>
                             <div ref={expRef}>

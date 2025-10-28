@@ -7,12 +7,8 @@ import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import ScheduleAvailability from '@/components/ScheduleAvailability';
 import ReviewSection from '@/components/ReviewSection';
-import {
-    mockAppointments,
-    getDisplayText,
-    scrollToSection,
-    countAppointments,
-} from '@/utils/profileUtils';
+import ExpandableText from '@/components/ExpandableText';
+import { mockAppointments, scrollToSection, countAppointments } from '@/utils/profileUtils';
 import { useServiceReviews } from '@/hooks/useServiceReviews';
 import { useReviewHandlers } from '@/hooks/useReviewHandlers';
 import { TargetType } from '@/types/review.types';
@@ -39,7 +35,6 @@ const ServiceDetailPage: React.FC = () => {
     const hoursRef = useRef<HTMLDivElement>(null);
     const reviewRef = useRef<HTMLDivElement>(null);
 
-    const [expanded, setExpanded] = useState(false);
     const [reviewPage, setReviewPage] = useState(1);
     const { servicesparentId, serviceschildId, servicesId } = useParams<{
         servicesparentId: string;
@@ -180,10 +175,6 @@ const ServiceDetailPage: React.FC = () => {
             </MainLayout>
         );
     }
-
-    const limit = 300;
-    const isLongText = currentService.description.length > limit;
-    const displayText = getDisplayText(currentService.description, expanded, isLongText, limit);
 
     // Calculate average rating from review statistics
     const averageRating = reviewStatistics?.averageRating
@@ -402,25 +393,7 @@ const ServiceDetailPage: React.FC = () => {
                                     <div className="detail-title">
                                         <h4>Mô tả dịch vụ</h4>
                                     </div>
-                                    <p>{displayText}</p>
-                                    {isLongText && (
-                                        <Link
-                                            to="#"
-                                            className="show-more d-flex align-items-center"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setExpanded((prev) => !prev);
-                                            }}
-                                        >
-                                            {expanded ? 'Thu gọn' : 'Xem thêm'}
-                                            <i
-                                                className={clsx('fa-solid', 'ms-2', {
-                                                    'fa-chevron-up': expanded,
-                                                    'fa-chevron-down': !expanded,
-                                                })}
-                                            ></i>
-                                        </Link>
-                                    )}
+                                    <ExpandableText text={currentService.description} limit={300} />
                                 </div>
                             </div>
                             {/* ----------------------- */}
