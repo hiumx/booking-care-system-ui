@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
 import SideBar from './components/SideBar';
 import {
     DoctorAppointmentBookingCard,
@@ -31,6 +34,7 @@ const breadcrumbData = {
 
 const DoctorList: React.FC = () => {
     const dispatch = useAppDispatch();
+    const { profile } = useSelector((state: RootState) => state.user);
     const { doctors, isLoading, pagination, error } = useAppSelector((state) => state.doctor);
     const { languages } = useAppSelector((state) => state.language);
     const { serviceTypes } = useAppSelector((state) => state.serviceType);
@@ -82,7 +86,7 @@ const DoctorList: React.FC = () => {
     >(undefined);
 
     const doctorsPerPage = 10;
-    const patientId = '2FC80E8F-D296-42BC-ADDF-EAA6281BF244'; // Valid GUID format
+    const patientId = profile?.id; // Valid GUID format
     const skeletonKeys = Array.from({ length: 10 }, (_, i) => `skeleton-${i}`);
 
     // Initialize filters from URL params for reschedule flow - ONLY ONCE
