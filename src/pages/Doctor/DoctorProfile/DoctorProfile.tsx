@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
@@ -18,10 +18,10 @@ import {
     scrollToSection,
     calculatePriceRange,
     countAppointments,
+    formatAverageRating,
 } from '@/utils/profileUtils';
-import { useDoctorReviews } from '@/hooks/useDoctorReviews';
 import { useFavoriteDoctor } from '@/hooks/useFavoriteDoctor';
-import { useReviewHandlers } from '@/hooks/useReviewHandlers';
+import { useReviewSection } from '@/hooks/useReviewSection';
 import { TargetType } from '@/types/review.types';
 import { renderStars } from '@/utils/renderStars';
 
@@ -60,18 +60,8 @@ const DoctorProfile: React.FC = () => {
     const currentUserId = currentUserProfile?.id; // For create review (patientId) & UI comparison
     const currentAccountId = currentUserProfile?.accountId; // For create reply (authorId)
 
-    // State for review pagination
-    const [reviewPage, setReviewPage] = useState(1);
-
-    // Custom hook for reviews with server-side pagination - No Redux needed!
-    const {
-        reviews,
-        statistics: reviewStatistics,
-        pagination: reviewPagination,
-        isLoading: reviewLoading,
-        fetchReviews,
-        refetchStatistics,
-    } = useDoctorReviews(id, reviewPage, 10);
+    // Use selectedDoctor data instead of mock data
+    const doctor = selectedDoctor;
 
     // Custom hook for favorite doctor
     const {
@@ -79,6 +69,28 @@ const DoctorProfile: React.FC = () => {
         isLoading: favoriteLoading,
         toggleFavorite,
     } = useFavoriteDoctor(currentUserId, id);
+
+    // Custom hook for review section - handles reviews, pagination, and all review/reply operations
+    const {
+        reviews,
+        reviewStatistics,
+        reviewPagination,
+        reviewLoading,
+        handlePageChange,
+        handleSubmitReview,
+        handleReplySubmission,
+        handleEditReview,
+        handleDeleteReview,
+        handleEditReply,
+        handleDeleteReply,
+    } = useReviewSection({
+        targetType: TargetType.DOCTOR,
+        targetId: id,
+        targetName: doctor ? `${doctor.lastName} ${doctor.firstName}` : '',
+        currentUserId,
+        currentAccountId,
+        hospitalId: doctor?.hospital?.id,
+    });
 
     // Fetch doctor data when component mounts
     useEffect(() => {
@@ -94,28 +106,6 @@ const DoctorProfile: React.FC = () => {
     const clinicRef = useRef<HTMLDivElement>(null);
     const hoursRef = useRef<HTMLDivElement>(null);
     const reviewRef = useRef<HTMLDivElement>(null);
-
-    // Use selectedDoctor data instead of mock data
-    const doctor = selectedDoctor;
-
-    // Review handlers using custom hook - MUST be before early returns
-    const {
-        handleSubmitReview,
-        handleReplySubmission,
-        handleEditReview,
-        handleDeleteReview,
-        handleEditReply,
-        handleDeleteReply,
-    } = useReviewHandlers({
-        targetType: TargetType.DOCTOR,
-        targetId: id,
-        currentUserId,
-        currentAccountId,
-        targetName: doctor ? `${doctor.lastName} ${doctor.firstName}` : '',
-        hospitalId: doctor?.hospital?.id,
-        refetchReviews: () => fetchReviews(reviewPage),
-        refetchStatistics,
-    });
 
     // Breadcrumb data
     const breadcrumbData = {
@@ -184,10 +174,8 @@ const DoctorProfile: React.FC = () => {
         );
     }
 
-    // Calculate average rating from review statistics (use Redux state)
-    const averageRating = reviewStatistics?.averageRating
-        ? reviewStatistics.averageRating.toFixed(1)
-        : '0.0';
+    // Calculate average rating from review statistics
+    const averageRating = formatAverageRating(reviewStatistics?.averageRating);
     const totalReviews = reviewStatistics?.totalReviews || 0;
 
     // Function to get gender display text
@@ -611,10 +599,7 @@ const DoctorProfile: React.FC = () => {
                                     currentPage={reviewPagination?.currentPage || 1}
                                     totalPages={reviewPagination?.totalPages || 1}
                                     totalCount={reviewPagination?.totalCount || 0}
-                                    onPageChange={(page) => {
-                                        setReviewPage(page);
-                                        fetchReviews(page);
-                                    }}
+                                    onPageChange={handlePageChange}
                                     onSubmitReview={handleSubmitReview}
                                     onReplySubmission={handleReplySubmission}
                                     onEditReview={handleEditReview}

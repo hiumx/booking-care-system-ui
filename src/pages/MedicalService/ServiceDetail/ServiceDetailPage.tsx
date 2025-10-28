@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import clsx from 'clsx';
@@ -8,9 +8,13 @@ import Breadcrumb from '@/components/Breadcrumb';
 import ScheduleAvailability from '@/components/ScheduleAvailability';
 import ReviewSection from '@/components/ReviewSection';
 import ExpandableText from '@/components/ExpandableText';
-import { mockAppointments, scrollToSection, countAppointments } from '@/utils/profileUtils';
-import { useServiceReviews } from '@/hooks/useServiceReviews';
-import { useReviewHandlers } from '@/hooks/useReviewHandlers';
+import {
+    mockAppointments,
+    scrollToSection,
+    countAppointments,
+    formatAverageRating,
+} from '@/utils/profileUtils';
+import { useReviewSection } from '@/hooks/useReviewSection';
 import { TargetType } from '@/types/review.types';
 import { renderStars } from '@/utils/renderStars';
 
@@ -35,7 +39,6 @@ const ServiceDetailPage: React.FC = () => {
     const hoursRef = useRef<HTMLDivElement>(null);
     const reviewRef = useRef<HTMLDivElement>(null);
 
-    const [reviewPage, setReviewPage] = useState(1);
     const { servicesparentId, serviceschildId, servicesId } = useParams<{
         servicesparentId: string;
         serviceschildId: string;
@@ -59,33 +62,26 @@ const ServiceDetailPage: React.FC = () => {
     const selectedService =
         servicesData?.services.find((service) => service.id === servicesId) || null;
 
-    // Custom hook for service reviews with server-side pagination - No Redux needed!
+    // Custom hook for review section - handles reviews, pagination, and all review/reply operations
     const {
         reviews,
-        statistics: reviewStatistics,
-        pagination: reviewPagination,
-        isLoading: reviewLoading,
-        fetchReviews,
-        refetchStatistics,
-    } = useServiceReviews(servicesId, reviewPage, 10);
-
-    // Review handlers using custom hook - MUST be before early returns
-    const {
+        reviewStatistics,
+        reviewPagination,
+        reviewLoading,
+        handlePageChange,
         handleSubmitReview,
         handleReplySubmission,
         handleEditReview,
         handleDeleteReview,
         handleEditReply,
         handleDeleteReply,
-    } = useReviewHandlers({
+    } = useReviewSection({
         targetType: TargetType.SERVICE,
         targetId: servicesId,
         currentUserId,
         currentAccountId,
         targetName: selectedService?.name || 'Dịch vụ',
         hospitalId: selectedService?.hospitalId,
-        refetchReviews: () => fetchReviews(reviewPage),
-        refetchStatistics,
     });
 
     // Fetch data if not available in Redux
@@ -177,9 +173,7 @@ const ServiceDetailPage: React.FC = () => {
     }
 
     // Calculate average rating from review statistics
-    const averageRating = reviewStatistics?.averageRating
-        ? reviewStatistics.averageRating.toFixed(1)
-        : '0.0';
+    const averageRating = formatAverageRating(reviewStatistics?.averageRating);
     const totalReviews = reviewStatistics?.totalReviews || 0;
 
     // Count completed appointments (using service ID)
@@ -439,10 +433,7 @@ const ServiceDetailPage: React.FC = () => {
                                     currentPage={reviewPagination?.currentPage || 1}
                                     totalPages={reviewPagination?.totalPages || 1}
                                     totalCount={reviewPagination?.totalCount || 0}
-                                    onPageChange={(page) => {
-                                        setReviewPage(page);
-                                        fetchReviews(page);
-                                    }}
+                                    onPageChange={handlePageChange}
                                     onSubmitReview={handleSubmitReview}
                                     onReplySubmission={handleReplySubmission}
                                     onEditReview={handleEditReview}
