@@ -24,6 +24,7 @@ import { useDoctorReviews } from '@/hooks/useDoctorReviews';
 import { useFavoriteDoctor } from '@/hooks/useFavoriteDoctor';
 import { useReviewHandlers } from '@/hooks/useReviewHandlers';
 import { TargetType } from '@/types/review.types';
+import { renderStars } from '@/utils/renderStars';
 
 // Import images for DoctorProfileCard
 import doctorImg from '@/assets/img/doctors/doc-profile-02.jpg';
@@ -194,24 +195,6 @@ const DoctorProfile: React.FC = () => {
         ? reviewStatistics.averageRating.toFixed(1)
         : '0.0';
     const totalReviews = reviewStatistics?.totalReviews || 0;
-
-    // Function to render stars based on rating
-    const renderStars = (rating: number) => {
-        const stars = [];
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 >= 0.5;
-
-        for (let i = 1; i <= 5; i++) {
-            if (i <= fullStars) {
-                stars.push(<i key={i} className="fas fa-star filled"></i>);
-            } else if (i === fullStars + 1 && hasHalfStar) {
-                stars.push(<i key={i} className="fas fa-star-half-alt filled"></i>);
-            } else {
-                stars.push(<i key={i} className="fas fa-star"></i>);
-            }
-        }
-        return stars;
-    };
 
     // Function to get gender display text
     const getGenderDisplayText = (gender: Gender | undefined) => {

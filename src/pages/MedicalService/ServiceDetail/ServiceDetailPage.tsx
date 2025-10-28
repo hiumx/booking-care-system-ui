@@ -16,6 +16,7 @@ import {
 import { useServiceReviews } from '@/hooks/useServiceReviews';
 import { useReviewHandlers } from '@/hooks/useReviewHandlers';
 import { TargetType } from '@/types/review.types';
+import { renderStars } from '@/utils/renderStars';
 
 // Import images for DoctorProfileCard
 import badgeCheck from '@/assets/img/icons/badge-check.svg';
@@ -196,24 +197,6 @@ const ServiceDetailPage: React.FC = () => {
     // Get price from current service
     const servicePrice = currentService.price;
     const priceRange = servicePrice > 0 ? `${servicePrice.toLocaleString('vi-VN')} VNĐ` : 'Liên hệ';
-
-    // Function to render stars based on rating
-    const renderStars = (rating: number) => {
-        const stars = [];
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 >= 0.5;
-
-        for (let i = 1; i <= 5; i++) {
-            if (i <= fullStars) {
-                stars.push(<i key={i} className="fas fa-star filled"></i>);
-            } else if (i === fullStars + 1 && hasHalfStar) {
-                stars.push(<i key={i} className="fas fa-star-half-alt filled"></i>);
-            } else {
-                stars.push(<i key={i} className="fas fa-star"></i>);
-            }
-        }
-        return stars;
-    };
 
     const breadcrumbData = {
         items: [
