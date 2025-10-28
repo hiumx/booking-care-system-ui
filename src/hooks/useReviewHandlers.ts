@@ -8,7 +8,7 @@ interface UseReviewHandlersProps {
     currentUserId: string | undefined;
     currentAccountId: string | undefined;
     targetName: string;
-    hospitalId?: string | undefined;
+    hospitalId: string | undefined;
     refetchReviews: () => Promise<void>;
     refetchStatistics: () => Promise<void>;
 }
