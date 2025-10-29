@@ -61,7 +61,7 @@ export const useAccountNotification = (accessToken: string | null) => {
                 setTimeout(async () => {
                     await dispatch(logoutAsync()).unwrap();
                     dispatch(clearUserProfile());
-                    window.location.href = '/login';
+                    globalThis.location.href = '/login';
                 }, 2000);
             } else if (eventType === 'account_activated' || eventType === 'account_unlocked') {
                 toast.success(message || 'Tài khoản của bạn đã được kích hoạt lại.');
