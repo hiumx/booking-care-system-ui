@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import styles from '../SpecialtiesList.module.scss';
 
 interface SpecialityCardProps {
-    id: number;
+    id: string;
     name: string;
     doctorCount: number;
     image_url: string;

@@ -3,10 +3,10 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    min-height: 400px; // Ensure minimum height for consistency
+    min-height: 280px; // Giảm từ 320px xuống 280px
 
     .card-img {
-        height: 200px;
+        height: 120px; // Giảm từ 150px xuống 120px
         overflow: hidden;
         border-radius: 10px 10px 0 0;
         flex-shrink: 0;
@@ -28,7 +28,6 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
     }
 
     .dotIconWrapper {
@@ -38,9 +37,12 @@
     }
 
     .doctorName {
-        h3 a {
+        h4 a {
+            // Thay đổi từ h3 thành h4
             color: #012047;
             text-decoration: none;
+            font-size: 1.1rem; // Giảm font size
+            font-weight: 600;
 
             &:hover {
                 color: #0e82fd;
@@ -78,7 +80,7 @@
 @media (max-width: 1200px) {
     .doctorCardContainer {
         .card-img {
-            height: 180px;
+            height: 110px; // Giảm từ 140px
         }
     }
 }
@@ -86,7 +88,7 @@
 @media (max-width: 992px) {
     .doctorCardContainer {
         .card-img {
-            height: 160px;
+            height: 100px; // Giảm từ 130px
         }
     }
 }
@@ -94,7 +96,7 @@
 @media (max-width: 768px) {
     .doctorCardContainer {
         .card-img {
-            height: 200px;
+            height: 120px; // Giảm từ 150px
         }
 
         .favWrapper .favIcon {
@@ -108,7 +110,7 @@
 @media (max-width: 576px) {
     .doctorCardContainer {
         .card-img {
-            height: 180px;
+            height: 110px; // Giảm từ 140px
         }
 
         .favWrapper .favIcon {
