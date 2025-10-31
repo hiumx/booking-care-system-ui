@@ -78,10 +78,10 @@ const ContactUs: React.FC = () => {
 
         if (!result.success) {
             const formattedErrors: Record<string, string> = {};
-            result.error.issues.forEach((issue) => {
+            for (const issue of result.error.issues) {
                 const path = issue.path[0] as string;
                 formattedErrors[path] = issue.message;
-            });
+            }
             setErrors(formattedErrors);
             return false;
         }

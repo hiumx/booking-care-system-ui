@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Vietnamese phone number regex: starts with 03, 05, 07, 08, or 09 followed by 8 digits
-const vietnamesePhoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+const vietnamesePhoneRegex = /^0[35789]\d{8}$/;
 
 // Tax code regex: 10 digits or 10 digits followed by -XXX
 const taxCodeRegex = /^\d{10}(-\d{3})?$/;
@@ -9,8 +9,8 @@ const taxCodeRegex = /^\d{10}(-\d{3})?$/;
 // Maximum file size: 10MB
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-// Allowed file types
-const ALLOWED_FILE_TYPES = [
+// Allowed file types (using Set for better performance)
+const ALLOWED_FILE_TYPES = new Set([
     'image/jpeg',
     'image/jpg',
     'image/png',
@@ -19,14 +19,14 @@ const ALLOWED_FILE_TYPES = [
     'application/pdf',
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-];
+]);
 
 const fileValidation = z
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, {
         message: 'Kích thước tệp không được vượt quá 10MB',
     })
-    .refine((file) => ALLOWED_FILE_TYPES.includes(file.type), {
+    .refine((file) => ALLOWED_FILE_TYPES.has(file.type), {
         message: 'Định dạng tệp không hợp lệ. Chỉ chấp nhận: Ảnh, PDF, DOC, DOCX',
     });
 
@@ -38,7 +38,7 @@ export const hospitalRegistrationSchema = z.object({
     email: z
         .string()
         .min(1, 'Email là bắt buộc')
-        .email('Email không hợp lệ')
+        .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Email không hợp lệ')
         .max(100, 'Email không được vượt quá 100 ký tự'),
     phone: z
         .string()
