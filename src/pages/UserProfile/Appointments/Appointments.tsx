@@ -514,11 +514,11 @@ const Appointments: React.FC = () => {
         if (modalElement) {
             try {
                 // Try to get existing instance first
-                let modal = (window as any).bootstrap?.Modal?.getInstance(modalElement);
+                let modal = (globalThis as any).bootstrap?.Modal?.getInstance(modalElement);
 
                 // If no instance exists, create one
                 if (!modal) {
-                    modal = new (window as any).bootstrap.Modal(modalElement);
+                    modal = new (globalThis as any).bootstrap.Modal(modalElement);
                 }
 
                 // Hide the modal
