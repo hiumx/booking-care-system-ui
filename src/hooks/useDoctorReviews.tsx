@@ -5,45 +5,73 @@ import { Review, ReviewStatistics } from '@/types/review.types';
 interface UseDoctorReviewsReturn {
     reviews: Review[];
     statistics: ReviewStatistics | null;
+    pagination: {
+        currentPage: number;
+        totalPages: number;
+        totalCount: number;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+    } | null;
     isLoading: boolean;
     isLoadingStatistics: boolean;
     error: string | null;
-    refetchReviews: () => Promise<void>;
+    fetchReviews: (page: number) => Promise<void>;
     refetchStatistics: () => Promise<void>;
 }
 
 /**
- * Custom hook for managing doctor reviews
+ * Custom hook for managing doctor reviews with server-side pagination
  * Simple local state management - no Redux needed!
  */
-export const useDoctorReviews = (doctorId: string | undefined): UseDoctorReviewsReturn => {
+export const useDoctorReviews = (
+    doctorId: string | undefined,
+    initialPage: number = 1,
+    pageSize: number = 10
+): UseDoctorReviewsReturn => {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [statistics, setStatistics] = useState<ReviewStatistics | null>(null);
+    const [pagination, setPagination] = useState<{
+        currentPage: number;
+        totalPages: number;
+        totalCount: number;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+    } | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingStatistics, setIsLoadingStatistics] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Fetch reviews
-    const fetchReviews = useCallback(async () => {
-        if (!doctorId) return;
+    // Fetch reviews with pagination
+    const fetchReviews = useCallback(
+        async (page: number = 1) => {
+            if (!doctorId) return;
 
-        setIsLoading(true);
-        setError(null);
+            setIsLoading(true);
+            setError(null);
 
-        try {
-            const response = await ReviewService.getDoctorReviews({
-                doctorId,
-                page: 1,
-                pageSize: 100, // Get all reviews for now
-            });
-            setReviews(response.data.reviews);
-        } catch (err: any) {
-            setError(err.message || 'Failed to fetch reviews');
-            console.error('Error fetching reviews:', err);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [doctorId]);
+            try {
+                const response = await ReviewService.getDoctorReviews({
+                    doctorId,
+                    page,
+                    pageSize,
+                });
+                setReviews(response.data.reviews);
+                setPagination({
+                    currentPage: response.data.page,
+                    totalPages: response.data.totalPages,
+                    totalCount: response.data.totalCount,
+                    hasNextPage: response.data.hasNextPage,
+                    hasPreviousPage: response.data.hasPreviousPage,
+                });
+            } catch (err: any) {
+                setError(err.message || 'Failed to fetch reviews');
+                console.error('Error fetching reviews:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        [doctorId, pageSize]
+    );
 
     // Fetch statistics
     const fetchStatistics = useCallback(async () => {
@@ -64,17 +92,18 @@ export const useDoctorReviews = (doctorId: string | undefined): UseDoctorReviews
 
     // Initial fetch
     useEffect(() => {
-        fetchReviews();
+        fetchReviews(initialPage);
         fetchStatistics();
-    }, [fetchReviews, fetchStatistics]);
+    }, [fetchReviews, fetchStatistics, initialPage]);
 
     return {
         reviews,
         statistics,
+        pagination,
         isLoading,
         isLoadingStatistics,
         error,
-        refetchReviews: fetchReviews,
+        fetchReviews,
         refetchStatistics: fetchStatistics,
     };
 };

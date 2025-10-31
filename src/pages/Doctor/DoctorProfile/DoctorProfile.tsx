@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
@@ -15,15 +15,15 @@ import {
 import { AppDispatch } from '@/store';
 import {
     mockAppointments,
-    getDisplayText,
     scrollToSection,
     calculatePriceRange,
     countAppointments,
+    formatAverageRating,
 } from '@/utils/profileUtils';
-import { useDoctorReviews } from '@/hooks/useDoctorReviews';
 import { useFavoriteDoctor } from '@/hooks/useFavoriteDoctor';
-import { useReviewHandlers } from '@/hooks/useReviewHandlers';
+import { useReviewSection } from '@/hooks/useReviewSection';
 import { TargetType } from '@/types/review.types';
+import { renderStars } from '@/utils/renderStars';
 
 // Import images for DoctorProfileCard
 import doctorImg from '@/assets/img/doctors/doc-profile-02.jpg';
@@ -42,6 +42,7 @@ import experienceLogo1 from '@/assets/img/icons/experience-logo-01.svg';
 import '@/assets/css/feather.css';
 import ScheduleAvailability from '@/components/ScheduleAvailability';
 import HospitalInfo from '@/components/HospitalInfo';
+import ExpandableText from '@/components/ExpandableText';
 import { Gender } from '@/enums/common.enums';
 import { PATHS, replacePathParams } from '@/routes/paths';
 
@@ -59,14 +60,8 @@ const DoctorProfile: React.FC = () => {
     const currentUserId = currentUserProfile?.id; // For create review (patientId) & UI comparison
     const currentAccountId = currentUserProfile?.accountId; // For create reply (authorId)
 
-    // Custom hook for reviews - No Redux needed!
-    const {
-        reviews,
-        statistics: reviewStatistics,
-        isLoading: reviewLoading,
-        refetchReviews,
-        refetchStatistics,
-    } = useDoctorReviews(id);
+    // Use selectedDoctor data instead of mock data
+    const doctor = selectedDoctor;
 
     // Custom hook for favorite doctor
     const {
@@ -74,6 +69,28 @@ const DoctorProfile: React.FC = () => {
         isLoading: favoriteLoading,
         toggleFavorite,
     } = useFavoriteDoctor(currentUserId, id);
+
+    // Custom hook for review section - handles reviews, pagination, and all review/reply operations
+    const {
+        reviews,
+        reviewStatistics,
+        reviewPagination,
+        reviewLoading,
+        handlePageChange,
+        handleSubmitReview,
+        handleReplySubmission,
+        handleEditReview,
+        handleDeleteReview,
+        handleEditReply,
+        handleDeleteReply,
+    } = useReviewSection({
+        targetType: TargetType.DOCTOR,
+        targetId: id,
+        targetName: doctor ? `${doctor.lastName} ${doctor.firstName}` : '',
+        currentUserId,
+        currentAccountId,
+        hospitalId: doctor?.hospital?.id,
+    });
 
     // Fetch doctor data when component mounts
     useEffect(() => {
@@ -89,33 +106,6 @@ const DoctorProfile: React.FC = () => {
     const clinicRef = useRef<HTMLDivElement>(null);
     const hoursRef = useRef<HTMLDivElement>(null);
     const reviewRef = useRef<HTMLDivElement>(null);
-
-    const [expanded, setExpanded] = useState(false);
-
-    // Use selectedDoctor data instead of mock data
-    const doctor = selectedDoctor;
-    const limit = 300;
-    const isLongText = doctor?.bio ? doctor.bio.length > limit : false;
-
-    const displayText = getDisplayText(doctor?.bio, expanded, isLongText, limit);
-
-    // Review handlers using custom hook - MUST be before early returns
-    const {
-        handleSubmitReview,
-        handleReplySubmission,
-        handleEditReview,
-        handleDeleteReview,
-        handleEditReply,
-        handleDeleteReply,
-    } = useReviewHandlers({
-        targetType: TargetType.DOCTOR,
-        targetId: id,
-        currentUserId,
-        currentAccountId,
-        targetName: doctor ? `${doctor.lastName} ${doctor.firstName}` : '',
-        refetchReviews,
-        refetchStatistics,
-    });
 
     // Breadcrumb data
     const breadcrumbData = {
@@ -184,29 +174,9 @@ const DoctorProfile: React.FC = () => {
         );
     }
 
-    // Calculate average rating from review statistics (use Redux state)
-    const averageRating = reviewStatistics?.averageRating
-        ? reviewStatistics.averageRating.toFixed(1)
-        : '0.0';
+    // Calculate average rating from review statistics
+    const averageRating = formatAverageRating(reviewStatistics?.averageRating);
     const totalReviews = reviewStatistics?.totalReviews || 0;
-
-    // Function to render stars based on rating
-    const renderStars = (rating: number) => {
-        const stars = [];
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 >= 0.5;
-
-        for (let i = 1; i <= 5; i++) {
-            if (i <= fullStars) {
-                stars.push(<i key={i} className="fas fa-star filled"></i>);
-            } else if (i === fullStars + 1 && hasHalfStar) {
-                stars.push(<i key={i} className="fas fa-star-half-alt filled"></i>);
-            } else {
-                stars.push(<i key={i} className="fas fa-star"></i>);
-            }
-        }
-        return stars;
-    };
 
     // Function to get gender display text
     const getGenderDisplayText = (gender: Gender | undefined) => {
@@ -506,25 +476,7 @@ const DoctorProfile: React.FC = () => {
                                     <div className="detail-title">
                                         <h4>Tiểu sử bác sĩ</h4>
                                     </div>
-                                    <p>{displayText}</p>
-                                    {isLongText && (
-                                        <Link
-                                            to="#"
-                                            className="show-more d-flex align-items-center"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setExpanded((prev) => !prev);
-                                            }}
-                                        >
-                                            {expanded ? 'Thu gọn' : 'Xem thêm'}
-                                            <i
-                                                className={clsx('fa-solid', 'ms-2', {
-                                                    'fa-chevron-up': expanded,
-                                                    'fa-chevron-down': !expanded,
-                                                })}
-                                            ></i>
-                                        </Link>
-                                    )}
+                                    <ExpandableText text={doctor?.bio} limit={300} />
                                 </div>
                             </div>
                             <div ref={expRef}>
@@ -644,6 +596,10 @@ const DoctorProfile: React.FC = () => {
                                     currentUserId={currentUserId}
                                     currentAccountId={currentAccountId}
                                     isLoading={reviewLoading}
+                                    currentPage={reviewPagination?.currentPage || 1}
+                                    totalPages={reviewPagination?.totalPages || 1}
+                                    totalCount={reviewPagination?.totalCount || 0}
+                                    onPageChange={handlePageChange}
                                     onSubmitReview={handleSubmitReview}
                                     onReplySubmission={handleReplySubmission}
                                     onEditReview={handleEditReview}

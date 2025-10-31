@@ -8,6 +8,7 @@ interface UseReviewHandlersProps {
     currentUserId: string | undefined;
     currentAccountId: string | undefined;
     targetName: string;
+    hospitalId: string | undefined;
     refetchReviews: () => Promise<void>;
     refetchStatistics: () => Promise<void>;
 }
@@ -26,7 +27,8 @@ const buildReviewPayload = (
     targetType: TargetType,
     targetId: string,
     currentUserId: string,
-    reviewData: { rating: number; description: string }
+    reviewData: { rating: number; description: string },
+    hospitalId?: string
 ) => {
     const payload: any = {
         patientId: currentUserId,
@@ -39,6 +41,11 @@ const buildReviewPayload = (
         payload.doctorId = targetId;
     } else if (targetType === TargetType.SERVICE) {
         payload.serviceId = targetId;
+    }
+
+    // Add hospitalId if provided
+    if (hospitalId) {
+        payload.hospitalId = hospitalId;
     }
 
     return payload;
@@ -85,6 +92,7 @@ export const useReviewHandlers = ({
     targetId,
     currentUserId,
     currentAccountId,
+    hospitalId,
     refetchReviews,
     refetchStatistics,
 }: UseReviewHandlersProps) => {
@@ -96,7 +104,13 @@ export const useReviewHandlers = ({
         if (!targetId || !currentUserId) return;
 
         try {
-            const payload = buildReviewPayload(targetType, targetId, currentUserId, reviewData);
+            const payload = buildReviewPayload(
+                targetType,
+                targetId,
+                currentUserId,
+                reviewData,
+                hospitalId
+            );
             await ReviewService.createReview(payload);
             await refetchReviews();
             await refetchStatistics();

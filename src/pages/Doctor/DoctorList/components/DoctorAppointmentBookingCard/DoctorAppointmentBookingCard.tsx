@@ -1,9 +1,10 @@
 import clsx from 'clsx';
 import styles from './DoctorAppointmentBookingCard.module.scss';
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import { PATHS, replacePathParams } from '@/routes/paths';
 import { LanguageResponse } from '@/types/language.types';
+import { useFavoriteDoctor } from '@/hooks/useFavoriteDoctor';
 
 export interface DoctorPrice {
     id: string;
@@ -63,7 +64,12 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
         rescheduleParams,
     } = props;
 
-    const [isSelected, setIsSelected] = useState(isFavorite);
+    // Use the custom hook for favorite functionality
+    const {
+        isFavorited,
+        isLoading: isFavoriteLoading,
+        toggleFavorite,
+    } = useFavoriteDoctor(patientId, doctorId, isFavorite);
 
     // Tính toán service type và giá hiển thị dựa trên filter
     const displayServiceInfo = useMemo(() => {
@@ -95,20 +101,9 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
         };
     }, [prices, serviceTypeFilters]);
 
-    // Sync favorite state with prop when it changes
-    useEffect(() => {
-        setIsSelected(isFavorite);
-    }, [isFavorite]);
-
-    // Xử lý bật/tắt yêu thích (có thể gọi API để cập nhật bảng favourites)
+    // Handle favorite toggle using the custom hook
     const handleFavoriteToggle = () => {
-        if (!patientId) {
-            console.warn('Cần ID bệnh nhân để bật/tắt trạng thái yêu thích');
-            return;
-        }
-        setIsSelected(!isSelected);
-        // TODO: Gọi API để thêm/xóa bản ghi trong bảng favourites
-        // Ví dụ: POST đến /api/favourites với { patient_id, doctor_id }
+        toggleFavorite();
     };
 
     return (
@@ -134,14 +129,19 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                     {rating > 0 ? rating.toFixed(1) : 'Chưa có đánh giá'}
                                 </span>
                             </div>
-                            <span
+                            <button
+                                type="button"
                                 className={clsx(styles.favIcon, {
-                                    [styles.isSelected]: isSelected,
+                                    [styles.isSelected]: isFavorited,
                                 })}
                                 onClick={handleFavoriteToggle}
+                                disabled={isFavoriteLoading}
+                                aria-label={
+                                    isFavorited ? 'Bỏ yêu thích bác sĩ' : 'Yêu thích bác sĩ'
+                                }
                             >
                                 <i className="fa fa-heart"></i>
-                            </span>
+                            </button>
                         </div>
                     </div>
                     <div className="card-body p-0">
