@@ -39,6 +39,7 @@ interface SideBarProps {
     onGenderFilter?: (gender: string) => void;
     onGenderFilters?: (genders: string[]) => void; // Support multiple gender filters
     onPriceFilter?: (priceRange: { min: number; max: number }) => void;
+    initialServiceTypeFilters?: string[]; // Initial service type IDs from URL params
 }
 
 const mockFilterData: FilterSection[] = [
@@ -199,6 +200,7 @@ const SideBar: React.FC<SideBarProps> = ({
     onGenderFilter,
     onGenderFilters,
     onPriceFilter,
+    initialServiceTypeFilters,
 }) => {
     const dispatch = useAppDispatch();
     const { positions } = useAppSelector((state) => state.position);
@@ -252,6 +254,20 @@ const SideBar: React.FC<SideBarProps> = ({
         dispatch(getLanguagesAsync());
         dispatch(getServiceTypesAsync());
     }, [dispatch]);
+
+    // Initialize checked options from URL params (e.g., service-type)
+    useEffect(() => {
+        if (initialServiceTypeFilters && initialServiceTypeFilters.length > 0) {
+            setCheckedOptions((prev) => {
+                const updated = { ...prev };
+                initialServiceTypeFilters.forEach((serviceTypeId) => {
+                    const optionId = `serviceType-${serviceTypeId}`;
+                    updated[optionId] = true;
+                });
+                return updated;
+            });
+        }
+    }, [initialServiceTypeFilters]);
 
     // Create dynamic filter data from Redux
     const dynamicFilterData = useMemo(() => {

@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Calendar from '@/components/Calendar';
 import Modal from '@/components/Modal';
 import ModalArea from '@/components/ModalArea';
 import clsx from 'clsx';
 import styles from './SearchInput.module.scss';
+import { PATHS } from '@/routes/paths';
 // Removed unused icon imports as we now use images from backend
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getAllHospitalsAsync } from '@/store/slices/hospitalSlice';
@@ -42,6 +44,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
     rescheduleSpecialtyId,
 }) => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const { simpleHospitals } = useAppSelector((state) => state.hospital);
     const { specialties } = useAppSelector((state) => state.specialty);
 
@@ -62,6 +65,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
     const [doctorName, setDoctorName] = useState<string>('');
     const dateInputRef = useRef<HTMLInputElement>(null);
 
+    // Track if component is on DoctorList page for syncing
+    const isDoctorListPage = window.location.pathname.includes('/doctors');
+
     // Refs for auto-resize
     const doctorNameRef = useRef<HTMLDivElement>(null);
     const clinicRef = useRef<HTMLButtonElement>(null);
@@ -69,6 +75,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
     // Ref to track if reschedule filters have been initialized
     const rescheduleInitialized = useRef(false);
+
+    // Ref to track if URL params have been synced (for DoctorList page)
+    const urlParamsSynced = useRef(false);
 
     // Load data on component mount
     useEffect(() => {
@@ -95,6 +104,65 @@ const SearchInput: React.FC<SearchInputProps> = ({
         // Note: Don't call onHospitalFilters/onSpecialtyFilters here
         // DoctorList already handles the filtering via its own useEffect
     }, [rescheduleHospitalId, rescheduleSpecialtyId]);
+
+    // Sync search input with URL params when on DoctorList page
+    useEffect(() => {
+        if (isDoctorListPage && !urlParamsSynced.current) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchFromUrl = urlParams.get('search');
+            const dateFromUrl = urlParams.get('date');
+            const provinceIdFromUrl = urlParams.get('provinceId');
+            const districtIdFromUrl = urlParams.get('districtId');
+            const provinceNameFromUrl = urlParams.get('provinceName');
+            const districtNameFromUrl = urlParams.get('districtName');
+
+            if (searchFromUrl) {
+                setDoctorName(searchFromUrl);
+
+                // Update the contentEditable div
+                setTimeout(() => {
+                    const contentEditableDiv = document.querySelector(
+                        '[contenteditable="true"][data-placeholder="Nhập tên bác sĩ"]'
+                    );
+                    if (contentEditableDiv) {
+                        contentEditableDiv.textContent = searchFromUrl;
+                    }
+                }, 0);
+            }
+
+            // Sync date from URL
+            if (dateFromUrl) {
+                try {
+                    const parsedDate = new Date(dateFromUrl);
+                    if (!isNaN(parsedDate.getTime())) {
+                        setSelectedDate(parsedDate);
+                    }
+                } catch (e) {
+                    console.error('Error parsing date from URL:', e);
+                }
+            }
+
+            // Sync area from URL
+            if (provinceIdFromUrl || districtIdFromUrl) {
+                const areaInfo = {
+                    provinceId: provinceIdFromUrl || undefined,
+                    districtId: districtIdFromUrl || undefined,
+                    provinceName: provinceNameFromUrl || undefined,
+                    districtName: districtNameFromUrl || undefined,
+                };
+                setSelectedAreaInfo(areaInfo);
+
+                // Build display text
+                if (provinceNameFromUrl && districtNameFromUrl) {
+                    setSelectedArea(`${provinceNameFromUrl} - ${districtNameFromUrl}`);
+                } else if (provinceNameFromUrl) {
+                    setSelectedArea(provinceNameFromUrl);
+                }
+            }
+
+            urlParamsSynced.current = true;
+        }
+    }, [isDoctorListPage]);
 
     // Auto-resize function
     const autoResize = (element: HTMLDivElement) => {
@@ -302,6 +370,57 @@ const SearchInput: React.FC<SearchInputProps> = ({
           selectedDate.getFullYear() === today.getFullYear()
         : false;
 
+    // Handle form submit to navigate to DoctorList
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Build search params
+        const params = new URLSearchParams();
+
+        // Add search term if available
+        if (doctorName.trim()) {
+            params.set('search', doctorName.trim());
+        }
+
+        // Add specialty filter if available
+        if (selectedSpecialties.length > 0) {
+            // Use the first selected specialty for simplicity
+            params.set('specialtyId', selectedSpecialties[0]);
+        }
+
+        // Add hospital filter if available
+        if (selectedClinics.length > 0) {
+            // Use the first selected clinic for simplicity
+            params.set('hospitalId', selectedClinics[0]);
+        }
+
+        // Add area filter if available
+        if (selectedAreaInfo.provinceId) {
+            params.set('provinceId', selectedAreaInfo.provinceId);
+        }
+        if (selectedAreaInfo.districtId) {
+            params.set('districtId', selectedAreaInfo.districtId);
+        }
+        if (selectedAreaInfo.provinceName) {
+            params.set('provinceName', selectedAreaInfo.provinceName);
+        }
+        if (selectedAreaInfo.districtName) {
+            params.set('districtName', selectedAreaInfo.districtName);
+        }
+
+        // Add date if selected
+        if (selectedDate) {
+            params.set('date', selectedDate.toISOString());
+        }
+
+        // Always add pagination params
+        params.set('pageNumber', '1');
+        params.set('pageSize', '10');
+
+        // Navigate to DoctorList with params
+        navigate(`${PATHS.DOCTOR.ROOT}?${params.toString()}`);
+    };
+
     return (
         <div
             className={clsx(
@@ -318,7 +437,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     styles.customWidthSearch
                 )}
             >
-                <form action="#">
+                <form onSubmit={handleSubmit}>
                     {/* Second Row: Doctor, Specialty, Clinic, Location, Date, and Button */}
                     <div className={clsx('search-row second-row', styles.secondRow)}>
                         <div className={clsx('search-input search-map-line', styles.inputItem)}>
@@ -488,6 +607,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     items={specialtyItems}
                     title="Tìm theo chuyên khoa"
                     itemType="specialty"
+                    initialSelectedItems={selectedSpecialties}
                 />
                 <Modal
                     isOpen={showClinicModal}
@@ -496,6 +616,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     items={hospitalItems}
                     title="Tìm theo Bệnh viện"
                     itemType="hospital"
+                    initialSelectedItems={selectedClinics}
                 />
                 <ModalArea
                     isOpen={showAreaModal}

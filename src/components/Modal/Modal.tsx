@@ -17,6 +17,7 @@ interface ModalProps {
     }>;
     title: string;
     itemType?: 'hospital' | 'specialty';
+    initialSelectedItems?: string[]; // Add initial selected items
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -26,9 +27,17 @@ const Modal: React.FC<ModalProps> = ({
     items,
     title,
     itemType = 'specialty',
+    initialSelectedItems = [],
 }) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
+    const [selectedItems, setSelectedItems] = useState<string[]>(initialSelectedItems);
+
+    // Sync selectedItems with initialSelectedItems when modal opens
+    useEffect(() => {
+        if (isOpen && initialSelectedItems.length > 0) {
+            setSelectedItems(initialSelectedItems);
+        }
+    }, [isOpen, initialSelectedItems]);
 
     // Thêm useEffect để xử lý cuộn trang
     useEffect(() => {
