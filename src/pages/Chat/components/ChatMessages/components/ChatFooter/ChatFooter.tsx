@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
+import { toast } from 'react-toastify';
+import { useChat } from '@/providers/ChatProvider';
+import { MessageType } from '@/types/communication.types';
 import styles from './ChatFooter.module.scss';
 
 interface ChatFooterProps {
@@ -7,10 +10,14 @@ interface ChatFooterProps {
 }
 
 const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
+    const { sendMessage, activeConversation, startTyping, stopTyping } = useChat();
     const [message, setMessage] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
     const [showEmoji, setShowEmoji] = useState(false);
+    const [isSending, setIsSending] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -28,19 +35,75 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
         };
     }, [showDropdown]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (message.trim()) {
-            // Handle send message
-            console.log('Sending message:', message);
+        if (!message.trim() || !activeConversation || isSending) {
+            return;
+        }
+
+        setIsSending(true);
+        try {
+            await sendMessage(message.trim(), MessageType.TEXT);
             setMessage('');
+            setIsTyping(false);
+            stopTyping();
+        } catch (error) {
+            console.error('Error sending message:', error);
+            toast.error('Không thể gửi tin nhắn');
+        } finally {
+            setIsSending(false);
         }
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setMessage(e.target.value);
-        setIsTyping(e.target.value.length > 0);
+        const value = e.target.value;
+        setMessage(value);
+        setIsTyping(value.length > 0);
+
+        // Clear existing timeout
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+
+        if (value.trim()) {
+            // Send typing indicator
+            startTyping();
+
+            // Stop typing after 3 seconds of inactivity
+            typingTimeoutRef.current = setTimeout(() => {
+                stopTyping();
+            }, 3000);
+        } else {
+            stopTyping();
+        }
     };
+
+    const handleFileUpload = async (files: FileList | null, messageType: MessageType) => {
+        if (!files || files.length === 0 || !activeConversation) return;
+
+        setIsSending(true);
+        try {
+            const fileArray = Array.from(files);
+            await sendMessage('', messageType, fileArray);
+            toast.success('Đã gửi file thành công');
+            setShowDropdown(false);
+        } catch (error) {
+            console.error('Error uploading files:', error);
+            toast.error('Không thể gửi file');
+        } finally {
+            setIsSending(false);
+        }
+    };
+
+    // Cleanup typing timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+            stopTyping();
+        };
+    }, []);
 
     // Emoji click handler
     const handleEmojiClick = (emoji: string) => {
@@ -73,44 +136,99 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                     )}
                                     style={{ display: 'block' }}
                                 >
-                                    <a href="#" className="dropdown-item">
+                                    <a
+                                        href="#"
+                                        className="dropdown-item"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            fileInputRef.current?.click();
+                                            setShowDropdown(false);
+                                        }}
+                                    >
                                         <span>
                                             <i className="fa-solid fa-file-lines"></i>
                                         </span>
                                         Tài liệu
                                     </a>
-                                    <a href="#" className="dropdown-item">
+                                    <a
+                                        href="#"
+                                        className="dropdown-item"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            const input = document.createElement('input');
+                                            input.type = 'file';
+                                            input.accept = 'image/*';
+                                            input.capture = 'environment';
+                                            input.onchange = (e) =>
+                                                handleFileUpload(
+                                                    (e.target as HTMLInputElement).files,
+                                                    MessageType.IMAGE
+                                                );
+                                            input.click();
+                                            setShowDropdown(false);
+                                        }}
+                                    >
                                         <span>
                                             <i className="fa-solid fa-camera"></i>
                                         </span>
                                         Camera
                                     </a>
-                                    <a href="#" className="dropdown-item">
+                                    <a
+                                        href="#"
+                                        className="dropdown-item"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            const input = document.createElement('input');
+                                            input.type = 'file';
+                                            input.accept = 'image/*';
+                                            input.multiple = true;
+                                            input.onchange = (e) =>
+                                                handleFileUpload(
+                                                    (e.target as HTMLInputElement).files,
+                                                    MessageType.IMAGE
+                                                );
+                                            input.click();
+                                            setShowDropdown(false);
+                                        }}
+                                    >
                                         <span>
                                             <i className="fa-solid fa-image"></i>
                                         </span>
                                         Thư viện
                                     </a>
-                                    <a href="#" className="dropdown-item">
+                                    <a
+                                        href="#"
+                                        className="dropdown-item"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            const input = document.createElement('input');
+                                            input.type = 'file';
+                                            input.accept = 'audio/*';
+                                            input.onchange = (e) =>
+                                                handleFileUpload(
+                                                    (e.target as HTMLInputElement).files,
+                                                    MessageType.AUDIO
+                                                );
+                                            input.click();
+                                            setShowDropdown(false);
+                                        }}
+                                    >
                                         <span>
                                             <i className="fa-solid fa-volume-high"></i>
                                         </span>
                                         Âm thanh
                                     </a>
-                                    <a href="#" className="dropdown-item">
-                                        <span>
-                                            <i className="fa-solid fa-location-dot"></i>
-                                        </span>
-                                        Vị trí
-                                    </a>
-                                    <a href="#" className="dropdown-item">
-                                        <span>
-                                            <i className="fa-solid fa-user"></i>
-                                        </span>
-                                        Liên hệ
-                                    </a>
                                 </div>
                             )}
+                            {/* Hidden file input for documents */}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                style={{ display: 'none' }}
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
+                                multiple
+                                onChange={(e) => handleFileUpload(e.target.files, MessageType.FILE)}
+                            />
                         </div>
                     </div>
                 </div>
@@ -195,8 +313,18 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                     onChange={handleInputChange}
                 />
                 <div className="form-buttons">
-                    <button className="btn send-btn" type="submit">
-                        <i className="isax isax-send-25"></i>
+                    <button
+                        className="btn send-btn"
+                        type="submit"
+                        disabled={isSending || !activeConversation}
+                    >
+                        {isSending ? (
+                            <div className="spinner-border spinner-border-sm" role="status">
+                                <span className="visually-hidden">Đang gửi...</span>
+                            </div>
+                        ) : (
+                            <i className="isax isax-send-25"></i>
+                        )}
                     </button>
                 </div>
             </form>

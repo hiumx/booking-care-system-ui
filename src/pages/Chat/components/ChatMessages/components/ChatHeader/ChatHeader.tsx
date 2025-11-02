@@ -1,12 +1,27 @@
 import { useState, useRef, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import clsx from 'clsx';
-
+import { useChat } from '@/providers/ChatProvider';
+import { RootState } from '@/store';
 import VideoCallWindow from '../../../VideoCallWindow';
 import styles from './ChatHeader.module.scss';
+
 const ChatHeader = () => {
+    const { activeConversation, onlineUsers } = useChat();
+    const userProfile = useSelector((state: RootState) => state.user.profile);
+    // Backend uses uppercase accountId, normalize for comparison
+    const currentUserId = (userProfile?.accountId || userProfile?.id || '').toUpperCase();
     const [showSearch, setShowSearch] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Get other participant info - support both id and accountId fields
+    const otherParticipant = activeConversation?.participantDetails?.find(
+        (p) => (p.id || p.accountId || '').toUpperCase() !== currentUserId
+    );
+    const isOnline = otherParticipant
+        ? onlineUsers.has(otherParticipant.id || otherParticipant.accountId || '')
+        : false;
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -54,15 +69,17 @@ const ChatHeader = () => {
                                 </li>
                             </ul>
                         </div>
-                        <figure className="avatar avatar-online">
+                        <figure className={`avatar ${isOnline ? 'avatar-online' : ''}`}>
                             <img
-                                src="./src/assets/img/doctors-dashboard/profile-06.jpg"
-                                alt="image"
+                                src={otherParticipant?.avatarUrl || '/default-avatar.png'}
+                                alt="avatar"
                             />
                         </figure>
                         <div className="mt-1">
-                            <h5>Dr Edalin Hendry</h5>
-                            <small className="last-seen">Đang online</small>
+                            <h5>{otherParticipant?.fullName || 'Chọn hội thoại'}</h5>
+                            <small className="last-seen">
+                                {isOnline ? 'Đang online' : 'Offline'}
+                            </small>
                         </div>
                     </div>
                     <div className="chat-options">

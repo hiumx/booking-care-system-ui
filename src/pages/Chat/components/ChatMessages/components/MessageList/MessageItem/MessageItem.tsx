@@ -1,5 +1,6 @@
 import styles from './MessageItem.module.scss';
 import clsx from 'clsx';
+import { useState } from 'react';
 
 import { ChatMessage } from '../../../../../data/mockData';
 
@@ -8,6 +9,7 @@ interface MessageItemProps {
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const renderMessageContent = () => {
         switch (message.messageType) {
             case 'voice':
@@ -36,9 +38,13 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                                 <li key={index}>
                                     <div className="image-download-col">
                                         <a
-                                            href={attachment}
+                                            href="#"
                                             data-fancybox="gallery"
                                             className="fancybox"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setSelectedImage(attachment);
+                                            }}
                                         >
                                             <img src={attachment} alt="Img" />
                                         </a>
@@ -178,6 +184,41 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Image Preview Modal */}
+            {selectedImage && (
+                <div
+                    className="modal fade show"
+                    style={{
+                        display: 'block',
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    }}
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <div className="modal-dialog modal-dialog-centered modal-lg">
+                        <div className="modal-content bg-transparent border-0">
+                            <div className="modal-body p-0 text-center">
+                                <button
+                                    type="button"
+                                    className="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedImage(null);
+                                    }}
+                                    style={{ zIndex: 1051 }}
+                                ></button>
+                                <img
+                                    src={selectedImage}
+                                    alt="Preview"
+                                    className="img-fluid"
+                                    style={{ maxHeight: '90vh', cursor: 'pointer' }}
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

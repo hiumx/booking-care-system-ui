@@ -1,51 +1,76 @@
-import { mockChatContacts, ChatContact } from '../../../../data/mockData';
+import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import clsx from 'clsx';
+import { useChat } from '@/providers/ChatProvider';
+import { RootState } from '@/store';
+import { ConversationResponse } from '@/types/communication.types';
 import styles from './ChatList.module.scss';
 
-import clsx from 'clsx';
 interface ChatListProps {
     searchTerm: string;
 }
 
 const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
-    const filteredContacts = mockChatContacts.filter(
-        (contact: ChatContact) =>
-            contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            contact.lastMessage.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const { conversations, selectConversation, activeConversation, isLoading, onlineUsers } =
+        useChat();
+    const userProfile = useSelector((state: RootState) => state.user.profile);
+    // Backend uses uppercase, normalize for comparison
+    const currentUserId = (userProfile?.accountId || userProfile?.id || '').toUpperCase();
 
-    // const pinnedContacts = filteredContacts.filter((contact: ChatContact) => contact.isPinned);
-    const recentContacts = filteredContacts.filter((contact: ChatContact) => !contact.isPinned);
+    // Filter and transform conversations
+    const filteredConversations = useMemo(() => {
+        if (!searchTerm) return conversations;
 
-    const getMessageIcon = (messageType: string) => {
-        switch (messageType) {
-            case 'video':
-                return <i className="isax isax-video5 me-1"></i>;
-            case 'file':
-                return <i className="fa-solid fa-file-lines me-1"></i>;
-            case 'audio':
-                return <i className="fa-solid fa-microphone me-1"></i>;
-            case 'image':
-                return <i className="fa-solid fa-image me-1"></i>;
-            case 'location':
-                return <i className="fa-solid fa-location-dot me-1"></i>;
-            case 'missed-call':
-                return <i className="isax isax-call5-flip me-1"></i>;
-            default:
-                return null;
-        }
+        return conversations.filter((conv) => {
+            // Search in participant names or last message
+            const participantName = conv.participantDetails
+                ?.filter((p) => (p.id || p.accountId || '').toUpperCase() !== currentUserId)
+                .map((p) => p.fullName)
+                .join(', ');
+            const lastMessageContent = conv.lastMessage?.content || '';
+
+            return (
+                participantName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                lastMessageContent.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        });
+    }, [conversations, searchTerm, currentUserId]);
+
+    const recentContacts = filteredConversations;
+
+    // Get other participant info
+    const getOtherParticipant = (conv: ConversationResponse) => {
+        return conv.participantDetails?.find(
+            (p) => (p.id || p.accountId || '').toUpperCase() !== currentUserId
+        );
     };
 
-    const getStatusIcon = (contact: ChatContact) => {
-        if (contact.unreadCount > 0) {
-            return <div className="new-message-count">{contact.unreadCount}</div>;
-        }
-        if (contact.isPinned) {
-            return <i className="fa-solid fa-thumbtack"></i>;
-        }
-        return null;
+    // Check if user is online
+    const isUserOnline = (userId: string) => {
+        return onlineUsers.has(userId);
     };
 
-    const renderContactList = (contacts: ChatContact[], title: string) => (
+    // Format timestamp
+    const formatTime = (timestamp: string) => {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now.getTime() - date.getTime();
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+
+        if (minutes < 1) return 'Vừa xong';
+        if (minutes < 60) return `${minutes} phút trước`;
+        if (hours < 24) return `${hours} giờ trước`;
+        if (days < 7) return `${days} ngày trước`;
+        return date.toLocaleDateString('vi-VN');
+    };
+
+    const handleSelectConversation = (conversationId: string) => {
+        selectConversation(conversationId);
+    };
+
+    const renderContactList = (convs: ConversationResponse[], title: string) => (
         <>
             <div className="d-flex justify-content-between align-items-center ps-0 pe-0">
                 <div className="fav-title pin-chat">
@@ -53,37 +78,74 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
                 </div>
             </div>
             <ul className={clsx(styles.item, 'user-list')}>
-                {contacts.map((contact: ChatContact) => (
-                    <li key={contact.id} className="user-list-item">
-                        <a href="#">
-                            <div className={`avatar ${contact.isOnline ? 'avatar-online' : ''}`}>
-                                <img src={contact.avatar} alt={contact.name} />
-                            </div>
-                            <div className="users-list-body">
-                                <div>
-                                    <h5>{contact.name}</h5>
-                                    <p>
-                                        {getMessageIcon(contact.messageType)}
-                                        {contact.lastMessage}
-                                    </p>
+                {convs.map((conv) => {
+                    const otherUser = getOtherParticipant(conv);
+                    const isOnline = otherUser
+                        ? isUserOnline(otherUser.id || otherUser.accountId || '')
+                        : false;
+                    const isActive = activeConversation?.id === conv.id;
+
+                    return (
+                        <li
+                            key={conv.id}
+                            className={clsx('user-list-item', { active: isActive })}
+                            onClick={() => handleSelectConversation(conv.id)}
+                        >
+                            <a href="#" onClick={(e) => e.preventDefault()}>
+                                <div className={`avatar ${isOnline ? 'avatar-online' : ''}`}>
+                                    <img
+                                        src={otherUser?.avatarUrl || '/default-avatar.png'}
+                                        alt={otherUser?.fullName || 'User'}
+                                    />
                                 </div>
-                                <div className="last-chat-time">
-                                    <small className="text-muted">{contact.lastMessageTime}</small>
-                                    <div className="chat-pin">{getStatusIcon(contact)}</div>
+                                <div className="users-list-body">
+                                    <div>
+                                        <h5>{otherUser?.fullName || 'Unknown User'}</h5>
+                                        <p>{conv.lastMessage?.content || 'Không có tin nhắn'}</p>
+                                    </div>
+                                    <div className="last-chat-time">
+                                        <small className="text-muted">
+                                            {conv.lastMessage
+                                                ? formatTime(conv.lastMessage.createdAt)
+                                                : ''}
+                                        </small>
+                                        <div className="chat-pin">
+                                            {conv.unreadCount && conv.unreadCount > 0 ? (
+                                                <div className="new-message-count">
+                                                    {conv.unreadCount}
+                                                </div>
+                                            ) : null}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </a>
-                    </li>
-                ))}
+                            </a>
+                        </li>
+                    );
+                })}
             </ul>
         </>
     );
 
+    if (isLoading) {
+        return (
+            <div className="text-center p-4">
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Đang tải...</span>
+                </div>
+            </div>
+        );
+    }
+
+    if (recentContacts.length === 0) {
+        return (
+            <div className="text-center p-4">
+                <p className="text-muted">Không có hội thoại nào</p>
+            </div>
+        );
+    }
+
     return (
-        <>
-            {/* {pinnedContacts.length > 0 && renderContactList(pinnedContacts, 'Tin nhắn ghim')} */}
-            {recentContacts.length > 0 && renderContactList(recentContacts, 'Tin nhắn gần đây')}
-        </>
+        <>{recentContacts.length > 0 && renderContactList(recentContacts, 'Tin nhắn gần đây')}</>
     );
 };
 
