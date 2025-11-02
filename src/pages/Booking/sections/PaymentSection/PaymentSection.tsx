@@ -485,28 +485,24 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                 <div className="benefits-list">
                                                     <div className="benefit-item">
                                                         <i
-                                                            className="isax isax-info-circle text-warning me-2"
+                                                            className="isax isax-info-circle text-info me-2"
                                                             aria-hidden="true"
                                                         ></i>
                                                         <span>Thanh toán toàn bộ khi khám</span>
                                                     </div>
                                                     <div className="benefit-item">
                                                         <i
-                                                            className="isax isax-info-circle text-warning me-2"
+                                                            className="isax isax-info-circle text-info me-2"
                                                             aria-hidden="true"
                                                         ></i>
-                                                        <span>Không được giảm giá</span>
+                                                        <span>Không cần thanh toán trước</span>
                                                     </div>
-                                                </div>
-
-                                                <div className="price-info mt-3">
-                                                    <div className="current-price">
-                                                        <span className="text-muted">
-                                                            Thanh toán khi khám:
-                                                        </span>
-                                                        <span className="fw-bold text-dark ms-2">
-                                                            {TOTAL_AMOUNT.toLocaleString('vi-VN')} đ
-                                                        </span>
+                                                    <div className="benefit-item">
+                                                        <i
+                                                            className="isax isax-info-circle text-info me-2"
+                                                            aria-hidden="true"
+                                                        ></i>
+                                                        <span>Linh hoạt thay đổi lịch hẹn</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -592,79 +588,103 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                     </div>
                                 </>
                             )}
-                            <div className="pt-3 border-top booking-more-info">
-                                <h6 className="mb-3">Thông tin thanh toán</h6>
-                                {TOTAL_AMOUNT > 0 ? (
-                                    <>
-                                        {isSupplementaryPayment ? (
+                            {/* Only show payment info if NOT no-payment option */}
+                            {paymentOption !== 'no-payment' && (
+                                <>
+                                    <div className="pt-3 border-top booking-more-info">
+                                        <h6 className="mb-3">Thông tin thanh toán</h6>
+                                        {TOTAL_AMOUNT > 0 ? (
                                             <>
-                                                <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
-                                                    <p className="mb-0">
-                                                        Số tiền cần thanh toán thêm
-                                                    </p>
-                                                    <span className="fw-medium text-warning d-block">
-                                                        {DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ
-                                                    </span>
-                                                </div>
-                                                <div className="alert alert-warning mt-3 mb-0">
-                                                    <i className="bi bi-info-circle me-2"></i>
-                                                    <small>
-                                                        Bác sĩ mới có cọc cao hơn. Bạn cần thanh
-                                                        toán thêm{' '}
-                                                        {DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ
-                                                        để xác nhận lịch hẹn. Số tiền còn lại sẽ
-                                                        được thanh toán khi hoàn thành khám.
-                                                    </small>
-                                                </div>
+                                                {isSupplementaryPayment ? (
+                                                    <>
+                                                        <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
+                                                            <p className="mb-0">
+                                                                Số tiền cần thanh toán thêm
+                                                            </p>
+                                                            <span className="fw-medium text-warning d-block">
+                                                                {DEPOSIT_AMOUNT.toLocaleString(
+                                                                    'vi-VN'
+                                                                )}{' '}
+                                                                đ
+                                                            </span>
+                                                        </div>
+                                                        <div className="alert alert-warning mt-3 mb-0">
+                                                            <i className="bi bi-info-circle me-2"></i>
+                                                            <small>
+                                                                Bác sĩ mới có cọc cao hơn. Bạn cần
+                                                                thanh toán thêm{' '}
+                                                                {DEPOSIT_AMOUNT.toLocaleString(
+                                                                    'vi-VN'
+                                                                )}{' '}
+                                                                đ để xác nhận lịch hẹn. Số tiền còn
+                                                                lại sẽ được thanh toán khi hoàn
+                                                                thành khám.
+                                                            </small>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
+                                                            <p className="mb-0">
+                                                                Tổng phí khám bệnh
+                                                            </p>
+                                                            <span className="fw-medium d-block">
+                                                                {TOTAL_AMOUNT.toLocaleString(
+                                                                    'vi-VN'
+                                                                )}{' '}
+                                                                đ
+                                                            </span>
+                                                        </div>
+                                                        <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
+                                                            <p className="mb-0">
+                                                                Phí đặt cọc (30%)
+                                                            </p>
+                                                            <span className="fw-medium text-primary d-block">
+                                                                {DEPOSIT_AMOUNT.toLocaleString(
+                                                                    'vi-VN'
+                                                                )}{' '}
+                                                                đ
+                                                            </span>
+                                                        </div>
+                                                        <div className="alert alert-info mt-3 mb-0">
+                                                            <i className="bi bi-info-circle me-2"></i>
+                                                            <small>
+                                                                Bạn chỉ cần thanh toán đặt cọc 30% (
+                                                                {DEPOSIT_AMOUNT.toLocaleString(
+                                                                    'vi-VN'
+                                                                )}{' '}
+                                                                đ) để xác nhận lịch hẹn. Số tiền còn
+                                                                lại sẽ được thanh toán trực tiếp tại
+                                                                phòng khám.
+                                                            </small>
+                                                        </div>
+                                                    </>
+                                                )}
                                             </>
                                         ) : (
-                                            <>
-                                                <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
-                                                    <p className="mb-0">Tổng phí khám bệnh</p>
-                                                    <span className="fw-medium d-block">
-                                                        {TOTAL_AMOUNT.toLocaleString('vi-VN')} đ
-                                                    </span>
-                                                </div>
-                                                <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
-                                                    <p className="mb-0">Phí đặt cọc (30%)</p>
-                                                    <span className="fw-medium text-primary d-block">
-                                                        {DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ
-                                                    </span>
-                                                </div>
-                                                <div className="alert alert-info mt-3 mb-0">
-                                                    <i className="bi bi-info-circle me-2"></i>
-                                                    <small>
-                                                        Bạn chỉ cần thanh toán đặt cọc 30% (
-                                                        {DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ)
-                                                        để xác nhận lịch hẹn. Số tiền còn lại sẽ
-                                                        được thanh toán trực tiếp tại phòng khám.
-                                                    </small>
-                                                </div>
-                                            </>
+                                            <div className="alert alert-warning">
+                                                <i
+                                                    className="bi bi-exclamation-triangle me-2"
+                                                    aria-hidden="true"
+                                                ></i>{' '}
+                                                Không tìm thấy thông tin giá khám. Vui lòng quay lại
+                                                và chọn lại bác sĩ.
+                                            </div>
                                         )}
-                                    </>
-                                ) : (
-                                    <div className="alert alert-warning">
-                                        <i
-                                            className="bi bi-exclamation-triangle me-2"
-                                            aria-hidden="true"
-                                        ></i>{' '}
-                                        Không tìm thấy thông tin giá khám. Vui lòng quay lại và chọn
-                                        lại bác sĩ.
                                     </div>
-                                )}
-                            </div>
-                            {TOTAL_AMOUNT > 0 && (
-                                <div className="bg-primary d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between p-3 rounded">
-                                    <h6 className="text-white">
-                                        {isSupplementaryPayment
-                                            ? 'Số tiền cần thanh toán thêm'
-                                            : 'Số tiền thanh toán'}
-                                    </h6>
-                                    <h6 className="text-white">
-                                        {DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ
-                                    </h6>
-                                </div>
+                                    {TOTAL_AMOUNT > 0 && (
+                                        <div className="bg-primary d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between p-3 rounded">
+                                            <h6 className="text-white">
+                                                {isSupplementaryPayment
+                                                    ? 'Số tiền cần thanh toán thêm'
+                                                    : 'Số tiền thanh toán'}
+                                            </h6>
+                                            <h6 className="text-white">
+                                                {DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ
+                                            </h6>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                     </div>
