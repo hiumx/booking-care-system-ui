@@ -17,6 +17,7 @@ interface AppointmentGridCardProps {
     status: AppointmentUITab;
     onCancel?: (appointment: AppointmentCardData) => void; // Callback for cancel action
     onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void; // Callback for reschedule actions
+    onReview?: (appointment: AppointmentCardData) => void; // Callback for review action
 }
 
 const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
@@ -24,6 +25,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
     status,
     onCancel,
     onReschedule,
+    onReview: _onReview, // Available for future use if grid view needs review functionality
 }) => {
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
