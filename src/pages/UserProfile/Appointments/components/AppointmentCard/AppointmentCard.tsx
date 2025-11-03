@@ -19,6 +19,7 @@ interface AppointmentCardProps {
     variant?: 'full' | 'minimal'; // 'full' shows all actions, 'minimal' only shows view icon
     onCancel?: (appointment: AppointmentCardData) => void; // Callback for cancel action
     onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void; // Callback for reschedule actions
+    onReview?: (appointment: AppointmentCardData) => void; // Callback for review action
 }
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({
@@ -27,6 +28,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     variant = 'full',
     onCancel,
     onReschedule,
+    onReview,
 }) => {
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -89,6 +91,10 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                                 <Link
                                     to="#"
                                     className="text-decoration-underline"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        onReview?.(appointment);
+                                    }}
                                     data-bs-toggle="modal"
                                     data-bs-target="#add_review"
                                 >
