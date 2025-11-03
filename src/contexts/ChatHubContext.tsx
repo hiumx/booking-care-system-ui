@@ -42,8 +42,6 @@ export const ChatHubProvider: React.FC<ChatHubProviderProps> = ({ children }) =>
         // Build URL with userId query string (fallback if JWT claims don't work)
         const hubUrlWithUserId = `${chatHubUrl}?userId=${encodeURIComponent(userId)}`;
 
-        console.log('[ChatHubContext] 🔗 Creating shared SignalR connection for user:', userId);
-
         // Create SignalR connection
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(hubUrlWithUserId, {
@@ -84,9 +82,7 @@ export const ChatHubProvider: React.FC<ChatHubProviderProps> = ({ children }) =>
         const startConnection = async () => {
             try {
                 await connection.start();
-                console.log('[ChatHubContext] ✅ Connected successfully');
-                console.log('[ChatHubContext] 👤 User:', userId);
-                console.log('[ChatHubContext] 🔌 Connection ID:', connection.connectionId);
+
                 setIsConnected(true);
             } catch (error) {
                 console.error('[ChatHubContext] ❌ Connection failed:', error);

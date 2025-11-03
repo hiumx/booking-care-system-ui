@@ -10,48 +10,136 @@ interface MessageItemProps {
 
 const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+    // Helper: Get file icon based on mimeType
+    const getFileIcon = (mimeType?: string): string => {
+        if (!mimeType) return 'fa-solid fa-file';
+        if (mimeType.startsWith('image/')) return 'fa-solid fa-image';
+        if (mimeType.startsWith('audio/')) return 'fa-solid fa-volume-high';
+        if (mimeType.startsWith('video/')) return 'fa-solid fa-video';
+        if (mimeType.includes('pdf')) return 'fa-solid fa-file-pdf';
+        if (mimeType.includes('word')) return 'fa-solid fa-file-word';
+        if (mimeType.includes('excel') || mimeType.includes('spreadsheet'))
+            return 'fa-solid fa-file-excel';
+        if (mimeType.includes('text')) return 'fa-solid fa-file-lines';
+        return 'fa-solid fa-file';
+    };
+
+    // Helper: Format file size
+    const formatFileSize = (bytes?: number): string => {
+        if (!bytes || bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    };
+
     const renderMessageContent = () => {
         switch (message.messageType) {
             case 'voice':
+            case 'audio':
                 return (
-                    <div className="chat-voice-group">
-                        <ul>
-                            <li>
-                                <a href="javascript:void(0);">
-                                    <span>
-                                        <img src="./src/assets/img/icons/play-01.svg" alt="image" />
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <img src="./src/assets/img/icons/voice.svg" alt="image" />
-                            </li>
-                            <li>0:05</li>
-                        </ul>
+                    <div className="audio-attachments">
+                        <div className="chat-voice-group">
+                            <ul>
+                                <li>
+                                    <a href="javascript:void(0);">
+                                        <span>
+                                            <img
+                                                src="./src/assets/img/icons/play-01.svg"
+                                                alt="image"
+                                            />
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <img src="./src/assets/img/icons/voice.svg" alt="image" />
+                                </li>
+                                <li>0:05</li>
+                            </ul>
+                        </div>
+                        {/* Show text caption if exists (check for non-empty string) */}
+                        {message.content && message.content.trim().length > 0 && (
+                            <div className="mt-2">{message.content}</div>
+                        )}
                     </div>
                 );
             case 'image':
                 return (
-                    <div className="download-col">
-                        <ul className="nav mb-0">
-                            {message.attachments?.map((attachment, index) => (
-                                <li key={index}>
-                                    <div className="image-download-col">
-                                        <a
-                                            href="#"
-                                            data-fancybox="gallery"
-                                            className="fancybox"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setSelectedImage(attachment);
-                                            }}
-                                        >
-                                            <img src={attachment} alt="Img" />
-                                        </a>
+                    <div className="image-attachments">
+                        <div className="download-col">
+                            <ul className="nav mb-0">
+                                {message.attachments?.map((attachment: any, index) => {
+                                    const imageUrl =
+                                        attachment?.url || attachment?.fileUrl || attachment;
+                                    return (
+                                        <li key={index}>
+                                            <div className="image-download-col">
+                                                <a
+                                                    href="#"
+                                                    data-fancybox="gallery"
+                                                    className="fancybox"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setSelectedImage(imageUrl);
+                                                    }}
+                                                >
+                                                    <img src={imageUrl} alt="Img" />
+                                                </a>
+                                            </div>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
+                        {/* Show text caption if exists (check for non-empty string) */}
+                        {message.content && message.content.trim().length > 0 && (
+                            <div className="mt-2">{message.content}</div>
+                        )}
+                    </div>
+                );
+            case 'file':
+                return (
+                    <div className="file-attachments">
+                        {message.attachments?.map((attachment: any, index) => {
+                            const fileUrl = attachment?.url || attachment?.fileUrl;
+                            const fileName = attachment?.name || attachment?.fileName || 'File';
+                            const fileSize = attachment?.size || attachment?.fileSize;
+                            const mimeType = attachment?.mimeType;
+
+                            return (
+                                <div
+                                    key={index}
+                                    className="file-download d-flex align-items-center mb-2"
+                                >
+                                    <div className="file-type d-flex align-items-center justify-content-center me-2">
+                                        <i className={getFileIcon(mimeType)}></i>
                                     </div>
-                                </li>
-                            ))}
-                        </ul>
+                                    <div className="file-details flex-grow-1">
+                                        <span className="file-name">{fileName}</span>
+                                        <ul className="mb-0">
+                                            <li className="text-muted small">
+                                                {formatFileSize(fileSize)}
+                                            </li>
+                                            <li>
+                                                <a
+                                                    href={fileUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    download={fileName}
+                                                >
+                                                    Tải xuống
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {/* Show text content if exists (caption) */}
+                        {message.content && message.content.trim().length > 0 && (
+                            <div className="mt-2 text-muted small">{message.content}</div>
+                        )}
                     </div>
                 );
             case 'location':

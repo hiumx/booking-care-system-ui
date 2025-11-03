@@ -15,6 +15,9 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [showEmoji, setShowEmoji] = useState(false);
     const [isSending, setIsSending] = useState(false);
+    // File staging states (modern UX like Slack)
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [fileMessageType, setFileMessageType] = useState<MessageType | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -37,14 +40,34 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!message.trim() || !activeConversation || isSending) {
+
+        // Validation: Must have either text or files
+        const hasText = message.trim().length > 0;
+        const hasFiles = selectedFiles.length > 0;
+
+        if (!hasText && !hasFiles) {
+            return;
+        }
+
+        if (!activeConversation || isSending) {
             return;
         }
 
         setIsSending(true);
         try {
-            await sendMessage(message.trim(), MessageType.TEXT);
+            if (hasFiles && fileMessageType) {
+                // Send message with files (and optional text caption)
+                await sendMessage(message.trim(), fileMessageType, selectedFiles);
+                toast.success(`Đã gửi ${selectedFiles.length} file thành công`);
+            } else {
+                // Send text-only message
+                await sendMessage(message.trim(), MessageType.TEXT);
+            }
+
+            // Clear all inputs after successful send
             setMessage('');
+            setSelectedFiles([]);
+            setFileMessageType(null);
             setIsTyping(false);
             stopTyping();
         } catch (error) {
@@ -78,21 +101,59 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
         }
     };
 
-    const handleFileUpload = async (files: FileList | null, messageType: MessageType) => {
+    // Stage files for preview (don't send immediately)
+    const handleFileSelect = (files: FileList | null, messageType: MessageType) => {
         if (!files || files.length === 0 || !activeConversation) return;
 
-        setIsSending(true);
-        try {
-            const fileArray = Array.from(files);
-            await sendMessage('', messageType, fileArray);
-            toast.success('Đã gửi file thành công');
-            setShowDropdown(false);
-        } catch (error) {
-            console.error('Error uploading files:', error);
-            toast.error('Không thể gửi file');
-        } finally {
-            setIsSending(false);
+        const fileArray = Array.from(files);
+
+        // Validate file types match message type
+        const isValid = validateFileTypes(fileArray, messageType);
+        if (!isValid) {
+            toast.error('Loại file không hợp lệ');
+            return;
         }
+
+        // Stage files for preview
+        setSelectedFiles(fileArray);
+        setFileMessageType(messageType);
+        setShowDropdown(false);
+
+        console.log('[ChatFooter] Files staged:', {
+            count: fileArray.length,
+            type: messageType,
+            files: fileArray.map((f) => ({ name: f.name, size: f.size, type: f.type })),
+        });
+    };
+
+    // Validate file types match message type
+    const validateFileTypes = (files: File[], messageType: MessageType): boolean => {
+        switch (messageType) {
+            case MessageType.IMAGE:
+                return files.every((f) => f.type.startsWith('image/'));
+            case MessageType.AUDIO:
+                return files.every((f) => f.type.startsWith('audio/'));
+            case MessageType.FILE:
+                // Documents can be any file type
+                return true;
+            default:
+                return false;
+        }
+    };
+
+    // Remove a staged file
+    const handleRemoveFile = (index: number) => {
+        setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+        if (selectedFiles.length === 1) {
+            // Last file removed, clear message type
+            setFileMessageType(null);
+        }
+    };
+
+    // Clear all staged files
+    const handleClearFiles = () => {
+        setSelectedFiles([]);
+        setFileMessageType(null);
     };
 
     // Cleanup typing timeout on unmount
@@ -105,6 +166,17 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
         };
     }, []);
 
+    // Cleanup object URLs when files change to prevent memory leaks
+    useEffect(() => {
+        return () => {
+            selectedFiles.forEach((file) => {
+                if (file.type.startsWith('image/')) {
+                    URL.revokeObjectURL(URL.createObjectURL(file));
+                }
+            });
+        };
+    }, [selectedFiles]);
+
     // Emoji click handler
     const handleEmojiClick = (emoji: string) => {
         setMessage((prev) => prev + emoji);
@@ -112,8 +184,93 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
         setShowEmoji(false);
     };
 
+    // Helper: Format file size
+    const formatFileSize = (bytes: number): string => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    };
+
+    // Helper: Get file icon based on type
+    const getFileIcon = (file: File): string => {
+        if (file.type.startsWith('image/')) return 'fa-solid fa-image';
+        if (file.type.startsWith('audio/')) return 'fa-solid fa-volume-high';
+        if (file.type.startsWith('video/')) return 'fa-solid fa-video';
+        if (file.type.includes('pdf')) return 'fa-solid fa-file-pdf';
+        if (file.type.includes('word')) return 'fa-solid fa-file-word';
+        if (file.type.includes('excel') || file.type.includes('spreadsheet'))
+            return 'fa-solid fa-file-excel';
+        return 'fa-solid fa-file';
+    };
+
+    // Helper: Create preview URL for images
+    const createPreviewUrl = (file: File): string | null => {
+        if (file.type.startsWith('image/')) {
+            return URL.createObjectURL(file);
+        }
+        return null;
+    };
+
     return (
         <div className="chat-footer">
+            {/* File Preview Area (Modern UX like Slack) */}
+            {selectedFiles.length > 0 && (
+                <div className={styles.filePreviewArea}>
+                    <div className={styles.filePreviewHeader}>
+                        <span className={styles.filePreviewTitle}>
+                            <i className="fa-solid fa-paperclip"></i>
+                            {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} đã chọn
+                        </span>
+                        <button
+                            type="button"
+                            className={styles.clearAllBtn}
+                            onClick={handleClearFiles}
+                            title="Xóa tất cả"
+                        >
+                            <i className="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div className={styles.filePreviewList}>
+                        {selectedFiles.map((file, index) => {
+                            const previewUrl = createPreviewUrl(file);
+                            return (
+                                <div key={index} className={styles.filePreviewItem}>
+                                    {previewUrl ? (
+                                        <img
+                                            src={previewUrl}
+                                            alt={file.name}
+                                            className={styles.filePreviewImage}
+                                        />
+                                    ) : (
+                                        <div className={styles.filePreviewIcon}>
+                                            <i className={getFileIcon(file)}></i>
+                                        </div>
+                                    )}
+                                    <div className={styles.filePreviewInfo}>
+                                        <div className={styles.filePreviewName} title={file.name}>
+                                            {file.name}
+                                        </div>
+                                        <div className={styles.filePreviewSize}>
+                                            {formatFileSize(file.size)}
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className={styles.removeFileBtn}
+                                        onClick={() => handleRemoveFile(index)}
+                                        title="Xóa file"
+                                    >
+                                        <i className="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
             <form onSubmit={handleSubmit}>
                 <div className="smile-foot">
                     <div className="chat-action-btns">
@@ -160,12 +317,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                             input.accept = 'image/*';
                                             input.capture = 'environment';
                                             input.onchange = (e) =>
-                                                handleFileUpload(
+                                                handleFileSelect(
                                                     (e.target as HTMLInputElement).files,
                                                     MessageType.IMAGE
                                                 );
                                             input.click();
-                                            setShowDropdown(false);
                                         }}
                                     >
                                         <span>
@@ -183,12 +339,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                             input.accept = 'image/*';
                                             input.multiple = true;
                                             input.onchange = (e) =>
-                                                handleFileUpload(
+                                                handleFileSelect(
                                                     (e.target as HTMLInputElement).files,
                                                     MessageType.IMAGE
                                                 );
                                             input.click();
-                                            setShowDropdown(false);
                                         }}
                                     >
                                         <span>
@@ -205,12 +360,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                             input.type = 'file';
                                             input.accept = 'audio/*';
                                             input.onchange = (e) =>
-                                                handleFileUpload(
+                                                handleFileSelect(
                                                     (e.target as HTMLInputElement).files,
                                                     MessageType.AUDIO
                                                 );
                                             input.click();
-                                            setShowDropdown(false);
                                         }}
                                     >
                                         <span>
@@ -227,7 +381,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                 style={{ display: 'none' }}
                                 accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
                                 multiple
-                                onChange={(e) => handleFileUpload(e.target.files, MessageType.FILE)}
+                                onChange={(e) => handleFileSelect(e.target.files, MessageType.FILE)}
                             />
                         </div>
                     </div>
@@ -308,7 +462,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                 <input
                     type="text"
                     className="form-control chat_form"
-                    placeholder="Nhập tin nhắn của bạn..."
+                    placeholder={
+                        selectedFiles.length > 0
+                            ? `Thêm chú thích cho ${selectedFiles.length} file...`
+                            : 'Nhập tin nhắn của bạn...'
+                    }
                     value={message}
                     onChange={handleInputChange}
                 />
@@ -316,7 +474,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                     <button
                         className="btn send-btn"
                         type="submit"
-                        disabled={isSending || !activeConversation}
+                        disabled={
+                            isSending ||
+                            !activeConversation ||
+                            (message.trim().length === 0 && selectedFiles.length === 0)
+                        }
                     >
                         {isSending ? (
                             <div className="spinner-border spinner-border-sm" role="status">

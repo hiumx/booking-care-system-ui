@@ -22,11 +22,8 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
     useEffect(() => {
         if (!connection) return;
 
-        console.log('[useSharedChatHub] 📝 Registering event handlers');
-
         // Register event handlers using refs to get latest callbacks
         const receiveMessageHandler = (message: any) => {
-            console.log('[useSharedChatHub] 🔔 ReceiveMessage event:', message);
             callbacksRef.current?.onMessageReceived?.(message);
         };
 
@@ -47,17 +44,14 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
         };
 
         const userOnlineHandler = (userId: string) => {
-            console.log('[useSharedChatHub] 🟢 UserOnline event:', userId);
             callbacksRef.current?.onUserOnline?.(userId);
         };
 
         const userOfflineHandler = (userId: string) => {
-            console.log('[useSharedChatHub] 🔴 UserOffline event:', userId);
             callbacksRef.current?.onUserOffline?.(userId);
         };
 
         const onlineUsersHandler = (userIds: string[]) => {
-            console.log('[useSharedChatHub] 👥 OnlineUsers event:', userIds);
             callbacksRef.current?.onOnlineUsers?.(userIds);
         };
 
@@ -116,7 +110,6 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
             }
             try {
                 await connection.invoke('JoinConversation', conversationId);
-                console.log(`[useSharedChatHub] ✅ Joined conversation: ${conversationId}`);
             } catch (error) {
                 console.error('[useSharedChatHub] ❌ Error joining conversation:', error);
                 throw error;
@@ -132,7 +125,6 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
             }
             try {
                 await connection.invoke('LeaveConversation', conversationId);
-                console.log(`[useSharedChatHub] ✅ Left conversation: ${conversationId}`);
             } catch (error) {
                 console.error('[useSharedChatHub] ❌ Error leaving conversation:', error);
                 throw error;
@@ -187,9 +179,6 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
             }
             try {
                 await connection.invoke('MarkAllMessagesAsRead', conversationId);
-                console.log(
-                    `[useSharedChatHub] ✅ Marked all messages as read in: ${conversationId}`
-                );
             } catch (error: any) {
                 const errorMessage = error?.message || error?.toString() || '';
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, Fragment } from 'react';
 import { useSelector } from 'react-redux';
 import { useChat } from '@/providers/ChatProvider';
 import { RootState } from '@/store';
@@ -148,17 +148,6 @@ const MessageList = () => {
 
         const handleScroll = () => {
             const scrollTop = container.scrollTop;
-            const scrollHeight = container.scrollHeight;
-            const clientHeight = container.clientHeight;
-
-            // Debug log every scroll
-            console.log('[MessageList] 📜 Scroll event:', {
-                scrollTop,
-                scrollHeight,
-                clientHeight,
-                hasMore: hasMoreOldMessages,
-                isLoading: isLoadingMoreMessages,
-            });
 
             // Check if scrolled near the top (within 100px)
             if (scrollTop < 100 && hasMoreOldMessages && !isLoadingMoreMessages) {
@@ -201,32 +190,117 @@ const MessageList = () => {
         );
     }
 
-    // Transform MessageResponse to match MessageItem props
-    const transformedMessages = (messages || []).map((msg: MessageResponse) => ({
-        id: msg.id,
-        senderId: msg.senderId,
-        senderName: msg.senderInfo?.fullName || 'Unknown',
-        senderAvatar: msg.senderInfo?.avatarUrl || '/default-avatar.png',
-        content: msg.content,
-        timestamp: new Date(msg.createdAt).toLocaleTimeString('vi-VN', {
+    // Helper: Format timestamp smartly (like WhatsApp)
+    const formatMessageTimestamp = (createdAt: string): string => {
+        const messageDate = new Date(createdAt);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const lastWeek = new Date(today);
+        lastWeek.setDate(lastWeek.getDate() - 7);
+
+        const timeStr = messageDate.toLocaleTimeString('vi-VN', {
             hour: '2-digit',
             minute: '2-digit',
-        }),
-        // Convert type to string (backend sends enum number or string)
-        messageType: (typeof msg.type === 'string'
-            ? msg.type
-            : String(msg.type || 'Text')
-        ).toLowerCase() as any,
-        // Case-insensitive comparison for isOwn (senderId might be lowercase, currentUserId uppercase)
-        isOwn: msg.senderId?.toLowerCase() === currentUserId?.toLowerCase(),
-        isRead: msg.status === 'READ',
-        // Backend returns "url" but frontend expects "fileUrl"
-        // Filter out undefined values
-        attachments:
-            msg.attachments
-                ?.map((att: any) => att.url || att.fileUrl)
-                .filter((url: string | undefined) => !!url) || [],
-    }));
+        });
+
+        // Today: just time
+        if (messageDate >= today) {
+            return timeStr;
+        }
+
+        // Yesterday
+        if (messageDate >= yesterday) {
+            return `Hôm qua ${timeStr}`;
+        }
+
+        // This week: day name
+        if (messageDate >= lastWeek) {
+            const dayName = messageDate.toLocaleDateString('vi-VN', { weekday: 'long' });
+            return `${dayName} ${timeStr}`;
+        }
+
+        // Older: full date
+        const dateStr = messageDate.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+        return `${dateStr} ${timeStr}`;
+    };
+
+    // Transform MessageResponse to match MessageItem props
+    const transformedMessages = (messages || []).map((msg: MessageResponse) => {
+        const transformed = {
+            id: msg.id,
+            senderId: msg.senderId,
+            senderName: msg.senderInfo?.fullName || 'Unknown',
+            senderAvatar: msg.senderInfo?.avatarUrl || '/default-avatar.png',
+            content: msg.content,
+            timestamp: formatMessageTimestamp(msg.createdAt), // ✅ Smart formatting
+            // Convert type to string (backend sends enum number or string)
+            messageType: (() => {
+                if (typeof msg.type === 'string') {
+                    return msg.type.toLowerCase();
+                }
+
+                // Map MessageType enum NUMBER to string
+                const typeMap: { [key: number]: string } = {
+                    0: 'text', // Text
+                    1: 'image', // Image
+                    2: 'file', // File
+                    3: 'video', // Video
+                    4: 'audio', // Audio
+                    5: 'system', // System
+                    6: 'voice', // VoiceNote
+                    7: 'location', // Location
+                };
+
+                const typeNum =
+                    typeof msg.type === 'number' ? msg.type : parseInt(String(msg.type));
+                return typeMap[typeNum] || 'text';
+            })() as any,
+            // Case-insensitive comparison for isOwn (senderId might be lowercase, currentUserId uppercase)
+            isOwn: msg.senderId?.toLowerCase() === currentUserId?.toLowerCase(),
+            isRead: msg.status === 'READ',
+            // Pass full attachment info (url, name, size, mimeType) for proper file rendering
+            attachments: msg.attachments || [],
+        };
+
+        return transformed;
+    });
+
+    // Helper: Get date label for separator
+    const getDateLabel = (dateStr: string): string => {
+        const messageDate = new Date(dateStr);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        if (messageDate >= today) {
+            return 'Hôm nay';
+        }
+        if (messageDate >= yesterday) {
+            return 'Hôm qua';
+        }
+        return messageDate.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+    };
+
+    // Helper: Check if we need date separator
+    const needsDateSeparator = (currentMsg: any, previousMsg: any): boolean => {
+        if (!previousMsg) return true; // First message always needs separator
+
+        const currentDate = new Date(currentMsg.createdAt).toDateString();
+        const previousDate = new Date(previousMsg.createdAt).toDateString();
+
+        return currentDate !== previousDate;
+    };
 
     return (
         <div className="messages" ref={messagesContainerRef}>
@@ -240,9 +314,33 @@ const MessageList = () => {
                 </div>
             )}
 
-            {transformedMessages.map((message) => (
-                <MessageItem key={message.id} message={message} />
-            ))}
+            {transformedMessages.map((message, index) => {
+                // Find original message by ID (more reliable than index)
+                const currentOriginalMsg = messages.find((m) => m.id === message.id);
+                const previousTransformedMsg = index > 0 ? transformedMessages[index - 1] : null;
+                const previousOriginalMsg = previousTransformedMsg
+                    ? messages.find((m) => m.id === previousTransformedMsg.id)
+                    : null;
+
+                const showDateSeparator = needsDateSeparator(
+                    currentOriginalMsg,
+                    previousOriginalMsg
+                );
+
+                return (
+                    <Fragment key={message.id}>
+                        {/* Date Separator (like WhatsApp) */}
+                        {showDateSeparator && currentOriginalMsg && (
+                            <div className="text-center my-3">
+                                <span className="badge bg-light text-dark px-3 py-2 rounded-pill shadow-sm">
+                                    {getDateLabel(currentOriginalMsg.createdAt)}
+                                </span>
+                            </div>
+                        )}
+                        <MessageItem message={message} />
+                    </Fragment>
+                );
+            })}
 
             {/* Typing indicator */}
             {typingUser && (

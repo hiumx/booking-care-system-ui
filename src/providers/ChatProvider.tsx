@@ -4,6 +4,7 @@ import React, {
     useState,
     useCallback,
     useEffect,
+    useRef,
     ReactNode,
 } from 'react';
 import { useSelector } from 'react-redux';
@@ -78,6 +79,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
 
+    // ✅ Ref to track processing messages (prevent duplicates from multiple SignalR events)
+    const processingMessagesRef = useRef<Set<string>>(new Set());
+
     // Pagination state
     const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
     const [previousCursor, setPreviousCursor] = useState<string | undefined>(undefined);
@@ -132,8 +136,13 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     const hubCallbacks: ChatHubCallbacks = {
         onMessageReceived: useCallback(
             (message: SignalRMessageReceived) => {
-                console.log('[ChatProvider] 📨 ReceiveMessage event fired!');
-                console.log('[ChatProvider] Message received:', message);
+                // ✅ Check if already processing this message (backend sends to both conversation group + user group)
+                if (processingMessagesRef.current.has(message.messageId)) {
+                    return;
+                }
+
+                // Mark as processing
+                processingMessagesRef.current.add(message.messageId);
 
                 // Add message to messages list if it's for active conversation
                 if (activeConversation && message.conversationId === activeConversation.id) {
@@ -145,7 +154,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                         content: message.content,
                         type: message.type,
                         status: message.status,
-                        attachments: [],
+                        attachments: message.attachments || [], // ✅ Use attachments from SignalR
                         createdAt: message.createdAt,
                         updatedAt: message.createdAt,
                         senderInfo: getSenderInfo(message.senderId), // ✅ Add sender info
@@ -154,16 +163,18 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                     // Deduplicate: only add if message doesn't exist
                     setMessages((prev) => {
                         const exists = prev.some((m) => m.id === newMessage.id);
+
                         if (exists) {
-                            console.log(
-                                '[ChatProvider] ⚠️ Message already exists, skipping:',
-                                newMessage.id
-                            );
                             return prev;
                         }
-                        console.log('[ChatProvider] ✅ Adding new message to UI:', newMessage.id);
+
                         return [...prev, newMessage];
                     });
+
+                    // ✅ Cleanup processing flag after a short delay (allow state to update)
+                    setTimeout(() => {
+                        processingMessagesRef.current.delete(message.messageId);
+                    }, 1000); // 1 second should be enough for state to propagate
                 }
 
                 // Update conversation's last message
@@ -194,8 +205,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         ),
 
         onMessageRead: useCallback((data: SignalRMessageRead) => {
-            console.log('[ChatProvider] Message read:', data);
-
             // Update message status
             setMessages((prev) =>
                 prev.map((msg) =>
@@ -211,8 +220,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         }, []),
 
         onAllMessagesRead: useCallback((data: any) => {
-            console.log('[ChatProvider] All messages read:', data);
-
             // Reset unread count for conversation
             setConversations((prev) =>
                 prev.map((conv) =>
@@ -222,7 +229,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         }, []),
 
         onUserStartedTyping: useCallback((data: SignalRTypingEvent) => {
-            console.log('[ChatProvider] User started typing:', data);
             setTypingUsers((prev) => {
                 const newMap = new Map(prev);
                 newMap.set(data.conversationId, data.userId);
@@ -231,7 +237,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         }, []),
 
         onUserStoppedTyping: useCallback((data: SignalRTypingEvent) => {
-            console.log('[ChatProvider] User stopped typing:', data);
             setTypingUsers((prev) => {
                 const newMap = new Map(prev);
                 newMap.delete(data.conversationId);
@@ -240,14 +245,12 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         }, []),
 
         onOnlineUsers: useCallback((userIds: string[]) => {
-            console.log('[ChatProvider] 👥 Received online users list:', userIds);
             // Normalize to UPPERCASE for case-insensitive matching
             const normalizedIds = userIds.map((id) => id.toUpperCase());
             setOnlineUsers(new Set(normalizedIds));
         }, []),
 
         onUserOnline: useCallback((userId: string) => {
-            console.log('[ChatProvider] 🟢 User online:', userId);
             // Normalize to UPPERCASE for case-insensitive matching
             const normalizedId = userId.toUpperCase();
             setOnlineUsers((prev) => {
@@ -258,7 +261,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         }, []),
 
         onUserOffline: useCallback((userId: string) => {
-            console.log('[ChatProvider] 🔴 User offline:', userId);
             // Normalize to UPPERCASE for case-insensitive matching
             const normalizedId = userId.toUpperCase();
             setOnlineUsers((prev) => {
@@ -286,39 +288,19 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
     // Join conversation when selected
     useEffect(() => {
-        console.log('[ChatProvider] Join conversation effect triggered:', {
-            hasActiveConversation: !!activeConversation,
-            conversationId: activeConversation?.id,
-            isConnected: chatHub.isConnected,
-        });
-
         if (activeConversation && chatHub.isConnected) {
-            console.log(
-                '[ChatProvider] 🔗 Attempting to join conversation:',
-                activeConversation.id
-            );
             chatHub
                 .joinConversation(activeConversation.id)
-                .then(() => {
-                    console.log(
-                        '[ChatProvider] ✅ Successfully joined conversation:',
-                        activeConversation.id
-                    );
-                })
+                .then(() => {})
                 .catch((error) => {
                     console.error('[ChatProvider] ❌ Error joining conversation:', error);
                 });
 
             return () => {
-                console.log('[ChatProvider] 🔌 Leaving conversation:', activeConversation.id);
                 chatHub.leaveConversation(activeConversation.id).catch((error) => {
                     console.error('[ChatProvider] Error leaving conversation:', error);
                 });
             };
-        } else {
-            console.warn('[ChatProvider] ⚠️ Cannot join conversation:', {
-                reason: !activeConversation ? 'No active conversation' : 'SignalR not connected',
-            });
         }
     }, [activeConversation, chatHub]);
 
@@ -386,15 +368,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 setPreviousCursor(paginationData.previousCursor);
                 setHasMoreOldMessages(paginationData.hasNext);
                 setHasMoreNewMessages(paginationData.hasPrevious);
-
-                console.log('[ChatProvider] 📥 Loaded conversation:', {
-                    conversationId,
-                    messageCount: extractedMessages.length,
-                    hasMoreOld: paginationData.hasNext,
-                    hasMoreNew: paginationData.hasPrevious,
-                    nextCursor: paginationData.nextCursor,
-                    previousCursor: paginationData.previousCursor,
-                });
 
                 // Check if conversation has unread messages before calling mark-all-as-read
                 const conversation = conversations.find((conv) => conv.id === conversationId);
@@ -488,12 +461,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 // Load more older messages - prepend to the beginning
                 setMessages((prev) => {
                     const newMessages = [...extractedMessages, ...prev];
-                    console.log('[ChatProvider] ⬆️ Loaded older messages:', {
-                        count: extractedMessages.length,
-                        totalCount: newMessages.length,
-                        hasMore: paginationData.hasNext,
-                        nextCursor: paginationData.nextCursor,
-                    });
+
                     return newMessages;
                 });
             } else {
@@ -513,14 +481,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
     // Load more old messages (scroll up)
     const loadMoreOldMessages = useCallback(async () => {
-        console.log('[ChatProvider] 🔍 loadMoreOldMessages called:', {
-            hasConversation: !!activeConversation,
-            conversationId: activeConversation?.id,
-            hasMore: hasMoreOldMessages,
-            isLoading: isLoadingMoreMessages,
-            nextCursor: nextCursor,
-        });
-
         if (!activeConversation || !hasMoreOldMessages || isLoadingMoreMessages) {
             console.warn('[ChatProvider] ❌ Cannot load more old messages - condition failed');
             return;
@@ -531,10 +491,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
             return;
         }
 
-        console.log(
-            '[ChatProvider] ✅ Starting to load more old messages with cursor:',
-            nextCursor
-        );
         setIsLoadingMoreMessages(true);
         try {
             await loadMessages(activeConversation.id, nextCursor);
@@ -579,10 +535,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
             // Append newer messages to the end
             setMessages((prev) => [...prev, ...extractedMessages]);
-            console.log('[ChatProvider] ⬇️ Loaded newer messages:', {
-                count: extractedMessages.length,
-                hasMore: paginationData.hasPrevious,
-            });
         } catch (error) {
             console.error('[ChatProvider] Error loading newer messages:', error);
             toast.error('Không thể tải tin nhắn mới hơn');
@@ -599,27 +551,14 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 return;
             }
 
-            console.log('[ChatProvider] Sending message:', {
-                conversationId: activeConversation.id,
-                content: content.substring(0, 50),
-                type,
-                hasFiles: !!files,
-                isConnected: chatHub.isConnected,
-                userId,
-            });
-
             try {
                 // Try to send via SignalR first
                 if (chatHub.isConnected && type === MessageType.TEXT && !files) {
                     // Find receiver with case-insensitive comparison
-                    console.log('[ChatProvider] Finding receiver - userId:', userId);
-                    console.log('[ChatProvider] Participants:', activeConversation.participants);
 
                     const receiverId = activeConversation.participants.find(
                         (p) => p.toLowerCase() !== userId?.toLowerCase()
                     );
-
-                    console.log('[ChatProvider] Sending via SignalR to receiver:', receiverId);
 
                     if (!receiverId) {
                         console.warn('[ChatProvider] ⚠️ No receiver found! Self-conversation?');
@@ -630,8 +569,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                         content,
                         receiverId,
                     });
-
-                    console.log('[ChatProvider] ✅ Message sent successfully via SignalR');
                 } else {
                     // Fall back to REST API for files or if SignalR is not connected
                     console.log('[ChatProvider] Using REST API fallback');
@@ -672,13 +609,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                         type,
                     });
                 }
-
-                // Add message to local state with senderInfo
-                const messageWithSenderInfo = {
-                    ...response.data,
-                    senderInfo: response.data.senderInfo || getSenderInfo(response.data.senderId),
-                };
-                setMessages((prev) => [...prev, messageWithSenderInfo]);
+                console.log('[ChatProvider] Response:', response);
+                // ✅ Don't add to state here - let SignalR handle it to avoid duplicates
+                // Backend will broadcast via SignalR, which will add the message via onMessageReceived
             } catch (error) {
                 console.error('[ChatProvider] Error sending message via REST:', error);
                 throw error;

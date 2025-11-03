@@ -187,6 +187,7 @@ export interface SignalRMessageReceived {
     type: MessageType;
     createdAt: string;
     status: MessageStatus;
+    attachments?: MessageAttachment[]; // ✅ Support file attachments
 }
 
 export interface SignalRMessageRead {
