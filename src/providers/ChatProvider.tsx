@@ -9,7 +9,8 @@ import React, {
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { RootState } from '@/store';
-import { useChatHub, ChatHubCallbacks } from '@/hooks/useChatHub';
+import { useSharedChatHub } from '@/hooks/useSharedChatHub';
+import { ChatHubCallbacks } from '@/hooks/useChatHub';
 import { ChatService } from '@/services/chat.service';
 import {
     ConversationResponse,
@@ -30,6 +31,11 @@ interface ChatContextValue {
     isLoading: boolean;
     isLoadingMessages: boolean;
 
+    // Pagination state
+    hasMoreOldMessages: boolean;
+    hasMoreNewMessages: boolean;
+    isLoadingMoreMessages: boolean;
+
     // Conversation methods
     loadConversations: () => Promise<void>;
     selectConversation: (conversationId: string) => Promise<void>;
@@ -39,6 +45,8 @@ interface ChatContextValue {
     sendMessage: (content: string, type?: MessageType, files?: File[]) => Promise<void>;
     sendMessageViaREST: (content: string, type?: MessageType, files?: File[]) => Promise<void>;
     loadMessages: (conversationId: string, before?: string) => Promise<void>;
+    loadMoreOldMessages: () => Promise<void>; // Load older messages (scroll up)
+    loadMoreNewMessages: () => Promise<void>; // Load newer messages (scroll down)
     markAsRead: (messageId: string) => Promise<void>;
     markAllAsRead: (conversationId: string) => Promise<void>;
 
@@ -59,7 +67,6 @@ interface ChatProviderProps {
 export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     // Get user info from Redux
     const userProfile = useSelector((state: RootState) => state.user.profile);
-    const accessToken = useSelector((state: RootState) => state.auth.accessToken);
     const userId = userProfile?.accountId || '';
 
     // State
@@ -70,6 +77,13 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     const [typingUsers, setTypingUsers] = useState<Map<string, string>>(new Map());
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+
+    // Pagination state
+    const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+    const [previousCursor, setPreviousCursor] = useState<string | undefined>(undefined);
+    const [hasMoreOldMessages, setHasMoreOldMessages] = useState(false);
+    const [hasMoreNewMessages, setHasMoreNewMessages] = useState(false);
+    const [isLoadingMoreMessages, setIsLoadingMoreMessages] = useState(false);
 
     // Helper function to get sender info for a message
     const getSenderInfo = useCallback(
@@ -173,10 +187,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                     )
                 );
 
-                // Show toast notification if message is not from current user
-                if (message.senderId !== userId) {
-                    toast.info('Bạn có tin nhắn mới!');
-                }
+                // Don't show toast here - GlobalChatProvider handles notifications
+                // and message is already visible in the chat interface
             },
             [activeConversation, userId, getSenderInfo]
         ),
@@ -227,16 +239,31 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
             });
         }, []),
 
+        onOnlineUsers: useCallback((userIds: string[]) => {
+            console.log('[ChatProvider] 👥 Received online users list:', userIds);
+            // Normalize to UPPERCASE for case-insensitive matching
+            const normalizedIds = userIds.map((id) => id.toUpperCase());
+            setOnlineUsers(new Set(normalizedIds));
+        }, []),
+
         onUserOnline: useCallback((userId: string) => {
-            console.log('[ChatProvider] User online:', userId);
-            setOnlineUsers((prev) => new Set(prev).add(userId));
+            console.log('[ChatProvider] 🟢 User online:', userId);
+            // Normalize to UPPERCASE for case-insensitive matching
+            const normalizedId = userId.toUpperCase();
+            setOnlineUsers((prev) => {
+                const newSet = new Set(prev);
+                newSet.add(normalizedId);
+                return newSet;
+            });
         }, []),
 
         onUserOffline: useCallback((userId: string) => {
-            console.log('[ChatProvider] User offline:', userId);
+            console.log('[ChatProvider] 🔴 User offline:', userId);
+            // Normalize to UPPERCASE for case-insensitive matching
+            const normalizedId = userId.toUpperCase();
             setOnlineUsers((prev) => {
                 const newSet = new Set(prev);
-                newSet.delete(userId);
+                newSet.delete(normalizedId);
                 return newSet;
             });
         }, []),
@@ -247,8 +274,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         }, []),
     };
 
-    // Initialize SignalR hub
-    const chatHub = useChatHub(accessToken, hubCallbacks);
+    // Use shared SignalR hub connection (from ChatHubContext)
+    const chatHub = useSharedChatHub(hubCallbacks);
 
     // Load conversations on mount
     useEffect(() => {
@@ -307,10 +334,13 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 includeUnreadCount: true,
                 includeOnlineStatus: true,
             });
-            setConversations(response.data.data);
+            // Conversations API uses 'data' not 'items' (different from messages API)
+            setConversations(response.data.data || []);
         } catch (error) {
             console.error('[ChatProvider] Error loading conversations:', error);
             toast.error('Không thể tải danh sách hội thoại');
+            // Set empty array on error to prevent undefined
+            setConversations([]);
         } finally {
             setIsLoading(false);
         }
@@ -319,28 +349,52 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     const selectConversation = useCallback(
         async (conversationId: string) => {
             setIsLoadingMessages(true);
+
+            // Reset pagination state when selecting new conversation
+            setMessages([]);
+            setNextCursor(undefined);
+            setPreviousCursor(undefined);
+            setHasMoreOldMessages(false);
+            setHasMoreNewMessages(false);
+
             try {
                 // Load conversation details
                 const convResponse = await ChatService.getConversation(conversationId);
                 setActiveConversation(convResponse.data);
 
-                // Load messages (mixed timeline includes both messages and call logs)
+                // Load messages with cursor pagination
                 const messagesResponse = await ChatService.getMessages(conversationId, {
                     limit: 50,
+                    messagesOnly: true,
                     includeSenderInfo: true,
+                    includeReceiverInfo: true,
                 });
 
-                // Extract messages from mixed timeline items
-                // Backend returns { items: [{ itemType: "Message", message: {...} }] }
-                // Backend sorts by descending (newest first), but UI needs ascending (oldest first)
-                const responseData = messagesResponse.data as any;
-                const timelineItems = responseData.items || responseData.data || [];
-                const extractedMessages = timelineItems
-                    .filter((item: any) => item.itemType === 'Message' && item.message)
-                    .map((item: any) => item.message)
-                    .reverse(); // Reverse to show oldest first, newest last
+                // Extract messages and pagination metadata
+                const paginationData = messagesResponse.data;
+                const timelineItems = paginationData.items || []; // ← FIX: Use .items not .data
+                const extractedMessages = Array.isArray(timelineItems)
+                    ? timelineItems
+                          .filter((item: any) => !item.itemType || item.itemType === 'Message')
+                          .map((item: any) => item.message || item)
+                          .reverse() // Reverse to show oldest first, newest last
+                    : [];
 
+                // Update messages and pagination state
                 setMessages(extractedMessages);
+                setNextCursor(paginationData.nextCursor);
+                setPreviousCursor(paginationData.previousCursor);
+                setHasMoreOldMessages(paginationData.hasNext);
+                setHasMoreNewMessages(paginationData.hasPrevious);
+
+                console.log('[ChatProvider] 📥 Loaded conversation:', {
+                    conversationId,
+                    messageCount: extractedMessages.length,
+                    hasMoreOld: paginationData.hasNext,
+                    hasMoreNew: paginationData.hasPrevious,
+                    nextCursor: paginationData.nextCursor,
+                    previousCursor: paginationData.previousCursor,
+                });
 
                 // Check if conversation has unread messages before calling mark-all-as-read
                 const conversation = conversations.find((conv) => conv.id === conversationId);
@@ -411,10 +465,12 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 includeReceiverInfo: true,
             });
 
-            // Extract messages (handle both direct array and items structure)
+            // Response is CursorPaginationResponse with pagination metadata
+            const paginationData = response.data;
+            const timelineItems = paginationData.items || []; // ← FIX: Use .items not .data
+
+            // Extract messages from timeline items
             // Backend sorts by descending (newest first), but UI needs ascending (oldest first)
-            const responseData = response.data as any;
-            const timelineItems = responseData.items || responseData.data || [];
             const extractedMessages = Array.isArray(timelineItems)
                 ? timelineItems
                       .filter((item: any) => !item.itemType || item.itemType === 'Message')
@@ -422,18 +478,118 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                       .reverse() // Reverse to show oldest first, newest last
                 : [];
 
+            // Update pagination state
+            setNextCursor(paginationData.nextCursor);
+            setPreviousCursor(paginationData.previousCursor);
+            setHasMoreOldMessages(paginationData.hasNext);
+            setHasMoreNewMessages(paginationData.hasPrevious);
+
             if (before) {
                 // Load more older messages - prepend to the beginning
-                setMessages((prev) => [...extractedMessages, ...prev]);
+                setMessages((prev) => {
+                    const newMessages = [...extractedMessages, ...prev];
+                    console.log('[ChatProvider] ⬆️ Loaded older messages:', {
+                        count: extractedMessages.length,
+                        totalCount: newMessages.length,
+                        hasMore: paginationData.hasNext,
+                        nextCursor: paginationData.nextCursor,
+                    });
+                    return newMessages;
+                });
             } else {
                 // Initial load
                 setMessages(extractedMessages);
+                console.log('[ChatProvider] 📥 Initial load:', {
+                    count: extractedMessages.length,
+                    hasMore: paginationData.hasNext,
+                    nextCursor: paginationData.nextCursor,
+                });
             }
         } catch (error) {
             console.error('[ChatProvider] Error loading messages:', error);
             toast.error('Không thể tải tin nhắn');
         }
     }, []);
+
+    // Load more old messages (scroll up)
+    const loadMoreOldMessages = useCallback(async () => {
+        console.log('[ChatProvider] 🔍 loadMoreOldMessages called:', {
+            hasConversation: !!activeConversation,
+            conversationId: activeConversation?.id,
+            hasMore: hasMoreOldMessages,
+            isLoading: isLoadingMoreMessages,
+            nextCursor: nextCursor,
+        });
+
+        if (!activeConversation || !hasMoreOldMessages || isLoadingMoreMessages) {
+            console.warn('[ChatProvider] ❌ Cannot load more old messages - condition failed');
+            return;
+        }
+
+        if (!nextCursor) {
+            console.warn('[ChatProvider] ❌ No nextCursor available');
+            return;
+        }
+
+        console.log(
+            '[ChatProvider] ✅ Starting to load more old messages with cursor:',
+            nextCursor
+        );
+        setIsLoadingMoreMessages(true);
+        try {
+            await loadMessages(activeConversation.id, nextCursor);
+        } finally {
+            setIsLoadingMoreMessages(false);
+        }
+    }, [activeConversation, hasMoreOldMessages, isLoadingMoreMessages, nextCursor, loadMessages]);
+
+    // Load more new messages (scroll down - less common, usually get via real-time)
+    const loadMoreNewMessages = useCallback(async () => {
+        if (!activeConversation || !hasMoreNewMessages || isLoadingMoreMessages) {
+            return;
+        }
+
+        if (!previousCursor) {
+            console.warn('[ChatProvider] No previousCursor available');
+            return;
+        }
+
+        setIsLoadingMoreMessages(true);
+        try {
+            const response = await ChatService.getMessages(activeConversation.id, {
+                limit: 50,
+                after: previousCursor, // Use 'after' to load newer messages
+                messagesOnly: true,
+                includeSenderInfo: true,
+                includeReceiverInfo: true,
+            });
+
+            const paginationData = response.data;
+            const timelineItems = paginationData.items || []; // ← FIX: Use .items not .data
+            const extractedMessages = Array.isArray(timelineItems)
+                ? timelineItems
+                      .filter((item: any) => !item.itemType || item.itemType === 'Message')
+                      .map((item: any) => item.message || item)
+                      .reverse()
+                : [];
+
+            // Update pagination state
+            setPreviousCursor(paginationData.previousCursor);
+            setHasMoreNewMessages(paginationData.hasPrevious);
+
+            // Append newer messages to the end
+            setMessages((prev) => [...prev, ...extractedMessages]);
+            console.log('[ChatProvider] ⬇️ Loaded newer messages:', {
+                count: extractedMessages.length,
+                hasMore: paginationData.hasPrevious,
+            });
+        } catch (error) {
+            console.error('[ChatProvider] Error loading newer messages:', error);
+            toast.error('Không thể tải tin nhắn mới hơn');
+        } finally {
+            setIsLoadingMoreMessages(false);
+        }
+    }, [activeConversation, hasMoreNewMessages, isLoadingMoreMessages, previousCursor]);
 
     const sendMessage = useCallback(
         async (content: string, type: MessageType = MessageType.TEXT, files?: File[]) => {
@@ -601,12 +757,17 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         typingUsers,
         isLoading,
         isLoadingMessages,
+        hasMoreOldMessages,
+        hasMoreNewMessages,
+        isLoadingMoreMessages,
         loadConversations,
         selectConversation,
         createOrGetConversation,
         sendMessage,
         sendMessageViaREST,
         loadMessages,
+        loadMoreOldMessages,
+        loadMoreNewMessages,
         markAsRead,
         markAllAsRead,
         startTyping,

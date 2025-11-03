@@ -19,9 +19,12 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
 
     // Filter and transform conversations
     const filteredConversations = useMemo(() => {
-        if (!searchTerm) return conversations;
+        // Ensure conversations is always an array
+        const convs = conversations || [];
 
-        return conversations.filter((conv) => {
+        if (!searchTerm) return convs;
+
+        return convs.filter((conv) => {
             // Search in participant names or last message
             const participantName = conv.participantDetails
                 ?.filter((p) => (p.id || p.accountId || '').toUpperCase() !== currentUserId)
@@ -36,7 +39,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
         });
     }, [conversations, searchTerm, currentUserId]);
 
-    const recentContacts = filteredConversations;
+    const recentContacts = filteredConversations || []; // Ensure always array
 
     // Get other participant info
     const getOtherParticipant = (conv: ConversationResponse) => {

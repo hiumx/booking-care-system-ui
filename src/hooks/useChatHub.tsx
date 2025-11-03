@@ -19,6 +19,7 @@ export interface ChatHubCallbacks {
     onUserStoppedTyping?: (data: SignalRTypingEvent) => void;
     onUserOnline?: (userId: string) => void;
     onUserOffline?: (userId: string) => void;
+    onOnlineUsers?: (userIds: string[]) => void; // Receive initial list of online users
     onJoinedConversation?: (conversationId: string) => void;
     onLeftConversation?: (conversationId: string) => void;
     onError?: (error: string) => void;

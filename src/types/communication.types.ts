@@ -206,14 +206,63 @@ export interface SignalRTypingEvent {
     conversationId: string;
 }
 
-// Pagination Response
-export interface CursorPaginationResponse<T> {
-    data: T[];
+// Pagination Response for Mixed Timeline (Messages)
+export interface MixedTimelinePaginationResponse<T> {
+    items: T[]; // Backend returns 'items' for timeline items
+    nextCursor?: string;
+    previousCursor?: string;
+    hasNext: boolean;
+    hasPrevious: boolean;
+    count?: number;
+    limit: number;
+    enrichmentInfo?: {
+        senderInfoLoaded: boolean;
+        receiverInfoLoaded: boolean;
+        onlineStatusLoaded: boolean;
+        totalUsersEnriched: number;
+        messagesWithSenderInfo: number;
+        messagesWithReceiverInfo: number;
+    };
+}
+
+// Pagination Response for Conversations
+export interface ConversationPaginationResponse<T> {
+    data: T[]; // Backend returns 'data' for conversations
     nextCursor?: string;
     previousCursor?: string;
     hasNext: boolean;
     hasPrevious: boolean;
     limit: number;
+    enrichmentInfo?: {
+        participantDetailsLoaded: boolean;
+        unreadCountLoaded: boolean;
+        metadataLoaded: boolean;
+        onlineStatusLoaded: boolean;
+        totalConversations: number;
+        optimizationMode: string;
+        totalOriginalParticipants: number;
+        totalOtherParticipantsEnriched: number;
+        conversationsWithOtherParticipants: number;
+        performanceBenefit?: {
+            participantsSkipped: number;
+            cacheCallsOptimized: boolean;
+            networkCallsReduced: boolean;
+        };
+        totalParticipantsEnriched: number;
+    };
+}
+
+// Generic Pagination Response (for backward compatibility)
+export interface CursorPaginationResponse<T> {
+    items?: T[]; // For mixed timeline
+    data?: T[]; // For conversations
+    nextCursor?: string;
+    previousCursor?: string;
+    hasNext: boolean;
+    hasPrevious: boolean;
+    count?: number;
+    limit: number;
+    enrichmentInfo?: any;
 }
 
 // API Response Wrapper

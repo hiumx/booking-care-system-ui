@@ -6,12 +6,23 @@ import { MessageResponse } from '@/types/communication.types';
 import MessageItem from './MessageItem';
 
 const MessageList = () => {
-    const { messages, activeConversation, isLoadingMessages, typingUsers } = useChat();
+    const {
+        messages,
+        activeConversation,
+        isLoadingMessages,
+        typingUsers,
+        loadMoreOldMessages,
+        hasMoreOldMessages,
+        isLoadingMoreMessages,
+    } = useChat();
     const userProfile = useSelector((state: RootState) => state.user.profile);
     // Backend uses uppercase accountId, normalize for comparison
     const currentUserId = (userProfile?.accountId || userProfile?.id || '').toUpperCase();
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
     const prevMessagesLengthRef = useRef<number>(0);
+    const prevScrollHeightRef = useRef<number>(0);
+    const isLoadingOldMessagesRef = useRef<boolean>(false);
 
     // Scroll to bottom helper function
     const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
@@ -35,9 +46,13 @@ const MessageList = () => {
             if (prevLength === 0) {
                 // Initial load - scroll instantly to bottom
                 setTimeout(() => scrollToBottom('auto'), 100);
-            } else if (currentLength > prevLength) {
-                // New message arrived - smooth scroll
+            } else if (currentLength > prevLength && !isLoadingOldMessagesRef.current) {
+                // New message arrived (NOT from loading old messages) - smooth scroll
+                // Use ref instead of state to avoid race conditions
+                console.log('[MessageList] 📥 New message detected, scrolling to bottom');
                 scrollToBottom('smooth');
+            } else if (isLoadingOldMessagesRef.current) {
+                console.log('[MessageList] 🚫 Skipping auto-scroll (loading old messages)');
             }
         }
 
@@ -52,6 +67,112 @@ const MessageList = () => {
             scrollToBottom('smooth');
         }
     }, [typingUsers, activeConversation]);
+
+    // Helper to get scrollable container (chat-messages-scroll)
+    const getScrollContainer = () => {
+        // DOM structure: chat-messages-scroll > chat-body > messages
+        // messagesContainerRef.current is "messages"
+        // Need to go up 2 levels to get "chat-messages-scroll"
+        const messagesDiv = messagesContainerRef.current;
+        const chatBody = messagesDiv?.parentElement; // chat-body
+        const scrollContainer = chatBody?.parentElement; // chat-messages-scroll
+
+        if (!scrollContainer) {
+            console.warn('[MessageList] Could not find scroll container');
+            return null;
+        }
+
+        console.log('[MessageList] 🔍 Scroll container found:', {
+            className: scrollContainer.className,
+            scrollHeight: scrollContainer.scrollHeight,
+            clientHeight: scrollContainer.clientHeight,
+            scrollTop: scrollContainer.scrollTop,
+        });
+
+        return scrollContainer;
+    };
+
+    // Preserve scroll position when loading more old messages
+    useEffect(() => {
+        if (isLoadingMoreMessages) {
+            // Mark that we're loading old messages (prevents auto-scroll)
+            isLoadingOldMessagesRef.current = true;
+
+            // Store current scroll height before new messages are added
+            const container = getScrollContainer();
+            if (container) {
+                prevScrollHeightRef.current = container.scrollHeight;
+                console.log('[MessageList] 📏 Stored scroll height:', container.scrollHeight);
+            }
+        } else if (prevScrollHeightRef.current > 0) {
+            // After messages are loaded, restore scroll position
+            // Use setTimeout to ensure DOM is fully updated with new messages
+            setTimeout(() => {
+                const container = getScrollContainer();
+                if (container) {
+                    const heightDiff = container.scrollHeight - prevScrollHeightRef.current;
+                    if (heightDiff > 0) {
+                        // Scroll down by the amount of new content added
+                        container.scrollTop = heightDiff;
+                        console.log('[MessageList] ✅ Restored scroll position:', {
+                            oldHeight: prevScrollHeightRef.current,
+                            newHeight: container.scrollHeight,
+                            heightDiff,
+                            newScrollTop: container.scrollTop,
+                        });
+                    } else {
+                        console.warn('[MessageList] ⚠️ No height difference detected:', {
+                            oldHeight: prevScrollHeightRef.current,
+                            newHeight: container.scrollHeight,
+                        });
+                    }
+                    prevScrollHeightRef.current = 0;
+                }
+
+                // Reset flag after restoring scroll position
+                isLoadingOldMessagesRef.current = false;
+                console.log('[MessageList] ✅ Reset loading flag, auto-scroll re-enabled');
+            }, 150); // Wait slightly longer than auto-scroll effect (100ms)
+        }
+    }, [isLoadingMoreMessages]);
+
+    // Infinite scroll: Load more old messages when scrolling to top
+    useEffect(() => {
+        const container = getScrollContainer();
+        if (!container) {
+            console.warn('[MessageList] ⚠️ No scroll container, infinite scroll disabled');
+            return;
+        }
+
+        console.log('[MessageList] ✅ Infinite scroll enabled on:', container.className);
+
+        const handleScroll = () => {
+            const scrollTop = container.scrollTop;
+            const scrollHeight = container.scrollHeight;
+            const clientHeight = container.clientHeight;
+
+            // Debug log every scroll
+            console.log('[MessageList] 📜 Scroll event:', {
+                scrollTop,
+                scrollHeight,
+                clientHeight,
+                hasMore: hasMoreOldMessages,
+                isLoading: isLoadingMoreMessages,
+            });
+
+            // Check if scrolled near the top (within 100px)
+            if (scrollTop < 100 && hasMoreOldMessages && !isLoadingMoreMessages) {
+                console.log('[MessageList] 🚀 TRIGGERING load more old messages!');
+                loadMoreOldMessages();
+            }
+        };
+
+        container.addEventListener('scroll', handleScroll);
+        return () => {
+            console.log('[MessageList] 🧹 Cleaning up scroll listener');
+            container.removeEventListener('scroll', handleScroll);
+        };
+    }, [hasMoreOldMessages, isLoadingMoreMessages, loadMoreOldMessages]);
 
     // Get typing user info
     const typingUserId = activeConversation ? typingUsers.get(activeConversation.id) : null;
@@ -108,7 +229,17 @@ const MessageList = () => {
     }));
 
     return (
-        <div className="messages">
+        <div className="messages" ref={messagesContainerRef}>
+            {/* Loading indicator for old messages */}
+            {isLoadingMoreMessages && (
+                <div className="text-center py-2">
+                    <div className="spinner-border spinner-border-sm" role="status">
+                        <span className="visually-hidden">Đang tải tin nhắn cũ...</span>
+                    </div>
+                    <p className="text-muted small mt-1">Đang tải tin nhắn cũ...</p>
+                </div>
+            )}
+
             {transformedMessages.map((message) => (
                 <MessageItem key={message.id} message={message} />
             ))}
