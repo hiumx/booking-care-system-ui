@@ -120,10 +120,10 @@ const HospitalList: React.FC = () => {
         console.log('Area selected:', { areaDisplay, locationId, provinceId });
 
         // Parse area info from the display string and locationId
-        let newProvinceId = '';
-        let newDistrictId = '';
-        let newProvinceName = '';
-        let newDistrictName = '';
+        let newProvinceId: string;
+        let newDistrictId: string;
+        let newProvinceName: string;
+        let newDistrictName: string;
 
         if (areaDisplay.includes(' - ')) {
             // District selected: locationId is districtId, provinceId is provided

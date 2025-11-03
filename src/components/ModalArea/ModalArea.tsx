@@ -181,11 +181,12 @@ const ModalArea: React.FC<ModalAreaProps> = ({
 
     if (isLoading) {
         return ReactDOM.createPortal(
-            <div className={styles.modalOverlay}>
-                <div className={styles.modalContent}>
+            <>
+                <div className={styles.modalOverlay} aria-hidden="true" />
+                <dialog className={styles.modalContent} aria-modal="true">
                     <div className={styles.loading}>Đang tải...</div>
-                </div>
-            </div>,
+                </dialog>
+            </>,
             document.body
         );
     }
@@ -312,26 +313,14 @@ const ModalArea: React.FC<ModalAreaProps> = ({
     };
 
     return ReactDOM.createPortal(
-        <div
-            className={styles.modalOverlay}
-            onClick={(e) => {
-                if (e.target === e.currentTarget) onClose();
-            }}
-            onKeyDown={(e) => {
-                // Prevent space and enter from triggering overlay actions
-                if (e.key === ' ' || e.key === 'Enter') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                // Only close on Escape key
-                if (e.key === 'Escape') {
-                    onClose();
-                }
-            }}
-            aria-label="Đóng modal"
-            role="dialog"
-            tabIndex={-1}
-        >
+        <>
+            <div
+                className={styles.modalOverlay}
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) onClose();
+                }}
+                aria-hidden="true"
+            />
             <dialog
                 className={styles.modalContent}
                 onClose={onClose}
@@ -381,10 +370,6 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                             onKeyDown={handleSearchKeyDown}
                             onKeyUp={(e) => {
                                 // Stop propagation for all keys to prevent any unwanted behavior
-                                e.stopPropagation();
-                            }}
-                            onKeyPress={(e) => {
-                                // Stop propagation for all keypress events
                                 e.stopPropagation();
                             }}
                             onClick={(e) => {
@@ -445,7 +430,7 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                     </div>
                 )}
             </dialog>
-        </div>,
+        </>,
         document.body
     );
 };

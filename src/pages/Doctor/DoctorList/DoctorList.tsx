@@ -72,9 +72,9 @@ const DoctorList: React.FC = () => {
 
     const [sortOption, setSortOption] = useState('');
     const [currentPage, setCurrentPage] = useState(
-        pageNumberFromUrl ? parseInt(pageNumberFromUrl, 10) : 1
+        pageNumberFromUrl ? Number.parseInt(pageNumberFromUrl, 10) : 1
     );
-    const pageSize = pageSizeFromUrl ? parseInt(pageSizeFromUrl, 10) : 10;
+    const pageSize = pageSizeFromUrl ? Number.parseInt(pageSizeFromUrl, 10) : 10;
     const [searchTerm, setSearchTerm] = useState(searchFromUrl || '');
     const [specialtyFilter, setSpecialtyFilter] = useState('');
     const [specialtyFilters, setSpecialtyFilters] = useState<string[]>([]);
@@ -156,93 +156,101 @@ const DoctorList: React.FC = () => {
         };
     }, [searchTerm]);
 
+    // Helper functions to initialize filters from URL
+    const initializeBasicFilters = () => {
+        if (hospitalIdFromUrl) {
+            setHospitalFilters([hospitalIdFromUrl]);
+        }
+        if (specialtyIdFromUrl) {
+            setSpecialtyFilters([specialtyIdFromUrl]);
+        }
+    };
+
+    const initializeServiceTypeFilter = () => {
+        if (serviceTypeFromUrl && serviceTypes.length > 0) {
+            const serviceType = serviceTypes.find((st) => st.id === serviceTypeFromUrl);
+            console.log('🔍 Service Type Filter Debug:', {
+                serviceTypeFromUrl,
+                serviceTypes,
+                foundServiceType: serviceType,
+                willSetFilters: serviceType ? [serviceType.name] : 'NOT FOUND',
+            });
+            if (serviceType) {
+                setServiceTypeFilters([serviceType.name]);
+            }
+        }
+    };
+
+    const initializeRatingFilter = () => {
+        if (ratingFromUrl) {
+            const rating = Number.parseInt(ratingFromUrl, 10);
+            if (!Number.isNaN(rating) && rating >= 1 && rating <= 5) {
+                setRatingFilter(rating);
+            }
+        }
+    };
+
+    const initializeRangeFilter = () => {
+        if (positionIdsFromUrl && positionIdsFromUrl.length > 0) {
+            setPositionFilters(positionIdsFromUrl);
+        }
+
+        if (priceMinFromUrl || priceMaxFromUrl) {
+            const min = priceMinFromUrl ? Number.parseFloat(priceMinFromUrl) : 0;
+            const max = priceMaxFromUrl
+                ? Number.parseFloat(priceMaxFromUrl)
+                : Number.MAX_SAFE_INTEGER;
+            if (!Number.isNaN(min) && !Number.isNaN(max)) {
+                setPriceFilter({ min, max });
+            }
+        }
+
+        if (experienceMinFromUrl || experienceMaxFromUrl) {
+            const min = experienceMinFromUrl ? Number.parseInt(experienceMinFromUrl, 10) : 0;
+            const max = experienceMaxFromUrl
+                ? Number.parseInt(experienceMaxFromUrl, 10)
+                : Number.MAX_SAFE_INTEGER;
+            if (!Number.isNaN(min) && !Number.isNaN(max)) {
+                setExperienceFilter({ min, max });
+            }
+        }
+    };
+
+    const initializeLanguageFilter = () => {
+        if (languageIdsFromUrl && languageIdsFromUrl.length > 0 && languages.length > 0) {
+            const languageNames = languageIdsFromUrl
+                .map((id) => {
+                    const language = languages.find((lang) => lang.id === id);
+                    return language ? language.name : null;
+                })
+                .filter((name): name is string => name !== null);
+
+            if (languageNames.length > 0) {
+                setLanguageFilters(languageNames);
+            }
+        }
+    };
+
+    const initializeAreaFilter = () => {
+        if (provinceIdFromUrl || districtIdFromUrl || provinceNameFromUrl || districtNameFromUrl) {
+            setAreaFilter({
+                provinceId: provinceIdFromUrl || undefined,
+                districtId: districtIdFromUrl || undefined,
+                provinceName: provinceNameFromUrl || undefined,
+                districtName: districtNameFromUrl || undefined,
+            });
+        }
+    };
+
     // Initialize all filters from URL params - ONLY ONCE
     useEffect(() => {
         if (!hasInitializedUrlFilters.current) {
-            // Hospital and Specialty filters (works for both reschedule and normal flow)
-            if (hospitalIdFromUrl) {
-                setHospitalFilters([hospitalIdFromUrl]);
-            }
-            if (specialtyIdFromUrl) {
-                setSpecialtyFilters([specialtyIdFromUrl]);
-            }
-
-            // Service type filter from URL
-            if (serviceTypeFromUrl && serviceTypes.length > 0) {
-                const serviceType = serviceTypes.find((st) => st.id === serviceTypeFromUrl);
-                console.log('🔍 Service Type Filter Debug:', {
-                    serviceTypeFromUrl,
-                    serviceTypes,
-                    foundServiceType: serviceType,
-                    willSetFilters: serviceType ? [serviceType.name] : 'NOT FOUND',
-                });
-                if (serviceType) {
-                    setServiceTypeFilters([serviceType.name]);
-                }
-            }
-
-            // Rating filter from URL
-            if (ratingFromUrl) {
-                const rating = parseInt(ratingFromUrl, 10);
-                if (!isNaN(rating) && rating >= 1 && rating <= 5) {
-                    setRatingFilter(rating);
-                }
-            }
-
-            // Position filter from URL (support multiple)
-            if (positionIdsFromUrl && positionIdsFromUrl.length > 0) {
-                setPositionFilters(positionIdsFromUrl);
-            }
-
-            // Price filter from URL
-            if (priceMinFromUrl || priceMaxFromUrl) {
-                const min = priceMinFromUrl ? parseFloat(priceMinFromUrl) : 0;
-                const max = priceMaxFromUrl ? parseFloat(priceMaxFromUrl) : Number.MAX_SAFE_INTEGER;
-                if (!isNaN(min) && !isNaN(max)) {
-                    setPriceFilter({ min, max });
-                }
-            }
-
-            // Experience filter from URL
-            if (experienceMinFromUrl || experienceMaxFromUrl) {
-                const min = experienceMinFromUrl ? parseInt(experienceMinFromUrl, 10) : 0;
-                const max = experienceMaxFromUrl
-                    ? parseInt(experienceMaxFromUrl, 10)
-                    : Number.MAX_SAFE_INTEGER;
-                if (!isNaN(min) && !isNaN(max)) {
-                    setExperienceFilter({ min, max });
-                }
-            }
-
-            // Language filter from URL (support multiple)
-            if (languageIdsFromUrl && languageIdsFromUrl.length > 0 && languages.length > 0) {
-                const languageNames = languageIdsFromUrl
-                    .map((id) => {
-                        const language = languages.find((lang) => lang.id === id);
-                        return language ? language.name : null;
-                    })
-                    .filter((name): name is string => name !== null);
-
-                if (languageNames.length > 0) {
-                    setLanguageFilters(languageNames);
-                }
-            }
-
-            // Area filter from URL
-            if (
-                provinceIdFromUrl ||
-                districtIdFromUrl ||
-                provinceNameFromUrl ||
-                districtNameFromUrl
-            ) {
-                setAreaFilter({
-                    provinceId: provinceIdFromUrl || undefined,
-                    districtId: districtIdFromUrl || undefined,
-                    provinceName: provinceNameFromUrl || undefined,
-                    districtName: districtNameFromUrl || undefined,
-                });
-            }
-
+            initializeBasicFilters();
+            initializeServiceTypeFilter();
+            initializeRatingFilter();
+            initializeRangeFilter();
+            initializeLanguageFilter();
+            initializeAreaFilter();
             hasInitializedUrlFilters.current = true;
         }
     }, [
@@ -780,7 +788,9 @@ const DoctorList: React.FC = () => {
         // Update URL with multiple positionId params
         const newParams = new URLSearchParams(searchParams);
         newParams.delete('positionId'); // Clear all existing
-        positionIds.forEach((id) => newParams.append('positionId', id));
+        for (const id of positionIds) {
+            newParams.append('positionId', id);
+        }
         newParams.set('pageNumber', '1');
         newParams.set('pageSize', String(pageSize));
         setSearchParams(newParams, { replace: true });
@@ -799,7 +809,9 @@ const DoctorList: React.FC = () => {
         // Update URL with multiple languageId params
         const newParams = new URLSearchParams(searchParams);
         newParams.delete('languageId'); // Clear all existing
-        languageIds.forEach((id) => newParams.append('languageId', id));
+        for (const id of languageIds) {
+            newParams.append('languageId', id);
+        }
         newParams.set('pageNumber', '1');
         newParams.set('pageSize', String(pageSize));
         setSearchParams(newParams, { replace: true });
@@ -825,7 +837,7 @@ const DoctorList: React.FC = () => {
         if (ratings.length > 0) {
             // Convert rating strings to numbers
             const ratingNumbers = ratings
-                .map((rating) => Number.parseInt(rating))
+                .map((rating) => Number.parseInt(rating, 10))
                 .filter((rating) => !Number.isNaN(rating));
 
             setRatingFilters(ratingNumbers);
@@ -956,17 +968,19 @@ const DoctorList: React.FC = () => {
                             initialPriceRange={
                                 priceMinFromUrl || priceMaxFromUrl
                                     ? {
-                                          min: parseFloat(priceMinFromUrl || '0'),
-                                          max: parseFloat(priceMaxFromUrl || '10000000'),
+                                          min: Number.parseFloat(priceMinFromUrl || '0'),
+                                          max: Number.parseFloat(priceMaxFromUrl || '10000000'),
                                       }
                                     : undefined
                             }
-                            initialRating={ratingFromUrl ? parseInt(ratingFromUrl, 10) : undefined}
+                            initialRating={
+                                ratingFromUrl ? Number.parseInt(ratingFromUrl, 10) : undefined
+                            }
                             initialExperienceRange={
                                 experienceMinFromUrl || experienceMaxFromUrl
                                     ? {
-                                          min: parseInt(experienceMinFromUrl || '1', 10),
-                                          max: parseInt(experienceMaxFromUrl || '100', 10),
+                                          min: Number.parseInt(experienceMinFromUrl || '1', 10),
+                                          max: Number.parseInt(experienceMaxFromUrl || '100', 10),
                                       }
                                     : undefined
                             }

@@ -233,9 +233,9 @@ const SideBar: React.FC<SideBarProps> = ({
     const [checkedOptions, setCheckedOptions] = useState<{ [key: string]: boolean }>(() => {
         const initial = mockFilterData.reduce(
             (acc, section) => {
-                section.options.forEach((option) => {
+                for (const option of section.options) {
                     acc[option.id] = false;
-                });
+                }
                 return acc;
             },
             {} as { [key: string]: boolean }
@@ -284,10 +284,10 @@ const SideBar: React.FC<SideBarProps> = ({
                 }
             });
             if (positionIdsFromUrl && positionIdsFromUrl.length > 0) {
-                positionIdsFromUrl.forEach((positionId) => {
+                for (const positionId of positionIdsFromUrl) {
                     const optionId = `position-${positionId}`;
                     updated[optionId] = true;
-                });
+                }
             }
 
             // Clear and set language checkboxes
@@ -297,10 +297,10 @@ const SideBar: React.FC<SideBarProps> = ({
                 }
             });
             if (languageIdsFromUrl && languageIdsFromUrl.length > 0) {
-                languageIdsFromUrl.forEach((languageId) => {
+                for (const languageId of languageIdsFromUrl) {
                     const optionId = `language-${languageId}`;
                     updated[optionId] = true;
-                });
+                }
             }
 
             // Clear and set gender checkboxes
@@ -313,12 +313,12 @@ const SideBar: React.FC<SideBarProps> = ({
                 updated[genderMap[key]] = false;
             });
             if (genderIdsFromUrl && genderIdsFromUrl.length > 0) {
-                genderIdsFromUrl.forEach((gender) => {
+                for (const gender of genderIdsFromUrl) {
                     const genderId = genderMap[gender];
                     if (genderId) {
                         updated[genderId] = true;
                     }
-                });
+                }
             }
 
             // Clear and set service type checkboxes
@@ -328,10 +328,10 @@ const SideBar: React.FC<SideBarProps> = ({
                 }
             });
             if (initialServiceTypeFilters && initialServiceTypeFilters.length > 0) {
-                initialServiceTypeFilters.forEach((serviceTypeId) => {
+                for (const serviceTypeId of initialServiceTypeFilters) {
                     const optionId = `serviceType-${serviceTypeId}`;
                     updated[optionId] = true;
-                });
+                }
             }
 
             // Clear and set rating checkboxes
@@ -343,7 +343,7 @@ const SideBar: React.FC<SideBarProps> = ({
                 1: 'checkebox-sm50',
             };
             Object.keys(ratingMap).forEach((key) => {
-                updated[ratingMap[parseInt(key)] as string] = false;
+                updated[ratingMap[Number.parseInt(key, 10)]] = false;
             });
             if (initialRating !== undefined) {
                 const ratingId = ratingMap[initialRating];
@@ -610,9 +610,9 @@ const SideBar: React.FC<SideBarProps> = ({
 
             // Uncheck all service type options
             if (section) {
-                section.options.forEach((option) => {
+                for (const option of section.options) {
                     newCheckedOptions[option.id] = false;
-                });
+                }
             }
 
             // Check the selected option

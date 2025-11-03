@@ -50,7 +50,7 @@ const ListServiceTypeDoctor: React.FC = () => {
                                 className="d-flex align-items-center justify-content-center"
                                 style={{ minHeight: '120px' }}
                             >
-                                <div className="spinner-border text-primary" role="status">
+                                <div className="spinner-border text-primary" aria-label="Đang tải">
                                     <span className="visually-hidden">Đang tải...</span>
                                 </div>
                             </div>
