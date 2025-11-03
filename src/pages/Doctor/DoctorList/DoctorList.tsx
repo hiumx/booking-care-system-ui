@@ -184,30 +184,36 @@ const DoctorList: React.FC = () => {
         }
     };
 
+    const initializePriceRangeFilter = () => {
+        if (!priceMinFromUrl && !priceMaxFromUrl) return;
+
+        const min = priceMinFromUrl ? Number.parseFloat(priceMinFromUrl) : 0;
+        const max = priceMaxFromUrl ? Number.parseFloat(priceMaxFromUrl) : Number.MAX_SAFE_INTEGER;
+
+        if (!Number.isNaN(min) && !Number.isNaN(max)) {
+            setPriceFilter({ min, max });
+        }
+    };
+
+    const initializeExperienceRangeFilter = () => {
+        if (!experienceMinFromUrl && !experienceMaxFromUrl) return;
+
+        const min = experienceMinFromUrl ? Number.parseInt(experienceMinFromUrl, 10) : 0;
+        const max = experienceMaxFromUrl
+            ? Number.parseInt(experienceMaxFromUrl, 10)
+            : Number.MAX_SAFE_INTEGER;
+
+        if (!Number.isNaN(min) && !Number.isNaN(max)) {
+            setExperienceFilter({ min, max });
+        }
+    };
+
     const initializeRangeFilter = () => {
-        if (positionIdsFromUrl && positionIdsFromUrl.length > 0) {
+        if (positionIdsFromUrl?.length > 0) {
             setPositionFilters(positionIdsFromUrl);
         }
-
-        if (priceMinFromUrl || priceMaxFromUrl) {
-            const min = priceMinFromUrl ? Number.parseFloat(priceMinFromUrl) : 0;
-            const max = priceMaxFromUrl
-                ? Number.parseFloat(priceMaxFromUrl)
-                : Number.MAX_SAFE_INTEGER;
-            if (!Number.isNaN(min) && !Number.isNaN(max)) {
-                setPriceFilter({ min, max });
-            }
-        }
-
-        if (experienceMinFromUrl || experienceMaxFromUrl) {
-            const min = experienceMinFromUrl ? Number.parseInt(experienceMinFromUrl, 10) : 0;
-            const max = experienceMaxFromUrl
-                ? Number.parseInt(experienceMaxFromUrl, 10)
-                : Number.MAX_SAFE_INTEGER;
-            if (!Number.isNaN(min) && !Number.isNaN(max)) {
-                setExperienceFilter({ min, max });
-            }
-        }
+        initializePriceRangeFilter();
+        initializeExperienceRangeFilter();
     };
 
     const initializeLanguageFilter = () => {
