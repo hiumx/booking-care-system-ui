@@ -470,22 +470,27 @@ const Appointments: React.FC = () => {
                 userProfile.id
             );
 
-            // Calculate refund percentage for success message (patient cancellation)
-            const refundInfo = getRefundInfo(
-                selectedAppointmentToCancel.appointmentDate,
-                undefined,
-                false
-            );
-
-            // Show success message with refund info
-            if (refundInfo.refundPercentage === 100) {
-                toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 100% chi phí.');
-            } else if (refundInfo.refundPercentage === 50) {
-                toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 50% chi phí.');
-            } else {
-                toast.success(
-                    'Hủy lịch hẹn thành công. Do hủy muộn, bạn sẽ không được hoàn lại chi phí.'
+            // Show success message with refund info (only if has payment)
+            if (selectedAppointmentToCancel.consultationFees > 0) {
+                // Calculate refund percentage for success message (patient cancellation)
+                const refundInfo = getRefundInfo(
+                    selectedAppointmentToCancel.appointmentDate,
+                    undefined,
+                    false
                 );
+
+                if (refundInfo.refundPercentage === 100) {
+                    toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 100% chi phí.');
+                } else if (refundInfo.refundPercentage === 50) {
+                    toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 50% chi phí.');
+                } else {
+                    toast.success(
+                        'Hủy lịch hẹn thành công. Do hủy muộn, bạn sẽ không được hoàn lại chi phí.'
+                    );
+                }
+            } else {
+                // No payment - simple success message
+                toast.success('Hủy lịch hẹn thành công.');
             }
 
             // Close modal and reset state
@@ -786,7 +791,7 @@ const Appointments: React.FC = () => {
             {/* Dashboard Header */}
             <div className="dashboard-header">
                 <h3>Lịch Hẹn</h3>
-                <ul className="header-list-btns">
+                <ul className={clsx(styles.headerListBtns, 'header-list-btns')}>
                     <li>
                         <div className="input-block dash-search-input">
                             <input
@@ -842,7 +847,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('waiting')}
                             >
-                                Chờ Xác Nhận <span>{appointmentCounts.waiting}</span>
+                                Chờ Xác Nhận<span>{appointmentCounts.waiting}</span>
                             </button>
                         </li>
                         <li className="nav-item">
@@ -851,7 +856,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('upcoming')}
                             >
-                                Sắp Tới <span>{appointmentCounts.upcoming}</span>
+                                Sắp Khám<span>{appointmentCounts.upcoming}</span>
                             </button>
                         </li>
                         <li className="nav-item">
@@ -869,7 +874,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('completed')}
                             >
-                                Hoàn Thành <span>{appointmentCounts.completed}</span>
+                                Đã Khám <span>{appointmentCounts.completed}</span>
                             </button>
                         </li>
                     </ul>
@@ -1201,12 +1206,12 @@ const Appointments: React.FC = () => {
                 reasonPlaceholder="Vui lòng nhập lý do hủy lịch hẹn (tối thiểu 10 ký tự)..."
                 minReasonLength={10}
                 refundInfo={
-                    selectedAppointmentToCancel
+                    selectedAppointmentToCancel && selectedAppointmentToCancel.consultationFees > 0
                         ? getRefundInfo(
                               selectedAppointmentToCancel.appointmentDate,
                               undefined,
                               false
-                          ) // Patient cancellation
+                          ) // Patient cancellation - only show refund info if has payment
                         : undefined
                 }
             />
