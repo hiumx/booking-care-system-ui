@@ -295,7 +295,19 @@ const SearchInput: React.FC<SearchInputProps> = ({
         setShowSpecialtyModal(false);
     };
 
-    const handleSpecialtyApply = (specialties: string[]) => {
+    const handleSpecialtyApply = (specialties: string[], _searchTerm: string) => {
+        // If specialties is empty array, it means clear was called
+        if (specialties.length === 0) {
+            setSelectedSpecialties([]);
+            setShowSpecialtyModal(false);
+
+            // Call callback with empty array to clear filter
+            if (onSpecialtyFilters) {
+                onSpecialtyFilters([]);
+            }
+            return;
+        }
+
         setSelectedSpecialties(specialties);
         setShowSpecialtyModal(false);
 
@@ -318,7 +330,19 @@ const SearchInput: React.FC<SearchInputProps> = ({
         setShowClinicModal(false);
     };
 
-    const handleClinicApply = (clinics: string[]) => {
+    const handleClinicApply = (clinics: string[], _searchTerm: string) => {
+        // If clinics is empty array, it means clear was called
+        if (clinics.length === 0) {
+            setSelectedClinics([]);
+            setShowClinicModal(false);
+
+            // Call callback with empty array to clear filter
+            if (onHospitalFilters) {
+                onHospitalFilters([]);
+            }
+            return;
+        }
+
         setSelectedClinics(clinics);
         setShowClinicModal(false);
 
@@ -342,6 +366,19 @@ const SearchInput: React.FC<SearchInputProps> = ({
     };
 
     const handleAreaApply = (areaDisplay: string, locationId: string, provinceId?: string) => {
+        // If both areaDisplay and locationId are empty, it means clear was called
+        if (!areaDisplay && !locationId) {
+            setSelectedArea('');
+            setSelectedAreaInfo({});
+            setShowAreaModal(false);
+
+            // Call area filter callback with empty values to clear filter
+            if (onAreaFilter) {
+                onAreaFilter({});
+            }
+            return;
+        }
+
         setSelectedArea(areaDisplay);
 
         // Parse area info from the display string and locationId

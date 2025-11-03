@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { X, Search } from 'lucide-react';
+import { X, Search, Loader2 } from 'lucide-react';
 import ModalItem from './components/ModalItem';
 import styles from './Modal.module.scss';
 
@@ -30,12 +30,41 @@ const Modal: React.FC<ModalProps> = ({
     initialSelectedItems = [],
 }) => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [selectedItems, setSelectedItems] = useState<string[]>(initialSelectedItems);
+    const [isSearching, setIsSearching] = useState(false);
 
     // Sync selectedItems with initialSelectedItems whenever it changes
     useEffect(() => {
         setSelectedItems(initialSelectedItems || []);
     }, [initialSelectedItems]);
+
+    // Debounce search term - wait 2 seconds after user stops typing
+    useEffect(() => {
+        // Show loading if searchTerm is different from debouncedSearchTerm
+        if (searchTerm !== debouncedSearchTerm && searchTerm) {
+            setIsSearching(true);
+        } else {
+            setIsSearching(false);
+        }
+
+        const timer = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+            setIsSearching(false);
+        }, 2000);
+
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [searchTerm, debouncedSearchTerm]);
+
+    // Reset debounced search when modal closes
+    useEffect(() => {
+        if (!isOpen) {
+            setSearchTerm('');
+            setDebouncedSearchTerm('');
+        }
+    }, [isOpen]);
 
     // Thêm useEffect để xử lý cuộn trang
     useEffect(() => {
@@ -64,16 +93,21 @@ const Modal: React.FC<ModalProps> = ({
 
     const handleClearFilter = () => {
         setSearchTerm('');
+        setDebouncedSearchTerm('');
         setSelectedItems([]);
-    };
-
-    const handleApply = () => {
-        onApply(selectedItems, searchTerm);
+        // Clear selection in parent component and close modal
+        onApply([], '');
         onClose();
     };
 
+    const handleApply = () => {
+        onApply(selectedItems, debouncedSearchTerm);
+        onClose();
+    };
+
+    // Use debounced search term for filtering
     const filteredItems = items.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        item.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
 
     if (!isOpen) return null;
@@ -106,19 +140,39 @@ const Modal: React.FC<ModalProps> = ({
                 {/* Item List */}
                 <div className={styles.specialtyList}>
                     <div className={styles.scrollContainer}>
-                        {filteredItems.map((item) => (
-                            <ModalItem
-                                key={item.id}
-                                id={item.id}
-                                name={item.name}
-                                icon={item.icon}
-                                imageUrl={item.imageUrl}
-                                color={item.color}
-                                isSelected={selectedItems.includes(item.id)}
-                                onToggle={handleItemToggle}
-                                itemType={itemType}
-                            />
-                        ))}
+                        {filteredItems.length > 0 ? (
+                            filteredItems.map((item) => (
+                                <ModalItem
+                                    key={item.id}
+                                    id={item.id}
+                                    name={item.name}
+                                    icon={item.icon}
+                                    imageUrl={item.imageUrl}
+                                    color={item.color}
+                                    isSelected={selectedItems.includes(item.id)}
+                                    onToggle={handleItemToggle}
+                                    itemType={itemType}
+                                />
+                            ))
+                        ) : (
+                            <div className={styles.noResults}>
+                                {isSearching ? (
+                                    <>
+                                        <Loader2 className={styles.loadingIcon} size={24} />
+                                        <span>Đang tìm kiếm...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Search className={styles.iconPrimary} size={24} />
+                                        <span>
+                                            {debouncedSearchTerm
+                                                ? 'Không tìm thấy kết quả'
+                                                : 'Không có dữ liệu'}
+                                        </span>
+                                    </>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 

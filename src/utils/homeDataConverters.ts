@@ -50,6 +50,7 @@ export const convertToDoctorFormat = (apiDoctors: any[]) => {
         image: doctor.avatarUrl || '/default-doctor.png',
         specialty: doctor.specialty?.name || 'Chuyên khoa',
         hospitalName: doctor.hospital?.name || 'Bệnh viện',
+        hospitalId: doctor.hospitalId || doctor.hospital?.id, // Add hospitalId
         rating: doctor.reviewStatistics?.averageRating || 0,
         experience: `${doctor.yearsOfExperience || 0} năm kinh nghiệm`,
         positionName: doctor.position?.name,

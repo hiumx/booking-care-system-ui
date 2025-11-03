@@ -71,11 +71,17 @@ const ModalArea: React.FC<ModalAreaProps> = ({
 
     // Ensure native <dialog> is centered using showModal()
     const dialogRef = useRef<HTMLDialogElement | null>(null);
+    const searchInputRef = useRef<HTMLInputElement | null>(null);
+
     useEffect(() => {
         const dialogEl = dialogRef.current;
         if (!isLoading && isOpen && dialogEl && !dialogEl.open) {
             try {
                 dialogEl.showModal();
+                // Focus input after dialog opens
+                setTimeout(() => {
+                    searchInputRef.current?.focus();
+                }, 100);
             } catch (err) {
                 console.warn('showModal failed', err);
             }
@@ -110,10 +116,19 @@ const ModalArea: React.FC<ModalAreaProps> = ({
     const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             e.preventDefault();
+            e.stopPropagation();
             handleSearchEnter();
         } else if (e.key === 'Escape') {
             e.preventDefault();
+            e.stopPropagation();
             onClose();
+        } else if (e.key === ' ') {
+            // Prevent space from bubbling up and potentially closing modal
+            e.stopPropagation();
+            // Don't prevent default - allow space to be typed normally
+        } else {
+            // Stop propagation for all other keys to prevent any unwanted behavior
+            e.stopPropagation();
         }
     };
 
@@ -241,6 +256,10 @@ const ModalArea: React.FC<ModalAreaProps> = ({
         setSearchTerm('');
         setSelectedProvinceId('');
         setSelectedDistrictId('');
+
+        // Clear selection in parent component and close modal
+        onApply('', '');
+        onClose();
     };
 
     const handleApply = () => {
@@ -293,19 +312,39 @@ const ModalArea: React.FC<ModalAreaProps> = ({
     };
 
     return ReactDOM.createPortal(
-        <button
-            type="button"
+        <div
             className={styles.modalOverlay}
             onClick={(e) => {
                 if (e.target === e.currentTarget) onClose();
             }}
+            onKeyDown={(e) => {
+                // Prevent space and enter from triggering overlay actions
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                // Only close on Escape key
+                if (e.key === 'Escape') {
+                    onClose();
+                }
+            }}
             aria-label="Đóng modal"
+            role="dialog"
+            tabIndex={-1}
         >
             <dialog
                 className={styles.modalContent}
                 onClose={onClose}
                 aria-modal="true"
                 ref={dialogRef}
+                onClick={(e) => {
+                    // Prevent dialog clicks from bubbling to overlay
+                    e.stopPropagation();
+                }}
+                onKeyDown={(e) => {
+                    // Prevent any keyboard events from bubbling to overlay
+                    e.stopPropagation();
+                }}
             >
                 <div className={styles.modalHeader}>
                     <div className={styles.modalTitleSection}>
@@ -322,16 +361,43 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                     </div>
                 </div>
 
-                <div className={styles.searchContainer}>
+                <div
+                    className={styles.searchContainer}
+                    onClick={(e) => {
+                        // Prevent search container clicks from bubbling to overlay
+                        e.stopPropagation();
+                    }}
+                >
                     <div className={styles.searchInputWrapper}>
                         <Search className={styles.searchIcon} />
                         <input
                             type="text"
                             placeholder="Tìm theo tên (Enter để chọn, Esc để đóng)"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                e.stopPropagation();
+                            }}
                             onKeyDown={handleSearchKeyDown}
+                            onKeyUp={(e) => {
+                                // Stop propagation for all keys to prevent any unwanted behavior
+                                e.stopPropagation();
+                            }}
+                            onKeyPress={(e) => {
+                                // Stop propagation for all keypress events
+                                e.stopPropagation();
+                            }}
+                            onClick={(e) => {
+                                // Prevent click events from bubbling up
+                                e.stopPropagation();
+                            }}
+                            onFocus={(e) => {
+                                // Ensure input maintains focus
+                                e.stopPropagation();
+                            }}
                             className={styles.searchInput}
+                            autoFocus
+                            ref={searchInputRef}
                         />
                     </div>
                 </div>
@@ -379,7 +445,7 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                     </div>
                 )}
             </dialog>
-        </button>,
+        </div>,
         document.body
     );
 };

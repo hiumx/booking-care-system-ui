@@ -101,7 +101,8 @@ const Home: React.FC = () => {
                     image={doctor.image}
                     name={doctor.name}
                     specialty={doctor.specialty}
-                    hospitalName={doctor.hospitalName} // Đổi từ location thành hospitalName
+                    hospitalName={doctor.hospitalName}
+                    hospitalId={doctor.hospitalId}
                     rating={doctor.rating}
                     experience={doctor.experience}
                     positionName={doctor.positionName}
