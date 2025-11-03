@@ -11,7 +11,7 @@ import {
     CAROUSEL_HOSPITALS_BREAKPOINTS,
     CAROUSEL_DOCTORS_BREAKPOINTS,
 } from './Home.data';
-import ListServiceCategories from './components/ListServiceCategories';
+import ListServiceTypeDoctor from './components/ListServiceTypeDoctor';
 import { useHomeData } from '@/hooks/useHomeData';
 import {
     convertToServiceFormat,
@@ -101,7 +101,8 @@ const Home: React.FC = () => {
                     image={doctor.image}
                     name={doctor.name}
                     specialty={doctor.specialty}
-                    hospitalName={doctor.hospitalName} // Đổi từ location thành hospitalName
+                    hospitalName={doctor.hospitalName}
+                    hospitalId={doctor.hospitalId}
                     rating={doctor.rating}
                     experience={doctor.experience}
                     positionName={doctor.positionName}
@@ -125,7 +126,7 @@ const Home: React.FC = () => {
             <MainLayout>
                 {/* Banner */}
                 <Banner />
-                <ListServiceCategories />
+                <ListServiceTypeDoctor />
                 {/* List Specialties */}
                 {shouldShowSpecialties ? (
                     <SectionItem

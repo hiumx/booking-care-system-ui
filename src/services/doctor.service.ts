@@ -299,6 +299,7 @@ export class DoctorService {
     ): Promise<ApiResponse<DoctorListResponse>> {
         try {
             const filterRequest = {
+                searchTerm: params.searchTerm,
                 specialtyId: params.specialtyFilter,
                 specialtyIds: params.specialtyFilters, // Add multiple specialty support
                 positionId: params.positionFilter,

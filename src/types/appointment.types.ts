@@ -469,7 +469,7 @@ export const getDisplayName = (appointment: AppointmentCardData): string => {
     if (appointment.doctorInfo?.id) {
         return (
             appointment.doctorInfo.fullName ||
-            `${appointment.doctorInfo.firstName || ''} ${appointment.doctorInfo.lastName || ''}`.trim() ||
+            `${appointment.doctorInfo.lastName || ''} ${appointment.doctorInfo.firstName || ''}`.trim() ||
             'Bác sĩ'
         );
     }

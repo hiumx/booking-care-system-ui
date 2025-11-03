@@ -25,6 +25,7 @@ export interface LanguageSimpleResponse {
 export interface ServiceTypeSimpleResponse {
     id: string;
     name: string;
+    imageUrl?: string; // Icon URL from backend
 }
 
 // Hospital Simple Response DTO

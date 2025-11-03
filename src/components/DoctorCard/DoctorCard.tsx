@@ -1,6 +1,8 @@
 import { FC, useState } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
+import { Briefcase } from 'lucide-react';
+import { PATHS } from '@/routes/paths';
 import styles from './DoctorCard.module.scss';
 
 export type DoctorCardProps = {
@@ -8,6 +10,7 @@ export type DoctorCardProps = {
     name: string;
     specialty: string;
     hospitalName: string; // Đổi từ location thành hospitalName
+    hospitalId?: string; // Thêm hospitalId để tạo link
     rating: number;
     available?: boolean;
     experience: string;
@@ -25,6 +28,7 @@ const DoctorCard: FC<DoctorCardProps> = ({
     name,
     specialty,
     hospitalName, // Đổi từ location thành hospitalName
+    hospitalId, // Thêm hospitalId
     rating,
     available = true,
     experience,
@@ -36,6 +40,8 @@ const DoctorCard: FC<DoctorCardProps> = ({
     specialtiesLink = '#',
     className,
 }) => {
+    // Tạo link cho hospital
+    const hospitalLink = hospitalId ? `${PATHS.HOSPITAL.ROOT}/${hospitalId}` : '#';
     const [isFavorite, setIsFavorite] = useState(false);
 
     const toggleFavorite = () => {
@@ -46,7 +52,7 @@ const DoctorCard: FC<DoctorCardProps> = ({
         <div className={clsx(styles.doctorCardContainer, 'card', className)}>
             <div className="card-img card-img-hover">
                 <Link to={profileLink}>
-                    <img src={image} alt={name} />
+                    <img src={image} alt={name} className={styles.doctorImage} />
                 </Link>
                 <div className="grid-overlay-item d-flex align-items-center justify-content-between">
                     <span className="badge bg-orange">
@@ -74,7 +80,7 @@ const DoctorCard: FC<DoctorCardProps> = ({
                         <div className={styles.dotIconWrapper}>
                             <i className="fa-solid fa-circle me-1"></i>
                         </div>
-                        {available ? 'Available' : 'Unavailable'}
+                        {available ? 'Sẵn sàng' : 'Không sẵn sàng'}
                     </span>
                 </div>
 
@@ -88,15 +94,23 @@ const DoctorCard: FC<DoctorCardProps> = ({
                                 <p className="text-muted fs-14 mb-1">{positionName}</p>
                             )}
                         </div>
-                        <div className="d-flex align-items-center">
-                            <p className="d-flex align-items-center mb-0 fs-14">
+                        <div className={styles.hospitalInfo}>
+                            <p className="d-flex align-items-center mb-2 fs-14">
                                 <i className="isax isax-location me-2"></i>
-                                {hospitalName}
+                                {hospitalId && hospitalLink !== '#' ? (
+                                    <Link to={hospitalLink} className={styles.hospitalLink}>
+                                        {hospitalName}
+                                    </Link>
+                                ) : (
+                                    <span className={styles.hospitalText}>{hospitalName}</span>
+                                )}
                             </p>
-                            <div className={styles.fsWrapper}>
-                                <i className="fa-solid fa-circle text-primary mx-2 me-1"></i>
-                            </div>
-                            <span className="fs-14 fw-medium">{experience}</span>
+                        </div>
+                        <div className={styles.experienceInfo}>
+                            <p className="d-flex align-items-center mb-0 fs-14">
+                                <Briefcase className={styles.experienceIcon} size={16} />
+                                <span className="ms-2">{experience}</span>
+                            </p>
                         </div>
                     </div>
 

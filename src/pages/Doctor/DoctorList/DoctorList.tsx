@@ -17,6 +17,8 @@ import browseCategorie from '@/assets/img/icons/browse-categorie.svg';
 import SearchInput from '@/components/SearchInput';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { searchDoctorsAsync, filterDoctorsAsync } from '@/store/slices/doctorSlice';
+import { getServiceTypesAsync } from '@/store/slices/serviceTypeSlice';
+import { getLanguagesAsync } from '@/store/slices/languageSlice';
 import { Status, Gender } from '@/enums/common.enums';
 
 // Import images
@@ -38,18 +40,42 @@ const DoctorList: React.FC = () => {
     const { doctors, isLoading, pagination, error } = useAppSelector((state) => state.doctor);
     const { languages } = useAppSelector((state) => state.language);
     const { serviceTypes } = useAppSelector((state) => state.serviceType);
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     // Check if this is a reschedule flow (Option 3: Choose new doctor)
     const isRescheduleFlow = searchParams.get('rescheduleFor') !== null;
     const rescheduleAppointmentId = searchParams.get('rescheduleFor');
     const rescheduleToken = searchParams.get('token');
-    const rescheduleHospitalId = searchParams.get('hospitalId');
-    const rescheduleSpecialtyId = searchParams.get('specialtyId');
+
+    // Get common params (works for both reschedule and normal search flow)
+    const specialtyIdFromUrl = searchParams.get('specialtyId');
+    const hospitalIdFromUrl = searchParams.get('hospitalId');
+    const searchFromUrl = searchParams.get('search');
+
+    // Get serviceTypeId from URL params for filtering
+    const serviceTypeFromUrl = searchParams.get('serviceTypeId');
+
+    // Get other URL params
+    const pageNumberFromUrl = searchParams.get('pageNumber');
+    const ratingFromUrl = searchParams.get('rating');
+    const pageSizeFromUrl = searchParams.get('pageSize');
+    const positionIdsFromUrl = searchParams.getAll('positionId');
+    const priceMinFromUrl = searchParams.get('priceMin');
+    const priceMaxFromUrl = searchParams.get('priceMax');
+    const experienceMinFromUrl = searchParams.get('experienceMin');
+    const experienceMaxFromUrl = searchParams.get('experienceMax');
+    const languageIdsFromUrl = searchParams.getAll('languageId');
+    const provinceIdFromUrl = searchParams.get('provinceId');
+    const districtIdFromUrl = searchParams.get('districtId');
+    const provinceNameFromUrl = searchParams.get('provinceName');
+    const districtNameFromUrl = searchParams.get('districtName');
 
     const [sortOption, setSortOption] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(
+        pageNumberFromUrl ? Number.parseInt(pageNumberFromUrl, 10) : 1
+    );
+    const pageSize = pageSizeFromUrl ? Number.parseInt(pageSizeFromUrl, 10) : 10;
+    const [searchTerm, setSearchTerm] = useState(searchFromUrl || '');
     const [specialtyFilter, setSpecialtyFilter] = useState('');
     const [specialtyFilters, setSpecialtyFilters] = useState<string[]>([]);
     const [hospitalFilter, setHospitalFilter] = useState('');
@@ -85,30 +111,197 @@ const DoctorList: React.FC = () => {
         | undefined
     >(undefined);
 
-    const doctorsPerPage = 10;
     const patientId = profile?.id; // Valid GUID format
-    const skeletonKeys = Array.from({ length: 10 }, (_, i) => `skeleton-${i}`);
+    const skeletonKeys = Array.from({ length: pageSize }, (_, i) => `skeleton-${i}`);
 
-    // Initialize filters from URL params for reschedule flow - ONLY ONCE
+    // Initialize filters from URL params - ONLY ONCE
     // Use ref to prevent re-initialization on every render
-    const hasInitializedRescheduleFilters = useRef(false);
+    const hasInitializedUrlFilters = useRef(false);
 
+    // Debounced search term for API calls (to avoid calling API on every keystroke)
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Fetch service types on mount to ensure they're available
     useEffect(() => {
-        if (isRescheduleFlow && !hasInitializedRescheduleFilters.current) {
-            if (rescheduleHospitalId) {
-                setHospitalFilters([rescheduleHospitalId]);
-            }
-            if (rescheduleSpecialtyId) {
-                setSpecialtyFilters([rescheduleSpecialtyId]);
-            }
-            hasInitializedRescheduleFilters.current = true;
+        if (serviceTypes.length === 0) {
+            dispatch(getServiceTypesAsync());
         }
-    }, [isRescheduleFlow, rescheduleHospitalId, rescheduleSpecialtyId]);
+    }, [dispatch, serviceTypes.length]);
+
+    // Fetch languages on mount to ensure they're available
+    useEffect(() => {
+        if (languages.length === 0) {
+            dispatch(getLanguagesAsync());
+        }
+    }, [dispatch, languages.length]);
+
+    // Debounce searchTerm - only update debouncedSearchTerm after 3 seconds of no typing
+    useEffect(() => {
+        // Clear existing timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        // Set new timeout to update debouncedSearchTerm after 3 seconds
+        searchTimeoutRef.current = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 3000);
+
+        // Cleanup on unmount or when searchTerm changes (before new timeout is set)
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, [searchTerm]);
+
+    // Helper functions to initialize filters from URL
+    const initializeBasicFilters = () => {
+        if (hospitalIdFromUrl) {
+            setHospitalFilters([hospitalIdFromUrl]);
+        }
+        if (specialtyIdFromUrl) {
+            setSpecialtyFilters([specialtyIdFromUrl]);
+        }
+    };
+
+    const initializeServiceTypeFilter = () => {
+        if (serviceTypeFromUrl && serviceTypes.length > 0) {
+            const serviceType = serviceTypes.find((st) => st.id === serviceTypeFromUrl);
+            if (serviceType) {
+                setServiceTypeFilters([serviceType.name]);
+            }
+        }
+    };
+
+    const initializeRatingFilter = () => {
+        if (ratingFromUrl) {
+            const rating = Number.parseInt(ratingFromUrl, 10);
+            if (!Number.isNaN(rating) && rating >= 1 && rating <= 5) {
+                setRatingFilter(rating);
+            }
+        }
+    };
+
+    const initializePriceRangeFilter = () => {
+        if (!priceMinFromUrl && !priceMaxFromUrl) return;
+
+        const min = priceMinFromUrl ? Number.parseFloat(priceMinFromUrl) : 0;
+        const max = priceMaxFromUrl ? Number.parseFloat(priceMaxFromUrl) : Number.MAX_SAFE_INTEGER;
+
+        if (!Number.isNaN(min) && !Number.isNaN(max)) {
+            setPriceFilter({ min, max });
+        }
+    };
+
+    const initializeExperienceRangeFilter = () => {
+        if (!experienceMinFromUrl && !experienceMaxFromUrl) return;
+
+        const min = experienceMinFromUrl ? Number.parseInt(experienceMinFromUrl, 10) : 0;
+        const max = experienceMaxFromUrl
+            ? Number.parseInt(experienceMaxFromUrl, 10)
+            : Number.MAX_SAFE_INTEGER;
+
+        if (!Number.isNaN(min) && !Number.isNaN(max)) {
+            setExperienceFilter({ min, max });
+        }
+    };
+
+    const initializeRangeFilter = () => {
+        if (positionIdsFromUrl?.length > 0) {
+            setPositionFilters(positionIdsFromUrl);
+        }
+        initializePriceRangeFilter();
+        initializeExperienceRangeFilter();
+    };
+
+    const initializeLanguageFilter = () => {
+        if (languageIdsFromUrl && languageIdsFromUrl.length > 0 && languages.length > 0) {
+            const languageNames = languageIdsFromUrl
+                .map((id) => {
+                    const language = languages.find((lang) => lang.id === id);
+                    return language ? language.name : null;
+                })
+                .filter((name): name is string => name !== null);
+
+            if (languageNames.length > 0) {
+                setLanguageFilters(languageNames);
+            }
+        }
+    };
+
+    const initializeAreaFilter = () => {
+        if (provinceIdFromUrl || districtIdFromUrl || provinceNameFromUrl || districtNameFromUrl) {
+            setAreaFilter({
+                provinceId: provinceIdFromUrl || undefined,
+                districtId: districtIdFromUrl || undefined,
+                provinceName: provinceNameFromUrl || undefined,
+                districtName: districtNameFromUrl || undefined,
+            });
+        }
+    };
+
+    // Initialize all filters from URL params - ONLY ONCE
+    useEffect(() => {
+        if (!hasInitializedUrlFilters.current) {
+            initializeBasicFilters();
+            initializeServiceTypeFilter();
+            initializeRatingFilter();
+            initializeRangeFilter();
+            initializeLanguageFilter();
+            initializeAreaFilter();
+            hasInitializedUrlFilters.current = true;
+        }
+    }, [
+        specialtyIdFromUrl,
+        hospitalIdFromUrl,
+        serviceTypeFromUrl,
+        serviceTypes,
+        pageNumberFromUrl,
+        ratingFromUrl,
+        positionIdsFromUrl,
+        priceMinFromUrl,
+        priceMaxFromUrl,
+        experienceMinFromUrl,
+        experienceMaxFromUrl,
+        languageIdsFromUrl,
+        languages,
+        provinceIdFromUrl,
+        districtIdFromUrl,
+        provinceNameFromUrl,
+        districtNameFromUrl,
+    ]);
 
     const sortOptions = [
         { label: 'Giá từ thấp đến cao', value: 'low-to-high' },
         { label: 'Giá từ cao đến thấp', value: 'high-to-low' },
     ];
+
+    // Helper function to update URL params
+    const updateURLParams = (updates: Record<string, string | number | undefined | null>) => {
+        const newParams = new URLSearchParams(searchParams);
+
+        // Always ensure pageNumber and pageSize are present
+        const defaultParams = {
+            pageNumber: currentPage,
+            pageSize: pageSize,
+        };
+
+        // Merge defaults with updates
+        const allUpdates = { ...defaultParams, ...updates };
+
+        Object.entries(allUpdates).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && String(value) !== '') {
+                newParams.set(key, String(value));
+            } else if (key !== 'pageNumber' && key !== 'pageSize') {
+                // Don't delete pageNumber and pageSize
+                newParams.delete(key);
+            }
+        });
+
+        setSearchParams(newParams, { replace: true });
+    };
 
     // Helper function to get trimmed string or undefined
     const getTrimmedString = (value: string | undefined): string | undefined => {
@@ -123,8 +316,8 @@ const DoctorList: React.FC = () => {
     // Helper function to build basic filter parameters
     const buildBasicFilters = () => ({
         pageNumber: currentPage,
-        pageSize: doctorsPerPage,
-        searchTerm: getTrimmedString(searchTerm),
+        pageSize: pageSize,
+        searchTerm: getTrimmedString(debouncedSearchTerm),
         ratingFilter: ratingFilter,
         genderFilter: genderFilter,
         experienceRange: experienceFilter,
@@ -182,6 +375,33 @@ const DoctorList: React.FC = () => {
         );
     };
 
+    // Helper function to check if we should wait for service types
+    const shouldWaitForServiceTypes = () => {
+        if (!serviceTypeFromUrl) return false;
+        const isServiceTypesLoaded = serviceTypes.length > 0;
+        const isServiceTypeFilterSet = serviceTypeFilters.length > 0;
+        return !isServiceTypesLoaded || !isServiceTypeFilterSet;
+    };
+
+    // Helper function to check if we should wait for languages
+    const shouldWaitForLanguages = () => {
+        if (!languageIdsFromUrl || languageIdsFromUrl.length === 0) return false;
+        const isLanguagesLoaded = languages.length > 0;
+        const isLanguageFilterSet = languageFilters.length > 0;
+        return !isLanguagesLoaded || !isLanguageFilterSet;
+    };
+
+    // Helper function to check if we should wait for URL filters initialization
+    const shouldWaitForUrlFilters = () => {
+        const hasUrlParams =
+            isRescheduleFlow ||
+            serviceTypeFromUrl ||
+            (languageIdsFromUrl && languageIdsFromUrl.length > 0) ||
+            specialtyIdFromUrl ||
+            hospitalIdFromUrl;
+        return hasUrlParams && !hasInitializedUrlFilters.current;
+    };
+
     // Helper function to render doctor list content
     const renderDoctorListContent = () => {
         if (isLoading) {
@@ -201,17 +421,18 @@ const DoctorList: React.FC = () => {
                         {(searchTerm ||
                             specialtyFilters.length > 0 ||
                             hospitalFilters.length > 0 ||
-                            areaFilter) && (
+                            areaFilter ||
+                            priceFilter ||
+                            ratingFilter ||
+                            experienceFilter ||
+                            positionFilters.length > 0 ||
+                            languageFilters.length > 0 ||
+                            serviceTypeFilters.length > 0 ||
+                            genderFilters.length > 0) && (
                             <div className="mt-3">
                                 <button
                                     className="btn btn-outline-primary"
-                                    onClick={() => {
-                                        setSearchTerm('');
-                                        setSpecialtyFilters([]);
-                                        setHospitalFilters([]);
-                                        setAreaFilter(undefined);
-                                        setCurrentPage(1);
-                                    }}
+                                    onClick={handleClearAllFilters}
                                 >
                                     Xóa tất cả bộ lọc
                                 </button>
@@ -227,7 +448,7 @@ const DoctorList: React.FC = () => {
                 key={doctor.id}
                 doctorId={doctor.id}
                 patientId={patientId}
-                name={`${doctor.firstName} ${doctor.lastName}`}
+                name={`${doctor.lastName} ${doctor.firstName}`}
                 specialty={doctor.specialty?.name || 'Chưa cập nhật'}
                 position={doctor.position?.name || 'Chưa cập nhật'}
                 prices={
@@ -251,8 +472,8 @@ const DoctorList: React.FC = () => {
                         ? {
                               appointmentId: rescheduleAppointmentId!,
                               token: rescheduleToken!,
-                              rescheduleSpecialtyId: rescheduleSpecialtyId!,
-                              rescheduleHospitalId: rescheduleHospitalId!,
+                              rescheduleSpecialtyId: specialtyIdFromUrl!,
+                              rescheduleHospitalId: hospitalIdFromUrl!,
                           }
                         : undefined
                 }
@@ -262,16 +483,17 @@ const DoctorList: React.FC = () => {
 
     // Load doctors on component mount and when filters change
     useEffect(() => {
-        // If in reschedule flow, wait until filters are actually set in state before fetching
-        // This prevents the initial fetch with empty filters
-        const isWaitingForRescheduleFilters =
-            isRescheduleFlow &&
-            hasInitializedRescheduleFilters.current &&
-            hospitalFilters.length === 0 &&
-            specialtyFilters.length === 0 &&
-            (rescheduleHospitalId || rescheduleSpecialtyId);
+        // Wait until URL filters are initialized in state before fetching
+        // This prevents the initial fetch with empty filters when URL has params
+        if (shouldWaitForServiceTypes()) {
+            return;
+        }
 
-        if (isWaitingForRescheduleFilters) {
+        if (shouldWaitForLanguages()) {
+            return;
+        }
+
+        if (shouldWaitForUrlFilters()) {
             return;
         }
 
@@ -286,7 +508,8 @@ const DoctorList: React.FC = () => {
     }, [
         dispatch,
         currentPage,
-        searchTerm,
+        pageSize,
+        debouncedSearchTerm,
         specialtyFilter,
         specialtyFilters,
         hospitalFilter,
@@ -307,6 +530,10 @@ const DoctorList: React.FC = () => {
         genderFilters,
         priceFilter,
         areaFilter,
+        serviceTypeFromUrl,
+        serviceTypes,
+        isRescheduleFlow,
+        languages,
     ]);
 
     // Helper function to check if doctor passes availability filter
@@ -366,6 +593,7 @@ const DoctorList: React.FC = () => {
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
+        updateURLParams({ pageNumber: page });
     };
 
     const handleSortChange = (value: string) => {
@@ -385,6 +613,18 @@ const DoctorList: React.FC = () => {
 
     const handleSpecialtyFilters = (specialtyIds: string[]) => {
         setSpecialtyFilters(specialtyIds);
+
+        // Update URL with specialtyId param
+        const newParams = new URLSearchParams(searchParams);
+        if (specialtyIds.length > 0) {
+            newParams.set('specialtyId', specialtyIds[0]); // Use first specialty for URL
+        } else {
+            newParams.delete('specialtyId');
+        }
+        newParams.set('pageNumber', '1');
+        newParams.set('pageSize', String(pageSize));
+        setSearchParams(newParams, { replace: true });
+
         setCurrentPage(1);
     };
 
@@ -411,6 +651,18 @@ const DoctorList: React.FC = () => {
 
     const handleHospitalFilters = (hospitalIds: string[]) => {
         setHospitalFilters(hospitalIds);
+
+        // Update URL with hospitalId param
+        const newParams = new URLSearchParams(searchParams);
+        if (hospitalIds.length > 0) {
+            newParams.set('hospitalId', hospitalIds[0]); // Use first hospital for URL
+        } else {
+            newParams.delete('hospitalId');
+        }
+        newParams.set('pageNumber', '1');
+        newParams.set('pageSize', String(pageSize));
+        setSearchParams(newParams, { replace: true });
+
         setCurrentPage(1);
     };
 
@@ -421,6 +673,33 @@ const DoctorList: React.FC = () => {
         districtName?: string;
     }) => {
         setAreaFilter(areaInfo);
+
+        // Update URL with area params
+        const newParams = new URLSearchParams(searchParams);
+        if (areaInfo.provinceId) {
+            newParams.set('provinceId', areaInfo.provinceId);
+        } else {
+            newParams.delete('provinceId');
+        }
+        if (areaInfo.districtId) {
+            newParams.set('districtId', areaInfo.districtId);
+        } else {
+            newParams.delete('districtId');
+        }
+        if (areaInfo.provinceName) {
+            newParams.set('provinceName', areaInfo.provinceName);
+        } else {
+            newParams.delete('provinceName');
+        }
+        if (areaInfo.districtName) {
+            newParams.set('districtName', areaInfo.districtName);
+        } else {
+            newParams.delete('districtName');
+        }
+        newParams.set('pageNumber', '1');
+        newParams.set('pageSize', String(pageSize));
+        setSearchParams(newParams, { replace: true });
+
         setCurrentPage(1);
     };
 
@@ -434,9 +713,12 @@ const DoctorList: React.FC = () => {
                 'checkebox-sm49': 2,
                 'checkebox-sm50': 1,
             };
-            setRatingFilter(ratingMap[rating]);
+            const ratingValue = ratingMap[rating];
+            setRatingFilter(ratingValue);
+            updateURLParams({ rating: ratingValue, pageNumber: 1 });
         } else {
             setRatingFilter(undefined);
+            updateURLParams({ rating: null, pageNumber: 1 });
         }
         setCurrentPage(1);
     };
@@ -468,17 +750,38 @@ const DoctorList: React.FC = () => {
 
     const handlePriceFilter = (priceRange: { min: number; max: number }) => {
         setPriceFilter(priceRange);
+        updateURLParams({
+            priceMin: priceRange.min,
+            priceMax: priceRange.max,
+            pageNumber: 1,
+        });
         setCurrentPage(1);
     };
 
     const handleExperienceFilter = (experienceRange: { min: number; max: number }) => {
         setExperienceFilter(experienceRange);
+        updateURLParams({
+            experienceMin: experienceRange.min,
+            experienceMax: experienceRange.max,
+            pageNumber: 1,
+        });
         setCurrentPage(1);
     };
 
     // Multi-filter callback functions
     const handlePositionFilters = (positionIds: string[]) => {
         setPositionFilters(positionIds);
+
+        // Update URL with multiple positionId params
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('positionId'); // Clear all existing
+        for (const id of positionIds) {
+            newParams.append('positionId', id);
+        }
+        newParams.set('pageNumber', '1');
+        newParams.set('pageSize', String(pageSize));
+        setSearchParams(newParams, { replace: true });
+
         setCurrentPage(1);
     };
 
@@ -489,6 +792,17 @@ const DoctorList: React.FC = () => {
             return language ? language.name : id;
         });
         setLanguageFilters(languageNames);
+
+        // Update URL with multiple languageId params
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('languageId'); // Clear all existing
+        for (const id of languageIds) {
+            newParams.append('languageId', id);
+        }
+        newParams.set('pageNumber', '1');
+        newParams.set('pageSize', String(pageSize));
+        setSearchParams(newParams, { replace: true });
+
         setCurrentPage(1);
     };
 
@@ -499,19 +813,33 @@ const DoctorList: React.FC = () => {
             return serviceType ? serviceType.name : id;
         });
         setServiceTypeFilters(serviceTypeNames);
+        updateURLParams({
+            serviceTypeId: serviceTypeIds.length > 0 ? serviceTypeIds[0] : null,
+            pageNumber: 1,
+        });
         setCurrentPage(1);
     };
 
     const handleRatingFilters = (ratings: string[]) => {
         if (ratings.length > 0) {
             // Convert rating strings to numbers
-            setRatingFilters(
-                ratings
-                    .map((rating) => Number.parseInt(rating))
-                    .filter((rating) => !Number.isNaN(rating))
-            );
+            const ratingNumbers = ratings
+                .map((rating) => Number.parseInt(rating, 10))
+                .filter((rating) => !Number.isNaN(rating));
+
+            setRatingFilters(ratingNumbers);
+
+            // Update URL with rating (use first one for simplicity)
+            updateURLParams({
+                rating: ratingNumbers[0],
+                pageNumber: 1,
+            });
         } else {
             setRatingFilters([]);
+            updateURLParams({
+                rating: null,
+                pageNumber: 1,
+            });
         }
         setCurrentPage(1);
     };
@@ -552,6 +880,39 @@ const DoctorList: React.FC = () => {
         setCurrentPage(1);
     };
 
+    // Clear all filters handler
+    const handleClearAllFilters = () => {
+        // Clear all state
+        setSearchTerm('');
+        setSpecialtyFilter('');
+        setSpecialtyFilters([]);
+        setHospitalFilter('');
+        setHospitalFilters([]);
+        setPositionFilter('');
+        setPositionFilters([]);
+        setLanguageFilter('');
+        setLanguageFilters([]);
+        setServiceTypeFilter('');
+        setServiceTypeFilters([]);
+        setRatingFilter(undefined);
+        setRatingFilters([]);
+        setExperienceFilter(undefined);
+        setExperienceFilters([]);
+        setAvailabilityFilter('');
+        setConsultationTypeFilter('');
+        setGenderFilter(undefined);
+        setGenderFilters([]);
+        setPriceFilter(undefined);
+        setAreaFilter(undefined);
+        setCurrentPage(1);
+
+        // Clear all URL params except pageNumber and pageSize
+        const newParams = new URLSearchParams();
+        newParams.set('pageNumber', '1');
+        newParams.set('pageSize', String(pageSize));
+        setSearchParams(newParams, { replace: true });
+    };
+
     return (
         <MainLayout>
             <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
@@ -563,8 +924,8 @@ const DoctorList: React.FC = () => {
                     onHospitalFilter={handleHospitalFilter}
                     onHospitalFilters={handleHospitalFilters}
                     onAreaFilter={handleAreaFilter}
-                    rescheduleHospitalId={rescheduleHospitalId}
-                    rescheduleSpecialtyId={rescheduleSpecialtyId}
+                    rescheduleHospitalId={hospitalIdFromUrl}
+                    rescheduleSpecialtyId={specialtyIdFromUrl}
                 />
             </div>
             <div className="content mt-5">
@@ -588,6 +949,30 @@ const DoctorList: React.FC = () => {
                             onGenderFilter={handleGenderFilter}
                             onGenderFilters={handleGenderFilters}
                             onPriceFilter={handlePriceFilter}
+                            initialServiceTypeFilters={
+                                serviceTypeFromUrl ? [serviceTypeFromUrl] : undefined
+                            }
+                            initialPriceRange={
+                                priceMinFromUrl || priceMaxFromUrl
+                                    ? {
+                                          min: Number.parseFloat(priceMinFromUrl || '0'),
+                                          max: Number.parseFloat(priceMaxFromUrl || '10000000'),
+                                      }
+                                    : undefined
+                            }
+                            initialRating={
+                                ratingFromUrl ? Number.parseInt(ratingFromUrl, 10) : undefined
+                            }
+                            initialExperienceRange={
+                                experienceMinFromUrl || experienceMaxFromUrl
+                                    ? {
+                                          min: Number.parseInt(experienceMinFromUrl || '1', 10),
+                                          max: Number.parseInt(experienceMaxFromUrl || '100', 10),
+                                      }
+                                    : undefined
+                            }
+                            initialSearchTerm={searchFromUrl || ''}
+                            onClearAllFilters={handleClearAllFilters}
                         />
                         <div className="col-xl-9">
                             <div className="card">
