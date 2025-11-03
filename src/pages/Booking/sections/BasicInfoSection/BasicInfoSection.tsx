@@ -163,7 +163,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep 
                         <div className="col-lg-12">
                             <div className="mb-3">
                                 <label className="form-label" htmlFor="attachments">
-                                    Tệp đính kèm
+                                    Tệp đính kèm{' '}
                                     <span className="text-muted ms-1">(Không bắt buộc)</span>
                                     {attachments.length > 0 && (
                                         <small className="text-success ms-2">
