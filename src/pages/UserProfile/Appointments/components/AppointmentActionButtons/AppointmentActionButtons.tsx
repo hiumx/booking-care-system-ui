@@ -103,12 +103,6 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                         <i className="isax isax-clock5 me-1"></i> Chờ Xác Nhận
                     </span>
                 );
-            case 'upcoming':
-                return (
-                    <span className="badge badge-primary">
-                        <i className="isax isax-calendar-25 me-1"></i> Sắp Tới
-                    </span>
-                );
             case 'cancelled':
                 return (
                     <span className="badge badge-danger">
@@ -118,7 +112,7 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
             case 'completed':
                 return (
                     <span className="badge badge-success">
-                        <i className="isax isax-tick-circle me-1"></i> Hoàn Thành
+                        <i className="isax isax-tick-circle me-1"></i> Đã Khám
                     </span>
                 );
             default:

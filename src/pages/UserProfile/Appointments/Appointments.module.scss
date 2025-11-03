@@ -1,5 +1,9 @@
 // Appointments styling
-
+.headerListBtns {
+    li {
+        margin-left: 0px !important;
+    }
+}
 // Date Range Picker styling
 .dateRangePickerWrapper {
     .appointmentDatePicker {

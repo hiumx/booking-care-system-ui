@@ -18,7 +18,9 @@ import {
     isNewAppointment,
 } from '@/types/appointment.types';
 import { AppointmentService } from '@/services/appointment.service';
+import { TargetType } from '@/types/review.types';
 import { RootState } from '@/store';
+import { useReviewHandlers } from '@/hooks/useReviewHandlers';
 import { FilterState } from './components/AppointmentFilters/AppointmentTypes';
 import { getRefundInfo } from '@/utils/refund-policy.util';
 import { handleRescheduleAction } from '@/utils/reschedule-utils';
@@ -51,6 +53,13 @@ const Appointments: React.FC = () => {
     const [selectedAppointmentToCancel, setSelectedAppointmentToCancel] =
         useState<AppointmentCardData | null>(null);
     const [isCancelling, setIsCancelling] = useState(false);
+
+    // Review modal states
+    const [selectedAppointmentForReview, setSelectedAppointmentForReview] =
+        useState<AppointmentCardData | null>(null);
+    const [reviewRating, setReviewRating] = useState<number>(5);
+    const [reviewComment, setReviewComment] = useState<string>('');
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
     // Refresh trigger để fetch lại data sau khi cancel
     const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -250,7 +259,7 @@ const Appointments: React.FC = () => {
             // 2. Doctor info
             const doctorName =
                 apt.doctorInfo?.fullName?.toLowerCase() ||
-                `${apt.doctorInfo?.firstName || ''} ${apt.doctorInfo?.lastName || ''}`
+                `${apt.doctorInfo?.lastName || ''} ${apt.doctorInfo?.firstName || ''}`
                     .toLowerCase()
                     .trim();
             const specialty = apt.doctorInfo?.specialtyName?.toLowerCase() || '';
@@ -461,22 +470,27 @@ const Appointments: React.FC = () => {
                 userProfile.id
             );
 
-            // Calculate refund percentage for success message (patient cancellation)
-            const refundInfo = getRefundInfo(
-                selectedAppointmentToCancel.appointmentDate,
-                undefined,
-                false
-            );
-
-            // Show success message with refund info
-            if (refundInfo.refundPercentage === 100) {
-                toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 100% chi phí.');
-            } else if (refundInfo.refundPercentage === 50) {
-                toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 50% chi phí.');
-            } else {
-                toast.success(
-                    'Hủy lịch hẹn thành công. Do hủy muộn, bạn sẽ không được hoàn lại chi phí.'
+            // Show success message with refund info (only if has payment)
+            if (selectedAppointmentToCancel.consultationFees > 0) {
+                // Calculate refund percentage for success message (patient cancellation)
+                const refundInfo = getRefundInfo(
+                    selectedAppointmentToCancel.appointmentDate,
+                    undefined,
+                    false
                 );
+
+                if (refundInfo.refundPercentage === 100) {
+                    toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 100% chi phí.');
+                } else if (refundInfo.refundPercentage === 50) {
+                    toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 50% chi phí.');
+                } else {
+                    toast.success(
+                        'Hủy lịch hẹn thành công. Do hủy muộn, bạn sẽ không được hoàn lại chi phí.'
+                    );
+                }
+            } else {
+                // No payment - simple success message
+                toast.success('Hủy lịch hẹn thành công.');
             }
 
             // Close modal and reset state
@@ -496,6 +510,126 @@ const Appointments: React.FC = () => {
             toast.error(error.message || 'Không thể hủy lịch hẹn. Vui lòng thử lại.');
         } finally {
             setIsCancelling(false);
+        }
+    };
+
+    // Helper function to close review modal
+    const closeReviewModal = () => {
+        const modalElement = document.getElementById('add_review');
+        if (modalElement) {
+            try {
+                // Try to get existing instance first
+                let modal = (globalThis as any).bootstrap?.Modal?.getInstance(modalElement);
+
+                // If no instance exists, create one
+                if (!modal) {
+                    modal = new (globalThis as any).bootstrap.Modal(modalElement);
+                }
+
+                // Hide the modal
+                modal.hide();
+            } catch (modalError) {
+                console.error('Error closing modal:', modalError);
+                // Fallback: remove Bootstrap classes manually
+                modalElement.classList.remove('show');
+                document.body.classList.remove('modal-open');
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+            }
+        }
+    };
+
+    // Initialize review handlers hook
+    // Note: We use a dummy refetch since Appointments page doesn't display reviews list
+    const { handleSubmitReview: submitReviewFromHook } = useReviewHandlers({
+        targetType: TargetType.DOCTOR,
+        targetId: selectedAppointmentForReview?.doctorInfo?.id,
+        currentUserId: userProfile?.id,
+        currentAccountId: userProfile?.accountId,
+        targetName: selectedAppointmentForReview?.doctorInfo?.fullName || 'Bác sĩ',
+        hospitalId: selectedAppointmentForReview?.hospitalInfo?.id,
+        refetchReviews: async () => {
+            // No-op: Appointments page doesn't display reviews
+            // Reviews are shown in doctor profile pages
+        },
+        refetchStatistics: async () => {
+            // No-op: Appointments page doesn't display review statistics
+        },
+    });
+
+    // Handle open review modal
+    const handleOpenReviewModal = (appointment: AppointmentCardData) => {
+        setSelectedAppointmentForReview(appointment);
+        setReviewRating(5); // Default rating
+        setReviewComment(''); // Reset comment
+    };
+
+    // Handle review form submission
+    const handleSubmitReview = async (e: React.FormEvent) => {
+        e.preventDefault();
+        e.stopPropagation(); // Prevent event bubbling
+
+        // Prevent double submission
+        if (isSubmittingReview) {
+            return;
+        }
+
+        // Validation
+        if (!selectedAppointmentForReview || !userProfile?.id) {
+            toast.error('Không tìm thấy thông tin lịch hẹn hoặc người dùng.');
+            return;
+        }
+
+        if (!reviewRating || reviewRating < 1 || reviewRating > 5) {
+            toast.error('Vui lòng chọn đánh giá từ 1 đến 5 sao.');
+            return;
+        }
+
+        if (!reviewComment.trim() || reviewComment.trim().length < 5) {
+            toast.error('Vui lòng nhập nhận xét (tối thiểu 5 ký tự).');
+            return;
+        }
+
+        if (!selectedAppointmentForReview.doctorInfo?.id) {
+            toast.error('Không tìm thấy thông tin bác sĩ để đánh giá.');
+            return;
+        }
+
+        setIsSubmittingReview(true);
+
+        try {
+            // Use hook's handleSubmitReview which handles API call and error handling
+            // Toast success is already shown by the hook, but we'll close modal and refresh appointments
+            await submitReviewFromHook({
+                rating: reviewRating,
+                description: reviewComment.trim(),
+                termsAccepted: true, // Modal doesn't have terms checkbox, default to true
+            });
+
+            // On success: close modal, reset form, and refresh appointments
+            try {
+                // Reset form state
+                setSelectedAppointmentForReview(null);
+                setReviewRating(5);
+                setReviewComment('');
+
+                // Close modal
+                closeReviewModal();
+
+                // Refresh appointments to update hasReview status
+                setRefreshTrigger((prev) => prev + 1);
+            } catch (successHandlingError) {
+                console.error('Error during success handling:', successHandlingError);
+                // Modal closing and state reset errors won't affect the review creation
+            }
+        } catch (error: any) {
+            // Error handling is done by the hook, but we still need to handle modal state
+            console.error('Error in handleSubmitReview wrapper:', error);
+            // Hook already shows error toast, no need to show again
+        } finally {
+            setIsSubmittingReview(false);
         }
     };
 
@@ -585,6 +719,7 @@ const Appointments: React.FC = () => {
                                     status={activeTab}
                                     onCancel={handleCancelClick}
                                     onReschedule={handleRescheduleClick}
+                                    onReview={handleOpenReviewModal}
                                 />
                             ))}
                         </>
@@ -597,6 +732,7 @@ const Appointments: React.FC = () => {
                                     status={activeTab}
                                     onCancel={handleCancelClick}
                                     onReschedule={handleRescheduleClick}
+                                    onReview={handleOpenReviewModal}
                                 />
                             ))}
                         </div>
@@ -655,7 +791,7 @@ const Appointments: React.FC = () => {
             {/* Dashboard Header */}
             <div className="dashboard-header">
                 <h3>Lịch Hẹn</h3>
-                <ul className="header-list-btns">
+                <ul className={clsx(styles.headerListBtns, 'header-list-btns')}>
                     <li>
                         <div className="input-block dash-search-input">
                             <input
@@ -711,7 +847,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('waiting')}
                             >
-                                Chờ Xác Nhận <span>{appointmentCounts.waiting}</span>
+                                Chờ Xác Nhận<span>{appointmentCounts.waiting}</span>
                             </button>
                         </li>
                         <li className="nav-item">
@@ -720,7 +856,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('upcoming')}
                             >
-                                Sắp Tới <span>{appointmentCounts.upcoming}</span>
+                                Sắp Khám<span>{appointmentCounts.upcoming}</span>
                             </button>
                         </li>
                         <li className="nav-item">
@@ -738,7 +874,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('completed')}
                             >
-                                Hoàn Thành <span>{appointmentCounts.completed}</span>
+                                Đã Khám <span>{appointmentCounts.completed}</span>
                             </button>
                         </li>
                     </ul>
@@ -782,7 +918,10 @@ const Appointments: React.FC = () => {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h3 className="modal-title">Thêm đánh giá</h3>
+                            <h3 className="modal-title">
+                                Đánh giá{' '}
+                                {selectedAppointmentForReview?.doctorInfo?.fullName || 'Bác sĩ'}
+                            </h3>
                             <button
                                 type="button"
                                 className="btn-close"
@@ -792,7 +931,7 @@ const Appointments: React.FC = () => {
                                 <i className="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                        <form action="#">
+                        <form onSubmit={handleSubmitReview}>
                             <div className="add-dependent">
                                 <div className="modal-body pb-0">
                                     <div className="row">
@@ -812,6 +951,8 @@ const Appointments: React.FC = () => {
                                                                 name="rating"
                                                                 value="5"
                                                                 id="rating5"
+                                                                checked={reviewRating === 5}
+                                                                onChange={() => setReviewRating(5)}
                                                             />
                                                             <label htmlFor="rating5">
                                                                 <i
@@ -827,6 +968,8 @@ const Appointments: React.FC = () => {
                                                                 name="rating"
                                                                 value="4"
                                                                 id="rating4"
+                                                                checked={reviewRating === 4}
+                                                                onChange={() => setReviewRating(4)}
                                                             />
                                                             <label htmlFor="rating4">
                                                                 <i
@@ -842,6 +985,8 @@ const Appointments: React.FC = () => {
                                                                 name="rating"
                                                                 value="3"
                                                                 id="rating3"
+                                                                checked={reviewRating === 3}
+                                                                onChange={() => setReviewRating(3)}
                                                             />
                                                             <label htmlFor="rating3">
                                                                 <i
@@ -857,7 +1002,8 @@ const Appointments: React.FC = () => {
                                                                 name="rating"
                                                                 value="2"
                                                                 id="rating2"
-                                                                defaultChecked
+                                                                checked={reviewRating === 2}
+                                                                onChange={() => setReviewRating(2)}
                                                             />
                                                             <label htmlFor="rating2">
                                                                 <i
@@ -873,7 +1019,8 @@ const Appointments: React.FC = () => {
                                                                 name="rating"
                                                                 value="1"
                                                                 id="rating1"
-                                                                defaultChecked
+                                                                checked={reviewRating === 1}
+                                                                onChange={() => setReviewRating(1)}
                                                             />
                                                             <label htmlFor="rating1">
                                                                 <i
@@ -899,6 +1046,13 @@ const Appointments: React.FC = () => {
                                                     id="comment-textarea"
                                                     className="form-control"
                                                     rows={3}
+                                                    value={reviewComment}
+                                                    onChange={(e) =>
+                                                        setReviewComment(e.target.value)
+                                                    }
+                                                    placeholder="Chia sẻ trải nghiệm của bạn (tối thiểu 5 ký tự)..."
+                                                    minLength={5}
+                                                    required
                                                 ></textarea>
                                             </div>
                                         </div>
@@ -910,16 +1064,20 @@ const Appointments: React.FC = () => {
                                     <Link
                                         to="#"
                                         className="btn btn-md btn-dark rounded-pill"
-                                        data-bs-toggle="modal"
                                         data-bs-dismiss="modal"
+                                        onClick={() => {
+                                            setReviewRating(5);
+                                            setReviewComment('');
+                                        }}
                                     >
                                         Hủy
                                     </Link>
                                     <button
                                         type="submit"
                                         className="btn btn-md btn-primary-gradient rounded-pill"
+                                        disabled={isSubmittingReview}
                                     >
-                                        Thêm đánh giá
+                                        {isSubmittingReview ? 'Đang gửi...' : 'Thêm đánh giá'}
                                     </button>
                                 </div>
                             </div>
@@ -1048,12 +1206,12 @@ const Appointments: React.FC = () => {
                 reasonPlaceholder="Vui lòng nhập lý do hủy lịch hẹn (tối thiểu 10 ký tự)..."
                 minReasonLength={10}
                 refundInfo={
-                    selectedAppointmentToCancel
+                    selectedAppointmentToCancel && selectedAppointmentToCancel.consultationFees > 0
                         ? getRefundInfo(
                               selectedAppointmentToCancel.appointmentDate,
                               undefined,
                               false
-                          ) // Patient cancellation
+                          ) // Patient cancellation - only show refund info if has payment
                         : undefined
                 }
             />

@@ -119,6 +119,7 @@ export interface CreateAppointmentRequest {
     reason?: string;
     symptoms?: string;
     attachmentUrls?: string;
+    skipPayment?: boolean; // If true, skip payment and send confirmation email immediately
 }
 
 // Reschedule Requests
@@ -468,7 +469,7 @@ export const getDisplayName = (appointment: AppointmentCardData): string => {
     if (appointment.doctorInfo?.id) {
         return (
             appointment.doctorInfo.fullName ||
-            `${appointment.doctorInfo.firstName || ''} ${appointment.doctorInfo.lastName || ''}`.trim() ||
+            `${appointment.doctorInfo.lastName || ''} ${appointment.doctorInfo.firstName || ''}`.trim() ||
             'Bác sĩ'
         );
     }

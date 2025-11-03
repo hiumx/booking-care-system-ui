@@ -105,7 +105,7 @@ const Favourite: React.FC<FavouriteProps> = ({ patientId }) => {
     const convertToUIDoctor = (apiDoctor: DoctorResponse): FavouriteDoctor => {
         return {
             id: apiDoctor.id,
-            name: `${apiDoctor.firstName} ${apiDoctor.lastName}`,
+            name: `${apiDoctor.lastName} ${apiDoctor.firstName}`,
             specialty: apiDoctor.specialty?.name || 'Không xác định',
             image: apiDoctor.avatarUrl,
             rating: apiDoctor.reviewStatistics?.averageRating || 0,

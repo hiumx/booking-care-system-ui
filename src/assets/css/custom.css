@@ -57941,6 +57941,12 @@ ul li {
   justify-content: center;
   margin: 0 auto 8px;
 }
+.list-item .list-icon img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
 .list-item h6 {
   font-size: 16px;
   font-weight: 500;

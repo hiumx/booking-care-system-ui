@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import clsx from 'clsx';
 import styles from './SideBar.module.scss';
 import { Slider, styled } from '@mui/material';
@@ -39,6 +39,12 @@ interface SideBarProps {
     onGenderFilter?: (gender: string) => void;
     onGenderFilters?: (genders: string[]) => void; // Support multiple gender filters
     onPriceFilter?: (priceRange: { min: number; max: number }) => void;
+    initialServiceTypeFilters?: string[]; // Initial service type IDs from URL params
+    initialPriceRange?: { min: number; max: number }; // Initial price range from URL params
+    initialRating?: number; // Initial rating from URL params
+    initialExperienceRange?: { min: number; max: number }; // Initial experience range from URL params
+    initialSearchTerm?: string; // Initial search term from URL params
+    onClearAllFilters?: () => void; // Callback to clear all filters from parent
 }
 
 const mockFilterData: FilterSection[] = [
@@ -73,27 +79,6 @@ const mockFilterData: FilterSection[] = [
         hasViewMore: true,
     },
     {
-        title: 'Lịch trống',
-        options: [
-            { id: 'checkebox-sm17', label: 'Hôm nay' },
-            { id: 'checkebox-sm18', label: 'Ngày mai' },
-            { id: 'checkebox-sm19', label: 'Trong 7 ngày tới' },
-            { id: 'checkebox-sm20', label: 'Trong 30 ngày tới' },
-            { id: 'checkebox-sm21', label: 'Cuối tuần này' },
-        ],
-        hasViewMore: true,
-    },
-    {
-        title: 'Loại tư vấn',
-        options: [
-            { id: 'checkebox-sm35', label: 'Gọi thoại' },
-            { id: 'checkebox-sm36', label: 'Gọi video' },
-            { id: 'checkebox-sm37', label: 'Tư vấn tức thì' },
-            { id: 'checkebox-sm38', label: 'Chat' },
-            { id: 'checkebox-sm39', label: 'Tư vấn tại chỗ' },
-        ],
-    },
-    {
         title: 'Giới tính',
         options: [
             { id: 'checkebox-sm14', label: 'Nam' },
@@ -107,7 +92,7 @@ const mockFilterData: FilterSection[] = [
         hasViewMore: true,
     },
     {
-        title: 'Loại hình dịch vụ',
+        title: 'Loại dịch vụ',
         options: [], // Will be populated with real data from Redux
         hasViewMore: true,
     },
@@ -199,13 +184,20 @@ const SideBar: React.FC<SideBarProps> = ({
     onGenderFilter,
     onGenderFilters,
     onPriceFilter,
+    initialServiceTypeFilters,
+    initialPriceRange,
+    initialRating,
+    initialExperienceRange,
+    initialSearchTerm,
+    onClearAllFilters,
 }) => {
     const dispatch = useAppDispatch();
+    const [searchParams] = useSearchParams();
     const { positions } = useAppSelector((state) => state.position);
     const { languages } = useAppSelector((state) => state.language);
     const { serviceTypes } = useAppSelector((state) => state.serviceType);
 
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState(initialSearchTerm || '');
     const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>(() =>
         mockFilterData.reduce(
             (acc, section) => {
@@ -232,19 +224,41 @@ const SideBar: React.FC<SideBarProps> = ({
         [onSearchChange]
     );
     const [viewMoreSections, setViewMoreSections] = useState<{ [key: string]: boolean }>({});
-    const [priceRange, setPriceRange] = useState<number[]>([200000, 1000000]);
-    const [experienceRange, setExperienceRange] = useState<number[]>([1, 20]); // 1 to 30 years
-    const [checkedOptions, setCheckedOptions] = useState<{ [key: string]: boolean }>(() =>
-        mockFilterData.reduce(
+    const [priceRange, setPriceRange] = useState<number[]>(() =>
+        initialPriceRange ? [initialPriceRange.min, initialPriceRange.max] : [200000, 1000000]
+    );
+    const [experienceRange, setExperienceRange] = useState<number[]>(() =>
+        initialExperienceRange ? [initialExperienceRange.min, initialExperienceRange.max] : [1, 20]
+    ); // 1 to 30 years
+    const [checkedOptions, setCheckedOptions] = useState<{ [key: string]: boolean }>(() => {
+        const initial = mockFilterData.reduce(
             (acc, section) => {
-                section.options.forEach((option) => {
+                for (const option of section.options) {
                     acc[option.id] = false;
-                });
+                }
                 return acc;
             },
             {} as { [key: string]: boolean }
-        )
-    );
+        );
+
+        // Set rating checkbox if initialRating is provided
+        if (initialRating !== undefined) {
+            // Map rating to checkbox ID: 5->sm46, 4->sm47, 3->sm48, 2->sm49, 1->sm50
+            const ratingMap: { [key: number]: string } = {
+                5: 'checkebox-sm46',
+                4: 'checkebox-sm47',
+                3: 'checkebox-sm48',
+                2: 'checkebox-sm49',
+                1: 'checkebox-sm50',
+            };
+            const ratingId = ratingMap[initialRating];
+            if (ratingId) {
+                initial[ratingId] = true;
+            }
+        }
+
+        return initial;
+    });
 
     // Load data on component mount
     useEffect(() => {
@@ -252,6 +266,143 @@ const SideBar: React.FC<SideBarProps> = ({
         dispatch(getLanguagesAsync());
         dispatch(getServiceTypesAsync());
     }, [dispatch]);
+
+    // Helper function to clear checkboxes by prefix
+    const clearCheckboxesByPrefix = (updated: { [key: string]: boolean }, prefix: string): void => {
+        Object.keys(updated).forEach((key) => {
+            if (key.startsWith(prefix)) {
+                updated[key] = false;
+            }
+        });
+    };
+
+    // Helper function to set position checkboxes from URL
+    const syncPositionCheckboxes = (
+        updated: { [key: string]: boolean },
+        positionIdsFromUrl: string[]
+    ): void => {
+        clearCheckboxesByPrefix(updated, 'position-');
+        if (positionIdsFromUrl && positionIdsFromUrl.length > 0) {
+            for (const positionId of positionIdsFromUrl) {
+                updated[`position-${positionId}`] = true;
+            }
+        }
+    };
+
+    // Helper function to set language checkboxes from URL
+    const syncLanguageCheckboxes = (
+        updated: { [key: string]: boolean },
+        languageIdsFromUrl: string[]
+    ): void => {
+        clearCheckboxesByPrefix(updated, 'language-');
+        if (languageIdsFromUrl && languageIdsFromUrl.length > 0) {
+            for (const languageId of languageIdsFromUrl) {
+                updated[`language-${languageId}`] = true;
+            }
+        }
+    };
+
+    // Helper function to set gender checkboxes from URL
+    const syncGenderCheckboxes = (
+        updated: { [key: string]: boolean },
+        genderIdsFromUrl: string[]
+    ): void => {
+        const genderMap: { [key: string]: string } = {
+            MALE: 'checkebox-sm14',
+            FEMALE: 'checkebox-sm15',
+            OTHER: 'checkebox-sm16',
+        };
+        Object.keys(genderMap).forEach((key) => {
+            updated[genderMap[key]] = false;
+        });
+        if (genderIdsFromUrl && genderIdsFromUrl.length > 0) {
+            for (const gender of genderIdsFromUrl) {
+                const genderId = genderMap[gender];
+                if (genderId) {
+                    updated[genderId] = true;
+                }
+            }
+        }
+    };
+
+    // Helper function to set service type checkboxes from URL
+    const syncServiceTypeCheckboxes = (
+        updated: { [key: string]: boolean },
+        serviceTypeFilters: string[] | undefined
+    ): void => {
+        clearCheckboxesByPrefix(updated, 'serviceType-');
+        if (serviceTypeFilters && serviceTypeFilters.length > 0) {
+            for (const serviceTypeId of serviceTypeFilters) {
+                updated[`serviceType-${serviceTypeId}`] = true;
+            }
+        }
+    };
+
+    // Helper function to set rating checkboxes from URL
+    const syncRatingCheckboxes = (
+        updated: { [key: string]: boolean },
+        rating: number | undefined
+    ): void => {
+        const ratingMap: { [key: number]: string } = {
+            5: 'checkebox-sm46',
+            4: 'checkebox-sm47',
+            3: 'checkebox-sm48',
+            2: 'checkebox-sm49',
+            1: 'checkebox-sm50',
+        };
+        Object.keys(ratingMap).forEach((key) => {
+            updated[ratingMap[Number.parseInt(key, 10)]] = false;
+        });
+        if (rating !== undefined) {
+            const ratingId = ratingMap[rating];
+            if (ratingId) {
+                updated[ratingId] = true;
+            }
+        }
+    };
+
+    // Sync all checkbox options from URL params
+    useEffect(() => {
+        setCheckedOptions((prev) => {
+            const updated = { ...prev };
+            const positionIdsFromUrl = searchParams.getAll('positionId');
+            const languageIdsFromUrl = searchParams.getAll('languageId');
+            const genderIdsFromUrl = searchParams.getAll('gender');
+
+            syncPositionCheckboxes(updated, positionIdsFromUrl);
+            syncLanguageCheckboxes(updated, languageIdsFromUrl);
+            syncGenderCheckboxes(updated, genderIdsFromUrl);
+            syncServiceTypeCheckboxes(updated, initialServiceTypeFilters);
+            syncRatingCheckboxes(updated, initialRating);
+
+            return updated;
+        });
+    }, [initialServiceTypeFilters, initialRating, searchParams]);
+
+    // Sync search term from URL params
+    useEffect(() => {
+        setSearchTerm(initialSearchTerm || '');
+    }, [initialSearchTerm]);
+
+    // Sync price range from URL params
+    useEffect(() => {
+        if (initialPriceRange) {
+            setPriceRange([initialPriceRange.min, initialPriceRange.max]);
+        } else {
+            // Reset to default when cleared
+            setPriceRange([200000, 1000000]);
+        }
+    }, [initialPriceRange]);
+
+    // Sync experience range from URL params
+    useEffect(() => {
+        if (initialExperienceRange) {
+            setExperienceRange([initialExperienceRange.min, initialExperienceRange.max]);
+        } else {
+            // Reset to default when cleared
+            setExperienceRange([1, 20]);
+        }
+    }, [initialExperienceRange]);
 
     // Create dynamic filter data from Redux
     const dynamicFilterData = useMemo(() => {
@@ -284,7 +435,7 @@ const SideBar: React.FC<SideBarProps> = ({
 
         // Update Loại hình dịch vụ (Service Types) section with real data
         const serviceTypeSectionIndex = baseData.findIndex(
-            (section) => section.title === 'Loại hình dịch vụ'
+            (section) => section.title === 'Loại dịch vụ'
         );
         if (serviceTypeSectionIndex !== -1) {
             baseData[serviceTypeSectionIndex] = {
@@ -305,14 +456,7 @@ const SideBar: React.FC<SideBarProps> = ({
 
         // Ẩn section không có data (trừ các section luôn hiển thị)
         sections = sections.filter((section) => {
-            const alwaysShowSections = [
-                'Giá cả',
-                'Đánh giá',
-                'Kinh nghiệm',
-                'Lịch trống',
-                'Loại tư vấn',
-                'Giới tính',
-            ];
+            const alwaysShowSections = ['Giá cả', 'Đánh giá', 'Kinh nghiệm', 'Giới tính'];
             if (alwaysShowSections.includes(section.title)) {
                 return true;
             }
@@ -371,7 +515,7 @@ const SideBar: React.FC<SideBarProps> = ({
         const mappingFunctions = {
             'Học vị': (id: string) => id.replace('position-', ''),
             'Ngôn ngữ': (id: string) => id.replace('language-', ''),
-            'Loại hình dịch vụ': (id: string) => id.replace('serviceType-', ''),
+            'Loại dịch vụ': (id: string) => id.replace('serviceType-', ''),
             'Giới tính': (id: string) => {
                 const genderMap: { [key: string]: string } = {
                     'checkebox-sm14': 'MALE',
@@ -445,7 +589,7 @@ const SideBar: React.FC<SideBarProps> = ({
                     onLanguageFilter(languageId);
                 }
             },
-            'Loại hình dịch vụ': () => {
+            'Loại dịch vụ': () => {
                 if (onServiceTypeFilters) {
                     onServiceTypeFilters(checkedValues);
                 } else if (onServiceTypeFilter) {
@@ -459,18 +603,6 @@ const SideBar: React.FC<SideBarProps> = ({
                 } else if (onRatingFilter) {
                     const rating = isChecked ? id : '';
                     onRatingFilter(rating);
-                }
-            },
-            'Lịch trống': () => {
-                if (onAvailabilityFilter) {
-                    const availability = isChecked ? id : '';
-                    onAvailabilityFilter(availability);
-                }
-            },
-            'Loại tư vấn': () => {
-                if (onConsultationTypeFilter) {
-                    const consultationType = isChecked ? id : '';
-                    onConsultationTypeFilter(consultationType);
                 }
             },
             'Giới tính': () => {
@@ -494,16 +626,16 @@ const SideBar: React.FC<SideBarProps> = ({
         let isChecked: boolean;
 
         // Special handling for Service Type - radio button behavior (single selection)
-        if (sectionTitle === 'Loại hình dịch vụ') {
+        if (sectionTitle === 'Loại dịch vụ') {
             // For radio buttons, uncheck all options in this section first
             const section = dynamicFilterData.find((s) => s.title === sectionTitle);
             newCheckedOptions = { ...checkedOptions };
 
             // Uncheck all service type options
             if (section) {
-                section.options.forEach((option) => {
+                for (const option of section.options) {
                     newCheckedOptions[option.id] = false;
-                });
+                }
             }
 
             // Check the selected option
@@ -566,6 +698,8 @@ const SideBar: React.FC<SideBarProps> = ({
     const handleClearAll = (): void => {
         clearAllState();
         clearAllFilterCallbacks();
+        // Call parent's clear all handler if provided
+        onClearAllFilters?.();
     };
 
     const valueLabelFormat = (value: number): string => formatVND(value);
@@ -664,7 +798,9 @@ const SideBar: React.FC<SideBarProps> = ({
         }
 
         const shouldShowAll = viewMoreSections[section.title];
-        return shouldShowAll ? section.options : section.options.slice(0, 3);
+        // Show 5 items initially for Học vị, Ngôn ngữ, Loại hình dịch vụ
+        const initialDisplayCount = 5;
+        return shouldShowAll ? section.options : section.options.slice(0, initialDisplayCount);
     };
 
     // Helper function to render option list
@@ -672,7 +808,7 @@ const SideBar: React.FC<SideBarProps> = ({
         const optionsToShow = getOptionsToShow(section);
 
         // Use radio buttons for Service Type (single selection)
-        const isServiceType = section.title === 'Loại hình dịch vụ';
+        const isServiceType = section.title === 'Loại dịch vụ';
         const inputType = isServiceType ? 'radio' : 'checkbox';
         const inputName = isServiceType ? 'service-type-filter' : undefined;
 
@@ -701,7 +837,7 @@ const SideBar: React.FC<SideBarProps> = ({
 
     // Helper function to render view more button
     const renderViewMoreButton = (section: FilterSection, index: number) => {
-        if (!section.hasViewMore || section.title === 'Đánh giá' || section.options.length <= 3) {
+        if (!section.hasViewMore || section.title === 'Đánh giá' || section.options.length <= 5) {
             return null;
         }
 

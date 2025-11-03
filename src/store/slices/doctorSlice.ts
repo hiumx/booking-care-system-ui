@@ -172,6 +172,9 @@ const doctorSlice = createSlice({
             .addCase(searchDoctorsAsync.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
+                // Reset pagination to prevent showing stale totalCount
+                state.pagination.totalCount = 0;
+                state.pagination.totalPages = 0;
             })
             .addCase(searchDoctorsAsync.fulfilled, (state, action) => {
                 state.isLoading = false;
@@ -220,6 +223,9 @@ const doctorSlice = createSlice({
             .addCase(filterDoctorsAsync.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
+                // Reset pagination to prevent showing stale totalCount
+                state.pagination.totalCount = 0;
+                state.pagination.totalPages = 0;
             })
             .addCase(filterDoctorsAsync.fulfilled, (state, action) => {
                 state.isLoading = false;
