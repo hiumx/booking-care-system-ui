@@ -250,7 +250,7 @@ const Appointments: React.FC = () => {
             // 2. Doctor info
             const doctorName =
                 apt.doctorInfo?.fullName?.toLowerCase() ||
-                `${apt.doctorInfo?.firstName || ''} ${apt.doctorInfo?.lastName || ''}`
+                `${apt.doctorInfo?.lastName || ''} ${apt.doctorInfo?.firstName || ''}`
                     .toLowerCase()
                     .trim();
             const specialty = apt.doctorInfo?.specialtyName?.toLowerCase() || '';

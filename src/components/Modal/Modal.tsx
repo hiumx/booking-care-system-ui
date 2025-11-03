@@ -32,12 +32,10 @@ const Modal: React.FC<ModalProps> = ({
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedItems, setSelectedItems] = useState<string[]>(initialSelectedItems);
 
-    // Sync selectedItems with initialSelectedItems when modal opens
+    // Sync selectedItems with initialSelectedItems whenever it changes
     useEffect(() => {
-        if (isOpen && initialSelectedItems.length > 0) {
-            setSelectedItems(initialSelectedItems);
-        }
-    }, [isOpen, initialSelectedItems]);
+        setSelectedItems(initialSelectedItems || []);
+    }, [initialSelectedItems]);
 
     // Thêm useEffect để xử lý cuộn trang
     useEffect(() => {
@@ -54,9 +52,14 @@ const Modal: React.FC<ModalProps> = ({
     }, [isOpen]);
 
     const handleItemToggle = (itemId: string) => {
-        setSelectedItems((prev) =>
-            prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
-        );
+        setSelectedItems((prev) => {
+            // For hospital and specialty, only allow single selection
+            if (itemType === 'hospital' || itemType === 'specialty') {
+                return prev.includes(itemId) ? [] : [itemId];
+            }
+            // For other types, allow multiple selection
+            return prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId];
+        });
     };
 
     const handleClearFilter = () => {

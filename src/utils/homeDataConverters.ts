@@ -46,7 +46,7 @@ export const convertToHospitalFormat = (apiHospitals: any[]) => {
 export const convertToDoctorFormat = (apiDoctors: any[]) => {
     return apiDoctors.map((doctor) => ({
         id: doctor.id,
-        name: `${doctor.firstName} ${doctor.lastName}`,
+        name: `${doctor.lastName} ${doctor.firstName}`,
         image: doctor.avatarUrl || '/default-doctor.png',
         specialty: doctor.specialty?.name || 'Chuyên khoa',
         hospitalName: doctor.hospital?.name || 'Bệnh viện',

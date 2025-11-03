@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Calendar from '@/components/Calendar';
 import Modal from '@/components/Modal';
 import ModalArea from '@/components/ModalArea';
@@ -45,6 +45,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
 }) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { simpleHospitals } = useAppSelector((state) => state.hospital);
     const { specialties } = useAppSelector((state) => state.specialty);
 
@@ -76,9 +77,6 @@ const SearchInput: React.FC<SearchInputProps> = ({
     // Ref to track if reschedule filters have been initialized
     const rescheduleInitialized = useRef(false);
 
-    // Ref to track if URL params have been synced (for DoctorList page)
-    const urlParamsSynced = useRef(false);
-
     // Load data on component mount
     useEffect(() => {
         // Load hospitals (optimized API)
@@ -107,28 +105,27 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
     // Sync search input with URL params when on DoctorList page
     useEffect(() => {
-        if (isDoctorListPage && !urlParamsSynced.current) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const searchFromUrl = urlParams.get('search');
-            const dateFromUrl = urlParams.get('date');
-            const provinceIdFromUrl = urlParams.get('provinceId');
-            const districtIdFromUrl = urlParams.get('districtId');
-            const provinceNameFromUrl = urlParams.get('provinceName');
-            const districtNameFromUrl = urlParams.get('districtName');
+        if (isDoctorListPage) {
+            const searchFromUrl = searchParams.get('search');
+            const dateFromUrl = searchParams.get('date');
+            const provinceIdFromUrl = searchParams.get('provinceId');
+            const districtIdFromUrl = searchParams.get('districtId');
+            const provinceNameFromUrl = searchParams.get('provinceName');
+            const districtNameFromUrl = searchParams.get('districtName');
+            const specialtyIdFromUrl = searchParams.get('specialtyId');
+            const hospitalIdFromUrl = searchParams.get('hospitalId');
 
-            if (searchFromUrl) {
-                setDoctorName(searchFromUrl);
-
-                // Update the contentEditable div
-                setTimeout(() => {
-                    const contentEditableDiv = document.querySelector(
-                        '[contenteditable="true"][data-placeholder="Nhập tên bác sĩ"]'
-                    );
-                    if (contentEditableDiv) {
-                        contentEditableDiv.textContent = searchFromUrl;
-                    }
-                }, 0);
-            }
+            // Sync doctor name from URL
+            setDoctorName(searchFromUrl || '');
+            // Update the contentEditable div
+            setTimeout(() => {
+                const contentEditableDiv = document.querySelector(
+                    '[contenteditable="true"][data-placeholder="Nhập tên bác sĩ"]'
+                );
+                if (contentEditableDiv) {
+                    contentEditableDiv.textContent = searchFromUrl || '';
+                }
+            }, 0);
 
             // Sync date from URL
             if (dateFromUrl) {
@@ -158,11 +155,27 @@ const SearchInput: React.FC<SearchInputProps> = ({
                 } else if (provinceNameFromUrl) {
                     setSelectedArea(provinceNameFromUrl);
                 }
+            } else {
+                // Clear area if not in URL
+                setSelectedAreaInfo({});
+                setSelectedArea('');
             }
 
-            urlParamsSynced.current = true;
+            // Sync specialty from URL
+            if (specialtyIdFromUrl) {
+                setSelectedSpecialties([specialtyIdFromUrl]);
+            } else {
+                setSelectedSpecialties([]);
+            }
+
+            // Sync hospital from URL
+            if (hospitalIdFromUrl) {
+                setSelectedClinics([hospitalIdFromUrl]);
+            } else {
+                setSelectedClinics([]);
+            }
         }
-    }, [isDoctorListPage]);
+    }, [isDoctorListPage, searchParams]);
 
     // Auto-resize function
     const autoResize = (element: HTMLDivElement) => {

@@ -118,6 +118,10 @@ const DoctorList: React.FC = () => {
     // Use ref to prevent re-initialization on every render
     const hasInitializedUrlFilters = useRef(false);
 
+    // Debounced search term for API calls (to avoid calling API on every keystroke)
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
     // Fetch service types on mount to ensure they're available
     useEffect(() => {
         if (serviceTypes.length === 0) {
@@ -131,6 +135,26 @@ const DoctorList: React.FC = () => {
             dispatch(getLanguagesAsync());
         }
     }, [dispatch, languages.length]);
+
+    // Debounce searchTerm - only update debouncedSearchTerm after 3 seconds of no typing
+    useEffect(() => {
+        // Clear existing timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        // Set new timeout to update debouncedSearchTerm after 3 seconds
+        searchTimeoutRef.current = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 3000);
+
+        // Cleanup on unmount or when searchTerm changes (before new timeout is set)
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, [searchTerm]);
 
     // Initialize all filters from URL params - ONLY ONCE
     useEffect(() => {
@@ -285,7 +309,7 @@ const DoctorList: React.FC = () => {
     const buildBasicFilters = () => ({
         pageNumber: currentPage,
         pageSize: pageSize,
-        searchTerm: getTrimmedString(searchTerm),
+        searchTerm: getTrimmedString(debouncedSearchTerm),
         ratingFilter: ratingFilter,
         genderFilter: genderFilter,
         experienceRange: experienceFilter,
@@ -362,17 +386,18 @@ const DoctorList: React.FC = () => {
                         {(searchTerm ||
                             specialtyFilters.length > 0 ||
                             hospitalFilters.length > 0 ||
-                            areaFilter) && (
+                            areaFilter ||
+                            priceFilter ||
+                            ratingFilter ||
+                            experienceFilter ||
+                            positionFilters.length > 0 ||
+                            languageFilters.length > 0 ||
+                            serviceTypeFilters.length > 0 ||
+                            genderFilters.length > 0) && (
                             <div className="mt-3">
                                 <button
                                     className="btn btn-outline-primary"
-                                    onClick={() => {
-                                        setSearchTerm('');
-                                        setSpecialtyFilters([]);
-                                        setHospitalFilters([]);
-                                        setAreaFilter(undefined);
-                                        setCurrentPage(1);
-                                    }}
+                                    onClick={handleClearAllFilters}
                                 >
                                     Xóa tất cả bộ lọc
                                 </button>
@@ -388,7 +413,7 @@ const DoctorList: React.FC = () => {
                 key={doctor.id}
                 doctorId={doctor.id}
                 patientId={patientId}
-                name={`${doctor.firstName} ${doctor.lastName}`}
+                name={`${doctor.lastName} ${doctor.firstName}`}
                 specialty={doctor.specialty?.name || 'Chưa cập nhật'}
                 position={doctor.position?.name || 'Chưa cập nhật'}
                 prices={
@@ -462,7 +487,7 @@ const DoctorList: React.FC = () => {
             }
         }
 
-        // For other URL params (reschedule flow)
+        // For other URL params (reschedule flow or initial load)
         const isWaitingForUrlFilters = hasUrlParams && !hasInitializedUrlFilters.current;
 
         if (isWaitingForUrlFilters) {
@@ -489,7 +514,7 @@ const DoctorList: React.FC = () => {
         dispatch,
         currentPage,
         pageSize,
-        searchTerm,
+        debouncedSearchTerm,
         specialtyFilter,
         specialtyFilters,
         hospitalFilter,
@@ -593,6 +618,18 @@ const DoctorList: React.FC = () => {
 
     const handleSpecialtyFilters = (specialtyIds: string[]) => {
         setSpecialtyFilters(specialtyIds);
+
+        // Update URL with specialtyId param
+        const newParams = new URLSearchParams(searchParams);
+        if (specialtyIds.length > 0) {
+            newParams.set('specialtyId', specialtyIds[0]); // Use first specialty for URL
+        } else {
+            newParams.delete('specialtyId');
+        }
+        newParams.set('pageNumber', '1');
+        newParams.set('pageSize', String(pageSize));
+        setSearchParams(newParams, { replace: true });
+
         setCurrentPage(1);
     };
 
@@ -619,6 +656,18 @@ const DoctorList: React.FC = () => {
 
     const handleHospitalFilters = (hospitalIds: string[]) => {
         setHospitalFilters(hospitalIds);
+
+        // Update URL with hospitalId param
+        const newParams = new URLSearchParams(searchParams);
+        if (hospitalIds.length > 0) {
+            newParams.set('hospitalId', hospitalIds[0]); // Use first hospital for URL
+        } else {
+            newParams.delete('hospitalId');
+        }
+        newParams.set('pageNumber', '1');
+        newParams.set('pageSize', String(pageSize));
+        setSearchParams(newParams, { replace: true });
+
         setCurrentPage(1);
     };
 
@@ -629,6 +678,33 @@ const DoctorList: React.FC = () => {
         districtName?: string;
     }) => {
         setAreaFilter(areaInfo);
+
+        // Update URL with area params
+        const newParams = new URLSearchParams(searchParams);
+        if (areaInfo.provinceId) {
+            newParams.set('provinceId', areaInfo.provinceId);
+        } else {
+            newParams.delete('provinceId');
+        }
+        if (areaInfo.districtId) {
+            newParams.set('districtId', areaInfo.districtId);
+        } else {
+            newParams.delete('districtId');
+        }
+        if (areaInfo.provinceName) {
+            newParams.set('provinceName', areaInfo.provinceName);
+        } else {
+            newParams.delete('provinceName');
+        }
+        if (areaInfo.districtName) {
+            newParams.set('districtName', areaInfo.districtName);
+        } else {
+            newParams.delete('districtName');
+        }
+        newParams.set('pageNumber', '1');
+        newParams.set('pageSize', String(pageSize));
+        setSearchParams(newParams, { replace: true });
+
         setCurrentPage(1);
     };
 
@@ -805,6 +881,39 @@ const DoctorList: React.FC = () => {
         setCurrentPage(1);
     };
 
+    // Clear all filters handler
+    const handleClearAllFilters = () => {
+        // Clear all state
+        setSearchTerm('');
+        setSpecialtyFilter('');
+        setSpecialtyFilters([]);
+        setHospitalFilter('');
+        setHospitalFilters([]);
+        setPositionFilter('');
+        setPositionFilters([]);
+        setLanguageFilter('');
+        setLanguageFilters([]);
+        setServiceTypeFilter('');
+        setServiceTypeFilters([]);
+        setRatingFilter(undefined);
+        setRatingFilters([]);
+        setExperienceFilter(undefined);
+        setExperienceFilters([]);
+        setAvailabilityFilter('');
+        setConsultationTypeFilter('');
+        setGenderFilter(undefined);
+        setGenderFilters([]);
+        setPriceFilter(undefined);
+        setAreaFilter(undefined);
+        setCurrentPage(1);
+
+        // Clear all URL params except pageNumber and pageSize
+        const newParams = new URLSearchParams();
+        newParams.set('pageNumber', '1');
+        newParams.set('pageSize', String(pageSize));
+        setSearchParams(newParams, { replace: true });
+    };
+
     return (
         <MainLayout>
             <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
@@ -844,6 +953,25 @@ const DoctorList: React.FC = () => {
                             initialServiceTypeFilters={
                                 serviceTypeFromUrl ? [serviceTypeFromUrl] : undefined
                             }
+                            initialPriceRange={
+                                priceMinFromUrl || priceMaxFromUrl
+                                    ? {
+                                          min: parseFloat(priceMinFromUrl || '0'),
+                                          max: parseFloat(priceMaxFromUrl || '10000000'),
+                                      }
+                                    : undefined
+                            }
+                            initialRating={ratingFromUrl ? parseInt(ratingFromUrl, 10) : undefined}
+                            initialExperienceRange={
+                                experienceMinFromUrl || experienceMaxFromUrl
+                                    ? {
+                                          min: parseInt(experienceMinFromUrl || '1', 10),
+                                          max: parseInt(experienceMaxFromUrl || '100', 10),
+                                      }
+                                    : undefined
+                            }
+                            initialSearchTerm={searchFromUrl || ''}
+                            onClearAllFilters={handleClearAllFilters}
                         />
                         <div className="col-xl-9">
                             <div className="card">
