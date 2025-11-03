@@ -660,7 +660,7 @@ const Appointments: React.FC = () => {
             {/* Dashboard Header */}
             <div className="dashboard-header">
                 <h3>Lịch Hẹn</h3>
-                <ul className="header-list-btns">
+                <ul className={clsx(styles.headerListBtns, 'header-list-btns')}>
                     <li>
                         <div className="input-block dash-search-input">
                             <input
@@ -716,7 +716,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('waiting')}
                             >
-                                Chờ Xác Nhận <span>{appointmentCounts.waiting}</span>
+                                Chờ Xác Nhận<span>{appointmentCounts.waiting}</span>
                             </button>
                         </li>
                         <li className="nav-item">
@@ -725,7 +725,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('upcoming')}
                             >
-                                Sắp Tới <span>{appointmentCounts.upcoming}</span>
+                                Sắp Khám<span>{appointmentCounts.upcoming}</span>
                             </button>
                         </li>
                         <li className="nav-item">
@@ -743,7 +743,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('completed')}
                             >
-                                Hoàn Thành <span>{appointmentCounts.completed}</span>
+                                Đã Khám <span>{appointmentCounts.completed}</span>
                             </button>
                         </li>
                     </ul>

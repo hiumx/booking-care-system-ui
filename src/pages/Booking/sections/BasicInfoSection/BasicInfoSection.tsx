@@ -164,12 +164,32 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep 
                             <div className="mb-3">
                                 <label className="form-label" htmlFor="attachments">
                                     Tệp đính kèm
+                                    <span className="text-muted ms-1">(Không bắt buộc)</span>
                                     {attachments.length > 0 && (
                                         <small className="text-success ms-2">
                                             ({attachments.length} tệp đã chọn)
                                         </small>
                                     )}
                                 </label>
+                                <div className="alert alert-info py-2 mb-2">
+                                    <i className="fa fa-info-circle me-2"></i>
+                                    <small>
+                                        <strong>Khi nào nên đính kèm tệp?</strong>
+                                        <ul className="mb-0 mt-1 ps-3">
+                                            <li>
+                                                Tái khám: Kết quả xét nghiệm, hình ảnh chụp từ lần
+                                                khám trước
+                                            </li>
+                                            <li>Khám bệnh mãn tính: Hồ sơ bệnh án, đơn thuốc cũ</li>
+                                            <li>
+                                                Tư vấn từ xa: Hình ảnh triệu chứng, kết quả khám bên
+                                                ngoài
+                                            </li>
+                                        </ul>
+                                        <strong className="d-block mt-1">Chấp nhận:</strong> Ảnh
+                                        (JPG, PNG), PDF, Word (DOC, DOCX) - Tối đa 10MB/tệp
+                                    </small>
+                                </div>
                                 <CustomFileInput
                                     files={attachments}
                                     onChange={handleFileChange}
