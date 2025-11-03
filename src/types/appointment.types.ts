@@ -119,6 +119,7 @@ export interface CreateAppointmentRequest {
     reason?: string;
     symptoms?: string;
     attachmentUrls?: string;
+    skipPayment?: boolean; // If true, skip payment and send confirmation email immediately
 }
 
 // Reschedule Requests
