@@ -267,90 +267,113 @@ const SideBar: React.FC<SideBarProps> = ({
         dispatch(getServiceTypesAsync());
     }, [dispatch]);
 
+    // Helper function to clear checkboxes by prefix
+    const clearCheckboxesByPrefix = (updated: { [key: string]: boolean }, prefix: string): void => {
+        Object.keys(updated).forEach((key) => {
+            if (key.startsWith(prefix)) {
+                updated[key] = false;
+            }
+        });
+    };
+
+    // Helper function to set position checkboxes from URL
+    const syncPositionCheckboxes = (
+        updated: { [key: string]: boolean },
+        positionIdsFromUrl: string[]
+    ): void => {
+        clearCheckboxesByPrefix(updated, 'position-');
+        if (positionIdsFromUrl && positionIdsFromUrl.length > 0) {
+            for (const positionId of positionIdsFromUrl) {
+                updated[`position-${positionId}`] = true;
+            }
+        }
+    };
+
+    // Helper function to set language checkboxes from URL
+    const syncLanguageCheckboxes = (
+        updated: { [key: string]: boolean },
+        languageIdsFromUrl: string[]
+    ): void => {
+        clearCheckboxesByPrefix(updated, 'language-');
+        if (languageIdsFromUrl && languageIdsFromUrl.length > 0) {
+            for (const languageId of languageIdsFromUrl) {
+                updated[`language-${languageId}`] = true;
+            }
+        }
+    };
+
+    // Helper function to set gender checkboxes from URL
+    const syncGenderCheckboxes = (
+        updated: { [key: string]: boolean },
+        genderIdsFromUrl: string[]
+    ): void => {
+        const genderMap: { [key: string]: string } = {
+            MALE: 'checkebox-sm14',
+            FEMALE: 'checkebox-sm15',
+            OTHER: 'checkebox-sm16',
+        };
+        Object.keys(genderMap).forEach((key) => {
+            updated[genderMap[key]] = false;
+        });
+        if (genderIdsFromUrl && genderIdsFromUrl.length > 0) {
+            for (const gender of genderIdsFromUrl) {
+                const genderId = genderMap[gender];
+                if (genderId) {
+                    updated[genderId] = true;
+                }
+            }
+        }
+    };
+
+    // Helper function to set service type checkboxes from URL
+    const syncServiceTypeCheckboxes = (
+        updated: { [key: string]: boolean },
+        serviceTypeFilters: string[] | undefined
+    ): void => {
+        clearCheckboxesByPrefix(updated, 'serviceType-');
+        if (serviceTypeFilters && serviceTypeFilters.length > 0) {
+            for (const serviceTypeId of serviceTypeFilters) {
+                updated[`serviceType-${serviceTypeId}`] = true;
+            }
+        }
+    };
+
+    // Helper function to set rating checkboxes from URL
+    const syncRatingCheckboxes = (
+        updated: { [key: string]: boolean },
+        rating: number | undefined
+    ): void => {
+        const ratingMap: { [key: number]: string } = {
+            5: 'checkebox-sm46',
+            4: 'checkebox-sm47',
+            3: 'checkebox-sm48',
+            2: 'checkebox-sm49',
+            1: 'checkebox-sm50',
+        };
+        Object.keys(ratingMap).forEach((key) => {
+            updated[ratingMap[Number.parseInt(key, 10)]] = false;
+        });
+        if (rating !== undefined) {
+            const ratingId = ratingMap[rating];
+            if (ratingId) {
+                updated[ratingId] = true;
+            }
+        }
+    };
+
     // Sync all checkbox options from URL params
     useEffect(() => {
         setCheckedOptions((prev) => {
             const updated = { ...prev };
-
-            // Get URL params for positions, languages, and genders
             const positionIdsFromUrl = searchParams.getAll('positionId');
             const languageIdsFromUrl = searchParams.getAll('languageId');
             const genderIdsFromUrl = searchParams.getAll('gender');
 
-            // Clear and set position checkboxes
-            Object.keys(updated).forEach((key) => {
-                if (key.startsWith('position-')) {
-                    updated[key] = false;
-                }
-            });
-            if (positionIdsFromUrl && positionIdsFromUrl.length > 0) {
-                for (const positionId of positionIdsFromUrl) {
-                    const optionId = `position-${positionId}`;
-                    updated[optionId] = true;
-                }
-            }
-
-            // Clear and set language checkboxes
-            Object.keys(updated).forEach((key) => {
-                if (key.startsWith('language-')) {
-                    updated[key] = false;
-                }
-            });
-            if (languageIdsFromUrl && languageIdsFromUrl.length > 0) {
-                for (const languageId of languageIdsFromUrl) {
-                    const optionId = `language-${languageId}`;
-                    updated[optionId] = true;
-                }
-            }
-
-            // Clear and set gender checkboxes
-            const genderMap: { [key: string]: string } = {
-                MALE: 'checkebox-sm14',
-                FEMALE: 'checkebox-sm15',
-                OTHER: 'checkebox-sm16',
-            };
-            Object.keys(genderMap).forEach((key) => {
-                updated[genderMap[key]] = false;
-            });
-            if (genderIdsFromUrl && genderIdsFromUrl.length > 0) {
-                for (const gender of genderIdsFromUrl) {
-                    const genderId = genderMap[gender];
-                    if (genderId) {
-                        updated[genderId] = true;
-                    }
-                }
-            }
-
-            // Clear and set service type checkboxes
-            Object.keys(updated).forEach((key) => {
-                if (key.startsWith('serviceType-')) {
-                    updated[key] = false;
-                }
-            });
-            if (initialServiceTypeFilters && initialServiceTypeFilters.length > 0) {
-                for (const serviceTypeId of initialServiceTypeFilters) {
-                    const optionId = `serviceType-${serviceTypeId}`;
-                    updated[optionId] = true;
-                }
-            }
-
-            // Clear and set rating checkboxes
-            const ratingMap: { [key: number]: string } = {
-                5: 'checkebox-sm46',
-                4: 'checkebox-sm47',
-                3: 'checkebox-sm48',
-                2: 'checkebox-sm49',
-                1: 'checkebox-sm50',
-            };
-            Object.keys(ratingMap).forEach((key) => {
-                updated[ratingMap[Number.parseInt(key, 10)]] = false;
-            });
-            if (initialRating !== undefined) {
-                const ratingId = ratingMap[initialRating];
-                if (ratingId) {
-                    updated[ratingId] = true;
-                }
-            }
+            syncPositionCheckboxes(updated, positionIdsFromUrl);
+            syncLanguageCheckboxes(updated, languageIdsFromUrl);
+            syncGenderCheckboxes(updated, genderIdsFromUrl);
+            syncServiceTypeCheckboxes(updated, initialServiceTypeFilters);
+            syncRatingCheckboxes(updated, initialRating);
 
             return updated;
         });

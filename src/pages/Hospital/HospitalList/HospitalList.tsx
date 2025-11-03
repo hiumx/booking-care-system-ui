@@ -67,7 +67,6 @@ const HospitalList: React.FC = () => {
             sortOrder: 'asc',
         };
 
-        console.log('Loading hospitals with filter:', filter);
         dispatch(getOptimizedHospitalListAsync(filter));
     }, [debouncedSearch, selectedSpecialties, provinceId, districtId, currentPage, dispatch]);
 
@@ -117,8 +116,6 @@ const HospitalList: React.FC = () => {
 
     // Modal handlers
     const handleAreaSelect = (areaDisplay: string, locationId: string, provinceId?: string) => {
-        console.log('Area selected:', { areaDisplay, locationId, provinceId });
-
         // Parse area info from the display string and locationId
         let newProvinceId: string;
         let newDistrictId: string;
@@ -194,9 +191,6 @@ const HospitalList: React.FC = () => {
     };
 
     const handleSpecialtyApply = (selectedItems: string[], _searchTerm: string) => {
-        // _searchTerm is required by Modal interface but not used in this context
-        console.log('Specialties selected:', selectedItems);
-
         // If selectedItems is empty array, it means clear was called
         if (selectedItems.length === 0) {
             setSelectedSpecialties([]);

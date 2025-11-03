@@ -169,12 +169,6 @@ const DoctorList: React.FC = () => {
     const initializeServiceTypeFilter = () => {
         if (serviceTypeFromUrl && serviceTypes.length > 0) {
             const serviceType = serviceTypes.find((st) => st.id === serviceTypeFromUrl);
-            console.log('🔍 Service Type Filter Debug:', {
-                serviceTypeFromUrl,
-                serviceTypes,
-                foundServiceType: serviceType,
-                willSetFilters: serviceType ? [serviceType.name] : 'NOT FOUND',
-            });
             if (serviceType) {
                 setServiceTypeFilters([serviceType.name]);
             }
@@ -375,6 +369,33 @@ const DoctorList: React.FC = () => {
         );
     };
 
+    // Helper function to check if we should wait for service types
+    const shouldWaitForServiceTypes = () => {
+        if (!serviceTypeFromUrl) return false;
+        const isServiceTypesLoaded = serviceTypes.length > 0;
+        const isServiceTypeFilterSet = serviceTypeFilters.length > 0;
+        return !isServiceTypesLoaded || !isServiceTypeFilterSet;
+    };
+
+    // Helper function to check if we should wait for languages
+    const shouldWaitForLanguages = () => {
+        if (!languageIdsFromUrl || languageIdsFromUrl.length === 0) return false;
+        const isLanguagesLoaded = languages.length > 0;
+        const isLanguageFilterSet = languageFilters.length > 0;
+        return !isLanguagesLoaded || !isLanguageFilterSet;
+    };
+
+    // Helper function to check if we should wait for URL filters initialization
+    const shouldWaitForUrlFilters = () => {
+        const hasUrlParams =
+            isRescheduleFlow ||
+            serviceTypeFromUrl ||
+            (languageIdsFromUrl && languageIdsFromUrl.length > 0) ||
+            specialtyIdFromUrl ||
+            hospitalIdFromUrl;
+        return hasUrlParams && !hasInitializedUrlFilters.current;
+    };
+
     // Helper function to render doctor list content
     const renderDoctorListContent = () => {
         if (isLoading) {
@@ -458,60 +479,20 @@ const DoctorList: React.FC = () => {
     useEffect(() => {
         // Wait until URL filters are initialized in state before fetching
         // This prevents the initial fetch with empty filters when URL has params
-        const hasUrlParams =
-            isRescheduleFlow ||
-            serviceTypeFromUrl ||
-            (languageIdsFromUrl && languageIdsFromUrl.length > 0) ||
-            specialtyIdFromUrl ||
-            hospitalIdFromUrl;
-
-        // If we have service-type-id in URL, wait for serviceTypes to be loaded AND filter to be set
-        if (serviceTypeFromUrl) {
-            const isServiceTypesLoaded = serviceTypes.length > 0;
-            const isServiceTypeFilterSet = serviceTypeFilters.length > 0;
-
-            if (!isServiceTypesLoaded || !isServiceTypeFilterSet) {
-                console.log('⏳ Waiting for service types to load and filter to be set...', {
-                    isServiceTypesLoaded,
-                    isServiceTypeFilterSet,
-                    serviceTypeFilters,
-                });
-                return;
-            }
+        if (shouldWaitForServiceTypes()) {
+            return;
         }
 
-        // If we have languageId in URL, wait for languages to be loaded AND filter to be set
-        if (languageIdsFromUrl && languageIdsFromUrl.length > 0) {
-            const isLanguagesLoaded = languages.length > 0;
-            const isLanguageFilterSet = languageFilters.length > 0;
-
-            if (!isLanguagesLoaded || !isLanguageFilterSet) {
-                console.log('⏳ Waiting for languages to load and filter to be set...', {
-                    isLanguagesLoaded,
-                    isLanguageFilterSet,
-                    languageFilters,
-                });
-                return;
-            }
+        if (shouldWaitForLanguages()) {
+            return;
         }
 
-        // For other URL params (reschedule flow or initial load)
-        const isWaitingForUrlFilters = hasUrlParams && !hasInitializedUrlFilters.current;
-
-        if (isWaitingForUrlFilters) {
-            console.log('⏳ Waiting for URL filters to be initialized...');
+        if (shouldWaitForUrlFilters()) {
             return;
         }
 
         const params = buildSearchParams();
         const useAdvancedFiltering = shouldUseAdvancedFiltering();
-
-        console.log('🚀 Fetching doctors with params:', {
-            serviceTypeFromUrl,
-            serviceTypeFilters,
-            useAdvancedFiltering,
-            params,
-        });
 
         if (useAdvancedFiltering) {
             dispatch(filterDoctorsAsync(params));
