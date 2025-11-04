@@ -3,13 +3,10 @@ import MainLayout from '@/layouts/MainLayout';
 import { ChatProvider } from '@/providers/ChatProvider';
 import ChatSidebar from './components/ChatSidebar';
 import ChatMessages from './components/ChatMessages';
-import SignalRDebugPanel from './components/SignalRDebugPanel';
+
 import styles from './Chat.module.scss';
 
 const Chat = () => {
-    // Show debug panel only in development mode
-    const isDevelopment = import.meta.env.DEV;
-
     return (
         <MainLayout hasFooter={false}>
             <ChatProvider>
@@ -35,9 +32,6 @@ const Chat = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* SignalR Debug Panel - Only in Development */}
-                {isDevelopment && <SignalRDebugPanel />}
             </ChatProvider>
         </MainLayout>
     );

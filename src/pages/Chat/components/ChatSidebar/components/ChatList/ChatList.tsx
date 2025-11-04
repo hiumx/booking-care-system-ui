@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { useChat } from '@/providers/ChatProvider';
 import { RootState } from '@/store';
-import { ConversationResponse } from '@/types/communication.types';
+import { ConversationResponse, MessageType } from '@/types/communication.types';
 import styles from './ChatList.module.scss';
 
 interface ChatListProps {
@@ -48,9 +48,9 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
         );
     };
 
-    // Check if user is online
+    // Check if user is online - normalize to UPPERCASE to match backend normalization
     const isUserOnline = (userId: string) => {
-        return onlineUsers.has(userId);
+        return onlineUsers.has(userId.toUpperCase());
     };
 
     // Format timestamp
@@ -67,6 +67,42 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
         if (hours < 24) return `${hours} giờ trước`;
         if (days < 7) return `${days} ngày trước`;
         return date.toLocaleDateString('vi-VN');
+    };
+
+    // Format last message preview
+    const formatLastMessagePreview = (conv: ConversationResponse) => {
+        if (!conv.lastMessage) return 'Không có tin nhắn';
+
+        const { content, type, attachments } = conv.lastMessage;
+
+        // If has content, show it
+        if (content && content.trim()) {
+            return content;
+        }
+
+        // If no content but has attachments, show appropriate message
+        if (attachments && attachments.length > 0) {
+            const attachment = attachments[0];
+            const fileName = attachment.fileName || attachment.name;
+
+            switch (type) {
+                case MessageType.IMAGE:
+                    return fileName ? `📷 ${fileName}` : '📷 Đã gửi ảnh';
+                case MessageType.VIDEO:
+                    return fileName ? `🎥 ${fileName}` : '🎥 Đã gửi video';
+                case MessageType.AUDIO:
+                    return fileName ? `🎵 ${fileName}` : '🎵 Đã gửi audio';
+                case MessageType.FILE:
+                    return fileName ? `📎 ${fileName}` : '📎 Đã gửi file';
+                case MessageType.VOICE_NOTE:
+                    return '🎤 Tin nhắn thoại';
+                default:
+                    return fileName ? `📎 ${fileName}` : '📎 Đã gửi file';
+            }
+        }
+
+        // Fallback
+        return 'Không có tin nhắn';
     };
 
     const handleSelectConversation = (conversationId: string) => {
@@ -104,7 +140,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
                                 <div className="users-list-body">
                                     <div>
                                         <h5>{otherUser?.fullName || 'Unknown User'}</h5>
-                                        <p>{conv.lastMessage?.content || 'Không có tin nhắn'}</p>
+                                        <p>{formatLastMessagePreview(conv)}</p>
                                     </div>
                                     <div className="last-chat-time">
                                         <small className="text-muted">

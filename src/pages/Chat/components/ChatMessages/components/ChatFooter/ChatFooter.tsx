@@ -56,9 +56,9 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
         setIsSending(true);
         try {
             if (hasFiles && fileMessageType) {
-                // Send message with files (and optional text caption)
+                // Send message with file (and optional text caption)
                 await sendMessage(message.trim(), fileMessageType, selectedFiles);
-                toast.success(`Đã gửi ${selectedFiles.length} file thành công`);
+                toast.success('Đã gửi file thành công');
             } else {
                 // Send text-only message
                 await sendMessage(message.trim(), MessageType.TEXT);
@@ -141,16 +141,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
         }
     };
 
-    // Remove a staged file
-    const handleRemoveFile = (index: number) => {
-        setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-        if (selectedFiles.length === 1) {
-            // Last file removed, clear message type
-            setFileMessageType(null);
-        }
-    };
-
-    // Clear all staged files
+    // Clear staged file
     const handleClearFiles = () => {
         setSelectedFiles([]);
         setFileMessageType(null);
@@ -214,60 +205,44 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
     };
 
     return (
-        <div className="chat-footer">
-            {/* File Preview Area (Modern UX like Slack) */}
+        <div className={clsx('chat-footer', styles.chatFooterWrapper)}>
+            {/* File Preview Area - Single File */}
             {selectedFiles.length > 0 && (
                 <div className={styles.filePreviewArea}>
-                    <div className={styles.filePreviewHeader}>
-                        <span className={styles.filePreviewTitle}>
-                            <i className="fa-solid fa-paperclip"></i>
-                            {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} đã chọn
-                        </span>
-                        <button
-                            type="button"
-                            className={styles.clearAllBtn}
-                            onClick={handleClearFiles}
-                            title="Xóa tất cả"
-                        >
-                            <i className="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-                    <div className={styles.filePreviewList}>
-                        {selectedFiles.map((file, index) => {
-                            const previewUrl = createPreviewUrl(file);
-                            return (
-                                <div key={index} className={styles.filePreviewItem}>
-                                    {previewUrl ? (
-                                        <img
-                                            src={previewUrl}
-                                            alt={file.name}
-                                            className={styles.filePreviewImage}
-                                        />
-                                    ) : (
-                                        <div className={styles.filePreviewIcon}>
-                                            <i className={getFileIcon(file)}></i>
-                                        </div>
-                                    )}
-                                    <div className={styles.filePreviewInfo}>
-                                        <div className={styles.filePreviewName} title={file.name}>
-                                            {file.name}
-                                        </div>
-                                        <div className={styles.filePreviewSize}>
-                                            {formatFileSize(file.size)}
-                                        </div>
+                    {selectedFiles.map((file, index) => {
+                        const previewUrl = createPreviewUrl(file);
+                        return (
+                            <div key={index + 1} className={styles.filePreviewItem}>
+                                {previewUrl ? (
+                                    <img
+                                        src={previewUrl}
+                                        alt={file.name}
+                                        className={styles.filePreviewImage}
+                                    />
+                                ) : (
+                                    <div className={styles.filePreviewIcon}>
+                                        <i className={getFileIcon(file)}></i>
                                     </div>
-                                    <button
-                                        type="button"
-                                        className={styles.removeFileBtn}
-                                        onClick={() => handleRemoveFile(index)}
-                                        title="Xóa file"
-                                    >
-                                        <i className="fa-solid fa-xmark"></i>
-                                    </button>
+                                )}
+                                <div className={styles.filePreviewInfo}>
+                                    <div className={styles.filePreviewName} title={file.name}>
+                                        {file.name}
+                                    </div>
+                                    <div className={styles.filePreviewSize}>
+                                        {formatFileSize(file.size)}
+                                    </div>
                                 </div>
-                            );
-                        })}
-                    </div>
+                                <button
+                                    type="button"
+                                    className={styles.removeFileBtn}
+                                    onClick={handleClearFiles}
+                                    title="Xóa file"
+                                >
+                                    <i className="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        );
+                    })}
                 </div>
             )}
 
@@ -464,7 +439,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                     className="form-control chat_form"
                     placeholder={
                         selectedFiles.length > 0
-                            ? `Thêm chú thích cho ${selectedFiles.length} file...`
+                            ? 'Thêm chú thích cho file...'
                             : 'Nhập tin nhắn của bạn...'
                     }
                     value={message}

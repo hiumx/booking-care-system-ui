@@ -4,6 +4,11 @@
     }
 }
 
+// Wrapper to handle file preview + form layout
+.chatFooterWrapper {
+    position: relative;
+}
+
 .dropdownMenuUp {
     position: absolute;
     bottom: 64px !important;
@@ -19,69 +24,31 @@
     display: block !important;
 }
 
-// File Preview Area (Modern UX like Slack)
+// File Preview Area - Positioned absolutely ABOVE the form
+// This prevents layout shift and doesn't cover the input
 .filePreviewArea {
+    position: absolute;
+    bottom: 100%; // Position directly above the form
+    left: 0;
+    right: 0;
     background: #f8f9fa;
     border: 1px solid #e1e4e8;
+    border-bottom: none;
     border-radius: 8px 8px 0 0;
     padding: 12px;
-    margin-bottom: -1px; // Merge with form border
-    max-height: 300px;
-    overflow-y: auto;
-}
+    z-index: 10;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+    pointer-events: auto;
 
-.filePreviewHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e1e4e8;
-}
-
-.filePreviewTitle {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-
-    i {
-        color: #6c757d;
-    }
-}
-
-.clearAllBtn {
-    background: transparent;
-    border: none;
-    color: #6c757d;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-
-    &:hover {
-        background: #e1e4e8;
-        color: #dc3545;
-    }
-
-    i {
-        font-size: 16px;
-    }
-}
-
-.filePreviewList {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    // Ensure it's positioned relative to the footer wrapper
+    margin-bottom: 92px;
 }
 
 .filePreviewItem {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px;
+    padding: 12px;
     background: white;
     border: 1px solid #e1e4e8;
     border-radius: 6px;
@@ -168,7 +135,7 @@
 // Responsive adjustments
 @media (max-width: 768px) {
     .filePreviewArea {
-        max-height: 200px;
+        padding: 10px;
     }
 
     .filePreviewItem {

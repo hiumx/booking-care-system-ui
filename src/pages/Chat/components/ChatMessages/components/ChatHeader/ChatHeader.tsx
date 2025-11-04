@@ -19,8 +19,9 @@ const ChatHeader = () => {
     const otherParticipant = activeConversation?.participantDetails?.find(
         (p) => (p.id || p.accountId || '').toUpperCase() !== currentUserId
     );
+    // Check online status - normalize to UPPERCASE to match backend normalization
     const isOnline = otherParticipant
-        ? onlineUsers.has(otherParticipant.id || otherParticipant.accountId || '')
+        ? onlineUsers.has((otherParticipant.id || otherParticipant.accountId || '').toUpperCase())
         : false;
 
     useEffect(() => {

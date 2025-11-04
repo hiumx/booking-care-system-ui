@@ -258,7 +258,7 @@ const MessageList = () => {
                 };
 
                 const typeNum =
-                    typeof msg.type === 'number' ? msg.type : parseInt(String(msg.type));
+                    typeof msg.type === 'number' ? msg.type : Number.parseInt(String(msg.type));
                 return typeMap[typeNum] || 'text';
             })() as any,
             // Case-insensitive comparison for isOwn (senderId might be lowercase, currentUserId uppercase)

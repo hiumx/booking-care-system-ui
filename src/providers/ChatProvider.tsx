@@ -188,6 +188,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                                       content: message.content,
                                       senderId: message.senderId,
                                       createdAt: message.createdAt,
+                                      type: message.type,
+                                      attachments: message.attachments,
                                   },
                                   unreadCount:
                                       message.senderId !== userId
@@ -247,12 +249,14 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         onOnlineUsers: useCallback((userIds: string[]) => {
             // Normalize to UPPERCASE for case-insensitive matching
             const normalizedIds = userIds.map((id) => id.toUpperCase());
+            console.log('[ChatProvider] 📋 Received online users list:', normalizedIds);
             setOnlineUsers(new Set(normalizedIds));
         }, []),
 
         onUserOnline: useCallback((userId: string) => {
             // Normalize to UPPERCASE for case-insensitive matching
             const normalizedId = userId.toUpperCase();
+            console.log('[ChatProvider] ✅ User came online:', normalizedId);
             setOnlineUsers((prev) => {
                 const newSet = new Set(prev);
                 newSet.add(normalizedId);
@@ -263,6 +267,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         onUserOffline: useCallback((userId: string) => {
             // Normalize to UPPERCASE for case-insensitive matching
             const normalizedId = userId.toUpperCase();
+            console.log('[ChatProvider] ❌ User went offline:', normalizedId);
             setOnlineUsers((prev) => {
                 const newSet = new Set(prev);
                 newSet.delete(normalizedId);

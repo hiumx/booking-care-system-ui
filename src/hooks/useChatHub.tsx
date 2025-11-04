@@ -8,7 +8,6 @@ import {
     SignalRAllMessagesRead,
     SignalRTypingEvent,
 } from '@/types/communication.types';
-// import { API_CONFIG } from '@/configs/api.config'; // Commented: using direct URL for now
 import { RootState } from '@/store';
 
 export interface ChatHubCallbacks {
@@ -55,11 +54,9 @@ export const useChatHub = (
     // Get user profile from Redux for userId fallback
     const userProfile = useSelector((state: RootState) => state.user.profile);
 
-    // Build hub URL
-    // ⚠️ TEMPORARY: Connect directly to Communication Service (bypass Gateway)
-    // Gateway route has issues, fix later
-    // TODO: Fix Gateway routing and switch back to: ${API_CONFIG.gatewayUrl}/api/v1/communication/chatHub
-    const chatHubUrl = 'http://localhost:6005/chatHub';
+    // Build hub URL through API Gateway
+    // Use Gateway route: /api/v1/communication/chatHub
+    const chatHubUrl = `${import.meta.env.VITE_GATEWAY_URL || 'http://localhost:5000'}/api/v1/communication/chatHub`;
 
     // Update callbacks ref when callbacks change (but don't reconnect)
     useEffect(() => {
@@ -128,11 +125,18 @@ export const useChatHub = (
             callbacksRef.current?.onUserStoppedTyping?.(data);
         });
 
+        connection.on('OnlineUsers', (userIds) => {
+            console.log('[ChatHub] 📥 Received OnlineUsers:', userIds);
+            callbacksRef.current?.onOnlineUsers?.(userIds);
+        });
+
         connection.on('UserOnline', (userId) => {
+            console.log('[ChatHub] 📥 User came online:', userId);
             callbacksRef.current?.onUserOnline?.(userId);
         });
 
         connection.on('UserOffline', (userId) => {
+            console.log('[ChatHub] 📥 User went offline:', userId);
             callbacksRef.current?.onUserOffline?.(userId);
         });
 
