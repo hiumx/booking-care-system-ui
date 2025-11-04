@@ -67,7 +67,6 @@
     // Blockquotes
     blockquote {
         border-left: 4px solid #0d6efd;
-        padding-left: 1rem;
         margin: 1.5rem 0;
         font-style: italic;
         color: #666;
@@ -143,14 +142,14 @@
     }
 
     // Media figure (from CKEditor)
+    // Note: oembed elements are converted to iframe in ExpandableText component
     figure.media {
         margin: 1.5rem 0;
         display: block;
         text-align: center; // Center content
 
         iframe,
-        video,
-        oembed {
+        video {
             width: 80% !important;
             max-width: 800px;
             height: auto;
