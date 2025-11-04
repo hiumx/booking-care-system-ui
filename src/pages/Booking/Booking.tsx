@@ -81,7 +81,7 @@ const Booking: React.FC = () => {
     };
 
     // Helper function to ensure appointment is created and return appointmentId
-    const ensureAppointmentCreated = async (): Promise<string> => {
+    const ensureAppointmentCreated = async (skipPayment: boolean = false): Promise<string> => {
         // Return existing appointment ID if available
         if (bookingState.createdAppointmentId) {
             return bookingState.createdAppointmentId;
@@ -95,7 +95,10 @@ const Booking: React.FC = () => {
             throw new Error('Không thể tạo yêu cầu đặt lịch');
         }
 
-        const response = await AppointmentService.createAppointment(request);
+        // Add skipPayment flag for no-payment option
+        const finalRequest = { ...request, skipPayment };
+
+        const response = await AppointmentService.createAppointment(finalRequest);
 
         if (!response.success) {
             throw new Error(response.message || 'Không thể tạo lịch hẹn');
@@ -174,7 +177,8 @@ const Booking: React.FC = () => {
         }
 
         try {
-            const appointmentId = await ensureAppointmentCreated();
+            // Pass skipPayment = true to send booking confirmation email immediately
+            const appointmentId = await ensureAppointmentCreated(true);
             toast.success('Đặt lịch thành công! Vui lòng thanh toán khi đến khám.');
             navigate(PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', appointmentId));
         } catch (error: any) {

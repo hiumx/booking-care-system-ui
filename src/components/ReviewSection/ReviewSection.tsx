@@ -263,22 +263,17 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
             {/* Write Review Section */}
             <div className="write-review-section mb-4">
                 {showWriteReview ? (
-                    <WriteReview doctorName={doctorName} onSubmitReview={handleSubmitReview} />
+                    <WriteReview
+                        doctorName={doctorName}
+                        onSubmitReview={handleSubmitReview}
+                        onCancel={() => setShowWriteReview(false)}
+                    />
                 ) : (
                     <Button
                         text="Viết đánh giá"
                         type="button"
                         className="btn-primary"
                         onClick={() => setShowWriteReview(true)}
-                    />
-                )}
-
-                {showWriteReview && (
-                    <Button
-                        text="Hủy"
-                        type="button"
-                        className={clsx('mt-2', styles.cancelButton)}
-                        onClick={() => setShowWriteReview(false)}
                     />
                 )}
             </div>
