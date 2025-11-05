@@ -16,6 +16,7 @@ const SERVICE_CATEGORY_ENDPOINTS = {
     PARENTS: '/medical-services/servicecategories/parents',
     HEALTH: '/medical-services/servicecategories/health',
     BY_ID: (id: string) => `/medical-services/servicecategories/${id}`,
+    CHILDREN: (parentId: string) => `/medical-services/servicecategories/${parentId}/children`,
     SERVICES_WITH_HOSPITAL: (categoryId: string) =>
         `/medical-services/services/category/${categoryId}/with-hospital`,
 } as const;
@@ -105,6 +106,35 @@ export class MedicalServiceCategoriesService {
             };
         } catch (error: any) {
             throw new Error(error.message || 'Failed to fetch service category');
+        }
+    }
+
+    /**
+     * Get children of a parent service category
+     */
+    static async getServiceCategoryChildren(
+        parentId: string,
+        includeInactive: boolean = false
+    ): Promise<ApiResponse<ServiceCategoryResponse[]>> {
+        try {
+            const queryParams = new URLSearchParams();
+            if (includeInactive) {
+                queryParams.append('includeInactive', 'true');
+            }
+
+            const queryString = queryParams.toString();
+            const url = queryString
+                ? `${SERVICE_CATEGORY_ENDPOINTS.CHILDREN(parentId)}?${queryString}`
+                : SERVICE_CATEGORY_ENDPOINTS.CHILDREN(parentId);
+
+            const response: any = await axiosInstance.get(url);
+            return {
+                success: response.success ?? true,
+                data: response.data || response,
+                message: response.message,
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to fetch service category children');
         }
     }
 

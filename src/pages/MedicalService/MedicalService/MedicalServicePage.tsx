@@ -5,9 +5,9 @@ import Breadcrumb from '@/components/Breadcrumb';
 import ServiceCard from './components/ServiceCard';
 import ErrorAlert from '@/components/common/ErrorAlert';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { useApiCall } from '@/hooks/useApiCall';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { getParentServiceCategoriesAsync } from '@/store/slices/medicalServiceSlice';
 import { replacePathParams, PATHS } from '@/routes/paths';
-import { MedicalServiceCategoriesService } from '@/services/medicalServiceCategories.service';
 
 // 🔹 Constants
 const medicalServices = {
@@ -24,19 +24,19 @@ const breadcrumbData = {
 };
 
 const MedicalServicePage: React.FC = () => {
-    const {
-        data: parentServiceCategories,
-        isLoading,
-        error,
-        execute,
-        clearError,
-    } = useApiCall(
-        async () => {
-            const response = await MedicalServiceCategoriesService.getParentServiceCategories();
-            return response.data;
-        },
-        { immediate: true }
+    const dispatch = useAppDispatch();
+
+    // Get data from Redux store
+    const { parentServiceCategories, isLoading, error } = useAppSelector(
+        (state) => state.medicalService.serviceCategories
     );
+
+    // Fetch parent service categories if not already loaded
+    useEffect(() => {
+        if (parentServiceCategories.length === 0 && !isLoading) {
+            dispatch(getParentServiceCategoriesAsync());
+        }
+    }, [dispatch, parentServiceCategories.length, isLoading]);
 
     // Handle error
     useEffect(() => {
@@ -56,8 +56,7 @@ const MedicalServicePage: React.FC = () => {
                 <ErrorAlert
                     message="Không thể tải danh sách dịch vụ y tế. Vui lòng thử lại sau."
                     onRetry={() => {
-                        clearError();
-                        execute();
+                        dispatch(getParentServiceCategoriesAsync());
                     }}
                 />
             );

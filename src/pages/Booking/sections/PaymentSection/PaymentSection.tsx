@@ -236,44 +236,6 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                             <li>QR Code</li>
                                         </ul>
                                     </div>
-                                    <div className="mb-3">
-                                        <label
-                                            className="form-label"
-                                            htmlFor={`${method.name.toLowerCase()}-email`}
-                                        >
-                                            Email nhận thông tin thanh toán
-                                        </label>
-                                        <div className="position-relative input-icon">
-                                            <input
-                                                type="email"
-                                                className="form-control"
-                                                id={`${method.name.toLowerCase()}-email`}
-                                                placeholder="email@example.com"
-                                            />
-                                            <span>
-                                                <i className="isax isax-sms"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="mb-0">
-                                        <label
-                                            className="form-label"
-                                            htmlFor={`${method.name.toLowerCase()}-phone`}
-                                        >
-                                            Số điện thoại
-                                        </label>
-                                        <div className="position-relative input-icon">
-                                            <input
-                                                type="tel"
-                                                className="form-control"
-                                                id={`${method.name.toLowerCase()}-phone`}
-                                                placeholder="0123456789"
-                                            />
-                                            <span>
-                                                <i className="isax isax-call"></i>
-                                            </span>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         );

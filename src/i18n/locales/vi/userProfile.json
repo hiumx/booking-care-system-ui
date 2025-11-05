@@ -1,0 +1,67 @@
+{
+    "profile": {
+        "title": "Thông tin cá nhân",
+        "avatar": {
+            "label": "Ảnh đại diện",
+            "uploadNew": "Tải ảnh mới",
+            "delete": "Xóa",
+            "cancel": "Hủy",
+            "maxSize": "Ảnh của bạn phải dưới 5 MB, định dạng được chấp nhận: jpg, jpeg, png, gif",
+            "noImage": "Không có ảnh đại diện để xóa"
+        },
+        "fields": {
+            "firstName": {
+                "label": "Tên",
+                "required": "Tên không được để trống",
+                "minLength": "Tên phải có ít nhất 2 ký tự"
+            },
+            "lastName": {
+                "label": "Họ",
+                "required": "Họ không được để trống",
+                "minLength": "Họ phải có ít nhất 2 ký tự"
+            },
+            "gender": {
+                "label": "Giới tính",
+                "placeholder": "Chọn giới tính",
+                "male": "Nam",
+                "female": "Nữ",
+                "other": "Khác"
+            },
+            "dateOfBirth": {
+                "label": "Ngày sinh",
+                "placeholder": "Chọn ngày sinh",
+                "required": "Ngày sinh không được để trống",
+                "ageValidation": "Bạn phải từ 18 tuổi trở lên"
+            },
+            "email": {
+                "label": "Email",
+                "invalid": "Email không hợp lệ",
+                "verified": "Email đã được xác thực"
+            },
+            "phone": {
+                "label": "Số điện thoại",
+                "invalid": "Số điện thoại phải có 10 chữ số và bắt đầu bằng 0",
+                "verified": "Số điện thoại đã được xác thực"
+            },
+            "address": {
+                "label": "Địa chỉ",
+                "required": "Địa chỉ không được để trống",
+                "minLength": "Địa chỉ phải có ít nhất 5 ký tự"
+            }
+        },
+        "actions": {
+            "saveChanges": "Lưu thay đổi",
+            "saving": "Đang lưu...",
+            "cancel": "Hủy"
+        },
+        "messages": {
+            "noChanges": "Không có thay đổi nào để lưu",
+            "updateSuccess": "Cập nhật thông tin thành công!",
+            "updateError": "Không thể cập nhật thông tin. Vui lòng thử lại!",
+            "uploadError": "Upload ảnh thất bại",
+            "cancelChanges": "Đã hủy thay đổi",
+            "checkInfo": "Vui lòng kiểm tra lại thông tin!",
+            "requireEmailOrPhone": "Vui lòng cung cấp ít nhất một trong email hoặc số điện thoại!"
+        }
+    }
+}

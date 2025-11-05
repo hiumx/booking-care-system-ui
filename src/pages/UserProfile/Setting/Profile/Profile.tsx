@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import Select from 'react-select';
 import settingStyles from '@/pages/UserProfile/Setting/Setting.module.scss';
@@ -10,7 +11,7 @@ import DateInput from '@/components/DateInput';
 import { AppDispatch, RootState } from '@/store';
 import { updateUserProfile } from '@/store/slices/userSlice';
 import { Gender } from '@/enums/common.enums';
-import { getGenderText, UpdateUserRequest } from '@/types/user.types';
+import { UpdateUserRequest } from '@/types/user.types';
 import { AuthService } from '@/services/auth.service';
 import { UploadService } from '@/services/upload.service';
 import { usePhoneInput } from '@/hooks/usePhoneInput';
@@ -39,6 +40,7 @@ const getDefaultAvatarByGender = (gender: Gender | undefined): string => {
 };
 
 const Profile = () => {
+    const { t, i18n } = useTranslation(['userProfile', 'common']);
     const dispatch = useDispatch<AppDispatch>();
     const { profile, isLoading } = useSelector((state: RootState) => state.user);
     const { emailConfirmed, phoneConfirmed } = useSelector((state: RootState) => state.auth);
@@ -86,9 +88,9 @@ const Profile = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const genderOptions: GenderOption[] = [
-        { value: Gender.MALE, label: getGenderText(Gender.MALE) },
-        { value: Gender.FEMALE, label: getGenderText(Gender.FEMALE) },
-        { value: Gender.OTHER, label: getGenderText(Gender.OTHER) },
+        { value: Gender.MALE, label: t('profile.fields.gender.male') },
+        { value: Gender.FEMALE, label: t('profile.fields.gender.female') },
+        { value: Gender.OTHER, label: t('profile.fields.gender.other') },
     ];
 
     // Helper function to format date for input field
@@ -161,6 +163,30 @@ const Profile = () => {
         };
     }, [avatarPreview]);
 
+    // Re-validate errors when language changes
+    useEffect(() => {
+        // Only re-validate if there are existing errors
+        if (firstNameError) {
+            validateFieldOnChange('firstName', updateData.firstName || '');
+        }
+        if (lastNameError) {
+            validateFieldOnChange('lastName', updateData.lastName || '');
+        }
+        if (emailError) {
+            validateFieldOnChange('email', updateData.email || '');
+        }
+        if (phoneError) {
+            handlePhoneValidation(phone);
+        }
+        if (dateOfBirthError) {
+            validateFieldOnChange('dateOfBirth', updateData.dateOfBirth || '');
+        }
+        if (addressError) {
+            validateFieldOnChange('address', updateData.address || '');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [i18n.language]);
+
     // Helper: Validate field on change
     const validateFieldOnChange = (field: keyof UpdateUserRequest, value: string | Gender) => {
         if (typeof value !== 'string') return;
@@ -169,42 +195,44 @@ const Profile = () => {
             firstName: () => {
                 let error = '';
                 if (!value.trim()) {
-                    error = 'Họ không được để trống';
+                    error = t('profile.fields.firstName.required');
                 } else if (value.trim().length < 2) {
-                    error = 'Họ phải có ít nhất 2 ký tự';
+                    error = t('profile.fields.firstName.minLength');
                 }
                 setFirstNameError(error);
             },
             lastName: () => {
                 let error = '';
                 if (!value.trim()) {
-                    error = 'Tên không được để trống';
+                    error = t('profile.fields.lastName.required');
                 } else if (value.trim().length < 2) {
-                    error = 'Tên phải có ít nhất 2 ký tự';
+                    error = t('profile.fields.lastName.minLength');
                 }
                 setLastNameError(error);
             },
             email: () => {
                 if (emailConfirmed) return;
                 const error =
-                    value.trim() && !AuthService.validateEmail(value) ? 'Email không hợp lệ' : '';
+                    value.trim() && !AuthService.validateEmail(value)
+                        ? t('profile.fields.email.invalid')
+                        : '';
                 setEmailError(error);
             },
             dateOfBirth: () => {
                 let error = '';
                 if (!value.trim()) {
-                    error = 'Ngày sinh không được để trống';
+                    error = t('profile.fields.dateOfBirth.required');
                 } else if (!validateAge(value)) {
-                    error = 'Bạn phải từ 18 tuổi trở lên';
+                    error = t('profile.fields.dateOfBirth.ageValidation');
                 }
                 setDateOfBirthError(error);
             },
             address: () => {
                 let error = '';
                 if (!value.trim()) {
-                    error = 'Địa chỉ không được để trống';
+                    error = t('profile.fields.address.required');
                 } else if (value.trim().length < 5) {
-                    error = 'Địa chỉ phải có ít nhất 5 ký tự';
+                    error = t('profile.fields.address.minLength');
                 }
                 setAddressError(error);
             },
@@ -232,7 +260,7 @@ const Profile = () => {
             if (AuthService.validatePhoneNumber(value)) {
                 setPhoneError('');
             } else {
-                setPhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
+                setPhoneError(t('profile.fields.phone.invalid'));
             }
         } else {
             setPhoneError('');
@@ -245,19 +273,19 @@ const Profile = () => {
 
         // Validate firstName
         if (!updateData.firstName?.trim()) {
-            setFirstNameError('Họ không được để trống');
+            setFirstNameError(t('profile.fields.firstName.required'));
             hasError = true;
         } else if (updateData.firstName.trim().length < 2) {
-            setFirstNameError('Họ phải có ít nhất 2 ký tự');
+            setFirstNameError(t('profile.fields.firstName.minLength'));
             hasError = true;
         }
 
         // Validate lastName
         if (!updateData.lastName?.trim()) {
-            setLastNameError('Tên không được để trống');
+            setLastNameError(t('profile.fields.lastName.required'));
             hasError = true;
         } else if (updateData.lastName.trim().length < 2) {
-            setLastNameError('Tên phải có ít nhất 2 ký tự');
+            setLastNameError(t('profile.fields.lastName.minLength'));
             hasError = true;
         }
 
@@ -267,37 +295,37 @@ const Profile = () => {
             updateData.email?.trim() &&
             !AuthService.validateEmail(updateData.email)
         ) {
-            setEmailError('Email không hợp lệ');
+            setEmailError(t('profile.fields.email.invalid'));
             hasError = true;
         }
 
         // Validate phone if not confirmed (use phone from hook)
         if (!phoneConfirmed && phone.trim() && !AuthService.validatePhoneNumber(phone)) {
-            setPhoneError('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0');
+            setPhoneError(t('profile.fields.phone.invalid'));
             hasError = true;
         }
 
         // Validate dateOfBirth
         if (!updateData.dateOfBirth?.trim()) {
-            setDateOfBirthError('Ngày sinh không được để trống');
+            setDateOfBirthError(t('profile.fields.dateOfBirth.required'));
             hasError = true;
         } else if (!validateAge(updateData.dateOfBirth)) {
-            setDateOfBirthError('Bạn phải từ 18 tuổi trở lên');
+            setDateOfBirthError(t('profile.fields.dateOfBirth.ageValidation'));
             hasError = true;
         }
 
         // Validate address
         if (!updateData.address?.trim()) {
-            setAddressError('Địa chỉ không được để trống');
+            setAddressError(t('profile.fields.address.required'));
             hasError = true;
         } else if (updateData.address.trim().length < 5) {
-            setAddressError('Địa chỉ phải có ít nhất 5 ký tự');
+            setAddressError(t('profile.fields.address.minLength'));
             hasError = true;
         }
 
         // Check if at least one of email or phone is provided (use phone from hook)
         if (!updateData.email?.trim() && !phone.trim()) {
-            toast.error('Vui lòng cung cấp ít nhất một trong email hoặc số điện thoại!');
+            toast.error(t('profile.messages.requireEmailOrPhone'));
             hasError = true;
         }
 
@@ -311,7 +339,7 @@ const Profile = () => {
             if (uploadResult.success) {
                 return uploadResult.cloudFrontUrl || uploadResult.fileUrl || '';
             }
-            throw new Error(uploadResult.errorMessage || 'Upload ảnh thất bại');
+            throw new Error(uploadResult.errorMessage || t('profile.messages.uploadError'));
         }
 
         if (isAvatarDeleted) {
@@ -327,13 +355,13 @@ const Profile = () => {
         // Check if there are any changes (including avatar)
         const hasAvatarChange = selectedFile !== null || isAvatarDeleted;
         if (!hasChanges && !hasAvatarChange) {
-            toast.info('Không có thay đổi nào để lưu');
+            toast.info(t('profile.messages.noChanges'));
             return;
         }
 
         // Validate all fields
         if (validateAllFields()) {
-            toast.error('Vui lòng kiểm tra lại thông tin!');
+            toast.error(t('profile.messages.checkInfo'));
             return;
         }
 
@@ -364,10 +392,10 @@ const Profile = () => {
                 fileInputRef.current.value = '';
             }
 
-            toast.success('Cập nhật thông tin thành công!');
+            toast.success(t('profile.messages.updateSuccess'));
         } catch (error: any) {
             console.error('Failed to update profile:', error);
-            toast.error(error.message || 'Không thể cập nhật thông tin. Vui lòng thử lại!');
+            toast.error(error.message || t('profile.messages.updateError'));
         } finally {
             setIsUploadingAvatar(false);
         }
@@ -404,7 +432,7 @@ const Profile = () => {
     // Handle avatar delete (Chỉ đánh dấu, chưa xóa thật)
     const handleAvatarDelete = () => {
         if (!avatarPreview && !originalData.avatarUrl) {
-            toast.info('Không có ảnh đại diện để xóa');
+            toast.info(t('profile.avatar.noImage'));
             return;
         }
 
@@ -471,7 +499,7 @@ const Profile = () => {
         setAddressError('');
         setDateOfBirthError('');
 
-        toast.info('Đã hủy thay đổi');
+        toast.info(t('profile.messages.cancelChanges'));
     };
 
     const customSelectStyles = {
@@ -491,7 +519,7 @@ const Profile = () => {
     return (
         <form onSubmit={handleSubmit}>
             <div className="setting-card">
-                <label className="form-label mb-2">Ảnh đại diện</label>
+                <label className="form-label mb-2">{t('profile.avatar.label')}</label>
                 <div className="change-avatar img-upload">
                     <div
                         className="profile-img"
@@ -532,7 +560,7 @@ const Profile = () => {
                                 onClick={handleAvatarClick}
                                 style={{ cursor: 'pointer', border: 'none', background: 'none' }}
                             >
-                                Tải ảnh mới
+                                {t('profile.avatar.uploadNew')}
                             </button>{' '}
                             <input
                                 ref={fileInputRef}
@@ -561,38 +589,25 @@ const Profile = () => {
                                     opacity: isUploadingAvatar ? 0.5 : 1,
                                 }}
                             >
-                                {isAvatarDeleted ? 'Hủy' : 'Xóa'}
+                                {isAvatarDeleted
+                                    ? t('profile.avatar.cancel')
+                                    : t('profile.avatar.delete')}
                             </button>
                         </div>
-                        <p>
-                            Ảnh của bạn phải dưới 5 MB, định dạng được chấp nhận: jpg, jpeg, png,
-                            gif
-                        </p>
+                        <p>{t('profile.avatar.maxSize')}</p>
                     </div>
                 </div>
             </div>
 
             <div className="setting-title">
-                <h6>Thông tin cá nhân</h6>
+                <h6>{t('profile.title')}</h6>
             </div>
             <div className="setting-card">
                 <div className={clsx('row', settingStyles.input)}>
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
                             <Input
-                                label="Họ"
-                                isRequired
-                                type="text"
-                                value={updateData.firstName || ''}
-                                onChange={(e) => handleInputChange('firstName', e.target.value)}
-                                error={firstNameError}
-                            />
-                        </div>
-                    </div>
-                    <div className="col-lg-4 col-md-6">
-                        <div className="mb-3">
-                            <Input
-                                label="Tên"
+                                label={t('profile.fields.lastName.label')}
                                 isRequired
                                 type="text"
                                 value={updateData.lastName || ''}
@@ -603,8 +618,22 @@ const Profile = () => {
                     </div>
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
+                            <Input
+                                label={t('profile.fields.firstName.label')}
+                                isRequired
+                                type="text"
+                                value={updateData.firstName || ''}
+                                onChange={(e) => handleInputChange('firstName', e.target.value)}
+                                error={firstNameError}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="col-lg-4 col-md-6">
+                        <div className="mb-3">
                             <label className="form-label">
-                                Giới tính <span className="text-danger">*</span>
+                                {t('profile.fields.gender.label')}{' '}
+                                <span className="text-danger">*</span>
                             </label>
                             <Select
                                 value={genderOptions.find(
@@ -612,7 +641,7 @@ const Profile = () => {
                                 )}
                                 onChange={handleGenderChange}
                                 options={genderOptions}
-                                placeholder="Chọn giới tính"
+                                placeholder={t('profile.fields.gender.placeholder')}
                                 styles={customSelectStyles}
                                 isSearchable={false}
                             />
@@ -622,10 +651,10 @@ const Profile = () => {
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
                             <DateInput
-                                label="Ngày sinh"
+                                label={t('profile.fields.dateOfBirth.label')}
                                 value={updateData.dateOfBirth || ''}
                                 onChange={(date) => handleInputChange('dateOfBirth', date)}
-                                placeholder="Chọn ngày sinh"
+                                placeholder={t('profile.fields.dateOfBirth.placeholder')}
                                 isRequired={true}
                                 maxDate={new Date()} // Không cho chọn ngày tương lai
                                 minDate={new Date('1900-01-01')} // Giới hạn năm sinh
@@ -636,7 +665,7 @@ const Profile = () => {
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
                             <Input
-                                label="Email"
+                                label={t('profile.fields.email.label')}
                                 isRequired={emailConfirmed}
                                 type="email"
                                 value={updateData.email || ''}
@@ -646,8 +675,8 @@ const Profile = () => {
                             />
                             {emailConfirmed && (
                                 <small className="text-success d-block mt-1">
-                                    <i className="fa-solid fa-circle-check me-1"></i> Email đã được
-                                    xác thực
+                                    <i className="fa-solid fa-circle-check me-1"></i>{' '}
+                                    {t('profile.fields.email.verified')}
                                 </small>
                             )}
                         </div>
@@ -655,7 +684,7 @@ const Profile = () => {
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
                             <Input
-                                label="Số điện thoại"
+                                label={t('profile.fields.phone.label')}
                                 isRequired={phoneConfirmed}
                                 type="tel"
                                 inputMode="numeric"
@@ -671,8 +700,8 @@ const Profile = () => {
                             />
                             {phoneConfirmed && (
                                 <small className="text-success d-block mt-1">
-                                    <i className="fa-solid fa-circle-check me-1"></i> Số điện thoại
-                                    đã được xác thực
+                                    <i className="fa-solid fa-circle-check me-1"></i>{' '}
+                                    {t('profile.fields.phone.verified')}
                                 </small>
                             )}
                         </div>
@@ -681,7 +710,7 @@ const Profile = () => {
                     <div className="col-lg-8 col-md-6">
                         <div className="mb-3">
                             <Input
-                                label="Địa chỉ"
+                                label={t('profile.fields.address.label')}
                                 isRequired
                                 type="text"
                                 value={updateData.address || ''}
@@ -700,10 +729,14 @@ const Profile = () => {
                     className="btn btn-md btn-light rounded-pill"
                     disabled={isUploadingAvatar || isLoading || !hasChanges}
                 >
-                    Hủy
+                    {t('profile.actions.cancel')}
                 </button>
                 <Button
-                    text={isUploadingAvatar ? 'Đang lưu...' : 'Lưu thay đổi'}
+                    text={
+                        isUploadingAvatar
+                            ? t('profile.actions.saving')
+                            : t('profile.actions.saveChanges')
+                    }
                     type="submit"
                     className="btn-md rounded-pill"
                     isDisabled={isUploadingAvatar || isLoading || !hasChanges}
