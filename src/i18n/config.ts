@@ -32,9 +32,8 @@ const resources = {
     },
 };
 
-i18n
-    // Use language detector
-    .use(LanguageDetector)
+// Use language detector
+i18n.use(LanguageDetector)
     // Pass the i18n instance to react-i18next
     .use(initReactI18next)
     // Initialize i18next
@@ -63,4 +62,4 @@ i18n
         },
     });
 
-export default i18n;
+export { i18n as default };

@@ -88,7 +88,7 @@ export const translateAllApiErrors = (
             // Return translated or original code if not found
             return translated === translationKey ? code : translated;
         })
-        .filter((msg) => msg); // Remove empty strings
+        .filter(Boolean); // Remove empty strings
 
     return translatedErrors.join('. ') || fallbackMessage || i18n.t('errors:api.UNKNOWN_ERROR');
 };

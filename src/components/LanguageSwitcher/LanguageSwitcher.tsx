@@ -83,7 +83,7 @@ const LanguageSwitcher = () => {
                             {i18n.language === lang.code && (
                                 <i
                                     className="fas fa-check ms-auto"
-                                    style={{ color: '#0d6efd' }}
+                                    style={{ color: '#0a58ca' }}
                                 ></i>
                             )}
                         </button>
