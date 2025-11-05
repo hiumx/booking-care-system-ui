@@ -1,0 +1,67 @@
+{
+    "profile": {
+        "title": "Personal Information",
+        "avatar": {
+            "label": "Avatar",
+            "uploadNew": "Upload new image",
+            "delete": "Delete",
+            "cancel": "Cancel",
+            "maxSize": "Your image must be under 5 MB, accepted formats: jpg, jpeg, png, gif",
+            "noImage": "No avatar to delete"
+        },
+        "fields": {
+            "firstName": {
+                "label": "First Name",
+                "required": "First name is required",
+                "minLength": "First name must be at least 2 characters"
+            },
+            "lastName": {
+                "label": "Last Name",
+                "required": "Last name is required",
+                "minLength": "Last name must be at least 2 characters"
+            },
+            "gender": {
+                "label": "Gender",
+                "placeholder": "Select gender",
+                "male": "Male",
+                "female": "Female",
+                "other": "Other"
+            },
+            "dateOfBirth": {
+                "label": "Date of Birth",
+                "placeholder": "Select date of birth",
+                "required": "Date of birth is required",
+                "ageValidation": "You must be at least 18 years old"
+            },
+            "email": {
+                "label": "Email",
+                "invalid": "Invalid email address",
+                "verified": "Email has been verified"
+            },
+            "phone": {
+                "label": "Phone Number",
+                "invalid": "Phone number must have 10 digits and start with 0",
+                "verified": "Phone number has been verified"
+            },
+            "address": {
+                "label": "Address",
+                "required": "Address is required",
+                "minLength": "Address must be at least 5 characters"
+            }
+        },
+        "actions": {
+            "saveChanges": "Save Changes",
+            "saving": "Saving...",
+            "cancel": "Cancel"
+        },
+        "messages": {
+            "noChanges": "No changes to save",
+            "updateSuccess": "Profile updated successfully!",
+            "updateError": "Failed to update profile. Please try again!",
+            "uploadError": "Failed to upload image",
+            "cancelChanges": "Changes canceled",
+            "checkInfo": "Please check your information!",
+            "requireEmailOrPhone": "Please provide at least email or phone number!"
+        }
+    }
+}
