@@ -1,0 +1,46 @@
+{
+    "app": {
+        "name": "BookingCare",
+        "description": "Nền tảng đặt lịch khám bệnh trực tuyến"
+    },
+    "actions": {
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "delete": "Xóa",
+        "edit": "Chỉnh sửa",
+        "view": "Xem",
+        "search": "Tìm kiếm",
+        "filter": "Lọc",
+        "reset": "Đặt lại",
+        "submit": "Gửi",
+        "confirm": "Xác nhận",
+        "back": "Quay lại",
+        "next": "Tiếp theo",
+        "close": "Đóng",
+        "loading": "Đang tải...",
+        "processing": "Đang xử lý..."
+    },
+    "validation": {
+        "required": "Trường này là bắt buộc",
+        "invalidEmail": "Email không hợp lệ",
+        "invalidPhone": "Số điện thoại không hợp lệ",
+        "minLength": "Tối thiểu {{count}} ký tự",
+        "maxLength": "Tối đa {{count}} ký tự"
+    },
+    "messages": {
+        "success": "Thành công!",
+        "error": "Có lỗi xảy ra!",
+        "uploadSuccess": "Tải lên thành công",
+        "uploadError": "Không thể tải tệp lên",
+        "deleteSuccess": "Xóa thành công",
+        "deleteError": "Không thể xóa",
+        "saveSuccess": "Lưu thành công",
+        "saveError": "Không thể lưu"
+    },
+    "language": {
+        "vietnamese": "Tiếng Việt",
+        "english": "English",
+        "switchTo": "Chuyển sang {{language}}",
+        "switchLanguage": "Chọn ngôn ngữ"
+    }
+}

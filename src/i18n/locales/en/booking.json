@@ -1,0 +1,52 @@
+{
+    "steps": {
+        "selectDateTime": "Select date & time",
+        "basicInfo": "Basic information",
+        "selectPayment": "Select payment method",
+        "confirmation": "Confirmation"
+    },
+    "basicInfo": {
+        "title": "Patient information",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Email address",
+        "phoneNumber": "Phone number",
+        "symptoms": "Symptoms",
+        "attachments": "Attachments",
+        "optional": "(Optional)",
+        "placeholder": {
+            "firstName": "Enter first name",
+            "lastName": "Enter last name",
+            "email": "Enter email address",
+            "phoneNumber": "Enter phone number",
+            "symptoms": "Enter symptoms"
+        },
+        "attachmentInfo": {
+            "title": "When should you attach files?",
+            "followUp": "Follow-up visit: Test results, images from previous visit",
+            "chronic": "Chronic disease: Medical records, old prescriptions",
+            "remote": "Remote consultation: Symptom photos, external examination results",
+            "acceptedFormats": "Accepted:",
+            "formats": "Images (JPG, PNG), PDF, Word (DOC, DOCX) - Max 10MB/file"
+        },
+        "filesSelected": "{{count}} file(s) selected",
+        "uploadNote": "Files will be uploaded when you proceed to the next step"
+    },
+    "payment": {
+        "selectMethod": "Select payment method",
+        "methods": {
+            "momo": "MoMo Wallet",
+            "vnpay": "VNPay",
+            "cash": "Cash",
+            "card": "Credit/Debit Card"
+        }
+    },
+    "appointment": {
+        "date": "Appointment date",
+        "time": "Appointment time",
+        "doctor": "Doctor",
+        "specialty": "Specialty",
+        "hospital": "Hospital",
+        "fee": "Consultation fee"
+    }
+}

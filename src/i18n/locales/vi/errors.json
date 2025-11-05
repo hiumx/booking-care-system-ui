@@ -1,0 +1,28 @@
+{
+    "api": {
+        "INVALID_CREDENTIALS": "Email hoặc mật khẩu không đúng",
+        "USER_NOT_FOUND": "Không tìm thấy người dùng",
+        "USER_ALREADY_EXISTS": "Email này đã được đăng ký",
+        "APPOINTMENT_SLOT_TAKEN": "Khung giờ này đã được đặt",
+        "APPOINTMENT_NOT_FOUND": "Không tìm thấy lịch hẹn",
+        "DOCTOR_NOT_AVAILABLE": "Bác sĩ không khả dụng vào thời gian này",
+        "PAYMENT_FAILED": "Thanh toán thất bại",
+        "INVALID_TOKEN": "Phiên đăng nhập đã hết hạn",
+        "UNAUTHORIZED": "Bạn không có quyền thực hiện thao tác này",
+        "FORBIDDEN": "Truy cập bị từ chối",
+        "VALIDATION_ERROR": "Dữ liệu không hợp lệ",
+        "FILE_TOO_LARGE": "Tệp quá lớn (tối đa 10MB)",
+        "INVALID_FILE_TYPE": "Định dạng tệp không được hỗ trợ",
+        "NETWORK_ERROR": "Lỗi kết nối mạng",
+        "SERVER_ERROR": "Lỗi máy chủ, vui lòng thử lại sau",
+        "UNKNOWN_ERROR": "Có lỗi xảy ra, vui lòng thử lại"
+    },
+    "validation": {
+        "EMAIL_REQUIRED": "Vui lòng nhập email",
+        "EMAIL_INVALID": "Email không hợp lệ",
+        "PASSWORD_REQUIRED": "Vui lòng nhập mật khẩu",
+        "PASSWORD_TOO_SHORT": "Mật khẩu phải có ít nhất 6 ký tự",
+        "PHONE_INVALID": "Số điện thoại không hợp lệ",
+        "REQUIRED_FIELD": "Trường này là bắt buộc"
+    }
+}
