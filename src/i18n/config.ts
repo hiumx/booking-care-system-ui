@@ -32,34 +32,36 @@ const resources = {
     },
 };
 
-// Use language detector
-i18n.use(LanguageDetector)
+// Initialize and configure i18n
+const configuredI18n = i18n
+    // Use language detector
+    .use(LanguageDetector)
     // Pass the i18n instance to react-i18next
-    .use(initReactI18next)
-    // Initialize i18next
-    .init({
-        resources,
-        fallbackLng: 'vi', // Default language is Vietnamese
-        defaultNS: 'common',
-        ns: ['common', 'booking', 'auth', 'errors', 'userProfile'],
+    .use(initReactI18next);
 
-        // Language detection configuration
-        detection: {
-            order: ['localStorage', 'navigator', 'htmlTag'],
-            caches: ['localStorage'],
-            lookupLocalStorage: 'i18nextLng',
-        },
+configuredI18n.init({
+    resources,
+    fallbackLng: 'vi', // Default language is Vietnamese
+    defaultNS: 'common',
+    ns: ['common', 'booking', 'auth', 'errors', 'userProfile'],
 
-        interpolation: {
-            escapeValue: false, // React already escapes values
-        },
+    // Language detection configuration
+    detection: {
+        order: ['localStorage', 'navigator', 'htmlTag'],
+        caches: ['localStorage'],
+        lookupLocalStorage: 'i18nextLng',
+    },
 
-        // Debug mode in development
-        debug: import.meta.env.DEV,
+    interpolation: {
+        escapeValue: false, // React already escapes values
+    },
 
-        react: {
-            useSuspense: false,
-        },
-    });
+    // Debug mode in development
+    debug: import.meta.env.DEV,
 
-export { i18n as default };
+    react: {
+        useSuspense: false,
+    },
+});
+
+export default configuredI18n;
