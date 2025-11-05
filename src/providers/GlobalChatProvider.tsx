@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { RootState } from '@/store';
+import { RootState, AppDispatch } from '@/store';
 import { useSharedChatHub } from '@/hooks/useSharedChatHub';
 import { ChatHubCallbacks } from '@/hooks/useChatHub';
 import { SignalRMessageReceived } from '@/types/communication.types';
+import { incrementUnreadMessageCount, fetchUnreadMessageCount } from '@/store/slices/userSlice';
 
 interface GlobalChatContextValue {
     isConnected: boolean;
@@ -27,6 +28,7 @@ interface GlobalChatProviderProps {
  * - Shows toast notifications when NOT on Chat page
  */
 export const GlobalChatProvider: React.FC<GlobalChatProviderProps> = ({ children }) => {
+    const dispatch = useDispatch<AppDispatch>();
     const userProfile = useSelector((state: RootState) => state.user.profile);
     const userId = userProfile?.accountId || '';
     const location = useLocation();
@@ -44,17 +46,30 @@ export const GlobalChatProvider: React.FC<GlobalChatProviderProps> = ({ children
                 // 2. User is NOT on the Chat page (to avoid duplicate notifications)
                 const isOnChatPage = location.pathname.toLowerCase().includes('/chat');
 
-                if (message.senderId !== userId && !isOnChatPage) {
-                    toast.info('💬 Bạn có tin nhắn mới!', {
-                        onClick: () => {
-                            // Navigate to chat page
-                            window.location.href = '/chat';
-                        },
-                    });
+                if (message.senderId.toUpperCase() !== userId.toUpperCase()) {
+                    // Increment unread count in Redux
+                    dispatch(incrementUnreadMessageCount());
+
+                    // Show toast notification if not on chat page
+                    if (!isOnChatPage) {
+                        toast.info('💬 Bạn có tin nhắn mới!', {
+                            onClick: () => {
+                                // Navigate to chat page
+                                window.location.href = '/chat';
+                            },
+                        });
+                    }
                 }
             },
-            [userId, location.pathname]
+            [userId, location.pathname, dispatch]
         ),
+
+        onAllMessagesRead: useCallback(() => {
+            // Refresh unread count from server when messages are marked as read
+            if (userId) {
+                dispatch(fetchUnreadMessageCount(userId));
+            }
+        }, [userId, dispatch]),
 
         onOnlineUsers: useCallback((userIds: string[]) => {
             console.log('[GlobalChat] 👥 Received online users list:', userIds);

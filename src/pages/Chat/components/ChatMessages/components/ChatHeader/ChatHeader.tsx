@@ -70,18 +70,26 @@ const ChatHeader = () => {
                                 </li>
                             </ul>
                         </div>
-                        <figure className={`avatar ${isOnline ? 'avatar-online' : ''}`}>
-                            <img
-                                src={otherParticipant?.avatarUrl || '/default-avatar.png'}
-                                alt="avatar"
-                            />
-                        </figure>
-                        <div className="mt-1">
-                            <h5>{otherParticipant?.fullName || 'Chọn hội thoại'}</h5>
-                            <small className="last-seen">
-                                {isOnline ? 'Đang online' : 'Offline'}
-                            </small>
-                        </div>
+                        {activeConversation && otherParticipant ? (
+                            <>
+                                <figure className={`avatar ${isOnline ? 'avatar-online' : ''}`}>
+                                    <img
+                                        src={otherParticipant.avatarUrl || '/default-avatar.png'}
+                                        alt="avatar"
+                                    />
+                                </figure>
+                                <div className="mt-1">
+                                    <h5>{otherParticipant.fullName}</h5>
+                                    <small className="last-seen">
+                                        {isOnline ? 'Đang online' : 'Offline'}
+                                    </small>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="mt-1">
+                                <h5>Chọn hội thoại</h5>
+                            </div>
+                        )}
                     </div>
                     <div className="chat-options">
                         <ul className="list-inline">
@@ -93,6 +101,7 @@ const ChatHeader = () => {
                                     )}
                                     onClick={() => setShowSearch(!showSearch)}
                                     title="Tìm kiếm"
+                                    disabled={!activeConversation}
                                 >
                                     <i className="fa-solid fa-magnifying-glass"></i>
                                 </button>
@@ -106,6 +115,7 @@ const ChatHeader = () => {
                                         setShowVideoCall(true);
                                         setShowDropdown(false);
                                     }}
+                                    disabled={!activeConversation}
                                 >
                                     <i className="fa-solid fa-phone"></i>
                                 </button>
@@ -118,6 +128,7 @@ const ChatHeader = () => {
                                             'btn btn-outline-light no-bg'
                                         )}
                                         onClick={() => setShowDropdown((prev) => !prev)}
+                                        disabled={!activeConversation}
                                     >
                                         <i className="fa-solid fa-ellipsis-vertical"></i>
                                     </button>

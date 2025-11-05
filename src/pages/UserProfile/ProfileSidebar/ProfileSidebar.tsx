@@ -1,8 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { UserProfile, getGenderText } from '@/types/user.types';
-import { AppDispatch } from '@/store';
+import { AppDispatch, RootState } from '@/store';
 import { logoutAsync } from '@/store/slices/authSlice';
 import { clearUserProfile } from '@/store/slices/userSlice';
 import { PATHS } from '@/routes/paths';
@@ -16,6 +16,7 @@ interface ProfileSidebarProps {
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const { unreadMessageCount } = useSelector((state: RootState) => state.user);
 
     const isActive = (tab: string) => activeTab === tab;
 
@@ -135,7 +136,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                             <Link to="/chat">
                                 <i className="isax isax-messages-1"></i>
                                 <span>Tin nhắn</span>
-                                <small className="unread-msg">7</small>
+                                {unreadMessageCount > 0 && (
+                                    <small className="unread-msg">{unreadMessageCount}</small>
+                                )}
                             </Link>
                         </li>
 

@@ -475,6 +475,26 @@ export class ChatService {
     }
 
     /**
+     * Get total unread message count for a user across all conversations
+     */
+    static async getTotalUnreadCount(
+        userId: string
+    ): Promise<ApiResponse<{ userId: string; totalUnreadCount: number; timestamp: string }>> {
+        try {
+            const response: any = await axiosInstance.get(
+                `/communications/users/${userId.toUpperCase()}/total-unread-count`
+            );
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Total unread count retrieved successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to get total unread count');
+        }
+    }
+
+    /**
      * Upload file to S3 (via Communication Service)
      * Note: Prefer using createMessageWithFiles for direct message + file upload
      */
@@ -636,6 +656,7 @@ export const {
     markMessageAsRead,
     markAllMessagesAsRead,
     getUnreadCount,
+    getTotalUnreadCount,
     uploadFile,
     uploadMultipleFiles,
     deleteMessage,

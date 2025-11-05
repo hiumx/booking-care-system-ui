@@ -17,25 +17,35 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
     // Backend uses uppercase, normalize for comparison
     const currentUserId = (userProfile?.accountId || userProfile?.id || '').toUpperCase();
 
-    // Filter and transform conversations
+    // Filter and sort conversations
     const filteredConversations = useMemo(() => {
         // Ensure conversations is always an array
         const convs = conversations || [];
 
-        if (!searchTerm) return convs;
+        // Filter by search term
+        const filtered = !searchTerm
+            ? convs
+            : convs.filter((conv) => {
+                  // Search in participant names or last message
+                  const participantName = conv.participantDetails
+                      ?.filter((p) => (p.id || p.accountId || '').toUpperCase() !== currentUserId)
+                      .map((p) => p.fullName)
+                      .join(', ');
+                  const lastMessageContent = conv.lastMessage?.content || '';
 
-        return convs.filter((conv) => {
-            // Search in participant names or last message
-            const participantName = conv.participantDetails
-                ?.filter((p) => (p.id || p.accountId || '').toUpperCase() !== currentUserId)
-                .map((p) => p.fullName)
-                .join(', ');
-            const lastMessageContent = conv.lastMessage?.content || '';
+                  return (
+                      participantName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      lastMessageContent.toLowerCase().includes(searchTerm.toLowerCase())
+                  );
+              });
 
-            return (
-                participantName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                lastMessageContent.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+        // Sort by most recent message (newest first)
+        // Use updatedAt or lastMessage.createdAt as fallback
+        return filtered.sort((a, b) => {
+            const timeA = a.lastMessage?.createdAt || a.updatedAt || a.createdAt;
+            const timeB = b.lastMessage?.createdAt || b.updatedAt || b.createdAt;
+
+            return new Date(timeB).getTime() - new Date(timeA).getTime();
         });
     }, [conversations, searchTerm, currentUserId]);
 

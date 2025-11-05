@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import Favourite from './Favourite';
@@ -9,11 +10,20 @@ import AppointmentDetailPage from './Appointments/AppointmentDetailPage';
 import SettingsContainer from './Setting/SettingsContainer/SettingsContainer';
 import Invoices from './Invoices';
 import Wallet from './Wallet';
-import { RootState } from '@/store';
+import { RootState, AppDispatch } from '@/store';
+import { fetchUnreadMessageCount } from '@/store/slices/userSlice';
 
 const UserProfile = () => {
     const location = useLocation();
+    const dispatch = useDispatch<AppDispatch>();
     const { profile } = useSelector((state: RootState) => state.user);
+
+    // Fetch unread message count when profile is loaded
+    useEffect(() => {
+        if (profile?.accountId) {
+            dispatch(fetchUnreadMessageCount(profile.accountId));
+        }
+    }, [profile?.accountId, dispatch]);
 
     // Get active tab from query parameters
     const getActiveTab = () => {
