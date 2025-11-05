@@ -96,7 +96,7 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                                                 ({votes.positive} / {votes.total} Đánh giá)
                                             </p>
                                             <p className="d-flex align-items-center mb-0 fs-14">
-                                                <i className="isax isax-archive-14 text-dark me-2"></i>
+                                                <i className="isax isax-clock text-dark me-2"></i>
                                                 {experience} phút
                                             </p>
                                         </div>
@@ -109,7 +109,9 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                                 <div className="d-flex align-items-center flex-wrap row-gap-3">
                                     <div className="me-3">
                                         <p className="mb-1">Phí dịch vụ</p>
-                                        <h3 className="text-orange">${fees}</h3>
+                                        <h3 className="text-orange">
+                                            {fees.toLocaleString('vi-VN')} VNĐ
+                                        </h3>
                                     </div>
                                     <p className="mb-0">
                                         Lịch trống tiếp theo <br />
