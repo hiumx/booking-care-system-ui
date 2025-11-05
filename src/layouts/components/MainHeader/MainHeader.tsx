@@ -6,6 +6,7 @@ import { PATHS } from '@/routes/paths';
 import { AppDispatch, RootState } from '@/store';
 import { logoutAsync } from '@/store/slices/authSlice';
 import { fetchUserProfile, clearUserProfile } from '@/store/slices/userSlice';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 interface HeaderProps {
     isHeaderMenu?: boolean;
 }
@@ -63,6 +64,9 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                     >
                                         <i className="isax isax-moon"></i>
                                     </a>
+                                </li>
+                                <li className="nav-item">
+                                    <LanguageSwitcher />
                                 </li>
                                 {isAuthenticated ? (
                                     <li className="nav-item dropdown has-arrow logged-item">

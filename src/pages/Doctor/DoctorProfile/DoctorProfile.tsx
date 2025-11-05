@@ -40,6 +40,7 @@ import experienceLogo1 from '@/assets/img/icons/experience-logo-01.svg';
 
 // Icon CSS
 import '@/assets/css/feather.css';
+import '@/styles/bio-content.scss';
 import ScheduleAvailability from '@/components/ScheduleAvailability';
 import HospitalInfo from '@/components/HospitalInfo';
 import ExpandableText from '@/components/ExpandableText';
@@ -503,12 +504,21 @@ const DoctorProfile: React.FC = () => {
                                                 <strong>Kinh nghiệm:</strong>{' '}
                                                 {doctor.yearsOfExperience} năm kinh nghiệm
                                             </p>
-                                            <p>
+                                            <div>
                                                 <strong>Mô tả:</strong>{' '}
-                                                {doctor.bio
-                                                    ? doctor.bio.substring(0, 100) + '...'
-                                                    : 'Không có thông tin tiểu sử'}
-                                            </p>
+                                                {doctor.bio ? (
+                                                    <span
+                                                        className="bio-content"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html:
+                                                                doctor.bio.substring(0, 100) +
+                                                                '...',
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    'Không có thông tin tiểu sử'
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
