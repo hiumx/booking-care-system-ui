@@ -75,9 +75,26 @@
 
     .submitSection {
         text-align: left;
+        display: flex;
+        gap: 10px;
 
         .submitBtn {
             min-width: 120px;
+        }
+
+        .cancelBtn {
+            min-width: 120px;
+            background: #6c757d;
+            border-color: #6c757d;
+
+            &:hover {
+                background: #5a6268;
+                border-color: #545b62;
+            }
+            &:before {
+                background: #5a6268 !important;
+                border-color: #545b62 !important;
+            }
         }
     }
 }
@@ -147,8 +164,10 @@
 
         .submitSection {
             text-align: center;
+            flex-direction: column;
 
-            .submitBtn {
+            .submitBtn,
+            .cancelBtn {
                 width: 100%;
                 min-width: auto;
             }

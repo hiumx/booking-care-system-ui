@@ -13,9 +13,10 @@ interface WriteReviewProps {
         description: string;
         termsAccepted: boolean;
     }) => void;
+    onCancel?: () => void;
 }
 
-const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview }) => {
+const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview, onCancel }) => {
     const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
 
     // Use custom hooks for form validation and star rating
@@ -145,7 +146,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview })
 
                 <hr />
 
-                <div className="mb-3">
+                <div className="mb-3 d-none">
                     <div className="terms-accept">
                         <div className={clsx(styles.termsAccept, styles.customCheckbox)}>
                             <input
@@ -166,6 +167,14 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview })
 
                 <div className={styles.submitSection}>
                     <Button text="Thêm đánh giá" type="submit" className={styles.submitBtn} />
+                    {onCancel && (
+                        <Button
+                            text="Hủy"
+                            type="button"
+                            className={clsx('ms-2', styles.cancelBtn)}
+                            onClick={onCancel}
+                        />
+                    )}
                 </div>
             </form>
             {/* /Write Review Form */}

@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Calendar from '@/components/Calendar';
 import Modal from '@/components/Modal';
 import ModalArea from '@/components/ModalArea';
 import clsx from 'clsx';
 import styles from './SearchInput.module.scss';
+import { PATHS } from '@/routes/paths';
 // Removed unused icon imports as we now use images from backend
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getAllHospitalsAsync } from '@/store/slices/hospitalSlice';
@@ -42,6 +44,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
     rescheduleSpecialtyId,
 }) => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { simpleHospitals } = useAppSelector((state) => state.hospital);
     const { specialties } = useAppSelector((state) => state.specialty);
 
@@ -61,6 +65,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
     }>({});
     const [doctorName, setDoctorName] = useState<string>('');
     const dateInputRef = useRef<HTMLInputElement>(null);
+
+    // Track if component is on DoctorList page for syncing
+    const isDoctorListPage = globalThis.location.pathname.includes('/doctors');
 
     // Refs for auto-resize
     const doctorNameRef = useRef<HTMLDivElement>(null);
@@ -95,6 +102,89 @@ const SearchInput: React.FC<SearchInputProps> = ({
         // Note: Don't call onHospitalFilters/onSpecialtyFilters here
         // DoctorList already handles the filtering via its own useEffect
     }, [rescheduleHospitalId, rescheduleSpecialtyId]);
+
+    // Helper function to sync URL params
+    const syncDoctorNameFromUrl = (searchFromUrl: string | null) => {
+        setDoctorName(searchFromUrl || '');
+        setTimeout(() => {
+            const contentEditableDiv = document.querySelector(
+                '[contenteditable="true"][data-placeholder="Nhập tên bác sĩ"]'
+            );
+            if (contentEditableDiv) {
+                contentEditableDiv.textContent = searchFromUrl || '';
+            }
+        }, 0);
+    };
+
+    const syncDateFromUrl = (dateFromUrl: string | null) => {
+        if (!dateFromUrl) return;
+        try {
+            const parsedDate = new Date(dateFromUrl);
+            if (!Number.isNaN(parsedDate.getTime())) {
+                setSelectedDate(parsedDate);
+            }
+        } catch (e) {
+            console.error('Error parsing date from URL:', e);
+        }
+    };
+
+    const syncAreaFromUrl = (
+        provinceIdFromUrl: string | null,
+        districtIdFromUrl: string | null,
+        provinceNameFromUrl: string | null,
+        districtNameFromUrl: string | null
+    ) => {
+        if (provinceIdFromUrl || districtIdFromUrl) {
+            const areaInfo = {
+                provinceId: provinceIdFromUrl || undefined,
+                districtId: districtIdFromUrl || undefined,
+                provinceName: provinceNameFromUrl || undefined,
+                districtName: districtNameFromUrl || undefined,
+            };
+            setSelectedAreaInfo(areaInfo);
+
+            if (provinceNameFromUrl && districtNameFromUrl) {
+                setSelectedArea(`${provinceNameFromUrl} - ${districtNameFromUrl}`);
+            } else if (provinceNameFromUrl) {
+                setSelectedArea(provinceNameFromUrl);
+            }
+        } else {
+            setSelectedAreaInfo({});
+            setSelectedArea('');
+        }
+    };
+
+    const syncFiltersFromUrl = (
+        specialtyIdFromUrl: string | null,
+        hospitalIdFromUrl: string | null
+    ) => {
+        setSelectedSpecialties(specialtyIdFromUrl ? [specialtyIdFromUrl] : []);
+        setSelectedClinics(hospitalIdFromUrl ? [hospitalIdFromUrl] : []);
+    };
+
+    // Sync search input with URL params when on DoctorList page
+    useEffect(() => {
+        if (isDoctorListPage) {
+            const searchFromUrl = searchParams.get('search');
+            const dateFromUrl = searchParams.get('date');
+            const provinceIdFromUrl = searchParams.get('provinceId');
+            const districtIdFromUrl = searchParams.get('districtId');
+            const provinceNameFromUrl = searchParams.get('provinceName');
+            const districtNameFromUrl = searchParams.get('districtName');
+            const specialtyIdFromUrl = searchParams.get('specialtyId');
+            const hospitalIdFromUrl = searchParams.get('hospitalId');
+
+            syncDoctorNameFromUrl(searchFromUrl);
+            syncDateFromUrl(dateFromUrl);
+            syncAreaFromUrl(
+                provinceIdFromUrl,
+                districtIdFromUrl,
+                provinceNameFromUrl,
+                districtNameFromUrl
+            );
+            syncFiltersFromUrl(specialtyIdFromUrl, hospitalIdFromUrl);
+        }
+    }, [isDoctorListPage, searchParams]);
 
     // Auto-resize function
     const autoResize = (element: HTMLDivElement) => {
@@ -214,7 +304,19 @@ const SearchInput: React.FC<SearchInputProps> = ({
         setShowSpecialtyModal(false);
     };
 
-    const handleSpecialtyApply = (specialties: string[]) => {
+    const handleSpecialtyApply = (specialties: string[], _searchTerm: string) => {
+        // If specialties is empty array, it means clear was called
+        if (specialties.length === 0) {
+            setSelectedSpecialties([]);
+            setShowSpecialtyModal(false);
+
+            // Call callback with empty array to clear filter
+            if (onSpecialtyFilters) {
+                onSpecialtyFilters([]);
+            }
+            return;
+        }
+
         setSelectedSpecialties(specialties);
         setShowSpecialtyModal(false);
 
@@ -237,7 +339,19 @@ const SearchInput: React.FC<SearchInputProps> = ({
         setShowClinicModal(false);
     };
 
-    const handleClinicApply = (clinics: string[]) => {
+    const handleClinicApply = (clinics: string[], _searchTerm: string) => {
+        // If clinics is empty array, it means clear was called
+        if (clinics.length === 0) {
+            setSelectedClinics([]);
+            setShowClinicModal(false);
+
+            // Call callback with empty array to clear filter
+            if (onHospitalFilters) {
+                onHospitalFilters([]);
+            }
+            return;
+        }
+
         setSelectedClinics(clinics);
         setShowClinicModal(false);
 
@@ -261,6 +375,19 @@ const SearchInput: React.FC<SearchInputProps> = ({
     };
 
     const handleAreaApply = (areaDisplay: string, locationId: string, provinceId?: string) => {
+        // If both areaDisplay and locationId are empty, it means clear was called
+        if (!areaDisplay && !locationId) {
+            setSelectedArea('');
+            setSelectedAreaInfo({});
+            setShowAreaModal(false);
+
+            // Call area filter callback with empty values to clear filter
+            if (onAreaFilter) {
+                onAreaFilter({});
+            }
+            return;
+        }
+
         setSelectedArea(areaDisplay);
 
         // Parse area info from the display string and locationId
@@ -302,6 +429,57 @@ const SearchInput: React.FC<SearchInputProps> = ({
           selectedDate.getFullYear() === today.getFullYear()
         : false;
 
+    // Handle form submit to navigate to DoctorList
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Build search params
+        const params = new URLSearchParams();
+
+        // Add search term if available
+        if (doctorName.trim()) {
+            params.set('search', doctorName.trim());
+        }
+
+        // Add specialty filter if available
+        if (selectedSpecialties.length > 0) {
+            // Use the first selected specialty for simplicity
+            params.set('specialtyId', selectedSpecialties[0]);
+        }
+
+        // Add hospital filter if available
+        if (selectedClinics.length > 0) {
+            // Use the first selected clinic for simplicity
+            params.set('hospitalId', selectedClinics[0]);
+        }
+
+        // Add area filter if available
+        if (selectedAreaInfo.provinceId) {
+            params.set('provinceId', selectedAreaInfo.provinceId);
+        }
+        if (selectedAreaInfo.districtId) {
+            params.set('districtId', selectedAreaInfo.districtId);
+        }
+        if (selectedAreaInfo.provinceName) {
+            params.set('provinceName', selectedAreaInfo.provinceName);
+        }
+        if (selectedAreaInfo.districtName) {
+            params.set('districtName', selectedAreaInfo.districtName);
+        }
+
+        // Add date if selected
+        if (selectedDate) {
+            params.set('date', selectedDate.toISOString());
+        }
+
+        // Always add pagination params
+        params.set('pageNumber', '1');
+        params.set('pageSize', '10');
+
+        // Navigate to DoctorList with params
+        navigate(`${PATHS.DOCTOR.ROOT}?${params.toString()}`);
+    };
+
     return (
         <div
             className={clsx(
@@ -318,7 +496,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     styles.customWidthSearch
                 )}
             >
-                <form action="#">
+                <form onSubmit={handleSubmit}>
                     {/* Second Row: Doctor, Specialty, Clinic, Location, Date, and Button */}
                     <div className={clsx('search-row second-row', styles.secondRow)}>
                         <div className={clsx('search-input search-map-line', styles.inputItem)}>
@@ -488,6 +666,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     items={specialtyItems}
                     title="Tìm theo chuyên khoa"
                     itemType="specialty"
+                    initialSelectedItems={selectedSpecialties}
                 />
                 <Modal
                     isOpen={showClinicModal}
@@ -496,6 +675,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     items={hospitalItems}
                     title="Tìm theo Bệnh viện"
                     itemType="hospital"
+                    initialSelectedItems={selectedClinics}
                 />
                 <ModalArea
                     isOpen={showAreaModal}

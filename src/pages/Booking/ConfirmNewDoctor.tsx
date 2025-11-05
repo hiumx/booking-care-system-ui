@@ -340,7 +340,7 @@ const ConfirmNewDoctor: React.FC = () => {
                                                 <div className="flex-grow-1">
                                                     <h5 className="mb-2 text-dark">
                                                         {newDoctor.position?.name}{' '}
-                                                        {newDoctor.firstName} {newDoctor.lastName}
+                                                        {newDoctor.lastName} {newDoctor.firstName}
                                                     </h5>
                                                     <p className="text-muted mb-2">
                                                         <i className="isax isax-health me-2"></i>
