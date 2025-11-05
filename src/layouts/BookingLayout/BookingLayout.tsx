@@ -9,7 +9,7 @@ interface BookingLayoutProps {
 const BookingLayout: React.FC<BookingLayoutProps> = ({ children }) => {
     return (
         <div>
-            <MainHeader isHeaderMenu={false} />
+            <MainHeader isHeaderMenu={true} />
             {children}
             <BookingFooter />
         </div>
