@@ -416,7 +416,9 @@ const ServiceDetailPage: React.FC = () => {
                                         />
                                     ) : (
                                         <div className="alert alert-info">
-                                            <p>Không có bệnh viện nào cung cấp dịch vụ này.</p>
+                                            <p>
+                                                Không còn bệnh viện nào khác cung cấp dịch vụ này.
+                                            </p>
                                         </div>
                                     )}
                                 </div>
