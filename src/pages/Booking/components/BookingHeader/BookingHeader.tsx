@@ -78,37 +78,9 @@ const BookingHeader: React.FC<BookingHeaderProps> = ({
                                 <h6 className="mb-2">Thông tin lịch khám</h6>
                                 <div className="row gx-2 gy-3">
                                     <div className="col-lg-3 col-sm-6">
-                                        <div>
-                                            <h6 className="fs-14 fw-medium mb-1">Dịch vụ</h6>
-                                            <p className="mb-0">{appointment.service}</p>
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-3 col-sm-6">
-                                        <div>
-                                            <h6 className="fs-14 fw-medium mb-1">Dịch vụ</h6>
-                                            <p className="mb-0">{appointment.serviceType}</p>
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-3 col-sm-6">
-                                        <div>
-                                            <h6 className="fs-14 fw-medium mb-1">Ngày khám</h6>
-                                            <p className="mb-0">
-                                                <i className="fa-regular fa-calendar me-1"></i>
-                                                {date}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="col-lg-3 col-sm-6">
-                                        <div>
-                                            <h6 className="fs-14 fw-medium mb-1">Loại lịch khám</h6>
-                                            <p className="mb-0">{appointment.appointmentType}</p>
-                                        </div>
-                                    </div>
-                                    <div className="mt-2">
                                         {
                                             <>
-                                                <h6 className="fs-14 fw-medium mb-2 mt-2">
+                                                <h6 className="fs-14 fw-medium mb-1">
                                                     Giờ khám{' '}
                                                     {`${Math.max(timeSlots.length, 0)} khung`}
                                                 </h6>
@@ -133,6 +105,22 @@ const BookingHeader: React.FC<BookingHeaderProps> = ({
                                                 </div>
                                             </>
                                         }
+                                    </div>
+                                    <div className="col-lg-3 col-sm-6">
+                                        <div>
+                                            <h6 className="fs-14 fw-medium mb-1">Ngày khám</h6>
+                                            <p className="mb-0">
+                                                <i className="fa-regular fa-calendar me-1"></i>
+                                                {date}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-lg-3 col-sm-6">
+                                        <div>
+                                            <h6 className="fs-14 fw-medium mb-1">Loại lịch khám</h6>
+                                            <p className="mb-0">{appointment.appointmentType}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </>
