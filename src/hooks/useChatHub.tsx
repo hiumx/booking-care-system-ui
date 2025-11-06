@@ -22,6 +22,67 @@ export interface ChatHubCallbacks {
     onJoinedConversation?: (conversationId: string) => void;
     onLeftConversation?: (conversationId: string) => void;
     onError?: (error: string) => void;
+
+    // WebRTC Call callbacks
+    onIncomingCall?: (data: IncomingCallData) => void;
+    onCallAccepted?: (data: CallAcceptedData) => void;
+    onCallDeclined?: (data: CallDeclinedData) => void;
+    onCallEnded?: (data: CallEndedData) => void;
+    onUserBusy?: (data: UserBusyData) => void;
+    onReceiveOffer?: (data: WebRTCOfferData) => void;
+    onReceiveAnswer?: (data: WebRTCAnswerData) => void;
+    onReceiveIceCandidate?: (data: ICECandidateData) => void;
+}
+
+// WebRTC Data Types
+export interface IncomingCallData {
+    callerId: string;
+    calleeId: string;
+    conversationId: string;
+    callType: string;
+    callerName?: string;
+    callerAvatar?: string;
+}
+
+export interface CallAcceptedData {
+    calleeId: string;
+    callerId: string;
+    conversationId: string;
+}
+
+export interface CallDeclinedData {
+    calleeId: string;
+    callerId: string;
+    reason?: string;
+}
+
+export interface CallEndedData {
+    userId: string;
+    otherUserId: string;
+    reason?: string;
+}
+
+export interface UserBusyData {
+    userId: string;
+    callerId: string;
+}
+
+export interface WebRTCOfferData {
+    senderId: string;
+    receiverId: string;
+    offer: RTCSessionDescriptionInit;
+}
+
+export interface WebRTCAnswerData {
+    senderId: string;
+    receiverId: string;
+    answer: RTCSessionDescriptionInit;
+}
+
+export interface ICECandidateData {
+    senderId: string;
+    receiverId: string;
+    candidate: RTCIceCandidateInit;
 }
 
 export interface ChatHubConnection {

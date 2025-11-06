@@ -201,7 +201,7 @@ const ChatHeader = () => {
                 </div>
             </div>
 
-            {showVideoCall && (
+            {showVideoCall && activeConversation && otherParticipant && (
                 <div
                     style={{
                         position: 'fixed',
@@ -212,7 +212,16 @@ const ChatHeader = () => {
                         zIndex: 9999,
                     }}
                 >
-                    <VideoCallWindow />
+                    <VideoCallWindow
+                        isVisible={showVideoCall}
+                        onClose={() => setShowVideoCall(false)}
+                        participantId={otherParticipant.id || otherParticipant.accountId || ''}
+                        conversationId={activeConversation.id}
+                        participantName={otherParticipant.fullName || 'User'}
+                        participantAvatar={otherParticipant.avatarUrl}
+                        callType="video"
+                        isIncoming={false}
+                    />
                 </div>
             )}
         </>
