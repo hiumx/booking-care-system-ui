@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { useLocation } from 'react-router-dom';
 import clsx from 'clsx';
@@ -17,17 +17,32 @@ const ChatMessages = () => {
     const [showIncomingCallWindow, setShowIncomingCallWindow] = useState(false);
     const [currentCall, setCurrentCall] = useState<IncomingCallData | null>(null);
 
+    // ✅ Track if a call is currently being handled to prevent duplicates
+    const handlingCallRef = useRef<string | null>(null);
+
     // Get incoming call from global context
-    const { incomingCall, clearIncomingCall } = useGlobalChat();
+    const { clearIncomingCall } = useGlobalChat();
 
     // Handle incoming call from navigation state (when accepting from notification)
     useEffect(() => {
         const navState = location.state as { incomingCall?: IncomingCallData };
         if (navState?.incomingCall) {
+            const callId = `${navState.incomingCall.callerId}-${navState.incomingCall.conversationId}`;
+
+            // ✅ Check if already handling this call
+            if (handlingCallRef.current === callId) {
+                console.log('[ChatMessages] ⏭️ Already handling this call, ignoring');
+                return;
+            }
+
             console.log(
                 '[ChatMessages] 📞 Received incoming call from navigation:',
                 navState.incomingCall
             );
+
+            // ✅ Mark as handling
+            handlingCallRef.current = callId;
+
             setCurrentCall(navState.incomingCall);
             setShowIncomingCallWindow(true);
             // Clear global incoming call to prevent duplicate
@@ -37,22 +52,16 @@ const ChatMessages = () => {
         }
     }, [location, clearIncomingCall]);
 
-    // Auto-show call window if there's an incoming call and user is ALREADY on chat page
-    // Only show if we don't already have a currentCall to avoid duplicates
-    useEffect(() => {
-        if (incomingCall && !currentCall && !showIncomingCallWindow) {
-            console.log('[ChatMessages] 📞 Auto-accepting call on chat page:', incomingCall);
-            setCurrentCall(incomingCall);
-            setShowIncomingCallWindow(true);
-            // Clear global incoming call to prevent it from triggering again
-            clearIncomingCall();
-        }
-    }, [incomingCall, currentCall, showIncomingCallWindow, clearIncomingCall]);
+    // ✅ REMOVED: Auto-accept logic
+    // Now GlobalChatProvider will always show IncomingCallNotification
+    // User can choose to Accept (navigate here) or Decline
 
     const handleCloseCallWindow = () => {
         console.log('[ChatMessages] Closing call window');
         setShowIncomingCallWindow(false);
         setCurrentCall(null);
+        // ✅ Reset handling ref when call closes
+        handlingCallRef.current = null;
     };
 
     return (

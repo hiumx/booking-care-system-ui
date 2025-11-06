@@ -6,6 +6,7 @@ import styles from './VideoCallWindow.module.scss';
 import videojpg from '@/assets/img/video-call.jpg';
 import { useWebRTC } from '@/hooks/useWebRTC';
 import type { RootState } from '@/store';
+import { useGlobalChat } from '@/providers/GlobalChatProvider';
 
 interface VideoCallWindowProps {
     isVisible?: boolean;
@@ -24,13 +25,16 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
     participantId,
     conversationId,
     participantName: _participantName = 'User', // Reserved for future use
-    participantAvatar = './src/assets/img/patients/patient1.jpg',
+    participantAvatar: _participantAvatar = './src/assets/img/patients/patient1.jpg', // Reserved for future use
     callType: _callType = 'video', // Reserved for future use (audio/video mode)
     isIncoming = false,
 }) => {
     // Get current user ID from Redux
     const { profile } = useSelector((state: RootState) => state.user);
     const userId = profile?.accountId || '';
+
+    // Get global chat context for clearing processed calls
+    const { clearProcessedCall } = useGlobalChat();
 
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
@@ -46,6 +50,12 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const localVideoContainerRef = useRef<HTMLButtonElement>(null);
+
+    // Track if call has been initialized
+    const callInitializedRef = useRef(false);
+
+    // Track if remote video is playing (to prevent duplicate play() calls)
+    const remoteVideoPlayingRef = useRef(false);
 
     // WebRTC Hook Integration
     const {
@@ -64,12 +74,36 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         {
             onCallStateChange: (state) => {
                 console.log('[VideoCallWindow] Call state changed:', state);
+
+                // ✅ Update ref synchronously (before React re-renders)
+                callStateRef.current = state;
+
                 if (
                     state === 'ended' ||
                     state === 'declined' ||
                     state === 'failed' ||
                     state === 'busy'
                 ) {
+                    // ✅ Clear processed call to allow same user to call again
+                    console.log('[VideoCallWindow] Clearing processed call for:', participantId);
+                    clearProcessedCall(participantId, conversationId);
+
+                    // ✅ Reset remote video playing flag for next call
+                    remoteVideoPlayingRef.current = false;
+
+                    // ✅ Clear video srcObject when call ends to release camera/mic
+                    if (localVideoRef.current) {
+                        console.log(
+                            '[VideoCallWindow] Clearing local video srcObject (call ended)'
+                        );
+                        localVideoRef.current.srcObject = null;
+                    }
+                    if (remoteVideoRef.current) {
+                        console.log(
+                            '[VideoCallWindow] Clearing remote video srcObject (call ended)'
+                        );
+                        remoteVideoRef.current.srcObject = null;
+                    }
                     if (onClose) {
                         onClose();
                     } else if (globalThis.window !== undefined) {
@@ -79,9 +113,101 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                 }
             },
             onRemoteStream: (stream) => {
-                console.log('[VideoCallWindow] Remote stream received');
+                console.log('[VideoCallWindow] Remote stream received:', stream);
+                console.log('[VideoCallWindow] Remote stream tracks:', stream.getTracks());
+                console.log('[VideoCallWindow] Remote stream active:', stream.active);
+
+                const videoTracks = stream.getVideoTracks();
+                const audioTracks = stream.getAudioTracks();
+                console.log('[VideoCallWindow] Video tracks:', videoTracks.length);
+                console.log('[VideoCallWindow] Audio tracks:', audioTracks.length);
+
                 if (remoteVideoRef.current) {
-                    remoteVideoRef.current.srcObject = stream;
+                    // ✅ Only set srcObject if different (prevent "new load request")
+                    const currentSrcObject = remoteVideoRef.current.srcObject as MediaStream | null;
+                    if (currentSrcObject !== stream) {
+                        console.log('[VideoCallWindow] Setting remote video srcObject');
+                        remoteVideoRef.current.srcObject = stream;
+                    } else {
+                        console.log('[VideoCallWindow] srcObject already set, skipping');
+                    }
+
+                    // ✅ Only play when we have BOTH tracks AND haven't played yet
+                    if (
+                        videoTracks.length > 0 &&
+                        audioTracks.length > 0 &&
+                        !remoteVideoPlayingRef.current
+                    ) {
+                        console.log('[VideoCallWindow] Both tracks ready, preparing to play...');
+                        console.log(
+                            '[VideoCallWindow] Video element readyState:',
+                            remoteVideoRef.current.readyState
+                        );
+
+                        remoteVideoPlayingRef.current = true; // ✅ Mark as playing immediately
+
+                        // ✅ Function to attempt playing
+                        const tryPlay = () => {
+                            console.log(
+                                '[VideoCallWindow] Attempting play (readyState:',
+                                remoteVideoRef.current?.readyState,
+                                ')'
+                            );
+
+                            if (!remoteVideoRef.current) {
+                                remoteVideoPlayingRef.current = false;
+                                return;
+                            }
+
+                            remoteVideoRef.current
+                                .play()
+                                .then(() => {
+                                    console.log(
+                                        '[VideoCallWindow] ✅ Remote video playing successfully'
+                                    );
+                                })
+                                .catch((error) => {
+                                    console.error('[VideoCallWindow] ❌ Error playing:', error);
+                                    remoteVideoPlayingRef.current = false;
+                                });
+                        };
+
+                        // ✅ If video has enough data, play immediately
+                        if (remoteVideoRef.current.readyState >= 2) {
+                            console.log('[VideoCallWindow] Video ready, playing immediately');
+                            tryPlay();
+                        } else {
+                            // ✅ Wait for video data to load
+                            console.log('[VideoCallWindow] Waiting for loadeddata event...');
+                            const onLoadedData = () => {
+                                console.log('[VideoCallWindow] loadeddata fired, playing now');
+                                tryPlay();
+                                remoteVideoRef.current?.removeEventListener(
+                                    'loadeddata',
+                                    onLoadedData
+                                );
+                            };
+                            remoteVideoRef.current.addEventListener('loadeddata', onLoadedData);
+
+                            // ✅ Timeout fallback
+                            setTimeout(() => {
+                                if (remoteVideoRef.current) {
+                                    remoteVideoRef.current.removeEventListener(
+                                        'loadeddata',
+                                        onLoadedData
+                                    );
+                                    console.log('[VideoCallWindow] Timeout, force trying play');
+                                    tryPlay();
+                                }
+                            }, 2000);
+                        }
+                    } else if (remoteVideoPlayingRef.current) {
+                        console.log(
+                            '[VideoCallWindow] ⏭️ Already playing, skipping duplicate play()'
+                        );
+                    } else {
+                        console.log('[VideoCallWindow] ⏳ Waiting for all tracks...');
+                    }
                 }
             },
             onLocalStream: (stream) => {
@@ -101,6 +227,14 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
             avatar: profile?.avatarUrl,
         }
     );
+
+    // Ref to track current callState for cleanup
+    const callStateRef = useRef(callState);
+
+    // Keep callStateRef in sync
+    useEffect(() => {
+        callStateRef.current = callState;
+    }, [callState]);
 
     // Call duration timer - use callState instead of isCallActive
     useEffect(() => {
@@ -144,19 +278,34 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         }, 100);
     };
 
+    // Handle speaker mute/unmute via ref
+    useEffect(() => {
+        if (remoteVideoRef.current) {
+            remoteVideoRef.current.muted = isSpeakerMuted;
+        }
+    }, [isSpeakerMuted]);
+
     // Handle speaker toggle
     const toggleSpeaker = () => {
         setIsSpeakerMuted(!isSpeakerMuted);
-        if (remoteVideoRef.current) {
-            remoteVideoRef.current.muted = !isSpeakerMuted;
-        }
     };
 
     // Handle end call
     const handleEndCall = () => {
         console.log('[VideoCallWindow] Ending call with:', participantId);
+
+        // ✅ Clear video srcObject FIRST to release camera/mic immediately
+        if (localVideoRef.current) {
+            console.log('[VideoCallWindow] Clearing local video srcObject');
+            localVideoRef.current.srcObject = null;
+        }
+        if (remoteVideoRef.current) {
+            console.log('[VideoCallWindow] Clearing remote video srcObject');
+            remoteVideoRef.current.srcObject = null;
+        }
+
         endCall(participantId, 'User ended call');
-        cleanup();
+        // Don't call cleanup() here - endCall already does it
         if (onClose) {
             onClose();
         } else if (globalThis.window !== undefined) {
@@ -167,32 +316,98 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
 
     // Initialize call when component becomes visible
     useEffect(() => {
-        if (!isVisible || !participantId || !conversationId || callState !== 'idle') {
+        console.log('[VideoCallWindow] 🔍 Init effect triggered:', {
+            isVisible,
+            participantId,
+            conversationId,
+            callState,
+            isIncoming,
+            callInitialized: callInitializedRef.current,
+        });
+
+        // ✅ Prevent re-initialization if already initialized OR already in call
+        if (callInitializedRef.current) {
+            console.log('[VideoCallWindow] ⏸️ Call already initialized, skipping');
             return;
         }
 
+        // ✅ Also check callState to prevent re-init during Strict Mode remount
+        if (callState !== 'idle') {
+            console.log('[VideoCallWindow] ⏸️ Call already in progress, state:', callState);
+            return;
+        }
+
+        if (!isVisible) {
+            console.log('[VideoCallWindow] ⏸️ Not visible, skipping');
+            return;
+        }
+        if (!participantId) {
+            console.log('[VideoCallWindow] ⏸️ No participantId, skipping');
+            return;
+        }
+        if (!conversationId) {
+            console.log('[VideoCallWindow] ⏸️ No conversationId, skipping');
+            return;
+        }
+
+        console.log('[VideoCallWindow] ✅ All conditions met, initializing call');
         console.log('[VideoCallWindow] Initializing call, isIncoming:', isIncoming);
+
+        // Mark as initialized to prevent re-initialization
+        callInitializedRef.current = true;
 
         if (isIncoming) {
             // Accept incoming call
-            console.log('[VideoCallWindow] Accepting call from:', participantId);
+            console.log('[VideoCallWindow] 📞 Accepting incoming call from:', participantId);
             acceptCall(participantId, conversationId);
         } else {
             // Start outgoing call
-            console.log('[VideoCallWindow] Starting call to:', participantId);
+            console.log('[VideoCallWindow] 📞 Starting outgoing call to:', participantId);
             startCall(participantId, conversationId);
         }
-    }, [isVisible, participantId, conversationId, isIncoming, callState, acceptCall, startCall]);
+        // ✅ IMPORTANT: Remove acceptCall/startCall from dependencies to prevent re-initialization
+        // callState is included to check if call already in progress (Strict Mode safety)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isVisible, participantId, conversationId, isIncoming, callState]);
 
     // Cleanup on unmount
     useEffect(() => {
         return () => {
-            if (callState !== 'idle' && callState !== 'ended') {
-                console.log('[VideoCallWindow] Component unmounting, cleaning up');
+            const currentState = callStateRef.current;
+            console.log('[VideoCallWindow] Component unmounting, callState:', currentState);
+
+            // ✅ Clear video elements' srcObject to release media
+            if (localVideoRef.current) {
+                console.log('[VideoCallWindow] Clearing local video srcObject');
+                localVideoRef.current.srcObject = null;
+            }
+            if (remoteVideoRef.current) {
+                console.log('[VideoCallWindow] Clearing remote video srcObject');
+                remoteVideoRef.current.srcObject = null;
+            }
+
+            // ✅ ONLY cleanup if call is truly ending (not Strict Mode remount)
+            // If call is active (calling/connecting/connected), DON'T cleanup - Strict Mode remount
+            if (
+                currentState === 'idle' ||
+                currentState === 'ended' ||
+                currentState === 'declined' ||
+                currentState === 'failed'
+            ) {
+                console.log('[VideoCallWindow] Call inactive, running cleanup');
                 cleanup();
+                console.log('[VideoCallWindow] Resetting initialization flag');
+                callInitializedRef.current = false;
+            } else {
+                console.log(
+                    '[VideoCallWindow] Call active, skipping cleanup (Strict Mode remount)'
+                );
+                console.log('[VideoCallWindow] Call active, keeping initialization flag');
             }
         };
-    }, [callState, cleanup]);
+        // ✅ Empty deps - only run on mount/unmount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Drag & Drop handlers for local video
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -383,7 +598,7 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                 className={clsx(styles.remoteVideo, 'w-100 h-100')}
                                 autoPlay
                                 playsInline
-                                muted={isSpeakerMuted}
+                                muted={false}
                                 poster={videojpg}
                             >
                                 <track kind="captions" />
@@ -443,13 +658,16 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                     muted
                                     style={{ display: isVideoOff ? 'none' : 'block' }}
                                 />
-                                {/* Avatar fallback when video is off */}
+                                {/* Avatar fallback when video is off - Show current user's avatar */}
                                 <img
-                                    src={participantAvatar}
+                                    src={
+                                        profile?.avatarUrl ||
+                                        './src/assets/img/patients/patient1.jpg'
+                                    }
                                     className={clsx('img-fluid rounded border border-primary', {
                                         'd-none': !isVideoOff,
                                     })}
-                                    alt="User avatar"
+                                    alt="My avatar"
                                 />
 
                                 {/* Drag indicator */}
