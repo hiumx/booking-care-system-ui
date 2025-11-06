@@ -46,6 +46,8 @@ const ScheduleAvailability: React.FC = () => {
 
     const next7Days = generateNext7Days(startDate);
 
+    console.log('Next7Days: ', next7Days);
+
     // Mock data for appointment times
     const mockAppointmentTimes: AppointmentTime[] = [
         { id: 1, start_time: '09:00', end_time: '09:30' },
@@ -264,14 +266,14 @@ const ScheduleAvailability: React.FC = () => {
             doctor_schedule_time_id: 28,
             doctor_id: 1,
             appointment_time_id: 1,
-            appointment_date: '2025-09-18',
+            appointment_date: '2025-09-21',
             is_available: true,
         },
         {
             doctor_schedule_time_id: 29,
             doctor_id: 1,
             appointment_time_id: 5,
-            appointment_date: '2025-09-18',
+            appointment_date: '2025-09-23',
             is_available: true,
         },
     ];

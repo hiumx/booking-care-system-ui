@@ -37,13 +37,13 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep 
     const bookingState = useAppSelector((state) => state.booking);
 
     // Local state for form inputs
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [email, setEmail] = useState('');
-    const [symptoms, setSymptoms] = useState(bookingState.symptoms || '');
+    const [firstName, setFirstName] = useState<string>('');
+    const [lastName, setLastName] = useState<string>('');
+    const [phoneNumber, setPhoneNumber] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
+    const [symptoms, setSymptoms] = useState<string>(bookingState.symptoms || '');
     const [attachments, setAttachments] = useState<File[]>([]);
-    const [isUploading, setIsUploading] = useState(false);
+    const [isUploading, setIsUploading] = useState<boolean>(false);
 
     // Fill form with user profile data when component mounts
     useEffect(() => {
