@@ -12,7 +12,7 @@ const SlotItem: React.FC<SlotItemProps> = ({ id, rangeTime, handleClickSlot }) =
         <div className={clsx(styles.slotItem, 'form-check-inline visits me-0')}>
             <label className={clsx(styles.slotLabel, 'visit-btns')}>
                 <input
-                    type="checkbox"
+                    type="radio"
                     className="form-check-input"
                     name="appointment"
                     onChange={() => handleClickSlot(id)}

@@ -192,28 +192,26 @@ const scheduleSlice = createSlice({
             state.isSlotSelected = true;
         },
 
-        // Toggle slot selection (add or remove from selectedSlots array)
+        // Toggle slot selection (single slot only - replaces previous selection)
         toggleSlotSelection: (state, action: PayloadAction<AvailableSlot>) => {
             const slot = action.payload;
-            const existingIndex = state.selectedSlots.findIndex(
-                (s) => s.startTime === slot.startTime && s.endTime === slot.endTime
-            );
 
-            if (existingIndex >= 0) {
-                // Remove slot if already selected
-                state.selectedSlots.splice(existingIndex, 1);
-            } else {
-                // Add slot if not selected
-                state.selectedSlots.push(slot);
-            }
+            // Check if clicking the same slot that's already selected
+            const isSameSlot =
+                state.selectedSlot !== null &&
+                state.selectedSlot.startTime === slot.startTime &&
+                state.selectedSlot.endTime === slot.endTime;
 
-            // Update single slot and flag for backward compatibility
-            if (state.selectedSlots.length > 0) {
-                state.selectedSlot = state.selectedSlots[state.selectedSlots.length - 1];
-                state.isSlotSelected = true;
-            } else {
+            if (isSameSlot) {
+                // Unselect if clicking the same slot
+                state.selectedSlots = [];
                 state.selectedSlot = null;
                 state.isSlotSelected = false;
+            } else {
+                // Replace with new slot (only allow 1 slot per booking)
+                state.selectedSlots = [slot];
+                state.selectedSlot = slot;
+                state.isSlotSelected = true;
             }
         },
 
