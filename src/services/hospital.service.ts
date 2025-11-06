@@ -3,7 +3,7 @@
 import axiosInstance, { ApiResponse } from '@/configs/axios.config';
 import {
     HospitalListResponse,
-    HospitalDetailResponse,
+    HospitalProfileResponse,
     HospitalSearchParams,
     HospitalListOptimizedPaginatedResponse,
     HospitalListOptimizedFilterRequest,
@@ -40,7 +40,7 @@ export class HospitalService {
     /**
      * Get hospital by ID
      */
-    static async getHospitalById(id: string): Promise<ApiResponse<HospitalDetailResponse>> {
+    static async getHospitalById(id: string): Promise<ApiResponse<HospitalProfileResponse>> {
         try {
             const response: any = await axiosInstance.get(HOSPITAL_ENDPOINTS.GET_HOSPITAL(id));
             return {

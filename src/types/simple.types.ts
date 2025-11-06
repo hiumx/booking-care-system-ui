@@ -5,6 +5,7 @@ export interface SpecialtySimpleResponse {
     id: string;
     name: string;
     imageUrl: string;
+    doctorCount: number;
 }
 
 // Position Simple Response DTO
@@ -24,6 +25,7 @@ export interface LanguageSimpleResponse {
 export interface ServiceTypeSimpleResponse {
     id: string;
     name: string;
+    imageUrl?: string; // Icon URL from backend
 }
 
 // Hospital Simple Response DTO

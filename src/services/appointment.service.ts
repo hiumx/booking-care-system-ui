@@ -5,6 +5,10 @@ import {
     AppointmentQueryRequest,
     CreateAppointmentRequest,
     UpdateAppointmentStatusRequest,
+    RescheduleSameDoctorRequest,
+    ConfirmNewDoctorRequest,
+    RequestRefundRequest,
+    RescheduleResponse,
 } from '@/types/appointment.types';
 
 // Base API endpoints for appointments
@@ -13,6 +17,11 @@ const APPOINTMENT_ENDPOINTS = {
     HEALTH: '/appointments/health',
     PATIENT: '/appointments/patient',
     CANCEL_APPOINTMENT: (id: string) => `/appointments/cancel/${id}`,
+    RESCHEDULE_SAME_DOCTOR: (id: string) => `/appointments/${id}/reschedule-same-doctor`,
+    CONFIRM_NEW_DOCTOR: (id: string) => `/appointments/${id}/confirm-new-doctor`,
+    REQUEST_REFUND: (id: string) => `/appointments/${id}/request-refund`,
+    CHOOSE_NEW_DOCTOR: (id: string) => `/appointments/${id}/choose-new-doctor`,
+    GENERATE_RESCHEDULE_TOKEN: (id: string) => `/appointments/${id}/generate-reschedule-token`,
     STATUS: (id: string) => `/appointments/status/${id}`,
     BY_ID: (id: string) => `/appointments/${id}`,
     UPLOAD_ATTACHMENT: '/attachment/upload',
@@ -165,6 +174,7 @@ export class AppointmentService {
 
     /**
      * Cancel an appointment (Patient)
+     * Returns reschedule options for staff cancellations
      * Refund percentage depends on cancellation time:
      * - >= 24 hours before: 100% refund
      * - 12-24 hours before: 50% refund
@@ -174,7 +184,7 @@ export class AppointmentService {
         appointmentId: string,
         cancellationReason: string,
         cancelledByPatientId?: string
-    ): Promise<ApiResponse<void>> {
+    ): Promise<ApiResponse<RescheduleResponse>> {
         try {
             const response: any = await axiosInstance.post(
                 APPOINTMENT_ENDPOINTS.CANCEL_APPOINTMENT(appointmentId),
@@ -194,19 +204,162 @@ export class AppointmentService {
             throw new Error(error.message || 'Failed to cancel appointment');
         }
     }
+
+    /**
+     * Reschedule appointment with same doctor (Option 1)
+     */
+    static async rescheduleSameDoctor(
+        request: RescheduleSameDoctorRequest
+    ): Promise<ApiResponse<void>> {
+        try {
+            const response: any = await axiosInstance.post(
+                APPOINTMENT_ENDPOINTS.RESCHEDULE_SAME_DOCTOR(request.appointmentId),
+                request
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Appointment rescheduled successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to reschedule appointment');
+        }
+    }
+
+    /**
+     * Confirm new doctor assignment (Option 2)
+     */
+    static async confirmNewDoctor(request: ConfirmNewDoctorRequest): Promise<ApiResponse<void>> {
+        try {
+            const response: any = await axiosInstance.post(
+                APPOINTMENT_ENDPOINTS.CONFIRM_NEW_DOCTOR(request.appointmentId),
+                request
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'New doctor confirmed successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to confirm new doctor');
+        }
+    }
+
+    /**
+     * Request refund for cancelled appointment (Option 4)
+     * Sends request to Payment Service via Appointment Service
+     */
+    static async requestRefund(request: RequestRefundRequest): Promise<ApiResponse<void>> {
+        try {
+            const response: any = await axiosInstance.post(
+                APPOINTMENT_ENDPOINTS.REQUEST_REFUND(request.appointmentId),
+                request
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Refund request submitted successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to request refund');
+        }
+    }
+
+    /**
+     * Choose new doctor (Option 3)
+     * Patient selects a different doctor from same hospital + specialty
+     * Handles 3 scenarios: same price, higher price, lower price
+     */
+    static async chooseNewDoctor(request: {
+        appointmentId: string;
+        rescheduleToken: string;
+        newDoctorId: string;
+        newAppointmentDate: string;
+        newAppointmentTimeId: string;
+        doctorPriceId: string;
+        isStaffAssigned: boolean;
+    }): Promise<
+        ApiResponse<{
+            appointmentId: string;
+            action: 'direct_update' | 'payment_required' | 'refund_created';
+            originalPrice: number;
+            newPrice: number;
+            priceDifference: number;
+            paymentUrl?: string;
+            refundRequestId?: string;
+            message: string;
+        }>
+    > {
+        try {
+            const response: any = await axiosInstance.post(
+                APPOINTMENT_ENDPOINTS.CHOOSE_NEW_DOCTOR(request.appointmentId),
+                request
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Request processed successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to choose new doctor');
+        }
+    }
+
+    /**
+     * Generate reschedule token without cancelling appointment (lazy token generation)
+     * Used when patient clicks reschedule/choose new doctor button
+     */
+    static async generateRescheduleToken(request: {
+        appointmentId: string;
+        rescheduleAction: 'SAME_DOCTOR' | 'NEW_DOCTOR';
+        patientId: string;
+    }): Promise<
+        ApiResponse<{
+            rescheduleToken: string;
+            tokenExpiry: string;
+            redirectUrl: string;
+            message: string;
+        }>
+    > {
+        try {
+            const response: any = await axiosInstance.post(
+                APPOINTMENT_ENDPOINTS.GENERATE_RESCHEDULE_TOKEN(request.appointmentId),
+                request
+            );
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Token generated successfully',
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to generate reschedule token');
+        }
+    }
 }
 
 // Export individual methods for convenience
 export const {
     healthCheck,
     createAppointment,
+    generateRescheduleToken,
     getAppointmentById,
     getAppointmentsByPatient,
     updateAppointmentStatus,
     uploadAttachment,
     deleteAttachment,
     cancelAppointment,
+    rescheduleSameDoctor,
+    confirmNewDoctor,
+    requestRefund,
+    chooseNewDoctor,
 } = AppointmentService;
+
+// Export types
+export type { RescheduleOptions } from '@/types/appointment.types';
 
 // Default export
 export default AppointmentService;

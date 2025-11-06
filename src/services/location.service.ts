@@ -52,16 +52,17 @@ interface DistrictWithWardsApiResponse {
 }
 
 export class LocationService {
-    private static readonly PROVINCES_API_URL = 'https://provinces.open-api.vn/api/?depth=1';
-    private static readonly DISTRICTS_API_URL = 'https://provinces.open-api.vn/api/?depth=2';
-    private static readonly WARDS_API_URL = 'https://provinces.open-api.vn/api/?depth=3';
+    // Using local JSON files instead of external API due to SSL certificate issues
+    private static readonly PROVINCES_LOCAL_PATH = '/data/provinces.json';
+    private static readonly DISTRICTS_LOCAL_PATH = '/data/districts.json';
+    private static readonly WARDS_LOCAL_PATH = '/data/wards.json';
 
     /**
-     * Get all provinces/cities
+     * Get all provinces/cities from local JSON file
      */
     static async getProvinces(): Promise<ApiResponse<Province[]>> {
         try {
-            const response = await fetch(this.PROVINCES_API_URL);
+            const response = await fetch(this.PROVINCES_LOCAL_PATH);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -89,11 +90,11 @@ export class LocationService {
     }
 
     /**
-     * Get all districts by province ID
+     * Get all districts by province ID from local JSON file
      */
     static async getDistrictsByProvinceId(provinceId: string): Promise<ApiResponse<District[]>> {
         try {
-            const response = await fetch(this.DISTRICTS_API_URL);
+            const response = await fetch(this.DISTRICTS_LOCAL_PATH);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -132,11 +133,11 @@ export class LocationService {
     }
 
     /**
-     * Get all districts (for all provinces)
+     * Get all districts (for all provinces) from local JSON file
      */
     static async getAllDistricts(): Promise<ApiResponse<District[]>> {
         try {
-            const response = await fetch(this.DISTRICTS_API_URL);
+            const response = await fetch(this.DISTRICTS_LOCAL_PATH);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -167,11 +168,11 @@ export class LocationService {
     }
 
     /**
-     * Get all wards by district ID
+     * Get all wards by district ID from local JSON file
      */
     static async getWardsByDistrictId(districtId: string): Promise<ApiResponse<Ward[]>> {
         try {
-            const response = await fetch(this.WARDS_API_URL);
+            const response = await fetch(this.WARDS_LOCAL_PATH);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

@@ -25,6 +25,7 @@ export interface DoctorInfo {
     positionName?: string;
     hospitalId?: string;
     avatarUrl?: string;
+    consultationFee?: number;
 }
 
 // Service Information from API
@@ -110,6 +111,7 @@ export interface CreateAppointmentRequest {
     patientId: string;
     doctorId?: string;
     serviceId?: string;
+    specialtyId?: string;
     appointmentDate: string;
     appointmentTimeId: string;
     hospitalId?: string;
@@ -117,6 +119,75 @@ export interface CreateAppointmentRequest {
     reason?: string;
     symptoms?: string;
     attachmentUrls?: string;
+    skipPayment?: boolean; // If true, skip payment and send confirmation email immediately
+}
+
+// Reschedule Requests
+export interface RescheduleSameDoctorRequest {
+    appointmentId: string;
+    rescheduleToken: string;
+    newAppointmentDate: string;
+    newAppointmentTimeId: string;
+}
+
+export interface ConfirmNewDoctorRequest {
+    appointmentId: string;
+    rescheduleToken: string;
+    newDoctorId: string;
+    newAppointmentDate?: string;
+    newAppointmentTimeId?: string;
+}
+
+export interface RequestRefundRequest {
+    appointmentId: string;
+    rescheduleToken: string;
+}
+
+// Reschedule Options (for staff cancellation)
+export interface RescheduleOptions {
+    enableSameDoctorReschedule: boolean;
+    enableNewDoctorAssignment: boolean;
+    enableDoctorSelection: boolean;
+    enableRefundRequest: boolean;
+}
+
+// Reschedule Response with all 4 options
+export interface RescheduleResponse {
+    appointmentId: string;
+    rescheduleToken: string;
+    tokenExpiry: string;
+    message: string;
+    // Option 1: Reschedule with same doctor
+    sameDoctorRescheduleUrl?: string;
+    // Option 2: Confirm new doctor assigned by hospital
+    confirmNewDoctorUrl?: string;
+    // Option 3: Choose new doctor yourself
+    chooseNewDoctorUrl?: string;
+    // Option 4: Request refund
+    refundRequestUrl?: string;
+}
+
+// Refund History Response
+export interface RefundHistoryResponse {
+    id: string;
+    appointmentId: string;
+    patientId: string;
+    paymentId: string;
+    refundAmount: number;
+    originalAmount: number;
+    refundPercentage: number;
+    status: string;
+    reason: string;
+    patientNote?: string;
+    adminNote?: string;
+    bankAccountNumber?: string;
+    bankName?: string;
+    bankAccountHolderName?: string;
+    approvedAt?: string;
+    approvedBy?: string;
+    completedAt?: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 // Update Appointment Status Request
@@ -172,7 +243,10 @@ export interface AppointmentDetailProps {
     onStartSession?: () => void;
     onMessage?: () => void;
     onCancel?: () => void;
-    onReschedule?: () => void;
+    onReschedule?: (
+        appointment?: AppointmentCardData,
+        action?: 'SAME_DOCTOR' | 'NEW_DOCTOR'
+    ) => void;
     onDownloadPrescription?: () => void;
     onViewReason?: () => void;
 }
@@ -395,7 +469,7 @@ export const getDisplayName = (appointment: AppointmentCardData): string => {
     if (appointment.doctorInfo?.id) {
         return (
             appointment.doctorInfo.fullName ||
-            `${appointment.doctorInfo.firstName || ''} ${appointment.doctorInfo.lastName || ''}`.trim() ||
+            `${appointment.doctorInfo.lastName || ''} ${appointment.doctorInfo.firstName || ''}`.trim() ||
             'Bác sĩ'
         );
     }

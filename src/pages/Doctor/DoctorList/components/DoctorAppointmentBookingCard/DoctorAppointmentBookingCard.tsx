@@ -1,18 +1,19 @@
 import clsx from 'clsx';
 import styles from './DoctorAppointmentBookingCard.module.scss';
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import { PATHS, replacePathParams } from '@/routes/paths';
 import { LanguageResponse } from '@/types/language.types';
+import { useFavoriteDoctor } from '@/hooks/useFavoriteDoctor';
 
-interface DoctorPrice {
+export interface DoctorPrice {
     id: string;
     serviceTypeId: string;
     serviceTypeName: string;
     amount: number;
 }
 
-interface DoctorAppointmentBookingCardProps {
+export interface DoctorAppointmentBookingCardProps {
     doctorId: string; // Từ doctors.id
     patientId?: string; // Để kiểm tra yêu thích, tùy chọn nếu chưa đăng nhập
     name: string; // Nối first_name và last_name từ bảng doctors
@@ -26,6 +27,13 @@ interface DoctorAppointmentBookingCardProps {
     languages: LanguageResponse[]; // Danh sách ngôn ngữ của bác sĩ
     image: string; // Từ doctors.avatar_url
     serviceTypeFilters?: string[]; // Service types đang được filter
+    isRescheduleMode?: boolean; // Indicates if in reschedule flow (Option 3)
+    rescheduleParams?: {
+        appointmentId: string;
+        token: string;
+        rescheduleSpecialtyId: string;
+        rescheduleHospitalId: string;
+    };
 }
 
 // Hàm định dạng số tiền theo VND
@@ -52,9 +60,16 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
         languages,
         image,
         serviceTypeFilters = [],
+        isRescheduleMode = false,
+        rescheduleParams,
     } = props;
 
-    const [isSelected, setIsSelected] = useState(isFavorite);
+    // Use the custom hook for favorite functionality
+    const {
+        isFavorited,
+        isLoading: isFavoriteLoading,
+        toggleFavorite,
+    } = useFavoriteDoctor(patientId, doctorId, isFavorite);
 
     // Tính toán service type và giá hiển thị dựa trên filter
     const displayServiceInfo = useMemo(() => {
@@ -86,20 +101,9 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
         };
     }, [prices, serviceTypeFilters]);
 
-    // Sync favorite state with prop when it changes
-    useEffect(() => {
-        setIsSelected(isFavorite);
-    }, [isFavorite]);
-
-    // Xử lý bật/tắt yêu thích (có thể gọi API để cập nhật bảng favourites)
+    // Handle favorite toggle using the custom hook
     const handleFavoriteToggle = () => {
-        if (!patientId) {
-            console.warn('Cần ID bệnh nhân để bật/tắt trạng thái yêu thích');
-            return;
-        }
-        setIsSelected(!isSelected);
-        // TODO: Gọi API để thêm/xóa bản ghi trong bảng favourites
-        // Ví dụ: POST đến /api/favourites với { patient_id, doctor_id }
+        toggleFavorite();
     };
 
     return (
@@ -125,14 +129,19 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                     {rating > 0 ? rating.toFixed(1) : 'Chưa có đánh giá'}
                                 </span>
                             </div>
-                            <span
+                            <button
+                                type="button"
                                 className={clsx(styles.favIcon, {
-                                    [styles.isSelected]: isSelected,
+                                    [styles.isSelected]: isFavorited,
                                 })}
                                 onClick={handleFavoriteToggle}
+                                disabled={isFavoriteLoading}
+                                aria-label={
+                                    isFavorited ? 'Bỏ yêu thích bác sĩ' : 'Yêu thích bác sĩ'
+                                }
                             >
                                 <i className="fa fa-heart"></i>
-                            </span>
+                            </button>
                         </div>
                     </div>
                     <div className="card-body p-0">
@@ -225,13 +234,17 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                 </div>
                                 <div className={styles.bookingButtonContainer}>
                                     <Link
-                                        to={replacePathParams(PATHS.BOOKING.ROOT, {
-                                            doctorId,
-                                        })}
+                                        to={
+                                            isRescheduleMode && rescheduleParams
+                                                ? `${replacePathParams(PATHS.BOOKING.CHOOSE_NEW_DOCTOR, { doctorId })}?rescheduleFor=${rescheduleParams.appointmentId}&token=${rescheduleParams.token}&rescheduleSpecialtyId=${rescheduleParams.rescheduleSpecialtyId}&rescheduleHospitalId=${rescheduleParams.rescheduleHospitalId}`
+                                                : replacePathParams(PATHS.BOOKING.ROOT, {
+                                                      doctorId,
+                                                  })
+                                        }
                                         className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
                                     >
                                         <i className="isax isax-calendar-1 me-2"></i>
-                                        Đặt lịch khám
+                                        {isRescheduleMode ? 'Chọn bác sĩ này' : 'Đặt lịch khám'}
                                     </Link>
                                 </div>
                             </div>

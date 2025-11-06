@@ -2,7 +2,7 @@ import React from 'react';
 import ServiceCard from './ServiceCard';
 
 interface ServiceColumnProps {
-    services: { id: number; name: string; image: string }[];
+    services: { id: string; name: string; image: string }[];
     reverse?: boolean;
 }
 

@@ -9,17 +9,56 @@ import ServiceSection from './components/ServicesSection/ServiceSection';
 import {
     CAROUSEL_SPECIALTIES_BREAKPOINTS,
     CAROUSEL_HOSPITALS_BREAKPOINTS,
-    LIST_HOSPITALS,
-    LIST_SPECIALTIES,
-    LIST_DOCTORS,
     CAROUSEL_DOCTORS_BREAKPOINTS,
-    LIST_SERVICES,
 } from './Home.data';
-import ListServiceCategories from './components/ListServiceCategories';
+import ListServiceTypeDoctor from './components/ListServiceTypeDoctor';
+import { useHomeData } from '@/hooks/useHomeData';
+import {
+    convertToServiceFormat,
+    convertToSpecialtyFormat,
+    convertToHospitalFormat,
+    convertToDoctorFormat,
+    sortDoctorsByRating,
+} from '@/utils/homeDataConverters';
+import {
+    SpecialtiesEmptyState,
+    HospitalsEmptyState,
+    DoctorsEmptyState,
+    ServicesEmptyState,
+} from '@/components/LoadingEmptyState';
 
 const Home: React.FC = () => {
-    const listSpecialtyItems: { id: string | number; node: React.ReactNode }[] =
-        LIST_SPECIALTIES.map((specialty) => ({
+    const {
+        parentServiceCategories,
+        isLoading,
+        specialties,
+        isSpecialtiesLoading,
+        optimizedHospitals,
+        isHospitalsLoading,
+        doctors,
+        isDoctorsLoading,
+    } = useHomeData();
+
+    // Use Redux data only (no fallback to mock data)
+    const allServices = convertToServiceFormat(parentServiceCategories);
+    const allSpecialties = convertToSpecialtyFormat(specialties);
+    const allHospitals = convertToHospitalFormat(optimizedHospitals);
+
+    // Sort doctors by rating before converting to display format
+    const sortedDoctors = sortDoctorsByRating([...doctors]); // Create a copy to avoid mutating original array
+    const allDoctors = convertToDoctorFormat(sortedDoctors);
+
+    const leftServices = allServices.slice(0, Math.ceil(allServices.length / 2));
+    const rightServices = allServices.slice(Math.ceil(allServices.length / 2));
+
+    // Show loading or empty state if no data
+    const shouldShowServices = !isLoading && allServices.length > 0;
+    const shouldShowSpecialties = !isSpecialtiesLoading && allSpecialties.length > 0;
+    const shouldShowHospitals = !isHospitalsLoading && allHospitals.length > 0;
+    const shouldShowDoctors = !isDoctorsLoading && allDoctors.length > 0;
+
+    const listSpecialtyItems: { id: string | number; node: React.ReactNode }[] = allSpecialties.map(
+        (specialty) => ({
             id: specialty.id,
             node: (
                 <SpecialtyCarouselItem
@@ -28,11 +67,13 @@ const Home: React.FC = () => {
                     iconSrc={specialty.icon}
                     title={specialty.name}
                     doctorCount={specialty.doctorCount}
+                    specialtyId={specialty.id}
                 />
             ),
-        }));
+        })
+    );
 
-    const listHospitalItems: { id: string | number; node: React.ReactNode }[] = LIST_HOSPITALS.map(
+    const listHospitalItems: { id: string | number; node: React.ReactNode }[] = allHospitals.map(
         (hospital) => ({
             id: hospital.id,
             node: (
@@ -44,14 +85,14 @@ const Home: React.FC = () => {
                         image: hospital.image,
                         specialties: hospital.specialties,
                         location: hospital.address,
-                        distance: hospital.distance,
-                        specialtyCount: hospital.specialties?.length || 0,
+                        specialtyCount: hospital.specialtyCount,
                     }}
                 />
             ),
         })
     );
-    const listDoctorItems: { id: string | number; node: React.ReactNode }[] = LIST_DOCTORS.map(
+
+    const listDoctorItems: { id: string | number; node: React.ReactNode }[] = allDoctors.map(
         (doctor) => ({
             id: doctor.id,
             node: (
@@ -60,10 +101,13 @@ const Home: React.FC = () => {
                     image={doctor.image}
                     name={doctor.name}
                     specialty={doctor.specialty}
-                    location={doctor.location}
+                    hospitalName={doctor.hospitalName}
+                    hospitalId={doctor.hospitalId}
                     rating={doctor.rating}
-                    fee={doctor.fee}
-                    consultationTime={doctor.consultationTime}
+                    experience={doctor.experience}
+                    positionName={doctor.positionName}
+                    serviceTypeName={doctor.serviceTypeName}
+                    amount={doctor.amount}
                     profileLink={replacePathParams(
                         buildPath(PATHS.DOCTOR.ROOT, PATHS.DOCTOR.PROFILE),
                         {
@@ -76,44 +120,59 @@ const Home: React.FC = () => {
             ),
         })
     );
-    const leftServices = LIST_SERVICES.slice(0, 5); // 0 -> 4
-    const rightServices = LIST_SERVICES.slice(5, 10); // 5 -> 9
+
     return (
         <div>
             <MainLayout>
                 {/* Banner */}
                 <Banner />
-                <ListServiceCategories />
+                <ListServiceTypeDoctor />
                 {/* List Specialties */}
-                <SectionItem
-                    title="Chuyên khoa hàng đầu"
-                    desc="Chăm sóc và hỗ trợ"
-                    items={listSpecialtyItems}
-                    breakpoints={CAROUSEL_SPECIALTIES_BREAKPOINTS}
-                    viewAllTarget={PATHS.SPECIALTIES.ROOT}
-                    viewAllText="Xem tất cả chuyên khoa"
-                />
+                {shouldShowSpecialties ? (
+                    <SectionItem
+                        title="Chuyên khoa hàng đầu"
+                        desc="Chăm sóc và hỗ trợ"
+                        items={listSpecialtyItems}
+                        breakpoints={CAROUSEL_SPECIALTIES_BREAKPOINTS}
+                        viewAllTarget={PATHS.SPECIALTIES.ROOT}
+                        viewAllText="Xem tất cả chuyên khoa"
+                    />
+                ) : (
+                    <SpecialtiesEmptyState isLoading={isSpecialtiesLoading} />
+                )}
                 {/* List Hospitals */}
-                <SectionItem
-                    title="Bệnh viện hàng đầu"
-                    desc="Khám phá các bệnh viện nổi bật"
-                    items={listHospitalItems}
-                    breakpoints={CAROUSEL_HOSPITALS_BREAKPOINTS}
-                    viewAllText="Xem tất cả bệnh viện"
-                    viewAllTarget={PATHS.HOSPITAL.ROOT}
-                    isBackgroundColor
-                />
+                {shouldShowHospitals ? (
+                    <SectionItem
+                        title="Bệnh viện hàng đầu"
+                        desc="Khám phá các bệnh viện nổi bật"
+                        items={listHospitalItems}
+                        breakpoints={CAROUSEL_HOSPITALS_BREAKPOINTS}
+                        viewAllText="Xem tất cả bệnh viện"
+                        viewAllTarget={PATHS.HOSPITAL.ROOT}
+                        isBackgroundColor
+                    />
+                ) : (
+                    <HospitalsEmptyState isLoading={isHospitalsLoading} />
+                )}
                 {/* List Doctors */}
-                <SectionItem
-                    title="Bác sĩ hàng đầu"
-                    desc="Gặp gỡ các chuyên gia giỏi nhất"
-                    items={listDoctorItems}
-                    breakpoints={CAROUSEL_DOCTORS_BREAKPOINTS}
-                    viewAllTarget={PATHS.DOCTOR.ROOT}
-                    viewAllText="Xem tất cả bác sĩ"
-                />
+                {shouldShowDoctors ? (
+                    <SectionItem
+                        title="Bác sĩ hàng đầu"
+                        desc="Gặp gỡ các bác sĩ giỏi nhất"
+                        items={listDoctorItems}
+                        breakpoints={CAROUSEL_DOCTORS_BREAKPOINTS}
+                        viewAllTarget={PATHS.DOCTOR.ROOT}
+                        viewAllText="Xem tất cả bác sĩ"
+                    />
+                ) : (
+                    <DoctorsEmptyState isLoading={isDoctorsLoading} />
+                )}
                 {/* Services Section */}
-                <ServiceSection leftServices={leftServices} rightServices={rightServices} />
+                {shouldShowServices ? (
+                    <ServiceSection leftServices={leftServices} rightServices={rightServices} />
+                ) : (
+                    <ServicesEmptyState isLoading={isLoading} />
+                )}
             </MainLayout>
         </div>
     );

@@ -3,7 +3,7 @@ import { buildPath, PATHS, replacePathParams } from '@/routes/paths';
 import { Link } from 'react-router-dom';
 
 interface ServiceCardProps {
-    id: number;
+    id: string;
     name: string;
     image: string;
     reverse?: boolean; // để xác định layout left/right
@@ -11,7 +11,7 @@ interface ServiceCardProps {
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ id, name, image, reverse }) => {
     const fullLink = replacePathParams(buildPath(PATHS.Service.CATEGORIES), {
-        servicesparentId: id.toString(),
+        servicesparentId: id,
     });
     return (
         <div

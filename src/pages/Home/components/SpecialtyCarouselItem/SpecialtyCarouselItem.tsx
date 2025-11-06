@@ -1,4 +1,6 @@
 import clsx from 'clsx';
+import { Link } from 'react-router-dom';
+import { PATHS } from '@/routes/paths';
 import styles from './SpecialtyCarouselItem.module.scss';
 
 interface SpecialtyCarouselItemProps {
@@ -6,6 +8,7 @@ interface SpecialtyCarouselItemProps {
     iconSrc: string;
     title: string;
     doctorCount: number;
+    specialtyId: string;
 }
 
 const SpecialtyCarouselItem: React.FC<SpecialtyCarouselItemProps> = ({
@@ -13,6 +16,7 @@ const SpecialtyCarouselItem: React.FC<SpecialtyCarouselItemProps> = ({
     iconSrc,
     title,
     doctorCount,
+    specialtyId,
 }) => {
     return (
         <div className={clsx(styles.specialtyCarouselItemContainer, 'spaciality-item')}>
@@ -23,7 +27,7 @@ const SpecialtyCarouselItem: React.FC<SpecialtyCarouselItemProps> = ({
                 </span>
             </div>
             <h6>
-                <a href="doctor-grid.html">{title}</a>
+                <Link to={`${PATHS.HOSPITAL.ROOT}?specialtyId=${specialtyId}`}>{title}</Link>
             </h6>
             <p className="mb-0">{doctorCount} bác sĩ</p>
         </div>

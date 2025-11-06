@@ -1,0 +1,52 @@
+{
+    "steps": {
+        "selectDateTime": "Chọn ngày giờ khám",
+        "basicInfo": "Thông tin cơ bản",
+        "selectPayment": "Chọn phương thức thanh toán",
+        "confirmation": "Xác nhận"
+    },
+    "basicInfo": {
+        "title": "Thông tin bệnh nhân",
+        "firstName": "Họ",
+        "lastName": "Tên",
+        "email": "Địa chỉ email",
+        "phoneNumber": "Số điện thoại",
+        "symptoms": "Triệu chứng",
+        "attachments": "Tệp đính kèm",
+        "optional": "(Không bắt buộc)",
+        "placeholder": {
+            "firstName": "Nhập họ",
+            "lastName": "Nhập tên",
+            "email": "Nhập địa chỉ email",
+            "phoneNumber": "Nhập số điện thoại",
+            "symptoms": "Nhập triệu chứng"
+        },
+        "attachmentInfo": {
+            "title": "Khi nào nên đính kèm tệp?",
+            "followUp": "Tái khám: Kết quả xét nghiệm, hình ảnh chụp từ lần khám trước",
+            "chronic": "Khám bệnh mãn tính: Hồ sơ bệnh án, đơn thuốc cũ",
+            "remote": "Tư vấn từ xa: Hình ảnh triệu chứng, kết quả khám bên ngoài",
+            "acceptedFormats": "Chấp nhận:",
+            "formats": "Ảnh (JPG, PNG), PDF, Word (DOC, DOCX) - Tối đa 10MB/tệp"
+        },
+        "filesSelected": "{{count}} tệp đã chọn",
+        "uploadNote": "Tệp sẽ được tải lên khi bạn chuyển sang bước tiếp theo"
+    },
+    "payment": {
+        "selectMethod": "Chọn phương thức thanh toán",
+        "methods": {
+            "momo": "Ví MoMo",
+            "vnpay": "VNPay",
+            "cash": "Tiền mặt",
+            "card": "Thẻ tín dụng/ghi nợ"
+        }
+    },
+    "appointment": {
+        "date": "Ngày khám",
+        "time": "Giờ khám",
+        "doctor": "Bác sĩ",
+        "specialty": "Chuyên khoa",
+        "hospital": "Bệnh viện",
+        "fee": "Phí khám"
+    }
+}

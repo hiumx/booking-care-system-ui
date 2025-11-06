@@ -55,7 +55,7 @@ export const PATHS = {
     Service: {
         ROOT: '/servicesparent', // List all services
         CATEGORIES: '/servicesparent/:servicesparentId/categories', // List categories of a service
-        HOSPITALS: '/servicesparent/:servicesparentId/serviceschild/:serviceschildId/services', // List hospitals of a category
+        SERVICES: '/servicesparent/:servicesparentId/serviceschild/:serviceschildId/services', // List hospitals of a category
         DETAIL: '/servicesparent/:servicesparentId/serviceschild/:serviceschildId/services/:servicesId', // Service detail in hospital
     },
 
@@ -63,6 +63,10 @@ export const PATHS = {
     BOOKING: {
         ROOT: '/booking/:doctorId',
         CONFIRMATION: '/booking/confirmation/:appointmentId',
+        RESCHEDULE: '/booking/reschedule/:appointmentId',
+        CONFIRM_NEW_DOCTOR: '/booking/confirm-doctor/:appointmentId',
+        REQUEST_REFUND: '/booking/refund/:appointmentId',
+        CHOOSE_NEW_DOCTOR: '/booking/:doctorId/choose-new-doctor',
     },
 
     // Dashboard paths

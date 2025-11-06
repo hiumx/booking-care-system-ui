@@ -50,6 +50,15 @@ export const calculateAverageRating = (reviews: { rating: number }[]) => {
     return (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1);
 };
 
+/**
+ * Format average rating from review statistics
+ * @param averageRating - The average rating value
+ * @returns Formatted average rating as a string with 1 decimal place
+ */
+export const formatAverageRating = (averageRating: number | undefined): string => {
+    return averageRating ? averageRating.toFixed(1) : '0.0';
+};
+
 export const countAppointments = (appointments: any[], doctorId: number | string) => {
     return appointments.filter((apt) => apt.doctor_id === Number(doctorId)).length;
 };

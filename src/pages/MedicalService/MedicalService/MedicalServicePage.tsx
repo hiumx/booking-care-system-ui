@@ -1,74 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import ServiceCard from './components/ServiceCard';
+import ErrorAlert from '@/components/common/ErrorAlert';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { getParentServiceCategoriesAsync } from '@/store/slices/medicalServiceSlice';
+import { replacePathParams, PATHS } from '@/routes/paths';
 
-// 🔹 Mock data (sau này có thể fetch từ API)
+// 🔹 Constants
 const medicalServices = {
     title: 'Dịch Vụ Y Tế',
-    data: [
-        {
-            id: 1,
-            name: 'Y tá tại nhà',
-            image: '/src/assets/img/service/service-doctor-01.jpg',
-            servicecategories: 10,
-        },
-        {
-            id: 2,
-            name: 'Hỗ trợ di chuyển',
-            image: '/src/assets/img/service/service-doctor-02.jpg',
-            servicecategories: 10,
-        },
-        {
-            id: 3,
-            name: 'Vật lý trị liệu',
-            image: '/src/assets/img/service/service-doctor-03.jpg',
-            servicecategories: 10,
-        },
-        {
-            id: 4,
-            name: 'Thiết bị y tế',
-            image: '/src/assets/img/service/service-doctor-04.jpg',
-            servicecategories: 10,
-        },
-        {
-            id: 5,
-            name: 'Nhân viên chăm sóc chuyên nghiệp',
-            image: '/src/assets/img/service/service-doctor-05.jpg',
-            servicecategories: 10,
-        },
-        {
-            id: 6,
-            name: 'Xét nghiệm y khoa',
-            image: '/src/assets//img/service/service-doctor-06.jpg',
-            servicecategories: 10,
-        },
-        {
-            id: 7,
-            name: 'Tư vấn bác sĩ',
-            image: '/src/assets/img/service/service-doctor-07.jpg',
-            servicecategories: 10,
-        },
-        {
-            id: 8,
-            name: 'Chăm sóc mẹ và bé',
-            image: '/src/assets/img/service/service-doctor-08.jpg',
-            servicecategories: 10,
-        },
-        {
-            id: 9,
-            name: 'Tiêm chủng',
-            image: '/src/assets/img/service/service-doctor-09.jpg',
-            servicecategories: 10,
-        },
-        {
-            id: 10,
-            name: 'Tư vấn từ xa',
-            image: '/src/assets/img/service/service-doctor-10.jpg',
-            servicecategories: 10,
-        },
-    ],
 };
 
 // 🔹 Breadcrumb config
@@ -81,24 +24,68 @@ const breadcrumbData = {
 };
 
 const MedicalServicePage: React.FC = () => {
+    const dispatch = useAppDispatch();
+
+    // Get data from Redux store
+    const { parentServiceCategories, isLoading, error } = useAppSelector(
+        (state) => state.medicalService.serviceCategories
+    );
+
+    // Fetch parent service categories if not already loaded
+    useEffect(() => {
+        if (parentServiceCategories.length === 0 && !isLoading) {
+            dispatch(getParentServiceCategoriesAsync());
+        }
+    }, [dispatch, parentServiceCategories.length, isLoading]);
+
+    // Handle error
+    useEffect(() => {
+        if (error) {
+            console.error('Error fetching service categories:', error);
+            // You can add toast notification here if needed
+        }
+    }, [error]);
+
+    const renderContent = () => {
+        if (isLoading) {
+            return <LoadingSpinner />;
+        }
+
+        if (error) {
+            return (
+                <ErrorAlert
+                    message="Không thể tải danh sách dịch vụ y tế. Vui lòng thử lại sau."
+                    onRetry={() => {
+                        dispatch(getParentServiceCategoriesAsync());
+                    }}
+                />
+            );
+        }
+
+        return (
+            <div className="row">
+                {parentServiceCategories?.map((service) => (
+                    <ServiceCard
+                        key={service.id}
+                        id={service.id}
+                        name={service.name}
+                        image={service.imageUrl}
+                        servicecategories={service.children?.length || 0}
+                        link={replacePathParams(PATHS.Service.CATEGORIES, {
+                            servicesparentId: service.id,
+                        })}
+                    />
+                ))}
+            </div>
+        );
+    };
+
     return (
         <MainLayout>
             <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
 
             <div className={clsx('content')}>
-                <div className={clsx('container')}>
-                    <div className="row">
-                        {medicalServices.data.map((service) => (
-                            <ServiceCard
-                                key={service.id}
-                                id={service.id}
-                                name={service.name}
-                                image={service.image}
-                                servicecategories={service.servicecategories}
-                            />
-                        ))}
-                    </div>
-                </div>
+                <div className={clsx('container')}>{renderContent()}</div>
             </div>
         </MainLayout>
     );

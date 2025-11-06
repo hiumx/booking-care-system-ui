@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import Button from '@/components/Button';
+import { useReviewForm } from '@/hooks/useReviewForm';
+import { useStarRating } from '@/hooks/useStarRating';
 import styles from './EditReviewForm.module.scss';
 
 interface Review {
@@ -22,30 +24,44 @@ interface EditReviewFormProps {
 }
 
 const EditReviewForm: React.FC<EditReviewFormProps> = ({ review, onSubmitEdit, onCancel }) => {
-    const [rating, setRating] = useState<number>(review.rating || 0);
-    const [description, setDescription] = useState<string>(review.text || '');
-    const [recommend, setRecommend] = useState<boolean | undefined>(review.recommend);
-    const [hoveredStar, setHoveredStar] = useState<number>(0);
+    // Use custom hooks for form validation and star rating
+    const {
+        description,
+        setDescription,
+        recommend,
+        descriptionError,
+        setDescriptionError,
+        trimmedLength,
+        remainingChars,
+        maxChars,
+        minChars,
+        validateForm,
+        updateFormValues,
+    } = useReviewForm({
+        initialRating: review.rating || 0,
+        initialDescription: review.text || '',
+        initialRecommend: review.recommend,
+        maxChars: 500,
+        minChars: 5,
+    });
 
-    const maxChars = 500;
-    const remainingChars = maxChars - description.length;
+    const { rating, setRating, handleStarClick, handleStarHover, handleStarLeave, isStarActive } =
+        useStarRating(review.rating || 0);
+
+    // Update form when review ID changes (when editing a different review)
 
     useEffect(() => {
+        updateFormValues(review.rating || 0, review.text || '', review.recommend);
         setRating(review.rating || 0);
-        setDescription(review.text || '');
-        setRecommend(review.recommend);
-    }, [review]);
+        // Only depend on review.id to avoid resetting form while user is typing
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [review.id]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (rating === 0) {
-            alert('Vui lòng chọn rating');
-            return;
-        }
-
-        if (!description.trim()) {
-            alert('Vui lòng nhập nội dung review');
+        // Validate form (pass rating from useStarRating)
+        if (!validateForm(false, false, rating)) {
             return;
         }
 
@@ -59,24 +75,10 @@ const EditReviewForm: React.FC<EditReviewFormProps> = ({ review, onSubmitEdit, o
         onSubmitEdit(reviewData);
     };
 
-    const handleStarClick = (starValue: number) => {
-        setRating(starValue);
-    };
-
-    const handleStarHover = (starValue: number) => {
-        setHoveredStar(starValue);
-    };
-
-    const handleStarLeave = () => {
-        setHoveredStar(0);
-    };
-
     const renderStars = () => {
         const stars = [];
         for (let i = 1; i <= 5; i++) {
-            const isHovered = hoveredStar > 0 && i <= hoveredStar;
-            const isSelected = hoveredStar === 0 && i <= rating;
-            const isActive = isHovered || isSelected;
+            const isActive = isStarActive(i);
 
             stars.push(
                 <i
@@ -125,14 +127,33 @@ const EditReviewForm: React.FC<EditReviewFormProps> = ({ review, onSubmitEdit, o
                     <textarea
                         id="edit-description"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Chia sẻ trải nghiệm của bạn về bác sĩ..."
-                        className={styles.textarea}
+                        onChange={(e) => {
+                            setDescription(e.target.value);
+                            setDescriptionError(''); // Clear error on change
+                        }}
+                        placeholder="Chia sẻ trải nghiệm của bạn về bác sĩ... (tối thiểu 5 ký tự)"
+                        className={clsx(styles.textarea, {
+                            [styles.error]: descriptionError,
+                        })}
                         rows={4}
                         maxLength={maxChars}
                         required
                     />
+
+                    {/* Error Message */}
+                    {descriptionError && (
+                        <div className={styles.errorMessage}>{descriptionError}</div>
+                    )}
+
                     <div className={styles.charCounter}>
+                        <span
+                            className={clsx({
+                                [styles.danger]: trimmedLength < minChars && trimmedLength > 0,
+                                [styles.success]: trimmedLength >= minChars,
+                            })}
+                        >
+                            {trimmedLength}/{minChars} ký tự tối thiểu
+                        </span>
                         <span className={clsx({ [styles.warning]: remainingChars < 20 })}>
                             {remainingChars} ký tự còn lại
                         </span>

@@ -12,7 +12,7 @@ export const useDoctorInfo = (): DoctorInfo => {
     // Map doctor data from Redux to DoctorInfo format
     const doctorInfo: DoctorInfo = selectedDoctor
         ? {
-              name: `${selectedDoctor.firstName} ${selectedDoctor.lastName}`,
+              name: `${selectedDoctor.lastName} ${selectedDoctor.firstName}`,
               specialty: selectedDoctor.specialty?.name || 'Chuyên khoa',
               rating: 4.5, // TODO: Get from reviews/ratings when available
               location: selectedDoctor.hospital?.name || selectedDoctor.address || 'Địa chỉ',

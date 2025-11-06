@@ -89,4 +89,5 @@ export interface AuthState {
     emailConfirmed: boolean;
     phoneConfirmed: boolean;
     hasExternalProvider: boolean;
+    accessToken: string | null; // Store access token for SignalR authentication
 }

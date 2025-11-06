@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
+import { useSearchParams } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import HospitalCard, { HospitalCardSkeleton } from '@/components/HospitalCard';
@@ -32,17 +33,26 @@ const HospitalList: React.FC = () => {
     const dispatch = useAppDispatch();
     const { specialties } = useAppSelector((state) => state.specialty);
     const { optimizedHospitals, isLoading, pagination } = useAppSelector((state) => state.hospital);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Initialize state from URL parameters
+    const urlSpecialtyId = searchParams.get('specialtyId') || '';
+    const urlProvinceId = searchParams.get('provinceId') || '';
+    const urlDistrictId = searchParams.get('districtId') || '';
+    const urlSearch = searchParams.get('search') || '';
 
     // State for filtering and pagination
-    const [provinceId, setProvinceId] = useState<string>('');
-    const [districtId, setDistrictId] = useState<string>('');
-    const [search, setSearch] = useState('');
-    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [provinceId, setProvinceId] = useState<string>(urlProvinceId);
+    const [districtId, setDistrictId] = useState<string>(urlDistrictId);
+    const [search, setSearch] = useState(urlSearch);
+    const [debouncedSearch, setDebouncedSearch] = useState(urlSearch);
     const [currentPage, setCurrentPage] = useState(1);
     const [isAreaModalOpen, setIsAreaModalOpen] = useState(false);
     const [selectedAreaDisplay, setSelectedAreaDisplay] = useState('');
     const [showSpecialtyModal, setShowSpecialtyModal] = useState(false);
-    const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
+    const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>(
+        urlSpecialtyId ? [urlSpecialtyId] : []
+    );
 
     // Function to load hospitals with current filters
     const loadHospitals = useCallback(async () => {
@@ -57,7 +67,6 @@ const HospitalList: React.FC = () => {
             sortOrder: 'asc',
         };
 
-        console.log('Loading hospitals with filter:', filter);
         dispatch(getOptimizedHospitalListAsync(filter));
     }, [debouncedSearch, selectedSpecialties, provinceId, districtId, currentPage, dispatch]);
 
@@ -69,6 +78,25 @@ const HospitalList: React.FC = () => {
 
         return () => clearTimeout(timer);
     }, [search]);
+
+    // Update URL parameters when state changes
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (selectedSpecialties.length > 0) {
+            params.set('specialtyId', selectedSpecialties[0]); // For simplicity, use first specialty
+        }
+        if (provinceId) {
+            params.set('provinceId', provinceId);
+        }
+        if (districtId) {
+            params.set('districtId', districtId);
+        }
+        if (debouncedSearch) {
+            params.set('search', debouncedSearch);
+        }
+
+        setSearchParams(params, { replace: true });
+    }, [selectedSpecialties, provinceId, districtId, debouncedSearch, setSearchParams]);
 
     // Load specialties and hospitals on component mount
     useEffect(() => {
@@ -88,19 +116,53 @@ const HospitalList: React.FC = () => {
 
     // Modal handlers
     const handleAreaSelect = (areaDisplay: string, locationId: string, provinceId?: string) => {
-        console.log('Area selected:', { areaDisplay, locationId, provinceId });
-        setSelectedAreaDisplay(areaDisplay);
-
         // Parse area info from the display string and locationId
+        let newProvinceId: string;
+        let newDistrictId: string;
+        let newProvinceName: string;
+        let newDistrictName: string;
+
         if (areaDisplay.includes(' - ')) {
             // District selected: locationId is districtId, provinceId is provided
-            setDistrictId(locationId);
-            setProvinceId(provinceId || '');
+            const parts = areaDisplay.split(' - ');
+            newProvinceName = parts[0] || '';
+            newDistrictName = parts[1] || '';
+            newDistrictId = locationId;
+            newProvinceId = provinceId || '';
         } else {
             // Province selected: locationId is provinceId
-            setProvinceId(locationId);
-            setDistrictId('');
+            newProvinceName = areaDisplay;
+            newProvinceId = locationId;
+            newDistrictId = '';
+            newDistrictName = '';
         }
+
+        setSelectedAreaDisplay(areaDisplay);
+        setProvinceId(newProvinceId);
+        setDistrictId(newDistrictId);
+
+        // Update URL with area params
+        const newParams = new URLSearchParams(searchParams);
+        if (newProvinceId) {
+            newParams.set('provinceId', newProvinceId);
+            if (newProvinceName) {
+                newParams.set('provinceName', newProvinceName);
+            }
+        } else {
+            newParams.delete('provinceId');
+            newParams.delete('provinceName');
+        }
+        if (newDistrictId) {
+            newParams.set('districtId', newDistrictId);
+            if (newDistrictName) {
+                newParams.set('districtName', newDistrictName);
+            }
+        } else {
+            newParams.delete('districtId');
+            newParams.delete('districtName');
+        }
+        newParams.set('page', '1');
+        setSearchParams(newParams, { replace: true });
 
         setCurrentPage(1); // Reset to first page when filter changes
         setIsAreaModalOpen(false);
@@ -110,6 +172,16 @@ const HospitalList: React.FC = () => {
         setSelectedAreaDisplay('');
         setProvinceId('');
         setDistrictId('');
+
+        // Update URL to remove area params
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('provinceId');
+        newParams.delete('districtId');
+        newParams.delete('provinceName');
+        newParams.delete('districtName');
+        newParams.set('page', '1');
+        setSearchParams(newParams, { replace: true });
+
         setCurrentPage(1); // Reset to first page when filter changes
     };
 
@@ -119,15 +191,44 @@ const HospitalList: React.FC = () => {
     };
 
     const handleSpecialtyApply = (selectedItems: string[], _searchTerm: string) => {
-        // _searchTerm is required by Modal interface but not used in this context
-        console.log('Specialties selected:', selectedItems);
+        // If selectedItems is empty array, it means clear was called
+        if (selectedItems.length === 0) {
+            setSelectedSpecialties([]);
+            setCurrentPage(1);
+            setShowSpecialtyModal(false);
+
+            // Update URL to remove specialtyId
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete('specialtyId');
+            newParams.set('page', '1');
+            setSearchParams(newParams, { replace: true });
+            return;
+        }
+
         setSelectedSpecialties(selectedItems);
         setCurrentPage(1); // Reset to first page when filter changes
         setShowSpecialtyModal(false);
+
+        // Update URL with specialtyId param
+        const newParams = new URLSearchParams(searchParams);
+        if (selectedItems.length > 0) {
+            newParams.set('specialtyId', selectedItems[0]); // Use first specialty for URL
+        } else {
+            newParams.delete('specialtyId');
+        }
+        newParams.set('page', '1');
+        setSearchParams(newParams, { replace: true });
     };
 
     const handleClearSpecialty = () => {
         setSelectedSpecialties([]);
+
+        // Update URL to remove specialtyId
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('specialtyId');
+        newParams.set('page', '1');
+        setSearchParams(newParams, { replace: true });
+
         setCurrentPage(1); // Reset to first page when filter changes
     };
 
@@ -138,13 +239,18 @@ const HospitalList: React.FC = () => {
         imageUrl: specialty.imageUrl,
     }));
 
+    // Get specialty name from URL parameter
+    const selectedSpecialtyName = urlSpecialtyId
+        ? specialties.find((s) => s.id === urlSpecialtyId)?.name || ''
+        : '';
+
     // Breadcrumb data
     const breadcrumbData = {
         items: [
             { label: 'Home', path: '/', isActive: false },
             { label: 'Danh sách bệnh viện', isActive: true },
         ],
-        title: 'Bệnh viện',
+        title: selectedSpecialtyName ? `Bệnh viện - ${selectedSpecialtyName}` : 'Bệnh viện',
     };
 
     return (
@@ -237,7 +343,8 @@ const HospitalList: React.FC = () => {
                                                 ></i>
                                                 <span className={styles.specialtyText}>
                                                     {selectedSpecialties.length > 0
-                                                        ? `${selectedSpecialties.length} chuyên khoa`
+                                                        ? selectedSpecialtyName ||
+                                                          `${selectedSpecialties.length} chuyên khoa`
                                                         : 'Chọn chuyên khoa'}
                                                 </span>
                                                 {selectedSpecialties.length > 0 && (
@@ -330,7 +437,8 @@ const HospitalList: React.FC = () => {
                                                 )}
                                             >
                                                 <i className="fa-solid fa-briefcase-medical"></i>
-                                                {selectedSpecialties.length} chuyên khoa
+                                                {selectedSpecialtyName ||
+                                                    `${selectedSpecialties.length} chuyên khoa`}
                                                 <button
                                                     className="btn-close btn-close-white"
                                                     style={{ fontSize: '0.7em' }}
@@ -508,6 +616,7 @@ const HospitalList: React.FC = () => {
                 items={specialtyItems}
                 title="Tìm theo chuyên khoa"
                 itemType="specialty"
+                initialSelectedItems={selectedSpecialties}
             />
         </MainLayout>
     );

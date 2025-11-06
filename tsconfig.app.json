@@ -9,6 +9,9 @@
 
         /* Bundler mode */
         "moduleResolution": "bundler",
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
         "noEmit": false,
         "isolatedModules": true,
         "moduleDetection": "force",
@@ -43,6 +46,6 @@
         "noFallthroughCasesInSwitch": true,
         "noUncheckedSideEffectImports": true
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "src/**/*.json"],
     "exclude": ["node_modules", "dist"]
 }

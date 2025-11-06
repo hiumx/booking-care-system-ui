@@ -1,17 +1,22 @@
 import { FC, useState } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
+import { Briefcase } from 'lucide-react';
+import { PATHS } from '@/routes/paths';
 import styles from './DoctorCard.module.scss';
 
 export type DoctorCardProps = {
     image: string;
     name: string;
     specialty: string;
-    location: string;
+    hospitalName: string; // Đổi từ location thành hospitalName
+    hospitalId?: string; // Thêm hospitalId để tạo link
     rating: number;
     available?: boolean;
-    fee: number;
-    consultationTime: string;
+    experience: string;
+    positionName?: string; // Thêm position name
+    serviceTypeName?: string; // Thêm service type name
+    amount?: number; // Thêm amount thay cho fee
     profileLink?: string;
     bookingLink?: string;
     specialtiesLink?: string;
@@ -22,16 +27,21 @@ const DoctorCard: FC<DoctorCardProps> = ({
     image,
     name,
     specialty,
-    location,
+    hospitalName, // Đổi từ location thành hospitalName
+    hospitalId, // Thêm hospitalId
     rating,
     available = true,
-    fee,
-    consultationTime,
+    experience,
+    positionName,
+    serviceTypeName,
+    amount,
     profileLink = '#',
     bookingLink = '#',
     specialtiesLink = '#',
     className,
 }) => {
+    // Tạo link cho hospital
+    const hospitalLink = hospitalId ? `${PATHS.HOSPITAL.ROOT}/${hospitalId}` : '#';
     const [isFavorite, setIsFavorite] = useState(false);
 
     const toggleFavorite = () => {
@@ -42,7 +52,7 @@ const DoctorCard: FC<DoctorCardProps> = ({
         <div className={clsx(styles.doctorCardContainer, 'card', className)}>
             <div className="card-img card-img-hover">
                 <Link to={profileLink}>
-                    <img src={image} alt={name} />
+                    <img src={image} alt={name} className={styles.doctorImage} />
                 </Link>
                 <div className="grid-overlay-item d-flex align-items-center justify-content-between">
                     <span className="badge bg-orange">
@@ -70,37 +80,54 @@ const DoctorCard: FC<DoctorCardProps> = ({
                         <div className={styles.dotIconWrapper}>
                             <i className="fa-solid fa-circle me-1"></i>
                         </div>
-                        {available ? 'Available' : 'Unavailable'}
+                        {available ? 'Sẵn sàng' : 'Không sẵn sàng'}
                     </span>
                 </div>
 
-                <div className="p-3 pt-0">
-                    <div className="doctor-info-detail mb-3 pb-3">
+                <div className="p-2 pt-0">
+                    <div className="doctor-info-detail mb-2">
                         <div className={styles.doctorName}>
-                            <h3 className="mb-1">
+                            <h4 className="mb-1">
                                 <Link to={profileLink}>{name}</Link>
-                            </h3>
+                            </h4>
+                            {positionName && (
+                                <p className="text-muted fs-14 mb-1">{positionName}</p>
+                            )}
                         </div>
-                        <div className="d-flex align-items-center">
-                            <p className="d-flex align-items-center mb-0 fs-14">
+                        <div className={styles.hospitalInfo}>
+                            <p className="d-flex align-items-center mb-2 fs-14">
                                 <i className="isax isax-location me-2"></i>
-                                {location}
+                                {hospitalId && hospitalLink !== '#' ? (
+                                    <Link to={hospitalLink} className={styles.hospitalLink}>
+                                        {hospitalName}
+                                    </Link>
+                                ) : (
+                                    <span className={styles.hospitalText}>{hospitalName}</span>
+                                )}
                             </p>
-                            <div className={styles.fsWrapper}>
-                                <i className="fa-solid fa-circle text-primary mx-2 me-1"></i>
-                            </div>
-                            <span className="fs-14 fw-medium">{consultationTime}</span>
+                        </div>
+                        <div className={styles.experienceInfo}>
+                            <p className="d-flex align-items-center mb-0 fs-14">
+                                <Briefcase className={styles.experienceIcon} size={16} />
+                                <span className="ms-2">{experience}</span>
+                            </p>
                         </div>
                     </div>
 
-                    <div className="d-flex align-items-center justify-content-between">
-                        <div>
-                            <p className="mb-1">Phí tư vấn</p>
-                            <h3 className="text-orange">${fee}</h3>
-                        </div>
+                    <div className="d-flex align-items-center justify-content-between mt-2">
+                        {amount && (
+                            <div>
+                                <p className="mb-1 fs-14 text-muted">
+                                    {serviceTypeName || 'Phí tư vấn'}
+                                </p>
+                                <h5 className="text-orange mb-0">
+                                    {amount.toLocaleString('vi-VN')} VNĐ
+                                </h5>
+                            </div>
+                        )}
                         <Link
                             to={bookingLink}
-                            className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
+                            className="btn btn-sm btn-dark d-inline-flex align-items-center rounded-pill"
                         >
                             <i className="isax isax-calendar-1 me-2"></i>
                             {'Đặt ngay'}
