@@ -2,8 +2,8 @@ import { useEffect, useRef, Fragment } from 'react';
 import { useSelector } from 'react-redux';
 import { useChat } from '@/providers/ChatProvider';
 import { RootState } from '@/store';
-import { MessageResponse } from '@/types/communication.types';
 import MessageItem from './MessageItem';
+import CallLogItem from './CallLogItem';
 
 const MessageList = () => {
     const {
@@ -231,14 +231,43 @@ const MessageList = () => {
     };
 
     // Transform MessageResponse to match MessageItem props
-    const transformedMessages = (messages || []).map((msg: MessageResponse) => {
+    // Note: messages array contains mixed items (Message + CallLog)
+    const transformedMessages: Array<any> = (messages || []).map((item: any) => {
+        // Check itemType to determine if it's a message or call log
+        const isCallLog = item.itemType === 'CallLog';
+
+        if (isCallLog && item.callLog) {
+            // Find caller info from participantDetails
+            const callerId = item.callLog.callerId || '';
+            const callerInfo = activeConversation?.participantDetails?.find(
+                (p) => (p.id || p.accountId || '').toUpperCase() === callerId.toUpperCase()
+            );
+
+            // Return call log item with caller information
+            return {
+                id: item.id,
+                itemType: 'CallLog' as const,
+                callLog: item.callLog,
+                createdAt: item.createdAt,
+                // For call logs, determine ownership by comparing callerId with currentUserId
+                isOwn: callerId.toUpperCase() === currentUserId.toUpperCase(),
+                // Add caller info for display
+                callerName: callerInfo?.fullName || 'Unknown',
+                callerAvatar: callerInfo?.avatarUrl || '/default-avatar.png',
+            };
+        }
+
+        // Regular message transformation
+        const msg = item.message || item; // Handle both wrapped and unwrapped messages
         const transformed = {
-            id: msg.id,
+            id: msg.id || item.id,
+            itemType: 'Message' as const,
             senderId: msg.senderId,
             senderName: msg.senderInfo?.fullName || 'Unknown',
             senderAvatar: msg.senderInfo?.avatarUrl || '/default-avatar.png',
             content: msg.content,
-            timestamp: formatMessageTimestamp(msg.createdAt), // ✅ Smart formatting
+            timestamp: formatMessageTimestamp(msg.createdAt || item.createdAt), // ✅ Smart formatting
+            createdAt: msg.createdAt || item.createdAt,
             // Convert type to string (backend sends enum number or string)
             messageType: (() => {
                 if (typeof msg.type === 'string') {
@@ -314,30 +343,41 @@ const MessageList = () => {
                 </div>
             )}
 
-            {transformedMessages.map((message, index) => {
-                // Find original message by ID (more reliable than index)
-                const currentOriginalMsg = messages.find((m) => m.id === message.id);
-                const previousTransformedMsg = index > 0 ? transformedMessages[index - 1] : null;
-                const previousOriginalMsg = previousTransformedMsg
-                    ? messages.find((m) => m.id === previousTransformedMsg.id)
+            {transformedMessages.map((item, index) => {
+                // Find original item by ID (more reliable than index)
+                const currentOriginalItem = messages.find((m) => m.id === item.id);
+                const previousTransformedItem = index > 0 ? transformedMessages[index - 1] : null;
+                const previousOriginalItem = previousTransformedItem
+                    ? messages.find((m) => m.id === previousTransformedItem.id)
                     : null;
 
                 const showDateSeparator = needsDateSeparator(
-                    currentOriginalMsg,
-                    previousOriginalMsg
+                    currentOriginalItem,
+                    previousOriginalItem
                 );
 
                 return (
-                    <Fragment key={message.id}>
+                    <Fragment key={item.id}>
                         {/* Date Separator (like WhatsApp) */}
-                        {showDateSeparator && currentOriginalMsg && (
+                        {showDateSeparator && currentOriginalItem && (
                             <div className="text-center my-3">
                                 <span className="badge bg-light text-dark px-3 py-2 rounded-pill shadow-sm">
-                                    {getDateLabel(currentOriginalMsg.createdAt)}
+                                    {getDateLabel(currentOriginalItem.createdAt)}
                                 </span>
                             </div>
                         )}
-                        <MessageItem message={message} />
+
+                        {/* Render based on itemType */}
+                        {item.itemType === 'CallLog' ? (
+                            <CallLogItem
+                                callLog={item.callLog}
+                                isOwn={item.isOwn}
+                                callerName={item.callerName}
+                                callerAvatar={item.callerAvatar}
+                            />
+                        ) : (
+                            <MessageItem message={item} />
+                        )}
                     </Fragment>
                 );
             })}

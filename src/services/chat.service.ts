@@ -9,6 +9,9 @@ import {
     GetMessagesQueryParameters,
     MarkMessageAsReadRequest,
     MarkAllMessagesAsReadRequest,
+    CreateCallLogRequest,
+    UpdateCallLogRequest,
+    CallLogResponse,
     ApiResponse,
     CursorPaginationResponse,
     MessageAttachment,
@@ -25,11 +28,15 @@ import {
 // ==================================================================================
 
 /**
- * Check if a string is a valid GUID/UUID format
+ * Check if a string is a valid GUID/UUID or MongoDB ObjectId format
  */
 const isGuid = (value: string): boolean => {
+    // GUID format: 8-4-4-4-12 (with dashes)
     const guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    return guidRegex.test(value);
+    // MongoDB ObjectId format: 24 hex characters (no dashes)
+    const objectIdRegex = /^[0-9a-f]{24}$/i;
+
+    return guidRegex.test(value) || objectIdRegex.test(value);
 };
 
 /**
@@ -131,6 +138,8 @@ const COMMUNICATION_ENDPOINTS = {
     DELETE_MESSAGE: (messageId: string) => `/communications/messages/${messageId.toUpperCase()}`,
     BLOCK_CONVERSATION: `/communications/conversations/block`,
     UNBLOCK_CONVERSATION: `/communications/conversations/unblock`,
+    CREATE_CALL_LOG: `/communications/call-logs`,
+    UPDATE_CALL_LOG: (callLogId: string) => `/communications/call-logs/${callLogId.toUpperCase()}`,
 } as const;
 
 export class ChatService {
@@ -640,6 +649,59 @@ export class ChatService {
             throw new Error(error.message || 'Failed to unblock conversation');
         }
     }
+
+    /**
+     * Create a call log
+     */
+    static async createCallLog(
+        request: CreateCallLogRequest
+    ): Promise<ApiResponse<CallLogResponse>> {
+        try {
+            const transformedRequest = transformToPascalCase(request);
+            console.log('[ChatService] 📤 Sending createCallLog request:', transformedRequest);
+
+            const response: any = await axiosInstance.post(
+                COMMUNICATION_ENDPOINTS.CREATE_CALL_LOG,
+                transformedRequest
+            );
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Call log created successfully',
+            };
+        } catch (error: any) {
+            console.error('[ChatService] ❌ createCallLog error:', error);
+            throw new Error(error.message || 'Failed to create call log');
+        }
+    }
+
+    /**
+     * Update a call log
+     */
+    static async updateCallLog(
+        request: UpdateCallLogRequest
+    ): Promise<ApiResponse<CallLogResponse>> {
+        try {
+            const transformedRequest = transformToPascalCase(request);
+            console.log('[ChatService] 📤 Sending updateCallLog request:', {
+                url: COMMUNICATION_ENDPOINTS.UPDATE_CALL_LOG(request.id),
+                body: transformedRequest,
+            });
+
+            const response: any = await axiosInstance.put(
+                COMMUNICATION_ENDPOINTS.UPDATE_CALL_LOG(request.id),
+                transformedRequest
+            );
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Call log updated successfully',
+            };
+        } catch (error: any) {
+            console.error('[ChatService] ❌ updateCallLog error:', error);
+            throw new Error(error.message || 'Failed to update call log');
+        }
+    }
 }
 
 // Export individual methods for convenience
@@ -662,6 +724,8 @@ export const {
     deleteMessage,
     blockConversation,
     unblockConversation,
+    createCallLog,
+    updateCallLog,
 } = ChatService;
 
 // Default export

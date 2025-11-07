@@ -63,11 +63,13 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         remoteStream,
         isMuted,
         isVideoOff,
+        isScreenSharing,
         startCall,
         acceptCall,
         endCall,
         toggleMute,
         toggleVideo,
+        toggleScreenShare,
         cleanup,
     } = useWebRTC(
         userId,
@@ -769,14 +771,25 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                         ></i>
                                     </button>
 
-                                    {/* Screen Share (for future implementation) */}
+                                    {/* Screen Share */}
                                     <button
+                                        onClick={toggleScreenShare}
                                         className={clsx(
                                             styles.btnIcon,
-                                            'btn btn-sm bg-light text-dark d-flex align-items-center justify-content-center rounded-circle'
+                                            'btn btn-sm d-flex align-items-center justify-content-center rounded-circle',
+                                            isScreenSharing
+                                                ? 'bg-primary text-white'
+                                                : 'bg-light text-dark'
                                         )}
                                         type="button"
-                                        title="Chia sẻ màn hình"
+                                        title={
+                                            isScreenSharing
+                                                ? 'Dừng chia sẻ màn hình'
+                                                : 'Chia sẻ màn hình'
+                                        }
+                                        aria-label={
+                                            isScreenSharing ? 'Dừng chia sẻ' : 'Chia sẻ màn hình'
+                                        }
                                     >
                                         <i className="isax isax-screenmirroring"></i>
                                     </button>
