@@ -9,6 +9,7 @@ import AppointmentDetailPage from './Appointments/AppointmentDetailPage';
 import SettingsContainer from './Setting/SettingsContainer/SettingsContainer';
 import Invoices from './Invoices';
 import Wallet from './Wallet';
+import Notifications from './Notifications';
 import { RootState } from '@/store';
 
 const UserProfile = () => {
@@ -30,6 +31,7 @@ const UserProfile = () => {
             'medical-records',
             'wallet',
             'invoices',
+            'notifications',
             'chat',
             'vitals',
             'settings',
@@ -85,6 +87,11 @@ const UserProfile = () => {
                     items: [...baseItems, { label: 'Invoices', isActive: true }],
                     title: 'Invoices',
                 };
+            case 'notifications':
+                return {
+                    items: [...baseItems, { label: 'Notifications', isActive: true }],
+                    title: 'Danh sách thông báo',
+                };
             case 'chat':
                 return {
                     items: [...baseItems, { label: 'Messages', isActive: true }],
@@ -126,6 +133,8 @@ const UserProfile = () => {
                 return <SettingsContainer />;
             case 'invoices':
                 return <Invoices patientId={profile?.id} profile={profile} />;
+            case 'notifications':
+                return <Notifications />;
             default:
                 return <Favourite patientId={profile?.id} />; // Default to favourites
         }
