@@ -10,12 +10,10 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import medicalImg1 from '@/assets/img/medical-img1.jpg';
-import patientImg from '@/assets/img/patients/patient.jpg';
-import patientImg1 from '@/assets/img/patients/patient1.jpg';
-import patientImg2 from '@/assets/img/patients/patient2.jpg';
 import MainLayout from '@/layouts/MainLayout';
 import TestimonialSection from '@/components/TestimonialSection';
 import HeroSection from './components/HeroSection/HeroSection';
+import ExpandableText from '@/components/ExpandableText';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '@/store';
 import { getHospitalByIdAsync } from '@/store/slices/hospitalSlice';
@@ -51,6 +49,8 @@ const HospitalProfile: React.FC = () => {
     const [showHeader, setShowHeader] = useState(true);
     const [hasReachedTabs, setHasReachedTabs] = useState(false);
     const [activeTab, setActiveTab] = useState<'gioi-thieu' | 'bang-gia' | 'huong-dan' | 'faq'>();
+    const [expandedDoctorServices, setExpandedDoctorServices] = useState(true);
+    const [expandedHospitalServices, setExpandedHospitalServices] = useState(true);
 
     // Separate useEffect for API call - only runs when id changes
     useEffect(() => {
@@ -97,16 +97,19 @@ const HospitalProfile: React.FC = () => {
         };
     }, [hasReachedTabs]); // Only depend on hasReachedTabs, not dispatch or id
 
-    // Mock services
-    const services = [
-        { id: 1, name: 'Khám tổng quát', img: patientImg },
-        { id: 2, name: 'Tư vấn dinh dưỡng ', img: patientImg1 },
-        { id: 3, name: 'Điều trị da liễu', img: patientImg2 },
-        { id: 4, name: 'Huấn luyện cá nhân', img: medicalImg1 },
-        { id: 5, name: 'Xét nghiệm máu', img: patientImg },
-        { id: 6, name: 'Siêu âm', img: patientImg1 },
-        { id: 7, name: 'Chụp X-quang', img: patientImg2 },
-    ];
+    // Service Types (Dịch vụ khám & tư vấn của bác sĩ) from API
+    const doctorServices = (selectedHospital?.serviceTypes || []).map((st) => ({
+        id: st.id,
+        name: st.name,
+        img: st.imageUrl || medicalImg1,
+    }));
+
+    // Service Medicals (Dịch vụ y tế tại bệnh viện) from API
+    const hospitalServices = (selectedHospital?.serviceMedicals || []).map((sm) => ({
+        id: sm.id,
+        name: sm.name,
+        img: sm.imageUrl || medicalImg1,
+    }));
 
     // Function to get hospital image for specialty using round-robin distribution
     const getHospitalImageForSpecialty = (specialtyIndex: number) => {
@@ -217,35 +220,6 @@ const HospitalProfile: React.FC = () => {
                     <div className={styles.contentGrid}>
                         {/* LEFT: main content */}
                         <div className={styles.mainContent}>
-                            {/* Các dịch vụ */}
-                            <div className={styles.sectionBlock}>
-                                <h3 className={styles.sectionTitle}>Dịch vụ</h3>
-                                <Swiper
-                                    modules={[Navigation, Pagination, Autoplay]}
-                                    spaceBetween={16}
-                                    slidesPerView={'auto'}
-                                    navigation
-                                    pagination={{ clickable: true }}
-                                    autoplay={{ delay: 2500, disableOnInteraction: false }}
-                                    watchOverflow
-                                    className={styles.serviceSwiper}
-                                >
-                                    {services.map((service) => (
-                                        <SwiperSlide key={service.id}>
-                                            <Link to="/doctor/list" className={styles.serviceCard}>
-                                                <img
-                                                    src={service.img}
-                                                    alt={service.name}
-                                                    className={styles.serviceImg}
-                                                />
-                                                <div className={styles.serviceName}>
-                                                    {service.name}
-                                                </div>
-                                            </Link>
-                                        </SwiperSlide>
-                                    ))}
-                                </Swiper>
-                            </div>
                             {/* Các chuyên khoa */}
                             <div className={styles.sectionBlock}>
                                 <h3 className={styles.sectionTitle}>Chuyên khoa</h3>
@@ -295,12 +269,7 @@ const HospitalProfile: React.FC = () => {
                                                         </span>
                                                     </div>
                                                     <h6 className={styles.specialityTitle}>
-                                                        <Link
-                                                            to="/doctor/list"
-                                                            className={styles.specialityTitleLink}
-                                                        >
-                                                            {specialty.name}
-                                                        </Link>
+                                                        {specialty.name}
                                                     </h6>
                                                     <p
                                                         className={clsx(
@@ -316,31 +285,244 @@ const HospitalProfile: React.FC = () => {
                                     </Swiper>
                                 </div>
 
-                                {/* Mobile Simple List */}
+                                {/* Mobile Grid */}
                                 <div className={styles.mobileSpecialtyList}>
                                     {specialties.map((specialty) => (
                                         <Link
                                             key={specialty.id}
                                             to="/doctor/list"
-                                            className={styles.specialtyItem}
+                                            className={clsx('spaciality-item')}
                                         >
-                                            <div className={styles.specialtyIcon}>
-                                                {specialty.icon && (
-                                                    <img src={specialty.icon} alt="icon" />
-                                                )}
+                                            <div className={clsx('spaciality-img')}>
+                                                <img
+                                                    src={specialty.img}
+                                                    alt={specialty.name}
+                                                    className={styles.specialityImgEl}
+                                                />
+                                                <span
+                                                    className={clsx(
+                                                        'spaciality-icon',
+                                                        styles.specialityIcon
+                                                    )}
+                                                >
+                                                    {specialty.icon && (
+                                                        <img src={specialty.icon} alt="icon" />
+                                                    )}
+                                                </span>
                                             </div>
-                                            <div className={styles.specialtyText}>
-                                                <h6 className={styles.specialtyTitle}>
-                                                    {specialty.name}
-                                                </h6>
-                                                <p className={styles.specialtyMeta}>
-                                                    {specialty.doctorCount || 0} Bác sĩ
-                                                </p>
-                                            </div>
+                                            <h6 className={styles.specialityTitle}>
+                                                {specialty.name}
+                                            </h6>
+                                            <p className={clsx('mb-0', styles.specialityMeta)}>
+                                                {specialty.doctorCount || 0} Bác sĩ
+                                            </p>
                                         </Link>
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Dịch vụ khám & tư vấn của bác sĩ */}
+                            {doctorServices.length > 0 && (
+                                <div className={styles.sectionBlock}>
+                                    <div className={styles.categorySection}>
+                                        <div
+                                            className={styles.categoryHeader}
+                                            onClick={() =>
+                                                setExpandedDoctorServices(!expandedDoctorServices)
+                                            }
+                                            role="button"
+                                            tabIndex={0}
+                                            aria-label={`${expandedDoctorServices ? 'Thu gọn' : 'Mở rộng'} dịch vụ khám & tư vấn của bác sĩ`}
+                                            aria-expanded={expandedDoctorServices}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault();
+                                                    setExpandedDoctorServices(
+                                                        !expandedDoctorServices
+                                                    );
+                                                }
+                                            }}
+                                        >
+                                            <div className={styles.categoryInfo}>
+                                                <div>
+                                                    <h3 className={styles.categoryName}>
+                                                        Dịch vụ khám & tư vấn của bác sĩ
+                                                    </h3>
+                                                    <p className={styles.categoryDescription}>
+                                                        Các dịch vụ khám và tư vấn chuyên khoa
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className={styles.categoryActions}>
+                                                <span className={styles.categoryServiceCount}>
+                                                    {doctorServices.length} dịch vụ
+                                                </span>
+                                                <span
+                                                    className={styles.expandIcon}
+                                                    aria-hidden="true"
+                                                >
+                                                    {expandedDoctorServices ? (
+                                                        <svg
+                                                            width="18"
+                                                            height="18"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="2"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        >
+                                                            <polyline points="18 15 12 9 6 15"></polyline>
+                                                        </svg>
+                                                    ) : (
+                                                        <svg
+                                                            width="18"
+                                                            height="18"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="2"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        >
+                                                            <polyline points="6 9 12 15 18 9"></polyline>
+                                                        </svg>
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        {expandedDoctorServices && (
+                                            <div className={styles.servicesGrid}>
+                                                {doctorServices.map((service) => (
+                                                    <Link
+                                                        key={service.id}
+                                                        to="/doctor/list"
+                                                        className={styles.serviceCard}
+                                                    >
+                                                        <div className={styles.serviceCardContent}>
+                                                            <div className={styles.serviceImage}>
+                                                                <img
+                                                                    src={service.img}
+                                                                    alt={service.name}
+                                                                    onError={(e) => {
+                                                                        e.currentTarget.src =
+                                                                            medicalImg1;
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <div className={styles.serviceName}>
+                                                                {service.name}
+                                                            </div>
+                                                        </div>
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                            {/* Dịch vụ y tế tại bệnh viện */}
+                            {hospitalServices.length > 0 && (
+                                <div className={styles.sectionBlock}>
+                                    <div className={styles.categorySection}>
+                                        <div
+                                            className={styles.categoryHeader}
+                                            onClick={() =>
+                                                setExpandedHospitalServices(
+                                                    !expandedHospitalServices
+                                                )
+                                            }
+                                            role="button"
+                                            tabIndex={0}
+                                            aria-label={`${expandedHospitalServices ? 'Thu gọn' : 'Mở rộng'} dịch vụ y tế tại bệnh viện`}
+                                            aria-expanded={expandedHospitalServices}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault();
+                                                    setExpandedHospitalServices(
+                                                        !expandedHospitalServices
+                                                    );
+                                                }
+                                            }}
+                                        >
+                                            <div className={styles.categoryInfo}>
+                                                <div>
+                                                    <h3 className={styles.categoryName}>
+                                                        Dịch vụ y tế tại bệnh viện
+                                                    </h3>
+                                                    <p className={styles.categoryDescription}>
+                                                        Các dịch vụ y tế và xét nghiệm chuyên sâu
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className={styles.categoryActions}>
+                                                <span className={styles.categoryServiceCount}>
+                                                    {hospitalServices.length} dịch vụ
+                                                </span>
+                                                <span
+                                                    className={styles.expandIcon}
+                                                    aria-hidden="true"
+                                                >
+                                                    {expandedHospitalServices ? (
+                                                        <svg
+                                                            width="18"
+                                                            height="18"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="2"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        >
+                                                            <polyline points="18 15 12 9 6 15"></polyline>
+                                                        </svg>
+                                                    ) : (
+                                                        <svg
+                                                            width="18"
+                                                            height="18"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="2"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        >
+                                                            <polyline points="6 9 12 15 18 9"></polyline>
+                                                        </svg>
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        {expandedHospitalServices && (
+                                            <div className={styles.servicesGrid}>
+                                                {hospitalServices.map((service) => (
+                                                    <Link
+                                                        key={service.id}
+                                                        to="/doctor/list"
+                                                        className={styles.serviceCard}
+                                                    >
+                                                        <div className={styles.serviceCardContent}>
+                                                            <div className={styles.serviceImage}>
+                                                                <img
+                                                                    src={service.img}
+                                                                    alt={service.name}
+                                                                    onError={(e) => {
+                                                                        e.currentTarget.src =
+                                                                            medicalImg1;
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <div className={styles.serviceName}>
+                                                                {service.name}
+                                                            </div>
+                                                        </div>
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                             {/* Sticky tabs are above, now add floating CTA on map */}
                             <div className={styles.tabs} ref={tabsRef}>
                                 <a
@@ -387,69 +569,33 @@ const HospitalProfile: React.FC = () => {
 
                             <div id="gioi-thieu" className={styles.sectionBlock}>
                                 <h3 className={styles.sectionTitle}>Giới thiệu</h3>
-                                <p>{selectedHospital?.description || 'Đang tải mô tả...'}</p>
+                                <ExpandableText text={selectedHospital?.description} limit={300} />
                             </div>
 
                             <div id="bang-gia" className={styles.sectionBlock}>
                                 <h3 className={styles.sectionTitle}>Bảng giá</h3>
-                                <div className={styles.priceTable}>
-                                    <div className={styles.priceItem}>
-                                        <span className={styles.priceNumber}>1.</span>
-                                        <span className={styles.priceService}>
-                                            Khám bệnh Da dày & Đại tràng
-                                        </span>
-                                        <span className={styles.priceAmount}>200.000đ</span>
+                                {selectedHospital?.serviceMedicals &&
+                                selectedHospital.serviceMedicals.length > 0 ? (
+                                    <div className={styles.priceTable}>
+                                        {selectedHospital.serviceMedicals.map((service, index) => (
+                                            <div key={service.id} className={styles.priceItem}>
+                                                <span className={styles.priceNumber}>
+                                                    {index + 1}.
+                                                </span>
+                                                <span className={styles.priceService}>
+                                                    {service.name}
+                                                </span>
+                                                <span className={styles.priceAmount}>
+                                                    {service.price.toLocaleString('vi-VN')}đ
+                                                </span>
+                                            </div>
+                                        ))}
                                     </div>
-                                    <div className={styles.priceItem}>
-                                        <span className={styles.priceNumber}>2.</span>
-                                        <span className={styles.priceService}>
-                                            Khám bệnh Tiêu hóa - Gan mật
-                                        </span>
-                                        <span className={styles.priceAmount}>200.000đ</span>
+                                ) : (
+                                    <div className={styles.emptyState}>
+                                        <p className="text-muted">Chưa có thông tin bảng giá</p>
                                     </div>
-                                    <div className={styles.priceItem}>
-                                        <span className={styles.priceNumber}>3.</span>
-                                        <span className={styles.priceService}>
-                                            Nội soi Da dày không đau
-                                        </span>
-                                        <span className={styles.priceAmount}>3.100.000đ</span>
-                                    </div>
-                                    <div className={styles.priceItem}>
-                                        <span className={styles.priceNumber}>4.</span>
-                                        <span className={styles.priceService}>
-                                            Nội soi Đại tràng không đau
-                                        </span>
-                                        <span className={styles.priceAmount}>4.100.000đ</span>
-                                    </div>
-                                    <div className={styles.priceItem}>
-                                        <span className={styles.priceNumber}>5.</span>
-                                        <span className={styles.priceService}>
-                                            Nội soi Da dày và Đại tràng không đau
-                                        </span>
-                                        <span className={styles.priceAmount}>6.700.000đ</span>
-                                    </div>
-                                    <div className={styles.priceItem}>
-                                        <span className={styles.priceNumber}>6.</span>
-                                        <span className={styles.priceService}>
-                                            Tầm soát ung thư Da dày
-                                        </span>
-                                        <span className={styles.priceAmount}>3.100.000đ</span>
-                                    </div>
-                                    <div className={styles.priceItem}>
-                                        <span className={styles.priceNumber}>7.</span>
-                                        <span className={styles.priceService}>
-                                            Tầm soát ung thư Đại tràng
-                                        </span>
-                                        <span className={styles.priceAmount}>4.340.000đ</span>
-                                    </div>
-                                    <div className={styles.priceItem}>
-                                        <span className={styles.priceNumber}>8.</span>
-                                        <span className={styles.priceService}>
-                                            Tầm soát ung thư Da dày & Đại tràng
-                                        </span>
-                                        <span className={styles.priceAmount}>6.940.000đ</span>
-                                    </div>
-                                </div>
+                                )}
                             </div>
 
                             <div id="huong-dan" className={styles.sectionBlock}>
@@ -460,14 +606,14 @@ const HospitalProfile: React.FC = () => {
                                         <span className={styles.stepContent}>
                                             Truy cập website{' '}
                                             <a
-                                                href="https://medpro.vn/"
+                                                href="https://medcure.vn/"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className={styles.guideLink}
                                             >
-                                                https://medpro.vn/
+                                                https://medcure.vn/
                                             </a>{' '}
-                                            hoặc tải ứng dụng Medpro – Đặt lịch khám bệnh trên điện
+                                            hoặc tải ứng dụng MedCure – Đặt lịch khám bệnh trên điện
                                             thoại.
                                         </span>
                                     </div>
@@ -475,15 +621,31 @@ const HospitalProfile: React.FC = () => {
                                     <div className={styles.guideStep}>
                                         <span className={styles.stepLabel}>Bước 2:</span>
                                         <span className={styles.stepContent}>
-                                            Tìm kiếm "Bệnh viện Vinmec".
+                                            Tìm kiếm "{selectedHospital?.name || 'Bệnh viện'}".
                                         </span>
                                     </div>
 
                                     <div className={styles.guideStep}>
                                         <span className={styles.stepLabel}>Bước 3:</span>
                                         <span className={styles.stepContent}>
-                                            Chọn loại dịch vụ bạn mong muốn như khám tổng quát, khám
-                                            chuyên khoa, xét nghiệm, chẩn đoán hình ảnh...
+                                            Chọn loại dịch vụ bạn mong muốn như{' '}
+                                            {selectedHospital?.serviceMedicals &&
+                                            selectedHospital.serviceMedicals.length > 0 ? (
+                                                <>
+                                                    {selectedHospital.serviceMedicals
+                                                        .slice(0, 3)
+                                                        .map((service, index) => (
+                                                            <React.Fragment key={service.id}>
+                                                                {index > 0 && ', '}
+                                                                {service.name}
+                                                            </React.Fragment>
+                                                        ))}
+                                                    {selectedHospital.serviceMedicals.length > 3 &&
+                                                        '...'}
+                                                </>
+                                            ) : (
+                                                'khám tổng quát, khám chuyên khoa, xét nghiệm, chẩn đoán hình ảnh...'
+                                            )}
                                         </span>
                                     </div>
 

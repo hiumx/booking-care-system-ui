@@ -136,17 +136,17 @@ const DoctorList: React.FC = () => {
         }
     }, [dispatch, languages.length]);
 
-    // Debounce searchTerm - only update debouncedSearchTerm after 3 seconds of no typing
+    // Debounce searchTerm - only update debouncedSearchTerm after 2 seconds of no typing
     useEffect(() => {
         // Clear existing timeout
         if (searchTimeoutRef.current) {
             clearTimeout(searchTimeoutRef.current);
         }
 
-        // Set new timeout to update debouncedSearchTerm after 3 seconds
+        // Set new timeout to update debouncedSearchTerm after 2 seconds
         searchTimeoutRef.current = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
-        }, 3000);
+        }, 2000);
 
         // Cleanup on unmount or when searchTerm changes (before new timeout is set)
         return () => {
@@ -606,6 +606,17 @@ const DoctorList: React.FC = () => {
         setCurrentPage(1); // Reset to first page when searching
     };
 
+    // Function to search immediately without waiting for debounce
+    const handleSearchNow = () => {
+        // Clear existing timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+        // Set debouncedSearchTerm immediately to trigger search
+        setDebouncedSearchTerm(searchTerm);
+        setCurrentPage(1);
+    };
+
     const handleSpecialtyFilter = (specialtyId: string) => {
         setSpecialtyFilter(specialtyId);
         setCurrentPage(1);
@@ -919,6 +930,7 @@ const DoctorList: React.FC = () => {
             <div className="container">
                 <SearchInput
                     onSearchChange={handleSearchChange}
+                    onSearchNow={handleSearchNow}
                     onSpecialtyFilter={handleSpecialtyFilter}
                     onSpecialtyFilters={handleSpecialtyFilters}
                     onHospitalFilter={handleHospitalFilter}
