@@ -95,14 +95,15 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         [doctorId, medicalServiceId, dispatch]
     );
 
-    // Handle slot click - support multiple slot selection
+    // Handle slot click - single slot selection only (patient can book only 1 slot per booking)
     const handleClickSlot = useCallback(
         (slotIndex: number) => {
             // Toggle slot selection in local state (for UI highlighting)
+            // Single selection mode: replace current selection or clear if clicking same slot
             if (slotChecked.includes(slotIndex)) {
-                setSlotChecked((prev) => prev.filter((idx) => idx !== slotIndex));
+                setSlotChecked([]); // Unselect if clicking same slot
             } else {
-                setSlotChecked((prev) => [...prev, slotIndex]); // Multiple selection mode
+                setSlotChecked([slotIndex]); // Replace with new slot (only 1 allowed)
             }
 
             // Find the corresponding slot data
@@ -130,7 +131,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                     isBlocked: false,
                 };
 
-                // Toggle slot in Redux (add or remove)
+                // Toggle slot in Redux (replace or remove)
                 dispatch(toggleSlotSelection(slotPayload));
             }
         },
