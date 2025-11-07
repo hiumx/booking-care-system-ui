@@ -201,6 +201,10 @@ const authSlice = createSlice({
             state.hasExternalProvider = false;
             state.accessToken = null;
         },
+        updateAccessToken: (state, action) => {
+            // Update access token after refresh (used by axios interceptor)
+            state.accessToken = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -318,6 +322,6 @@ const authSlice = createSlice({
     },
 });
 
-export const { clearError, resetAuthState } = authSlice.actions;
+export const { clearError, resetAuthState, updateAccessToken } = authSlice.actions;
 
 export default authSlice.reducer;
