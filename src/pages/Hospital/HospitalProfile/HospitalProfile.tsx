@@ -13,6 +13,7 @@ import medicalImg1 from '@/assets/img/medical-img1.jpg';
 import MainLayout from '@/layouts/MainLayout';
 import TestimonialSection from '@/components/TestimonialSection';
 import HeroSection from './components/HeroSection/HeroSection';
+import ServiceCard from './components/ServiceCard';
 import ExpandableText from '@/components/ExpandableText';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '@/store';
@@ -394,27 +395,11 @@ const HospitalProfile: React.FC = () => {
                                         {expandedDoctorServices && (
                                             <div className={styles.servicesGrid}>
                                                 {doctorServices.map((service) => (
-                                                    <Link
+                                                    <ServiceCard
                                                         key={service.id}
-                                                        to="/doctor/list"
-                                                        className={styles.serviceCard}
-                                                    >
-                                                        <div className={styles.serviceCardContent}>
-                                                            <div className={styles.serviceImage}>
-                                                                <img
-                                                                    src={service.img}
-                                                                    alt={service.name}
-                                                                    onError={(e) => {
-                                                                        e.currentTarget.src =
-                                                                            medicalImg1;
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            <div className={styles.serviceName}>
-                                                                {service.name}
-                                                            </div>
-                                                        </div>
-                                                    </Link>
+                                                        name={service.name}
+                                                        img={service.img}
+                                                    />
                                                 ))}
                                             </div>
                                         )}
@@ -496,27 +481,11 @@ const HospitalProfile: React.FC = () => {
                                         {expandedHospitalServices && (
                                             <div className={styles.servicesGrid}>
                                                 {hospitalServices.map((service) => (
-                                                    <Link
+                                                    <ServiceCard
                                                         key={service.id}
-                                                        to="/doctor/list"
-                                                        className={styles.serviceCard}
-                                                    >
-                                                        <div className={styles.serviceCardContent}>
-                                                            <div className={styles.serviceImage}>
-                                                                <img
-                                                                    src={service.img}
-                                                                    alt={service.name}
-                                                                    onError={(e) => {
-                                                                        e.currentTarget.src =
-                                                                            medicalImg1;
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            <div className={styles.serviceName}>
-                                                                {service.name}
-                                                            </div>
-                                                        </div>
-                                                    </Link>
+                                                        name={service.name}
+                                                        img={service.img}
+                                                    />
                                                 ))}
                                             </div>
                                         )}
