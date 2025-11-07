@@ -254,6 +254,171 @@ const Notifications = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    // Helper function to render notification content based on loading/empty state
+    const renderNotificationContent = () => {
+        if (isLoading) {
+            return (
+                <div className="notification-list-page">
+                    {Array.from({ length: itemsPerPage }, (_, index) => (
+                        <NotificationSkeleton key={`skeleton-${index}`} />
+                    ))}
+                </div>
+            );
+        }
+
+        if (paginatedNotifications.length === 0) {
+            return (
+                <div className="text-center py-5">
+                    <i className="isax isax-notification-bing fs-1 text-muted"></i>
+                    <p className="text-muted mt-3">Chưa có thông báo nào</p>
+                </div>
+            );
+        }
+
+        return (
+            <>
+                <div className="notification-list-page">
+                    {paginatedNotifications.map((notification) => {
+                        const localizedNotification = getLocalizedNotification(
+                            notification,
+                            currentLanguage
+                        );
+
+                        // Extract complex logic to improve readability
+                        const backgroundColor = notification.isRead ? 'transparent' : '#f8f9fa';
+                        const cursorStyle =
+                            notification.actionUrl || notification.isRead ? 'pointer' : 'default';
+
+                        return (
+                            <div
+                                key={notification.id}
+                                className={clsx('notification-item', {
+                                    unread: !notification.isRead,
+                                })}
+                                style={{
+                                    padding: '16px',
+                                    borderBottom: '1px solid #e0e0e0',
+                                    backgroundColor,
+                                    cursor: cursorStyle,
+                                    transition: 'background-color 0.2s ease',
+                                }}
+                                {...(notification.actionUrl && {
+                                    onClick: () => handleNotificationClick(notification),
+                                })}
+                                onMouseEnter={(e) => {
+                                    if (notification.isRead || notification.actionUrl) {
+                                        e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (notification.isRead) {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    } else if (notification.actionUrl && !notification.isRead) {
+                                        e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                    }
+                                }}
+                            >
+                                <div className="d-flex gap-3">
+                                    <div
+                                        className="notification-icon"
+                                        style={{
+                                            width: '48px',
+                                            height: '48px',
+                                            borderRadius: '50%',
+                                            backgroundColor: '#e3f2fd',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            flexShrink: 0,
+                                        }}
+                                    >
+                                        <i
+                                            className={
+                                                notification.icon || 'isax isax-notification'
+                                            }
+                                            style={{
+                                                fontSize: '24px',
+                                                color: '#1976d2',
+                                            }}
+                                        ></i>
+                                    </div>
+                                    <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                                        <div className="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 className="mb-0" style={{ fontWeight: 600 }}>
+                                                {localizedNotification.title}
+                                            </h6>
+                                            <span
+                                                className="text-muted"
+                                                style={{
+                                                    fontSize: '12px',
+                                                    whiteSpace: 'nowrap',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '4px',
+                                                }}
+                                            >
+                                                <i
+                                                    className="isax isax-clock"
+                                                    style={{ fontSize: '14px' }}
+                                                ></i>
+                                                {formatTime(notification.createdAt)}
+                                            </span>
+                                        </div>
+                                        <p className="text-muted mb-2" style={{ fontSize: '14px' }}>
+                                            {localizedNotification.content}
+                                        </p>
+                                        <div className="d-flex gap-2 align-items-center">
+                                            {!notification.isRead && (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-outline-primary"
+                                                    onClick={() =>
+                                                        handleMarkAsRead(notification.id)
+                                                    }
+                                                >
+                                                    <i className="isax isax-tick-circle me-1"></i>{' '}
+                                                    Đánh dấu đã đọc
+                                                </button>
+                                            )}
+                                            <button
+                                                type="button"
+                                                className="btn btn-sm btn-outline-danger"
+                                                onClick={() => handleDelete(notification.id)}
+                                            >
+                                                <i className="isax isax-trash me-1"></i> Xóa
+                                            </button>
+                                            {!notification.isRead && (
+                                                <span
+                                                    className="badge bg-primary"
+                                                    style={{ marginLeft: 'auto' }}
+                                                >
+                                                    Mới
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="mt-4">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                            showPrevNext={true}
+                            maxVisiblePages={5}
+                        />
+                    </div>
+                )}
+            </>
+        );
+    };
+
     return (
         <>
             <div className="dashboard-header">
@@ -402,197 +567,7 @@ const Notifications = () => {
             <div className="tab-content appointment-tab-content">
                 <div className="tab-pane fade show active">
                     {/* Notifications List */}
-                    {isLoading ? (
-                        <div className="notification-list-page">
-                            {Array.from({ length: itemsPerPage }, (_, index) => (
-                                <NotificationSkeleton key={`skeleton-${Date.now()}-${index}`} />
-                            ))}
-                        </div>
-                    ) : paginatedNotifications.length === 0 ? (
-                        <div className="text-center py-5">
-                            <i className="isax isax-notification-bing fs-1 text-muted"></i>
-                            <p className="text-muted mt-3">Chưa có thông báo nào</p>
-                        </div>
-                    ) : (
-                        <>
-                            <div className="notification-list-page">
-                                {paginatedNotifications.map((notification) => {
-                                    const localizedNotification = getLocalizedNotification(
-                                        notification,
-                                        currentLanguage
-                                    );
-
-                                    // Extract complex logic to improve readability
-                                    const backgroundColor = notification.isRead
-                                        ? 'transparent'
-                                        : '#f8f9fa';
-                                    const cursorStyle =
-                                        notification.actionUrl || notification.isRead
-                                            ? 'pointer'
-                                            : 'default';
-
-                                    return (
-                                        <div
-                                            key={notification.id}
-                                            className={clsx('notification-item', {
-                                                unread: !notification.isRead,
-                                            })}
-                                            style={{
-                                                padding: '16px',
-                                                borderBottom: '1px solid #e0e0e0',
-                                                backgroundColor,
-                                                cursor: cursorStyle,
-                                                transition: 'background-color 0.2s ease',
-                                            }}
-                                            role={notification.actionUrl ? 'button' : undefined}
-                                            tabIndex={notification.actionUrl ? 0 : undefined}
-                                            onClick={() => {
-                                                if (notification.actionUrl) {
-                                                    handleNotificationClick(notification);
-                                                }
-                                            }}
-                                            onKeyDown={(e) => {
-                                                if (
-                                                    notification.actionUrl &&
-                                                    (e.key === 'Enter' || e.key === ' ')
-                                                ) {
-                                                    e.preventDefault();
-                                                    handleNotificationClick(notification);
-                                                }
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (notification.isRead || notification.actionUrl) {
-                                                    e.currentTarget.style.backgroundColor =
-                                                        '#f8f9fa';
-                                                }
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                if (notification.isRead) {
-                                                    e.currentTarget.style.backgroundColor =
-                                                        'transparent';
-                                                } else if (
-                                                    notification.actionUrl &&
-                                                    !notification.isRead
-                                                ) {
-                                                    e.currentTarget.style.backgroundColor =
-                                                        '#f8f9fa';
-                                                }
-                                            }}
-                                        >
-                                            <div className="d-flex gap-3">
-                                                <div
-                                                    className="notification-icon"
-                                                    style={{
-                                                        width: '48px',
-                                                        height: '48px',
-                                                        borderRadius: '50%',
-                                                        backgroundColor: '#e3f2fd',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        flexShrink: 0,
-                                                    }}
-                                                >
-                                                    <i
-                                                        className={
-                                                            notification.icon ||
-                                                            'isax isax-notification'
-                                                        }
-                                                        style={{
-                                                            fontSize: '24px',
-                                                            color: '#1976d2',
-                                                        }}
-                                                    ></i>
-                                                </div>
-                                                <div
-                                                    className="flex-grow-1"
-                                                    style={{ minWidth: 0 }}
-                                                >
-                                                    <div className="d-flex justify-content-between align-items-start mb-2">
-                                                        <h6
-                                                            className="mb-0"
-                                                            style={{ fontWeight: 600 }}
-                                                        >
-                                                            {localizedNotification.title}
-                                                        </h6>
-                                                        <span
-                                                            className="text-muted"
-                                                            style={{
-                                                                fontSize: '12px',
-                                                                whiteSpace: 'nowrap',
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                gap: '4px',
-                                                            }}
-                                                        >
-                                                            <i
-                                                                className="isax isax-clock"
-                                                                style={{ fontSize: '14px' }}
-                                                            ></i>
-                                                            {formatTime(notification.createdAt)}
-                                                        </span>
-                                                    </div>
-                                                    <p
-                                                        className="text-muted mb-2"
-                                                        style={{ fontSize: '14px' }}
-                                                    >
-                                                        {localizedNotification.content}
-                                                    </p>
-                                                    <div className="d-flex gap-2 align-items-center">
-                                                        {!notification.isRead && (
-                                                            <button
-                                                                type="button"
-                                                                className="btn btn-sm btn-outline-primary"
-                                                                onClick={() =>
-                                                                    handleMarkAsRead(
-                                                                        notification.id
-                                                                    )
-                                                                }
-                                                            >
-                                                                <i className="isax isax-tick-circle me-1"></i>{' '}
-                                                                Đánh dấu đã đọc
-                                                            </button>
-                                                        )}
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-sm btn-outline-danger"
-                                                            onClick={() =>
-                                                                handleDelete(notification.id)
-                                                            }
-                                                        >
-                                                            <i className="isax isax-trash me-1"></i>{' '}
-                                                            Xóa
-                                                        </button>
-                                                        {!notification.isRead && (
-                                                            <span
-                                                                className="badge bg-primary"
-                                                                style={{ marginLeft: 'auto' }}
-                                                            >
-                                                                Mới
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            {/* Pagination */}
-                            {totalPages > 1 && (
-                                <div className="mt-4">
-                                    <Pagination
-                                        currentPage={currentPage}
-                                        totalPages={totalPages}
-                                        onPageChange={handlePageChange}
-                                        showPrevNext={true}
-                                        maxVisiblePages={5}
-                                    />
-                                </div>
-                            )}
-                        </>
-                    )}
+                    {renderNotificationContent()}
                 </div>
             </div>
         </>
