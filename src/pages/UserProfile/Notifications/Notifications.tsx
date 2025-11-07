@@ -303,7 +303,17 @@ const Notifications = () => {
                                     transition: 'background-color 0.2s ease',
                                 }}
                                 {...(notification.actionUrl && {
-                                    onClick: () => handleNotificationClick(notification),
+                                    role: 'button',
+                                    tabIndex: 0,
+                                    onClick: () => {
+                                        void handleNotificationClick(notification);
+                                    },
+                                    onKeyDown: (e: React.KeyboardEvent) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            void handleNotificationClick(notification);
+                                        }
+                                    },
                                 })}
                                 onMouseEnter={(e) => {
                                     if (notification.isRead || notification.actionUrl) {
