@@ -187,7 +187,7 @@ const Notifications = () => {
 
     const handleDeleteAll = async () => {
         if (
-            !window.confirm(
+            !globalThis.confirm(
                 'Bạn có chắc chắn muốn xóa tất cả thông báo? Hành động này không thể hoàn tác.'
             )
         ) {
@@ -350,8 +350,7 @@ const Notifications = () => {
                             border: '1px solid #e0e0e0',
                         }}
                     >
-                        <i className="isax isax-setting-2"></i>
-                        Tùy chọn
+                        <i className="isax isax-setting-2"></i> Tùy chọn
                     </button>
 
                     {isSettingsOpen && (
@@ -378,8 +377,7 @@ const Notifications = () => {
                                     padding: '8px 16px',
                                 }}
                             >
-                                <i className="isax isax-tick-circle"></i>
-                                Đánh dấu tất cả đã đọc
+                                <i className="isax isax-tick-circle"></i> Đánh dấu tất cả đã đọc
                             </button>
                             <div className="dropdown-divider"></div>
                             <button
@@ -393,8 +391,7 @@ const Notifications = () => {
                                     padding: '8px 16px',
                                 }}
                             >
-                                <i className="isax isax-trash"></i>
-                                Xóa tất cả
+                                <i className="isax isax-trash"></i> Xóa tất cả
                             </button>
                         </div>
                     )}
@@ -407,8 +404,8 @@ const Notifications = () => {
                     {/* Notifications List */}
                     {isLoading ? (
                         <div className="notification-list-page">
-                            {Array.from({ length: itemsPerPage }).map((_, index) => (
-                                <NotificationSkeleton key={`notification-skeleton-${index}`} />
+                            {Array.from({ length: itemsPerPage }, (_, index) => (
+                                <NotificationSkeleton key={`skeleton-${Date.now()}-${index}`} />
                             ))}
                         </div>
                     ) : paginatedNotifications.length === 0 ? (
@@ -424,6 +421,16 @@ const Notifications = () => {
                                         notification,
                                         currentLanguage
                                     );
+
+                                    // Extract complex logic to improve readability
+                                    const backgroundColor = notification.isRead
+                                        ? 'transparent'
+                                        : '#f8f9fa';
+                                    const cursorStyle =
+                                        notification.actionUrl || notification.isRead
+                                            ? 'pointer'
+                                            : 'default';
+
                                     return (
                                         <div
                                             key={notification.id}
@@ -433,18 +440,23 @@ const Notifications = () => {
                                             style={{
                                                 padding: '16px',
                                                 borderBottom: '1px solid #e0e0e0',
-                                                backgroundColor: !notification.isRead
-                                                    ? '#f8f9fa'
-                                                    : 'transparent',
-                                                cursor: notification.actionUrl
-                                                    ? 'pointer'
-                                                    : notification.isRead
-                                                      ? 'pointer'
-                                                      : 'default',
+                                                backgroundColor,
+                                                cursor: cursorStyle,
                                                 transition: 'background-color 0.2s ease',
                                             }}
+                                            role={notification.actionUrl ? 'button' : undefined}
+                                            tabIndex={notification.actionUrl ? 0 : undefined}
                                             onClick={() => {
                                                 if (notification.actionUrl) {
+                                                    handleNotificationClick(notification);
+                                                }
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (
+                                                    notification.actionUrl &&
+                                                    (e.key === 'Enter' || e.key === ' ')
+                                                ) {
+                                                    e.preventDefault();
                                                     handleNotificationClick(notification);
                                                 }
                                             }}
@@ -537,7 +549,7 @@ const Notifications = () => {
                                                                     )
                                                                 }
                                                             >
-                                                                <i className="isax isax-tick-circle me-1"></i>
+                                                                <i className="isax isax-tick-circle me-1"></i>{' '}
                                                                 Đánh dấu đã đọc
                                                             </button>
                                                         )}
@@ -548,7 +560,7 @@ const Notifications = () => {
                                                                 handleDelete(notification.id)
                                                             }
                                                         >
-                                                            <i className="isax isax-trash me-1"></i>
+                                                            <i className="isax isax-trash me-1"></i>{' '}
                                                             Xóa
                                                         </button>
                                                         {!notification.isRead && (

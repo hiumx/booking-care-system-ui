@@ -172,7 +172,10 @@ export class NotificationService {
                 params.append('isRead', String(isRead));
             }
 
-            const url = `${NOTIFICATION_ENDPOINTS.COUNTS_BY_TYPE}${params.toString() ? `?${params.toString()}` : ''}`;
+            const queryString = params.toString();
+            const url = queryString
+                ? `${NOTIFICATION_ENDPOINTS.COUNTS_BY_TYPE}?${queryString}`
+                : NOTIFICATION_ENDPOINTS.COUNTS_BY_TYPE;
             const response: any = await axiosInstance.get(url);
 
             return {

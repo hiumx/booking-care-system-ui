@@ -227,12 +227,12 @@ const notificationSlice = createSlice({
         // Mark all as read
         builder
             .addCase(markAllNotificationsAsRead.fulfilled, (state) => {
-                state.notifications.forEach((n) => {
-                    if (!n.isRead) {
-                        n.isRead = true;
-                        n.readAt = new Date().toISOString();
+                for (const notification of state.notifications) {
+                    if (!notification.isRead) {
+                        notification.isRead = true;
+                        notification.readAt = new Date().toISOString();
                     }
-                });
+                }
                 state.unreadCount = 0;
             })
             .addCase(markAllNotificationsAsRead.rejected, (state, action) => {

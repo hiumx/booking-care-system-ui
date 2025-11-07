@@ -12,8 +12,8 @@ class SignalRService {
     private connection: signalR.HubConnection | null = null;
     private dispatch: AppDispatch | null = null;
     private reconnectAttempts = 0;
-    private maxReconnectAttempts = 5;
-    private reconnectDelay = 5000;
+    private readonly maxReconnectAttempts = 5;
+    private readonly reconnectDelay = 5000;
 
     /**
      * Initialize SignalR connection
