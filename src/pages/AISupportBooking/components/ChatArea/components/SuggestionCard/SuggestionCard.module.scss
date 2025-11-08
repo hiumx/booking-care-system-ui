@@ -1,0 +1,191 @@
+.suggestionCard {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        border-color: #0e82fd;
+    }
+
+    .cardHeader {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+
+        .doctorIcon,
+        .hospitalIcon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .doctorIcon {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            color: #f57c00;
+        }
+
+        .hospitalIcon {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #0e82fd;
+        }
+
+        .cardInfo {
+            flex: 1;
+            min-width: 0;
+
+            .cardTitle {
+                font-size: 16px;
+                font-weight: 600;
+                color: #212121;
+                margin: 0 0 4px 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .cardSubtitle {
+                font-size: 13px;
+                color: #757575;
+                margin: 0;
+            }
+        }
+    }
+
+    .cardBody {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .cardDetail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #616161;
+
+            svg {
+                flex-shrink: 0;
+                color: #757575;
+            }
+
+            .starIcon {
+                color: #ffb300;
+            }
+
+            .label {
+                font-weight: 500;
+                color: #757575;
+            }
+
+            .value {
+                color: #212121;
+                font-weight: 500;
+            }
+
+            .priceValue {
+                color: #0e82fd;
+                font-weight: 600;
+                font-size: 14px;
+            }
+        }
+
+        .cardDetails {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .specialties {
+            .specialtiesLabel {
+                font-size: 12px;
+                font-weight: 600;
+                color: #757575;
+                margin: 0 0 8px 0;
+            }
+
+            .specialtyTags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+
+                .specialtyTag {
+                    padding: 4px 10px;
+                    background: #e3f2fd;
+                    color: #0e82fd;
+                    border-radius: 12px;
+                    font-size: 12px;
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+
+    .cardFooter {
+        margin-top: auto;
+        padding-top: 16px;
+
+        .bookButton {
+            width: 100%;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(14, 130, 253, 0.3);
+            }
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .suggestionCard {
+        padding: 12px;
+
+        .cardHeader {
+            .doctorIcon,
+            .hospitalIcon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .cardInfo {
+                .cardTitle {
+                    font-size: 14px;
+                }
+
+                .cardSubtitle {
+                    font-size: 12px;
+                }
+            }
+        }
+
+        .cardBody {
+            .cardDetail {
+                font-size: 12px;
+            }
+        }
+    }
+}

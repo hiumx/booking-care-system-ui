@@ -36,6 +36,7 @@ import SmartBooking from '@/pages/SmartBooking';
 import ServiceList from '@/pages/MedicalService/MedicalService/MedicalServicePage';
 import ServiceHospitals from '@/pages/MedicalService/ServiceHospital/ServiceHospitalPage';
 import ServiceDetail from '@/pages/MedicalService/ServiceDetail/ServiceDetailPage';
+import AISupportBooking from '@/pages/AISupportBooking';
 
 const routes: RouteObject[] = [
     {
@@ -81,6 +82,10 @@ const routes: RouteObject[] = [
     {
         path: PATHS.SMART_BOOKING,
         element: <SmartBooking />,
+    },
+    {
+        path: PATHS.AI_SUPPORT_BOOKING,
+        element: <AISupportBooking />,
     },
 
     // Authentication paths
