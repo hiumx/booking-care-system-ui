@@ -6,6 +6,7 @@ import MessageBubble from './components/MessageBubble';
 import SuggestionCard from './components/SuggestionCard';
 import TypingIndicator from './components/TypingIndicator';
 import SearchBox from '../SearchBox';
+import Carousel from '@/components/Carousel';
 import styles from './ChatArea.module.scss';
 
 interface ChatAreaProps {
@@ -21,6 +22,25 @@ interface ChatAreaProps {
         displayName: string;
     }) => void;
 }
+
+// Breakpoints cho SuggestionCard Carousel
+const CAROUSEL_SUGGESTIONS_BREAKPOINTS = {
+    1280: {
+        slidesPerView: 3, // máy tính để bàn
+    },
+    1024: {
+        slidesPerView: 2, // laptop
+    },
+    768: {
+        slidesPerView: 2, // máy tính bảng
+    },
+    480: {
+        slidesPerView: 1, // điện thoại
+    },
+    0: {
+        slidesPerView: 1, // điện thoại nhỏ
+    },
+};
 
 const ChatArea: React.FC<ChatAreaProps> = ({
     messages,
@@ -56,6 +76,17 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         // TODO: Implement navigation to booking page
     };
 
+    const handleSupportBooking = (suggestionId: string, type: 'doctor' | 'hospital') => {
+        // Open support chat or show support options
+        console.log('Hỗ trợ đặt lịch cho:', type, suggestionId);
+        // TODO: Implement support booking flow
+        const supportMessage =
+            type === 'doctor'
+                ? `Tôi cần hỗ trợ đặt lịch khám với bác sĩ này`
+                : `Tôi cần hỗ trợ đặt lịch khám tại bệnh viện này`;
+        setInputValue(supportMessage);
+    };
+
     const handleConsultMore = () => {
         // Continue conversation
         setInputValue('Tư vấn thêm về vấn đề này');
@@ -78,7 +109,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                         <Stethoscope size={24} />
                     </div>
                     <div className={styles.headerInfo}>
-                        <h3 className={styles.headerTitle}>AI Tư vấn Y tế</h3>
+                        <h3 className={styles.headerTitle}>AI tư vấn y tế</h3>
                         <p className={styles.headerSubtitle}>Hỗ trợ đặt lịch khám bệnh 24/7</p>
                     </div>
                 </div>
@@ -90,7 +121,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                         <div className={styles.emptyIcon}>
                             <MessageCircle size={64} />
                         </div>
-                        <h3 className={styles.emptyTitle}>Chào mừng bạn đến với AI Tư vấn Y tế</h3>
+                        <h3 className={styles.emptyTitle}>Chào mừng bạn đến với AI tư vấn y tế</h3>
                         <p className={styles.emptyDescription}>
                             Hãy mô tả triệu chứng hoặc nhu cầu của bạn để chúng tôi có thể tư vấn và
                             gợi ý bác sĩ phù hợp nhất.
@@ -144,24 +175,59 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                                 Bệnh viện
                                             </button>
                                         </div>
-                                        <div className={styles.suggestionsGrid}>
-                                            {message.suggestions
-                                                .filter(
-                                                    (suggestion) => suggestion.type === activeTab
-                                                )
-                                                .map((suggestion, index) => (
-                                                    <SuggestionCard
-                                                        key={index}
-                                                        suggestion={suggestion}
-                                                        onBookAppointment={() =>
-                                                            handleBookAppointment(
-                                                                suggestion.type === 'doctor'
-                                                                    ? suggestion.doctor?.id || ''
-                                                                    : suggestion.hospital?.id || ''
-                                                            )
+                                        <div className={styles.suggestionsCarousel}>
+                                            {(() => {
+                                                const filteredSuggestions =
+                                                    message.suggestions.filter(
+                                                        (suggestion) =>
+                                                            suggestion.type === activeTab
+                                                    );
+
+                                                const carouselItems = filteredSuggestions.map(
+                                                    (suggestion, index) => ({
+                                                        id:
+                                                            suggestion.type === 'doctor'
+                                                                ? suggestion.doctor?.id || index
+                                                                : suggestion.hospital?.id || index,
+                                                        node: (
+                                                            <SuggestionCard
+                                                                key={index}
+                                                                suggestion={suggestion}
+                                                                onBookAppointment={() =>
+                                                                    handleBookAppointment(
+                                                                        suggestion.type === 'doctor'
+                                                                            ? suggestion.doctor
+                                                                                  ?.id || ''
+                                                                            : suggestion.hospital
+                                                                                  ?.id || ''
+                                                                    )
+                                                                }
+                                                                onSupportBooking={() =>
+                                                                    handleSupportBooking(
+                                                                        suggestion.type === 'doctor'
+                                                                            ? suggestion.doctor
+                                                                                  ?.id || ''
+                                                                            : suggestion.hospital
+                                                                                  ?.id || '',
+                                                                        suggestion.type
+                                                                    )
+                                                                }
+                                                            />
+                                                        ),
+                                                    })
+                                                );
+
+                                                return (
+                                                    <Carousel
+                                                        slides={carouselItems}
+                                                        breakpoints={
+                                                            CAROUSEL_SUGGESTIONS_BREAKPOINTS
                                                         }
+                                                        loop={false}
+                                                        isAutoPlay={false}
                                                     />
-                                                ))}
+                                                );
+                                            })()}
                                         </div>
                                         <div className={styles.actionButtons}>
                                             <button

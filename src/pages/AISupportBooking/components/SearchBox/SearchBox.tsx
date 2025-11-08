@@ -417,6 +417,11 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                         >
                             <MapPin size={16} />
                         </button>
+                        {userLocation && (
+                            <span className={styles.locationBadge} title={userLocation.displayName}>
+                                Vị trí: {userLocation.displayName}
+                            </span>
+                        )}
                         {showLocationModal && (
                             <div ref={locationModalRef} className={styles.attachmentModal}>
                                 {!userLocation && (

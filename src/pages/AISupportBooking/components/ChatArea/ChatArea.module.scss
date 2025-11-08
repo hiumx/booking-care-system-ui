@@ -232,12 +232,37 @@
         }
     }
 
-    .suggestionsGrid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 16px;
+    .suggestionsCarousel {
         margin-bottom: 20px;
-        align-items: stretch;
+        margin-top: 12px; // Thêm margin-top để tránh border bị cắt khi hover (card hover translateY(-4px) + extra space)
+        width: 100%;
+
+        // Đảm bảo carousel items có chiều cao đều nhau
+        :global(.swiper-slide) {
+            height: auto;
+            display: flex;
+        }
+
+        :global(.swiper-slide > div) {
+            width: 100%;
+        }
+
+        // Điều chỉnh spacing cho carousel
+        :global(.swiper) {
+            padding-bottom: 10px; // Giảm padding-bottom để navigation buttons gần hơn
+            padding-top: 8px; // Thêm padding-top để có không gian khi hover (translateY(-4px) + buffer)
+        }
+
+        // Điều chỉnh carousel container để giảm padding-bottom
+        :global(.carouselContainer) {
+            padding-bottom: 2rem; // Giảm từ 3rem xuống 2rem
+        }
+
+        // Điều chỉnh vị trí navigation buttons để gần hơn
+        :global(.carouselNav) {
+            gap: 0.5rem !important; // Giảm gap từ 1rem xuống 0.5rem
+            bottom: 0.25rem !important; // Điều chỉnh vị trí để gần hơn (từ -0.5rem lên 0.25rem)
+        }
     }
 
     .actionButtons {
@@ -303,8 +328,9 @@
         }
 
         .suggestionsContainer {
-            .suggestionsGrid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            .suggestionsCarousel {
+                margin-bottom: 20px;
+                margin-top: 12px; // Giữ margin-top để tránh border bị cắt khi hover
             }
         }
     }
@@ -440,10 +466,9 @@
                 }
             }
 
-            .suggestionsGrid {
-                grid-template-columns: 1fr;
-                gap: 12px;
+            .suggestionsCarousel {
                 margin-bottom: 16px;
+                margin-top: 12px; // Giữ margin-top để tránh border bị cắt khi hover
             }
 
             .actionButtons {

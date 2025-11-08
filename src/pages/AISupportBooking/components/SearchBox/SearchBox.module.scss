@@ -91,6 +91,27 @@
 .attachmentWrapper,
 .locationWrapper {
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.locationBadge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #e3f2fd;
+    color: #0e82fd;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 1px solid #0e82fd;
+    line-height: 1.4;
+    vertical-align: middle;
+    box-sizing: border-box;
 }
 
 .iconButton {
@@ -473,6 +494,12 @@
             font-size: 13px;
         }
     }
+
+    .locationBadge {
+        max-width: 150px;
+        font-size: 11px;
+        padding: 3px 8px;
+    }
 }
 
 @media (max-width: 576px) {
@@ -522,5 +549,11 @@
                 height: 16px;
             }
         }
+    }
+
+    .locationBadge {
+        max-width: 120px;
+        font-size: 10px;
+        padding: 2px 6px;
     }
 }
