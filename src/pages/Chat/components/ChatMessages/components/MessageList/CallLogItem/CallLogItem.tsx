@@ -70,7 +70,7 @@ const CallLogItem: React.FC<CallLogItemProps> = ({ callLog, isOwn, callerName, c
             )}
             <div className="chat-content">
                 <div className="message-content">
-                    <div className="d-flex align-items-start gap-2">
+                    <div className="d-flex align-items-start">
                         <i
                             className={clsx(
                                 getCallTypeIcon(),
@@ -90,14 +90,16 @@ const CallLogItem: React.FC<CallLogItemProps> = ({ callLog, isOwn, callerName, c
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="chat-time">
-                    <div>
-                        <div className="time">
-                            {new Date(callLog.startedAt).toLocaleTimeString('vi-VN', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                            })}
+                    <div className="chat-time">
+                        <div>
+                            <div className="time" style={{ color: 'black' }}>
+                                {callLog.startedAt
+                                    ? new Date(callLog.startedAt).toLocaleTimeString('vi-VN', {
+                                          hour: '2-digit',
+                                          minute: '2-digit',
+                                      })
+                                    : ''}
+                            </div>
                         </div>
                     </div>
                 </div>

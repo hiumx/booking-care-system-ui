@@ -243,6 +243,15 @@ const MessageList = () => {
                 (p) => (p.id || p.accountId || '').toUpperCase() === callerId.toUpperCase()
             );
 
+            // 🔍 Debug: Check ownership calculation
+            const isOwnCall = callerId.toUpperCase() === currentUserId.toUpperCase();
+            console.log('[MessageList] 🔍 Call log ownership check:', {
+                callerId: callerId.toUpperCase(),
+                currentUserId: currentUserId,
+                isOwn: isOwnCall,
+                callLogId: item.id,
+            });
+
             // Return call log item with caller information
             return {
                 id: item.id,
@@ -250,7 +259,7 @@ const MessageList = () => {
                 callLog: item.callLog,
                 createdAt: item.createdAt,
                 // For call logs, determine ownership by comparing callerId with currentUserId
-                isOwn: callerId.toUpperCase() === currentUserId.toUpperCase(),
+                isOwn: isOwnCall,
                 // Add caller info for display
                 callerName: callerInfo?.fullName || 'Unknown',
                 callerAvatar: callerInfo?.avatarUrl || '/default-avatar.png',
