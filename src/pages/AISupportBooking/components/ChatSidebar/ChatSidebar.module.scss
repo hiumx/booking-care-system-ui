@@ -144,6 +144,37 @@
         transition: all 0.3s ease;
         box-shadow: 0 4px 12px rgba(14, 130, 253, 0.3);
 
+        .newChatButtonAvatar {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .chatAvatarFallback {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff;
+                font-size: 10px;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+            }
+        }
+
         &:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(14, 130, 253, 0.4);
@@ -227,11 +258,24 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
 
             img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
+            }
+
+            .chatAvatarFallback {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff;
+                font-size: 18px;
+                font-weight: 600;
+                letter-spacing: 0.5px;
             }
         }
 
@@ -336,6 +380,101 @@
             opacity: 1;
         }
     }
+
+    .userInfo {
+        padding: 16px;
+        background: #ffffff;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+
+        .userAvatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: linear-gradient(90.08deg, #0e82fd 0.09%, #06aed4 70.28%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+
+            &:hover {
+                transform: scale(1.05);
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .avatarFallback {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff;
+                font-size: 18px;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+            }
+        }
+
+        .userDetails {
+            flex: 1;
+            min-width: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+
+            .userName {
+                font-size: 15px;
+                font-weight: 600;
+                color: #212121;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                line-height: 1.2;
+            }
+
+            .userStatus {
+                font-size: 13px;
+                color: #757575;
+            }
+        }
+
+        .upgradeButton {
+            padding: 8px 16px;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #212121;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            white-space: nowrap;
+
+            &:hover {
+                background: #f5f5f5;
+                border-color: #bdbdbd;
+            }
+
+            &:active {
+                transform: scale(0.98);
+            }
+        }
+    }
 }
 
 // Responsive - Tablet
@@ -427,6 +566,36 @@
                     width: 24px;
                     height: 24px;
                 }
+            }
+        }
+
+        .userInfo {
+            padding: 12px;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+
+            .userAvatar {
+                width: 40px;
+                height: 40px;
+
+                .avatarFallback {
+                    font-size: 16px;
+                }
+            }
+
+            .userDetails {
+                .userName {
+                    font-size: 14px;
+                }
+
+                .userStatus {
+                    font-size: 12px;
+                }
+            }
+
+            .upgradeButton {
+                padding: 6px 12px;
+                font-size: 13px;
             }
         }
     }

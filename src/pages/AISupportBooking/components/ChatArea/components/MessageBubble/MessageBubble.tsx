@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
-import { Stethoscope, User, Edit2, Copy, Check } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { Stethoscope, Edit2, Copy, Check } from 'lucide-react';
+import { RootState } from '@/store';
 import { Message } from '../../../../types';
 import styles from './MessageBubble.module.scss';
 
@@ -11,13 +13,28 @@ interface MessageBubbleProps {
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
     const isUser = message.sender === 'user';
+    const { profile } = useSelector((state: RootState) => state.user);
+    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState(message.content);
     const [copied, setCopied] = useState(false);
+    const [avatarError, setAvatarError] = useState(false);
 
     useEffect(() => {
         setEditContent(message.content);
     }, [message.content]);
+
+    // Lấy chữ cái đầu để hiển thị trong avatar mặc định
+    const getInitials = () => {
+        if (!isAuthenticated || !profile?.fullName) {
+            return 'U';
+        }
+        const names = profile.fullName.trim().split(' ');
+        if (names.length >= 2) {
+            return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+        }
+        return names[0][0].toUpperCase();
+    };
 
     const formatTime = (date: Date) => {
         return new Intl.DateTimeFormat('vi-VN', {
@@ -159,7 +176,16 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
         >
             <div className={styles.avatar}>
                 {isUser ? (
-                    <User size={20} className={styles.userIcon} />
+                    isAuthenticated && profile && profile.avatarUrl && !avatarError ? (
+                        <img
+                            src={profile.avatarUrl}
+                            alt={profile.fullName || 'User'}
+                            onError={() => setAvatarError(true)}
+                            className={styles.userAvatarImg}
+                        />
+                    ) : (
+                        <div className={styles.userAvatarFallback}>{getInitials()}</div>
+                    )
                 ) : (
                     <Stethoscope size={20} className={styles.aiIcon} />
                 )}

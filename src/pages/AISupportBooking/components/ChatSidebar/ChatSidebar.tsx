@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
-import { MessageSquare, Plus, User, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { MessageSquare, Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AppDispatch, RootState } from '@/store';
+import { fetchUserProfile } from '@/store/slices/userSlice';
+import { PATHS } from '@/routes/paths';
 import { ChatHistory } from '../../types';
 import styles from './ChatSidebar.module.scss';
 
@@ -14,20 +19,50 @@ interface ChatSidebarProps {
     onToggle?: () => void;
 }
 
-interface ChatAvatarProps {
-    avatar: string;
-    title: string;
-}
-
-const ChatAvatar: React.FC<ChatAvatarProps> = ({ avatar, title }) => {
+// Component để hiển thị avatar người dùng (dùng cho chat items)
+const UserAvatar: React.FC = () => {
+    const { profile } = useSelector((state: RootState) => state.user);
+    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
     const [avatarError, setAvatarError] = useState(false);
-    const hasAvatar = avatar && avatar.trim() !== '';
 
-    if (hasAvatar && !avatarError) {
-        return <img src={avatar} alt={title} onError={() => setAvatarError(true)} />;
-    }
+    // Reset avatar error when profile changes
+    useEffect(() => {
+        setAvatarError(false);
+    }, [profile?.avatarUrl]);
 
-    return <User size={20} />;
+    // Lấy chữ cái đầu để hiển thị trong avatar mặc định
+    const getInitials = () => {
+        if (!isAuthenticated || !profile?.fullName) {
+            return 'U';
+        }
+        const names = profile.fullName.trim().split(' ');
+        if (names.length >= 2) {
+            return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+        }
+        return names[0][0].toUpperCase();
+    };
+
+    return (
+        <>
+            {isAuthenticated && profile && profile.avatarUrl && !avatarError ? (
+                <>
+                    <img
+                        key={profile.avatarUrl}
+                        src={profile.avatarUrl}
+                        alt={profile.fullName || 'User'}
+                        onError={() => {
+                            setAvatarError(true);
+                        }}
+                    />
+                    <div className={styles.chatAvatarFallback} style={{ display: 'none' }}>
+                        {getInitials()}
+                    </div>
+                </>
+            ) : (
+                <div className={styles.chatAvatarFallback}>{getInitials()}</div>
+            )}
+        </>
+    );
 };
 
 const ChatSidebar: React.FC<ChatSidebarProps> = ({
@@ -39,8 +74,50 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
     isOpen = true,
     onToggle,
 }) => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
+    const { profile } = useSelector((state: RootState) => state.user);
+    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+    const [avatarError, setAvatarError] = useState(false);
+
+    // Fetch user profile when authenticated and profile is null
+    useEffect(() => {
+        if (isAuthenticated && profile === null) {
+            dispatch(fetchUserProfile()).catch((error) => {
+                console.error('Failed to fetch user profile:', error);
+            });
+        }
+    }, [isAuthenticated, profile, dispatch]);
+
+    // Reset avatar error when profile changes
+    useEffect(() => {
+        setAvatarError(false);
+    }, [profile?.avatarUrl]);
+
     const formatTime = (timeString: string) => {
         return timeString;
+    };
+
+    // Lấy tên hiển thị
+    const getDisplayName = () => {
+        if (profile?.fullName) {
+            return profile.fullName;
+        }
+        return 'Khách';
+    };
+
+    // Lấy chữ cái đầu để hiển thị trong avatar mặc định
+    const getInitials = () => {
+        // Nếu chưa đăng nhập, hiển thị "U"
+        if (!isAuthenticated || !profile?.fullName) {
+            return 'U';
+        }
+        // Nếu đã đăng nhập, lấy chữ cái đầu từ tên
+        const names = profile.fullName.trim().split(' ');
+        if (names.length >= 2) {
+            return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+        }
+        return names[0][0].toUpperCase();
     };
 
     return (
@@ -86,7 +163,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                     onClick={() => onSelectChat(chat.id)}
                                 >
                                     <div className={styles.chatAvatar}>
-                                        <ChatAvatar avatar={chat.avatar} title={chat.title} />
+                                        <UserAvatar />
                                     </div>
                                     <div className={styles.chatContent}>
                                         <div className={styles.chatTitle}>
@@ -120,6 +197,53 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                         )}
                     </div>
                 </>
+            )}
+
+            {/* User Info Section */}
+            {isOpen && (
+                <div className={styles.userInfo}>
+                    <div
+                        className={styles.userAvatar}
+                        onClick={() =>
+                            navigate(`${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=settings`)
+                        }
+                    >
+                        {isAuthenticated && profile && profile.avatarUrl && !avatarError ? (
+                            <>
+                                <img
+                                    key={profile.avatarUrl}
+                                    src={profile.avatarUrl}
+                                    alt={getDisplayName()}
+                                    onError={() => {
+                                        setAvatarError(true);
+                                    }}
+                                />
+                                <div className={styles.avatarFallback} style={{ display: 'none' }}>
+                                    {getInitials()}
+                                </div>
+                            </>
+                        ) : (
+                            // Hiển thị avatar mặc định với chữ cái (đã login nhưng không có ảnh, hoặc chưa login, hoặc ảnh lỗi)
+                            <div className={styles.avatarFallback}>{getInitials()}</div>
+                        )}
+                    </div>
+                    <div
+                        className={styles.userDetails}
+                        onClick={() =>
+                            navigate(`${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=settings`)
+                        }
+                    >
+                        <div className={styles.userName}>{getDisplayName()}</div>
+                    </div>
+                    {!isAuthenticated && (
+                        <button
+                            className={styles.upgradeButton}
+                            onClick={() => navigate(PATHS.LOGIN)}
+                        >
+                            Login
+                        </button>
+                    )}
+                </div>
             )}
         </div>
     );
