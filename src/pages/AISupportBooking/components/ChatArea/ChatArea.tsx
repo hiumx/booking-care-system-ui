@@ -14,6 +14,12 @@ interface ChatAreaProps {
     onSendMessage: (content: string) => void;
     onEditMessage?: (messageId: string, newContent: string) => void;
     onToggleSidebar?: () => void;
+    userLocation?: { provinceId?: string; districtId?: string; displayName: string } | null;
+    onLocationChange?: (location: {
+        provinceId?: string;
+        districtId?: string;
+        displayName: string;
+    }) => void;
 }
 
 const ChatArea: React.FC<ChatAreaProps> = ({
@@ -22,6 +28,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     onSendMessage,
     onEditMessage,
     onToggleSidebar,
+    userLocation,
+    onLocationChange,
 }) => {
     const [inputValue, setInputValue] = useState('');
     const [activeTab, setActiveTab] = useState<'doctor' | 'hospital'>('doctor');
@@ -192,7 +200,13 @@ const ChatArea: React.FC<ChatAreaProps> = ({
             </div>
 
             <div className={styles.inputContainer}>
-                <SearchBox value={inputValue} onChange={setInputValue} onSend={handleSend} />
+                <SearchBox
+                    value={inputValue}
+                    onChange={setInputValue}
+                    onSend={handleSend}
+                    userLocation={userLocation}
+                    onLocationChange={onLocationChange}
+                />
             </div>
         </div>
     );

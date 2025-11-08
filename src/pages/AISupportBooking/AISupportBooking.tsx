@@ -1,13 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import { Home } from 'lucide-react';
 import ChatSidebar from './components/ChatSidebar';
 import ChatArea from './components/ChatArea';
+import { AppDispatch, RootState } from '@/store';
+import { fetchUserProfile } from '@/store/slices/userSlice';
 import styles from './AISupportBooking.module.scss';
 import { Message, ChatHistory, Doctor, Hospital, Suggestion } from './types';
 import { PATHS } from '@/routes/paths';
 
 const AISupportBooking: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { profile } = useSelector((state: RootState) => state.user);
+    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
     const [messages, setMessages] = useState<Message[]>([]);
     const [chatHistories, setChatHistories] = useState<ChatHistory[]>([
         {
@@ -35,6 +42,59 @@ const AISupportBooking: React.FC = () => {
         }
         return true;
     });
+
+    // Location state
+    const [userLocation, setUserLocation] = useState<{
+        provinceId?: string;
+        districtId?: string;
+        displayName: string;
+    } | null>(null);
+
+    // Fetch user profile when authenticated
+    useEffect(() => {
+        if (isAuthenticated && profile === null) {
+            dispatch(fetchUserProfile()).catch((error) => {
+                console.error('Failed to fetch user profile:', error);
+            });
+        }
+    }, [isAuthenticated, profile, dispatch]);
+
+    // Kiểm tra và load vị trí khi vào page
+    useEffect(() => {
+        const checkLocation = () => {
+            let location: { provinceId?: string; districtId?: string; displayName: string } | null =
+                null;
+
+            // Ưu tiên 1: Nếu đã đăng nhập, kiểm tra address trong profile
+            if (isAuthenticated && profile?.address) {
+                location = {
+                    displayName: profile.address,
+                };
+            } else {
+                // Ưu tiên 2: Kiểm tra localStorage
+                const saved = localStorage.getItem('aiSupportLocation');
+                if (saved) {
+                    try {
+                        location = JSON.parse(saved);
+                    } catch (e) {
+                        console.error('Error parsing location from localStorage:', e);
+                    }
+                }
+            }
+
+            if (location) {
+                setUserLocation(location);
+            }
+        };
+
+        // Chờ profile được fetch nếu đã đăng nhập
+        if (isAuthenticated && profile === null) {
+            // Đợi profile được fetch
+            return;
+        }
+
+        checkLocation();
+    }, [isAuthenticated, profile]);
 
     // Kiểm tra xem message có phải là câu trả lời đồng ý không
     const isAffirmativeResponse = (message: string): boolean => {
@@ -344,6 +404,12 @@ const AISupportBooking: React.FC = () => {
     const handleSendMessage = async (content: string) => {
         if (!content.trim()) return;
 
+        // Kiểm tra vị trí trước khi gửi message
+        if (!userLocation) {
+            // Modal vị trí sẽ tự động hiển thị trong SearchBox
+            return;
+        }
+
         const userMessage: Message = {
             id: Date.now().toString(),
             content: content.trim(),
@@ -395,6 +461,12 @@ const AISupportBooking: React.FC = () => {
     };
 
     const handleNewChat = () => {
+        // Kiểm tra vị trí trước khi tạo chat mới
+        if (!userLocation) {
+            // Modal vị trí sẽ tự động hiển thị trong SearchBox
+            return;
+        }
+
         const newChatId = Date.now().toString();
         const newChat: ChatHistory = {
             id: newChatId,
@@ -410,6 +482,12 @@ const AISupportBooking: React.FC = () => {
     };
 
     const handleSelectChat = (chatId: string) => {
+        // Kiểm tra vị trí trước khi chọn chat
+        if (!userLocation) {
+            // Modal vị trí sẽ tự động hiển thị trong SearchBox
+            return;
+        }
+
         setActiveChatId(chatId);
         // Load messages for this chat (mock)
         setMessages([]);
@@ -468,6 +546,11 @@ const AISupportBooking: React.FC = () => {
                         onSendMessage={handleSendMessage}
                         onEditMessage={handleEditMessage}
                         onToggleSidebar={() => setIsSidebarOpen(true)}
+                        userLocation={userLocation}
+                        onLocationChange={(location) => {
+                            setUserLocation(location);
+                            localStorage.setItem('aiSupportLocation', JSON.stringify(location));
+                        }}
                     />
                 </div>
             </div>
