@@ -1,0 +1,31 @@
+{
+    "menu": {
+        "booking": {
+            "title": "Book Appointment",
+            "doctor": "Book Doctor",
+            "hospital": "Book Hospital"
+        },
+        "medicalServices": {
+            "title": "Medical Services",
+            "specialty": "Book Specialty",
+            "healthPackage": "Book Health Package",
+            "onlineConsultation": "Online Consultation"
+        },
+        "news": {
+            "title": "News",
+            "serviceNews": "Service News",
+            "healthNews": "Health News"
+        },
+        "contact": "Contact Us"
+    },
+    "auth": {
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout"
+    },
+    "user": {
+        "patient": "Patient",
+        "appointments": "Appointments",
+        "profile": "Personal Information"
+    }
+}

@@ -13,6 +13,16 @@ import errorsVi from './locales/vi/errors.json';
 import errorsEn from './locales/en/errors.json';
 import userProfileVi from './locales/vi/userProfile.json';
 import userProfileEn from './locales/en/userProfile.json';
+import homeVi from './locales/vi/home.json';
+import homeEn from './locales/en/home.json';
+import headerVi from './locales/vi/header.json';
+import headerEn from './locales/en/header.json';
+import legalNoticeVi from './locales/vi/legalNotice.json';
+import legalNoticeEn from './locales/en/legalNotice.json';
+import privacyPolicyVi from './locales/vi/privacyPolicy.json';
+import privacyPolicyEn from './locales/en/privacyPolicy.json';
+import refundPolicyVi from './locales/vi/refundPolicy.json';
+import refundPolicyEn from './locales/en/refundPolicy.json';
 
 // Define resources
 const resources = {
@@ -22,6 +32,11 @@ const resources = {
         auth: authVi,
         errors: errorsVi,
         userProfile: userProfileVi,
+        home: homeVi,
+        header: headerVi,
+        legalNotice: legalNoticeVi,
+        privacyPolicy: privacyPolicyVi,
+        refundPolicy: refundPolicyVi,
     },
     en: {
         common: commonEn,
@@ -29,6 +44,11 @@ const resources = {
         auth: authEn,
         errors: errorsEn,
         userProfile: userProfileEn,
+        home: homeEn,
+        header: headerEn,
+        legalNotice: legalNoticeEn,
+        privacyPolicy: privacyPolicyEn,
+        refundPolicy: refundPolicyEn,
     },
 };
 
@@ -43,7 +63,18 @@ configuredI18n.init({
     resources,
     fallbackLng: 'vi', // Default language is Vietnamese
     defaultNS: 'common',
-    ns: ['common', 'booking', 'auth', 'errors', 'userProfile'],
+    ns: [
+        'common',
+        'booking',
+        'auth',
+        'errors',
+        'userProfile',
+        'home',
+        'header',
+        'legalNotice',
+        'privacyPolicy',
+        'refundPolicy',
+    ],
 
     // Language detection configuration
     detection: {

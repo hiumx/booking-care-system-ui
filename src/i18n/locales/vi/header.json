@@ -1,0 +1,31 @@
+{
+    "menu": {
+        "booking": {
+            "title": "Đặt khám",
+            "doctor": "Đặt khám bác sĩ",
+            "hospital": "Đặt khám bệnh viện"
+        },
+        "medicalServices": {
+            "title": "Dịch vụ y tế",
+            "specialty": "Đặt khám chuyên khoa",
+            "healthPackage": "Đặt khám gói sức khỏe",
+            "onlineConsultation": "Tư vấn online"
+        },
+        "news": {
+            "title": "Tin tức",
+            "serviceNews": "Tin dịch vụ",
+            "healthNews": "Tin y tế"
+        },
+        "contact": "Liên hệ hợp tác"
+    },
+    "auth": {
+        "login": "Đăng nhập",
+        "register": "Đăng ký",
+        "logout": "Đăng xuất"
+    },
+    "user": {
+        "patient": "Bệnh nhân",
+        "appointments": "Lịch hẹn",
+        "profile": "Thông tin cá nhân"
+    }
+}
