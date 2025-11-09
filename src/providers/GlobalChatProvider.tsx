@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { RootState, AppDispatch } from '@/store';
 import { useSharedChatHub } from '@/hooks/useSharedChatHub';
 import { useNotificationSounds } from '@/hooks/useNotificationSounds';
@@ -9,6 +8,7 @@ import { ChatHubCallbacks, IncomingCallData } from '@/hooks/useChatHub';
 import { SignalRMessageReceived } from '@/types/communication.types';
 import { incrementUnreadMessageCount, fetchUnreadMessageCount } from '@/store/slices/userSlice';
 import IncomingCallNotification from '@/components/IncomingCallNotification';
+import MessageNotificationCard from '@/components/MessageNotificationCard';
 
 interface GlobalChatContextValue {
     isConnected: boolean;
@@ -19,7 +19,7 @@ interface GlobalChatContextValue {
     acceptIncomingCall: () => void;
     declineIncomingCall: () => void;
     clearIncomingCall: () => void;
-    clearProcessedCall: (callerId: string, conversationId: string) => void; // ✅ Add new function
+    clearProcessedCall: (callerId: string, conversationId: string) => void;
 }
 
 const GlobalChatContext = createContext<GlobalChatContextValue | undefined>(undefined);
@@ -43,6 +43,7 @@ export const GlobalChatProvider: React.FC<GlobalChatProviderProps> = ({ children
 
     const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
     const [incomingCall, setIncomingCall] = useState<IncomingCallData | null>(null);
+    const [messageNotificationOpen, setMessageNotificationOpen] = useState(false);
 
     // ✅ Track processed calls to prevent spam/duplicates
     const processedCallsRef = useRef<Set<string>>(new Set());
@@ -67,16 +68,10 @@ export const GlobalChatProvider: React.FC<GlobalChatProviderProps> = ({ children
                     // Increment unread count in Redux
                     dispatch(incrementUnreadMessageCount());
 
-                    // ✅ Play message notification sound (only if not on chat page)
+                    // ✅ Show message notification card (only if not on chat page)
                     if (!isOnChatPage) {
                         playMessageNotification();
-
-                        toast.info('💬 Bạn có tin nhắn mới!', {
-                            onClick: () => {
-                                // Navigate to chat page
-                                window.location.href = '/chat';
-                            },
-                        });
+                        setMessageNotificationOpen(true);
                     }
                 }
             },
@@ -367,6 +362,13 @@ export const GlobalChatProvider: React.FC<GlobalChatProviderProps> = ({ children
     return (
         <GlobalChatContext.Provider value={value}>
             {children}
+            {/* Global Message Notification */}
+            <MessageNotificationCard
+                isOpen={messageNotificationOpen}
+                onClose={() => setMessageNotificationOpen(false)}
+                onNavigate={() => navigate('/chat')}
+                duration={6000}
+            />
             {/* Global Incoming Call Notification */}
             {incomingCall && (
                 <IncomingCallNotification

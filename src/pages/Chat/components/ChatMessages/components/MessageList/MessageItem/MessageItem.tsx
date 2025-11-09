@@ -239,7 +239,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                         </span>
                     </h6>
 
-                    {message.isOwn && (
+                    {message.isOwn && !isRecalled && (
                         <div className="chat-action-btns ms-3">
                             <div className="chat-action-col">
                                 <a href="#" data-bs-toggle="dropdown">
