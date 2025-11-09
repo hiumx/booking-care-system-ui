@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 interface ServiceItem {
     id: string | number;
@@ -42,7 +43,7 @@ const HorizontalServicesSection: React.FC<HorizontalServicesSectionProps> = ({
                     {duplicatedServices.map((service, index) => (
                         <div key={`${service.id}-${index}`} className="services-slide">
                             <h6>
-                                <a href="javascript:void(0);">{service.title}</a>
+                                <Link to="#">{service.title}</Link>
                             </h6>
                         </div>
                     ))}

@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import { useTranslation } from 'react-i18next';
 import 'swiper/css';
+import { Link } from 'react-router-dom';
 
 interface Testimonial {
     id: string | number;
@@ -204,21 +205,16 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
                                         </h6>
                                         <p>{testimonial.comment}</p>
                                         <div className="d-flex align-items-center">
-                                            <a
-                                                href="javascript:void(0);"
-                                                className="avatar avatar-lg"
-                                            >
+                                            <Link to="#" className="avatar avatar-lg">
                                                 <img
                                                     src={testimonial.authorAvatar}
                                                     className="rounded-circle"
                                                     alt={testimonial.authorName}
                                                 />
-                                            </a>
+                                            </Link>
                                             <div className="ms-2">
                                                 <h6 className="mb-1">
-                                                    <a href="javascript:void(0);">
-                                                        {testimonial.authorName}
-                                                    </a>
+                                                    <Link to="#">{testimonial.authorName}</Link>
                                                 </h6>
                                                 <p className="fs-14 mb-0">
                                                     {testimonial.authorLocation}
