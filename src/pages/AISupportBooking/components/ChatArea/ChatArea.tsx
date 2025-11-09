@@ -88,8 +88,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     };
 
     const handleConsultMore = () => {
-        // Continue conversation
-        setInputValue('Tư vấn thêm về vấn đề này');
+        // Gửi message "tôi muốn được tư vấn thêm"
+        setInputValue('tôi muốn được tư vấn thêm');
     };
 
     return (
@@ -123,8 +123,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                         </div>
                         <h3 className={styles.emptyTitle}>Chào mừng bạn đến với AI tư vấn y tế</h3>
                         <p className={styles.emptyDescription}>
-                            Hãy mô tả triệu chứng hoặc nhu cầu của bạn để chúng tôi có thể tư vấn và
-                            gợi ý bác sĩ phù hợp nhất.
+                            Tôi có thể giúp gì cho bạn? Bạn có thể mô tả triệu chứng, tôi sẽ giúp
+                            bạn tìm kiếm bác sĩ, bệnh viện.
                         </p>
                         <div className={styles.suggestedQuestions}>
                             <p className={styles.suggestedTitle}>Câu hỏi gợi ý:</p>
@@ -158,22 +158,47 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                 {message.suggestions && message.suggestions.length > 0 && (
                                     <div className={styles.suggestionsContainer}>
                                         <div className={styles.tabsContainer}>
-                                            <button
-                                                className={clsx(styles.tab, {
-                                                    [styles.activeTab]: activeTab === 'doctor',
-                                                })}
-                                                onClick={() => setActiveTab('doctor')}
-                                            >
-                                                Bác sĩ
-                                            </button>
-                                            <button
-                                                className={clsx(styles.tab, {
-                                                    [styles.activeTab]: activeTab === 'hospital',
-                                                })}
-                                                onClick={() => setActiveTab('hospital')}
-                                            >
-                                                Bệnh viện
-                                            </button>
+                                            {(() => {
+                                                const doctorCount = message.suggestions.filter(
+                                                    (s) => s.type === 'doctor'
+                                                ).length;
+                                                const hospitalCount = message.suggestions.filter(
+                                                    (s) => s.type === 'hospital'
+                                                ).length;
+
+                                                return (
+                                                    <>
+                                                        <button
+                                                            className={clsx(styles.tab, {
+                                                                [styles.activeTab]:
+                                                                    activeTab === 'doctor',
+                                                            })}
+                                                            onClick={() => setActiveTab('doctor')}
+                                                        >
+                                                            Bác sĩ
+                                                            {doctorCount > 0 && (
+                                                                <span className={styles.tabBadge}>
+                                                                    {doctorCount}
+                                                                </span>
+                                                            )}
+                                                        </button>
+                                                        <button
+                                                            className={clsx(styles.tab, {
+                                                                [styles.activeTab]:
+                                                                    activeTab === 'hospital',
+                                                            })}
+                                                            onClick={() => setActiveTab('hospital')}
+                                                        >
+                                                            Bệnh viện
+                                                            {hospitalCount > 0 && (
+                                                                <span className={styles.tabBadge}>
+                                                                    {hospitalCount}
+                                                                </span>
+                                                            )}
+                                                        </button>
+                                                    </>
+                                                );
+                                            })()}
                                         </div>
                                         <div className={styles.suggestionsCarousel}>
                                             {(() => {

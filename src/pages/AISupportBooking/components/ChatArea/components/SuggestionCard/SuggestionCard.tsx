@@ -1,5 +1,5 @@
-import React from 'react';
-import { MapPin, Star, Award, Building2, Stethoscope, HelpCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, Star, Building2, Stethoscope, HelpCircle } from 'lucide-react';
 import { Suggestion } from '../../../../types';
 import clsx from 'clsx';
 import styles from './SuggestionCard.module.scss';
@@ -15,13 +15,33 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
     onBookAppointment,
     onSupportBooking,
 }) => {
+    const [doctorAvatarError, setDoctorAvatarError] = useState(false);
+    const [hospitalImageError, setHospitalImageError] = useState(false);
+
     if (suggestion.type === 'doctor' && suggestion.doctor) {
         const doctor = suggestion.doctor;
+        const getInitials = () => {
+            const names = doctor.name.trim().split(' ');
+            if (names.length >= 2) {
+                return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+            }
+            return names[0]?.[0]?.toUpperCase() || 'D';
+        };
+
         return (
             <div className={styles.suggestionCard}>
                 <div className={styles.cardHeader}>
                     <div className={styles.doctorIcon}>
-                        <Award size={24} />
+                        {doctor.avatarUrl && !doctorAvatarError ? (
+                            <img
+                                src={doctor.avatarUrl}
+                                alt={doctor.name}
+                                onError={() => setDoctorAvatarError(true)}
+                                className={styles.avatarImage}
+                            />
+                        ) : (
+                            <div className={styles.avatarFallback}>{getInitials()}</div>
+                        )}
                     </div>
                     <div className={styles.cardInfo}>
                         <h4 className={styles.cardTitle}>{doctor.name}</h4>
@@ -86,11 +106,28 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
         const displaySpecialties = specialties.slice(0, 3);
         const remainingCount = specialties.length - 3;
 
+        const getInitials = () => {
+            const words = hospital.name.trim().split(' ');
+            if (words.length >= 2) {
+                return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+            }
+            return words[0]?.[0]?.toUpperCase() || 'H';
+        };
+
         return (
             <div className={styles.suggestionCard}>
                 <div className={styles.cardHeader}>
                     <div className={styles.hospitalIcon}>
-                        <Building2 size={24} />
+                        {hospital.imageUrl && !hospitalImageError ? (
+                            <img
+                                src={hospital.imageUrl}
+                                alt={hospital.name}
+                                onError={() => setHospitalImageError(true)}
+                                className={styles.avatarImage}
+                            />
+                        ) : (
+                            <div className={styles.avatarFallback}>{getInitials()}</div>
+                        )}
                     </div>
                     <div className={styles.cardInfo}>
                         <h4 className={styles.cardTitle}>{hospital.name}</h4>

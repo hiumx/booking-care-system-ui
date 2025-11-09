@@ -106,6 +106,32 @@
                 margin: 8px 0;
             }
 
+            .disclaimerSection {
+                margin-top: 8px;
+                margin-bottom: 2px;
+            }
+
+            .disclaimerTitle {
+                font-weight: 600;
+                font-size: 15px;
+                color: #d32f2f;
+                display: block;
+                margin-bottom: 4px;
+            }
+
+            .disclaimerText {
+                font-size: 14px;
+                color: #d32f2f;
+                font-style: italic;
+                line-height: 1.6;
+                padding: 8px 12px;
+                background: #ffebee;
+                border-left: 3px solid #d32f2f;
+                border-radius: 4px;
+                margin-top: 2px;
+                margin-bottom: 8px;
+            }
+
             &.userBubble {
                 background: #ffffff;
                 color: #212121;

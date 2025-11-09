@@ -15,6 +15,7 @@ export interface Doctor {
     yearOfExperience: number;
     serviceTypeName?: string;
     price?: string;
+    avatarUrl?: string;
 }
 
 export interface Hospital {
@@ -23,6 +24,7 @@ export interface Hospital {
     address: string;
     specialtyId: string[];
     specialtyName: string[];
+    imageUrl?: string;
 }
 
 export interface Suggestion {

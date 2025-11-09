@@ -79,15 +79,65 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
     };
 
     const formatTextContent = (text: string) => {
+        // Loại bỏ markdown ** và thay thế bằng <strong>
+        // Xử lý **text** thành <strong>text</strong>
+        const processedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
         // Format text response với bold tên và border-bottom dưới mỗi block thông tin
-        const lines = text.split('\n');
+        const lines = processedText.split('\n');
         const formattedLines: React.ReactNode[] = [];
         let currentBlockStart = -1;
         let isInBlock = false;
+        let isInDisclaimer = false;
+        let disclaimerProcessed = false; // Track if disclaimer has been processed to avoid duplicates
 
         lines.forEach((line, index) => {
             const trimmedLine = line.trim();
             const nextLine = index < lines.length - 1 ? lines[index + 1]?.trim() : '';
+
+            // Kiểm tra nếu là disclaimer section (bắt đầu với "Lưu ý:") - chỉ xử lý 1 lần
+            if (trimmedLine.startsWith('Lưu ý:') && !disclaimerProcessed) {
+                isInDisclaimer = true;
+                formattedLines.push(
+                    <React.Fragment key={index}>
+                        <div className={styles.disclaimerSection}>
+                            <strong className={styles.disclaimerTitle}>{trimmedLine}</strong>
+                        </div>
+                    </React.Fragment>
+                );
+                return;
+            }
+
+            // Kiểm tra nếu là disclaimer text (bắt đầu với *) - chỉ xử lý 1 lần
+            if (
+                isInDisclaimer &&
+                trimmedLine.startsWith('*') &&
+                trimmedLine.endsWith('*') &&
+                !disclaimerProcessed
+            ) {
+                const disclaimerText = trimmedLine.slice(1, -1); // Remove * at start and end
+                formattedLines.push(
+                    <React.Fragment key={index}>
+                        <div
+                            className={styles.disclaimerText}
+                            dangerouslySetInnerHTML={{ __html: disclaimerText }}
+                        />
+                    </React.Fragment>
+                );
+                // Mark disclaimer as processed and reset flag
+                disclaimerProcessed = true;
+                isInDisclaimer = false;
+                return;
+            }
+
+            // Skip duplicate disclaimer lines - only skip if already processed
+            if (
+                disclaimerProcessed &&
+                (trimmedLine.startsWith('Lưu ý:') ||
+                    (trimmedLine.startsWith('*') && trimmedLine.endsWith('*')))
+            ) {
+                return; // Skip duplicate disclaimer only if already processed
+            }
 
             // Kiểm tra nếu là section title (có dấu hai chấm ở cuối và không phải là tên bác sĩ/bệnh viện)
             const isSectionTitle = trimmedLine.match(/^(Bệnh viện chuyên về|Bác sĩ chuyên về).*:$/);
@@ -100,7 +150,10 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
                 // Section title - không thêm border, spacing nhỏ hơn
                 formattedLines.push(
                     <React.Fragment key={index}>
-                        <strong className={styles.sectionTitle}>{trimmedLine}</strong>
+                        <strong
+                            className={styles.sectionTitle}
+                            dangerouslySetInnerHTML={{ __html: trimmedLine }}
+                        />
                         {index < lines.length - 1 && <br />}
                     </React.Fragment>
                 );
@@ -120,14 +173,17 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
                 isInBlock = true;
                 formattedLines.push(
                     <React.Fragment key={index}>
-                        <strong className={styles.boldName}>{trimmedLine}</strong>
+                        <strong
+                            className={styles.boldName}
+                            dangerouslySetInnerHTML={{ __html: trimmedLine }}
+                        />
                     </React.Fragment>
                 );
             } else if (trimmedLine) {
-                // Nếu là dòng có nội dung trong block
+                // Nếu là dòng có nội dung trong block - render HTML nếu có
                 formattedLines.push(
                     <React.Fragment key={index}>
-                        {trimmedLine}
+                        <span dangerouslySetInnerHTML={{ __html: trimmedLine }} />
                         {index < lines.length - 1 && <br />}
                     </React.Fragment>
                 );
@@ -214,15 +270,17 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
                 </div>
                 <div className={styles.footer}>
                     <span className={styles.timestamp}>{formatTime(message.timestamp)}</span>
-                    {isUser && !isEditing && (
+                    {!isEditing && (
                         <div className={styles.actionButtons}>
-                            <button
-                                className={styles.actionButton}
-                                onClick={handleEdit}
-                                data-tooltip="Sửa"
-                            >
-                                <Edit2 size={14} />
-                            </button>
+                            {isUser && (
+                                <button
+                                    className={styles.actionButton}
+                                    onClick={handleEdit}
+                                    data-tooltip="Sửa"
+                                >
+                                    <Edit2 size={14} />
+                                </button>
+                            )}
                             <button
                                 className={styles.actionButton}
                                 onClick={handleCopy}
