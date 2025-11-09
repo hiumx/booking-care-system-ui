@@ -25,6 +25,9 @@ import HospitalProfile from '@/pages/Hospital/HospitalProfile';
 import AboutUs from '@/pages/AboutUs/AboutUs';
 import DoctorList from '@/pages/Doctor/DoctorList';
 import ContactUs from '@/pages/ContactUs';
+import LegalNotice from '@/pages/LegalNotice/LegalNotice';
+import PrivacyPolicy from '@/pages/PrivacyPolicy/PrivacyPolicy';
+import RefundPolicy from '@/pages/RefundPolicy/RefundPolicy';
 import Booking from '@/pages/Booking/Booking';
 import BookingConfirmation from '@/pages/BookingConfirmation';
 import RescheduleAppointment from '@/pages/Booking/RescheduleAppointment';
@@ -77,6 +80,18 @@ const routes: RouteObject[] = [
     {
         path: PATHS.CONTACT_US,
         element: <ContactUs />,
+    },
+    {
+        path: PATHS.LEGAL_NOTICE,
+        element: <LegalNotice />,
+    },
+    {
+        path: PATHS.PRIVACY_POLICY,
+        element: <PrivacyPolicy />,
+    },
+    {
+        path: PATHS.REFUND_POLICY,
+        element: <RefundPolicy />,
     },
     {
         path: PATHS.SMART_BOOKING,
