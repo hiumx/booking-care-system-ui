@@ -18,6 +18,10 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
     // File staging states (modern UX like Slack)
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [fileMessageType, setFileMessageType] = useState<MessageType | null>(null);
+    // ✅ Speech-to-Text states
+    const [isListening, setIsListening] = useState(false);
+    const [transcript, setTranscript] = useState('');
+    const recognitionRef = useRef<any>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -37,6 +41,93 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [showDropdown]);
+
+    // ✅ Initialize Speech Recognition
+    useEffect(() => {
+        const SpeechRecognition =
+            (globalThis as any).SpeechRecognition || (globalThis as any).webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            console.warn('Speech Recognition API not supported');
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false; // Stop after one phrase
+        recognition.interimResults = true; // Show interim results
+        recognition.lang = 'vi-VN'; // Vietnamese language
+
+        recognition.onstart = () => {
+            setIsListening(true);
+            setTranscript('');
+        };
+
+        recognition.onresult = (event: any) => {
+            let finalTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcriptPart = event.results[i][0].transcript;
+
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcriptPart + ' ';
+                }
+            }
+
+            // Update state with final transcript
+            if (finalTranscript) {
+                setTranscript((prev) => prev + finalTranscript);
+            }
+        };
+
+        recognition.onerror = (event: any) => {
+            toast.error(`Lỗi: ${event.error}`);
+            setIsListening(false);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+
+        return () => {
+            if (recognitionRef.current) {
+                recognitionRef.current.abort();
+            }
+        };
+    }, []);
+
+    // ✅ Auto-add transcript to message when it updates (after recognition ends)
+    useEffect(() => {
+        if (transcript.trim() && !isListening) {
+            console.log('[STT] 📝 Transcript ready:', transcript);
+            setMessage((prev) => {
+                const newMessage = prev + transcript;
+                console.log('[STT] ✅ Auto-added to input:', newMessage);
+                return newMessage;
+            });
+            setTranscript('');
+        }
+    }, [transcript, isListening]);
+
+    // ✅ Handle microphone button click
+    const handleMicrophoneClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+
+        if (!recognitionRef.current) {
+            toast.error('Speech Recognition không được hỗ trợ trên trình duyệt này');
+            return;
+        }
+
+        if (isListening) {
+            // Stop listening and add to input automatically
+            recognitionRef.current.stop();
+            setIsListening(false);
+        } else {
+            // Start listening
+            recognitionRef.current.start();
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -430,9 +521,37 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                     )}
                 </div>
                 <div className="smile-foot">
-                    <a href="#" className="action-circle">
-                        <i className="isax isax-microphone-2"></i>
-                    </a>
+                    <button
+                        type="button"
+                        className={clsx('action-circle', { [styles.listening]: isListening })}
+                        onClick={handleMicrophoneClick}
+                        title={isListening ? 'Click để dừng nghe' : 'Click để bắt đầu ghi âm'}
+                        aria-label={isListening ? 'Dừng ghi âm' : 'Bắt đầu ghi âm'}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: 0,
+                        }}
+                    >
+                        <i
+                            className={clsx('isax isax-microphone-2', {
+                                [styles.recordingPulse]: isListening,
+                            })}
+                        ></i>
+                    </button>
+                    {isListening && (
+                        <div
+                            style={{
+                                fontSize: '0.75rem',
+                                color: '#ff6b6b',
+                                marginTop: '0.25rem',
+                                textAlign: 'center',
+                            }}
+                        >
+                            Đang nghe...
+                        </div>
+                    )}
                 </div>
                 <input
                     type="text"
