@@ -58,32 +58,41 @@ const LanguageSwitcher = () => {
     return (
         <div className="language-switcher-dropdown" ref={dropdownRef}>
             <button
+                type="button"
                 className="language-switcher"
                 onClick={toggleDropdown}
-                aria-label={t('language.switchLanguage')}
+                aria-label={t('language.switchLanguage') || 'Switch Language'}
                 aria-expanded={isOpen}
+                aria-haspopup="listbox"
             >
-                <img src={currentLang.flag} alt={currentLang.name} className="flag-icon" />
+                <img src={currentLang.flag} alt="" className="flag-icon" role="presentation" />
                 <span className="language-text">{currentLang.name}</span>
-                <i className={clsx('fas', isOpen ? 'fa-chevron-up' : 'fa-chevron-down')}></i>
+                <i
+                    className={clsx('fas', isOpen ? 'fa-chevron-up' : 'fa-chevron-down')}
+                    aria-hidden="true"
+                ></i>
             </button>
 
             {isOpen && (
-                <div className="language-options">
+                <div className="language-options" role="listbox">
                     {languages.map((lang) => (
                         <button
                             key={lang.code}
+                            type="button"
+                            role="option"
+                            aria-selected={i18n.language === lang.code}
                             className={clsx('language-option', {
                                 active: i18n.language === lang.code,
                             })}
                             onClick={() => handleLanguageChange(lang.code)}
                         >
-                            <img src={lang.flag} alt={lang.name} className="flag-icon" />
+                            <img src={lang.flag} alt="" className="flag-icon" role="presentation" />
                             <span>{lang.name}</span>
                             {i18n.language === lang.code && (
                                 <i
                                     className="fas fa-check ms-auto"
                                     style={{ color: '#0a58ca' }}
+                                    aria-hidden="true"
                                 ></i>
                             )}
                         </button>
