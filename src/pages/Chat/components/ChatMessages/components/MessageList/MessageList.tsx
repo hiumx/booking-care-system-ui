@@ -302,6 +302,8 @@ const MessageList = () => {
             // Case-insensitive comparison for isOwn (senderId might be lowercase, currentUserId uppercase)
             isOwn: msg.senderId?.toLowerCase() === currentUserId?.toLowerCase(),
             isRead: msg.status === 'READ',
+            // ✅ Include status for recalled message detection
+            status: msg.status, // RECALLED, SENT, READ, etc.
             // Pass full attachment info (url, name, size, mimeType) for proper file rendering
             attachments: msg.attachments || [],
         };

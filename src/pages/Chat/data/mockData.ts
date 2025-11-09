@@ -26,6 +26,8 @@ export interface ChatMessage {
     senderAvatar: string;
     content: string;
     timestamp: string;
+    createdAt?: string; // ISO datetime for recall time validation
+    status?: string; // MessageStatus - 'SENT', 'READ', 'RECALLED', etc.
     messageType: 'text' | 'video' | 'file' | 'audio' | 'image' | 'location' | 'voice';
     isOwn: boolean;
     isRead: boolean;

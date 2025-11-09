@@ -1,8 +1,12 @@
 import styles from './MessageItem.module.scss';
 import clsx from 'clsx';
 import { useState } from 'react';
-
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { ChatMessage } from '../../../../../data/mockData';
+import { ChatService } from '@/services/chat.service';
+import { RootState } from '@/store';
+import ConfirmDialog from '@/components/ConfirmDialog/ConfirmDialog';
 
 interface MessageItemProps {
     message: ChatMessage;
@@ -10,6 +14,59 @@ interface MessageItemProps {
 
 const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [isRecalling, setIsRecalling] = useState(false);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
+    // Get current user ID from Redux
+    const userProfile = useSelector((state: RootState) => state.user.profile);
+    const currentUserId = userProfile?.accountId || '';
+
+    // Check if message can be recalled
+    const canRecall = (): boolean => {
+        // Only sender can recall
+        if (!message.isOwn) return false;
+
+        // Can't recall already recalled message
+        if (message.status === 'RECALLED') return false;
+
+        // Check if createdAt exists
+        if (!message.createdAt) return false;
+
+        // Check 1-hour time limit
+        const messageTime = new Date(message.createdAt).getTime();
+        const now = Date.now();
+        const hoursSinceSent = (now - messageTime) / (1000 * 60 * 60);
+
+        return hoursSinceSent < 1;
+    };
+
+    // Check if message is recalled
+    const isRecalled = message.status === 'RECALLED';
+
+    // Handle recall message
+    const handleRecallMessage = async () => {
+        if (!canRecall()) {
+            toast.error('Không thể thu hồi tin nhắn này');
+            return;
+        }
+
+        setShowConfirmDialog(true);
+    };
+
+    const confirmRecall = async () => {
+        try {
+            setIsRecalling(true);
+            await ChatService.recallMessage(message.id, currentUserId);
+
+            toast.success('Đã thu hồi tin nhắn');
+            // Message will be updated via SignalR real-time notification
+        } catch (error: any) {
+            console.error('[MessageItem] ❌ Recall message error:', error);
+            toast.error(error.message || 'Không thể thu hồi tin nhắn');
+        } finally {
+            setIsRecalling(false);
+        }
+    };
 
     // Helper: Get file icon based on mimeType
     const getFileIcon = (mimeType?: string): string => {
@@ -181,95 +238,51 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                             )}
                         </span>
                     </h6>
-                    <div className="chat-action-btns ms-3">
-                        <div className="chat-action-col">
-                            <a href="#" data-bs-toggle="dropdown">
-                                <i className="fa-solid fa-ellipsis"></i>
-                            </a>
-                            <div className="dropdown-menu chat-drop-menu dropdown-menu-end">
-                                <a href="#" className="dropdown-item message-info-left">
-                                    Thông tin tin nhắn
+
+                    {message.isOwn && (
+                        <div className="chat-action-btns ms-3">
+                            <div className="chat-action-col">
+                                <a href="#" data-bs-toggle="dropdown">
+                                    <i className="fa-solid fa-ellipsis"></i>
                                 </a>
-                                <a href="#" className="dropdown-item">
-                                    Trả lời
-                                </a>
-                                <a href="#" className="dropdown-item">
-                                    Phản ứng
-                                </a>
-                                <a href="#" className="dropdown-item">
-                                    Chuyển tiếp
-                                </a>
-                                <a href="#" className="dropdown-item">
-                                    Xóa
-                                </a>
+                                <div className="dropdown-menu chat-drop-menu dropdown-menu-end">
+                                    {canRecall() && (
+                                        <a
+                                            href="#"
+                                            className="dropdown-item message-info-left"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                handleRecallMessage();
+                                            }}
+                                            style={{
+                                                opacity: isRecalling ? 0.5 : 1,
+                                                cursor: isRecalling ? 'not-allowed' : 'pointer',
+                                            }}
+                                        >
+                                            {isRecalling ? (
+                                                <>
+                                                    <span className="spinner-border spinner-border-sm me-2"></span>
+                                                    Đang thu hồi...
+                                                </>
+                                            ) : (
+                                                'Thu hồi tin nhắn'
+                                            )}
+                                        </a>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
                 <div className="message-content">
-                    {renderMessageContent()}
-                    <div className={`emoj-group ${message.isOwn ? 'right-emoji-group' : ''}`}>
-                        <ul>
-                            <li className="emoj-action">
-                                <a href="javascript:void(0);">
-                                    <i className="fa-regular fa-face-smile"></i>
-                                </a>
-                                <div className="emoj-group-list">
-                                    <ul>
-                                        <li>
-                                            <a href="javascript:void(0);">
-                                                <img
-                                                    src="./src/assets/img/icons/emoj-icon-01.svg"
-                                                    alt="Icon"
-                                                />
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);">
-                                                <img
-                                                    src="./src/assets/img/icons/emoj-icon-02.svg"
-                                                    alt="Icon"
-                                                />
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);">
-                                                <img
-                                                    src="./src/assets/img/icons/emoj-icon-03.svg"
-                                                    alt="Icon"
-                                                />
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);">
-                                                <img
-                                                    src="./src/assets/img/icons/emoj-icon-04.svg"
-                                                    alt="Icon"
-                                                />
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);">
-                                                <img
-                                                    src="./src/assets/img/icons/emoj-icon-05.svg"
-                                                    alt="Icon"
-                                                />
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#forward-message"
-                                >
-                                    <i className="fa-solid fa-share"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                    {isRecalled ? (
+                        <div style={{ fontStyle: 'italic', opacity: 0.6, color: '#6c757d' }}>
+                            <i className="fa-solid fa-rotate-left me-1"></i>
+                            {message.content}
+                        </div>
+                    ) : (
+                        renderMessageContent()
+                    )}
                 </div>
             </div>
 
@@ -307,6 +320,19 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                     </div>
                 </div>
             )}
+
+            {/* Confirm Dialog for message recall */}
+            <ConfirmDialog
+                isOpen={showConfirmDialog}
+                onClose={() => setShowConfirmDialog(false)}
+                onConfirm={confirmRecall}
+                title="Thu hồi tin nhắn"
+                message="Bạn có chắc chắn muốn thu hồi tin nhắn này? Hành động này không thể hoàn tác."
+                confirmText="Thu hồi"
+                cancelText="Hủy"
+                type="warning"
+                icon="fa-solid fa-rotate-left"
+            />
         </div>
     );
 };
