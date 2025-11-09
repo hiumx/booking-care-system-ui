@@ -91,26 +91,35 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
             setCounterValues(initialValues);
         };
 
-        const animateCounter = (counter: CounterItem) => {
+        const updateCounterValue = (counterId: string | number, value: number) => {
+            setCounterValues((prev) => ({
+                ...prev,
+                [counterId]: value,
+            }));
+        };
+
+        const createCounterTimer = (counter: CounterItem): NodeJS.Timeout => {
             const duration = 2000; // 2 seconds
             const steps = 60;
             const increment = counter.value / steps;
             let current = 0;
-            const timer = setInterval(() => {
+
+            const handleCounterUpdate = (timer: NodeJS.Timeout) => {
                 current += increment;
-                if (current >= counter.value) {
-                    setCounterValues((prev) => ({
-                        ...prev,
-                        [counter.id]: counter.value,
-                    }));
+                const isComplete = current >= counter.value;
+                const valueToSet = isComplete ? counter.value : Math.floor(current);
+                updateCounterValue(counter.id, valueToSet);
+                if (isComplete) {
                     clearInterval(timer);
-                } else {
-                    setCounterValues((prev) => ({
-                        ...prev,
-                        [counter.id]: Math.floor(current),
-                    }));
                 }
-            }, duration / steps);
+            };
+
+            const timer = setInterval(() => handleCounterUpdate(timer), duration / steps);
+            return timer;
+        };
+
+        const animateCounter = (counter: CounterItem) => {
+            const timer = createCounterTimer(counter);
             timers.push(timer);
         };
 

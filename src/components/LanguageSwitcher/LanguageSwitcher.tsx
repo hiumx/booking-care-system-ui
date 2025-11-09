@@ -80,7 +80,6 @@ const LanguageSwitcher = () => {
                             key={lang.code}
                             type="button"
                             role="menuitem"
-                            aria-selected={i18n.language === lang.code}
                             className={clsx('language-option', {
                                 active: i18n.language === lang.code,
                             })}

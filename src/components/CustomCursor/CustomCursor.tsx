@@ -17,14 +17,14 @@ const CustomCursor: React.FC = () => {
             cursorInner.style.transform = `translate(${clientX}px, ${clientY}px)`;
 
             // Update cursor outer position with slight delay for smooth effect
-            if (!isMoving) {
+            if (isMoving) {
+                cursorOuter.style.transform = `translate(${clientX}px, ${clientY}px)`;
+            } else {
                 isMoving = true;
                 requestAnimationFrame(() => {
                     cursorOuter.style.transform = `translate(${clientX}px, ${clientY}px)`;
                     isMoving = false;
                 });
-            } else {
-                cursorOuter.style.transform = `translate(${clientX}px, ${clientY}px)`;
             }
         };
 
