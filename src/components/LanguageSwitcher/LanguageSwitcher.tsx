@@ -63,7 +63,7 @@ const LanguageSwitcher = () => {
                 onClick={toggleDropdown}
                 aria-label={t('language.switchLanguage') || 'Switch Language'}
                 aria-expanded={isOpen}
-                aria-haspopup="listbox"
+                aria-haspopup="menu"
             >
                 <img src={currentLang.flag} alt="" className="flag-icon" role="presentation" />
                 <span className="language-text">{currentLang.name}</span>
@@ -74,12 +74,12 @@ const LanguageSwitcher = () => {
             </button>
 
             {isOpen && (
-                <div className="language-options" role="listbox">
+                <div className="language-options" role="menu">
                     {languages.map((lang) => (
                         <button
                             key={lang.code}
                             type="button"
-                            role="option"
+                            role="menuitem"
                             aria-selected={i18n.language === lang.code}
                             className={clsx('language-option', {
                                 active: i18n.language === lang.code,

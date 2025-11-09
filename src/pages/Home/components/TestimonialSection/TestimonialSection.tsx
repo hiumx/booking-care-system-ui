@@ -83,43 +83,48 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
 
         const timers: NodeJS.Timeout[] = [];
 
+        const initializeCounters = () => {
+            const initialValues: Record<string | number, number> = {};
+            for (const counter of displayCounters) {
+                initialValues[counter.id] = 0;
+            }
+            setCounterValues(initialValues);
+        };
+
+        const animateCounter = (counter: CounterItem) => {
+            const duration = 2000; // 2 seconds
+            const steps = 60;
+            const increment = counter.value / steps;
+            let current = 0;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= counter.value) {
+                    setCounterValues((prev) => ({
+                        ...prev,
+                        [counter.id]: counter.value,
+                    }));
+                    clearInterval(timer);
+                } else {
+                    setCounterValues((prev) => ({
+                        ...prev,
+                        [counter.id]: Math.floor(current),
+                    }));
+                }
+            }, duration / steps);
+            timers.push(timer);
+        };
+
         const observer = new IntersectionObserver(
             (entries) => {
-                entries.forEach((entry) => {
+                for (const entry of entries) {
                     if (entry.isIntersecting && !countersAnimated) {
                         setCountersAnimated(true);
-                        // Initialize counter values
-                        const initialValues: Record<string | number, number> = {};
-                        displayCounters.forEach((counter) => {
-                            initialValues[counter.id] = 0;
-                        });
-                        setCounterValues(initialValues);
-
-                        // Animate counters
-                        displayCounters.forEach((counter) => {
-                            const duration = 2000; // 2 seconds
-                            const steps = 60;
-                            const increment = counter.value / steps;
-                            let current = 0;
-                            const timer = setInterval(() => {
-                                current += increment;
-                                if (current >= counter.value) {
-                                    setCounterValues((prev) => ({
-                                        ...prev,
-                                        [counter.id]: counter.value,
-                                    }));
-                                    clearInterval(timer);
-                                } else {
-                                    setCounterValues((prev) => ({
-                                        ...prev,
-                                        [counter.id]: Math.floor(current),
-                                    }));
-                                }
-                            }, duration / steps);
-                            timers.push(timer);
-                        });
+                        initializeCounters();
+                        for (const counter of displayCounters) {
+                            animateCounter(counter);
+                        }
                     }
-                });
+                }
             },
             { threshold: 0.5 }
         );
@@ -133,7 +138,9 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
                 observer.unobserve(counterRef.current);
             }
             // Cleanup timers
-            timers.forEach((timer) => clearInterval(timer));
+            for (const timer of timers) {
+                clearInterval(timer);
+            }
         };
     }, [countersAnimated, displayCounters]);
 

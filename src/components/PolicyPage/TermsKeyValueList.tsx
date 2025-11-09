@@ -28,8 +28,8 @@ const TermsKeyValueList: React.FC<TermsKeyValueListProps> = ({
             {subtitle && <h5 className="mb-2">{subtitle}</h5>}
             {description && <p>{description}</p>}
             <ul>
-                {items.map((item, index) => (
-                    <li key={index}>
+                {items.map((item) => (
+                    <li key={`${item.key}-${item.value}`}>
                         <strong>{item.key}:</strong> {item.value}
                     </li>
                 ))}

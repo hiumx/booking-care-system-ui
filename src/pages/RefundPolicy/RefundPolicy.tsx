@@ -1,14 +1,15 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import {
     PolicyPageLayout,
     TermsTextSection,
     TermsListSection,
     TermsKeyValueList,
+    ContactSection,
 } from '@/components/PolicyPage';
+import { usePolicyPageData } from '@/components/PolicyPage/usePolicyPageData';
 
 const RefundPolicy: React.FC = () => {
-    const { t } = useTranslation('refundPolicy');
+    const { t, getContactInfo, getKeyValueItems } = usePolicyPageData('refundPolicy');
 
     const refundProcessItems = t('sections.refundProcess.items', {
         returnObjects: true,
@@ -18,35 +19,29 @@ const RefundPolicy: React.FC = () => {
         returnObjects: true,
     }) as string[];
 
-    const refundMethodsItems = [
+    const refundMethodsItems = getKeyValueItems([
         {
-            key: t('sections.refundMethods.items.creditCard'),
-            value: t('sections.refundMethods.items.creditCardValue'),
+            keyPath: 'sections.refundMethods.items.creditCard',
+            valuePath: 'sections.refundMethods.items.creditCardValue',
         },
         {
-            key: t('sections.refundMethods.items.eWallet'),
-            value: t('sections.refundMethods.items.eWalletValue'),
+            keyPath: 'sections.refundMethods.items.eWallet',
+            valuePath: 'sections.refundMethods.items.eWalletValue',
         },
         {
-            key: t('sections.refundMethods.items.bankTransfer'),
-            value: t('sections.refundMethods.items.bankTransferValue'),
+            keyPath: 'sections.refundMethods.items.bankTransfer',
+            valuePath: 'sections.refundMethods.items.bankTransferValue',
         },
-    ];
+    ]);
 
-    const complaintsInfo = [
-        {
-            label: t('sections.complaints.email'),
-            value: t('sections.complaints.emailValue'),
-        },
-        {
-            label: t('sections.complaints.hotline'),
-            value: t('sections.complaints.hotlineValue'),
-        },
-        {
-            label: t('sections.complaints.supportHours'),
-            value: t('sections.complaints.supportHoursValue'),
-        },
-    ];
+    const complaintsInfo = getContactInfo({
+        email: 'sections.complaints.email',
+        emailValue: 'sections.complaints.emailValue',
+        hotline: 'sections.complaints.hotline',
+        hotlineValue: 'sections.complaints.hotlineValue',
+        address: 'sections.complaints.supportHours',
+        addressValue: 'sections.complaints.supportHoursValue',
+    });
 
     const renderRefundCard = (
         percentage: string,
@@ -136,8 +131,8 @@ const RefundPolicy: React.FC = () => {
             <div className="terms-text terms-list">
                 <h6>{t('sections.refundProcess.title')}</h6>
                 <ol>
-                    {refundProcessItems.map((item, index) => (
-                        <li key={index}>
+                    {refundProcessItems.map((item) => (
+                        <li key={`${item.title}-${item.description}`}>
                             <strong>{item.title}:</strong> {item.description}
                         </li>
                     ))}
@@ -159,18 +154,13 @@ const RefundPolicy: React.FC = () => {
                 ></p>
                 <p>{t('sections.processingFee.description2')}</p>
             </TermsTextSection>
-            <div className="terms-text terms-list">
-                <h6>{t('sections.complaints.title')}</h6>
-                <p>{t('sections.complaints.description')}</p>
-                <ul>
-                    {complaintsInfo.map((contact, index) => (
-                        <li key={index}>
-                            <strong>{contact.label}:</strong> {contact.value}
-                        </li>
-                    ))}
-                </ul>
+            <ContactSection
+                title={t('sections.complaints.title')}
+                description={t('sections.complaints.description')}
+                contacts={complaintsInfo}
+            >
                 <p className="mt-3">{t('sections.complaints.commitment')}</p>
-            </div>
+            </ContactSection>
             <TermsListSection
                 title={t('sections.noRefundCases.title')}
                 description={t('sections.noRefundCases.description')}

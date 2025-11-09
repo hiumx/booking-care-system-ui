@@ -18,8 +18,8 @@ const TermsListSection: React.FC<TermsListSectionProps> = ({
             <h6>{title}</h6>
             {description && <p>{description}</p>}
             <ul>
-                {items.map((item, index) => (
-                    <li key={index}>{item}</li>
+                {items.map((item) => (
+                    <li key={item}>{item}</li>
                 ))}
             </ul>
         </div>

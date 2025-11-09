@@ -29,8 +29,8 @@ const MainFooter: React.FC = () => {
                                             {t('footer.company.title')}
                                         </h6>
                                         <ul>
-                                            {companyLinks.map((link, index) => (
-                                                <li key={index}>
+                                            {companyLinks.map((link) => (
+                                                <li key={`${link.path}-${link.text}`}>
                                                     <Link to={link.path}>{link.text}</Link>
                                                 </li>
                                             ))}
@@ -43,8 +43,8 @@ const MainFooter: React.FC = () => {
                                             {t('footer.treatments.title')}
                                         </h6>
                                         <ul>
-                                            {treatmentLinks.map((link, index) => (
-                                                <li key={index}>
+                                            {treatmentLinks.map((link) => (
+                                                <li key={`${link.path}-${link.text}`}>
                                                     <Link to={link.path}>{link.text}</Link>
                                                 </li>
                                             ))}
@@ -57,8 +57,8 @@ const MainFooter: React.FC = () => {
                                             {t('footer.specialities.title')}
                                         </h6>
                                         <ul>
-                                            {specialityLinks.map((link, index) => (
-                                                <li key={index}>
+                                            {specialityLinks.map((link) => (
+                                                <li key={`${link.path}-${link.text}`}>
                                                     <Link to={link.path}>{link.text}</Link>
                                                 </li>
                                             ))}
@@ -71,8 +71,8 @@ const MainFooter: React.FC = () => {
                                             {t('footer.utilities.title')}
                                         </h6>
                                         <ul>
-                                            {utilityLinks.map((link, index) => (
-                                                <li key={index}>
+                                            {utilityLinks.map((link) => (
+                                                <li key={`${link.path}-${link.text}`}>
                                                     <Link to={link.path}>{link.text}</Link>
                                                 </li>
                                             ))}

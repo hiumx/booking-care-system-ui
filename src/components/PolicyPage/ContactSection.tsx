@@ -23,8 +23,8 @@ const ContactSection: React.FC<ContactSectionProps> = ({
             <h6>{title}</h6>
             <p>{description}</p>
             <ul>
-                {contacts.map((contact, index) => (
-                    <li key={index}>
+                {contacts.map((contact) => (
+                    <li key={`${contact.label}-${contact.value}`}>
                         <strong>{contact.label}:</strong> {contact.value}
                     </li>
                 ))}

@@ -44,10 +44,10 @@ const CustomCursor: React.FC = () => {
             if (link) {
                 // Check if we're still inside a hoverable element
                 const relatedTarget = (e as MouseEvent).relatedTarget as HTMLElement;
-                if (
-                    !relatedTarget ||
-                    !relatedTarget.closest('a, [role="button"], .cursor-pointer, button')
-                ) {
+                const isStillHoverable = relatedTarget?.closest(
+                    'a, [role="button"], .cursor-pointer, button'
+                );
+                if (!isStillHoverable) {
                     cursorInner.classList.remove('cursor-hover');
                     cursorOuter.classList.remove('cursor-hover');
                 }
@@ -59,13 +59,13 @@ const CustomCursor: React.FC = () => {
         cursorOuter.style.visibility = 'visible';
 
         // Add event listeners
-        window.addEventListener('mousemove', handleMouseMove);
+        globalThis.addEventListener('mousemove', handleMouseMove);
         document.body.addEventListener('mouseenter', handleMouseEnter, true);
         document.body.addEventListener('mouseleave', handleMouseLeave, true);
 
         // Cleanup
         return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
+            globalThis.removeEventListener('mousemove', handleMouseMove);
             document.body.removeEventListener('mouseenter', handleMouseEnter, true);
             document.body.removeEventListener('mouseleave', handleMouseLeave, true);
         };

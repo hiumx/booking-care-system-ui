@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import {
     PolicyPageLayout,
     TermsTextSection,
@@ -7,9 +6,10 @@ import {
     ContactSection,
     TermsKeyValueList,
 } from '@/components/PolicyPage';
+import { usePolicyPageData } from '@/components/PolicyPage/usePolicyPageData';
 
 const PrivacyPolicy: React.FC = () => {
-    const { t } = useTranslation('privacyPolicy');
+    const { t, getContactInfo, getKeyValueItems } = usePolicyPageData('privacyPolicy');
 
     const informationUsageItems = t('sections.informationUsage.items', {
         returnObjects: true,
@@ -19,81 +19,75 @@ const PrivacyPolicy: React.FC = () => {
         returnObjects: true,
     }) as string[];
 
-    const informationCollectionItems = [
+    const informationCollectionItems = getKeyValueItems([
         {
-            key: t('sections.informationCollection.items.registration'),
-            value: t('sections.informationCollection.items.registrationValue'),
+            keyPath: 'sections.informationCollection.items.registration',
+            valuePath: 'sections.informationCollection.items.registrationValue',
         },
         {
-            key: t('sections.informationCollection.items.medical'),
-            value: t('sections.informationCollection.items.medicalValue'),
+            keyPath: 'sections.informationCollection.items.medical',
+            valuePath: 'sections.informationCollection.items.medicalValue',
         },
         {
-            key: t('sections.informationCollection.items.payment'),
-            value: t('sections.informationCollection.items.paymentValue'),
+            keyPath: 'sections.informationCollection.items.payment',
+            valuePath: 'sections.informationCollection.items.paymentValue',
         },
         {
-            key: t('sections.informationCollection.items.technical'),
-            value: t('sections.informationCollection.items.technicalValue'),
+            keyPath: 'sections.informationCollection.items.technical',
+            valuePath: 'sections.informationCollection.items.technicalValue',
         },
-    ];
+    ]);
 
-    const informationSharingItems = [
+    const informationSharingItems = getKeyValueItems([
         {
-            key: t('sections.informationSharing.items.healthcare'),
-            value: t('sections.informationSharing.items.healthcareValue'),
+            keyPath: 'sections.informationSharing.items.healthcare',
+            valuePath: 'sections.informationSharing.items.healthcareValue',
         },
         {
-            key: t('sections.informationSharing.items.partners'),
-            value: t('sections.informationSharing.items.partnersValue'),
+            keyPath: 'sections.informationSharing.items.partners',
+            valuePath: 'sections.informationSharing.items.partnersValue',
         },
         {
-            key: t('sections.informationSharing.items.legal'),
-            value: t('sections.informationSharing.items.legalValue'),
+            keyPath: 'sections.informationSharing.items.legal',
+            valuePath: 'sections.informationSharing.items.legalValue',
         },
         {
-            key: t('sections.informationSharing.items.protection'),
-            value: t('sections.informationSharing.items.protectionValue'),
+            keyPath: 'sections.informationSharing.items.protection',
+            valuePath: 'sections.informationSharing.items.protectionValue',
         },
-    ];
+    ]);
 
-    const userRightsItems = [
+    const userRightsItems = getKeyValueItems([
         {
-            key: t('sections.userRights.items.access'),
-            value: t('sections.userRights.items.accessValue'),
+            keyPath: 'sections.userRights.items.access',
+            valuePath: 'sections.userRights.items.accessValue',
         },
         {
-            key: t('sections.userRights.items.edit'),
-            value: t('sections.userRights.items.editValue'),
+            keyPath: 'sections.userRights.items.edit',
+            valuePath: 'sections.userRights.items.editValue',
         },
         {
-            key: t('sections.userRights.items.delete'),
-            value: t('sections.userRights.items.deleteValue'),
+            keyPath: 'sections.userRights.items.delete',
+            valuePath: 'sections.userRights.items.deleteValue',
         },
         {
-            key: t('sections.userRights.items.withdraw'),
-            value: t('sections.userRights.items.withdrawValue'),
+            keyPath: 'sections.userRights.items.withdraw',
+            valuePath: 'sections.userRights.items.withdrawValue',
         },
         {
-            key: t('sections.userRights.items.complaint'),
-            value: t('sections.userRights.items.complaintValue'),
+            keyPath: 'sections.userRights.items.complaint',
+            valuePath: 'sections.userRights.items.complaintValue',
         },
-    ];
+    ]);
 
-    const contactInfo = [
-        {
-            label: t('sections.contact.email'),
-            value: t('sections.contact.emailValue'),
-        },
-        {
-            label: t('sections.contact.hotline'),
-            value: t('sections.contact.hotlineValue'),
-        },
-        {
-            label: t('sections.contact.address'),
-            value: t('sections.contact.addressValue'),
-        },
-    ];
+    const contactInfo = getContactInfo({
+        email: 'sections.contact.email',
+        emailValue: 'sections.contact.emailValue',
+        hotline: 'sections.contact.hotline',
+        hotlineValue: 'sections.contact.hotlineValue',
+        address: 'sections.contact.address',
+        addressValue: 'sections.contact.addressValue',
+    });
 
     return (
         <PolicyPageLayout namespace="privacyPolicy">

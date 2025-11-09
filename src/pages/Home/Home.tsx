@@ -42,7 +42,7 @@ const Home: React.FC = () => {
         // Use setTimeout to ensure DOM is fully rendered
         const timer = setTimeout(() => {
             // Check if AOS is initialized before refreshing
-            if (typeof AOS !== 'undefined') {
+            if (AOS !== undefined) {
                 AOS.refresh();
             }
         }, 300);

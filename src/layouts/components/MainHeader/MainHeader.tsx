@@ -135,7 +135,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                     <Link
                                         to="#"
                                         id="dark-mode-toggle"
-                                        className={`theme-toggle ${!isDark ? 'activate' : ''}`}
+                                        className={`theme-toggle ${isDark ? '' : 'activate'}`}
                                         onClick={(e) => {
                                             e.preventDefault();
                                             setDarkMode(true);

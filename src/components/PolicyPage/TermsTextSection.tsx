@@ -19,8 +19,8 @@ const TermsTextSection: React.FC<TermsTextSectionProps> = ({
         <div className={`terms-text ${className}`}>
             <h6>{title}</h6>
             {description && <p>{description}</p>}
-            {descriptions?.map((desc, index) => (
-                <p key={index}>{desc}</p>
+            {descriptions?.map((desc) => (
+                <p key={desc}>{desc}</p>
             ))}
             {children}
         </div>

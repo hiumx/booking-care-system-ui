@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import {
     PolicyPageLayout,
     TermsTextSection,
@@ -7,9 +6,10 @@ import {
     ContactSection,
     TermsKeyValueList,
 } from '@/components/PolicyPage';
+import { usePolicyPageData } from '@/components/PolicyPage/usePolicyPageData';
 
 const LegalNotice: React.FC = () => {
-    const { t } = useTranslation('legalNotice');
+    const { t, getContactInfo, getKeyValueItems } = usePolicyPageData('legalNotice');
 
     const userResponsibilitiesItems = t('sections.userResponsibilities.items', {
         returnObjects: true,
@@ -19,39 +19,33 @@ const LegalNotice: React.FC = () => {
         returnObjects: true,
     }) as string[];
 
-    const companyInfoItems = [
+    const companyInfoItems = getKeyValueItems([
         {
-            key: t('sections.companyInfo.items.companyName'),
-            value: t('sections.companyInfo.items.companyNameValue'),
+            keyPath: 'sections.companyInfo.items.companyName',
+            valuePath: 'sections.companyInfo.items.companyNameValue',
         },
         {
-            key: t('sections.companyInfo.items.address'),
-            value: t('sections.companyInfo.items.addressValue'),
+            keyPath: 'sections.companyInfo.items.address',
+            valuePath: 'sections.companyInfo.items.addressValue',
         },
         {
-            key: t('sections.companyInfo.items.email'),
-            value: t('sections.companyInfo.items.emailValue'),
+            keyPath: 'sections.companyInfo.items.email',
+            valuePath: 'sections.companyInfo.items.emailValue',
         },
         {
-            key: t('sections.companyInfo.items.hotline'),
-            value: t('sections.companyInfo.items.hotlineValue'),
+            keyPath: 'sections.companyInfo.items.hotline',
+            valuePath: 'sections.companyInfo.items.hotlineValue',
         },
-    ];
+    ]);
 
-    const contactInfo = [
-        {
-            label: t('sections.contact.email'),
-            value: t('sections.contact.emailValue'),
-        },
-        {
-            label: t('sections.contact.hotline'),
-            value: t('sections.contact.hotlineValue'),
-        },
-        {
-            label: t('sections.contact.address'),
-            value: t('sections.contact.addressValue'),
-        },
-    ];
+    const contactInfo = getContactInfo({
+        email: 'sections.contact.email',
+        emailValue: 'sections.contact.emailValue',
+        hotline: 'sections.contact.hotline',
+        hotlineValue: 'sections.contact.hotlineValue',
+        address: 'sections.contact.address',
+        addressValue: 'sections.contact.addressValue',
+    });
 
     return (
         <PolicyPageLayout namespace="legalNotice">
