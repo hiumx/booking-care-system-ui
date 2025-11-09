@@ -51,7 +51,7 @@ const Banner: React.FC = () => {
             <div className="container">
                 <div className="row align-items-center">
                     <div className="col-lg-7">
-                        <div className="banner-content aos">
+                        <div className="banner-content aos" data-aos="fade-up">
                             <motion.div
                                 className="relative inline-block"
                                 style={{
@@ -141,7 +141,7 @@ const Banner: React.FC = () => {
                         </div>
                     </div>
                     <div className="col-lg-5">
-                        <div className="banner-img aos">
+                        <div className="banner-img aos" data-aos="fade-up">
                             <img
                                 src="/src/assets/img/banner/banner-doctor.svg"
                                 className="img-fluid"
