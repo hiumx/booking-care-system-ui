@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
 import { Stethoscope, MessageCircle, Menu } from 'lucide-react';
-import { Message } from '../../types';
+import { Message } from '@/types/ai.types';
 import MessageBubble from './components/MessageBubble';
 import SuggestionCard from './components/SuggestionCard';
 import TypingIndicator from './components/TypingIndicator';

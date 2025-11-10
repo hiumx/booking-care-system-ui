@@ -87,6 +87,10 @@ const routes: RouteObject[] = [
         path: PATHS.AI_SUPPORT_BOOKING,
         element: <AISupportBooking />,
     },
+    {
+        path: PATHS.AI_SUPPORT_BOOKING_CHAT,
+        element: <AISupportBooking />,
+    },
 
     // Authentication paths
     {

@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Home } from 'lucide-react';
 import ChatSidebar from './components/ChatSidebar';
 import ChatArea from './components/ChatArea';
+import ChatSidebarSkeleton from './components/ChatSidebar/ChatSidebarSkeleton';
+import ChatAreaSkeleton from './components/ChatArea/ChatAreaSkeleton';
 import { AppDispatch, RootState } from '@/store';
 import { fetchUserProfile } from '@/store/slices/userSlice';
 import styles from './AISupportBooking.module.scss';
-import { Message, ChatHistory, Suggestion } from './types';
-import { PATHS } from '@/routes/paths';
+import { Message, ChatHistory, Suggestion } from '@/types/ai.types';
+import { PATHS, replacePathParams } from '@/routes/paths';
 import { AIService, SymptomAnalysisRequest } from '@/services/ai.service';
 
 const AISupportBooking: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const { chatId } = useParams<{ chatId?: string }>();
     const { profile } = useSelector((state: RootState) => state.user);
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
@@ -21,6 +24,8 @@ const AISupportBooking: React.FC = () => {
     const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
     const [activeChatId, setActiveChatId] = useState<string | null>(null);
     const [isAITyping, setIsAITyping] = useState(false);
+    const [isLoadingSessions, setIsLoadingSessions] = useState(true);
+    const [isLoadingChat, setIsLoadingChat] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
         // Mặc định mở trên desktop, đóng trên mobile
         if (typeof window !== 'undefined') {
@@ -93,6 +98,7 @@ const AISupportBooking: React.FC = () => {
     // Load conversation sessions when component mounts or user changes
     useEffect(() => {
         const loadSessions = async () => {
+            setIsLoadingSessions(true);
             try {
                 // Backend will get userId from authentication token
                 const response = await AIService.getUserSessions();
@@ -136,6 +142,8 @@ const AISupportBooking: React.FC = () => {
             } catch (error) {
                 console.error('Error loading conversation sessions:', error);
                 // Don't show error to user, just log it
+            } finally {
+                setIsLoadingSessions(false);
             }
         };
 
@@ -144,6 +152,123 @@ const AISupportBooking: React.FC = () => {
             loadSessions();
         }
     }, [isAuthenticated, userLocation]);
+
+    // Sync activeChatId with URL parameter
+    useEffect(() => {
+        const syncChatWithUrl = async () => {
+            if (chatId && chatId !== activeChatId && isAuthenticated && userLocation) {
+                // URL has a chatId, load that chat
+                setActiveChatId(chatId);
+                setIsLoadingChat(true);
+
+                // Load conversation history for this chat
+                try {
+                    const response = await AIService.getSession(chatId);
+                    if (response.success && response.data?.conversationHistory) {
+                        const history = response.data.conversationHistory;
+                        const loadedMessages: Message[] = history.map((msg: any, index: number) => {
+                            let suggestions: Suggestion[] | undefined = undefined;
+                            if (msg.suggestions) {
+                                try {
+                                    const suggestionsData = msg.suggestions;
+                                    const doctors =
+                                        suggestionsData.doctors ||
+                                        (Array.isArray(suggestionsData)
+                                            ? suggestionsData.filter(
+                                                  (s: any) => s.type === 'doctor'
+                                              )
+                                            : []);
+                                    const hospitals =
+                                        suggestionsData.hospitals ||
+                                        (Array.isArray(suggestionsData)
+                                            ? suggestionsData.filter(
+                                                  (s: any) => s.type === 'hospital'
+                                              )
+                                            : []);
+
+                                    suggestions = [
+                                        ...(Array.isArray(doctors) ? doctors : []).map(
+                                            (d: any) => ({
+                                                type: 'doctor' as const,
+                                                doctor: {
+                                                    id: d.id || d.doctor?.id,
+                                                    name: d.name || d.doctor?.name,
+                                                    specialtyName:
+                                                        d.specialtyName || d.doctor?.specialtyName,
+                                                    hospitalName:
+                                                        d.hospitalName || d.doctor?.hospitalName,
+                                                    rating: d.rating || d.doctor?.rating || 0,
+                                                    yearOfExperience:
+                                                        d.yearOfExperience ||
+                                                        d.doctor?.yearOfExperience ||
+                                                        0,
+                                                    serviceTypeName:
+                                                        d.serviceTypeName ||
+                                                        d.doctor?.serviceTypeName ||
+                                                        undefined,
+                                                    price: d.price || d.doctor?.price || undefined,
+                                                    avatarUrl:
+                                                        d.avatarUrl ||
+                                                        d.doctor?.avatarUrl ||
+                                                        undefined,
+                                                },
+                                            })
+                                        ),
+                                        ...(Array.isArray(hospitals) ? hospitals : []).map(
+                                            (h: any) => ({
+                                                type: 'hospital' as const,
+                                                hospital: {
+                                                    id: h.id || h.hospital?.id,
+                                                    name: h.name || h.hospital?.name,
+                                                    address: h.address || h.hospital?.address,
+                                                    specialtyId: [],
+                                                    specialtyName:
+                                                        h.specialtyNames ||
+                                                        h.hospital?.specialtyName ||
+                                                        [],
+                                                    imageUrl:
+                                                        h.imageUrl ||
+                                                        h.hospital?.imageUrl ||
+                                                        undefined,
+                                                },
+                                            })
+                                        ),
+                                    ];
+                                } catch (e) {
+                                    console.error('Error parsing suggestions:', e);
+                                }
+                            }
+
+                            const sender = msg.role?.toLowerCase() === 'ai' ? 'ai' : 'user';
+                            return {
+                                id: `${chatId}-${index}`,
+                                content: msg.content || '',
+                                sender: sender,
+                                timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+                                suggestions: suggestions,
+                            };
+                        });
+                        setMessages(loadedMessages);
+                    } else {
+                        setMessages([]);
+                    }
+                } catch (error) {
+                    console.error('Error loading conversation history:', error);
+                    setMessages([]);
+                } finally {
+                    setIsLoadingChat(false);
+                }
+            } else if (!chatId && activeChatId) {
+                // No chatId in URL but we have an active chat, update URL
+                navigate(
+                    replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, { chatId: activeChatId }),
+                    { replace: true }
+                );
+            }
+        };
+
+        syncChatWithUrl();
+    }, [chatId, isAuthenticated, userLocation]);
 
     // Generate GUID-like string for session ID
     const generateSessionId = (): string => {
@@ -194,6 +319,10 @@ const AISupportBooking: React.FC = () => {
             };
             setChatHistories((prev) => [newChat, ...prev]);
             setActiveChatId(currentChatId);
+            // Navigate to the new chat URL
+            navigate(replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, { chatId: currentChatId }), {
+                replace: true,
+            });
         }
 
         // Call real AI API
@@ -349,6 +478,8 @@ const AISupportBooking: React.FC = () => {
         setChatHistories((prev) => [newChat, ...prev]);
         setActiveChatId(newChatId);
         setMessages([]);
+        // Navigate to the new chat URL
+        navigate(replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, { chatId: newChatId }));
     };
 
     const handleSelectChat = async (chatId: string) => {
@@ -365,6 +496,9 @@ const AISupportBooking: React.FC = () => {
         }
 
         setActiveChatId(chatId);
+        // Update URL to reflect selected chat
+        navigate(replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, { chatId: chatId }));
+        setIsLoadingChat(true);
 
         // Load conversation history for this chat
         try {
@@ -457,6 +591,8 @@ const AISupportBooking: React.FC = () => {
         } catch (error) {
             console.error('Error loading conversation history:', error);
             setMessages([]);
+        } finally {
+            setIsLoadingChat(false);
         }
     };
 
@@ -471,10 +607,17 @@ const AISupportBooking: React.FC = () => {
                 // Nếu chat bị xóa là chat đang active, chuyển sang chat khác hoặc reset
                 if (activeChatId === chatId) {
                     if (remainingChats.length > 0) {
-                        setActiveChatId(remainingChats[0].id);
+                        const newActiveId = remainingChats[0].id;
+                        setActiveChatId(newActiveId);
+                        navigate(
+                            replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, {
+                                chatId: newActiveId,
+                            })
+                        );
                     } else {
                         setActiveChatId(null);
                         setMessages([]);
+                        navigate(PATHS.AI_SUPPORT_BOOKING);
                     }
                 }
                 return remainingChats;
@@ -486,10 +629,17 @@ const AISupportBooking: React.FC = () => {
                 const remainingChats = prev.filter((chat) => chat.id !== chatId);
                 if (activeChatId === chatId) {
                     if (remainingChats.length > 0) {
-                        setActiveChatId(remainingChats[0].id);
+                        const newActiveId = remainingChats[0].id;
+                        setActiveChatId(newActiveId);
+                        navigate(
+                            replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, {
+                                chatId: newActiveId,
+                            })
+                        );
                     } else {
                         setActiveChatId(null);
                         setMessages([]);
+                        navigate(PATHS.AI_SUPPORT_BOOKING);
                     }
                 }
                 return remainingChats;
@@ -516,29 +666,37 @@ const AISupportBooking: React.FC = () => {
             <div className={styles.container}>
                 <div className={styles.chatLayout}>
                     {/* Sidebar - Lịch sử chat */}
-                    <ChatSidebar
-                        chatHistories={chatHistories}
-                        activeChatId={activeChatId}
-                        onNewChat={handleNewChat}
-                        onSelectChat={handleSelectChat}
-                        onDeleteChat={handleDeleteChat}
-                        isOpen={isSidebarOpen}
-                        onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-                    />
+                    {isLoadingSessions ? (
+                        <ChatSidebarSkeleton />
+                    ) : (
+                        <ChatSidebar
+                            chatHistories={chatHistories}
+                            activeChatId={activeChatId}
+                            onNewChat={handleNewChat}
+                            onSelectChat={handleSelectChat}
+                            onDeleteChat={handleDeleteChat}
+                            isOpen={isSidebarOpen}
+                            onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+                        />
+                    )}
 
                     {/* Chat Area - Khu vực chat chính */}
-                    <ChatArea
-                        messages={messages}
-                        isAITyping={isAITyping}
-                        onSendMessage={handleSendMessage}
-                        onEditMessage={handleEditMessage}
-                        onToggleSidebar={() => setIsSidebarOpen(true)}
-                        userLocation={userLocation}
-                        onLocationChange={(location) => {
-                            setUserLocation(location);
-                            localStorage.setItem('aiSupportLocation', JSON.stringify(location));
-                        }}
-                    />
+                    {isLoadingChat ? (
+                        <ChatAreaSkeleton />
+                    ) : (
+                        <ChatArea
+                            messages={messages}
+                            isAITyping={isAITyping}
+                            onSendMessage={handleSendMessage}
+                            onEditMessage={handleEditMessage}
+                            onToggleSidebar={() => setIsSidebarOpen(true)}
+                            userLocation={userLocation}
+                            onLocationChange={(location) => {
+                                setUserLocation(location);
+                                localStorage.setItem('aiSupportLocation', JSON.stringify(location));
+                            }}
+                        />
+                    )}
                 </div>
             </div>
         </div>

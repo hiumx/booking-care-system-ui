@@ -6,7 +6,7 @@ import { MessageSquare, Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-r
 import { AppDispatch, RootState } from '@/store';
 import { fetchUserProfile } from '@/store/slices/userSlice';
 import { PATHS } from '@/routes/paths';
-import { ChatHistory } from '../../types';
+import { ChatHistory } from '@/types/ai.types';
 import styles from './ChatSidebar.module.scss';
 
 interface ChatSidebarProps {

@@ -17,6 +17,7 @@ export const PATHS = {
     CONTACT_US: '/contact-us',
     SMART_BOOKING: '/smart-booking',
     AI_SUPPORT_BOOKING: '/ai-support-booking',
+    AI_SUPPORT_BOOKING_CHAT: '/ai-support-booking/:chatId',
 
     // Authentication paths
     LOGIN: '/login',
