@@ -188,7 +188,7 @@ const SideBar: React.FC<SideBarProps> = ({
     initialPriceRange,
     initialRating,
     initialExperienceRange,
-    initialSearchTerm,
+    initialSearchTerm: _initialSearchTerm,
     onClearAllFilters,
 }) => {
     const dispatch = useAppDispatch();
@@ -197,7 +197,7 @@ const SideBar: React.FC<SideBarProps> = ({
     const { languages } = useAppSelector((state) => state.language);
     const { serviceTypes } = useAppSelector((state) => state.serviceType);
 
-    const [searchTerm, setSearchTerm] = useState(initialSearchTerm || '');
+    const [searchTerm, setSearchTerm] = useState('');
     const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>(() =>
         mockFilterData.reduce(
             (acc, section) => {
@@ -378,11 +378,6 @@ const SideBar: React.FC<SideBarProps> = ({
             return updated;
         });
     }, [initialServiceTypeFilters, initialRating, searchParams]);
-
-    // Sync search term from URL params
-    useEffect(() => {
-        setSearchTerm(initialSearchTerm || '');
-    }, [initialSearchTerm]);
 
     // Sync price range from URL params
     useEffect(() => {
