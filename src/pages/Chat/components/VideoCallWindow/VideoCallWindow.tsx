@@ -483,6 +483,27 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         snapToCorner();
     };
 
+    // Helper: Calculate target corner position
+    const calculateTargetCorner = (
+        centerX: number,
+        centerY: number,
+        midX: number,
+        midY: number,
+        containerWidth: number,
+        containerHeight: number,
+        videoWidth: number,
+        videoHeight: number,
+        padding: number
+    ) => {
+        const isLeft = centerX < midX;
+        const isTop = centerY < midY;
+
+        const targetX = isLeft ? padding : containerWidth - videoWidth - padding;
+        const targetY = isTop ? padding : containerHeight - videoHeight - padding;
+
+        return { targetX, targetY };
+    };
+
     // Snap to nearest corner for better UX
     const snapToCorner = () => {
         if (!containerRef.current) return;
@@ -493,10 +514,11 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         const containerHeight = containerRect.height;
         const localVideoWidth = 200;
         const localVideoHeight = 150;
+        const padding = 16;
 
         // Current position (transform offset from initial top-right position)
         const initialX = containerWidth - 216; // 200px + 16px padding
-        const initialY = 16;
+        const initialY = padding;
         const currentX = initialX + x;
         const currentY = initialY + y;
 
@@ -505,26 +527,18 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         const midX = containerWidth / 2;
         const midY = containerHeight / 2;
 
-        let targetX, targetY;
-
         // Determine which corner to snap to
-        if (centerX < midX && centerY < midY) {
-            // Top-left
-            targetX = 16;
-            targetY = 16;
-        } else if (centerX >= midX && centerY < midY) {
-            // Top-right
-            targetX = containerWidth - localVideoWidth - 16;
-            targetY = 16;
-        } else if (centerX < midX && centerY >= midY) {
-            // Bottom-left
-            targetX = 16;
-            targetY = containerHeight - localVideoHeight - 16;
-        } else {
-            // Bottom-right
-            targetX = containerWidth - localVideoWidth - 16;
-            targetY = containerHeight - localVideoHeight - 16;
-        }
+        const { targetX, targetY } = calculateTargetCorner(
+            centerX,
+            centerY,
+            midX,
+            midY,
+            containerWidth,
+            containerHeight,
+            localVideoWidth,
+            localVideoHeight,
+            padding
+        );
 
         // Convert to transform offset
         const transformX = targetX - initialX;

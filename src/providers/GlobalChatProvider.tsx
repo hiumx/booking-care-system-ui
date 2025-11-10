@@ -179,9 +179,9 @@ export const GlobalChatProvider: React.FC<GlobalChatProviderProps> = ({ children
 
                     if (isCallerWhoEnded) {
                         console.log(
-                            '[GlobalChat] ⏭️ Caller ended call before receiver answered, removing from processed set:',
-                            callId
+                            '[GlobalChat] Clearing incoming call notification (caller ended call)'
                         );
+                        // ✅ Clear from processed set to allow same user to call again
                         processedCallsRef.current.delete(callId);
                         return null;
                     }
@@ -252,7 +252,8 @@ export const GlobalChatProvider: React.FC<GlobalChatProviderProps> = ({ children
     // Handle accepting incoming call
     const acceptIncomingCall = useCallback(() => {
         if (!incomingCall) return;
-        console.log('[GlobalChat] ✅ Accepting call, navigating to chat...');
+        console.log('[GlobalChat] ✅ Accepting call...');
+        console.trace('[GlobalChat] 🔍 acceptIncomingCall called from:');
 
         // ✅ Stop incoming call sound
         stopIncomingCallSound();
@@ -334,6 +335,7 @@ export const GlobalChatProvider: React.FC<GlobalChatProviderProps> = ({ children
     const clearProcessedCall = useCallback((callerId: string, conversationId: string) => {
         const callId = `${callerId}-${conversationId}`;
         console.log('[GlobalChat] Clearing processed call from set:', callId);
+        // Delete immediately to allow new calls
         processedCallsRef.current.delete(callId);
     }, []);
 

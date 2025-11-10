@@ -79,6 +79,28 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
         return date.toLocaleDateString('vi-VN');
     };
 
+    // Helper: Get attachment preview message
+    const getAttachmentPreview = (type: MessageType, fileName?: string) => {
+        const attachmentMessages: Record<MessageType, { withFile: string; withoutFile: string }> = {
+            [MessageType.IMAGE]: { withFile: `📷 ${fileName}`, withoutFile: '📷 Đã gửi ảnh' },
+            [MessageType.VIDEO]: { withFile: `🎥 ${fileName}`, withoutFile: '🎥 Đã gửi video' },
+            [MessageType.AUDIO]: { withFile: `🎵 ${fileName}`, withoutFile: '🎵 Đã gửi audio' },
+            [MessageType.FILE]: { withFile: `📎 ${fileName}`, withoutFile: '📎 Đã gửi file' },
+            [MessageType.VOICE_NOTE]: {
+                withFile: '🎤 Tin nhắn thoại',
+                withoutFile: '🎤 Tin nhắn thoại',
+            },
+            [MessageType.TEXT]: { withFile: `📎 ${fileName}`, withoutFile: '📎 Đã gửi file' },
+            [MessageType.SYSTEM]: {
+                withFile: '⚙️ Tin nhắn hệ thống',
+                withoutFile: '⚙️ Tin nhắn hệ thống',
+            },
+        };
+
+        const message = attachmentMessages[type] || attachmentMessages[MessageType.FILE];
+        return fileName ? message.withFile : message.withoutFile;
+    };
+
     // Format last message preview
     const formatLastMessagePreview = (conv: ConversationResponse) => {
         if (!conv.lastMessage) return 'Không có tin nhắn';
@@ -94,21 +116,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
         if (attachments && attachments.length > 0) {
             const attachment = attachments[0];
             const fileName = attachment.fileName || attachment.name;
-
-            switch (type) {
-                case MessageType.IMAGE:
-                    return fileName ? `📷 ${fileName}` : '📷 Đã gửi ảnh';
-                case MessageType.VIDEO:
-                    return fileName ? `🎥 ${fileName}` : '🎥 Đã gửi video';
-                case MessageType.AUDIO:
-                    return fileName ? `🎵 ${fileName}` : '🎵 Đã gửi audio';
-                case MessageType.FILE:
-                    return fileName ? `📎 ${fileName}` : '📎 Đã gửi file';
-                case MessageType.VOICE_NOTE:
-                    return '🎤 Tin nhắn thoại';
-                default:
-                    return fileName ? `📎 ${fileName}` : '📎 Đã gửi file';
-            }
+            return getAttachmentPreview(type || MessageType.FILE, fileName);
         }
 
         // Fallback

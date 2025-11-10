@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import ChatHeader from './components/ChatHeader';
 import MessageList from './components/MessageList';
@@ -14,6 +14,7 @@ import styles from './ChatMessages.module.scss';
 
 const ChatMessages = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const [showIncomingCallWindow, setShowIncomingCallWindow] = useState(false);
     const [currentCall, setCurrentCall] = useState<IncomingCallData | null>(null);
 
@@ -26,6 +27,10 @@ const ChatMessages = () => {
     // Handle incoming call from navigation state (when accepting from notification)
     useEffect(() => {
         const navState = location.state as { incomingCall?: IncomingCallData };
+
+        console.log('[ChatMessages] 🔍 useEffect triggered, navState:', navState);
+        console.log('[ChatMessages] 🔍 handlingCallRef.current:', handlingCallRef.current);
+
         if (navState?.incomingCall) {
             const callId = `${navState.incomingCall.callerId}-${navState.incomingCall.conversationId}`;
 
@@ -47,10 +52,8 @@ const ChatMessages = () => {
             setShowIncomingCallWindow(true);
             // Clear global incoming call to prevent duplicate
             clearIncomingCall();
-            // Clear navigation state
-            window.history.replaceState({}, document.title);
         }
-    }, [location, clearIncomingCall]);
+    }, [location.state, clearIncomingCall]);
 
     // ✅ REMOVED: Auto-accept logic
     // Now GlobalChatProvider will always show IncomingCallNotification
@@ -62,6 +65,9 @@ const ChatMessages = () => {
         setCurrentCall(null);
         // ✅ Reset handling ref when call closes
         handlingCallRef.current = null;
+        // ✅ Clear location state to prevent auto-accepting next call
+        console.log('[ChatMessages] Clearing location state');
+        navigate('/chat', { replace: true, state: {} });
     };
 
     return (
