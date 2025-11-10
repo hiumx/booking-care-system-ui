@@ -79,6 +79,77 @@
                 word-wrap: break-word; // Xuống hàng khi cần
                 overflow-wrap: break-word; // Xuống hàng khi cần
                 // Xóa white-space: nowrap và text-overflow: ellipsis để cho phép xuống hàng
+
+                &.clickableTitle {
+                    cursor: pointer;
+                    transition: color 0.2s ease;
+                    color: #0e82fd;
+                    position: relative;
+                    display: inline-block; // Đảm bảo tooltip căn giữa theo text, không phải theo block
+
+                    &:hover {
+                        color: #0c6fd6;
+                        text-decoration: underline;
+                    }
+
+                    &:active {
+                        color: #0a5bb8;
+                    }
+
+                    // Custom tooltip
+                    &[data-tooltip] {
+                        position: relative;
+                        display: inline-block; // Đảm bảo tooltip căn giữa theo text width
+
+                        &::before,
+                        &::after {
+                            position: absolute;
+                            opacity: 0;
+                            pointer-events: none;
+                            transition:
+                                opacity 0.3s ease,
+                                transform 0.3s ease;
+                            z-index: 1000;
+                        }
+
+                        &::before {
+                            content: attr(data-tooltip);
+                            top: 100%;
+                            left: 50%;
+                            transform: translateX(-50%) translateY(8px);
+                            padding: 6px 12px;
+                            background-color: #333;
+                            color: #fff;
+                            font-size: 12px;
+                            font-weight: 500;
+                            white-space: nowrap;
+                            border-radius: 6px;
+                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+                            margin-top: 8px;
+                            // Đảm bảo tooltip không bị cắt
+                            min-width: max-content;
+                        }
+
+                        &::after {
+                            content: '';
+                            top: 100%;
+                            left: 50%;
+                            transform: translateX(-50%) translateY(2px);
+                            width: 0;
+                            height: 0;
+                            border-left: 6px solid transparent;
+                            border-right: 6px solid transparent;
+                            border-bottom: 6px solid #333;
+                            margin-top: 2px;
+                        }
+
+                        &:hover::before,
+                        &:hover::after {
+                            opacity: 1;
+                            transform: translateX(-50%) translateY(0);
+                        }
+                    }
+                }
             }
 
             .cardSubtitle {

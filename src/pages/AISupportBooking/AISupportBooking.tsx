@@ -88,19 +88,39 @@ const AISupportBooking: React.FC = () => {
                 const response = await AIService.getUserSessions(profile?.id);
                 if (response.success && response.data) {
                     // Map sessions to ChatHistory format
-                    const histories: ChatHistory[] = response.data.map((session) => ({
-                        id: session.sessionId,
-                        title: session.title || 'Cuộc trò chuyện mới',
-                        lastMessage: session.lastMessage || '',
-                        lastMessageTime: new Date(session.updatedAt).toLocaleString('vi-VN', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                        }),
-                        avatar: '',
-                    }));
+                    const histories: ChatHistory[] = response.data.map((session) => {
+                        // Parse UTC time string and convert to local time
+                        // session.updatedAt is in UTC format from backend (ISO string)
+                        let formattedTime = 'Vừa xong';
+                        try {
+                            // Parse the UTC date string
+                            const utcDate = new Date(session.updatedAt);
+
+                            // Check if date is valid
+                            if (!isNaN(utcDate.getTime())) {
+                                // Format with local timezone (no timeZone option needed, Date already converts to local)
+                                formattedTime = utcDate.toLocaleString('vi-VN', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false, // Use 24-hour format
+                                });
+                            }
+                        } catch (error) {
+                            console.error('Error formatting time:', error);
+                            formattedTime = 'Vừa xong';
+                        }
+
+                        return {
+                            id: session.sessionId,
+                            title: session.title || 'Cuộc trò chuyện mới',
+                            lastMessage: session.lastMessage || '',
+                            lastMessageTime: formattedTime,
+                            avatar: '',
+                        };
+                    });
                     setChatHistories(histories);
                 }
             } catch (error) {

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapPin, Star, Building2, Stethoscope, HelpCircle } from 'lucide-react';
 import { Suggestion } from '../../../../types';
+import { PATHS, replacePathParams } from '@/routes/paths';
 import clsx from 'clsx';
 import styles from './SuggestionCard.module.scss';
 
@@ -15,8 +17,25 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
     onBookAppointment,
     onSupportBooking,
 }) => {
+    const navigate = useNavigate();
     const [doctorAvatarError, setDoctorAvatarError] = useState(false);
     const [hospitalImageError, setHospitalImageError] = useState(false);
+
+    const handleDoctorNameClick = (doctorId: string) => {
+        const doctorProfilePath = replacePathParams(
+            `${PATHS.DOCTOR.ROOT}/${PATHS.DOCTOR.PROFILE}`,
+            { id: doctorId }
+        );
+        navigate(doctorProfilePath);
+    };
+
+    const handleHospitalNameClick = (hospitalId: string) => {
+        const hospitalProfilePath = replacePathParams(
+            `${PATHS.HOSPITAL.ROOT}/${PATHS.HOSPITAL.DETAIL}`,
+            { id: hospitalId }
+        );
+        navigate(hospitalProfilePath);
+    };
 
     if (suggestion.type === 'doctor' && suggestion.doctor) {
         const doctor = suggestion.doctor;
@@ -44,7 +63,13 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                         )}
                     </div>
                     <div className={styles.cardInfo}>
-                        <h4 className={styles.cardTitle}>{doctor.name}</h4>
+                        <h4
+                            className={clsx(styles.cardTitle, styles.clickableTitle)}
+                            onClick={() => handleDoctorNameClick(doctor.id)}
+                            data-tooltip="Xem thông tin bác sĩ"
+                        >
+                            {doctor.name}
+                        </h4>
                         <p className={styles.cardSubtitle}>Chuyên khoa: {doctor.specialtyName}</p>
                     </div>
                 </div>
@@ -130,7 +155,13 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                         )}
                     </div>
                     <div className={styles.cardInfo}>
-                        <h4 className={styles.cardTitle}>{hospital.name}</h4>
+                        <h4
+                            className={clsx(styles.cardTitle, styles.clickableTitle)}
+                            onClick={() => handleHospitalNameClick(hospital.id)}
+                            data-tooltip="Xem thông tin bệnh viện"
+                        >
+                            {hospital.name}
+                        </h4>
                     </div>
                 </div>
                 <div className={styles.cardBody}>
