@@ -326,28 +326,11 @@ const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({ imageUrl, onClo
         }
     }, [imageUrl]);
 
-    const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
-        // Close when clicking on backdrop (outside modal content)
-        const dialog = dialogRef.current;
-        if (dialog && e.target === dialog) {
-            onClose();
-        }
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDialogElement>) => {
-        // Close on Escape key
-        if (e.key === 'Escape') {
-            onClose();
-        }
-    };
-
     if (!imageUrl) return null;
 
     return (
         <dialog
             ref={dialogRef}
-            onClick={handleBackdropClick}
-            onKeyDown={handleKeyDown}
             onClose={onClose}
             className="image-preview-dialog"
             style={{
@@ -359,16 +342,34 @@ const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({ imageUrl, onClo
                 margin: 'auto',
             }}
         >
-            <div className="modal-dialog modal-dialog-centered modal-lg">
+            {/* Backdrop overlay to handle clicks outside */}
+            <div
+                onClick={onClose}
+                style={{
+                    position: 'fixed',
+                    inset: 0,
+                    cursor: 'pointer',
+                }}
+                aria-label="Close dialog"
+                role="button"
+                tabIndex={-1}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onClose();
+                    }
+                }}
+            />
+            <div
+                className="modal-dialog modal-dialog-centered modal-lg"
+                style={{ position: 'relative', zIndex: 1 }}
+            >
                 <div className="modal-content bg-transparent border-0">
                     <div className="modal-body p-0 text-center">
                         <button
                             type="button"
                             className="btn-close btn-close-white position-absolute top-0 end-0 m-3"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onClose();
-                            }}
+                            onClick={onClose}
                             style={{ zIndex: 1051 }}
                             aria-label="Close"
                         ></button>

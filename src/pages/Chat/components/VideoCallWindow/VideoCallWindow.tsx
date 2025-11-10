@@ -78,16 +78,6 @@ const getIconClass = (condition: boolean, activeIcon: string, inactiveIcon: stri
     return `isax ${condition ? activeIcon : inactiveIcon}`;
 };
 
-/**
- * Helper: Get button title/aria-label based on state
- */
-const getButtonLabel = (
-    isActive: boolean,
-    labels: { active: string; inactive: string }
-): string => {
-    return isActive ? labels.active : labels.inactive;
-};
-
 const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
     isVisible = true,
     onClose,
@@ -665,10 +655,7 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                     right: '16px',
                                     top: '16px',
                                     padding: '8px',
-                                    cursor: getButtonLabel(isDragging, {
-                                        active: 'grabbing',
-                                        inactive: 'grab',
-                                    }),
+                                    cursor: isDragging ? 'grabbing' : 'grab',
                                     zIndex: isDragging ? 1001 : 1000,
                                     transform: `translate(${localVideoPosition.x}px, ${localVideoPosition.y}px)`,
                                     border: 'none',
@@ -693,10 +680,7 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                     playsInline
                                     muted
                                     style={{
-                                        display: getButtonLabel(isVideoOff, {
-                                            active: 'none',
-                                            inactive: 'block',
-                                        }),
+                                        display: isVideoOff ? 'none' : 'block',
                                     }}
                                 />
                                 {/* Avatar fallback when video is off - Show current user's avatar */}
@@ -750,14 +734,8 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                             `${styles.btnIcon} btn btn-sm d-flex justify-content-center align-items-center rounded-circle`
                                         )}
                                         type="button"
-                                        title={getButtonLabel(isMuted, {
-                                            active: 'Bật microphone',
-                                            inactive: 'Tắt microphone',
-                                        })}
-                                        aria-label={getButtonLabel(isMuted, {
-                                            active: 'Bật mic',
-                                            inactive: 'Tắt mic',
-                                        })}
+                                        title={isMuted ? 'Bật microphone' : 'Tắt microphone'}
+                                        aria-label={isMuted ? 'Bật mic' : 'Tắt mic'}
                                     >
                                         <i
                                             className={getIconClass(
@@ -776,14 +754,8 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                             `${styles.btnIcon} btn btn-sm d-flex justify-content-center align-items-center rounded-circle`
                                         )}
                                         type="button"
-                                        title={getButtonLabel(isVideoOff, {
-                                            active: 'Bật camera',
-                                            inactive: 'Tắt camera',
-                                        })}
-                                        aria-label={getButtonLabel(isVideoOff, {
-                                            active: 'Bật video',
-                                            inactive: 'Tắt video',
-                                        })}
+                                        title={isVideoOff ? 'Bật camera' : 'Tắt camera'}
+                                        aria-label={isVideoOff ? 'Bật video' : 'Tắt video'}
                                     >
                                         <i
                                             className={getIconClass(
@@ -816,10 +788,7 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                             `${styles.btnIcon} btn btn-sm d-flex justify-content-center align-items-center rounded-circle`
                                         )}
                                         type="button"
-                                        title={getButtonLabel(isSpeakerMuted, {
-                                            active: 'Bật loa',
-                                            inactive: 'Tắt loa',
-                                        })}
+                                        title={isSpeakerMuted ? 'Bật loa' : 'Tắt loa'}
                                     >
                                         <i
                                             className={getIconClass(
@@ -841,14 +810,14 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                                 : 'bg-light text-dark'
                                         )}
                                         type="button"
-                                        title={getButtonLabel(isScreenSharing, {
-                                            active: 'Dừng chia sẻ màn hình',
-                                            inactive: 'Chia sẻ màn hình',
-                                        })}
-                                        aria-label={getButtonLabel(isScreenSharing, {
-                                            active: 'Dừng chia sẻ',
-                                            inactive: 'Chia sẻ màn hình',
-                                        })}
+                                        title={
+                                            isScreenSharing
+                                                ? 'Dừng chia sẻ màn hình'
+                                                : 'Chia sẻ màn hình'
+                                        }
+                                        aria-label={
+                                            isScreenSharing ? 'Dừng chia sẻ' : 'Chia sẻ màn hình'
+                                        }
                                     >
                                         <i className="isax isax-screenmirroring"></i>
                                     </button>
