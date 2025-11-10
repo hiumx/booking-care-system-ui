@@ -39,6 +39,7 @@ export interface UserState {
     profile: UserProfile | null;
     isLoading: boolean;
     error: string | null;
+    unreadMessageCount: number;
 }
 
 // Update user request interface
