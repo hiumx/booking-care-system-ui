@@ -64,6 +64,27 @@ const handleRemoteVideoPlayback = (
     }, 2000);
 };
 
+/**
+ * Helper: Get button class based on state
+ */
+const getButtonClass = (isActive: boolean, baseClass: string): string => {
+    return clsx(baseClass, isActive ? 'bg-danger text-white' : 'bg-light text-dark');
+};
+
+/**
+ * Helper: Get icon class based on state
+ */
+const getIconClass = (condition: boolean, activeIcon: string, inactiveIcon: string): string => {
+    return `isax ${condition ? activeIcon : inactiveIcon}`;
+};
+
+/**
+ * Helper: Get button title/aria-label based on state
+ */
+const getButtonLabel = (condition: boolean, activeLabel: string, inactiveLabel: string): string => {
+    return condition ? activeLabel : inactiveLabel;
+};
+
 const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
     isVisible = true,
     onClose,
@@ -641,7 +662,7 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                     right: '16px',
                                     top: '16px',
                                     padding: '8px',
-                                    cursor: isDragging ? 'grabbing' : 'grab',
+                                    cursor: getButtonLabel(isDragging, 'grabbing', 'grab'),
                                     zIndex: isDragging ? 1001 : 1000,
                                     transform: `translate(${localVideoPosition.x}px, ${localVideoPosition.y}px)`,
                                     border: 'none',
@@ -665,7 +686,7 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                     autoPlay
                                     playsInline
                                     muted
-                                    style={{ display: isVideoOff ? 'none' : 'block' }}
+                                    style={{ display: getButtonLabel(isVideoOff, 'none', 'block') }}
                                 />
                                 {/* Avatar fallback when video is off - Show current user's avatar */}
                                 <img
@@ -713,36 +734,52 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                     {/* Microphone Toggle */}
                                     <button
                                         onClick={toggleMute}
-                                        className={clsx(
-                                            styles.btnIcon,
-                                            'btn btn-sm d-flex justify-content-center align-items-center rounded-circle',
-                                            isMuted ? 'bg-danger text-white' : 'bg-light text-dark'
+                                        className={getButtonClass(
+                                            isMuted,
+                                            `${styles.btnIcon} btn btn-sm d-flex justify-content-center align-items-center rounded-circle`
                                         )}
                                         type="button"
-                                        title={isMuted ? 'Bật microphone' : 'Tắt microphone'}
-                                        aria-label={isMuted ? 'Bật mic' : 'Tắt mic'}
+                                        title={getButtonLabel(
+                                            isMuted,
+                                            'Bật microphone',
+                                            'Tắt microphone'
+                                        )}
+                                        aria-label={getButtonLabel(isMuted, 'Bật mic', 'Tắt mic')}
                                     >
                                         <i
-                                            className={`isax ${isMuted ? 'isax-microphone-slash' : 'isax-microphone-2'}`}
+                                            className={getIconClass(
+                                                isMuted,
+                                                'isax-microphone-slash',
+                                                'isax-microphone-2'
+                                            )}
                                         ></i>
                                     </button>
 
                                     {/* Video Toggle */}
                                     <button
                                         onClick={toggleVideo}
-                                        className={clsx(
-                                            styles.btnIcon,
-                                            'btn btn-sm d-flex justify-content-center align-items-center rounded-circle',
-                                            isVideoOff
-                                                ? 'bg-danger text-white'
-                                                : 'bg-light text-dark'
+                                        className={getButtonClass(
+                                            isVideoOff,
+                                            `${styles.btnIcon} btn btn-sm d-flex justify-content-center align-items-center rounded-circle`
                                         )}
                                         type="button"
-                                        title={isVideoOff ? 'Bật camera' : 'Tắt camera'}
-                                        aria-label={isVideoOff ? 'Bật video' : 'Tắt video'}
+                                        title={getButtonLabel(
+                                            isVideoOff,
+                                            'Bật camera',
+                                            'Tắt camera'
+                                        )}
+                                        aria-label={getButtonLabel(
+                                            isVideoOff,
+                                            'Bật video',
+                                            'Tắt video'
+                                        )}
                                     >
                                         <i
-                                            className={`isax ${isVideoOff ? 'isax-video-slash' : 'isax-video'}`}
+                                            className={getIconClass(
+                                                isVideoOff,
+                                                'isax-video-slash',
+                                                'isax-video'
+                                            )}
                                         ></i>
                                     </button>
 
@@ -763,18 +800,19 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                     {/* Speaker Toggle */}
                                     <button
                                         onClick={toggleSpeaker}
-                                        className={clsx(
-                                            styles.btnIcon,
-                                            'btn btn-sm d-flex justify-content-center align-items-center rounded-circle',
-                                            isSpeakerMuted
-                                                ? 'bg-danger text-white'
-                                                : 'bg-light text-dark'
+                                        className={getButtonClass(
+                                            isSpeakerMuted,
+                                            `${styles.btnIcon} btn btn-sm d-flex justify-content-center align-items-center rounded-circle`
                                         )}
                                         type="button"
-                                        title={isSpeakerMuted ? 'Bật loa' : 'Tắt loa'}
+                                        title={getButtonLabel(isSpeakerMuted, 'Bật loa', 'Tắt loa')}
                                     >
                                         <i
-                                            className={`isax ${isSpeakerMuted ? 'isax-volume-slash' : 'isax-volume-high'}`}
+                                            className={getIconClass(
+                                                isSpeakerMuted,
+                                                'isax-volume-slash',
+                                                'isax-volume-high'
+                                            )}
                                         ></i>
                                     </button>
 
@@ -789,14 +827,16 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                                 : 'bg-light text-dark'
                                         )}
                                         type="button"
-                                        title={
-                                            isScreenSharing
-                                                ? 'Dừng chia sẻ màn hình'
-                                                : 'Chia sẻ màn hình'
-                                        }
-                                        aria-label={
-                                            isScreenSharing ? 'Dừng chia sẻ' : 'Chia sẻ màn hình'
-                                        }
+                                        title={getButtonLabel(
+                                            isScreenSharing,
+                                            'Dừng chia sẻ màn hình',
+                                            'Chia sẻ màn hình'
+                                        )}
+                                        aria-label={getButtonLabel(
+                                            isScreenSharing,
+                                            'Dừng chia sẻ',
+                                            'Chia sẻ màn hình'
+                                        )}
                                     >
                                         <i className="isax isax-screenmirroring"></i>
                                     </button>

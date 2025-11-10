@@ -1,6 +1,6 @@
 import styles from './MessageItem.module.scss';
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { ChatMessage } from '../../../../../data/mockData';
@@ -288,57 +288,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
             </div>
 
             {/* Image Preview Modal */}
-            {selectedImage && (
-                <div
-                    className="modal fade show"
-                    style={{
-                        display: 'block',
-                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                    }}
-                    onClick={() => setSelectedImage(null)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Escape') {
-                            setSelectedImage(null);
-                        }
-                    }}
-                    role="dialog"
-                    aria-modal="true"
-                    tabIndex={-1}
-                >
-                    <div className="modal-dialog modal-dialog-centered modal-lg">
-                        <div className="modal-content bg-transparent border-0">
-                            <div className="modal-body p-0 text-center">
-                                <button
-                                    type="button"
-                                    className="btn-close btn-close-white position-absolute top-0 end-0 m-3"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedImage(null);
-                                    }}
-                                    style={{ zIndex: 1051 }}
-                                ></button>
-                                <button
-                                    type="button"
-                                    onClick={(e) => e.stopPropagation()}
-                                    style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        padding: 0,
-                                        cursor: 'default',
-                                    }}
-                                >
-                                    <img
-                                        src={selectedImage}
-                                        alt="Preview"
-                                        className="img-fluid"
-                                        style={{ maxHeight: '90vh' }}
-                                    />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ImagePreviewDialog imageUrl={selectedImage} onClose={() => setSelectedImage(null)} />
 
             {/* Confirm Dialog for message recall */}
             <ConfirmDialog
@@ -356,4 +306,118 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
     );
 };
 
+// Image Preview Dialog Component using native <dialog> element
+interface ImagePreviewDialogProps {
+    imageUrl: string | null;
+    onClose: () => void;
+}
+
+const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({ imageUrl, onClose }) => {
+    const dialogRef = useRef<HTMLDialogElement>(null);
+
+    useEffect(() => {
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+
+        if (imageUrl) {
+            dialog.showModal();
+        } else {
+            dialog.close();
+        }
+    }, [imageUrl]);
+
+    const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
+        // Close when clicking on backdrop (outside modal content)
+        const dialog = dialogRef.current;
+        if (dialog && e.target === dialog) {
+            onClose();
+        }
+    };
+
+    if (!imageUrl) return null;
+
+    return (
+        <dialog
+            ref={dialogRef}
+            onClick={handleBackdropClick}
+            onClose={onClose}
+            className="image-preview-dialog"
+            style={{
+                padding: 0,
+                border: 'none',
+                backgroundColor: 'transparent',
+                maxWidth: '90vw',
+                maxHeight: '90vh',
+                margin: 'auto',
+            }}
+        >
+            <div className="modal-dialog modal-dialog-centered modal-lg">
+                <div className="modal-content bg-transparent border-0">
+                    <div className="modal-body p-0 text-center">
+                        <button
+                            type="button"
+                            className="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onClose();
+                            }}
+                            style={{ zIndex: 1051 }}
+                            aria-label="Close"
+                        ></button>
+                        <button
+                            type="button"
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                padding: 0,
+                                cursor: 'default',
+                            }}
+                            aria-label="Image preview"
+                        >
+                            <img
+                                src={imageUrl}
+                                alt="Preview"
+                                className="img-fluid"
+                                style={{ maxHeight: '90vh' }}
+                            />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </dialog>
+    );
+};
+
 export default MessageItem;
+
+// Add global styles for dialog backdrop
+if (typeof document !== 'undefined') {
+    const style = document.createElement('style');
+    style.textContent = `
+        .image-preview-dialog::backdrop {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        
+        .image-preview-dialog {
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    `;
+    if (!document.head.querySelector('style[data-dialog-styles]')) {
+        style.setAttribute('data-dialog-styles', 'true');
+        document.head.appendChild(style);
+    }
+}
