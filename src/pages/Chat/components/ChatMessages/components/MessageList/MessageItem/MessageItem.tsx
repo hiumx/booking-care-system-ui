@@ -343,22 +343,18 @@ const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({ imageUrl, onClo
             }}
         >
             {/* Backdrop overlay to handle clicks outside */}
-            <div
+            <button
+                type="button"
                 onClick={onClose}
                 style={{
                     position: 'fixed',
                     inset: 0,
                     cursor: 'pointer',
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
                 }}
                 aria-label="Close dialog"
-                role="button"
-                tabIndex={-1}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        onClose();
-                    }
-                }}
             />
             <div
                 className="modal-dialog modal-dialog-centered modal-lg"
