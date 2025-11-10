@@ -334,12 +334,20 @@ const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({ imageUrl, onClo
         }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDialogElement>) => {
+        // Close on Escape key
+        if (e.key === 'Escape') {
+            onClose();
+        }
+    };
+
     if (!imageUrl) return null;
 
     return (
         <dialog
             ref={dialogRef}
             onClick={handleBackdropClick}
+            onKeyDown={handleKeyDown}
             onClose={onClose}
             className="image-preview-dialog"
             style={{
@@ -417,7 +425,7 @@ if (typeof document !== 'undefined') {
         }
     `;
     if (!document.head.querySelector('style[data-dialog-styles]')) {
-        style.setAttribute('data-dialog-styles', 'true');
+        style.dataset.dialogStyles = 'true';
         document.head.appendChild(style);
     }
 }

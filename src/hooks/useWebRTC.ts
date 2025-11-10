@@ -481,7 +481,7 @@ export const useWebRTC = (
         const senders = pc.getSenders();
         console.log('[WebRTC] Stopping tracks from', senders.length, 'senders');
         for (const sender of senders) {
-            if (sender.track && sender.track.readyState === 'live') {
+            if (sender.track?.readyState === 'live') {
                 console.log(
                     '[WebRTC] Stopping track from sender:',
                     sender.track.kind,
