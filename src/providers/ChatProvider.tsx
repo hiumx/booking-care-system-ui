@@ -6,6 +6,7 @@ import React, {
     useEffect,
     useRef,
     ReactNode,
+    useMemo,
 } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -478,7 +479,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 const timelineItems = paginationData.items || []; // ← FIX: Use .items not .data
                 // Keep all timeline items (both messages and call logs)
                 const extractedMessages = Array.isArray(timelineItems)
-                    ? timelineItems.reverse() // Reverse to show oldest first, newest last
+                    ? [...timelineItems].reverse() // Create copy then reverse to show oldest first
                     : [];
 
                 // Update messages and pagination state
@@ -552,7 +553,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
             const paginationData = messagesResponse.data;
             const timelineItems = paginationData.items || [];
-            const extractedMessages = Array.isArray(timelineItems) ? timelineItems.reverse() : [];
+            const extractedMessages = Array.isArray(timelineItems)
+                ? [...timelineItems].reverse()
+                : [];
 
             setMessages(extractedMessages);
             setNextCursor(paginationData.nextCursor);
@@ -607,7 +610,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
             // Backend sorts by descending (newest first), but UI needs ascending (oldest first)
             // Keep all timeline items (both messages and call logs)
             const extractedMessages = Array.isArray(timelineItems)
-                ? timelineItems.reverse() // Reverse to show oldest first, newest last
+                ? [...timelineItems].reverse() // Create copy then reverse to show oldest first
                 : [];
 
             // Update pagination state
@@ -682,7 +685,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
             const paginationData = response.data;
             const timelineItems = paginationData.items || []; // ← FIX: Use .items not .data
             // Keep all timeline items (both messages and call logs)
-            const extractedMessages = Array.isArray(timelineItems) ? timelineItems.reverse() : [];
+            const extractedMessages = Array.isArray(timelineItems)
+                ? [...timelineItems].reverse()
+                : [];
 
             // Update pagination state
             setPreviousCursor(paginationData.previousCursor);
@@ -837,31 +842,58 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         }
     }, [activeConversation, chatHub]);
 
-    const value: ChatContextValue = {
-        conversations,
-        activeConversation,
-        messages,
-        onlineUsers,
-        typingUsers,
-        isLoading,
-        isLoadingMessages,
-        hasMoreOldMessages,
-        hasMoreNewMessages,
-        isLoadingMoreMessages,
-        loadConversations,
-        selectConversation,
-        createOrGetConversation,
-        sendMessage,
-        sendMessageViaREST,
-        loadMessages,
-        loadMoreOldMessages,
-        loadMoreNewMessages,
-        markAsRead,
-        markAllAsRead,
-        startTyping,
-        stopTyping,
-        isConnected: chatHub.isConnected,
-    };
+    const value: ChatContextValue = useMemo(
+        () => ({
+            conversations,
+            activeConversation,
+            messages,
+            onlineUsers,
+            typingUsers,
+            isLoading,
+            isLoadingMessages,
+            hasMoreOldMessages,
+            hasMoreNewMessages,
+            isLoadingMoreMessages,
+            loadConversations,
+            selectConversation,
+            createOrGetConversation,
+            sendMessage,
+            sendMessageViaREST,
+            loadMessages,
+            loadMoreOldMessages,
+            loadMoreNewMessages,
+            markAsRead,
+            markAllAsRead,
+            startTyping,
+            stopTyping,
+            isConnected: chatHub.isConnected,
+        }),
+        [
+            conversations,
+            activeConversation,
+            messages,
+            onlineUsers,
+            typingUsers,
+            isLoading,
+            isLoadingMessages,
+            hasMoreOldMessages,
+            hasMoreNewMessages,
+            isLoadingMoreMessages,
+            loadConversations,
+            selectConversation,
+            createOrGetConversation,
+            sendMessage,
+            sendMessageViaREST,
+            loadMessages,
+            loadMoreOldMessages,
+            loadMoreNewMessages,
+            markAsRead,
+            markAllAsRead,
+            startTyping,
+            stopTyping,
+            chatHub.isConnected,
+        ]
+    );
 
     return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };

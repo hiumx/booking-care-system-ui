@@ -19,6 +19,51 @@ interface VideoCallWindowProps {
     isIncoming?: boolean;
 }
 
+/**
+ * Helper: Handle remote video playback with proper ready state checking
+ */
+const handleRemoteVideoPlayback = (
+    videoElement: HTMLVideoElement,
+    remoteVideoPlayingRef: { current: boolean }
+) => {
+    const tryPlay = () => {
+        console.log('[VideoCallWindow] Attempting play (readyState:', videoElement.readyState, ')');
+
+        videoElement
+            .play()
+            .then(() => {
+                console.log('[VideoCallWindow] ✅ Remote video playing successfully');
+            })
+            .catch((error) => {
+                console.error('[VideoCallWindow] ❌ Error playing:', error);
+                remoteVideoPlayingRef.current = false;
+            });
+    };
+
+    // If video has enough data, play immediately
+    if (videoElement.readyState >= 2) {
+        console.log('[VideoCallWindow] Video ready, playing immediately');
+        tryPlay();
+        return;
+    }
+
+    // Wait for video data to load
+    console.log('[VideoCallWindow] Waiting for loadeddata event...');
+    const onLoadedData = () => {
+        console.log('[VideoCallWindow] loadeddata fired, playing now');
+        tryPlay();
+        videoElement.removeEventListener('loadeddata', onLoadedData);
+    };
+    videoElement.addEventListener('loadeddata', onLoadedData);
+
+    // Timeout fallback
+    setTimeout(() => {
+        videoElement.removeEventListener('loadeddata', onLoadedData);
+        console.log('[VideoCallWindow] Timeout, force trying play');
+        tryPlay();
+    }, 2000);
+};
+
 const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
     isVisible = true,
     onClose,
@@ -124,92 +169,34 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                 console.log('[VideoCallWindow] Video tracks:', videoTracks.length);
                 console.log('[VideoCallWindow] Audio tracks:', audioTracks.length);
 
-                if (remoteVideoRef.current) {
-                    // ✅ Only set srcObject if different (prevent "new load request")
-                    const currentSrcObject = remoteVideoRef.current.srcObject as MediaStream | null;
-                    if (currentSrcObject !== stream) {
-                        console.log('[VideoCallWindow] Setting remote video srcObject');
-                        remoteVideoRef.current.srcObject = stream;
-                    } else {
-                        console.log('[VideoCallWindow] srcObject already set, skipping');
-                    }
+                if (!remoteVideoRef.current) return;
 
-                    // ✅ Only play when we have BOTH tracks AND haven't played yet
-                    if (
-                        videoTracks.length > 0 &&
-                        audioTracks.length > 0 &&
-                        !remoteVideoPlayingRef.current
-                    ) {
-                        console.log('[VideoCallWindow] Both tracks ready, preparing to play...');
-                        console.log(
-                            '[VideoCallWindow] Video element readyState:',
-                            remoteVideoRef.current.readyState
-                        );
+                // ✅ Only set srcObject if different (prevent "new load request")
+                const currentSrcObject = remoteVideoRef.current.srcObject as MediaStream | null;
+                if (currentSrcObject !== stream) {
+                    console.log('[VideoCallWindow] Setting remote video srcObject');
+                    remoteVideoRef.current.srcObject = stream;
+                } else {
+                    console.log('[VideoCallWindow] srcObject already set, skipping');
+                }
 
-                        remoteVideoPlayingRef.current = true; // ✅ Mark as playing immediately
+                // ✅ Only play when we have BOTH tracks AND haven't played yet
+                const hasAllTracks = videoTracks.length > 0 && audioTracks.length > 0;
+                const notYetPlaying = !remoteVideoPlayingRef.current;
 
-                        // ✅ Function to attempt playing
-                        const tryPlay = () => {
-                            console.log(
-                                '[VideoCallWindow] Attempting play (readyState:',
-                                remoteVideoRef.current?.readyState,
-                                ')'
-                            );
+                if (hasAllTracks && notYetPlaying) {
+                    console.log('[VideoCallWindow] Both tracks ready, preparing to play...');
+                    console.log(
+                        '[VideoCallWindow] Video element readyState:',
+                        remoteVideoRef.current.readyState
+                    );
 
-                            if (!remoteVideoRef.current) {
-                                remoteVideoPlayingRef.current = false;
-                                return;
-                            }
-
-                            remoteVideoRef.current
-                                .play()
-                                .then(() => {
-                                    console.log(
-                                        '[VideoCallWindow] ✅ Remote video playing successfully'
-                                    );
-                                })
-                                .catch((error) => {
-                                    console.error('[VideoCallWindow] ❌ Error playing:', error);
-                                    remoteVideoPlayingRef.current = false;
-                                });
-                        };
-
-                        // ✅ If video has enough data, play immediately
-                        if (remoteVideoRef.current.readyState >= 2) {
-                            console.log('[VideoCallWindow] Video ready, playing immediately');
-                            tryPlay();
-                        } else {
-                            // ✅ Wait for video data to load
-                            console.log('[VideoCallWindow] Waiting for loadeddata event...');
-                            const onLoadedData = () => {
-                                console.log('[VideoCallWindow] loadeddata fired, playing now');
-                                tryPlay();
-                                remoteVideoRef.current?.removeEventListener(
-                                    'loadeddata',
-                                    onLoadedData
-                                );
-                            };
-                            remoteVideoRef.current.addEventListener('loadeddata', onLoadedData);
-
-                            // ✅ Timeout fallback
-                            setTimeout(() => {
-                                if (remoteVideoRef.current) {
-                                    remoteVideoRef.current.removeEventListener(
-                                        'loadeddata',
-                                        onLoadedData
-                                    );
-                                    console.log('[VideoCallWindow] Timeout, force trying play');
-                                    tryPlay();
-                                }
-                            }, 2000);
-                        }
-                    } else if (remoteVideoPlayingRef.current) {
-                        console.log(
-                            '[VideoCallWindow] ⏭️ Already playing, skipping duplicate play()'
-                        );
-                    } else {
-                        console.log('[VideoCallWindow] ⏳ Waiting for all tracks...');
-                    }
+                    remoteVideoPlayingRef.current = true; // ✅ Mark as playing immediately
+                    handleRemoteVideoPlayback(remoteVideoRef.current, remoteVideoPlayingRef);
+                } else if (remoteVideoPlayingRef.current) {
+                    console.log('[VideoCallWindow] ⏭️ Already playing, skipping duplicate play()');
+                } else {
+                    console.log('[VideoCallWindow] ⏳ Waiting for all tracks...');
                 }
             },
             onLocalStream: (stream) => {
@@ -484,17 +471,29 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
     };
 
     // Helper: Calculate target corner position
-    const calculateTargetCorner = (
-        centerX: number,
-        centerY: number,
-        midX: number,
-        midY: number,
-        containerWidth: number,
-        containerHeight: number,
-        videoWidth: number,
-        videoHeight: number,
-        padding: number
-    ) => {
+    const calculateTargetCorner = (params: {
+        centerX: number;
+        centerY: number;
+        midX: number;
+        midY: number;
+        containerWidth: number;
+        containerHeight: number;
+        videoWidth: number;
+        videoHeight: number;
+        padding: number;
+    }) => {
+        const {
+            centerX,
+            centerY,
+            midX,
+            midY,
+            containerWidth,
+            containerHeight,
+            videoWidth,
+            videoHeight,
+            padding,
+        } = params;
+
         const isLeft = centerX < midX;
         const isTop = centerY < midY;
 
@@ -528,17 +527,17 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         const midY = containerHeight / 2;
 
         // Determine which corner to snap to
-        const { targetX, targetY } = calculateTargetCorner(
+        const { targetX, targetY } = calculateTargetCorner({
             centerX,
             centerY,
             midX,
             midY,
             containerWidth,
             containerHeight,
-            localVideoWidth,
-            localVideoHeight,
-            padding
-        );
+            videoWidth: localVideoWidth,
+            videoHeight: localVideoHeight,
+            padding,
+        });
 
         // Convert to transform offset
         const transformX = targetX - initialX;
