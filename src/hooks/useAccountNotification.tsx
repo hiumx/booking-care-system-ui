@@ -100,7 +100,14 @@ export const useAccountNotification = (accessToken: string | null) => {
         // Cleanup on unmount
         return () => {
             if (connectionRef.current) {
-                connectionRef.current.stop();
+                const state = connectionRef.current.state;
+                // Only stop if connection is in a stable state (not negotiating)
+                if (
+                    state === signalR.HubConnectionState.Connected ||
+                    state === signalR.HubConnectionState.Disconnected
+                ) {
+                    connectionRef.current.stop();
+                }
             }
         };
     }, [accessToken, dispatch]);

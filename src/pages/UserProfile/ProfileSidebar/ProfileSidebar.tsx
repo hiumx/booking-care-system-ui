@@ -16,6 +16,7 @@ interface ProfileSidebarProps {
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const { unreadCount } = useSelector((state: RootState) => state.notification);
     const { unreadMessageCount } = useSelector((state: RootState) => state.user);
 
     const isActive = (tab: string) => activeTab === tab;
@@ -130,6 +131,15 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                             <Link to="/user/profile?tab=invoices">
                                 <i className="isax isax-document-text"></i>
                                 <span>Hóa đơn</span>
+                            </Link>
+                        </li>
+                        <li className={isActive('notifications') ? 'active' : ''}>
+                            <Link to="/user/profile?tab=notifications">
+                                <i className="isax isax-notification-bing"></i>
+                                <span>Thông báo</span>
+                                {unreadCount > 0 && (
+                                    <small className="unread-msg">{unreadCount}</small>
+                                )}
                             </Link>
                         </li>
                         <li className={isActive('chat') ? 'active' : ''}>

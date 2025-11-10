@@ -26,6 +26,7 @@ import serviceTypeReducer from './slices/serviceTypeSlice';
 import specialtyReducer from './slices/specialtySlice';
 import bookingReducer from './slices/bookingSlice';
 import medicalServiceReducer from './slices/medicalServiceSlice';
+import notificationReducer from './slices/notificationSlice';
 
 // Root reducer
 const rootReducer = combineReducers({
@@ -42,6 +43,7 @@ const rootReducer = combineReducers({
     specialty: specialtyReducer,
     booking: bookingReducer,
     medicalService: medicalServiceReducer,
+    notification: notificationReducer,
 });
 
 // Redux persist configuration
@@ -58,7 +60,8 @@ const persistConfig: PersistConfig<RootState> = {
         'serviceType',
         'specialty',
         'medicalService',
-    ], // Don't persist these (fetch fresh on app load)
+        'notification', // Don't persist notifications (fetch fresh via SignalR)
+    ],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
