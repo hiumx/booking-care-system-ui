@@ -88,8 +88,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     };
 
     const handleConsultMore = () => {
-        // Gửi message "tôi muốn được tư vấn thêm"
-        setInputValue('tôi muốn được tư vấn thêm');
+        // Tự động gửi message "tôi muốn được tư vấn thêm" khi click button
+        onSendMessage('tôi muốn được tư vấn thêm');
     };
 
     return (

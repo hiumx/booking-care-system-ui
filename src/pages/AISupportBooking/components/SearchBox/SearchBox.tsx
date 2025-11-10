@@ -307,7 +307,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
     const handleApplyLocation = (
         areaDisplay: string,
-        locationId: string,
+        _locationId: string, // Prefix with _ to indicate intentionally unused
         provinceId?: string,
         districtId?: string
     ) => {
@@ -500,8 +500,15 @@ const SearchBox: React.FC<SearchBoxProps> = ({
             {/* Modal nhập vị trí */}
             <ModalArea
                 isOpen={showLocationInputModal}
-                onClose={() => setShowLocationInputModal(false)}
+                onClose={() => {
+                    // Nếu chưa có vị trí, không cho đóng modal
+                    if (!userLocation) {
+                        return;
+                    }
+                    setShowLocationInputModal(false);
+                }}
                 onApply={handleApplyLocation}
+                requireSelection={!userLocation}
             />
         </div>
     );
