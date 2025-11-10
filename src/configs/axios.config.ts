@@ -1,6 +1,6 @@
 import axios, { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { API_CONFIG } from './api.config';
-import { resetAuthState } from '@/store/slices/authSlice';
+import { resetAuthState, updateAccessToken } from '@/store/slices/authSlice';
 import { clearUserProfile } from '@/store/slices/userSlice';
 import { AuthService } from '@/services/auth.service';
 
@@ -121,6 +121,11 @@ const handleTokenRefresh = async (originalRequest: ExtendedAxiosRequestConfig) =
     try {
         const refreshResponse: any = await instance.post('/auth/refresh-token');
         const newToken = refreshResponse?.data?.token || refreshResponse?.token;
+
+        // ✅ Update Redux state with new access token
+        if (newToken && reduxStore) {
+            reduxStore.dispatch(updateAccessToken(newToken));
+        }
 
         processQueue(null, newToken || '1');
         isRefreshing = false;
