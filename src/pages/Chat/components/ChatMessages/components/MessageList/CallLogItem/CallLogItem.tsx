@@ -16,7 +16,8 @@ const CallLogItem: React.FC<CallLogItemProps> = ({ callLog, isOwn, callerName, c
         const remainingSeconds = seconds % 60;
 
         if (minutes > 0) {
-            return `${minutes} phút ${remainingSeconds > 0 ? `${remainingSeconds} giây` : ''}`;
+            const secondsPart = remainingSeconds > 0 ? `${remainingSeconds} giây` : '';
+            return `${minutes} phút ${secondsPart}`;
         }
         return `${seconds} giây`;
     };

@@ -247,8 +247,8 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                                 </a>
                                 <div className="dropdown-menu chat-drop-menu dropdown-menu-end">
                                     {canRecall() && (
-                                        <a
-                                            href="#"
+                                        <button
+                                            type="button"
                                             className="dropdown-item message-info-left"
                                             onClick={(e) => {
                                                 e.preventDefault();
@@ -258,16 +258,17 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                                                 opacity: isRecalling ? 0.5 : 1,
                                                 cursor: isRecalling ? 'not-allowed' : 'pointer',
                                             }}
+                                            disabled={isRecalling}
                                         >
                                             {isRecalling ? (
                                                 <>
                                                     <span className="spinner-border spinner-border-sm me-2"></span>
-                                                    Đang thu hồi...
+                                                    <span>Đang thu hồi...</span>
                                                 </>
                                             ) : (
                                                 'Thu hồi tin nhắn'
                                             )}
-                                        </a>
+                                        </button>
                                     )}
                                 </div>
                             </div>
@@ -300,6 +301,8 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                             setSelectedImage(null);
                         }
                     }}
+                    role="dialog"
+                    aria-modal="true"
                     tabIndex={-1}
                 >
                     <div className="modal-dialog modal-dialog-centered modal-lg">
@@ -314,13 +317,23 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                                     }}
                                     style={{ zIndex: 1051 }}
                                 ></button>
-                                <img
-                                    src={selectedImage}
-                                    alt="Preview"
-                                    className="img-fluid"
-                                    style={{ maxHeight: '90vh' }}
+                                <button
+                                    type="button"
                                     onClick={(e) => e.stopPropagation()}
-                                />
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: 0,
+                                        cursor: 'default',
+                                    }}
+                                >
+                                    <img
+                                        src={selectedImage}
+                                        alt="Preview"
+                                        className="img-fluid"
+                                        style={{ maxHeight: '90vh' }}
+                                    />
+                                </button>
                             </div>
                         </div>
                     </div>

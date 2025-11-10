@@ -173,11 +173,11 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
 
                 // ✅ Only set srcObject if different (prevent "new load request")
                 const currentSrcObject = remoteVideoRef.current.srcObject as MediaStream | null;
-                if (currentSrcObject !== stream) {
+                if (currentSrcObject === stream) {
+                    console.log('[VideoCallWindow] srcObject already set, skipping');
+                } else {
                     console.log('[VideoCallWindow] Setting remote video srcObject');
                     remoteVideoRef.current.srcObject = stream;
-                } else {
-                    console.log('[VideoCallWindow] srcObject already set, skipping');
                 }
 
                 // ✅ Only play when we have BOTH tracks AND haven't played yet
@@ -303,6 +303,37 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         }
     };
 
+    // Helper function to validate call initialization conditions
+    const canInitializeCall = () => {
+        if (callInitializedRef.current) {
+            console.log('[VideoCallWindow] ⏸️ Call already initialized, skipping');
+            return false;
+        }
+        if (callState !== 'idle') {
+            console.log('[VideoCallWindow] ⏸️ Call already in progress, state:', callState);
+            return false;
+        }
+        if (!isVisible || !participantId || !conversationId) {
+            console.log('[VideoCallWindow] ⏸️ Missing required params');
+            return false;
+        }
+        return true;
+    };
+
+    // Helper function to initialize the call
+    const initializeCall = () => {
+        console.log('[VideoCallWindow] ✅ All conditions met, initializing call');
+        callInitializedRef.current = true;
+
+        if (isIncoming) {
+            console.log('[VideoCallWindow] 📞 Accepting incoming call from:', participantId);
+            acceptCall(participantId, conversationId);
+        } else {
+            console.log('[VideoCallWindow] 📞 Starting outgoing call to:', participantId);
+            startCall(participantId, conversationId);
+        }
+    };
+
     // Initialize call when component becomes visible
     useEffect(() => {
         console.log('[VideoCallWindow] 🔍 Init effect triggered:', {
@@ -314,45 +345,8 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
             callInitialized: callInitializedRef.current,
         });
 
-        // ✅ Prevent re-initialization if already initialized OR already in call
-        if (callInitializedRef.current) {
-            console.log('[VideoCallWindow] ⏸️ Call already initialized, skipping');
-            return;
-        }
-
-        // ✅ Also check callState to prevent re-init during Strict Mode remount
-        if (callState !== 'idle') {
-            console.log('[VideoCallWindow] ⏸️ Call already in progress, state:', callState);
-            return;
-        }
-
-        if (!isVisible) {
-            console.log('[VideoCallWindow] ⏸️ Not visible, skipping');
-            return;
-        }
-        if (!participantId) {
-            console.log('[VideoCallWindow] ⏸️ No participantId, skipping');
-            return;
-        }
-        if (!conversationId) {
-            console.log('[VideoCallWindow] ⏸️ No conversationId, skipping');
-            return;
-        }
-
-        console.log('[VideoCallWindow] ✅ All conditions met, initializing call');
-        console.log('[VideoCallWindow] Initializing call, isIncoming:', isIncoming);
-
-        // Mark as initialized to prevent re-initialization
-        callInitializedRef.current = true;
-
-        if (isIncoming) {
-            // Accept incoming call
-            console.log('[VideoCallWindow] 📞 Accepting incoming call from:', participantId);
-            acceptCall(participantId, conversationId);
-        } else {
-            // Start outgoing call
-            console.log('[VideoCallWindow] 📞 Starting outgoing call to:', participantId);
-            startCall(participantId, conversationId);
+        if (canInitializeCall()) {
+            initializeCall();
         }
         // ✅ IMPORTANT: Remove acceptCall/startCall from dependencies to prevent re-initialization
         // callState is included to check if call already in progress (Strict Mode safety)

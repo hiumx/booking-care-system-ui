@@ -23,9 +23,8 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
         const convs = conversations || [];
 
         // Filter by search term
-        const filtered = !searchTerm
-            ? convs
-            : convs.filter((conv) => {
+        const filtered = searchTerm
+            ? convs.filter((conv) => {
                   // Search in participant names or last message
                   const participantName = conv.participantDetails
                       ?.filter((p) => (p.id || p.accountId || '').toUpperCase() !== currentUserId)
@@ -37,7 +36,8 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
                       participantName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                       lastMessageContent.toLowerCase().includes(searchTerm.toLowerCase())
                   );
-              });
+              })
+            : convs;
 
         // Sort by most recent message (newest first)
         // Use updatedAt or lastMessage.createdAt as fallback
@@ -143,18 +143,11 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
                     const isActive = activeConversation?.id === conv.id;
 
                     return (
-                        <li
+                        <button
                             key={conv.id}
                             className={clsx('user-list-item', { active: isActive })}
                             onClick={() => handleSelectConversation(conv.id)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                    e.preventDefault();
-                                    handleSelectConversation(conv.id);
-                                }
-                            }}
-                            role="button"
-                            tabIndex={0}
+                            type="button"
                         >
                             <div className={clsx(styles.conversation, 'd-flex w-100')}>
                                 <div className={`avatar ${isOnline ? 'avatar-online' : ''}`}>
@@ -184,7 +177,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
                                     </div>
                                 </div>
                             </div>
-                        </li>
+                        </button>
                     );
                 })}
             </ul>

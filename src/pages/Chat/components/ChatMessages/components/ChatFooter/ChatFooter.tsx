@@ -251,11 +251,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
     // Cleanup object URLs when files change to prevent memory leaks
     useEffect(() => {
         return () => {
-            selectedFiles.forEach((file) => {
+            for (const file of selectedFiles) {
                 if (file.type.startsWith('image/')) {
                     URL.revokeObjectURL(URL.createObjectURL(file));
                 }
-            });
+            }
         };
     }, [selectedFiles]);
 
