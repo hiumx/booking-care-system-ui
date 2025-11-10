@@ -108,14 +108,14 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
         const { content, type, attachments } = conv.lastMessage;
 
         // If has content, show it
-        if (content && content.trim()) {
+        if (content?.trim()) {
             return content;
         }
 
         // If no content but has attachments, show appropriate message
-        if (attachments && attachments.length > 0) {
+        if (attachments?.length) {
             const attachment = attachments[0];
-            const fileName = attachment.fileName || attachment.name;
+            const fileName = attachment?.fileName || attachment?.name;
             return getAttachmentPreview(type || MessageType.FILE, fileName);
         }
 
@@ -147,8 +147,16 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
                             key={conv.id}
                             className={clsx('user-list-item', { active: isActive })}
                             onClick={() => handleSelectConversation(conv.id)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handleSelectConversation(conv.id);
+                                }
+                            }}
+                            role="button"
+                            tabIndex={0}
                         >
-                            <a href="#" onClick={(e) => e.preventDefault()}>
+                            <div className={clsx(styles.conversation, 'd-flex w-100')}>
                                 <div className={`avatar ${isOnline ? 'avatar-online' : ''}`}>
                                     <img
                                         src={otherUser?.avatarUrl || '/default-avatar.png'}
@@ -175,7 +183,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
                                         </div>
                                     </div>
                                 </div>
-                            </a>
+                            </div>
                         </li>
                     );
                 })}
@@ -186,9 +194,9 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
     if (isLoading) {
         return (
             <div className="text-center p-4">
-                <div className="spinner-border" role="status">
+                <output className="spinner-border">
                     <span className="visually-hidden">Đang tải...</span>
-                </div>
+                </output>
             </div>
         );
     }

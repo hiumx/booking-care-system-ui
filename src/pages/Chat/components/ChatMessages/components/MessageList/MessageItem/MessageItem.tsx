@@ -104,7 +104,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                                         <span>
                                             <img
                                                 src="./src/assets/img/icons/play-01.svg"
-                                                alt="image"
+                                                alt="Play"
                                             />
                                         </span>
                                     </a>
@@ -166,7 +166,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
 
                             return (
                                 <div
-                                    key={index}
+                                    key={attachment?.id || `${message.id}-attachment-${index}`}
                                     className="file-download d-flex align-items-center mb-2"
                                 >
                                     <div className="file-type d-flex align-items-center justify-content-center me-2">
@@ -295,6 +295,12 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                         backgroundColor: 'rgba(0, 0, 0, 0.9)',
                     }}
                     onClick={() => setSelectedImage(null)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                            setSelectedImage(null);
+                        }
+                    }}
+                    tabIndex={-1}
                 >
                     <div className="modal-dialog modal-dialog-centered modal-lg">
                         <div className="modal-content bg-transparent border-0">
@@ -312,7 +318,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                                     src={selectedImage}
                                     alt="Preview"
                                     className="img-fluid"
-                                    style={{ maxHeight: '90vh', cursor: 'pointer' }}
+                                    style={{ maxHeight: '90vh' }}
                                     onClick={(e) => e.stopPropagation()}
                                 />
                             </div>

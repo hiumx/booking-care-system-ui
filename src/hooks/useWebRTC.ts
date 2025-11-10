@@ -387,7 +387,7 @@ export const useWebRTC = (
             // Handle remote stream
             pc.ontrack = (event) => {
                 console.log('[WebRTC] Received remote track:', event.track.kind);
-                if (event.streams && event.streams[0]) {
+                if (event.streams?.[0]) {
                     console.log('[WebRTC] Setting remote stream');
                     setRemoteStream(event.streams[0]);
                     callbacks?.onRemoteStream?.(event.streams[0]);

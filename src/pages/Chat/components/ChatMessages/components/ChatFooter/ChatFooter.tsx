@@ -359,11 +359,10 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                     )}
                                     style={{ display: 'block' }}
                                 >
-                                    <a
-                                        href="#"
+                                    <button
+                                        type="button"
                                         className="dropdown-item"
-                                        onClick={(e) => {
-                                            e.preventDefault();
+                                        onClick={() => {
                                             fileInputRef.current?.click();
                                             setShowDropdown(false);
                                         }}
@@ -372,12 +371,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                             <i className="fa-solid fa-file-lines"></i>
                                         </span>
                                         Tài liệu
-                                    </a>
-                                    <a
-                                        href="#"
+                                    </button>
+                                    <button
+                                        type="button"
                                         className="dropdown-item"
-                                        onClick={(e) => {
-                                            e.preventDefault();
+                                        onClick={() => {
                                             const input = document.createElement('input');
                                             input.type = 'file';
                                             input.accept = 'image/*';
@@ -394,12 +392,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                             <i className="fa-solid fa-camera"></i>
                                         </span>
                                         Camera
-                                    </a>
-                                    <a
-                                        href="#"
+                                    </button>
+                                    <button
+                                        type="button"
                                         className="dropdown-item"
-                                        onClick={(e) => {
-                                            e.preventDefault();
+                                        onClick={() => {
                                             const input = document.createElement('input');
                                             input.type = 'file';
                                             input.accept = 'image/*';
@@ -416,12 +413,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                             <i className="fa-solid fa-image"></i>
                                         </span>
                                         Thư viện
-                                    </a>
-                                    <a
-                                        href="#"
+                                    </button>
+                                    <button
+                                        type="button"
                                         className="dropdown-item"
-                                        onClick={(e) => {
-                                            e.preventDefault();
+                                        onClick={() => {
                                             const input = document.createElement('input');
                                             input.type = 'file';
                                             input.accept = 'audio/*';
@@ -437,7 +433,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                             <i className="fa-solid fa-volume-high"></i>
                                         </span>
                                         Âm thanh
-                                    </a>
+                                    </button>
                                 </div>
                             )}
                             {/* Hidden file input for documents */}
@@ -575,9 +571,9 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                         }
                     >
                         {isSending ? (
-                            <div className="spinner-border spinner-border-sm" role="status">
+                            <output className="spinner-border spinner-border-sm">
                                 <span className="visually-hidden">Đang gửi...</span>
-                            </div>
+                            </output>
                         ) : (
                             <i className="isax isax-send-25"></i>
                         )}

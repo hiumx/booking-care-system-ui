@@ -183,9 +183,9 @@ const MessageList = () => {
     if (isLoadingMessages) {
         return (
             <div className="messages text-center p-4">
-                <div className="spinner-border" role="status">
+                <output className="spinner-border">
                     <span className="visually-hidden">Đang tải tin nhắn...</span>
-                </div>
+                </output>
             </div>
         );
     }
@@ -298,7 +298,7 @@ const MessageList = () => {
                 const typeNum =
                     typeof msg.type === 'number' ? msg.type : Number.parseInt(String(msg.type));
                 return typeMap[typeNum] || 'text';
-            })() as any,
+            })(),
             // Case-insensitive comparison for isOwn (senderId might be lowercase, currentUserId uppercase)
             isOwn: msg.senderId?.toLowerCase() === currentUserId?.toLowerCase(),
             isRead: msg.status === 'READ',
@@ -347,9 +347,9 @@ const MessageList = () => {
             {/* Loading indicator for old messages */}
             {isLoadingMoreMessages && (
                 <div className="text-center py-2">
-                    <div className="spinner-border spinner-border-sm" role="status">
+                    <output className="spinner-border spinner-border-sm">
                         <span className="visually-hidden">Đang tải tin nhắn cũ...</span>
-                    </div>
+                    </output>
                     <p className="text-muted small mt-1">Đang tải tin nhắn cũ...</p>
                 </div>
             )}

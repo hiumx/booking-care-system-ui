@@ -3,3 +3,15 @@
         text-decoration: none;
     }
 }
+
+.conversation {
+    padding: 10px;
+    display: flex;
+    display: -webkit-flex;
+    cursor: pointer;
+    margin-bottom: 15px;
+    border: 1px solid #e6e8ee;
+    box-shadow: none;
+    border-radius: 5px;
+    position: relative;
+}

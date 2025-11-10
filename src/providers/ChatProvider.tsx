@@ -491,8 +491,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
                 // Check if conversation has unread messages before calling mark-all-as-read
                 const conversation = conversations.find((conv) => conv.id === conversationId);
-                const hasUnreadMessages =
-                    conversation && conversation.unreadCount && conversation.unreadCount > 0;
+                const hasUnreadMessages = (conversation?.unreadCount ?? 0) > 0;
 
                 if (hasUnreadMessages) {
                     // Only mark as read if there are unread messages
