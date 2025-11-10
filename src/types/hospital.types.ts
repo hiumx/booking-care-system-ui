@@ -73,6 +73,24 @@ export interface HospitalProfileResponse {
     avatarUrl?: string;
     images: Array<{ id: string; imageUrl: string }>;
     specialties: Array<{ id: string; name: string; imageUrl?: string; doctorCount?: number }>;
+    serviceMedicals: HospitalServiceMedicalResponse[];
+    serviceTypes: HospitalServiceTypeResponse[];
+}
+
+// Service Medical Response
+export interface HospitalServiceMedicalResponse {
+    id: string;
+    name: string;
+    imageUrl?: string;
+    price: number;
+}
+
+// Service Type Response
+export interface HospitalServiceTypeResponse {
+    id: string;
+    name: string;
+    imageUrl?: string;
+    doctorCount: number;
 }
 
 // Hospital Image Response DTOs
