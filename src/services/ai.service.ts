@@ -167,14 +167,12 @@ export class AIService {
     }
 
     /**
-     * Get all conversation sessions for a user
+     * Get all conversation sessions for authenticated user
+     * Backend will get userId from authentication token
      */
-    static async getUserSessions(userId?: string): Promise<ApiResponse<SessionSummary[]>> {
+    static async getUserSessions(): Promise<ApiResponse<SessionSummary[]>> {
         try {
-            const url = userId
-                ? `${AI_ENDPOINTS.BASE}/sessions?userId=${userId}`
-                : `${AI_ENDPOINTS.BASE}/sessions`;
-            const response: any = await axiosInstance.get(url);
+            const response: any = await axiosInstance.get(`${AI_ENDPOINTS.BASE}/sessions`);
             return {
                 success: response.success ?? true,
                 data: response.data || [],

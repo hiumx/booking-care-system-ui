@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Home } from 'lucide-react';
 import ChatSidebar from './components/ChatSidebar';
@@ -13,6 +13,7 @@ import { AIService, SymptomAnalysisRequest } from '@/services/ai.service';
 
 const AISupportBooking: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
     const { profile } = useSelector((state: RootState) => state.user);
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
@@ -34,6 +35,14 @@ const AISupportBooking: React.FC = () => {
         districtId?: string;
         displayName: string;
     } | null>(null);
+
+    // Check authentication - redirect to login if not authenticated
+    useEffect(() => {
+        if (!isAuthenticated) {
+            // Redirect to login with return URL
+            navigate(`${PATHS.LOGIN}?returnUrl=${encodeURIComponent(window.location.pathname)}`);
+        }
+    }, [isAuthenticated, navigate]);
 
     // Fetch user profile when authenticated
     useEffect(() => {
@@ -85,7 +94,8 @@ const AISupportBooking: React.FC = () => {
     useEffect(() => {
         const loadSessions = async () => {
             try {
-                const response = await AIService.getUserSessions(profile?.id);
+                // Backend will get userId from authentication token
+                const response = await AIService.getUserSessions();
                 if (response.success && response.data) {
                     // Map sessions to ChatHistory format
                     const histories: ChatHistory[] = response.data.map((session) => {
@@ -129,11 +139,11 @@ const AISupportBooking: React.FC = () => {
             }
         };
 
-        // Only load if we have location (required for AI service)
-        if (userLocation) {
+        // Only load if authenticated and have location
+        if (isAuthenticated && userLocation) {
             loadSessions();
         }
-    }, [profile?.id, userLocation]);
+    }, [isAuthenticated, userLocation]);
 
     // Generate GUID-like string for session ID
     const generateSessionId = (): string => {
@@ -146,6 +156,12 @@ const AISupportBooking: React.FC = () => {
 
     const handleSendMessage = async (content: string) => {
         if (!content.trim()) return;
+
+        // Kiểm tra authentication
+        if (!isAuthenticated) {
+            navigate(`${PATHS.LOGIN}?returnUrl=${encodeURIComponent(window.location.pathname)}`);
+            return;
+        }
 
         // Kiểm tra vị trí trước khi gửi message
         if (!userLocation) {
@@ -193,9 +209,9 @@ const AISupportBooking: React.FC = () => {
                     timestamp: m.timestamp.toISOString(),
                 }));
 
+            // Backend will get userId from authentication token
             const request: SymptomAnalysisRequest = {
                 sessionId: currentChatId,
-                userId: profile?.id,
                 message: content.trim(),
                 location: userLocation
                     ? {
@@ -310,6 +326,12 @@ const AISupportBooking: React.FC = () => {
     };
 
     const handleNewChat = () => {
+        // Kiểm tra authentication
+        if (!isAuthenticated) {
+            navigate(`${PATHS.LOGIN}?returnUrl=${encodeURIComponent(window.location.pathname)}`);
+            return;
+        }
+
         // Kiểm tra vị trí trước khi tạo chat mới
         if (!userLocation) {
             // Modal vị trí sẽ tự động hiển thị trong SearchBox
@@ -330,6 +352,12 @@ const AISupportBooking: React.FC = () => {
     };
 
     const handleSelectChat = async (chatId: string) => {
+        // Kiểm tra authentication
+        if (!isAuthenticated) {
+            navigate(`${PATHS.LOGIN}?returnUrl=${encodeURIComponent(window.location.pathname)}`);
+            return;
+        }
+
         // Kiểm tra vị trí trước khi chọn chat
         if (!userLocation) {
             // Modal vị trí sẽ tự động hiển thị trong SearchBox
