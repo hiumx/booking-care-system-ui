@@ -183,7 +183,7 @@ const AISupportBooking: React.FC = () => {
                             const utcDate = new Date(session.updatedAt);
 
                             // Check if date is valid
-                            if (!isNaN(utcDate.getTime())) {
+                            if (!Number.isNaN(utcDate.getTime())) {
                                 // Format with local timezone (no timeZone option needed, Date already converts to local)
                                 formattedTime = utcDate.toLocaleString('vi-VN', {
                                     day: '2-digit',
@@ -270,6 +270,74 @@ const AISupportBooking: React.FC = () => {
         });
     };
 
+    // Helper function to create a new chat
+    const createNewChat = (content: string): ChatHistory => {
+        const title =
+            content.trim().length > 30 ? `${content.trim().substring(0, 30)}...` : content.trim();
+
+        return {
+            id: generateSessionId(),
+            title,
+            lastMessage: content.trim(),
+            lastMessageTime: 'Vừa xong',
+            avatar: '',
+        };
+    };
+
+    // Helper function to map API response to suggestions
+    const mapResponseToSuggestions = (response: any): Suggestion[] => {
+        const doctorSuggestions = (response.data.recommendedDoctors || []).map((d: any) => ({
+            type: 'doctor' as const,
+            doctor: {
+                id: d.id,
+                name: d.name,
+                specialtyName: d.specialtyName,
+                hospitalName: d.hospitalName,
+                rating: d.rating,
+                yearOfExperience: d.yearOfExperience,
+                serviceTypeName: d.serviceTypeName || undefined,
+                price: d.price || undefined,
+                avatarUrl: d.avatarUrl || undefined,
+            },
+        }));
+
+        const hospitalSuggestions = (response.data.recommendedHospitals || []).map((h: any) => ({
+            type: 'hospital' as const,
+            hospital: {
+                id: h.id,
+                name: h.name,
+                address: h.address,
+                specialtyId: [],
+                specialtyName: h.specialtyNames || [],
+                imageUrl: h.imageUrl || undefined,
+            },
+        }));
+
+        return [...doctorSuggestions, ...hospitalSuggestions];
+    };
+
+    // Helper function to prepare conversation history
+    const prepareConversationHistory = (messages: Message[]) => {
+        return messages
+            .filter((m) => m.sender === 'user' || m.sender === 'ai')
+            .map((m) => ({
+                role: m.sender,
+                content: m.content,
+                timestamp: m.timestamp.toISOString(),
+            }));
+    };
+
+    // Helper function to get error message
+    const getErrorMessage = (error: any): string => {
+        if (error.message) {
+            return `Xin lỗi, ${error.message}`;
+        }
+        if (error.response?.data?.message) {
+            return `Xin lỗi, ${error.response.data.message}`;
+        }
+        return 'Xin lỗi, đã có lỗi xảy ra khi phân tích triệu chứng của bạn. Vui lòng thử lại sau.';
+    };
+
     const handleSendMessage = async (content: string) => {
         if (!content.trim()) return;
 
@@ -297,17 +365,8 @@ const AISupportBooking: React.FC = () => {
         // Create new chat if no active chat
         let currentChatId = activeChatId;
         if (!currentChatId) {
-            currentChatId = generateSessionId();
-            const newChat: ChatHistory = {
-                id: currentChatId,
-                title:
-                    content.trim().length > 30
-                        ? `${content.trim().substring(0, 30)}...`
-                        : content.trim(),
-                lastMessage: content.trim(),
-                lastMessageTime: 'Vừa xong',
-                avatar: '',
-            };
+            const newChat = createNewChat(content);
+            currentChatId = newChat.id;
             setChatHistories((prev) => [newChat, ...prev]);
             setActiveChatId(currentChatId);
             // Navigate to the new chat URL
@@ -320,14 +379,8 @@ const AISupportBooking: React.FC = () => {
         setIsAITyping(true);
 
         try {
-            // Prepare conversation history (only user and AI messages, exclude current message)
-            const conversationHistory = messages
-                .filter((m) => m.sender === 'user' || m.sender === 'ai')
-                .map((m) => ({
-                    role: m.sender,
-                    content: m.content,
-                    timestamp: m.timestamp.toISOString(),
-                }));
+            // Prepare conversation history
+            const conversationHistory = prepareConversationHistory(messages);
 
             // Backend will get userId from authentication token
             const request: SymptomAnalysisRequest = {
@@ -353,34 +406,8 @@ const AISupportBooking: React.FC = () => {
                 currentChatId = response.data.sessionId;
             }
 
-            // Map response to Message format
-            const suggestions: Suggestion[] = [
-                ...(response.data.recommendedDoctors || []).map((d) => ({
-                    type: 'doctor' as const,
-                    doctor: {
-                        id: d.id,
-                        name: d.name,
-                        specialtyName: d.specialtyName,
-                        hospitalName: d.hospitalName,
-                        rating: d.rating,
-                        yearOfExperience: d.yearOfExperience,
-                        serviceTypeName: d.serviceTypeName || undefined,
-                        price: d.price || undefined,
-                        avatarUrl: d.avatarUrl || undefined,
-                    },
-                })),
-                ...(response.data.recommendedHospitals || []).map((h) => ({
-                    type: 'hospital' as const,
-                    hospital: {
-                        id: h.id,
-                        name: h.name,
-                        address: h.address,
-                        specialtyId: [], // Would need from API
-                        specialtyName: h.specialtyNames || [],
-                        imageUrl: h.imageUrl || undefined,
-                    },
-                })),
-            ];
+            // Map response to suggestions
+            const suggestions = mapResponseToSuggestions(response);
 
             // Build AI message content
             // Message từ backend đã bao gồm disclaimer và intro text nếu có recommendations
@@ -408,14 +435,7 @@ const AISupportBooking: React.FC = () => {
             console.error('Error analyzing symptoms:', error);
 
             // Show error message to user
-            let errorContent =
-                'Xin lỗi, đã có lỗi xảy ra khi phân tích triệu chứng của bạn. Vui lòng thử lại sau.';
-
-            if (error.message) {
-                errorContent = `Xin lỗi, ${error.message}`;
-            } else if (error.response?.data?.message) {
-                errorContent = `Xin lỗi, ${error.response.data.message}`;
-            }
+            const errorContent = getErrorMessage(error);
 
             const errorMessage: Message = {
                 id: Date.now().toString(),

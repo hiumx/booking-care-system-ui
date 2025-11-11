@@ -13,7 +13,7 @@
     &:hover {
         transform: translateY(-4px);
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-        border-color: #0e82fd;
+        border-color: #0066cc;
     }
 
     .cardHeader {
@@ -83,7 +83,7 @@
                 &.clickableTitle {
                     cursor: pointer;
                     transition: color 0.2s ease;
-                    color: #0e82fd;
+                    color: #0066cc;
                     position: relative;
                     display: inline-block; // Đảm bảo tooltip căn giữa theo text, không phải theo block
 
@@ -192,7 +192,7 @@
             }
 
             .priceValue {
-                color: #0e82fd;
+                color: #0066cc;
                 font-weight: 600;
                 font-size: 14px;
             }
@@ -260,12 +260,12 @@
         }
 
         .supportButton {
-            background: #0e82fd;
+            background: #0066cc;
             color: #ffffff;
-            border-color: #0e82fd;
+            border-color: #0066cc;
 
             &:hover {
-                background: #0c6fd6;
+                background: #0052a3;
                 border-color: #0c6fd6;
             }
         }

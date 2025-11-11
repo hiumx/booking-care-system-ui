@@ -42,6 +42,73 @@ const CAROUSEL_SUGGESTIONS_BREAKPOINTS = {
     },
 };
 
+// Helper component for rendering tabs
+const SuggestionTabs: React.FC<{
+    suggestions: any[];
+    activeTab: 'doctor' | 'hospital';
+    onTabChange: (tab: 'doctor' | 'hospital') => void;
+}> = ({ suggestions, activeTab, onTabChange }) => {
+    const doctorCount = suggestions.filter((s) => s.type === 'doctor').length;
+    const hospitalCount = suggestions.filter((s) => s.type === 'hospital').length;
+
+    return (
+        <>
+            <button
+                className={clsx(styles.tab, {
+                    [styles.activeTab]: activeTab === 'doctor',
+                })}
+                onClick={() => onTabChange('doctor')}
+            >
+                Bác sĩ
+                {doctorCount > 0 && <span className={styles.tabBadge}>{doctorCount}</span>}
+            </button>
+            <button
+                className={clsx(styles.tab, {
+                    [styles.activeTab]: activeTab === 'hospital',
+                })}
+                onClick={() => onTabChange('hospital')}
+            >
+                Bệnh viện
+                {hospitalCount > 0 && <span className={styles.tabBadge}>{hospitalCount}</span>}
+            </button>
+        </>
+    );
+};
+
+// Helper function to create carousel items
+const createCarouselItems = (
+    suggestions: any[],
+    activeTab: 'doctor' | 'hospital',
+    handleBookAppointment: (id: string) => void,
+    handleSupportBooking: (id: string, type: 'doctor' | 'hospital') => void
+) => {
+    const filteredSuggestions = suggestions.filter((suggestion) => suggestion.type === activeTab);
+
+    return filteredSuggestions.map((suggestion, index) => {
+        const suggestionId =
+            suggestion.type === 'doctor'
+                ? suggestion.doctor?.id || `doctor-${index}`
+                : suggestion.hospital?.id || `hospital-${index}`;
+
+        const entityId =
+            suggestion.type === 'doctor'
+                ? suggestion.doctor?.id || ''
+                : suggestion.hospital?.id || '';
+
+        return {
+            id: suggestionId,
+            node: (
+                <SuggestionCard
+                    key={suggestionId}
+                    suggestion={suggestion}
+                    onBookAppointment={() => handleBookAppointment(entityId)}
+                    onSupportBooking={() => handleSupportBooking(entityId, suggestion.type)}
+                />
+            ),
+        };
+    });
+};
+
 const ChatArea: React.FC<ChatAreaProps> = ({
     messages,
     isAITyping,
@@ -158,104 +225,24 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                 {message.suggestions && message.suggestions.length > 0 && (
                                     <div className={styles.suggestionsContainer}>
                                         <div className={styles.tabsContainer}>
-                                            {(() => {
-                                                const doctorCount = message.suggestions.filter(
-                                                    (s) => s.type === 'doctor'
-                                                ).length;
-                                                const hospitalCount = message.suggestions.filter(
-                                                    (s) => s.type === 'hospital'
-                                                ).length;
-
-                                                return (
-                                                    <>
-                                                        <button
-                                                            className={clsx(styles.tab, {
-                                                                [styles.activeTab]:
-                                                                    activeTab === 'doctor',
-                                                            })}
-                                                            onClick={() => setActiveTab('doctor')}
-                                                        >
-                                                            Bác sĩ
-                                                            {doctorCount > 0 && (
-                                                                <span className={styles.tabBadge}>
-                                                                    {doctorCount}
-                                                                </span>
-                                                            )}
-                                                        </button>
-                                                        <button
-                                                            className={clsx(styles.tab, {
-                                                                [styles.activeTab]:
-                                                                    activeTab === 'hospital',
-                                                            })}
-                                                            onClick={() => setActiveTab('hospital')}
-                                                        >
-                                                            Bệnh viện
-                                                            {hospitalCount > 0 && (
-                                                                <span className={styles.tabBadge}>
-                                                                    {hospitalCount}
-                                                                </span>
-                                                            )}
-                                                        </button>
-                                                    </>
-                                                );
-                                            })()}
+                                            <SuggestionTabs
+                                                suggestions={message.suggestions}
+                                                activeTab={activeTab}
+                                                onTabChange={setActiveTab}
+                                            />
                                         </div>
                                         <div className={styles.suggestionsCarousel}>
-                                            {(() => {
-                                                const filteredSuggestions =
-                                                    message.suggestions.filter(
-                                                        (suggestion) =>
-                                                            suggestion.type === activeTab
-                                                    );
-
-                                                const carouselItems = filteredSuggestions.map(
-                                                    (suggestion, index) => {
-                                                        const suggestionId =
-                                                            suggestion.type === 'doctor'
-                                                                ? suggestion.doctor?.id ||
-                                                                  `doctor-${index}`
-                                                                : suggestion.hospital?.id ||
-                                                                  `hospital-${index}`;
-
-                                                        const entityId =
-                                                            suggestion.type === 'doctor'
-                                                                ? suggestion.doctor?.id || ''
-                                                                : suggestion.hospital?.id || '';
-
-                                                        return {
-                                                            id: suggestionId,
-                                                            node: (
-                                                                <SuggestionCard
-                                                                    key={suggestionId}
-                                                                    suggestion={suggestion}
-                                                                    onBookAppointment={() =>
-                                                                        handleBookAppointment(
-                                                                            entityId
-                                                                        )
-                                                                    }
-                                                                    onSupportBooking={() =>
-                                                                        handleSupportBooking(
-                                                                            entityId,
-                                                                            suggestion.type
-                                                                        )
-                                                                    }
-                                                                />
-                                                            ),
-                                                        };
-                                                    }
-                                                );
-
-                                                return (
-                                                    <Carousel
-                                                        slides={carouselItems}
-                                                        breakpoints={
-                                                            CAROUSEL_SUGGESTIONS_BREAKPOINTS
-                                                        }
-                                                        loop={false}
-                                                        isAutoPlay={false}
-                                                    />
-                                                );
-                                            })()}
+                                            <Carousel
+                                                slides={createCarouselItems(
+                                                    message.suggestions,
+                                                    activeTab,
+                                                    handleBookAppointment,
+                                                    handleSupportBooking
+                                                )}
+                                                breakpoints={CAROUSEL_SUGGESTIONS_BREAKPOINTS}
+                                                loop={false}
+                                                isAutoPlay={false}
+                                            />
                                         </div>
                                         <div className={styles.actionButtons}>
                                             <button

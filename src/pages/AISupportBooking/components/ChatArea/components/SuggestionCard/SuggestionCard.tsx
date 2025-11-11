@@ -66,7 +66,15 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                         <h4
                             className={clsx(styles.cardTitle, styles.clickableTitle)}
                             onClick={() => handleDoctorNameClick(doctor.id)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    handleDoctorNameClick(doctor.id);
+                                }
+                            }}
+                            role="button"
+                            tabIndex={0}
                             data-tooltip="Xem thông tin bác sĩ"
+                            aria-label={`Xem thông tin bác sĩ ${doctor.name}`}
                         >
                             {doctor.name}
                         </h4>
@@ -158,7 +166,15 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                         <h4
                             className={clsx(styles.cardTitle, styles.clickableTitle)}
                             onClick={() => handleHospitalNameClick(hospital.id)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    handleHospitalNameClick(hospital.id);
+                                }
+                            }}
+                            role="button"
+                            tabIndex={0}
                             data-tooltip="Xem thông tin bệnh viện"
+                            aria-label={`Xem thông tin bệnh viện ${hospital.name}`}
                         >
                             {hospital.name}
                         </h4>

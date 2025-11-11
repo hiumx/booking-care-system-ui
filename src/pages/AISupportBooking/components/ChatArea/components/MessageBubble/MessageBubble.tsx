@@ -162,14 +162,114 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
         return <div key={`border-${blockStart}${suffix}`} className={styles.dataBlockBorder}></div>;
     };
 
+    // Helper type for tracking state
+    interface FormatState {
+        formattedLines: React.ReactNode[];
+        currentBlockStart: number;
+        isInBlock: boolean;
+        isInDisclaimer: boolean;
+        disclaimerProcessed: boolean;
+    }
+
+    // Process disclaimer title
+    const processDisclaimerTitle = (
+        trimmedLine: string,
+        index: number,
+        state: FormatState
+    ): boolean => {
+        if (trimmedLine.startsWith('Lưu ý:') && !state.disclaimerProcessed) {
+            state.isInDisclaimer = true;
+            state.formattedLines.push(renderDisclaimerTitle(trimmedLine, index));
+            return true;
+        }
+        return false;
+    };
+
+    // Process disclaimer text
+    const processDisclaimerText = (
+        trimmedLine: string,
+        index: number,
+        state: FormatState
+    ): boolean => {
+        if (
+            state.isInDisclaimer &&
+            trimmedLine.startsWith('*') &&
+            trimmedLine.endsWith('*') &&
+            !state.disclaimerProcessed
+        ) {
+            state.formattedLines.push(renderDisclaimerText(trimmedLine, index));
+            state.disclaimerProcessed = true;
+            state.isInDisclaimer = false;
+            return true;
+        }
+        return false;
+    };
+
+    // Check if should skip duplicate disclaimer
+    const shouldSkipDuplicateDisclaimer = (
+        trimmedLine: string,
+        disclaimerProcessed: boolean
+    ): boolean => {
+        return (
+            disclaimerProcessed &&
+            (trimmedLine.startsWith('Lưu ý:') ||
+                (trimmedLine.startsWith('*') && trimmedLine.endsWith('*')))
+        );
+    };
+
+    // Process name line
+    const processNameLine = (trimmedLine: string, index: number, state: FormatState): void => {
+        if (state.isInBlock && state.currentBlockStart >= 0) {
+            state.formattedLines.push(renderBlockBorder(state.currentBlockStart));
+        }
+        state.currentBlockStart = index;
+        state.isInBlock = true;
+        state.formattedLines.push(renderNameLine(trimmedLine, index));
+    };
+
+    // Process content line
+    const processContentLine = (
+        trimmedLine: string,
+        index: number,
+        isLastLine: boolean,
+        state: FormatState
+    ): void => {
+        if (isListItem(trimmedLine)) {
+            state.formattedLines.push(renderListItem(trimmedLine, index));
+        } else {
+            state.formattedLines.push(renderContentLine(trimmedLine, index, isLastLine));
+        }
+    };
+
+    // Process empty line
+    const processEmptyLine = (index: number, nextLine: string, state: FormatState): void => {
+        if (
+            state.isInBlock &&
+            (/^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/.test(nextLine) || nextLine === '')
+        ) {
+            state.formattedLines.push(
+                <React.Fragment key={`empty-${index}`}>
+                    <br key={`br-${index}`} />
+                    {renderBlockBorder(state.currentBlockStart, `-${index}`)}
+                </React.Fragment>
+            );
+            state.isInBlock = false;
+        } else {
+            state.formattedLines.push(<br key={`br-${index}`} />);
+        }
+    };
+
     const formatTextContent = (text: string) => {
         const processedText = processMarkdown(text);
         const lines = processedText.split('\n');
-        const formattedLines: React.ReactNode[] = [];
-        let currentBlockStart = -1;
-        let isInBlock = false;
-        let isInDisclaimer = false;
-        let disclaimerProcessed = false;
+
+        const state: FormatState = {
+            formattedLines: [],
+            currentBlockStart: -1,
+            isInBlock: false,
+            isInDisclaimer: false,
+            disclaimerProcessed: false,
+        };
 
         for (let index = 0; index < lines.length; index++) {
             const line = lines[index];
@@ -177,79 +277,29 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
             const nextLine = index < lines.length - 1 ? lines[index + 1]?.trim() : '';
             const isLastLine = index === lines.length - 1;
 
-            // Handle disclaimer title
-            if (trimmedLine.startsWith('Lưu ý:') && !disclaimerProcessed) {
-                isInDisclaimer = true;
-                formattedLines.push(renderDisclaimerTitle(trimmedLine, index));
-                continue;
-            }
+            // Process disclaimers
+            if (processDisclaimerTitle(trimmedLine, index, state)) continue;
+            if (processDisclaimerText(trimmedLine, index, state)) continue;
+            if (shouldSkipDuplicateDisclaimer(trimmedLine, state.disclaimerProcessed)) continue;
 
-            // Handle disclaimer text
-            if (
-                isInDisclaimer &&
-                trimmedLine.startsWith('*') &&
-                trimmedLine.endsWith('*') &&
-                !disclaimerProcessed
-            ) {
-                formattedLines.push(renderDisclaimerText(trimmedLine, index));
-                disclaimerProcessed = true;
-                isInDisclaimer = false;
-                continue;
-            }
-
-            // Skip duplicate disclaimer lines
-            if (
-                disclaimerProcessed &&
-                (trimmedLine.startsWith('Lưu ý:') ||
-                    (trimmedLine.startsWith('*') && trimmedLine.endsWith('*')))
-            ) {
-                continue;
-            }
-
-            // Handle section titles
+            // Process different line types
             if (isSectionTitle(trimmedLine)) {
-                formattedLines.push(renderSectionTitle(trimmedLine, index, isLastLine));
-            }
-            // Handle name lines
-            else if (isNameLine(trimmedLine)) {
-                if (isInBlock && currentBlockStart >= 0) {
-                    formattedLines.push(renderBlockBorder(currentBlockStart));
-                }
-                currentBlockStart = index;
-                isInBlock = true;
-                formattedLines.push(renderNameLine(trimmedLine, index));
-            }
-            // Handle content lines
-            else if (trimmedLine) {
-                if (isListItem(trimmedLine)) {
-                    formattedLines.push(renderListItem(trimmedLine, index));
-                } else {
-                    formattedLines.push(renderContentLine(trimmedLine, index, isLastLine));
-                }
-            }
-            // Handle empty lines
-            else if (
-                isInBlock &&
-                (/^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/.test(nextLine) || nextLine === '')
-            ) {
-                formattedLines.push(
-                    <React.Fragment key={`empty-${index}`}>
-                        <br key={`br-${index}`} />
-                        {renderBlockBorder(currentBlockStart, `-${index}`)}
-                    </React.Fragment>
-                );
-                isInBlock = false;
+                state.formattedLines.push(renderSectionTitle(trimmedLine, index, isLastLine));
+            } else if (isNameLine(trimmedLine)) {
+                processNameLine(trimmedLine, index, state);
+            } else if (trimmedLine) {
+                processContentLine(trimmedLine, index, isLastLine, state);
             } else {
-                formattedLines.push(<br key={`br-${index}`} />);
+                processEmptyLine(index, nextLine, state);
             }
         }
 
         // Add final border if needed
-        if (isInBlock && currentBlockStart >= 0) {
-            formattedLines.push(renderBlockBorder(currentBlockStart, '-end'));
+        if (state.isInBlock && state.currentBlockStart >= 0) {
+            state.formattedLines.push(renderBlockBorder(state.currentBlockStart, '-end'));
         }
 
-        return formattedLines;
+        return state.formattedLines;
     };
 
     return (

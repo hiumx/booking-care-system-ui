@@ -212,12 +212,12 @@
             gap: 8px;
 
             &:hover {
-                color: #0e82fd;
+                color: #0066cc;
                 background: rgba(14, 130, 253, 0.05);
             }
 
             &.activeTab {
-                color: #0066cc; // Improved contrast for WCAG AA compliance
+                color: #0052a3; // Improved contrast for WCAG AA compliance
                 font-weight: 600;
                 background: rgba(14, 130, 253, 0.1);
 
@@ -251,11 +251,11 @@
             }
 
             &.activeTab .tabBadge {
-                background: #0e82fd;
+                background: #0066cc;
             }
 
             &:hover .tabBadge {
-                background: #0e82fd;
+                background: #0066cc;
             }
         }
     }

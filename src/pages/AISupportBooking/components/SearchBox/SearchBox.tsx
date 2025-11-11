@@ -498,7 +498,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                         // Không cho đóng modal khi click vào overlay (bắt buộc phải chọn vị trí)
                         e.stopPropagation();
                     }}
-                    role="presentation"
                     aria-hidden="true"
                 />
             )}

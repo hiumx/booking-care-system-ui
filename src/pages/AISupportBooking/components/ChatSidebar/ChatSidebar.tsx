@@ -106,13 +106,11 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
         return 'Khách';
     };
 
-    // Lấy chữ cái đầu để hiển thị trong avatar mặc định
-    const getInitialsForUser = () => {
-        // Nếu chưa đăng nhập, hiển thị "U"
+    // Sử dụng lại hàm getInitials từ ChatAvatar component
+    const getInitials = () => {
         if (!isAuthenticated || !profile?.fullName) {
             return 'U';
         }
-        // Nếu đã đăng nhập, lấy chữ cái đầu từ tên
         const names = profile.fullName.trim().split(' ');
         if (names.length >= 2) {
             return (names[0][0] + names[names.length - 1][0]).toUpperCase();
@@ -236,12 +234,12 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                     }}
                                 />
                                 <div className={styles.avatarFallback} style={{ display: 'none' }}>
-                                    {getInitialsForUser()}
+                                    {getInitials()}
                                 </div>
                             </>
                         ) : (
                             // Hiển thị avatar mặc định với chữ cái (đã login nhưng không có ảnh, hoặc chưa login, hoặc ảnh lỗi)
-                            <div className={styles.avatarFallback}>{getInitialsForUser()}</div>
+                            <div className={styles.avatarFallback}>{getInitials()}</div>
                         )}
                     </div>
                     <div
