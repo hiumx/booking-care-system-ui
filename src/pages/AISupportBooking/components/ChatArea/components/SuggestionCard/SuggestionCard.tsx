@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Star, Building2, Stethoscope, HelpCircle } from 'lucide-react';
-import { Suggestion } from '../../../../types';
+import { Suggestion } from '@/types/ai.types';
 import { PATHS, replacePathParams } from '@/routes/paths';
 import clsx from 'clsx';
 import styles from './SuggestionCard.module.scss';
@@ -173,8 +173,11 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                         <div className={styles.specialties}>
                             <p className={styles.specialtiesLabel}>Chuyên khoa:</p>
                             <div className={styles.specialtyTags}>
-                                {displaySpecialties.map((specialty, index) => (
-                                    <span key={index} className={styles.specialtyTag}>
+                                {displaySpecialties.map((specialty: string, index: number) => (
+                                    <span
+                                        key={`specialty-${specialty}-${index}`}
+                                        className={styles.specialtyTag}
+                                    >
                                         {specialty}
                                     </span>
                                 ))}

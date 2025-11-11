@@ -296,6 +296,12 @@
     &.userMessage:hover .content .actionButtons {
         opacity: 1;
     }
+
+    .listItem {
+        padding-left: 20px;
+        margin: 4px 0;
+        line-height: 1.6;
+    }
 }
 
 @keyframes fadeIn {

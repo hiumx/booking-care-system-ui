@@ -13,6 +13,76 @@ import { Message, ChatHistory, Suggestion } from '@/types/ai.types';
 import { PATHS, replacePathParams } from '@/routes/paths';
 import { AIService, SymptomAnalysisRequest } from '@/services/ai.service';
 
+// Helper function to parse doctor data
+const parseDoctorData = (d: any) => ({
+    type: 'doctor' as const,
+    doctor: {
+        id: d.id || d.doctor?.id,
+        name: d.name || d.doctor?.name,
+        specialtyName: d.specialtyName || d.doctor?.specialtyName,
+        hospitalName: d.hospitalName || d.doctor?.hospitalName,
+        rating: d.rating || d.doctor?.rating || 0,
+        yearOfExperience: d.yearOfExperience || d.doctor?.yearOfExperience || 0,
+        serviceTypeName: d.serviceTypeName || d.doctor?.serviceTypeName || undefined,
+        price: d.price || d.doctor?.price || undefined,
+        avatarUrl: d.avatarUrl || d.doctor?.avatarUrl || undefined,
+    },
+});
+
+// Helper function to parse hospital data
+const parseHospitalData = (h: any) => ({
+    type: 'hospital' as const,
+    hospital: {
+        id: h.id || h.hospital?.id,
+        name: h.name || h.hospital?.name,
+        address: h.address || h.hospital?.address,
+        specialtyId: [],
+        specialtyName: h.specialtyNames || h.hospital?.specialtyName || [],
+        imageUrl: h.imageUrl || h.hospital?.imageUrl || undefined,
+    },
+});
+
+// Helper function to parse suggestions
+const parseSuggestions = (suggestionsData: any): Suggestion[] | undefined => {
+    if (!suggestionsData) return undefined;
+
+    try {
+        const doctors =
+            suggestionsData.doctors ||
+            (Array.isArray(suggestionsData)
+                ? suggestionsData.filter((s: any) => s.type === 'doctor')
+                : []);
+
+        const hospitals =
+            suggestionsData.hospitals ||
+            (Array.isArray(suggestionsData)
+                ? suggestionsData.filter((s: any) => s.type === 'hospital')
+                : []);
+
+        return [
+            ...(Array.isArray(doctors) ? doctors : []).map(parseDoctorData),
+            ...(Array.isArray(hospitals) ? hospitals : []).map(parseHospitalData),
+        ];
+    } catch (e) {
+        console.error('Error parsing suggestions:', e);
+        return undefined;
+    }
+};
+
+// Helper function to convert message from API
+const convertMessageFromAPI = (msg: any, chatId: string, index: number): Message => {
+    const suggestions = parseSuggestions(msg.suggestions);
+    const sender = msg.role?.toLowerCase() === 'ai' ? 'ai' : 'user';
+
+    return {
+        id: `${chatId}-${index}`,
+        content: msg.content || '',
+        sender: sender,
+        timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+        suggestions: suggestions,
+    };
+};
+
 const AISupportBooking: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
@@ -166,88 +236,9 @@ const AISupportBooking: React.FC = () => {
                     const response = await AIService.getSession(chatId);
                     if (response.success && response.data?.conversationHistory) {
                         const history = response.data.conversationHistory;
-                        const loadedMessages: Message[] = history.map((msg: any, index: number) => {
-                            let suggestions: Suggestion[] | undefined = undefined;
-                            if (msg.suggestions) {
-                                try {
-                                    const suggestionsData = msg.suggestions;
-                                    const doctors =
-                                        suggestionsData.doctors ||
-                                        (Array.isArray(suggestionsData)
-                                            ? suggestionsData.filter(
-                                                  (s: any) => s.type === 'doctor'
-                                              )
-                                            : []);
-                                    const hospitals =
-                                        suggestionsData.hospitals ||
-                                        (Array.isArray(suggestionsData)
-                                            ? suggestionsData.filter(
-                                                  (s: any) => s.type === 'hospital'
-                                              )
-                                            : []);
-
-                                    suggestions = [
-                                        ...(Array.isArray(doctors) ? doctors : []).map(
-                                            (d: any) => ({
-                                                type: 'doctor' as const,
-                                                doctor: {
-                                                    id: d.id || d.doctor?.id,
-                                                    name: d.name || d.doctor?.name,
-                                                    specialtyName:
-                                                        d.specialtyName || d.doctor?.specialtyName,
-                                                    hospitalName:
-                                                        d.hospitalName || d.doctor?.hospitalName,
-                                                    rating: d.rating || d.doctor?.rating || 0,
-                                                    yearOfExperience:
-                                                        d.yearOfExperience ||
-                                                        d.doctor?.yearOfExperience ||
-                                                        0,
-                                                    serviceTypeName:
-                                                        d.serviceTypeName ||
-                                                        d.doctor?.serviceTypeName ||
-                                                        undefined,
-                                                    price: d.price || d.doctor?.price || undefined,
-                                                    avatarUrl:
-                                                        d.avatarUrl ||
-                                                        d.doctor?.avatarUrl ||
-                                                        undefined,
-                                                },
-                                            })
-                                        ),
-                                        ...(Array.isArray(hospitals) ? hospitals : []).map(
-                                            (h: any) => ({
-                                                type: 'hospital' as const,
-                                                hospital: {
-                                                    id: h.id || h.hospital?.id,
-                                                    name: h.name || h.hospital?.name,
-                                                    address: h.address || h.hospital?.address,
-                                                    specialtyId: [],
-                                                    specialtyName:
-                                                        h.specialtyNames ||
-                                                        h.hospital?.specialtyName ||
-                                                        [],
-                                                    imageUrl:
-                                                        h.imageUrl ||
-                                                        h.hospital?.imageUrl ||
-                                                        undefined,
-                                                },
-                                            })
-                                        ),
-                                    ];
-                                } catch (e) {
-                                    console.error('Error parsing suggestions:', e);
-                                }
-                            }
-
-                            const sender = msg.role?.toLowerCase() === 'ai' ? 'ai' : 'user';
-                            return {
-                                id: `${chatId}-${index}`,
-                                content: msg.content || '',
-                                sender: sender,
-                                timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
-                                suggestions: suggestions,
-                            };
-                        });
+                        const loadedMessages: Message[] = history.map((msg: any, index: number) =>
+                            convertMessageFromAPI(msg, chatId, index)
+                        );
                         setMessages(loadedMessages);
                     } else {
                         setMessages([]);

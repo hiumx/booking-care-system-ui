@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { useSelector } from 'react-redux';
 import { Stethoscope, Edit2, Copy, Check } from 'lucide-react';
 import { RootState } from '@/store';
-import { Message } from '../../../../types';
+import { Message } from '@/types/ai.types';
 import styles from './MessageBubble.module.scss';
 
 interface MessageBubbleProps {
@@ -91,7 +91,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
         let isInDisclaimer = false;
         let disclaimerProcessed = false; // Track if disclaimer has been processed to avoid duplicates
 
-        lines.forEach((line, index) => {
+        for (let index = 0; index < lines.length; index++) {
+            const line = lines[index];
             const trimmedLine = line.trim();
             const nextLine = index < lines.length - 1 ? lines[index + 1]?.trim() : '';
 
@@ -99,13 +100,13 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
             if (trimmedLine.startsWith('Lưu ý:') && !disclaimerProcessed) {
                 isInDisclaimer = true;
                 formattedLines.push(
-                    <React.Fragment key={index}>
+                    <React.Fragment key={`disclaimer-title-${index}`}>
                         <div className={styles.disclaimerSection}>
                             <strong className={styles.disclaimerTitle}>{trimmedLine}</strong>
                         </div>
                     </React.Fragment>
                 );
-                return;
+                continue;
             }
 
             // Kiểm tra nếu là disclaimer text (bắt đầu với *) - chỉ xử lý 1 lần
@@ -117,7 +118,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
             ) {
                 const disclaimerText = trimmedLine.slice(1, -1); // Remove * at start and end
                 formattedLines.push(
-                    <React.Fragment key={index}>
+                    <React.Fragment key={`disclaimer-text-${index}`}>
                         <div
                             className={styles.disclaimerText}
                             dangerouslySetInnerHTML={{ __html: disclaimerText }}
@@ -127,7 +128,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
                 // Mark disclaimer as processed and reset flag
                 disclaimerProcessed = true;
                 isInDisclaimer = false;
-                return;
+                continue;
             }
 
             // Skip duplicate disclaimer lines - only skip if already processed
@@ -136,20 +137,23 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
                 (trimmedLine.startsWith('Lưu ý:') ||
                     (trimmedLine.startsWith('*') && trimmedLine.endsWith('*')))
             ) {
-                return; // Skip duplicate disclaimer only if already processed
+                continue; // Skip duplicate disclaimer only if already processed
             }
 
             // Kiểm tra nếu là section title (có dấu hai chấm ở cuối và không phải là tên bác sĩ/bệnh viện)
-            const isSectionTitle = trimmedLine.match(/^(Bệnh viện chuyên về|Bác sĩ chuyên về).*:$/);
+            const isSectionTitle =
+                /^(Bệnh viện chuyên về|Bác sĩ chuyên về|Dựa trên các triệu chứng|Lời khuyên chung|Chuyên khoa phù hợp).*:?$/.exec(
+                    trimmedLine
+                );
 
             // Kiểm tra nếu là tên bác sĩ hoặc bệnh viện (bắt đầu với "Bác sĩ", "BS.", hoặc "Bệnh viện", "Phòng khám" nhưng không phải section title)
             const isNameLine =
-                !isSectionTitle && trimmedLine.match(/^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/);
+                !isSectionTitle && /^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/.test(trimmedLine);
 
             if (isSectionTitle) {
                 // Section title - không thêm border, spacing nhỏ hơn
                 formattedLines.push(
-                    <React.Fragment key={index}>
+                    <React.Fragment key={`section-${index}`}>
                         <strong
                             className={styles.sectionTitle}
                             dangerouslySetInnerHTML={{ __html: trimmedLine }}
@@ -172,7 +176,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
                 currentBlockStart = index;
                 isInBlock = true;
                 formattedLines.push(
-                    <React.Fragment key={index}>
+                    <React.Fragment key={`name-${index}`}>
                         <strong
                             className={styles.boldName}
                             dangerouslySetInnerHTML={{ __html: trimmedLine }}
@@ -180,35 +184,50 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
                     </React.Fragment>
                 );
             } else if (trimmedLine) {
-                // Nếu là dòng có nội dung trong block - render HTML nếu có
-                formattedLines.push(
-                    <React.Fragment key={index}>
-                        <span dangerouslySetInnerHTML={{ __html: trimmedLine }} />
-                        {index < lines.length - 1 && <br />}
-                    </React.Fragment>
-                );
+                // Kiểm tra nếu là list item (bắt đầu với - hoặc •)
+                const isListItem = /^[-•]/.test(trimmedLine);
+
+                if (isListItem) {
+                    // Format list item với indent
+                    formattedLines.push(
+                        <React.Fragment key={`list-${index}`}>
+                            <div className={styles.listItem}>
+                                <span dangerouslySetInnerHTML={{ __html: trimmedLine }} />
+                            </div>
+                        </React.Fragment>
+                    );
+                } else {
+                    // Nếu là dòng có nội dung trong block - render HTML nếu có
+                    formattedLines.push(
+                        <React.Fragment key={`content-${index}`}>
+                            <span dangerouslySetInnerHTML={{ __html: trimmedLine }} />
+                            {index < lines.length - 1 && <br />}
+                        </React.Fragment>
+                    );
+                }
             } else {
                 // Dòng trống - kiểm tra xem có phải kết thúc block không
                 // Nếu dòng trống và dòng tiếp theo là tên mới hoặc không có dòng tiếp theo, kết thúc block
                 if (
                     isInBlock &&
-                    (nextLine.match(/^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/) || nextLine === '')
+                    (/^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/.test(nextLine) || nextLine === '')
                 ) {
+                    // Dòng trống và kết thúc block
                     formattedLines.push(
-                        <React.Fragment key={index}>
-                            <br />
+                        <React.Fragment key={`empty-${index}`}>
+                            <br key={`br-${index}`} />
                             <div
-                                key={`border-${currentBlockStart}`}
+                                key={`border-${currentBlockStart}-${index}`}
                                 className={styles.dataBlockBorder}
                             ></div>
                         </React.Fragment>
                     );
                     isInBlock = false;
                 } else {
-                    formattedLines.push(<br key={index} />);
+                    formattedLines.push(<br key={`br-${index}`} />);
                 }
             }
-        });
+        }
 
         // Thêm border-bottom cho block cuối cùng nếu chưa có
         if (isInBlock && currentBlockStart >= 0) {
@@ -264,7 +283,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
                         />
                     ) : (
                         <div className={styles.text}>
-                            {!isUser ? formatTextContent(message.content) : message.content}
+                            {isUser ? message.content : formatTextContent(message.content)}
                         </div>
                     )}
                 </div>

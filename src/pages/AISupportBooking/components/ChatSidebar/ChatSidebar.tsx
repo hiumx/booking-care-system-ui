@@ -161,6 +161,15 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                         [styles.active]: activeChatId === chat.id,
                                     })}
                                     onClick={() => onSelectChat(chat.id)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            onSelectChat(chat.id);
+                                        }
+                                    }}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label={`Chọn cuộc trò chuyện: ${chat.title || chat.lastMessage || 'Cuộc trò chuyện'}`}
                                 >
                                     <div className={styles.chatAvatar}>
                                         <UserAvatar />

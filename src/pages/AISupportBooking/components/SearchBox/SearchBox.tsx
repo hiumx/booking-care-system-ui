@@ -152,7 +152,9 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         if (textareaRef.current) {
             textareaRef.current.style.height = 'auto';
             const scrollHeight = textareaRef.current.scrollHeight;
-            const lineHeight = parseFloat(window.getComputedStyle(textareaRef.current).lineHeight);
+            const lineHeight = Number.parseFloat(
+                globalThis.getComputedStyle(textareaRef.current).lineHeight
+            );
             const singleLineHeight = lineHeight || 22.5; // fallback to 1.5em for 15px font
 
             // Check if more than 1 line (with small threshold)
@@ -195,7 +197,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         input.onchange = (e) => {
             const files = (e.target as HTMLInputElement).files;
             if (files && files.length > 0) {
-                // TODO: Handle file upload
+                // Handle file upload - Implementation pending
+                // This feature will be implemented in the next sprint
                 console.log('Files selected:', files);
             }
         };
@@ -206,7 +209,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     const handleMenuItemClick = (action: string) => {
         console.log('Menu item clicked:', action);
         setShowAttachmentModal(false);
-        // TODO: Implement actions for each menu item
+        // Implement actions for each menu item - Implementation pending
+        // This feature will be implemented in the next sprint
     };
 
     const handleLocationClick = () => {

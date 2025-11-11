@@ -14,14 +14,14 @@ const ChatSidebarSkeleton: React.FC = () => {
             </div>
 
             {/* New Chat Button Skeleton */}
-            <div className={styles.newChatButton} style={{ pointerEvents: 'none' }}>
+            <div style={{ padding: '10px 20px', marginBottom: '16px', pointerEvents: 'none' }}>
                 <Skeleton
                     animation={false}
                     variant="rectangular"
                     width="100%"
-                    height={40}
+                    height={48}
                     sx={{
-                        borderRadius: '8px',
+                        borderRadius: '12px',
                         bgcolor: '#e0e0e0',
                         border: 'none',
                         outline: 'none',
@@ -36,7 +36,7 @@ const ChatSidebarSkeleton: React.FC = () => {
             <div className={styles.chatList}>
                 {[1, 2, 3, 4, 5].map((index) => (
                     <div key={index} className={styles.chatItem}>
-                        <div className={styles.chatAvatar}>
+                        <div style={{ width: 40, height: 40, flexShrink: 0 }}>
                             <Skeleton
                                 animation={false}
                                 variant="circular"
@@ -81,7 +81,7 @@ const ChatSidebarSkeleton: React.FC = () => {
 
             {/* User Info Skeleton */}
             <div className={styles.userInfo}>
-                <div className={styles.userAvatar}>
+                <div style={{ width: 40, height: 40, flexShrink: 0 }}>
                     <Skeleton
                         animation={false}
                         variant="circular"
