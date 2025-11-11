@@ -228,21 +228,19 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
                 }
             }
             // Handle empty lines
-            else {
-                if (
-                    isInBlock &&
-                    (/^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/.test(nextLine) || nextLine === '')
-                ) {
-                    formattedLines.push(
-                        <React.Fragment key={`empty-${index}`}>
-                            <br key={`br-${index}`} />
-                            {renderBlockBorder(currentBlockStart, `-${index}`)}
-                        </React.Fragment>
-                    );
-                    isInBlock = false;
-                } else {
-                    formattedLines.push(<br key={`br-${index}`} />);
-                }
+            else if (
+                isInBlock &&
+                (/^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/.test(nextLine) || nextLine === '')
+            ) {
+                formattedLines.push(
+                    <React.Fragment key={`empty-${index}`}>
+                        <br key={`br-${index}`} />
+                        {renderBlockBorder(currentBlockStart, `-${index}`)}
+                    </React.Fragment>
+                );
+                isInBlock = false;
+            } else {
+                formattedLines.push(<br key={`br-${index}`} />);
             }
         }
 
@@ -263,16 +261,20 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
         >
             <div className={styles.avatar}>
                 {isUser ? (
-                    isAuthenticated && profile && profile.avatarUrl && !avatarError ? (
-                        <img
-                            src={profile.avatarUrl}
-                            alt={profile.fullName || 'User'}
-                            onError={() => setAvatarError(true)}
-                            className={styles.userAvatarImg}
-                        />
-                    ) : (
-                        <div className={styles.userAvatarFallback}>{getInitials()}</div>
-                    )
+                    (() => {
+                        const hasAvatar = isAuthenticated && profile?.avatarUrl && !avatarError;
+                        if (hasAvatar) {
+                            return (
+                                <img
+                                    src={profile.avatarUrl}
+                                    alt={profile.fullName || 'User'}
+                                    onError={() => setAvatarError(true)}
+                                    className={styles.userAvatarImg}
+                                />
+                            );
+                        }
+                        return <div className={styles.userAvatarFallback}>{getInitials()}</div>;
+                    })()
                 ) : (
                     <Stethoscope size={20} className={styles.aiIcon} />
                 )}

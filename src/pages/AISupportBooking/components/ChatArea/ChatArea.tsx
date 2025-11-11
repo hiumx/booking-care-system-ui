@@ -209,45 +209,40 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                                     );
 
                                                 const carouselItems = filteredSuggestions.map(
-                                                    (suggestion, index) => ({
-                                                        id:
+                                                    (suggestion, index) => {
+                                                        const suggestionId =
                                                             suggestion.type === 'doctor'
                                                                 ? suggestion.doctor?.id ||
                                                                   `doctor-${index}`
                                                                 : suggestion.hospital?.id ||
-                                                                  `hospital-${index}`,
-                                                        node: (
-                                                            <SuggestionCard
-                                                                key={
-                                                                    suggestion.type === 'doctor'
-                                                                        ? suggestion.doctor?.id ||
-                                                                          `doctor-${index}`
-                                                                        : suggestion.hospital?.id ||
-                                                                          `hospital-${index}`
-                                                                }
-                                                                suggestion={suggestion}
-                                                                onBookAppointment={() =>
-                                                                    handleBookAppointment(
-                                                                        suggestion.type === 'doctor'
-                                                                            ? suggestion.doctor
-                                                                                  ?.id || ''
-                                                                            : suggestion.hospital
-                                                                                  ?.id || ''
-                                                                    )
-                                                                }
-                                                                onSupportBooking={() =>
-                                                                    handleSupportBooking(
-                                                                        suggestion.type === 'doctor'
-                                                                            ? suggestion.doctor
-                                                                                  ?.id || ''
-                                                                            : suggestion.hospital
-                                                                                  ?.id || '',
-                                                                        suggestion.type
-                                                                    )
-                                                                }
-                                                            />
-                                                        ),
-                                                    })
+                                                                  `hospital-${index}`;
+
+                                                        const entityId =
+                                                            suggestion.type === 'doctor'
+                                                                ? suggestion.doctor?.id || ''
+                                                                : suggestion.hospital?.id || '';
+
+                                                        return {
+                                                            id: suggestionId,
+                                                            node: (
+                                                                <SuggestionCard
+                                                                    key={suggestionId}
+                                                                    suggestion={suggestion}
+                                                                    onBookAppointment={() =>
+                                                                        handleBookAppointment(
+                                                                            entityId
+                                                                        )
+                                                                    }
+                                                                    onSupportBooking={() =>
+                                                                        handleSupportBooking(
+                                                                            entityId,
+                                                                            suggestion.type
+                                                                        )
+                                                                    }
+                                                                />
+                                                            ),
+                                                        };
+                                                    }
                                                 );
 
                                                 return (

@@ -459,18 +459,115 @@ const AISupportBooking: React.FC = () => {
         }
 
         const newChatId = generateSessionId();
+        const now = new Date();
+        const formattedTime = now.toLocaleString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+        });
         const newChat: ChatHistory = {
             id: newChatId,
             title: 'Cuộc trò chuyện mới',
             lastMessage: '',
-            lastMessageTime: 'Vừa tạo',
+            lastMessageTime: formattedTime,
             avatar: '',
         };
-        setChatHistories((prev) => [newChat, ...prev]);
+        setChatHistories([newChat, ...chatHistories]);
         setActiveChatId(newChatId);
         setMessages([]);
         // Navigate to the new chat URL
         navigate(replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, { chatId: newChatId }));
+    };
+
+    // Helper function to parse doctor suggestions
+    const parseDoctorSuggestions = (doctors: any[]): Suggestion[] => {
+        if (!Array.isArray(doctors)) return [];
+
+        return doctors.map((d: any) => ({
+            type: 'doctor' as const,
+            doctor: {
+                id: d.id || d.doctor?.id,
+                name: d.name || d.doctor?.name,
+                specialtyName: d.specialtyName || d.doctor?.specialtyName,
+                hospitalName: d.hospitalName || d.doctor?.hospitalName,
+                rating: d.rating || d.doctor?.rating || 0,
+                yearOfExperience: d.yearOfExperience || d.doctor?.yearOfExperience || 0,
+                serviceTypeName: d.serviceTypeName || d.doctor?.serviceTypeName || undefined,
+                price: d.price || d.doctor?.price || undefined,
+                avatarUrl: d.avatarUrl || d.doctor?.avatarUrl || undefined,
+            },
+        }));
+    };
+
+    // Helper function to parse hospital suggestions
+    const parseHospitalSuggestions = (hospitals: any[]): Suggestion[] => {
+        if (!Array.isArray(hospitals)) return [];
+
+        return hospitals.map((h: any) => ({
+            type: 'hospital' as const,
+            hospital: {
+                id: h.id || h.hospital?.id,
+                name: h.name || h.hospital?.name,
+                address: h.address || h.hospital?.address,
+                specialtyId: [],
+                specialtyName: h.specialtyNames || h.hospital?.specialtyName || [],
+                imageUrl: h.imageUrl || h.hospital?.imageUrl || undefined,
+            },
+        }));
+    };
+
+    // Helper function to parse suggestions from message
+    const parseSuggestions = (suggestionsData: any, index: number): Suggestion[] | undefined => {
+        if (!suggestionsData) {
+            console.log('No suggestions found for message:', index);
+            return undefined;
+        }
+
+        try {
+            console.log('Loading suggestions for message:', index, suggestionsData);
+
+            // Handle both object and already parsed structure
+            const doctors =
+                suggestionsData.doctors ||
+                (Array.isArray(suggestionsData)
+                    ? suggestionsData.filter((s: any) => s.type === 'doctor')
+                    : []);
+            const hospitals =
+                suggestionsData.hospitals ||
+                (Array.isArray(suggestionsData)
+                    ? suggestionsData.filter((s: any) => s.type === 'hospital')
+                    : []);
+
+            const suggestions = [
+                ...parseDoctorSuggestions(doctors),
+                ...parseHospitalSuggestions(hospitals),
+            ];
+
+            if (suggestions.length > 0) {
+                console.log('Successfully loaded suggestions:', suggestions.length, 'items');
+            }
+            return suggestions;
+        } catch (e) {
+            console.error('Error parsing suggestions:', e, suggestionsData);
+            return undefined;
+        }
+    };
+
+    // Helper function to convert history message to Message format
+    const convertHistoryMessage = (msg: any, index: number, chatId: string): Message => {
+        const suggestions = parseSuggestions(msg.suggestions, index);
+        const sender = msg.role?.toLowerCase() === 'ai' ? 'ai' : 'user';
+
+        return {
+            id: `${chatId}-${index}`,
+            content: msg.content || '',
+            sender: sender,
+            timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+            suggestions: suggestions,
+        };
     };
 
     const handleSelectChat = async (chatId: string) => {
@@ -486,95 +583,14 @@ const AISupportBooking: React.FC = () => {
             return;
         }
 
-        setActiveChatId(chatId);
-        // Update URL to reflect selected chat
-        navigate(replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, { chatId: chatId }));
         setIsLoadingChat(true);
-
-        // Load conversation history for this chat
         try {
             const response = await AIService.getSession(chatId);
             if (response.success && response.data?.conversationHistory) {
                 const history = response.data.conversationHistory;
-                // Map conversation history to Message format
-                const loadedMessages: Message[] = history.map((msg: any, index: number) => {
-                    // Parse suggestions if available
-                    let suggestions: Suggestion[] | undefined = undefined;
-                    if (msg.suggestions) {
-                        try {
-                            const suggestionsData = msg.suggestions;
-                            console.log('Loading suggestions for message:', index, suggestionsData);
-
-                            // Handle both object and already parsed structure
-                            const doctors =
-                                suggestionsData.doctors ||
-                                (Array.isArray(suggestionsData)
-                                    ? suggestionsData.filter((s: any) => s.type === 'doctor')
-                                    : []);
-                            const hospitals =
-                                suggestionsData.hospitals ||
-                                (Array.isArray(suggestionsData)
-                                    ? suggestionsData.filter((s: any) => s.type === 'hospital')
-                                    : []);
-
-                            suggestions = [
-                                ...(Array.isArray(doctors) ? doctors : []).map((d: any) => ({
-                                    type: 'doctor' as const,
-                                    doctor: {
-                                        id: d.id || d.doctor?.id,
-                                        name: d.name || d.doctor?.name,
-                                        specialtyName: d.specialtyName || d.doctor?.specialtyName,
-                                        hospitalName: d.hospitalName || d.doctor?.hospitalName,
-                                        rating: d.rating || d.doctor?.rating || 0,
-                                        yearOfExperience:
-                                            d.yearOfExperience || d.doctor?.yearOfExperience || 0,
-                                        serviceTypeName:
-                                            d.serviceTypeName ||
-                                            d.doctor?.serviceTypeName ||
-                                            undefined,
-                                        price: d.price || d.doctor?.price || undefined,
-                                        avatarUrl: d.avatarUrl || d.doctor?.avatarUrl || undefined,
-                                    },
-                                })),
-                                ...(Array.isArray(hospitals) ? hospitals : []).map((h: any) => ({
-                                    type: 'hospital' as const,
-                                    hospital: {
-                                        id: h.id || h.hospital?.id,
-                                        name: h.name || h.hospital?.name,
-                                        address: h.address || h.hospital?.address,
-                                        specialtyId: [],
-                                        specialtyName:
-                                            h.specialtyNames || h.hospital?.specialtyName || [],
-                                        imageUrl: h.imageUrl || h.hospital?.imageUrl || undefined,
-                                    },
-                                })),
-                            ];
-
-                            if (suggestions.length > 0) {
-                                console.log(
-                                    'Successfully loaded suggestions:',
-                                    suggestions.length,
-                                    'items'
-                                );
-                            }
-                        } catch (e) {
-                            console.error('Error parsing suggestions:', e, msg.suggestions);
-                        }
-                    } else {
-                        console.log('No suggestions found for message:', index);
-                    }
-
-                    // Determine sender: 'ai' for AI messages, 'user' for patient/guest/user messages
-                    const sender = msg.role?.toLowerCase() === 'ai' ? 'ai' : 'user';
-
-                    return {
-                        id: `${chatId}-${index}`,
-                        content: msg.content || '',
-                        sender: sender,
-                        timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
-                        suggestions: suggestions,
-                    };
-                });
+                const loadedMessages: Message[] = history.map((msg: any, index: number) =>
+                    convertHistoryMessage(msg, index, chatId)
+                );
                 setMessages(loadedMessages);
             } else {
                 setMessages([]);
