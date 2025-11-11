@@ -1,3 +1,5 @@
+import { MessageAttachment } from '@/types/communication.types';
+
 export interface OnlineContact {
     id: string;
     name: string;
@@ -24,10 +26,12 @@ export interface ChatMessage {
     senderAvatar: string;
     content: string;
     timestamp: string;
+    createdAt?: string; // ISO datetime for recall time validation
+    status?: string; // MessageStatus - 'SENT', 'READ', 'RECALLED', etc.
     messageType: 'text' | 'video' | 'file' | 'audio' | 'image' | 'location' | 'voice';
     isOwn: boolean;
     isRead: boolean;
-    attachments?: string[];
+    attachments?: MessageAttachment[] | string[]; // ✅ Support both full objects and URL strings
 }
 
 export const mockOnlineContacts: OnlineContact[] = [

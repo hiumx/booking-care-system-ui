@@ -1,50 +1,259 @@
 import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
+import { useSelector } from 'react-redux';
 
 import styles from './VideoCallWindow.module.scss';
 import videojpg from '@/assets/img/video-call.jpg';
+import { useWebRTC } from '@/hooks/useWebRTC';
+import type { RootState } from '@/store';
+import { useGlobalChat } from '@/providers/GlobalChatProvider';
 
 interface VideoCallWindowProps {
     isVisible?: boolean;
     onClose?: () => void;
+    participantId: string;
+    conversationId: string;
+    participantName?: string;
     participantAvatar?: string;
+    callType?: 'video' | 'audio';
+    isIncoming?: boolean;
 }
+
+/**
+ * Helper: Handle remote video playback with proper ready state checking
+ */
+const handleRemoteVideoPlayback = (
+    videoElement: HTMLVideoElement,
+    remoteVideoPlayingRef: { current: boolean }
+) => {
+    const tryPlay = () => {
+        console.log('[VideoCallWindow] Attempting play (readyState:', videoElement.readyState, ')');
+
+        videoElement
+            .play()
+            .then(() => {
+                console.log('[VideoCallWindow] ✅ Remote video playing successfully');
+            })
+            .catch((error) => {
+                console.error('[VideoCallWindow] ❌ Error playing:', error);
+                remoteVideoPlayingRef.current = false;
+            });
+    };
+
+    // If video has enough data, play immediately
+    if (videoElement.readyState >= 2) {
+        console.log('[VideoCallWindow] Video ready, playing immediately');
+        tryPlay();
+        return;
+    }
+
+    // Wait for video data to load
+    console.log('[VideoCallWindow] Waiting for loadeddata event...');
+    const onLoadedData = () => {
+        console.log('[VideoCallWindow] loadeddata fired, playing now');
+        tryPlay();
+        videoElement.removeEventListener('loadeddata', onLoadedData);
+    };
+    videoElement.addEventListener('loadeddata', onLoadedData);
+
+    // Timeout fallback
+    setTimeout(() => {
+        videoElement.removeEventListener('loadeddata', onLoadedData);
+        console.log('[VideoCallWindow] Timeout, force trying play');
+        tryPlay();
+    }, 2000);
+};
+
+/**
+ * Helper: Get button class based on state
+ */
+const getButtonClass = (isActive: boolean, baseClass: string): string => {
+    return clsx(baseClass, isActive ? 'bg-danger text-white' : 'bg-light text-dark');
+};
+
+/**
+ * Helper: Get icon class based on state
+ */
+const getIconClass = (condition: boolean, activeIcon: string, inactiveIcon: string): string => {
+    return `isax ${condition ? activeIcon : inactiveIcon}`;
+};
 
 const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
     isVisible = true,
     onClose,
-    participantAvatar = './src/assets/img/patients/patient1.jpg',
+    participantId,
+    conversationId,
+    participantName: _participantName = 'User', // Reserved for future use
+    participantAvatar: _participantAvatar = './src/assets/img/patients/patient1.jpg', // Reserved for future use
+    callType: _callType = 'video', // Reserved for future use (audio/video mode)
+    isIncoming = false,
 }) => {
+    // Get current user ID from Redux
+    const { profile } = useSelector((state: RootState) => state.user);
+    const userId = profile?.accountId || '';
+
+    // Get global chat context for clearing processed calls
+    const { clearProcessedCall } = useGlobalChat();
+
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [isMicMuted, setIsMicMuted] = useState(false);
-    const [isVideoOff, setIsVideoOff] = useState(false);
     const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
     const [callDuration, setCallDuration] = useState(0);
-    const [isCallActive, setIsCallActive] = useState(false);
 
     // Draggable state for local video
     const [isDragging, setIsDragging] = useState(false);
-    const [localVideoPosition, setLocalVideoPosition] = useState({ x: 0, y: 0 }); // Transform offset from initial position
+    const [localVideoPosition, setLocalVideoPosition] = useState({ x: 0, y: 0 });
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-    // Refs for video elements - will be used for WebRTC integration
+    // Refs for video elements
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const localVideoContainerRef = useRef<HTMLButtonElement>(null);
 
-    // Call duration timer
+    // Track if call has been initialized
+    const callInitializedRef = useRef(false);
+
+    // Track if remote video is playing (to prevent duplicate play() calls)
+    const remoteVideoPlayingRef = useRef(false);
+
+    // WebRTC Hook Integration
+    const {
+        callState,
+        remoteStream,
+        isMuted,
+        isVideoOff,
+        isScreenSharing,
+        startCall,
+        acceptCall,
+        endCall,
+        toggleMute,
+        toggleVideo,
+        toggleScreenShare,
+        cleanup,
+    } = useWebRTC(
+        userId,
+        {
+            onCallStateChange: (state) => {
+                console.log('[VideoCallWindow] Call state changed:', state);
+
+                // ✅ Update ref synchronously (before React re-renders)
+                callStateRef.current = state;
+
+                if (
+                    state === 'ended' ||
+                    state === 'declined' ||
+                    state === 'failed' ||
+                    state === 'busy'
+                ) {
+                    // ✅ Clear processed call to allow same user to call again
+                    console.log('[VideoCallWindow] Clearing processed call for:', participantId);
+                    clearProcessedCall(participantId, conversationId);
+
+                    // ✅ Reset remote video playing flag for next call
+                    remoteVideoPlayingRef.current = false;
+
+                    // ✅ Clear video srcObject when call ends to release camera/mic
+                    if (localVideoRef.current) {
+                        console.log(
+                            '[VideoCallWindow] Clearing local video srcObject (call ended)'
+                        );
+                        localVideoRef.current.srcObject = null;
+                    }
+                    if (remoteVideoRef.current) {
+                        console.log(
+                            '[VideoCallWindow] Clearing remote video srcObject (call ended)'
+                        );
+                        remoteVideoRef.current.srcObject = null;
+                    }
+                    if (onClose) {
+                        onClose();
+                    } else if (globalThis.window !== undefined) {
+                        const evt = new CustomEvent('closeVideoCall');
+                        globalThis.window.dispatchEvent(evt);
+                    }
+                }
+            },
+            onRemoteStream: (stream) => {
+                console.log('[VideoCallWindow] Remote stream received:', stream);
+                console.log('[VideoCallWindow] Remote stream tracks:', stream.getTracks());
+                console.log('[VideoCallWindow] Remote stream active:', stream.active);
+
+                const videoTracks = stream.getVideoTracks();
+                const audioTracks = stream.getAudioTracks();
+                console.log('[VideoCallWindow] Video tracks:', videoTracks.length);
+                console.log('[VideoCallWindow] Audio tracks:', audioTracks.length);
+
+                if (!remoteVideoRef.current) return;
+
+                // ✅ Only set srcObject if different (prevent "new load request")
+                const currentSrcObject = remoteVideoRef.current.srcObject as MediaStream | null;
+                if (currentSrcObject === stream) {
+                    console.log('[VideoCallWindow] srcObject already set, skipping');
+                } else {
+                    console.log('[VideoCallWindow] Setting remote video srcObject');
+                    remoteVideoRef.current.srcObject = stream;
+                }
+
+                // ✅ Only play when we have BOTH tracks AND haven't played yet
+                const hasAllTracks = videoTracks.length > 0 && audioTracks.length > 0;
+                const notYetPlaying = !remoteVideoPlayingRef.current;
+
+                if (hasAllTracks && notYetPlaying) {
+                    console.log('[VideoCallWindow] Both tracks ready, preparing to play...');
+                    console.log(
+                        '[VideoCallWindow] Video element readyState:',
+                        remoteVideoRef.current.readyState
+                    );
+
+                    remoteVideoPlayingRef.current = true; // ✅ Mark as playing immediately
+                    handleRemoteVideoPlayback(remoteVideoRef.current, remoteVideoPlayingRef);
+                } else if (remoteVideoPlayingRef.current) {
+                    console.log('[VideoCallWindow] ⏭️ Already playing, skipping duplicate play()');
+                } else {
+                    console.log('[VideoCallWindow] ⏳ Waiting for all tracks...');
+                }
+            },
+            onLocalStream: (stream) => {
+                console.log('[VideoCallWindow] Local stream received');
+                if (localVideoRef.current) {
+                    localVideoRef.current.srcObject = stream;
+                }
+            },
+            onError: (error) => {
+                console.error('[VideoCallWindow] ❌ WebRTC error:', error);
+                // Don't show alert popup as it's annoying, just log to console
+                // User will see the call failed through UI state changes
+            },
+        },
+        {
+            name: profile?.fullName,
+            avatar: profile?.avatarUrl,
+        }
+    );
+
+    // Ref to track current callState for cleanup
+    const callStateRef = useRef(callState);
+
+    // Keep callStateRef in sync
+    useEffect(() => {
+        callStateRef.current = callState;
+    }, [callState]);
+
+    // Call duration timer - use callState instead of isCallActive
     useEffect(() => {
         let interval: NodeJS.Timeout;
-        if (isCallActive) {
+        const isActive = callState === 'connected' || callState === 'connecting';
+        if (isActive) {
             interval = setInterval(() => {
                 setCallDuration((prev) => prev + 1);
             }, 1000);
+        } else {
+            setCallDuration(0);
         }
         return () => {
             if (interval) clearInterval(interval);
         };
-    }, [isCallActive]);
+    }, [callState]);
 
     // Format call duration
     const formatDuration = (seconds: number): string => {
@@ -72,48 +281,34 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         }, 100);
     };
 
-    // Handle mic toggle
-    const toggleMic = () => {
-        setIsMicMuted(!isMicMuted);
-        // Future WebRTC integration:
-        // if (localStreamRef.current) {
-        //     localStreamRef.current.getAudioTracks().forEach(track => {
-        //         track.enabled = isMicMuted;
-        //     });
-        // }
-    };
-
-    // Handle video toggle
-    const toggleVideo = () => {
-        setIsVideoOff(!isVideoOff);
-        // Future WebRTC integration:
-        // if (localStreamRef.current) {
-        //     localStreamRef.current.getVideoTracks().forEach(track => {
-        //         track.enabled = isVideoOff;
-        //     });
-        // }
-    };
+    // Handle speaker mute/unmute via ref
+    useEffect(() => {
+        if (remoteVideoRef.current) {
+            remoteVideoRef.current.muted = isSpeakerMuted;
+        }
+    }, [isSpeakerMuted]);
 
     // Handle speaker toggle
     const toggleSpeaker = () => {
         setIsSpeakerMuted(!isSpeakerMuted);
-        // Future WebRTC integration:
-        // if (remoteVideoRef.current) {
-        //     remoteVideoRef.current.muted = !isSpeakerMuted;
-        // }
     };
 
     // Handle end call
     const handleEndCall = () => {
-        setIsCallActive(false);
-        setCallDuration(0);
-        // Future WebRTC cleanup:
-        // if (peerConnectionRef.current) {
-        //     peerConnectionRef.current.close();
-        // }
-        // if (localStreamRef.current) {
-        //     localStreamRef.current.getTracks().forEach(track => track.stop());
-        // }
+        console.log('[VideoCallWindow] Ending call with:', participantId);
+
+        // ✅ Clear video srcObject FIRST to release camera/mic immediately
+        if (localVideoRef.current) {
+            console.log('[VideoCallWindow] Clearing local video srcObject');
+            localVideoRef.current.srcObject = null;
+        }
+        if (remoteVideoRef.current) {
+            console.log('[VideoCallWindow] Clearing remote video srcObject');
+            remoteVideoRef.current.srcObject = null;
+        }
+
+        endCall(participantId, 'User ended call');
+        // Don't call cleanup() here - endCall already does it
         if (onClose) {
             onClose();
         } else if (globalThis.window !== undefined) {
@@ -122,17 +317,94 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         }
     };
 
-    // Start call (placeholder for WebRTC initialization)
-    const startCall = () => {
-        setIsCallActive(true);
-        // Future WebRTC initialization will go here
+    // Helper function to validate call initialization conditions
+    const canInitializeCall = () => {
+        if (callInitializedRef.current) {
+            console.log('[VideoCallWindow] ⏸️ Call already initialized, skipping');
+            return false;
+        }
+        if (callState !== 'idle') {
+            console.log('[VideoCallWindow] ⏸️ Call already in progress, state:', callState);
+            return false;
+        }
+        if (!isVisible || !participantId || !conversationId) {
+            console.log('[VideoCallWindow] ⏸️ Missing required params');
+            return false;
+        }
+        return true;
     };
 
-    useEffect(() => {
-        if (isVisible && !isCallActive) {
-            startCall();
+    // Helper function to initialize the call
+    const initializeCall = () => {
+        console.log('[VideoCallWindow] ✅ All conditions met, initializing call');
+        callInitializedRef.current = true;
+
+        if (isIncoming) {
+            console.log('[VideoCallWindow] 📞 Accepting incoming call from:', participantId);
+            acceptCall(participantId, conversationId);
+        } else {
+            console.log('[VideoCallWindow] 📞 Starting outgoing call to:', participantId);
+            startCall(participantId, conversationId);
         }
-    }, [isVisible]);
+    };
+
+    // Initialize call when component becomes visible
+    useEffect(() => {
+        console.log('[VideoCallWindow] 🔍 Init effect triggered:', {
+            isVisible,
+            participantId,
+            conversationId,
+            callState,
+            isIncoming,
+            callInitialized: callInitializedRef.current,
+        });
+
+        if (canInitializeCall()) {
+            initializeCall();
+        }
+        // ✅ IMPORTANT: Remove acceptCall/startCall from dependencies to prevent re-initialization
+        // callState is included to check if call already in progress (Strict Mode safety)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isVisible, participantId, conversationId, isIncoming, callState]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            const currentState = callStateRef.current;
+            console.log('[VideoCallWindow] Component unmounting, callState:', currentState);
+
+            // ✅ Clear video elements' srcObject to release media
+            if (localVideoRef.current) {
+                console.log('[VideoCallWindow] Clearing local video srcObject');
+                localVideoRef.current.srcObject = null;
+            }
+            if (remoteVideoRef.current) {
+                console.log('[VideoCallWindow] Clearing remote video srcObject');
+                remoteVideoRef.current.srcObject = null;
+            }
+
+            // ✅ ONLY cleanup if call is truly ending (not Strict Mode remount)
+            // If call is active (calling/connecting/connected), DON'T cleanup - Strict Mode remount
+            if (
+                currentState === 'idle' ||
+                currentState === 'ended' ||
+                currentState === 'declined' ||
+                currentState === 'failed'
+            ) {
+                console.log('[VideoCallWindow] Call inactive, running cleanup');
+                cleanup();
+                console.log('[VideoCallWindow] Resetting initialization flag');
+                callInitializedRef.current = false;
+            } else {
+                console.log(
+                    '[VideoCallWindow] Call active, skipping cleanup (Strict Mode remount)'
+                );
+                console.log('[VideoCallWindow] Call active, keeping initialization flag');
+            }
+        };
+        // ✅ Empty deps - only run on mount/unmount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Drag & Drop handlers for local video
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -206,6 +478,39 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         snapToCorner();
     };
 
+    // Helper: Calculate target corner position
+    const calculateTargetCorner = (params: {
+        centerX: number;
+        centerY: number;
+        midX: number;
+        midY: number;
+        containerWidth: number;
+        containerHeight: number;
+        videoWidth: number;
+        videoHeight: number;
+        padding: number;
+    }) => {
+        const {
+            centerX,
+            centerY,
+            midX,
+            midY,
+            containerWidth,
+            containerHeight,
+            videoWidth,
+            videoHeight,
+            padding,
+        } = params;
+
+        const isLeft = centerX < midX;
+        const isTop = centerY < midY;
+
+        const targetX = isLeft ? padding : containerWidth - videoWidth - padding;
+        const targetY = isTop ? padding : containerHeight - videoHeight - padding;
+
+        return { targetX, targetY };
+    };
+
     // Snap to nearest corner for better UX
     const snapToCorner = () => {
         if (!containerRef.current) return;
@@ -216,10 +521,11 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         const containerHeight = containerRect.height;
         const localVideoWidth = 200;
         const localVideoHeight = 150;
+        const padding = 16;
 
         // Current position (transform offset from initial top-right position)
         const initialX = containerWidth - 216; // 200px + 16px padding
-        const initialY = 16;
+        const initialY = padding;
         const currentX = initialX + x;
         const currentY = initialY + y;
 
@@ -228,26 +534,18 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
         const midX = containerWidth / 2;
         const midY = containerHeight / 2;
 
-        let targetX, targetY;
-
         // Determine which corner to snap to
-        if (centerX < midX && centerY < midY) {
-            // Top-left
-            targetX = 16;
-            targetY = 16;
-        } else if (centerX >= midX && centerY < midY) {
-            // Top-right
-            targetX = containerWidth - localVideoWidth - 16;
-            targetY = 16;
-        } else if (centerX < midX && centerY >= midY) {
-            // Bottom-left
-            targetX = 16;
-            targetY = containerHeight - localVideoHeight - 16;
-        } else {
-            // Bottom-right
-            targetX = containerWidth - localVideoWidth - 16;
-            targetY = containerHeight - localVideoHeight - 16;
-        }
+        const { targetX, targetY } = calculateTargetCorner({
+            centerX,
+            centerY,
+            midX,
+            midY,
+            containerWidth,
+            containerHeight,
+            videoWidth: localVideoWidth,
+            videoHeight: localVideoHeight,
+            padding,
+        });
 
         // Convert to transform offset
         const transformX = targetX - initialX;
@@ -323,7 +621,7 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                 className={clsx(styles.remoteVideo, 'w-100 h-100')}
                                 autoPlay
                                 playsInline
-                                muted={isSpeakerMuted}
+                                muted={false}
                                 poster={videojpg}
                             >
                                 <track kind="captions" />
@@ -332,7 +630,8 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                             {/* Fallback image when no remote video */}
                             <div
                                 className={clsx(styles.videoPlaceholder, {
-                                    [styles.hidden]: isCallActive,
+                                    [styles.hidden]:
+                                        callState === 'connected' || remoteStream !== null,
                                 })}
                             >
                                 <img
@@ -380,15 +679,20 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                     autoPlay
                                     playsInline
                                     muted
-                                    style={{ display: isVideoOff ? 'none' : 'block' }}
+                                    style={{
+                                        display: isVideoOff ? 'none' : 'block',
+                                    }}
                                 />
-                                {/* Avatar fallback when video is off */}
+                                {/* Avatar fallback when video is off - Show current user's avatar */}
                                 <img
-                                    src={participantAvatar}
+                                    src={
+                                        profile?.avatarUrl ||
+                                        './src/assets/img/patients/patient1.jpg'
+                                    }
                                     className={clsx('img-fluid rounded border border-primary', {
                                         'd-none': !isVideoOff,
                                     })}
-                                    alt="User avatar"
+                                    alt="My avatar"
                                 />
 
                                 {/* Drag indicator */}
@@ -424,37 +728,41 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                 >
                                     {/* Microphone Toggle */}
                                     <button
-                                        onClick={toggleMic}
-                                        className={clsx(
-                                            styles.btnIcon,
-                                            'btn btn-sm d-flex justify-content-center align-items-center rounded-circle',
-                                            isMicMuted
-                                                ? 'bg-danger text-white'
-                                                : 'bg-light text-dark'
+                                        onClick={toggleMute}
+                                        className={getButtonClass(
+                                            isMuted,
+                                            `${styles.btnIcon} btn btn-sm d-flex justify-content-center align-items-center rounded-circle`
                                         )}
                                         type="button"
-                                        title={isMicMuted ? 'Bật microphone' : 'Tắt microphone'}
+                                        title={isMuted ? 'Bật microphone' : 'Tắt microphone'}
+                                        aria-label={isMuted ? 'Bật mic' : 'Tắt mic'}
                                     >
                                         <i
-                                            className={`isax ${isMicMuted ? 'isax-microphone-slash' : 'isax-microphone-2'}`}
+                                            className={getIconClass(
+                                                isMuted,
+                                                'isax-microphone-slash',
+                                                'isax-microphone-2'
+                                            )}
                                         ></i>
                                     </button>
 
                                     {/* Video Toggle */}
                                     <button
                                         onClick={toggleVideo}
-                                        className={clsx(
-                                            styles.btnIcon,
-                                            'btn btn-sm d-flex justify-content-center align-items-center rounded-circle',
-                                            isVideoOff
-                                                ? 'bg-danger text-white'
-                                                : 'bg-light text-dark'
+                                        className={getButtonClass(
+                                            isVideoOff,
+                                            `${styles.btnIcon} btn btn-sm d-flex justify-content-center align-items-center rounded-circle`
                                         )}
                                         type="button"
                                         title={isVideoOff ? 'Bật camera' : 'Tắt camera'}
+                                        aria-label={isVideoOff ? 'Bật video' : 'Tắt video'}
                                     >
                                         <i
-                                            className={`isax ${isVideoOff ? 'isax-video-slash' : 'isax-video'}`}
+                                            className={getIconClass(
+                                                isVideoOff,
+                                                'isax-video-slash',
+                                                'isax-video'
+                                            )}
                                         ></i>
                                     </button>
 
@@ -475,29 +783,41 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
                                     {/* Speaker Toggle */}
                                     <button
                                         onClick={toggleSpeaker}
-                                        className={clsx(
-                                            styles.btnIcon,
-                                            'btn btn-sm d-flex justify-content-center align-items-center rounded-circle',
-                                            isSpeakerMuted
-                                                ? 'bg-danger text-white'
-                                                : 'bg-light text-dark'
+                                        className={getButtonClass(
+                                            isSpeakerMuted,
+                                            `${styles.btnIcon} btn btn-sm d-flex justify-content-center align-items-center rounded-circle`
                                         )}
                                         type="button"
                                         title={isSpeakerMuted ? 'Bật loa' : 'Tắt loa'}
                                     >
                                         <i
-                                            className={`isax ${isSpeakerMuted ? 'isax-volume-slash' : 'isax-volume-high'}`}
+                                            className={getIconClass(
+                                                isSpeakerMuted,
+                                                'isax-volume-slash',
+                                                'isax-volume-high'
+                                            )}
                                         ></i>
                                     </button>
 
-                                    {/* Screen Share (for future implementation) */}
+                                    {/* Screen Share */}
                                     <button
+                                        onClick={toggleScreenShare}
                                         className={clsx(
                                             styles.btnIcon,
-                                            'btn btn-sm bg-light text-dark d-flex align-items-center justify-content-center rounded-circle'
+                                            'btn btn-sm d-flex align-items-center justify-content-center rounded-circle',
+                                            isScreenSharing
+                                                ? 'bg-primary text-white'
+                                                : 'bg-light text-dark'
                                         )}
                                         type="button"
-                                        title="Chia sẻ màn hình"
+                                        title={
+                                            isScreenSharing
+                                                ? 'Dừng chia sẻ màn hình'
+                                                : 'Chia sẻ màn hình'
+                                        }
+                                        aria-label={
+                                            isScreenSharing ? 'Dừng chia sẻ' : 'Chia sẻ màn hình'
+                                        }
                                     >
                                         <i className="isax isax-screenmirroring"></i>
                                     </button>

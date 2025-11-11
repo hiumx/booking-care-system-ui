@@ -18,6 +18,7 @@ import { getSpecialtiesAsync } from '@/store/slices/specialtySlice';
 type SearchInputProps = {
     forceWrap?: boolean; // make inputs wrap into multiple rows regardless of screen size
     onSearchChange?: (searchTerm: string) => void; // Callback for search term changes
+    onSearchNow?: () => void; // Callback to trigger search immediately (for DoctorList page)
     onSpecialtyFilter?: (specialtyId: string) => void; // Callback for single specialty filter (backward compatibility)
     onSpecialtyFilters?: (specialtyIds: string[]) => void; // Callback for multiple specialty filters
     onHospitalFilter?: (hospitalId: string) => void; // Callback for single hospital filter (backward compatibility)
@@ -35,6 +36,7 @@ type SearchInputProps = {
 const SearchInput: React.FC<SearchInputProps> = ({
     forceWrap = false,
     onSearchChange,
+    onSearchNow,
     onSpecialtyFilter,
     onSpecialtyFilters,
     onHospitalFilter,
@@ -429,9 +431,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
           selectedDate.getFullYear() === today.getFullYear()
         : false;
 
-    // Handle form submit to navigate to DoctorList
+    // Handle form submit to navigate to DoctorList or trigger search immediately
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // If on DoctorList page and onSearchNow callback is provided, trigger immediate search
+        if (isDoctorListPage && onSearchNow) {
+            onSearchNow();
+            return;
+        }
 
         // Build search params
         const params = new URLSearchParams();

@@ -3,7 +3,7 @@ import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { getParentServiceCategoriesAsync } from '@/store/slices/medicalServiceSlice';
 import { getSpecialtiesAsync } from '@/store/slices/specialtySlice';
 import { getOptimizedHospitalListAsync } from '@/store/slices/hospitalSlice';
-import { searchDoctorsAsync } from '@/store/slices/doctorSlice';
+import { searchDoctorsAsync, clearDoctors } from '@/store/slices/doctorSlice';
 import { HospitalListOptimizedFilterRequest } from '@/types/hospital.types';
 import { DoctorSearchParams } from '@/types/doctor.types';
 import { selectSpecialties, selectSpecialtyLoading } from '@/store/selectors/specialty.selectors';
@@ -63,9 +63,12 @@ export const useHomeData = () => {
     }, [dispatch, optimizedHospitals.length]);
 
     // Fetch doctors if not already loaded
+    // Clear doctors state first to ensure Home always shows default doctors (not filtered results from DoctorList)
     useEffect(() => {
-        if (!hasFetchedDoctors.current && doctors.length === 0) {
+        if (!hasFetchedDoctors.current) {
             hasFetchedDoctors.current = true;
+            // Clear any previous doctors state (e.g. from DoctorList filtered results)
+            dispatch(clearDoctors());
             const params: DoctorSearchParams = {
                 pageNumber: 1,
                 pageSize: 20,
@@ -74,7 +77,7 @@ export const useHomeData = () => {
             };
             dispatch(searchDoctorsAsync(params));
         }
-    }, [dispatch, doctors.length]);
+    }, [dispatch]);
 
     return {
         parentServiceCategories,
