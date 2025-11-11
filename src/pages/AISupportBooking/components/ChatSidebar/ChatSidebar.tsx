@@ -19,6 +19,18 @@ interface ChatSidebarProps {
     onToggle?: () => void;
 }
 
+// Shared utility function to get user initials
+const getUserInitials = (isAuthenticated: boolean, fullName?: string): string => {
+    if (!isAuthenticated || !fullName) {
+        return 'U';
+    }
+    const names = fullName.trim().split(' ');
+    if (names.length >= 2) {
+        return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+    }
+    return names[0][0].toUpperCase();
+};
+
 // Component để hiển thị avatar người dùng (dùng cho chat items)
 const UserAvatar: React.FC = () => {
     const { profile } = useSelector((state: RootState) => state.user);
@@ -29,18 +41,6 @@ const UserAvatar: React.FC = () => {
     useEffect(() => {
         setAvatarError(false);
     }, [profile?.avatarUrl]);
-
-    // Lấy chữ cái đầu để hiển thị trong avatar mặc định
-    const getInitials = () => {
-        if (!isAuthenticated || !profile?.fullName) {
-            return 'U';
-        }
-        const names = profile.fullName.trim().split(' ');
-        if (names.length >= 2) {
-            return (names[0][0] + names[names.length - 1][0]).toUpperCase();
-        }
-        return names[0][0].toUpperCase();
-    };
 
     return (
         <>
@@ -55,11 +55,13 @@ const UserAvatar: React.FC = () => {
                         }}
                     />
                     <div className={styles.chatAvatarFallback} style={{ display: 'none' }}>
-                        {getInitials()}
+                        {getUserInitials(isAuthenticated, profile?.fullName)}
                     </div>
                 </>
             ) : (
-                <div className={styles.chatAvatarFallback}>{getInitials()}</div>
+                <div className={styles.chatAvatarFallback}>
+                    {getUserInitials(isAuthenticated, profile?.fullName)}
+                </div>
             )}
         </>
     );
@@ -104,18 +106,6 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
             return profile.fullName;
         }
         return 'Khách';
-    };
-
-    // Sử dụng lại hàm getInitials từ ChatAvatar component
-    const getInitials = () => {
-        if (!isAuthenticated || !profile?.fullName) {
-            return 'U';
-        }
-        const names = profile.fullName.trim().split(' ');
-        if (names.length >= 2) {
-            return (names[0][0] + names[names.length - 1][0]).toUpperCase();
-        }
-        return names[0][0].toUpperCase();
     };
 
     return (
@@ -234,12 +224,14 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                     }}
                                 />
                                 <div className={styles.avatarFallback} style={{ display: 'none' }}>
-                                    {getInitials()}
+                                    {getUserInitials(isAuthenticated, profile?.fullName)}
                                 </div>
                             </>
                         ) : (
                             // Hiển thị avatar mặc định với chữ cái (đã login nhưng không có ảnh, hoặc chưa login, hoặc ảnh lỗi)
-                            <div className={styles.avatarFallback}>{getInitials()}</div>
+                            <div className={styles.avatarFallback}>
+                                {getUserInitials(isAuthenticated, profile?.fullName)}
+                            </div>
                         )}
                     </div>
                     <div

@@ -259,6 +259,32 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
         }
     };
 
+    // Process a single line
+    const processSingleLine = (
+        trimmedLine: string,
+        index: number,
+        nextLine: string,
+        isLastLine: boolean,
+        state: FormatState
+    ): boolean => {
+        // Process disclaimers - return true if processed
+        if (processDisclaimerTitle(trimmedLine, index, state)) return true;
+        if (processDisclaimerText(trimmedLine, index, state)) return true;
+        if (shouldSkipDuplicateDisclaimer(trimmedLine, state.disclaimerProcessed)) return true;
+
+        // Process different line types
+        if (isSectionTitle(trimmedLine)) {
+            state.formattedLines.push(renderSectionTitle(trimmedLine, index, isLastLine));
+        } else if (isNameLine(trimmedLine)) {
+            processNameLine(trimmedLine, index, state);
+        } else if (trimmedLine) {
+            processContentLine(trimmedLine, index, isLastLine, state);
+        } else {
+            processEmptyLine(index, nextLine, state);
+        }
+        return false;
+    };
+
     const formatTextContent = (text: string) => {
         const processedText = processMarkdown(text);
         const lines = processedText.split('\n');
@@ -272,26 +298,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
         };
 
         for (let index = 0; index < lines.length; index++) {
-            const line = lines[index];
-            const trimmedLine = line.trim();
+            const trimmedLine = lines[index].trim();
             const nextLine = index < lines.length - 1 ? lines[index + 1]?.trim() : '';
             const isLastLine = index === lines.length - 1;
 
-            // Process disclaimers
-            if (processDisclaimerTitle(trimmedLine, index, state)) continue;
-            if (processDisclaimerText(trimmedLine, index, state)) continue;
-            if (shouldSkipDuplicateDisclaimer(trimmedLine, state.disclaimerProcessed)) continue;
-
-            // Process different line types
-            if (isSectionTitle(trimmedLine)) {
-                state.formattedLines.push(renderSectionTitle(trimmedLine, index, isLastLine));
-            } else if (isNameLine(trimmedLine)) {
-                processNameLine(trimmedLine, index, state);
-            } else if (trimmedLine) {
-                processContentLine(trimmedLine, index, isLastLine, state);
-            } else {
-                processEmptyLine(index, nextLine, state);
-            }
+            processSingleLine(trimmedLine, index, nextLine, isLastLine, state);
         }
 
         // Add final border if needed
