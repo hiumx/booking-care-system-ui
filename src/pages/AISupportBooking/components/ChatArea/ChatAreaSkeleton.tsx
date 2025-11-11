@@ -133,13 +133,100 @@ const ChatAreaSkeleton: React.FC = () => {
 
             {/* Input Area Skeleton */}
             <div className={styles.inputArea}>
-                <Skeleton
-                    animation={false}
-                    variant="rectangular"
-                    width="100%"
-                    height={56}
-                    sx={{ borderRadius: '28px', bgcolor: '#e0e0e0', border: 'none' }}
-                />
+                <div
+                    style={{
+                        border: '1px solid #e5e7eb',
+                        margin: '10px',
+                        borderRadius: '12px',
+                        background: '#ffffff',
+                        padding: '10px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        width: '100%',
+                    }}
+                >
+                    {/* Textarea skeleton */}
+                    <div style={{ padding: '0 0 4px 0' }}>
+                        <Skeleton
+                            animation={false}
+                            variant="text"
+                            width="60%"
+                            height={24}
+                            sx={{ bgcolor: '#f0f0f0' }}
+                        />
+                    </div>
+
+                    {/* Icon row skeleton */}
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '8px 12px',
+                            marginTop: '4px',
+                        }}
+                    >
+                        {/* Left icons */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            {/* Attachment button */}
+                            <Skeleton
+                                animation={false}
+                                variant="circular"
+                                width={40}
+                                height={40}
+                                sx={{ bgcolor: '#f0f0f0' }}
+                            />
+
+                            {/* Location wrapper */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                {/* Location button */}
+                                <Skeleton
+                                    animation={false}
+                                    variant="circular"
+                                    width={40}
+                                    height={40}
+                                    sx={{ bgcolor: '#f0f0f0' }}
+                                />
+
+                                {/* Location badge */}
+                                <Skeleton
+                                    animation={false}
+                                    variant="rectangular"
+                                    width={120}
+                                    height={28}
+                                    sx={{ borderRadius: '12px', bgcolor: '#e3f2fd' }}
+                                />
+                            </div>
+
+                            {/* Mic button */}
+                            <Skeleton
+                                animation={false}
+                                variant="circular"
+                                width={40}
+                                height={40}
+                                sx={{ bgcolor: '#f0f0f0' }}
+                            />
+
+                            {/* Clear button */}
+                            <Skeleton
+                                animation={false}
+                                variant="circular"
+                                width={40}
+                                height={40}
+                                sx={{ bgcolor: '#f0f0f0' }}
+                            />
+                        </div>
+
+                        {/* Send button skeleton */}
+                        <Skeleton
+                            animation={false}
+                            variant="rectangular"
+                            width={70}
+                            height={40}
+                            sx={{ borderRadius: '20px', bgcolor: '#f0f0f0' }}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     );

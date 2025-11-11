@@ -44,7 +44,7 @@ const UserAvatar: React.FC = () => {
 
     return (
         <>
-            {isAuthenticated && profile && profile.avatarUrl && !avatarError ? (
+            {isAuthenticated && profile?.avatarUrl && !avatarError ? (
                 <>
                     <img
                         key={profile.avatarUrl}
@@ -107,7 +107,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
     };
 
     // Lấy chữ cái đầu để hiển thị trong avatar mặc định
-    const getInitials = () => {
+    const getInitialsForUser = () => {
         // Nếu chưa đăng nhập, hiển thị "U"
         if (!isAuthenticated || !profile?.fullName) {
             return 'U';
@@ -216,8 +216,16 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                         onClick={() =>
                             navigate(`${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=settings`)
                         }
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                navigate(`${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=settings`);
+                            }
+                        }}
+                        aria-label="User profile"
                     >
-                        {isAuthenticated && profile && profile.avatarUrl && !avatarError ? (
+                        {isAuthenticated && profile?.avatarUrl && !avatarError ? (
                             <>
                                 <img
                                     key={profile.avatarUrl}
@@ -228,12 +236,12 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                     }}
                                 />
                                 <div className={styles.avatarFallback} style={{ display: 'none' }}>
-                                    {getInitials()}
+                                    {getInitialsForUser()}
                                 </div>
                             </>
                         ) : (
                             // Hiển thị avatar mặc định với chữ cái (đã login nhưng không có ảnh, hoặc chưa login, hoặc ảnh lỗi)
-                            <div className={styles.avatarFallback}>{getInitials()}</div>
+                            <div className={styles.avatarFallback}>{getInitialsForUser()}</div>
                         )}
                     </div>
                     <div
@@ -241,6 +249,14 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                         onClick={() =>
                             navigate(`${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=settings`)
                         }
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                navigate(`${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=settings`);
+                            }
+                        }}
+                        aria-label="User details"
                     >
                         <div className={styles.userName}>{getDisplayName()}</div>
                     </div>

@@ -212,11 +212,19 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                                     (suggestion, index) => ({
                                                         id:
                                                             suggestion.type === 'doctor'
-                                                                ? suggestion.doctor?.id || index
-                                                                : suggestion.hospital?.id || index,
+                                                                ? suggestion.doctor?.id ||
+                                                                  `doctor-${index}`
+                                                                : suggestion.hospital?.id ||
+                                                                  `hospital-${index}`,
                                                         node: (
                                                             <SuggestionCard
-                                                                key={index}
+                                                                key={
+                                                                    suggestion.type === 'doctor'
+                                                                        ? suggestion.doctor?.id ||
+                                                                          `doctor-${index}`
+                                                                        : suggestion.hospital?.id ||
+                                                                          `hospital-${index}`
+                                                                }
                                                                 suggestion={suggestion}
                                                                 onBookAppointment={() =>
                                                                     handleBookAppointment(

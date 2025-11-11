@@ -264,7 +264,7 @@ const AISupportBooking: React.FC = () => {
     // Generate GUID-like string for session ID
     const generateSessionId = (): string => {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-            const r = (Math.random() * 16) | 0;
+            const r = Math.trunc(Math.random() * 16);
             const v = c === 'x' ? r : (r & 0x3) | 0x8;
             return v.toString(16);
         });
@@ -652,7 +652,18 @@ const AISupportBooking: React.FC = () => {
             </Link>
             {/* Overlay khi sidebar mở trên mobile */}
             {isSidebarOpen && (
-                <div className={styles.sidebarOverlay} onClick={() => setIsSidebarOpen(false)} />
+                <div
+                    className={styles.sidebarOverlay}
+                    onClick={() => setIsSidebarOpen(false)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+                            setIsSidebarOpen(false);
+                        }
+                    }}
+                    aria-label="Close sidebar"
+                />
             )}
             <div className={styles.container}>
                 <div className={styles.chatLayout}>

@@ -78,148 +78,165 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
         }
     };
 
-    const formatTextContent = (text: string) => {
-        // Loại bỏ markdown ** và thay thế bằng <strong>
-        // Xử lý **text** thành <strong>text</strong>
-        const processedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Helper functions to reduce cognitive complexity
+    const processMarkdown = (text: string) => {
+        return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    };
 
-        // Format text response với bold tên và border-bottom dưới mỗi block thông tin
+    const isSectionTitle = (line: string) => {
+        return /^(Bệnh viện chuyên về|Bác sĩ chuyên về|Dựa trên các triệu chứng|Lời khuyên chung|Chuyên khoa phù hợp).*:?$/.test(
+            line
+        );
+    };
+
+    const isNameLine = (line: string) => {
+        return !isSectionTitle(line) && /^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/.test(line);
+    };
+
+    const isListItem = (line: string) => {
+        return /^[-•]/.test(line);
+    };
+
+    const renderDisclaimerTitle = (line: string, index: number) => {
+        return (
+            <React.Fragment key={`disclaimer-title-${index}`}>
+                <div className={styles.disclaimerSection}>
+                    <strong className={styles.disclaimerTitle}>{line}</strong>
+                </div>
+            </React.Fragment>
+        );
+    };
+
+    const renderDisclaimerText = (line: string, index: number) => {
+        const disclaimerText = line.slice(1, -1);
+        return (
+            <React.Fragment key={`disclaimer-text-${index}`}>
+                <div
+                    className={styles.disclaimerText}
+                    dangerouslySetInnerHTML={{ __html: disclaimerText }}
+                />
+            </React.Fragment>
+        );
+    };
+
+    const renderSectionTitle = (line: string, index: number, isLastLine: boolean) => {
+        return (
+            <React.Fragment key={`section-${index}`}>
+                <strong
+                    className={styles.sectionTitle}
+                    dangerouslySetInnerHTML={{ __html: line }}
+                />
+                {!isLastLine && <br />}
+            </React.Fragment>
+        );
+    };
+
+    const renderNameLine = (line: string, index: number) => {
+        return (
+            <React.Fragment key={`name-${index}`}>
+                <strong className={styles.boldName} dangerouslySetInnerHTML={{ __html: line }} />
+            </React.Fragment>
+        );
+    };
+
+    const renderListItem = (line: string, index: number) => {
+        return (
+            <React.Fragment key={`list-${index}`}>
+                <div className={styles.listItem}>
+                    <span dangerouslySetInnerHTML={{ __html: line }} />
+                </div>
+            </React.Fragment>
+        );
+    };
+
+    const renderContentLine = (line: string, index: number, isLastLine: boolean) => {
+        return (
+            <React.Fragment key={`content-${index}`}>
+                <span dangerouslySetInnerHTML={{ __html: line }} />
+                {!isLastLine && <br />}
+            </React.Fragment>
+        );
+    };
+
+    const renderBlockBorder = (blockStart: number, suffix: string = '') => {
+        return <div key={`border-${blockStart}${suffix}`} className={styles.dataBlockBorder}></div>;
+    };
+
+    const formatTextContent = (text: string) => {
+        const processedText = processMarkdown(text);
         const lines = processedText.split('\n');
         const formattedLines: React.ReactNode[] = [];
         let currentBlockStart = -1;
         let isInBlock = false;
         let isInDisclaimer = false;
-        let disclaimerProcessed = false; // Track if disclaimer has been processed to avoid duplicates
+        let disclaimerProcessed = false;
 
         for (let index = 0; index < lines.length; index++) {
             const line = lines[index];
             const trimmedLine = line.trim();
             const nextLine = index < lines.length - 1 ? lines[index + 1]?.trim() : '';
+            const isLastLine = index === lines.length - 1;
 
-            // Kiểm tra nếu là disclaimer section (bắt đầu với "Lưu ý:") - chỉ xử lý 1 lần
+            // Handle disclaimer title
             if (trimmedLine.startsWith('Lưu ý:') && !disclaimerProcessed) {
                 isInDisclaimer = true;
-                formattedLines.push(
-                    <React.Fragment key={`disclaimer-title-${index}`}>
-                        <div className={styles.disclaimerSection}>
-                            <strong className={styles.disclaimerTitle}>{trimmedLine}</strong>
-                        </div>
-                    </React.Fragment>
-                );
+                formattedLines.push(renderDisclaimerTitle(trimmedLine, index));
                 continue;
             }
 
-            // Kiểm tra nếu là disclaimer text (bắt đầu với *) - chỉ xử lý 1 lần
+            // Handle disclaimer text
             if (
                 isInDisclaimer &&
                 trimmedLine.startsWith('*') &&
                 trimmedLine.endsWith('*') &&
                 !disclaimerProcessed
             ) {
-                const disclaimerText = trimmedLine.slice(1, -1); // Remove * at start and end
-                formattedLines.push(
-                    <React.Fragment key={`disclaimer-text-${index}`}>
-                        <div
-                            className={styles.disclaimerText}
-                            dangerouslySetInnerHTML={{ __html: disclaimerText }}
-                        />
-                    </React.Fragment>
-                );
-                // Mark disclaimer as processed and reset flag
+                formattedLines.push(renderDisclaimerText(trimmedLine, index));
                 disclaimerProcessed = true;
                 isInDisclaimer = false;
                 continue;
             }
 
-            // Skip duplicate disclaimer lines - only skip if already processed
+            // Skip duplicate disclaimer lines
             if (
                 disclaimerProcessed &&
                 (trimmedLine.startsWith('Lưu ý:') ||
                     (trimmedLine.startsWith('*') && trimmedLine.endsWith('*')))
             ) {
-                continue; // Skip duplicate disclaimer only if already processed
+                continue;
             }
 
-            // Kiểm tra nếu là section title (có dấu hai chấm ở cuối và không phải là tên bác sĩ/bệnh viện)
-            const isSectionTitle =
-                /^(Bệnh viện chuyên về|Bác sĩ chuyên về|Dựa trên các triệu chứng|Lời khuyên chung|Chuyên khoa phù hợp).*:?$/.exec(
-                    trimmedLine
-                );
-
-            // Kiểm tra nếu là tên bác sĩ hoặc bệnh viện (bắt đầu với "Bác sĩ", "BS.", hoặc "Bệnh viện", "Phòng khám" nhưng không phải section title)
-            const isNameLine =
-                !isSectionTitle && /^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/.test(trimmedLine);
-
-            if (isSectionTitle) {
-                // Section title - không thêm border, spacing nhỏ hơn
-                formattedLines.push(
-                    <React.Fragment key={`section-${index}`}>
-                        <strong
-                            className={styles.sectionTitle}
-                            dangerouslySetInnerHTML={{ __html: trimmedLine }}
-                        />
-                        {index < lines.length - 1 && <br />}
-                    </React.Fragment>
-                );
-            } else if (isNameLine) {
-                // Nếu đang trong một block, thêm border-bottom trước khi bắt đầu block mới
+            // Handle section titles
+            if (isSectionTitle(trimmedLine)) {
+                formattedLines.push(renderSectionTitle(trimmedLine, index, isLastLine));
+            }
+            // Handle name lines
+            else if (isNameLine(trimmedLine)) {
                 if (isInBlock && currentBlockStart >= 0) {
-                    formattedLines.push(
-                        <div
-                            key={`border-${currentBlockStart}`}
-                            className={styles.dataBlockBorder}
-                        ></div>
-                    );
+                    formattedLines.push(renderBlockBorder(currentBlockStart));
                 }
-
-                // Bắt đầu block mới
                 currentBlockStart = index;
                 isInBlock = true;
-                formattedLines.push(
-                    <React.Fragment key={`name-${index}`}>
-                        <strong
-                            className={styles.boldName}
-                            dangerouslySetInnerHTML={{ __html: trimmedLine }}
-                        />
-                    </React.Fragment>
-                );
-            } else if (trimmedLine) {
-                // Kiểm tra nếu là list item (bắt đầu với - hoặc •)
-                const isListItem = /^[-•]/.test(trimmedLine);
-
-                if (isListItem) {
-                    // Format list item với indent
-                    formattedLines.push(
-                        <React.Fragment key={`list-${index}`}>
-                            <div className={styles.listItem}>
-                                <span dangerouslySetInnerHTML={{ __html: trimmedLine }} />
-                            </div>
-                        </React.Fragment>
-                    );
+                formattedLines.push(renderNameLine(trimmedLine, index));
+            }
+            // Handle content lines
+            else if (trimmedLine) {
+                if (isListItem(trimmedLine)) {
+                    formattedLines.push(renderListItem(trimmedLine, index));
                 } else {
-                    // Nếu là dòng có nội dung trong block - render HTML nếu có
-                    formattedLines.push(
-                        <React.Fragment key={`content-${index}`}>
-                            <span dangerouslySetInnerHTML={{ __html: trimmedLine }} />
-                            {index < lines.length - 1 && <br />}
-                        </React.Fragment>
-                    );
+                    formattedLines.push(renderContentLine(trimmedLine, index, isLastLine));
                 }
-            } else {
-                // Dòng trống - kiểm tra xem có phải kết thúc block không
-                // Nếu dòng trống và dòng tiếp theo là tên mới hoặc không có dòng tiếp theo, kết thúc block
+            }
+            // Handle empty lines
+            else {
                 if (
                     isInBlock &&
                     (/^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/.test(nextLine) || nextLine === '')
                 ) {
-                    // Dòng trống và kết thúc block
                     formattedLines.push(
                         <React.Fragment key={`empty-${index}`}>
                             <br key={`br-${index}`} />
-                            <div
-                                key={`border-${currentBlockStart}-${index}`}
-                                className={styles.dataBlockBorder}
-                            ></div>
+                            {renderBlockBorder(currentBlockStart, `-${index}`)}
                         </React.Fragment>
                     );
                     isInBlock = false;
@@ -229,14 +246,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
             }
         }
 
-        // Thêm border-bottom cho block cuối cùng nếu chưa có
+        // Add final border if needed
         if (isInBlock && currentBlockStart >= 0) {
-            formattedLines.push(
-                <div
-                    key={`border-${currentBlockStart}-end`}
-                    className={styles.dataBlockBorder}
-                ></div>
-            );
+            formattedLines.push(renderBlockBorder(currentBlockStart, '-end'));
         }
 
         return formattedLines;

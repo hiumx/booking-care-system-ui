@@ -190,7 +190,7 @@
 
             &:hover {
                 background: #e3f2fd;
-                color: #0e82fd;
+                color: #0066cc; // Improved contrast for WCAG AA compliance
                 transform: scale(1.1);
             }
 
@@ -256,11 +256,11 @@
             transition: all 0.2s ease;
 
             &.saveButton {
-                background: #0e82fd;
+                background: #0066cc; // Improved contrast for WCAG AA compliance
                 color: #ffffff;
 
                 &:hover {
-                    background: #0a6dd4;
+                    background: #0052a3; // Darker hover state
                 }
             }
 
