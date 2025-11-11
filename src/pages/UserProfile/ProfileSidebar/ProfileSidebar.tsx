@@ -17,6 +17,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { unreadCount } = useSelector((state: RootState) => state.notification);
+    const { unreadMessageCount } = useSelector((state: RootState) => state.user);
 
     const isActive = (tab: string) => activeTab === tab;
 
@@ -145,7 +146,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                             <Link to="/chat">
                                 <i className="isax isax-messages-1"></i>
                                 <span>Tin nhắn</span>
-                                <small className="unread-msg">7</small>
+                                {unreadMessageCount > 0 && (
+                                    <small className="unread-msg">{unreadMessageCount}</small>
+                                )}
                             </Link>
                         </li>
 
