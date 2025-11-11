@@ -212,6 +212,18 @@ export class MedicalServiceCategoriesService {
             if (params?.includeInactive !== undefined) {
                 queryParams.append('includeInactive', params.includeInactive.toString());
             }
+            if (params?.searchTerm) {
+                queryParams.append('searchTerm', params.searchTerm);
+            }
+            if (params?.hospitalIds && params.hospitalIds.length > 0) {
+                queryParams.append('hospitalIds', params.hospitalIds.join(','));
+            }
+            if (params?.provinceId) {
+                queryParams.append('provinceId', params.provinceId);
+            }
+            if (params?.districtId) {
+                queryParams.append('districtId', params.districtId);
+            }
 
             const url = `${SERVICE_CATEGORY_ENDPOINTS.SERVICES_WITH_HOSPITAL(categoryId)}?${queryParams.toString()}`;
             const response: any = await axiosInstance.get(url);

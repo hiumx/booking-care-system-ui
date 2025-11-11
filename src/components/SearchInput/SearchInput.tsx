@@ -31,6 +31,9 @@ type SearchInputProps = {
     }) => void; // Callback for area filter
     rescheduleHospitalId?: string | null; // Hospital ID from reschedule flow (Option 3)
     rescheduleSpecialtyId?: string | null; // Specialty ID from reschedule flow (Option 3)
+    searchPlaceholder?: string; // Custom placeholder for search field
+    hideSpecialty?: boolean; // Hide specialty field
+    hideDate?: boolean; // Hide date field
 };
 
 const SearchInput: React.FC<SearchInputProps> = ({
@@ -44,6 +47,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
     onAreaFilter,
     rescheduleHospitalId,
     rescheduleSpecialtyId,
+    searchPlaceholder = 'Nhập tên bác sĩ',
+    hideSpecialty = false,
+    hideDate = false,
 }) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -70,6 +76,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
     // Track if component is on DoctorList page for syncing
     const isDoctorListPage = globalThis.location.pathname.includes('/doctors');
+    // Track if component is on ServiceHospital page for syncing
+    const isServiceHospitalPage = globalThis.location.pathname.includes('/services');
 
     // Refs for auto-resize
     const doctorNameRef = useRef<HTMLDivElement>(null);
@@ -78,6 +86,12 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
     // Ref to track if reschedule filters have been initialized
     const rescheduleInitialized = useRef(false);
+
+    // Ref to track current input value to prevent sync loop when typing
+    const currentInputValueRef = useRef<string>('');
+
+    // Ref to track if ServiceHospitalPage has initialized from URL (only sync once on mount)
+    const serviceHospitalPageInitialized = useRef(false);
 
     // Load data on component mount
     useEffect(() => {
@@ -106,12 +120,12 @@ const SearchInput: React.FC<SearchInputProps> = ({
     }, [rescheduleHospitalId, rescheduleSpecialtyId]);
 
     // Helper function to sync URL params
-    const syncDoctorNameFromUrl = (searchFromUrl: string | null) => {
+    const syncDoctorNameFromUrl = (searchFromUrl: string | null, placeholder?: string) => {
         setDoctorName(searchFromUrl || '');
         setTimeout(() => {
             const contentEditableDiv = document.querySelector(
-                '[contenteditable="true"][data-placeholder="Nhập tên bác sĩ"]'
-            );
+                `[contenteditable="true"][data-placeholder="${placeholder || 'Nhập tên bác sĩ'}"]`
+            ) as HTMLElement;
             if (contentEditableDiv) {
                 contentEditableDiv.textContent = searchFromUrl || '';
             }
@@ -176,7 +190,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
             const specialtyIdFromUrl = searchParams.get('specialtyId');
             const hospitalIdFromUrl = searchParams.get('hospitalId');
 
-            syncDoctorNameFromUrl(searchFromUrl);
+            syncDoctorNameFromUrl(searchFromUrl, 'Nhập tên bác sĩ');
             syncDateFromUrl(dateFromUrl);
             syncAreaFromUrl(
                 provinceIdFromUrl,
@@ -187,6 +201,78 @@ const SearchInput: React.FC<SearchInputProps> = ({
             syncFiltersFromUrl(specialtyIdFromUrl, hospitalIdFromUrl);
         }
     }, [isDoctorListPage, searchParams]);
+
+    // Sync for ServiceHospital page - ONLY ONCE on mount, never sync searchTerm from URL after that
+    useEffect(() => {
+        if (isServiceHospitalPage) {
+            if (serviceHospitalPageInitialized.current) {
+                return; // Already initialized, skip
+            }
+            const searchTermFromUrl = searchParams.get('searchTerm');
+            const provinceIdFromUrl = searchParams.get('provinceId');
+            const districtIdFromUrl = searchParams.get('districtId');
+            const provinceNameFromUrl = searchParams.get('provinceName');
+            const districtNameFromUrl = searchParams.get('districtName');
+            const hospitalIdFromUrl = searchParams.get('hospitalId');
+            const hospitalIdsFromUrl = searchParams.getAll('hospitalIds');
+
+            // Initial load - sync from URL only once
+            if (searchTermFromUrl === null) {
+                currentInputValueRef.current = '';
+            } else {
+                syncDoctorNameFromUrl(searchTermFromUrl, searchPlaceholder);
+                currentInputValueRef.current = searchTermFromUrl;
+            }
+
+            // Sync area filter UI only (these don't cause focus loss)
+            syncAreaFromUrl(
+                provinceIdFromUrl,
+                districtIdFromUrl,
+                provinceNameFromUrl,
+                districtNameFromUrl
+            );
+
+            // Sync hospital filters UI only (these don't cause focus loss)
+            if (hospitalIdsFromUrl.length > 0) {
+                setSelectedClinics(hospitalIdsFromUrl);
+            } else if (hospitalIdFromUrl) {
+                setSelectedClinics([hospitalIdFromUrl]);
+            } else {
+                setSelectedClinics([]);
+            }
+
+            serviceHospitalPageInitialized.current = true;
+        }
+    }, [isServiceHospitalPage, searchPlaceholder]);
+
+    // Sync other filters (not searchTerm) for ServiceHospital page when URL changes
+    useEffect(() => {
+        if (isServiceHospitalPage && serviceHospitalPageInitialized.current) {
+            const provinceIdFromUrl = searchParams.get('provinceId');
+            const districtIdFromUrl = searchParams.get('districtId');
+            const provinceNameFromUrl = searchParams.get('provinceName');
+            const districtNameFromUrl = searchParams.get('districtName');
+            const hospitalIdFromUrl = searchParams.get('hospitalId');
+            const hospitalIdsFromUrl = searchParams.getAll('hospitalIds');
+
+            // Sync area filter UI only (these don't cause focus loss)
+            syncAreaFromUrl(
+                provinceIdFromUrl,
+                districtIdFromUrl,
+                provinceNameFromUrl,
+                districtNameFromUrl
+            );
+
+            // Sync hospital filters UI only (these don't cause focus loss)
+            if (hospitalIdsFromUrl.length > 0) {
+                setSelectedClinics(hospitalIdsFromUrl);
+            } else if (hospitalIdFromUrl) {
+                setSelectedClinics([hospitalIdFromUrl]);
+            } else {
+                setSelectedClinics([]);
+            }
+        }
+    }, [isServiceHospitalPage, searchParams]);
 
     // Auto-resize function
     const autoResize = (element: HTMLDivElement) => {
@@ -519,10 +605,12 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                     )}
                                     contentEditable
                                     suppressContentEditableWarning={true}
-                                    data-placeholder="Nhập tên bác sĩ"
+                                    data-placeholder={searchPlaceholder}
                                     onInput={(e) => {
                                         const text = e.currentTarget.textContent || '';
                                         setDoctorName(text);
+                                        // Update ref to track current input value
+                                        currentInputValueRef.current = text;
                                         onSearchChange?.(text);
                                         autoResize(e.currentTarget);
                                     }}
@@ -564,39 +652,42 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                 </button>
                             </div>
                         </div>
-                        <div className={clsx('search-input search-map-line', styles.inputItem)}>
-                            <i className="isax isax-health5"></i>
-                            <div className="mb-0">
-                                <button
-                                    ref={specialtyRef}
-                                    type="button"
-                                    className={clsx(
-                                        'form-control',
-                                        styles.formControlCustom,
-                                        styles.multiLineInput
-                                    )}
-                                    data-placeholder="Chọn chuyên khoa"
-                                    onClick={handleSpecialtyClick}
-                                    aria-label="Chọn chuyên khoa"
-                                    style={{ minHeight: '50px', textAlign: 'left' }}
-                                >
-                                    {selectedSpecialties.length > 0
-                                        ? selectedSpecialties
-                                              .map(
-                                                  (id) =>
-                                                      specialtyItems.find((spec) => spec.id === id)
-                                                          ?.name
-                                              )
-                                              .filter(Boolean)
-                                              .map((name) => (
-                                                  <span key={name} className={styles.tag}>
-                                                      {name}
-                                                  </span>
-                                              ))
-                                        : null}
-                                </button>
+                        {!hideSpecialty && (
+                            <div className={clsx('search-input search-map-line', styles.inputItem)}>
+                                <i className="isax isax-health5"></i>
+                                <div className="mb-0">
+                                    <button
+                                        ref={specialtyRef}
+                                        type="button"
+                                        className={clsx(
+                                            'form-control',
+                                            styles.formControlCustom,
+                                            styles.multiLineInput
+                                        )}
+                                        data-placeholder="Chọn chuyên khoa"
+                                        onClick={handleSpecialtyClick}
+                                        aria-label="Chọn chuyên khoa"
+                                        style={{ minHeight: '50px', textAlign: 'left' }}
+                                    >
+                                        {selectedSpecialties.length > 0
+                                            ? selectedSpecialties
+                                                  .map(
+                                                      (id) =>
+                                                          specialtyItems.find(
+                                                              (spec) => spec.id === id
+                                                          )?.name
+                                                  )
+                                                  .filter(Boolean)
+                                                  .map((name) => (
+                                                      <span key={name} className={styles.tag}>
+                                                          {name}
+                                                      </span>
+                                                  ))
+                                            : null}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        )}
                         <div className={clsx('search-input search-map-line', styles.inputItem)}>
                             <i className="isax isax-location5"></i>
                             <div className="mb-0">
@@ -618,41 +709,46 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                 </button>
                             </div>
                         </div>
-                        <div
-                            className={clsx('search-input search-calendar-line', styles.inputItem)}
-                        >
-                            <i
-                                className="isax isax-calendar-tick5"
-                                onClick={() => setShowDatePicker(!showDatePicker)}
-                            ></i>
-                            <div className="mb-0">
-                                <input
-                                    type="text"
-                                    className="form-control datetimepicker"
-                                    placeholder="Date"
-                                    value={formatDate(selectedDate)}
+                        {!hideDate && (
+                            <div
+                                className={clsx(
+                                    'search-input search-calendar-line',
+                                    styles.inputItem
+                                )}
+                            >
+                                <i
+                                    className="isax isax-calendar-tick5"
                                     onClick={() => setShowDatePicker(!showDatePicker)}
-                                    ref={dateInputRef}
-                                    readOnly
-                                />
-                                <Calendar
-                                    value={selectedDate}
-                                    onChange={handleDateChange}
-                                    minDate={new Date()}
-                                    maxDate={
-                                        new Date(
-                                            today.getFullYear(),
-                                            today.getMonth(),
-                                            today.getDate() + 30
-                                        )
-                                    }
-                                    anchorEl={dateInputRef.current}
-                                    open={showDatePicker}
-                                    onClose={() => setShowDatePicker(false)}
-                                    isTodaySelected={isTodaySelected}
-                                />
+                                ></i>
+                                <div className="mb-0">
+                                    <input
+                                        type="text"
+                                        className="form-control datetimepicker"
+                                        placeholder="Date"
+                                        value={formatDate(selectedDate)}
+                                        onClick={() => setShowDatePicker(!showDatePicker)}
+                                        ref={dateInputRef}
+                                        readOnly
+                                    />
+                                    <Calendar
+                                        value={selectedDate}
+                                        onChange={handleDateChange}
+                                        minDate={new Date()}
+                                        maxDate={
+                                            new Date(
+                                                today.getFullYear(),
+                                                today.getMonth(),
+                                                today.getDate() + 30
+                                            )
+                                        }
+                                        anchorEl={dateInputRef.current}
+                                        open={showDatePicker}
+                                        onClose={() => setShowDatePicker(false)}
+                                        isTodaySelected={isTodaySelected}
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        )}
                         <div className="form-search-btn">
                             <button
                                 className={clsx(

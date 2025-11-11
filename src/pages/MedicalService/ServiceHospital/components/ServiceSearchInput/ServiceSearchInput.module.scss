@@ -1,0 +1,174 @@
+.searchBoxCustom {
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin: -3rem auto 3rem;
+    max-width: 1200px;
+    position: relative;
+    z-index: 10;
+}
+
+.searchBoxOne {
+    form {
+        width: 100%;
+    }
+}
+
+.searchInput {
+    position: relative;
+
+    .label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 0.5rem;
+
+        i {
+            font-size: 1rem;
+        }
+    }
+
+    .input,
+    .selectBtn {
+        background: #fff;
+        border: 2px solid transparent;
+        border-radius: 0.75rem;
+        padding: 0.75rem 2.5rem 0.75rem 1rem;
+        font-size: 0.9375rem;
+        transition: all 0.3s ease;
+        width: 100%;
+        text-align: left;
+
+        &:focus {
+            border-color: #0e82fd;
+            box-shadow: 0 0 0 0.2rem rgba(14, 130, 253, 0.15);
+            outline: none;
+        }
+
+        &:hover {
+            border-color: #bae6fd;
+        }
+    }
+
+    .selectBtn {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+
+        .placeholder {
+            color: #6c757d;
+        }
+    }
+
+    .clearBtn {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: #6c757d;
+        font-size: 1.125rem;
+        cursor: pointer;
+        padding: 0.25rem;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        margin-top: 0.9rem;
+
+        &:hover {
+            background: #f8f9fa;
+            color: #dc3545;
+        }
+    }
+}
+
+.modalContent {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.hospitalList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.hospitalItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: #fff;
+    border: 2px solid #e9ecef;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    width: 100%;
+
+    &:hover {
+        border-color: #0e82fd;
+        background: #f0f9ff;
+        transform: translateX(4px);
+    }
+
+    &.selected {
+        border-color: #0e82fd;
+        background: #e0f2fe;
+    }
+}
+
+.hospitalInfo {
+    flex: 1;
+
+    h6 {
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+        color: #212529;
+    }
+
+    p {
+        font-size: 0.875rem;
+    }
+}
+
+// Responsive
+@media (max-width: 991px) {
+    .searchBoxCustom {
+        padding: 1.5rem;
+        margin: -2rem 1rem 2rem;
+    }
+
+    .searchInput {
+        .clearBtn {
+            margin-top: 0.9rem;
+        }
+    }
+}
+
+@media (max-width: 575px) {
+    .searchBoxCustom {
+        padding: 1.25rem;
+        border-radius: 0.75rem;
+    }
+
+    .searchInput {
+        .label {
+            font-size: 0.8125rem;
+        }
+
+        .input,
+        .selectBtn {
+            padding: 0.625rem 2.25rem 0.625rem 0.875rem;
+            font-size: 0.875rem;
+        }
+    }
+}
