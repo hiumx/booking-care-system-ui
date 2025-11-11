@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useTranslation } from 'react-i18next';
 import { PATHS } from '@/routes/paths';
 import { AppDispatch, RootState } from '@/store';
 import { logoutAsync } from '@/store/slices/authSlice';
