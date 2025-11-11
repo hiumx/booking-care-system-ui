@@ -47,6 +47,7 @@
         "react-toastify": "^11.0.5",
         "redux-persist": "^6.0.0",
         "swiper": "^11.2.10",
+        "use-sound": "^5.0.0",
         "zod": "^4.1.12"
     },
     "devDependencies": {

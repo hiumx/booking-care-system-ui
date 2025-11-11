@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import Favourite from './Favourite';
@@ -9,11 +10,21 @@ import AppointmentDetailPage from './Appointments/AppointmentDetailPage';
 import SettingsContainer from './Setting/SettingsContainer/SettingsContainer';
 import Invoices from './Invoices';
 import Wallet from './Wallet';
-import { RootState } from '@/store';
+import Notifications from './Notifications';
+import { RootState, AppDispatch } from '@/store';
+import { fetchUnreadMessageCount } from '@/store/slices/userSlice';
 
 const UserProfile = () => {
     const location = useLocation();
+    const dispatch = useDispatch<AppDispatch>();
     const { profile } = useSelector((state: RootState) => state.user);
+
+    // Fetch unread message count when profile is loaded
+    useEffect(() => {
+        if (profile?.accountId) {
+            dispatch(fetchUnreadMessageCount(profile.accountId));
+        }
+    }, [profile?.accountId, dispatch]);
 
     // Get active tab from query parameters
     const getActiveTab = () => {
@@ -30,6 +41,7 @@ const UserProfile = () => {
             'medical-records',
             'wallet',
             'invoices',
+            'notifications',
             'chat',
             'vitals',
             'settings',
@@ -54,58 +66,27 @@ const UserProfile = () => {
             { label: 'Patient', isActive: false },
         ];
 
-        switch (activeTab) {
-            case 'appointments':
-                return {
-                    items: [...baseItems, { label: 'My Appointments', isActive: true }],
-                    title: 'My Appointments',
-                };
-            case 'favourites':
-                return {
-                    items: [...baseItems, { label: 'Favourites', isActive: true }],
-                    title: 'Favourites',
-                };
-            case 'dependent':
-                return {
-                    items: [...baseItems, { label: 'Dependants', isActive: true }],
-                    title: 'Dependants',
-                };
-            case 'medical-records':
-                return {
-                    items: [...baseItems, { label: 'Medical Records', isActive: true }],
-                    title: 'Medical Records',
-                };
-            case 'wallet':
-                return {
-                    items: [...baseItems, { label: 'Wallet', isActive: true }],
-                    title: 'Lịch sử hoàn tiền',
-                };
-            case 'invoices':
-                return {
-                    items: [...baseItems, { label: 'Invoices', isActive: true }],
-                    title: 'Invoices',
-                };
-            case 'chat':
-                return {
-                    items: [...baseItems, { label: 'Messages', isActive: true }],
-                    title: 'Messages',
-                };
-            case 'vitals':
-                return {
-                    items: [...baseItems, { label: 'Vitals', isActive: true }],
-                    title: 'Vitals',
-                };
-            case 'settings':
-                return {
-                    items: [...baseItems, { label: 'Settings', isActive: true }],
-                    title: 'Settings',
-                };
-            default:
-                return {
-                    items: [...baseItems, { label: 'Dashboard', isActive: true }],
-                    title: 'Dashboard',
-                };
-        }
+        // Tab configuration map - eliminates switch statement duplication
+        const tabConfig: Record<string, { label: string; title: string }> = {
+            appointments: { label: 'My Appointments', title: 'My Appointments' },
+            favourites: { label: 'Favourites', title: 'Favourites' },
+            dependent: { label: 'Dependants', title: 'Dependants' },
+            'medical-records': { label: 'Medical Records', title: 'Medical Records' },
+            wallet: { label: 'Wallet', title: 'Lịch sử hoàn tiền' },
+            invoices: { label: 'Invoices', title: 'Invoices' },
+            notifications: { label: 'Notifications', title: 'Danh sách thông báo' },
+            chat: { label: 'Messages', title: 'Messages' },
+            vitals: { label: 'Vitals', title: 'Vitals' },
+            settings: { label: 'Settings', title: 'Settings' },
+        };
+
+        // Get config for active tab or default to dashboard
+        const config = tabConfig[activeTab] || { label: 'Dashboard', title: 'Dashboard' };
+
+        return {
+            items: [...baseItems, { label: config.label, isActive: true }],
+            title: config.title,
+        };
     };
 
     // Render content based on active tab
@@ -126,6 +107,8 @@ const UserProfile = () => {
                 return <SettingsContainer />;
             case 'invoices':
                 return <Invoices patientId={profile?.id} profile={profile} />;
+            case 'notifications':
+                return <Notifications />;
             default:
                 return <Favourite patientId={profile?.id} />; // Default to favourites
         }
