@@ -12,6 +12,34 @@ interface SuggestionCardProps {
     onSupportBooking?: () => void;
 }
 
+interface CardFooterProps {
+    onBookAppointment: () => void;
+    onSupportBooking?: () => void;
+}
+
+const CardFooter: React.FC<CardFooterProps> = ({ onBookAppointment, onSupportBooking }) => (
+    <div className={styles.cardFooter}>
+        <div className={styles.buttonGroup}>
+            <button
+                className={clsx('btn', 'btn-outline-primary', styles.bookButton)}
+                onClick={onBookAppointment}
+            >
+                <Stethoscope size={16} />
+                <span>Đặt lịch khám bệnh</span>
+            </button>
+            {onSupportBooking && (
+                <button
+                    className={clsx('btn', 'btn-primary', styles.supportButton)}
+                    onClick={onSupportBooking}
+                >
+                    <HelpCircle size={16} />
+                    <span>Hỗ trợ đặt lịch</span>
+                </button>
+            )}
+        </div>
+    </div>
+);
+
 const SuggestionCard: React.FC<SuggestionCardProps> = ({
     suggestion,
     onBookAppointment,
@@ -108,26 +136,10 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                         </div>
                     </div>
                 </div>
-                <div className={styles.cardFooter}>
-                    <div className={styles.buttonGroup}>
-                        <button
-                            className={clsx('btn', 'btn-outline-primary', styles.bookButton)}
-                            onClick={onBookAppointment}
-                        >
-                            <Stethoscope size={16} />
-                            <span>Đặt lịch khám bệnh</span>
-                        </button>
-                        {onSupportBooking && (
-                            <button
-                                className={clsx('btn', 'btn-primary', styles.supportButton)}
-                                onClick={onSupportBooking}
-                            >
-                                <HelpCircle size={16} />
-                                <span>Hỗ trợ đặt lịch</span>
-                            </button>
-                        )}
-                    </div>
-                </div>
+                <CardFooter
+                    onBookAppointment={onBookAppointment}
+                    onSupportBooking={onSupportBooking}
+                />
             </div>
         );
     }
@@ -206,26 +218,10 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                         </div>
                     )}
                 </div>
-                <div className={styles.cardFooter}>
-                    <div className={styles.buttonGroup}>
-                        <button
-                            className={clsx('btn', 'btn-outline-primary', styles.bookButton)}
-                            onClick={onBookAppointment}
-                        >
-                            <Stethoscope size={16} />
-                            <span>Đặt lịch khám bệnh</span>
-                        </button>
-                        {onSupportBooking && (
-                            <button
-                                className={clsx('btn', 'btn-primary', styles.supportButton)}
-                                onClick={onSupportBooking}
-                            >
-                                <HelpCircle size={16} />
-                                <span>Hỗ trợ đặt lịch</span>
-                            </button>
-                        )}
-                    </div>
-                </div>
+                <CardFooter
+                    onBookAppointment={onBookAppointment}
+                    onSupportBooking={onSupportBooking}
+                />
             </div>
         );
     }

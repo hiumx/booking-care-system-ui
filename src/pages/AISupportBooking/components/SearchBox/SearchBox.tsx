@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import {
     Paperclip,
     Trash2,
@@ -40,7 +41,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     userLocation,
     forceShowLocationModal = false,
 }) => {
-    const [isRecording, setIsRecording] = useState(false);
     const [isMultiLine, setIsMultiLine] = useState(false);
     const [showAttachmentModal, setShowAttachmentModal] = useState(false);
     const [showLocationModal, setShowLocationModal] = useState(forceShowLocationModal);
@@ -48,17 +48,16 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     const [isGettingLocation, setIsGettingLocation] = useState(false);
     const [locationError, setLocationError] = useState<string | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const recognitionRef = useRef<SpeechRecognition | null>(null);
-    const valueRef = useRef<string>(value);
     const modalRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const locationModalRef = useRef<HTMLDivElement>(null);
     const locationButtonRef = useRef<HTMLButtonElement>(null);
 
-    // Update valueRef when value changes
-    useEffect(() => {
-        valueRef.current = value;
-    }, [value]);
+    // Use speech recognition hook
+    const { isRecording, toggleRecording } = useSpeechRecognition({
+        onTranscript: onChange,
+        currentValue: value,
+    });
 
     // Tự động hiển thị modal vị trí nếu chưa có vị trí
     useEffect(() => {
@@ -101,32 +100,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         };
     }, [showAttachmentModal, showLocationModal, userLocation]);
 
-    // Setup speech recognition
-    useEffect(() => {
-        const SpeechRecognition =
-            (globalThis as any).SpeechRecognition || (globalThis as any).webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            const recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = 'vi-VN';
-            recognitionRef.current = recognition;
-
-            recognition.onresult = (event: SpeechRecognitionEvent) => {
-                let transcript = '';
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    transcript += event.results[i][0].transcript;
-                }
-                const newText = valueRef.current + ' ' + transcript.trim();
-                onChange(newText);
-            };
-
-            recognition.onend = () => {
-                setIsRecording(false);
-            };
-        }
-    }, [onChange]);
-
     const handleSend = () => {
         if (value.trim()) {
             onSend();
@@ -164,16 +137,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
             // Set max height to 3 lines
             const maxHeight = singleLineHeight * 3;
             textareaRef.current.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
-        }
-    };
-
-    const handleStartRecording = () => {
-        if (isRecording) {
-            recognitionRef.current?.stop();
-            setIsRecording(false);
-        } else {
-            recognitionRef.current?.start();
-            setIsRecording(true);
         }
     };
 
@@ -461,7 +424,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                     <button
                         type="button"
                         data-tooltip={isRecording ? 'Dừng ghi âm' : 'Ghi âm'}
-                        onClick={handleStartRecording}
+                        onClick={toggleRecording}
                         className={clsx(styles.micButton, {
                             [styles.recording]: isRecording,
                         })}

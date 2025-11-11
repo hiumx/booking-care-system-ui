@@ -505,21 +505,7 @@ const AISupportBooking: React.FC = () => {
     // Helper function to parse doctor suggestions
     const parseDoctorSuggestions = (doctors: any[]): Suggestion[] => {
         if (!Array.isArray(doctors)) return [];
-
-        return doctors.map((d: any) => ({
-            type: 'doctor' as const,
-            doctor: {
-                id: d.id || d.doctor?.id,
-                name: d.name || d.doctor?.name,
-                specialtyName: d.specialtyName || d.doctor?.specialtyName,
-                hospitalName: d.hospitalName || d.doctor?.hospitalName,
-                rating: d.rating || d.doctor?.rating || 0,
-                yearOfExperience: d.yearOfExperience || d.doctor?.yearOfExperience || 0,
-                serviceTypeName: d.serviceTypeName || d.doctor?.serviceTypeName || undefined,
-                price: d.price || d.doctor?.price || undefined,
-                avatarUrl: d.avatarUrl || d.doctor?.avatarUrl || undefined,
-            },
-        }));
+        return doctors.map(parseDoctorData);
     };
 
     // Helper function to parse hospital suggestions
@@ -590,6 +576,30 @@ const AISupportBooking: React.FC = () => {
         };
     };
 
+    // Helper function to handle chat deletion navigation
+    const handleChatDeletionNavigation = (chatId: string) => {
+        setChatHistories((prev) => {
+            const remainingChats = prev.filter((chat) => chat.id !== chatId);
+            // Nếu chat bị xóa là chat đang active, chuyển sang chat khác hoặc reset
+            if (activeChatId === chatId) {
+                if (remainingChats.length > 0) {
+                    const newActiveId = remainingChats[0].id;
+                    setActiveChatId(newActiveId);
+                    navigate(
+                        replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, {
+                            chatId: newActiveId,
+                        })
+                    );
+                } else {
+                    setActiveChatId(null);
+                    setMessages([]);
+                    navigate(PATHS.AI_SUPPORT_BOOKING);
+                }
+            }
+            return remainingChats;
+        });
+    };
+
     const handleSelectChat = async (chatId: string) => {
         // Kiểm tra authentication
         if (!isAuthenticated) {
@@ -627,50 +637,12 @@ const AISupportBooking: React.FC = () => {
         try {
             // Gọi API để xóa session trong database
             await AIService.deleteSession(chatId);
-
-            // Cập nhật UI sau khi xóa thành công
-            setChatHistories((prev) => {
-                const remainingChats = prev.filter((chat) => chat.id !== chatId);
-                // Nếu chat bị xóa là chat đang active, chuyển sang chat khác hoặc reset
-                if (activeChatId === chatId) {
-                    if (remainingChats.length > 0) {
-                        const newActiveId = remainingChats[0].id;
-                        setActiveChatId(newActiveId);
-                        navigate(
-                            replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, {
-                                chatId: newActiveId,
-                            })
-                        );
-                    } else {
-                        setActiveChatId(null);
-                        setMessages([]);
-                        navigate(PATHS.AI_SUPPORT_BOOKING);
-                    }
-                }
-                return remainingChats;
-            });
         } catch (error) {
             console.error('Error deleting chat:', error);
             // Vẫn xóa trên UI nếu API call fail (fallback)
-            setChatHistories((prev) => {
-                const remainingChats = prev.filter((chat) => chat.id !== chatId);
-                if (activeChatId === chatId) {
-                    if (remainingChats.length > 0) {
-                        const newActiveId = remainingChats[0].id;
-                        setActiveChatId(newActiveId);
-                        navigate(
-                            replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, {
-                                chatId: newActiveId,
-                            })
-                        );
-                    } else {
-                        setActiveChatId(null);
-                        setMessages([]);
-                        navigate(PATHS.AI_SUPPORT_BOOKING);
-                    }
-                }
-                return remainingChats;
-            });
+        } finally {
+            // Cập nhật UI sau khi xóa (thành công hoặc thất bại)
+            handleChatDeletionNavigation(chatId);
         }
     };
 
