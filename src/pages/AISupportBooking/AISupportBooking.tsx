@@ -269,15 +269,15 @@ const AISupportBooking: React.FC = () => {
             return globalThis.crypto.randomUUID();
         }
 
-        const bytes = new Uint8Array(16);
-        if (globalThis.crypto?.getRandomValues) {
-            globalThis.crypto.getRandomValues(bytes);
-        } else {
-            for (let index = 0; index < bytes.length; index += 1) {
-                bytes[index] = Math.trunc(Math.random() * 256);
-            }
+        // Ensure crypto.getRandomValues is available for secure random generation
+        if (!globalThis.crypto?.getRandomValues) {
+            throw new Error('Crypto API not available. Secure random generation is required.');
         }
 
+        const bytes = new Uint8Array(16);
+        globalThis.crypto.getRandomValues(bytes);
+
+        // Set version (4) and variant bits for UUID v4
         bytes[6] = (bytes[6] & 0x0f) | 0x40;
         bytes[8] = (bytes[8] & 0x3f) | 0x80;
 

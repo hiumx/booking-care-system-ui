@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import ReCAPTCHA from 'react-google-recaptcha';
 import AuthLayout from '@/layouts/AuthLayout';
-import { Phone, ArrowLeft, Mail } from 'lucide-react';
+import { ArrowLeft, Phone } from 'lucide-react';
 import clsx from 'clsx';
 import { PATHS } from '@/routes/paths';
 import Button from '@/components/Button';
@@ -17,7 +17,7 @@ import { OtpService } from '@/services/otp.service';
 import { usePhoneInput } from '@/hooks/usePhoneInput';
 import { useOtpInput } from '@/hooks/useOtpInput';
 import { toast } from 'react-toastify';
-import { ContactMethodSection } from '@/components/Auth/ContactMethodSection';
+import { AuthContactMethodForm } from '@/components/Auth/AuthContactMethodForm';
 import { OtpInputGrid } from '@/components/Auth/OtpInputGrid';
 
 interface ForgotPasswordProps {
@@ -208,50 +208,33 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
 
     const renderInputStep = () => (
         <form onSubmit={handleSubmit}>
-            <ContactMethodSection
+            <AuthContactMethodForm
                 method={method}
-                onMethodChange={(value) => setMethod(value)}
-                toggleOptions={[
-                    {
-                        value: 'phone',
-                        label: t('forgotPassword.phone'),
-                        icon: <Phone size={16} className="me-2" />,
-                    },
-                    {
-                        value: 'email',
-                        label: t('forgotPassword.email'),
-                        icon: <Mail size={16} className="me-2" />,
-                    },
-                ]}
-                contactInputProps={{
-                    method,
-                    phoneInput: {
-                        label: t('forgotPassword.phone'),
-                        placeholder: t('forgotPassword.phonePlaceholder'),
-                        value: phone,
-                        onChange: handlePhoneChange,
-                        onKeyDown: handlePhoneKeyDown,
-                        onPaste: handlePhonePaste,
-                    },
-                    emailInput: {
-                        label: t('forgotPassword.email'),
-                        placeholder: t('forgotPassword.emailPlaceholder'),
-                        value: email,
-                        onChange: (event) => setEmail(event.target.value),
-                    },
-                    onFocus: () => setShowCaptcha(true),
+                onMethodChange={setMethod}
+                phone={phone}
+                email={email}
+                onPhoneChange={handlePhoneChange}
+                onEmailChange={(event) => setEmail(event.target.value)}
+                onPhoneKeyDown={handlePhoneKeyDown}
+                onPhonePaste={handlePhonePaste}
+                onFocus={() => setShowCaptcha(true)}
+                showCaptcha={showCaptcha}
+                siteKey={siteKey ?? undefined}
+                isHuman={isHuman}
+                onVerifyHuman={(value) => setIsHuman(Boolean(value))}
+                onExpiredHuman={() => setIsHuman(false)}
+                onCheckboxChange={setIsHuman}
+                recaptchaRef={recaptchaRef}
+                translations={{
+                    phoneLabel: t('forgotPassword.phone'),
+                    phonePlaceholder: t('forgotPassword.phonePlaceholder'),
+                    emailLabel: t('forgotPassword.email'),
+                    emailPlaceholder: t('forgotPassword.emailPlaceholder'),
+                    phoneToggleLabel: t('forgotPassword.phone'),
+                    emailToggleLabel: t('forgotPassword.email'),
+                    notRobotLabel: t('common.notRobot', 'Tôi không phải là robot'),
                 }}
-                captchaProps={{
-                    isVisible: showCaptcha,
-                    siteKey: siteKey ?? undefined,
-                    onVerify: (value) => setIsHuman(Boolean(value)),
-                    onExpired: () => setIsHuman(false),
-                    checkboxId: 'forgot-captcha',
-                    checkboxChecked: isHuman,
-                    onCheckboxChange: setIsHuman,
-                    label: t('common.notRobot', 'Tôi không phải là robot'),
-                    recaptchaRef,
-                }}
+                captchaId="forgot-captcha"
             />
             {/* Error message */}
             {error && (

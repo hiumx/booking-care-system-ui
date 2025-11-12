@@ -1,0 +1,1 @@
+export { AuthContactMethodForm } from './AuthContactMethodForm';
