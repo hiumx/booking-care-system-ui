@@ -10,7 +10,7 @@ interface UseOtpInputOptions {
  * Provides OTP state management and input handlers
  */
 export const useOtpInput = ({ length = 6 }: UseOtpInputOptions = {}) => {
-    const [otp, setOtp] = useState<string[]>(Array(length).fill(''));
+    const [otp, setOtp] = useState<string[]>(new Array<string>(length).fill(''));
     const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
 
     const otpValue = useMemo(() => otp.join(''), [otp]);
@@ -48,7 +48,7 @@ export const useOtpInput = ({ length = 6 }: UseOtpInputOptions = {}) => {
     );
 
     const resetOtp = useCallback(() => {
-        setOtp(Array(length).fill(''));
+        setOtp(new Array<string>(length).fill(''));
     }, [length]);
 
     return {

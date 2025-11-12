@@ -26,6 +26,7 @@ import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicato
 import { PasswordRequirementsList } from '@/components/PasswordRequirementsList';
 import { ContactMethodInput } from '@/components/Auth/ContactMethodInput';
 import { CaptchaSection } from '@/components/Auth/CaptchaSection';
+import { OtpInputGrid } from '@/components/Auth/OtpInputGrid';
 import { toast } from 'react-toastify';
 import { NAME_REGEX } from '@/constants';
 import { Gender } from '@/enums/common.enums';
@@ -651,31 +652,21 @@ const Register: React.FC = () => {
                     </div>
 
                     <form onSubmit={handleVerifyOtp}>
-                        <div className="d-flex justify-content-center gap-2">
-                            {otp.map((digit, idx) => (
-                                <input
-                                    key={idx}
-                                    ref={(el) => {
-                                        otpRefs.current[idx] = el;
-                                    }}
-                                    type="text"
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    maxLength={1}
-                                    value={digit}
-                                    onChange={(e) => handleOtpChange(idx, e.target.value)}
-                                    onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                                    className="text-center fw-bold"
-                                    style={{
-                                        width: 48,
-                                        height: 56,
-                                        fontSize: 20,
-                                        borderRadius: 8,
-                                        border: '2px solid #e5e7eb',
-                                    }}
-                                />
-                            ))}
-                        </div>
+                        <OtpInputGrid
+                            otp={otp}
+                            otpRefs={otpRefs}
+                            onChange={handleOtpChange}
+                            onKeyDown={handleOtpKeyDown}
+                            containerClassName="d-flex justify-content-center gap-2"
+                            baseInputClassName="text-center fw-bold"
+                            inputStyle={{
+                                width: 48,
+                                height: 56,
+                                fontSize: 20,
+                                borderRadius: 8,
+                                border: '2px solid #e5e7eb',
+                            }}
+                        />
 
                         <button
                             type="submit"

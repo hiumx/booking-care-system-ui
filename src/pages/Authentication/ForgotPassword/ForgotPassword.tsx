@@ -19,6 +19,7 @@ import { useOtpInput } from '@/hooks/useOtpInput';
 import { toast } from 'react-toastify';
 import { ContactMethodInput } from '@/components/Auth/ContactMethodInput';
 import { CaptchaSection } from '@/components/Auth/CaptchaSection';
+import { OtpInputGrid } from '@/components/Auth/OtpInputGrid';
 
 interface ForgotPasswordProps {
     onSubmit?: (email: string, phone: string) => void;
@@ -309,35 +310,23 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
 
             <form onSubmit={handleVerifyOtp}>
                 {/* OTP Input */}
-                <div className="d-flex justify-content-center gap-2 mb-4">
-                    {otp.map((digit, idx) => (
-                        <input
-                            key={otpInputIds[idx]}
-                            ref={(el) => {
-                                otpRefs.current[idx] = el;
-                            }}
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            maxLength={1}
-                            value={digit}
-                            onChange={(e) => handleOtpChange(idx, e.target.value)}
-                            onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                            className={clsx(
-                                'text-center fw-bold border rounded',
-                                digit ? 'border-primary' : 'border-secondary',
-                                'focus:border-primary focus:ring-1 focus:ring-primary'
-                            )}
-                            style={{
-                                width: 48,
-                                height: 56,
-                                fontSize: 20,
-                                outline: 'none',
-                                transition: 'border-color 0.15s ease-in-out',
-                            }}
-                        />
-                    ))}
-                </div>
+                <OtpInputGrid
+                    otp={otp}
+                    otpRefs={otpRefs}
+                    onChange={handleOtpChange}
+                    onKeyDown={handleOtpKeyDown}
+                    containerClassName="d-flex justify-content-center gap-2 mb-4"
+                    baseInputClassName="text-center fw-bold border rounded focus:border-primary focus:ring-1 focus:ring-primary"
+                    getInputClassName={(digit) => (digit ? 'border-primary' : 'border-secondary')}
+                    inputStyle={{
+                        width: 48,
+                        height: 56,
+                        fontSize: 20,
+                        outline: 'none',
+                        transition: 'border-color 0.15s ease-in-out',
+                    }}
+                    inputKeyBuilder={(index) => otpInputIds[index]}
+                />
 
                 {/* Error message */}
                 {error && (

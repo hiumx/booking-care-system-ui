@@ -98,7 +98,7 @@ const AISupportBooking: React.FC = () => {
     const [isLoadingChat, setIsLoadingChat] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
         // Mặc định mở trên desktop, đóng trên mobile
-        if (typeof globalThis.window !== 'undefined') {
+        if (globalThis.window !== undefined) {
             return globalThis.window.innerWidth > 768;
         }
         return true;
@@ -265,9 +265,7 @@ const AISupportBooking: React.FC = () => {
 
     // Generate GUID-like string for session ID
     const generateSessionId = (): string => {
-        // Using replace() with regex flag 'g' to replace all occurrences
-        // replaceAll() doesn't support regex patterns with callback functions
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c: string) => {
             const r = Math.trunc(Math.random() * 16);
             const v = c === 'x' ? r : (r & 0x3) | 0x8;
             return v.toString(16);
