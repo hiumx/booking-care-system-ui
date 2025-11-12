@@ -24,7 +24,10 @@ import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 import { PasswordRequirementsList } from '@/components/PasswordRequirementsList';
-import { AuthContactMethodForm } from '@/components/Auth/AuthContactMethodForm';
+import {
+    AuthContactMethodForm,
+    createAuthContactMethodFormProps,
+} from '@/components/Auth/AuthContactMethodForm';
 import { OtpInputGrid } from '@/components/Auth/OtpInputGrid';
 import { toast } from 'react-toastify';
 import { NAME_REGEX } from '@/constants';
@@ -520,31 +523,31 @@ const Register: React.FC = () => {
                 <div>
                     <form onSubmit={handleSendOtp}>
                         <AuthContactMethodForm
-                            method={method}
-                            onMethodChange={setMethod}
-                            phone={phone}
-                            email={email}
-                            onPhoneChange={handlePhoneChange}
-                            onEmailChange={(event) => setEmail(event.target.value)}
-                            onPhoneKeyDown={handlePhoneKeyDown}
-                            onPhonePaste={handlePhonePaste}
-                            onFocus={() => setShowCaptcha(true)}
-                            showCaptcha={showCaptcha}
-                            siteKey={siteKey ?? undefined}
-                            isHuman={isHuman}
-                            onVerifyHuman={(value) => setIsHuman(Boolean(value))}
-                            onExpiredHuman={() => setIsHuman(false)}
-                            onCheckboxChange={setIsHuman}
-                            translations={{
-                                phoneLabel: t('register.phone'),
-                                phonePlaceholder: t('register.phonePlaceholder'),
-                                emailLabel: t('register.addressEmail'),
-                                emailPlaceholder: t('register.emailPlaceholder'),
-                                phoneToggleLabel: t('register.phone'),
-                                emailToggleLabel: t('register.email'),
-                                notRobotLabel: t('common.notRobot', 'Tôi không phải là robot'),
-                            }}
-                            captchaId="register-captcha"
+                            {...createAuthContactMethodFormProps({
+                                method,
+                                phone,
+                                email,
+                                showCaptcha,
+                                isHuman,
+                                setMethod,
+                                handlePhoneChange,
+                                setEmail,
+                                handlePhoneKeyDown,
+                                handlePhonePaste,
+                                setShowCaptcha,
+                                setIsHuman,
+                                translations: {
+                                    phoneLabel: t('register.phone'),
+                                    phonePlaceholder: t('register.phonePlaceholder'),
+                                    emailLabel: t('register.addressEmail'),
+                                    emailPlaceholder: t('register.emailPlaceholder'),
+                                    phoneToggleLabel: t('register.phone'),
+                                    emailToggleLabel: t('register.email'),
+                                    notRobotLabel: t('common.notRobot', 'Tôi không phải là robot'),
+                                },
+                                captchaId: 'register-captcha',
+                                siteKey: siteKey ?? undefined,
+                            })}
                         />
 
                         {/* Agreement */}

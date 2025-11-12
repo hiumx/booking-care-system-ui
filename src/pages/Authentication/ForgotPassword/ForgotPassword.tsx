@@ -17,7 +17,10 @@ import { OtpService } from '@/services/otp.service';
 import { usePhoneInput } from '@/hooks/usePhoneInput';
 import { useOtpInput } from '@/hooks/useOtpInput';
 import { toast } from 'react-toastify';
-import { AuthContactMethodForm } from '@/components/Auth/AuthContactMethodForm';
+import {
+    AuthContactMethodForm,
+    createAuthContactMethodFormProps,
+} from '@/components/Auth/AuthContactMethodForm';
 import { OtpInputGrid } from '@/components/Auth/OtpInputGrid';
 
 interface ForgotPasswordProps {
@@ -209,32 +212,32 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
     const renderInputStep = () => (
         <form onSubmit={handleSubmit}>
             <AuthContactMethodForm
-                method={method}
-                onMethodChange={setMethod}
-                phone={phone}
-                email={email}
-                onPhoneChange={handlePhoneChange}
-                onEmailChange={(event) => setEmail(event.target.value)}
-                onPhoneKeyDown={handlePhoneKeyDown}
-                onPhonePaste={handlePhonePaste}
-                onFocus={() => setShowCaptcha(true)}
-                showCaptcha={showCaptcha}
-                siteKey={siteKey ?? undefined}
-                isHuman={isHuman}
-                onVerifyHuman={(value) => setIsHuman(Boolean(value))}
-                onExpiredHuman={() => setIsHuman(false)}
-                onCheckboxChange={setIsHuman}
-                recaptchaRef={recaptchaRef}
-                translations={{
-                    phoneLabel: t('forgotPassword.phone'),
-                    phonePlaceholder: t('forgotPassword.phonePlaceholder'),
-                    emailLabel: t('forgotPassword.email'),
-                    emailPlaceholder: t('forgotPassword.emailPlaceholder'),
-                    phoneToggleLabel: t('forgotPassword.phone'),
-                    emailToggleLabel: t('forgotPassword.email'),
-                    notRobotLabel: t('common.notRobot', 'Tôi không phải là robot'),
-                }}
-                captchaId="forgot-captcha"
+                {...createAuthContactMethodFormProps({
+                    method,
+                    phone,
+                    email,
+                    showCaptcha,
+                    isHuman,
+                    setMethod,
+                    handlePhoneChange,
+                    setEmail,
+                    handlePhoneKeyDown,
+                    handlePhonePaste,
+                    setShowCaptcha,
+                    setIsHuman,
+                    translations: {
+                        phoneLabel: t('forgotPassword.phone'),
+                        phonePlaceholder: t('forgotPassword.phonePlaceholder'),
+                        emailLabel: t('forgotPassword.email'),
+                        emailPlaceholder: t('forgotPassword.emailPlaceholder'),
+                        phoneToggleLabel: t('forgotPassword.phone'),
+                        emailToggleLabel: t('forgotPassword.email'),
+                        notRobotLabel: t('common.notRobot', 'Tôi không phải là robot'),
+                    },
+                    captchaId: 'forgot-captcha',
+                    siteKey: siteKey ?? undefined,
+                    recaptchaRef,
+                })}
             />
             {/* Error message */}
             {error && (
