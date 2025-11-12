@@ -16,6 +16,9 @@ export const PATHS = {
     ABOUT_US: '/about-us',
     CONTACT_US: '/contact-us',
     SMART_BOOKING: '/smart-booking',
+    LEGAL_NOTICE: '/legal-notice',
+    PRIVACY_POLICY: '/privacy-policy',
+    REFUND_POLICY: '/refund-policy',
 
     // Authentication paths
     LOGIN: '/login',
