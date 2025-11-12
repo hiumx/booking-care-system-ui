@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import AOS from 'aos';
 import { buildPath, PATHS, replacePathParams } from '@/routes/paths';
 import MainLayout from '../../layouts/MainLayout';
 import Banner from './components/Banner';
@@ -12,6 +14,13 @@ import {
     CAROUSEL_DOCTORS_BREAKPOINTS,
 } from './Home.data';
 import ListServiceTypeDoctor from './components/ListServiceTypeDoctor';
+import InfoSection from './components/InfoSection';
+import ArticleSection from './components/ArticleSection';
+import FAQSection from './components/FAQSection';
+import TestimonialSection from './components/TestimonialSection';
+import BookusSection from './components/BookusSection';
+import ReasonsSection from './components/ReasonsSection';
+import HorizontalServicesSection from './components/HorizontalServicesSection';
 import { useHomeData } from '@/hooks/useHomeData';
 import {
     convertToServiceFormat,
@@ -28,6 +37,18 @@ import {
 } from '@/components/LoadingEmptyState';
 
 const Home: React.FC = () => {
+    useEffect(() => {
+        // Refresh AOS when Home component mounts to ensure animations work
+        // Use setTimeout to ensure DOM is fully rendered
+        const timer = setTimeout(() => {
+            // Check if AOS is initialized before refreshing
+            if (AOS !== undefined) {
+                AOS.refresh();
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, []);
     const {
         parentServiceCategories,
         isLoading,
@@ -173,6 +194,20 @@ const Home: React.FC = () => {
                 ) : (
                     <ServicesEmptyState isLoading={isLoading} />
                 )}
+                {/* Horizontal Services Section */}
+                <HorizontalServicesSection />
+                {/* Reasons Section */}
+                <ReasonsSection />
+                {/* Bookus Section */}
+                <BookusSection />
+                {/* Testimonial Section */}
+                <TestimonialSection />
+                {/* FAQ Section */}
+                <FAQSection />
+                {/* Article Section */}
+                <ArticleSection />
+                {/* Info Section */}
+                <InfoSection />
             </MainLayout>
         </div>
     );

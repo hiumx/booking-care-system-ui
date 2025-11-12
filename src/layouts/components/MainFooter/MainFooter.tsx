@@ -1,4 +1,21 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { PATHS } from '@/routes/paths';
+
+interface FooterLink {
+    text: string;
+    path: string;
+}
+
 const MainFooter: React.FC = () => {
+    const { t } = useTranslation('home');
+
+    const companyLinks = t('footer.company.links', { returnObjects: true }) as FooterLink[];
+    const treatmentLinks = t('footer.treatments.links', { returnObjects: true }) as FooterLink[];
+    const specialityLinks = t('footer.specialities.links', { returnObjects: true }) as FooterLink[];
+    const utilityLinks = t('footer.utilities.links', { returnObjects: true }) as FooterLink[];
+
     return (
         <footer className="footer inner-footer">
             <div className="footer-top">
@@ -8,89 +25,57 @@ const MainFooter: React.FC = () => {
                             <div className="row">
                                 <div className="col-lg-3 col-md-3">
                                     <div className="footer-widget footer-menu">
-                                        <h6 className="footer-title">Company</h6>
+                                        <h6 className="footer-title">
+                                            {t('footer.company.title')}
+                                        </h6>
                                         <ul>
-                                            <li>
-                                                <a href="#">About</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Features</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Works</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Careers</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Locations</a>
-                                            </li>
+                                            {companyLinks.map((link) => (
+                                                <li key={`${link.path}-${link.text}`}>
+                                                    <Link to={link.path}>{link.text}</Link>
+                                                </li>
+                                            ))}
                                         </ul>
                                     </div>
                                 </div>
                                 <div className="col-lg-3 col-md-3">
                                     <div className="footer-widget footer-menu">
-                                        <h6 className="footer-title">Treatments</h6>
+                                        <h6 className="footer-title">
+                                            {t('footer.treatments.title')}
+                                        </h6>
                                         <ul>
-                                            <li>
-                                                <a href="#">Dental</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Cardiac</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Spinal Cord</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Hair Growth</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Anemia & Disorder</a>
-                                            </li>
+                                            {treatmentLinks.map((link) => (
+                                                <li key={`${link.path}-${link.text}`}>
+                                                    <Link to={link.path}>{link.text}</Link>
+                                                </li>
+                                            ))}
                                         </ul>
                                     </div>
                                 </div>
                                 <div className="col-lg-3 col-md-3">
                                     <div className="footer-widget footer-menu">
-                                        <h6 className="footer-title">Specialities</h6>
+                                        <h6 className="footer-title">
+                                            {t('footer.specialities.title')}
+                                        </h6>
                                         <ul>
-                                            <li>
-                                                <a href="#">Transplant</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Cardiologist</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Oncology</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Pediatrics</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Gynacology</a>
-                                            </li>
+                                            {specialityLinks.map((link) => (
+                                                <li key={`${link.path}-${link.text}`}>
+                                                    <Link to={link.path}>{link.text}</Link>
+                                                </li>
+                                            ))}
                                         </ul>
                                     </div>
                                 </div>
                                 <div className="col-lg-3 col-md-3">
                                     <div className="footer-widget footer-menu">
-                                        <h6 className="footer-title">Utilites</h6>
+                                        <h6 className="footer-title">
+                                            {t('footer.utilities.title')}
+                                        </h6>
                                         <ul>
-                                            <li>
-                                                <a href="#">Pricing</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Contact</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Request A Quote</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Premium Membership</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Integrations</a>
-                                            </li>
+                                            {utilityLinks.map((link) => (
+                                                <li key={`${link.path}-${link.text}`}>
+                                                    <Link to={link.path}>{link.text}</Link>
+                                                </li>
+                                            ))}
                                         </ul>
                                     </div>
                                 </div>
@@ -98,50 +83,51 @@ const MainFooter: React.FC = () => {
                         </div>
                         <div className="col-lg-4 col-md-7">
                             <div className="footer-widget">
-                                <h6 className="footer-title">Newsletter</h6>
-                                <p className="mb-2">Subscribe & Stay Updated from the Doccure</p>
+                                <h6 className="footer-title">{t('footer.newsletter.title')}</h6>
+                                <p className="mb-2">{t('footer.newsletter.description')}</p>
                                 <div className="subscribe-input">
                                     <form action="#">
                                         <input
                                             type="email"
                                             className="form-control"
-                                            placeholder="Enter Email Address"
+                                            placeholder={t('footer.newsletter.placeholder')}
                                         />
                                         <button
                                             type="submit"
                                             className="btn btn-md btn-primary-gradient d-inline-flex align-items-center"
                                         >
-                                            <i className="isax isax-send-25 me-1"></i>Send
+                                            <i className="isax isax-send-25 me-1"></i>
+                                            {t('footer.newsletter.button')}
                                         </button>
                                     </form>
                                 </div>
                                 <div className="social-icon">
-                                    <h6 className="mb-3">Connect With Us</h6>
+                                    <h6 className="mb-3">{t('footer.connectWithUs')}</h6>
                                     <ul>
                                         <li>
-                                            <a href="#">
+                                            <Link to="#">
                                                 <i className="fa-brands fa-facebook"></i>
-                                            </a>
+                                            </Link>
                                         </li>
                                         <li>
-                                            <a href="#">
+                                            <Link to="#">
                                                 <i className="fa-brands fa-x-twitter"></i>
-                                            </a>
+                                            </Link>
                                         </li>
                                         <li>
-                                            <a href="#">
+                                            <Link to="#">
                                                 <i className="fa-brands fa-instagram"></i>
-                                            </a>
+                                            </Link>
                                         </li>
                                         <li>
-                                            <a href="#">
+                                            <Link to="#">
                                                 <i className="fa-brands fa-linkedin"></i>
-                                            </a>
+                                            </Link>
                                         </li>
                                         <li>
-                                            <a href="#">
+                                            <Link to="#">
                                                 <i className="fa-brands fa-pinterest"></i>
-                                            </a>
+                                            </Link>
                                         </li>
                                     </ul>
                                 </div>
@@ -181,51 +167,53 @@ const MainFooter: React.FC = () => {
                 <div className="container">
                     <div className="copyright">
                         <div className="copyright-text">
-                            <p className="mb-0">Copyright © 2025 Doccure. All Rights Reserved</p>
+                            <p className="mb-0">{t('footer.copyright')}</p>
                         </div>
                         <div className="copyright-menu">
                             <ul className="policy-menu">
                                 <li>
-                                    <a href="#">Legal Notice</a>
+                                    <Link to={PATHS.LEGAL_NOTICE}>{t('footer.legalNotice')}</Link>
                                 </li>
                                 <li>
-                                    <a href="#">Privacy Policy</a>
+                                    <Link to={PATHS.PRIVACY_POLICY}>
+                                        {t('footer.privacyPolicy')}
+                                    </Link>
                                 </li>
                                 <li>
-                                    <a href="#">Refund Policy</a>
+                                    <Link to={PATHS.REFUND_POLICY}>{t('footer.refundPolicy')}</Link>
                                 </li>
                             </ul>
                         </div>
                         <ul className="payment-method">
                             <li>
-                                <a href="#">
+                                <Link to="#">
                                     <img src="/src/assets/img/icons/card-01.svg" alt="Img" />
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#">
+                                <Link to="#">
                                     <img src="/src/assets/img/icons/card-02.svg" alt="Img" />
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#">
+                                <Link to="#">
                                     <img src="/src/assets/img/icons/card-03.svg" alt="Img" />
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#">
+                                <Link to="#">
                                     <img src="/src/assets/img/icons/card-04.svg" alt="Img" />
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#">
+                                <Link to="#">
                                     <img src="/src/assets/img/icons/card-05.svg" alt="Img" />
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#">
+                                <Link to="#">
                                     <img src="/src/assets/img/icons/card-06.svg" alt="Img" />
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </div>
