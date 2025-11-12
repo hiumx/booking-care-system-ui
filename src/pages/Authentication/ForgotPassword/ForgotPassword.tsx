@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import ReCAPTCHA from 'react-google-recaptcha';
 import AuthLayout from '@/layouts/AuthLayout';
 import { Mail, Phone, ArrowLeft } from 'lucide-react';
@@ -26,6 +27,7 @@ const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 const deviceId = import.meta.env.VITE_DEVICE_ID || 'booking-care-web-client';
 
 const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
+    const { t } = useTranslation('auth');
     const dispatch = useDispatch<AppDispatch>();
     const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
@@ -96,16 +98,14 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         // Also keep captcha visible for user to verify again
         setShowCaptcha(true);
 
-        toast.success(
-            'Nếu email tồn tại trong hệ thống, bạn sẽ nhận được hướng dẫn đặt lại mật khẩu.'
-        );
+        toast.success(t('forgotPassword.successEmail'));
     };
 
     const handlePhoneFlow = async () => {
         // Phone flow: move to OTP step
         setStep('otp');
         setCountdown(60);
-        toast.success('Mã OTP đã được gửi đến số điện thoại của bạn.');
+        toast.success(t('forgotPassword.successPhone'));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -126,7 +126,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
             }
         } catch (error) {
             console.error('Forgot password error:', error);
-            toast.error('Gửi yêu cầu thất bại. Vui lòng thử lại.');
+            toast.error(t('forgotPassword.error'));
         }
 
         // Also call the optional onSubmit prop for backward compatibility
@@ -184,11 +184,11 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
             const verifyResponse = await processOtpVerification();
             const resetTokenResponse = await processResetToken(verifyResponse);
 
-            toast.success('Xác thực thành công! Đang chuyển hướng...');
+            toast.success(t('forgotPassword.successPhone'));
             globalThis.location.href = resetTokenResponse.data.resetUrl;
         } catch (error: any) {
             console.error('OTP verification error:', error);
-            toast.error('Xác thực OTP thất bại. Vui lòng thử lại.');
+            toast.error(t('forgotPassword.error'));
         } finally {
             setIsVerifying(false);
         }
@@ -201,10 +201,10 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
             await dispatch(forgotPasswordAsync({ phoneNumber: phone, deviceId })).unwrap();
             setCountdown(60);
             setOtp(new Array(6).fill(''));
-            toast.success('Mã OTP mới đã được gửi.');
+            toast.success(t('forgotPassword.successPhone'));
         } catch (error) {
             console.error('Resend OTP error:', error);
-            toast.error('Gửi lại mã OTP thất bại. Vui lòng thử lại.');
+            toast.error(t('forgotPassword.error'));
         }
     };
 
@@ -215,13 +215,13 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
     };
 
     const getTitle = () => {
-        if (step === 'otp') return 'Xác thực OTP';
-        return 'Quên mật khẩu';
+        if (step === 'otp') return t('forgotPassword.otpTitle');
+        return t('forgotPassword.title');
     };
 
     const getSubtitle = () => {
-        if (step === 'otp') return `Nhập mã OTP từ tin nhắn đã gửi đến số điện thoại`;
-        return 'Nhập email hoặc số điện thoại để khôi phục quyền truy cập vào tài khoản';
+        if (step === 'otp') return t('forgotPassword.otpSubtitle');
+        return t('forgotPassword.subtitle');
     };
 
     const maskPhoneNumber = (phoneNumber: string) => {
@@ -240,7 +240,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                     onClick={() => setMethod('phone')}
                 >
                     <i className="feather-phone me-1"></i>
-                    Số điện thoại
+                    {t('forgotPassword.phone')}
                 </button>
                 <button
                     type="button"
@@ -248,7 +248,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                     onClick={() => setMethod('email')}
                 >
                     <i className="feather-mail me-1"></i>
-                    Email
+                    {t('forgotPassword.email')}
                 </button>
             </div>
         </div>
@@ -260,10 +260,10 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
             <div className="mb-3">
                 {method === 'phone' ? (
                     <Input
-                        label="Số điện thoại"
+                        label={t('forgotPassword.phone')}
                         type="tel"
                         inputMode="numeric"
-                        placeholder="Nhập số điện thoại"
+                        placeholder={t('forgotPassword.phonePlaceholder')}
                         leftContent={
                             <>
                                 <img
@@ -286,9 +286,9 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                     />
                 ) : (
                     <Input
-                        label="Địa chỉ email"
+                        label={t('forgotPassword.email')}
                         type="email"
-                        placeholder="Nhập địa chỉ email"
+                        placeholder={t('forgotPassword.emailPlaceholder')}
                         leftIcon={<Mail size={18} className="text-muted" />}
                         wrapVariant="email"
                         value={email}
@@ -323,7 +323,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                                 onChange={(e) => setIsHuman(e.target.checked)}
                             />
                             <label htmlFor="captcha" className="text-muted">
-                                Tôi không phải là robot
+                                {t('common.notRobot', 'Tôi không phải là robot')}
                             </label>
                         </div>
                     )}
@@ -332,7 +332,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
 
             <div className="mb-3 mt-3">
                 <Button
-                    text={isLoading ? 'Đang gửi...' : 'Đặt lại mật khẩu'}
+                    text={isLoading ? t('forgotPassword.submitting') : t('forgotPassword.submit')}
                     type="submit"
                     isDisabled={!canSend || isLoading}
                     className="w-100 fw-bold"
@@ -340,7 +340,8 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
             </div>
             <div className="account-signup">
                 <p>
-                    Đã nhớ mật khẩu? <Link to={PATHS.LOGIN}>Đăng nhập ngay</Link>
+                    {t('forgotPassword.backToLogin')}{' '}
+                    <Link to={PATHS.LOGIN}>{t('register.login')}</Link>
                 </p>
             </div>
         </form>
@@ -360,7 +361,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                     <Phone size={24} className="text-primary" />
                 </div>
                 <p className="text-muted">
-                    Mã OTP đã được gửi đến số điện thoại{' '}
+                    {t('forgotPassword.otpSentTo')}{' '}
                     <span className="fw-medium text-dark">{maskPhoneNumber(phone)}</span>
                 </p>
             </div>
@@ -406,7 +407,9 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
 
                 {/* Verify Button */}
                 <Button
-                    text={isVerifying ? 'Đang xác thực...' : 'Xác thực OTP'}
+                    text={
+                        isVerifying ? t('forgotPassword.verifying') : t('forgotPassword.verifyOtp')
+                    }
                     type="submit"
                     isDisabled={!canVerifyOtp || isVerifying}
                     className={clsx(
@@ -423,19 +426,21 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                         className="btn btn-link p-0 d-flex align-items-center text-muted"
                     >
                         <ArrowLeft size={16} className="me-1" />
-                        Quay lại
+                        {t('forgotPassword.backToLogin')}
                     </button>
 
                     <div className="text-muted">
                         {countdown > 0 ? (
-                            <span>Gửi lại sau {countdown}s</span>
+                            <span>
+                                {t('forgotPassword.resendIn')} {countdown}s
+                            </span>
                         ) : (
                             <button
                                 type="button"
                                 onClick={handleResendOtp}
                                 className="btn btn-link p-0 text-primary"
                             >
-                                Gửi lại mã OTP
+                                {t('forgotPassword.resendOtp')}
                             </button>
                         )}
                     </div>

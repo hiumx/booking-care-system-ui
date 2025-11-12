@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { Lock, User, Phone, Mail, CheckCircle } from 'lucide-react';
 import Select from 'react-select';
@@ -31,6 +32,7 @@ const deviceId = import.meta.env.VITE_DEVICE_ID || 'booking-care-web-client';
 const OTP_LENGTH = 6;
 
 const Register: React.FC = () => {
+    const { t } = useTranslation('auth');
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { isLoading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -101,12 +103,16 @@ const Register: React.FC = () => {
         if (passwordRequirements.hasNumber) score += 20;
         if (passwordRequirements.hasSpecialChar) score += 20;
 
-        if (score <= 20) return { score, label: 'Yếu', color: '#ef4444', width: 20 };
-        if (score <= 40) return { score, label: 'Trung bình', color: '#f59e0b', width: 40 };
-        if (score <= 60) return { score, label: 'Tốt', color: '#3b82f6', width: 60 };
-        if (score <= 80) return { score, label: 'Mạnh', color: '#10b981', width: 80 };
-        return { score, label: 'Rất mạnh', color: '#059669', width: 100 };
-    }, [password, passwordRequirements]);
+        if (score <= 20)
+            return { score, label: t('register.passwordWeak'), color: '#ef4444', width: 20 };
+        if (score <= 40)
+            return { score, label: t('register.passwordFair'), color: '#f59e0b', width: 40 };
+        if (score <= 60)
+            return { score, label: t('register.passwordGood'), color: '#3b82f6', width: 60 };
+        if (score <= 80)
+            return { score, label: t('register.passwordStrong'), color: '#10b981', width: 80 };
+        return { score, label: t('register.passwordVeryStrong'), color: '#059669', width: 100 };
+    }, [password, passwordRequirements, t]);
 
     const canCreatePassword = useMemo(() => {
         const hasPassword = password.trim() !== '';
@@ -138,11 +144,11 @@ const Register: React.FC = () => {
     const getGenderLabel = (genderValue: Gender | '') => {
         switch (genderValue) {
             case Gender.MALE:
-                return 'Nam';
+                return t('register.genderMale');
             case Gender.FEMALE:
-                return 'Nữ';
+                return t('register.genderFemale');
             case Gender.OTHER:
-                return 'Khác';
+                return t('register.genderOther');
             default:
                 return '';
         }
@@ -495,14 +501,14 @@ const Register: React.FC = () => {
 
         try {
             await dispatch(registerAsync(registerData)).unwrap();
-            toast.success('Đăng ký thành công! Chào mừng bạn đến với Doccure!');
+            toast.success(t('register.success'));
             navigate('/login');
         } catch (error) {
             console.error('Registration error:', error);
             const errorMsg =
                 method === 'phone'
-                    ? 'Độ tuổi không hợp lệ hoặc email này đã được đăng ký tài khoản.'
-                    : 'Độ tuổi không hợp lệ hoặc số điện thoại này đã được đăng ký tài khoản.';
+                    ? t('register.errorAgeOrDuplicatePhone')
+                    : t('register.errorAgeOrDuplicateEmail');
             toast.error(errorMsg);
         } finally {
             setIsSubmitting(false);
@@ -512,30 +518,30 @@ const Register: React.FC = () => {
     const getStepTitle = () => {
         switch (step) {
             case 0:
-                return 'Đăng ký tài khoản';
+                return t('register.title');
             case 1:
-                return 'Xác thực OTP';
+                return t('register.otpTitle');
             case 2:
-                return 'Tạo mật khẩu';
+                return t('register.passwordTitle');
             case 3:
-                return 'Thông tin cá nhân';
+                return t('register.profileTitle');
             default:
-                return 'Đăng ký tài khoản';
+                return t('register.title');
         }
     };
 
     const getStepSubtitle = () => {
         switch (step) {
             case 0:
-                return 'Bắt đầu hành trình chăm sóc sức khỏe của bạn';
+                return t('register.subtitle');
             case 1:
-                return 'Nhập mã xác thực để tiếp tục';
+                return t('register.otpSubtitle');
             case 2:
-                return 'Tạo mật khẩu bảo mật cho tài khoản';
+                return t('register.passwordSubtitle');
             case 3:
-                return 'Hoàn thiện hồ sơ của bạn';
+                return t('register.profileSubtitle');
             default:
-                return 'Bắt đầu hành trình chăm sóc sức khỏe của bạn';
+                return t('register.subtitle');
         }
     };
 
@@ -552,9 +558,9 @@ const Register: React.FC = () => {
             {step > 0 && (
                 <StepWizard
                     steps={[
-                        { id: 1, title: 'Xác thực' },
-                        { id: 2, title: 'Mật khẩu' },
-                        { id: 3, title: 'Hoàn tất' },
+                        { id: 1, title: t('register.stepVerification') },
+                        { id: 2, title: t('register.stepPassword') },
+                        { id: 3, title: t('register.stepComplete') },
                     ]}
                     currentStep={step}
                     className="mb-4"
@@ -576,7 +582,7 @@ const Register: React.FC = () => {
                                 onClick={() => setMethod('phone')}
                             >
                                 <Phone size={16} className="me-2" />
-                                Số điện thoại
+                                {t('register.phone')}
                             </button>
                             <button
                                 type="button"
@@ -587,7 +593,7 @@ const Register: React.FC = () => {
                                 onClick={() => setMethod('email')}
                             >
                                 <Mail size={16} className="me-2" />
-                                Email
+                                {t('register.email')}
                             </button>
                         </div>
                     </div>
@@ -596,10 +602,10 @@ const Register: React.FC = () => {
                         <div className="mb-3">
                             {method === 'phone' ? (
                                 <Input
-                                    label="Số điện thoại"
+                                    label={t('register.phone')}
                                     type="tel"
                                     inputMode="numeric"
-                                    placeholder="Nhập số điện thoại"
+                                    placeholder={t('register.phonePlaceholder')}
                                     leftContent={
                                         <>
                                             <img
@@ -622,9 +628,9 @@ const Register: React.FC = () => {
                                 />
                             ) : (
                                 <Input
-                                    label="Địa chỉ email"
+                                    label={t('register.addressEmail')}
                                     type="email"
-                                    placeholder="Nhập địa chỉ email"
+                                    placeholder={t('register.emailPlaceholder')}
                                     leftIcon={<Mail size={18} className="text-muted" />}
                                     wrapVariant="email"
                                     value={email}
@@ -652,7 +658,7 @@ const Register: React.FC = () => {
                                             onChange={(e) => setIsHuman(e.target.checked)}
                                         />
                                         <label htmlFor="captcha" className="text-muted">
-                                            Tôi không phải là robot
+                                            {t('common.notRobot', 'Tôi không phải là robot')}
                                         </label>
                                     </div>
                                 )}
@@ -673,19 +679,19 @@ const Register: React.FC = () => {
                                 }}
                             />
                             <label htmlFor="agree" className="text-muted">
-                                Tôi đã đọc và đồng ý với{' '}
+                                {t('register.agreeTerms')}{' '}
                                 <Link to="/terms" className="text-primary">
-                                    điều khoản sử dụng
+                                    {t('register.termsOfService')}
                                 </Link>{' '}
-                                và{' '}
+                                {t('register.and')}{' '}
                                 <Link to="/privacy" className="text-primary">
-                                    chính sách bảo mật
+                                    {t('register.privacyPolicy')}
                                 </Link>
                             </label>
                         </div>
 
                         <Button
-                            text={isSending ? 'Đang gửi...' : 'Gửi mã OTP'}
+                            text={isSending ? t('register.sending') : t('register.sendOtp')}
                             type="submit"
                             isDisabled={!canSendOtp || isSending}
                             className="w-100 fw-bold"
@@ -700,7 +706,8 @@ const Register: React.FC = () => {
 
                     <div className="account-signup">
                         <p>
-                            Đã có tài khoản? <Link to={PATHS.LOGIN}>Đăng nhập ngay</Link>
+                            {t('register.hasAccount')}{' '}
+                            <Link to={PATHS.LOGIN}>{t('register.login')}</Link>
                         </p>
                     </div>
                 </div>
@@ -721,7 +728,7 @@ const Register: React.FC = () => {
                             <Mail size={24} className="text-primary" />
                         </div>
                         <p className="text-muted">
-                            Mã OTP đã được gửi đến{' '}
+                            {t('register.otpSentTo')}{' '}
                             <span className="fw-medium text-dark">
                                 {method === 'phone' ? phone : email}
                             </span>
@@ -771,10 +778,10 @@ const Register: React.FC = () => {
                                         className="spinner-border spinner-border-sm me-2"
                                         role="status"
                                     />
-                                    Đang xác thực...
+                                    {t('register.verifying')}
                                 </>
                             ) : (
-                                <>Xác thực OTP</>
+                                <>{t('register.verifyOtp')}</>
                             )}
                         </button>
 
@@ -782,9 +789,11 @@ const Register: React.FC = () => {
                             className="d-flex justify-content-center align-items-center mt-3 text-muted"
                             style={{ gap: 2 }}
                         >
-                            <p>Không nhận được mã?</p>
+                            <p>{t('register.otpNotReceived')}</p>
                             {countdown > 0 ? (
-                                <p className="text-primary">(Gửi lại sau {countdown}s)</p>
+                                <p className="text-primary">
+                                    ({t('register.resendIn')} {countdown}s)
+                                </p>
                             ) : (
                                 <button
                                     type="button"
@@ -792,7 +801,7 @@ const Register: React.FC = () => {
                                     onClick={handleResendOtp}
                                     style={{ marginBottom: 14 }}
                                 >
-                                    {'(Gửi lại mã)'}
+                                    {'(' + t('register.resendOtp') + ')'}
                                 </button>
                             )}
                         </div>
@@ -814,7 +823,7 @@ const Register: React.FC = () => {
                         >
                             <Lock size={24} style={{ color: '#16a34a' }} />
                         </div>
-                        <p className="text-muted">Tạo mật khẩu mạnh để bảo vệ tài khoản của bạn</p>
+                        <p className="text-muted">{t('register.passwordSubtitle')}</p>
                     </div>
 
                     <form onSubmit={handleCreatePassword}>
@@ -822,9 +831,9 @@ const Register: React.FC = () => {
                             <Input
                                 id="reg-password"
                                 name="password"
-                                label="Mật khẩu"
+                                label={t('register.password')}
                                 type="password"
-                                placeholder="Nhập mật khẩu"
+                                placeholder={t('register.passwordPlaceholder')}
                                 leftIcon={<i className="feather-lock" />}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -836,7 +845,9 @@ const Register: React.FC = () => {
                             {password && (
                                 <div className="mt-2">
                                     <div className="d-flex justify-content-between align-items-center mb-1">
-                                        <small className="text-muted">Độ mạnh mật khẩu:</small>
+                                        <small className="text-muted">
+                                            {t('register.passwordStrength')}
+                                        </small>
                                         <small
                                             className="fw-medium"
                                             style={{
@@ -862,14 +873,14 @@ const Register: React.FC = () => {
                         <div className="mb-3">
                             <Input
                                 id="reg-confirm"
-                                label="Xác nhận mật khẩu"
+                                label={t('register.confirmPassword')}
                                 type="password"
                                 className={clsx(
                                     confirmPassword && confirmPassword === password
                                         ? 'border-success'
                                         : ''
                                 )}
-                                placeholder="Nhập lại mật khẩu mới"
+                                placeholder={t('register.confirmPasswordPlaceholder')}
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 leftIcon={<i className="feather-lock" />}
@@ -888,7 +899,7 @@ const Register: React.FC = () => {
                         <div className="mb-3">
                             <div className={'requirements-list'}>
                                 <span className="mb-1" style={{ fontWeight: 600 }}>
-                                    Yêu cầu mật khẩu:
+                                    {t('register.passwordRequirements')}
                                 </span>
                                 <div className={'requirement-item'}>
                                     <span className={'requirement-icon'}>
@@ -906,7 +917,7 @@ const Register: React.FC = () => {
                                                 : 'text-muted'
                                         )}
                                     >
-                                        Ít nhất 8 ký tự
+                                        {t('register.passwordMinLength')}
                                     </span>
                                 </div>
                                 <div className={'requirement-item'}>
@@ -925,7 +936,7 @@ const Register: React.FC = () => {
                                                 : 'text-muted'
                                         )}
                                     >
-                                        Một chữ hoa
+                                        {t('register.passwordUppercase')}
                                     </span>
                                 </div>
                                 <div className={'requirement-item'}>
@@ -944,7 +955,7 @@ const Register: React.FC = () => {
                                                 : 'text-muted'
                                         )}
                                     >
-                                        Một chữ thường
+                                        {t('register.passwordLowercase')}
                                     </span>
                                 </div>
                                 <div className={'requirement-item'}>
@@ -963,7 +974,7 @@ const Register: React.FC = () => {
                                                 : 'text-muted'
                                         )}
                                     >
-                                        Một số
+                                        {t('register.passwordNumber')}
                                     </span>
                                 </div>
                                 <div className={'requirement-item'}>
@@ -982,13 +993,13 @@ const Register: React.FC = () => {
                                                 : 'text-muted'
                                         )}
                                     >
-                                        Một ký tự đặc biệt
+                                        {t('register.passwordSpecialChar')}
                                     </span>
                                 </div>
                             </div>
                         </div>
                         <Button
-                            text="Tạo mật khẩu"
+                            text={t('register.createPassword')}
                             type="submit"
                             isDisabled={!canCreatePassword}
                             className="w-100 fw-medium"
@@ -1024,7 +1035,7 @@ const Register: React.FC = () => {
                                 {/* Full Name */}
                                 <div className="mb-3">
                                     <Input
-                                        label="Họ và tên"
+                                        label={t('register.fullName')}
                                         isRequired
                                         type="text"
                                         leftIcon={<User size={18} />}
@@ -1032,7 +1043,7 @@ const Register: React.FC = () => {
                                         onChange={(e) => handleFullNameChange(e.target.value)}
                                         className={clsx('rounded-3', styles.inputCustom)}
                                         style={{ paddingLeft: 48 }}
-                                        placeholder="Nhập họ và tên đầy đủ"
+                                        placeholder={t('register.fullNamePlaceholder')}
                                         error={fullNameError}
                                     />
                                 </div>
@@ -1046,13 +1057,20 @@ const Register: React.FC = () => {
                                     }}
                                 >
                                     <label className="form-label">
-                                        Giới tính <span className="text-danger">*</span>
+                                        {t('register.gender')}{' '}
+                                        <span className="text-danger">*</span>
                                     </label>
                                     <Select<{ value: Gender; label: string }>
                                         options={[
-                                            { value: Gender.MALE, label: 'Nam' },
-                                            { value: Gender.FEMALE, label: 'Nữ' },
-                                            { value: Gender.OTHER, label: 'Khác' },
+                                            { value: Gender.MALE, label: t('register.genderMale') },
+                                            {
+                                                value: Gender.FEMALE,
+                                                label: t('register.genderFemale'),
+                                            },
+                                            {
+                                                value: Gender.OTHER,
+                                                label: t('register.genderOther'),
+                                            },
                                         ]}
                                         value={
                                             gender === ''
@@ -1065,7 +1083,7 @@ const Register: React.FC = () => {
                                         onChange={(selected) => {
                                             handleGenderChange(selected?.value ?? '');
                                         }}
-                                        placeholder="Chọn giới tính"
+                                        placeholder={t('register.genderPlaceholder')}
                                         className={clsx(
                                             'react-select-container',
                                             genderError && 'is-invalid'
@@ -1122,7 +1140,7 @@ const Register: React.FC = () => {
                                 {/* Phone */}
                                 <div className="mb-3">
                                     <Input
-                                        label="Số điện thoại"
+                                        label={t('register.phone')}
                                         isRequired
                                         type="tel"
                                         inputMode="numeric"
@@ -1132,7 +1150,7 @@ const Register: React.FC = () => {
                                         onKeyDown={handleProfilePhoneKeyDown}
                                         onPaste={handleProfilePhonePaste}
                                         className={clsx('rounded-3')}
-                                        placeholder="Nhập số điện thoại"
+                                        placeholder={t('register.phonePlaceholder')}
                                         disabled={method === 'phone'}
                                         error={profilePhoneError}
                                     />
@@ -1149,7 +1167,8 @@ const Register: React.FC = () => {
                                 {/* Birth Date */}
                                 <div className="mb-3">
                                     <label className="form-label">
-                                        Ngày sinh <span className="text-danger">*</span>
+                                        {t('register.dateOfBirth')}{' '}
+                                        <span className="text-danger">*</span>
                                     </label>
                                     <div className="position-relative">
                                         <input
@@ -1179,14 +1198,14 @@ const Register: React.FC = () => {
                                 {/* Email */}
                                 <div className="mb-3">
                                     <Input
-                                        label="Email"
+                                        label={t('register.email')}
                                         isRequired
                                         type="email"
                                         leftIcon={<i className="feather-mail" />}
                                         value={profileEmail}
                                         onChange={(e) => handleProfileEmailChange(e.target.value)}
                                         className={clsx('rounded-3')}
-                                        placeholder="Nhập địa chỉ email"
+                                        placeholder={t('register.emailPlaceholder')}
                                         disabled={method === 'email'}
                                         error={profileEmailError}
                                     />
@@ -1200,7 +1219,8 @@ const Register: React.FC = () => {
                                 {/* Address */}
                                 <div className="mb-3">
                                     <label className="form-label">
-                                        Địa chỉ <span className="text-danger">*</span>
+                                        {t('register.address')}{' '}
+                                        <span className="text-danger">*</span>
                                     </label>
                                     <textarea
                                         value={address}
@@ -1211,7 +1231,7 @@ const Register: React.FC = () => {
                                             addressError && 'is-invalid'
                                         )}
                                         rows={2}
-                                        placeholder="Nhập địa chỉ đầy đủ"
+                                        placeholder={t('register.addressPlaceholder')}
                                         style={{
                                             paddingLeft: 16,
                                             paddingRight: 16,
@@ -1246,10 +1266,10 @@ const Register: React.FC = () => {
                                         className="spinner-border spinner-border-sm me-2"
                                         role="status"
                                     />
-                                    Đang tạo tài khoản...
+                                    {t('register.submitting')}
                                 </>
                             ) : (
-                                <>Hoàn tất đăng ký</>
+                                <>{t('register.submit')}</>
                             )}
                         </button>
                     </form>
