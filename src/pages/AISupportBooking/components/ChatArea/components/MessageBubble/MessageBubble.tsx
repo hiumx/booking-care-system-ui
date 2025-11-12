@@ -86,8 +86,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
         let match: RegExpExecArray | null;
 
         while ((match = boldRegex.exec(text)) !== null) {
-            segments.push(text.slice(lastIndex, match.index));
-            segments.push(`<strong>${match[1]}</strong>`);
+            segments.push(text.slice(lastIndex, match.index), `<strong>${match[1]}</strong>`);
             lastIndex = match.index + match[0].length;
         }
 

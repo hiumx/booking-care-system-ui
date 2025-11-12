@@ -17,9 +17,7 @@ import { OtpService } from '@/services/otp.service';
 import { usePhoneInput } from '@/hooks/usePhoneInput';
 import { useOtpInput } from '@/hooks/useOtpInput';
 import { toast } from 'react-toastify';
-import { ContactMethodInput } from '@/components/Auth/ContactMethodInput';
-import { ContactMethodToggle } from '@/components/Auth/ContactMethodToggle';
-import { CaptchaSection } from '@/components/Auth/CaptchaSection';
+import { ContactMethodSection } from '@/components/Auth/ContactMethodSection';
 import { OtpInputGrid } from '@/components/Auth/OtpInputGrid';
 
 interface ForgotPasswordProps {
@@ -210,9 +208,10 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
 
     const renderInputStep = () => (
         <form onSubmit={handleSubmit}>
-            <ContactMethodToggle
+            <ContactMethodSection
                 method={method}
-                options={[
+                onMethodChange={(value) => setMethod(value)}
+                toggleOptions={[
                     {
                         value: 'phone',
                         label: t('forgotPassword.phone'),
@@ -224,47 +223,42 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                         icon: <Mail size={16} className="me-2" />,
                     },
                 ]}
-                onChange={(value) => setMethod(value)}
-            />
-            <div className="mb-3">
-                <ContactMethodInput
-                    method={method}
-                    phoneInput={{
+                contactInputProps={{
+                    method,
+                    phoneInput: {
                         label: t('forgotPassword.phone'),
                         placeholder: t('forgotPassword.phonePlaceholder'),
                         value: phone,
                         onChange: handlePhoneChange,
                         onKeyDown: handlePhoneKeyDown,
                         onPaste: handlePhonePaste,
-                    }}
-                    emailInput={{
+                    },
+                    emailInput: {
                         label: t('forgotPassword.email'),
                         placeholder: t('forgotPassword.emailPlaceholder'),
                         value: email,
                         onChange: (event) => setEmail(event.target.value),
-                    }}
-                    onFocus={() => setShowCaptcha(true)}
-                />
-            </div>
+                    },
+                    onFocus: () => setShowCaptcha(true),
+                }}
+                captchaProps={{
+                    isVisible: showCaptcha,
+                    siteKey: siteKey ?? undefined,
+                    onVerify: (value) => setIsHuman(Boolean(value)),
+                    onExpired: () => setIsHuman(false),
+                    checkboxId: 'forgot-captcha',
+                    checkboxChecked: isHuman,
+                    onCheckboxChange: setIsHuman,
+                    label: t('common.notRobot', 'Tôi không phải là robot'),
+                    recaptchaRef,
+                }}
+            />
             {/* Error message */}
             {error && (
                 <div className="alert alert-danger text-center mb-3" role="alert">
                     {error}
                 </div>
             )}
-            {/* Captcha */}
-            <CaptchaSection
-                isVisible={showCaptcha}
-                siteKey={siteKey ?? undefined}
-                onVerify={(value) => setIsHuman(Boolean(value))}
-                onExpired={() => setIsHuman(false)}
-                checkboxId="forgot-captcha"
-                checkboxChecked={isHuman}
-                onCheckboxChange={setIsHuman}
-                label={t('common.notRobot', 'Tôi không phải là robot')}
-                recaptchaRef={recaptchaRef}
-            />
-
             <div className="mb-3 mt-3">
                 <Button
                     text={isLoading ? t('forgotPassword.submitting') : t('forgotPassword.submit')}

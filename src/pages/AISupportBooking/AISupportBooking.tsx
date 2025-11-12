@@ -265,15 +265,35 @@ const AISupportBooking: React.FC = () => {
 
     // Generate GUID-like string for session ID
     const generateSessionId = (): string => {
-        const template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
-        return Array.from(template, (char) => {
-            if (char === 'x' || char === 'y') {
-                const randomHex = Math.trunc(Math.random() * 16);
-                const resolved = char === 'x' ? randomHex : (randomHex & 0x3) | 0x8;
-                return resolved.toString(16);
+        if (globalThis.crypto?.randomUUID) {
+            return globalThis.crypto.randomUUID();
+        }
+
+        const bytes = new Uint8Array(16);
+        if (globalThis.crypto?.getRandomValues) {
+            globalThis.crypto.getRandomValues(bytes);
+        } else {
+            for (let index = 0; index < bytes.length; index += 1) {
+                bytes[index] = Math.trunc(Math.random() * 256);
             }
-            return char;
-        }).join('');
+        }
+
+        bytes[6] = (bytes[6] & 0x0f) | 0x40;
+        bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+        const byteToHex = (byte: number) => {
+            return byte.toString(16).padStart(2, '0');
+        };
+
+        const segments = [
+            bytes.slice(0, 4),
+            bytes.slice(4, 6),
+            bytes.slice(6, 8),
+            bytes.slice(8, 10),
+            bytes.slice(10, 16),
+        ];
+
+        return segments.map((segment) => Array.from(segment, byteToHex).join('')).join('-');
     };
 
     // Helper function to create a new chat

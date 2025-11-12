@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { ReactNode } from 'react';
 
-interface ToggleOption {
+export interface ContactMethodToggleOption {
     value: 'phone' | 'email';
     label: string;
     icon: ReactNode;
@@ -9,7 +9,7 @@ interface ToggleOption {
 
 interface ContactMethodToggleProps {
     method: 'phone' | 'email';
-    options: ToggleOption[];
+    options: ContactMethodToggleOption[];
     onChange: (value: 'phone' | 'email') => void;
     wrapperClassName?: string;
 }

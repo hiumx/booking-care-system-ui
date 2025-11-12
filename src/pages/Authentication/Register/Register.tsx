@@ -24,9 +24,7 @@ import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 import { PasswordRequirementsList } from '@/components/PasswordRequirementsList';
-import { ContactMethodInput } from '@/components/Auth/ContactMethodInput';
-import { ContactMethodToggle } from '@/components/Auth/ContactMethodToggle';
-import { CaptchaSection } from '@/components/Auth/CaptchaSection';
+import { ContactMethodSection } from '@/components/Auth/ContactMethodSection';
 import { OtpInputGrid } from '@/components/Auth/OtpInputGrid';
 import { toast } from 'react-toastify';
 import { NAME_REGEX } from '@/constants';
@@ -520,56 +518,50 @@ const Register: React.FC = () => {
             {/* Step 0: Initial registration */}
             {step === 0 && (
                 <div>
-                    {/* Method toggle */}
-                    <ContactMethodToggle
-                        method={method}
-                        options={[
-                            {
-                                value: 'phone',
-                                label: t('register.phone'),
-                                icon: <Phone size={16} className="me-2" />,
-                            },
-                            {
-                                value: 'email',
-                                label: t('register.email'),
-                                icon: <Mail size={16} className="me-2" />,
-                            },
-                        ]}
-                        onChange={(value) => setMethod(value)}
-                    />
-
                     <form onSubmit={handleSendOtp}>
-                        <div className="mb-3">
-                            <ContactMethodInput
-                                method={method}
-                                phoneInput={{
+                        <ContactMethodSection
+                            method={method}
+                            onMethodChange={(value) => setMethod(value)}
+                            toggleOptions={[
+                                {
+                                    value: 'phone',
+                                    label: t('register.phone'),
+                                    icon: <Phone size={16} className="me-2" />,
+                                },
+                                {
+                                    value: 'email',
+                                    label: t('register.email'),
+                                    icon: <Mail size={16} className="me-2" />,
+                                },
+                            ]}
+                            contactInputProps={{
+                                method,
+                                phoneInput: {
                                     label: t('register.phone'),
                                     placeholder: t('register.phonePlaceholder'),
                                     value: phone,
                                     onChange: handlePhoneChange,
                                     onKeyDown: handlePhoneKeyDown,
                                     onPaste: handlePhonePaste,
-                                }}
-                                emailInput={{
+                                },
+                                emailInput: {
                                     label: t('register.addressEmail'),
                                     placeholder: t('register.emailPlaceholder'),
                                     value: email,
                                     onChange: (event) => setEmail(event.target.value),
-                                }}
-                                onFocus={() => setShowCaptcha(true)}
-                            />
-                        </div>
-
-                        {/* Captcha */}
-                        <CaptchaSection
-                            isVisible={showCaptcha}
-                            siteKey={siteKey ?? undefined}
-                            onVerify={(value) => setIsHuman(Boolean(value))}
-                            onExpired={() => setIsHuman(false)}
-                            checkboxId="register-captcha"
-                            checkboxChecked={isHuman}
-                            onCheckboxChange={setIsHuman}
-                            label={t('common.notRobot', 'Tôi không phải là robot')}
+                                },
+                                onFocus: () => setShowCaptcha(true),
+                            }}
+                            captchaProps={{
+                                isVisible: showCaptcha,
+                                siteKey: siteKey ?? undefined,
+                                onVerify: (value) => setIsHuman(Boolean(value)),
+                                onExpired: () => setIsHuman(false),
+                                checkboxId: 'register-captcha',
+                                checkboxChecked: isHuman,
+                                onCheckboxChange: setIsHuman,
+                                label: t('common.notRobot', 'Tôi không phải là robot'),
+                            }}
                         />
 
                         {/* Agreement */}
