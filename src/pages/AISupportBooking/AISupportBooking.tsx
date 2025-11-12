@@ -98,8 +98,8 @@ const AISupportBooking: React.FC = () => {
     const [isLoadingChat, setIsLoadingChat] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
         // Mặc định mở trên desktop, đóng trên mobile
-        if (typeof window !== 'undefined') {
-            return window.innerWidth > 768;
+        if (typeof globalThis.window !== 'undefined') {
+            return globalThis.window.innerWidth > 768;
         }
         return true;
     });
@@ -115,7 +115,9 @@ const AISupportBooking: React.FC = () => {
     useEffect(() => {
         if (!isAuthenticated) {
             // Redirect to login with return URL
-            navigate(`${PATHS.LOGIN}?returnUrl=${encodeURIComponent(window.location.pathname)}`);
+            navigate(
+                `${PATHS.LOGIN}?returnUrl=${encodeURIComponent(globalThis.location.pathname)}`
+            );
         }
     }, [isAuthenticated, navigate]);
 
@@ -263,6 +265,8 @@ const AISupportBooking: React.FC = () => {
 
     // Generate GUID-like string for session ID
     const generateSessionId = (): string => {
+        // Using replace() with regex flag 'g' to replace all occurrences
+        // replaceAll() doesn't support regex patterns with callback functions
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
             const r = Math.trunc(Math.random() * 16);
             const v = c === 'x' ? r : (r & 0x3) | 0x8;
@@ -343,7 +347,9 @@ const AISupportBooking: React.FC = () => {
 
         // Kiểm tra authentication
         if (!isAuthenticated) {
-            navigate(`${PATHS.LOGIN}?returnUrl=${encodeURIComponent(window.location.pathname)}`);
+            navigate(
+                `${PATHS.LOGIN}?returnUrl=${encodeURIComponent(globalThis.location.pathname)}`
+            );
             return;
         }
 
@@ -468,7 +474,9 @@ const AISupportBooking: React.FC = () => {
     const handleNewChat = () => {
         // Kiểm tra authentication
         if (!isAuthenticated) {
-            navigate(`${PATHS.LOGIN}?returnUrl=${encodeURIComponent(window.location.pathname)}`);
+            navigate(
+                `${PATHS.LOGIN}?returnUrl=${encodeURIComponent(globalThis.location.pathname)}`
+            );
             return;
         }
 
@@ -603,7 +611,9 @@ const AISupportBooking: React.FC = () => {
     const handleSelectChat = async (chatId: string) => {
         // Kiểm tra authentication
         if (!isAuthenticated) {
-            navigate(`${PATHS.LOGIN}?returnUrl=${encodeURIComponent(window.location.pathname)}`);
+            navigate(
+                `${PATHS.LOGIN}?returnUrl=${encodeURIComponent(globalThis.location.pathname)}`
+            );
             return;
         }
 

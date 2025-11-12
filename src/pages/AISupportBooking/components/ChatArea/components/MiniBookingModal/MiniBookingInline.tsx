@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Stethoscope } from 'lucide-react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { toast } from 'react-toastify';
 import AppointmentService from '@/services/appointment.service';
@@ -14,7 +14,6 @@ import DateTimeSection from '@/pages/Booking/sections/DateTimeSection';
 import BasicInfoSection from '@/pages/Booking/sections/BasicInfoSection';
 import PaymentSection from '@/pages/Booking/sections/PaymentSection';
 import PaymentService, { CreatePaymentRequest } from '@/services/payment.service';
-import { useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
 import { setCreatedAppointmentId } from '@/store/slices/bookingSlice';
 import styles from '../../ChatArea.module.scss';
 
@@ -25,11 +24,11 @@ interface MiniBookingInlineProps {
 
 const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({ doctorId, onClose }) => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const { profile } = useSelector((state: RootState) => state.user);
-    const dispatch = useReduxDispatch();
-    const userState = useReduxSelector((state: RootState) => state.user);
-    const doctorState = useReduxSelector((state: RootState) => state.doctor);
-    const scheduleState = useReduxSelector((state: RootState) => state.schedule);
+    const userState = useSelector((state: RootState) => state.user);
+    const doctorState = useSelector((state: RootState) => state.doctor);
+    const scheduleState = useSelector((state: RootState) => state.schedule);
 
     type Step = 'datetime' | 'basic' | 'payment';
 
@@ -39,15 +38,16 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({ doctorId, onClose
     const [showStep, setShowStep] = useState(false);
 
     // Build AI guide text per step
+    const getGuideText = (step: Step): string => {
+        if (step === 'datetime') return 'Mời bạn chọn ngày và khung giờ phù hợp';
+        if (step === 'basic') return 'Vui lòng xác nhận thông tin người khám';
+        return 'Chọn phương thức thanh toán để hoàn tất đặt lịch';
+    };
+
     useEffect(() => {
         setIsGuideTyping(true);
         setShowStep(false);
-        const text =
-            currentStep === 'datetime'
-                ? 'Mời bạn chọn ngày và khung giờ phù hợp'
-                : currentStep === 'basic'
-                  ? 'Vui lòng xác nhận thông tin người khám'
-                  : 'Chọn phương thức thanh toán để hoàn tất đặt lịch';
+        const text = getGuideText(currentStep);
         setGuideText(text);
         const t = setTimeout(() => {
             setIsGuideTyping(false);
@@ -91,16 +91,24 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({ doctorId, onClose
             attachmentUrls: [],
         });
         const response = await AppointmentService.createAppointment({
-            ...(request as any),
+            ...request,
             skipPayment,
-        } as any);
-        const appointmentId = (response.data as any)?.appointmentId;
+        });
+        // API returns appointmentId in data, but type definition says void
+        const appointmentId = (response.data as unknown as { appointmentId?: string })
+            ?.appointmentId;
         if (!appointmentId) throw new Error('Không nhận được ID lịch hẹn');
         dispatch(setCreatedAppointmentId(appointmentId));
         return appointmentId;
     };
 
     // Helpers to reuse Booking sections
+    const getStepTitle = (step: Step): string => {
+        if (step === 'datetime') return 'Chọn ngày và giờ';
+        if (step === 'basic') return 'Xác nhận thông tin người khám';
+        return 'Thanh toán';
+    };
+
     const nextStep = () => {
         if (currentStep === 'datetime') handleContinueFromDateTime();
         else if (currentStep === 'basic') handleContinueFromBasic();
@@ -108,6 +116,70 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({ doctorId, onClose
     const prevStep = () => {
         if (currentStep === 'payment') setCurrentStep('basic');
         else if (currentStep === 'basic') setCurrentStep('datetime');
+    };
+
+    const renderStepContent = () => {
+        if (currentStep === 'datetime') {
+            return (
+                <DateTimeSection
+                    nextStep={nextStep}
+                    prevStep={prevStep}
+                    doctorId={doctorId}
+                    hidePrev={true}
+                />
+            );
+        }
+        if (currentStep === 'basic') {
+            return <BasicInfoSection nextStep={nextStep} prevStep={prevStep} />;
+        }
+        return (
+            <PaymentSection
+                nextStep={nextStep}
+                prevStep={prevStep}
+                isCreatingAppointment={false}
+                onCreateAppointmentAndPayment={async (
+                    paymentMethodId: string,
+                    depositAmount: number
+                ) => {
+                    try {
+                        const appointmentId = await ensureAppointmentCreated(false);
+                        const paymentRequest: CreatePaymentRequest = {
+                            appointmentId,
+                            patientId: userState.profile!.id,
+                            hospitalId: doctorState.selectedDoctor?.hospital?.id,
+                            amount: depositAmount,
+                            paymentMethodId,
+                        };
+                        const paymentResponse =
+                            await PaymentService.createAppointmentPayment(paymentRequest);
+                        if (!paymentResponse.paymentUrl) {
+                            throw new Error('Không nhận được URL thanh toán');
+                        }
+                        toast.success('Đang chuyển hướng đến cổng thanh toán...');
+                        setTimeout(() => {
+                            globalThis.location.href = paymentResponse.paymentUrl;
+                        }, 1000);
+                    } catch (error: any) {
+                        console.error('Process failed:', error);
+                        toast.error(error.message || 'Không thể hoàn tất quy trình');
+                    }
+                }}
+                onCreateAppointmentOnly={async () => {
+                    try {
+                        const appointmentId = await ensureAppointmentCreated(true);
+                        toast.success('Đặt lịch thành công!');
+                        onClose();
+                        navigate(
+                            PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', appointmentId)
+                        );
+                    } catch (error: any) {
+                        console.error('Create appointment failed:', error);
+                        toast.error(error.message || 'Không thể tạo lịch hẹn');
+                    }
+                }}
+                isProcessingPayment={false}
+            />
+        );
     };
 
     return (
@@ -131,13 +203,7 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({ doctorId, onClose
                         <div className="card-body">
                             <div className="d-flex align-items-center justify-content-between mb-3">
                                 <div className="d-flex align-items-center gap-2">
-                                    <strong>
-                                        {currentStep === 'datetime'
-                                            ? 'Chọn ngày và giờ'
-                                            : currentStep === 'basic'
-                                              ? 'Xác nhận thông tin người khám'
-                                              : 'Thanh toán'}
-                                    </strong>
+                                    <strong>{getStepTitle(currentStep)}</strong>
                                 </div>
                                 <button
                                     className="btn btn-sm btn-outline-primary"
@@ -147,76 +213,7 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({ doctorId, onClose
                                 </button>
                             </div>
 
-                            {currentStep === 'datetime' ? (
-                                <DateTimeSection
-                                    nextStep={nextStep}
-                                    prevStep={prevStep}
-                                    doctorId={doctorId}
-                                    hidePrev={true}
-                                />
-                            ) : currentStep === 'basic' ? (
-                                <BasicInfoSection nextStep={nextStep} prevStep={prevStep} />
-                            ) : (
-                                <PaymentSection
-                                    nextStep={nextStep}
-                                    prevStep={prevStep}
-                                    isCreatingAppointment={false}
-                                    onCreateAppointmentAndPayment={async (
-                                        paymentMethodId: string,
-                                        depositAmount: number
-                                    ) => {
-                                        try {
-                                            const appointmentId =
-                                                await ensureAppointmentCreated(false);
-                                            const paymentRequest: CreatePaymentRequest = {
-                                                appointmentId,
-                                                patientId: userState.profile!.id,
-                                                hospitalId:
-                                                    doctorState.selectedDoctor?.hospital?.id,
-                                                amount: depositAmount,
-                                                paymentMethodId,
-                                            };
-                                            const paymentResponse =
-                                                await PaymentService.createAppointmentPayment(
-                                                    paymentRequest
-                                                );
-                                            if (!paymentResponse.paymentUrl) {
-                                                throw new Error('Không nhận được URL thanh toán');
-                                            }
-                                            toast.success(
-                                                'Đang chuyển hướng đến cổng thanh toán...'
-                                            );
-                                            setTimeout(() => {
-                                                globalThis.location.href =
-                                                    paymentResponse.paymentUrl;
-                                            }, 1000);
-                                        } catch (error: any) {
-                                            console.error('Process failed:', error);
-                                            toast.error(
-                                                error.message || 'Không thể hoàn tất quy trình'
-                                            );
-                                        }
-                                    }}
-                                    onCreateAppointmentOnly={async () => {
-                                        try {
-                                            const appointmentId =
-                                                await ensureAppointmentCreated(true);
-                                            toast.success('Đặt lịch thành công!');
-                                            onClose();
-                                            navigate(
-                                                PATHS.BOOKING.CONFIRMATION.replace(
-                                                    ':appointmentId',
-                                                    appointmentId
-                                                )
-                                            );
-                                        } catch (error: any) {
-                                            console.error('Create appointment failed:', error);
-                                            toast.error(error.message || 'Không thể tạo lịch hẹn');
-                                        }
-                                    }}
-                                    isProcessingPayment={false}
-                                />
-                            )}
+                            {renderStepContent()}
                         </div>
                     </div>
                 </div>

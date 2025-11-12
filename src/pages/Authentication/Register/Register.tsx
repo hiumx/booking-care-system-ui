@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -20,8 +20,13 @@ import { SendOtpRequest, VerifyOtpRequest } from '@/types/otp.types';
 import { AuthService } from '@/services/auth.service';
 import { OtpService } from '@/services/otp.service';
 import { usePhoneInput } from '@/hooks/usePhoneInput';
+import { useOtpInput } from '@/hooks/useOtpInput';
+import { usePasswordValidation } from '@/hooks/usePasswordValidation';
+import { useAuthRedirect } from '@/hooks/useAuthRedirect';
+import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
+import { PasswordRequirementsList } from '@/components/PasswordRequirementsList';
 import { toast } from 'react-toastify';
-import { PASSWORD_REGEX, PASSWORD_MIN_LENGTH, OTP_REGEX, NAME_REGEX } from '@/constants';
+import { NAME_REGEX } from '@/constants';
 import { Gender } from '@/enums/common.enums';
 import { validateAge } from '@/utils/validation';
 
@@ -35,7 +40,7 @@ const Register: React.FC = () => {
     const { t } = useTranslation('auth');
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const { isLoading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+    const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
     const [step, setStep] = useState<Step>(0);
     const [method, setMethod] = useState<'email' | 'phone'>('phone');
@@ -60,9 +65,12 @@ const Register: React.FC = () => {
     const [showCaptcha, setShowCaptcha] = useState(false);
     const [agree, setAgree] = useState(true);
 
+    // Use auth redirect hook
+    useAuthRedirect();
+
     // Step 1: OTP
-    const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''));
-    const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
+    const { otp, otpValue, otpRefs, canVerifyOtp, handleOtpChange, handleOtpKeyDown, resetOtp } =
+        useOtpInput({ length: OTP_LENGTH });
     const [countdown, setCountdown] = useState<number>(60);
     const [isSending, setIsSending] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
@@ -74,45 +82,12 @@ const Register: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    // Password requirements validation
-    const passwordRequirements = useMemo(() => {
-        const hasMinLength = password.length >= PASSWORD_MIN_LENGTH;
-        const hasUppercase = PASSWORD_REGEX.UPPERCASE.test(password);
-        const hasLowercase = PASSWORD_REGEX.LOWERCASE.test(password);
-        const hasNumber = PASSWORD_REGEX.DIGIT.test(password);
-        const hasSpecialChar = PASSWORD_REGEX.SPECIAL_CHAR.test(password);
 
-        return {
-            hasMinLength,
-            hasUppercase,
-            hasLowercase,
-            hasNumber,
-            hasSpecialChar,
-            allMet: hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar,
-        };
-    }, [password]);
-
-    // Password strength calculation
-    const passwordStrength = useMemo(() => {
-        if (!password) return { score: 0, label: '', color: '', width: 0 };
-
-        let score = 0;
-        if (passwordRequirements.hasMinLength) score += 20;
-        if (passwordRequirements.hasUppercase) score += 20;
-        if (passwordRequirements.hasLowercase) score += 20;
-        if (passwordRequirements.hasNumber) score += 20;
-        if (passwordRequirements.hasSpecialChar) score += 20;
-
-        if (score <= 20)
-            return { score, label: t('register.passwordWeak'), color: '#ef4444', width: 20 };
-        if (score <= 40)
-            return { score, label: t('register.passwordFair'), color: '#f59e0b', width: 40 };
-        if (score <= 60)
-            return { score, label: t('register.passwordGood'), color: '#3b82f6', width: 60 };
-        if (score <= 80)
-            return { score, label: t('register.passwordStrong'), color: '#10b981', width: 80 };
-        return { score, label: t('register.passwordVeryStrong'), color: '#059669', width: 100 };
-    }, [password, passwordRequirements, t]);
+    // Use password validation hook
+    const { passwordRequirements, passwordStrength } = usePasswordValidation({
+        password,
+        translationPrefix: 'register',
+    });
 
     const canCreatePassword = useMemo(() => {
         const hasPassword = password.trim() !== '';
@@ -181,9 +156,6 @@ const Register: React.FC = () => {
 
         return validIdentifier && isHuman && agree;
     }, [method, email, isPhoneValid, isHuman, agree]);
-
-    const otpValue = useMemo(() => otp.join(''), [otp]);
-    const canVerifyOtp = otpValue.length === OTP_LENGTH && OTP_REGEX.SIX_DIGITS.test(otpValue);
 
     // Validation handlers for step 3 fields
     const handleFullNameChange = (value: string) => {
@@ -286,13 +258,6 @@ const Register: React.FC = () => {
         dispatch(clearError());
     }, [dispatch]);
 
-    // Redirect if already authenticated
-    useEffect(() => {
-        if (isAuthenticated) {
-            navigate('/');
-        }
-    }, [isAuthenticated, navigate]);
-
     // Countdown timer
     useEffect(() => {
         if (step !== 1) return;
@@ -338,24 +303,6 @@ const Register: React.FC = () => {
         }
     };
 
-    const handleOtpChange = (index: number, value: string) => {
-        if (!OTP_REGEX.SINGLE_DIGIT.test(value)) return;
-        setOtp((prev) => {
-            const next = [...prev];
-            next[index] = value;
-            return next;
-        });
-        if (value && index < OTP_LENGTH - 1) {
-            otpRefs.current[index + 1]?.focus();
-        }
-    };
-
-    const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Backspace' && !otp[index] && index > 0) {
-            otpRefs.current[index - 1]?.focus();
-        }
-    };
-
     const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!canVerifyOtp) return;
@@ -397,7 +344,7 @@ const Register: React.FC = () => {
             const response = await OtpService.sendOtp(sendOtpData);
 
             setCountdown(60);
-            setOtp(new Array(6).fill(''));
+            resetOtp();
             toast.success(response.message || 'Mã OTP mới đã được gửi thành công!');
         } catch (error: any) {
             console.error('Resend OTP error:', error);
@@ -842,32 +789,11 @@ const Register: React.FC = () => {
                                 onTogglePassword={() => togglePasswordVisibility('password')}
                             />
 
-                            {password && (
-                                <div className="mt-2">
-                                    <div className="d-flex justify-content-between align-items-center mb-1">
-                                        <small className="text-muted">
-                                            {t('register.passwordStrength')}
-                                        </small>
-                                        <small
-                                            className="fw-medium"
-                                            style={{
-                                                color: passwordStrength.color,
-                                            }}
-                                        >
-                                            {passwordStrength.label}
-                                        </small>
-                                    </div>
-                                    <div className={'strength-bar'}>
-                                        <div
-                                            className={'strength-fill'}
-                                            style={{
-                                                width: `${passwordStrength.width}%`,
-                                                backgroundColor: passwordStrength.color,
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            )}
+                            <PasswordStrengthIndicator
+                                password={password}
+                                passwordStrength={passwordStrength}
+                                translationPrefix="register"
+                            />
                         </div>
 
                         <div className="mb-3">
@@ -897,106 +823,10 @@ const Register: React.FC = () => {
                         </div>
                         {/* Password Requirements */}
                         <div className="mb-3">
-                            <div className={'requirements-list'}>
-                                <span className="mb-1" style={{ fontWeight: 600 }}>
-                                    {t('register.passwordRequirements')}
-                                </span>
-                                <div className={'requirement-item'}>
-                                    <span className={'requirement-icon'}>
-                                        {passwordRequirements.hasMinLength ? (
-                                            <CheckCircle size={16} className="text-success" />
-                                        ) : (
-                                            <CheckCircle size={16} className="text-muted" />
-                                        )}
-                                    </span>
-                                    <span
-                                        className={clsx(
-                                            'requirement-text',
-                                            passwordRequirements.hasMinLength
-                                                ? 'text-success'
-                                                : 'text-muted'
-                                        )}
-                                    >
-                                        {t('register.passwordMinLength')}
-                                    </span>
-                                </div>
-                                <div className={'requirement-item'}>
-                                    <span className={'requirement-icon'}>
-                                        {passwordRequirements.hasUppercase ? (
-                                            <CheckCircle size={16} className="text-success" />
-                                        ) : (
-                                            <CheckCircle size={16} className="text-muted" />
-                                        )}
-                                    </span>
-                                    <span
-                                        className={clsx(
-                                            'requirement-text',
-                                            passwordRequirements.hasUppercase
-                                                ? 'text-success'
-                                                : 'text-muted'
-                                        )}
-                                    >
-                                        {t('register.passwordUppercase')}
-                                    </span>
-                                </div>
-                                <div className={'requirement-item'}>
-                                    <span className={'requirement-icon'}>
-                                        {passwordRequirements.hasLowercase ? (
-                                            <CheckCircle size={16} className="text-success" />
-                                        ) : (
-                                            <CheckCircle size={16} className="text-muted" />
-                                        )}
-                                    </span>
-                                    <span
-                                        className={clsx(
-                                            'requirement-text',
-                                            passwordRequirements.hasLowercase
-                                                ? 'text-success'
-                                                : 'text-muted'
-                                        )}
-                                    >
-                                        {t('register.passwordLowercase')}
-                                    </span>
-                                </div>
-                                <div className={'requirement-item'}>
-                                    <span className={'requirement-icon'}>
-                                        {passwordRequirements.hasNumber ? (
-                                            <CheckCircle size={16} className="text-success" />
-                                        ) : (
-                                            <CheckCircle size={16} className="text-muted" />
-                                        )}
-                                    </span>
-                                    <span
-                                        className={clsx(
-                                            'requirement-text',
-                                            passwordRequirements.hasNumber
-                                                ? 'text-success'
-                                                : 'text-muted'
-                                        )}
-                                    >
-                                        {t('register.passwordNumber')}
-                                    </span>
-                                </div>
-                                <div className={'requirement-item'}>
-                                    <span className={'requirement-icon'}>
-                                        {passwordRequirements.hasSpecialChar ? (
-                                            <CheckCircle size={16} className="text-success" />
-                                        ) : (
-                                            <CheckCircle size={16} className="text-muted" />
-                                        )}
-                                    </span>
-                                    <span
-                                        className={clsx(
-                                            'requirement-text',
-                                            passwordRequirements.hasSpecialChar
-                                                ? 'text-success'
-                                                : 'text-muted'
-                                        )}
-                                    >
-                                        {t('register.passwordSpecialChar')}
-                                    </span>
-                                </div>
-                            </div>
+                            <PasswordRequirementsList
+                                passwordRequirements={passwordRequirements}
+                                translationPrefix="register"
+                            />
                         </div>
                         <Button
                             text={t('register.createPassword')}

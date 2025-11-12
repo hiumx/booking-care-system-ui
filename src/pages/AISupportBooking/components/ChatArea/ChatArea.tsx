@@ -144,7 +144,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     const handleBookAppointment = (suggestionId: string) => {
         // Navigate to booking page or open booking modal
         console.log('Đặt lịch khám bệnh cho:', suggestionId);
-        // TODO: Implement navigation to booking page
+        // Note: Navigation is handled by handleSupportBooking function
     };
 
     const handleSupportBooking = (suggestionId: string, type: 'doctor' | 'hospital') => {

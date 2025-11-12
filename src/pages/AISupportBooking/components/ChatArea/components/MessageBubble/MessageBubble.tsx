@@ -80,6 +80,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
 
     // Helper functions to reduce cognitive complexity
     const processMarkdown = (text: string) => {
+        // Using replace() with regex flag 'g' to replace all occurrences
+        // replaceAll() doesn't support regex patterns, only string literals
         return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     };
 

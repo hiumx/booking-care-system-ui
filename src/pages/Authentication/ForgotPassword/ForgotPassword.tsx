@@ -16,8 +16,8 @@ import { VerifyOtpRequest } from '@/types/otp.types';
 import { AuthService } from '@/services/auth.service';
 import { OtpService } from '@/services/otp.service';
 import { usePhoneInput } from '@/hooks/usePhoneInput';
+import { useOtpInput } from '@/hooks/useOtpInput';
 import { toast } from 'react-toastify';
-import { OTP_REGEX } from '@/constants';
 
 interface ForgotPasswordProps {
     onSubmit?: (email: string, phone: string) => void;
@@ -43,10 +43,10 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
     const [showCaptcha, setShowCaptcha] = useState(false);
 
     // OTP states
-    const [otp, setOtp] = useState<string[]>(new Array(6).fill(''));
+    const { otp, otpValue, otpRefs, canVerifyOtp, handleOtpChange, handleOtpKeyDown, resetOtp } =
+        useOtpInput({ length: 6 });
     const [isVerifying, setIsVerifying] = useState(false);
     const [countdown, setCountdown] = useState(60);
-    const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
 
     // Create stable IDs for OTP inputs to avoid using array index as key
     const otpInputIds = useMemo(
@@ -81,10 +81,6 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         }, 1000);
         return () => clearInterval(timer);
     }, [step, countdown]);
-
-    // OTP validation
-    const otpValue = useMemo(() => otp.join(''), [otp]);
-    const canVerifyOtp = otpValue.length === 6 && OTP_REGEX.SIX_DIGITS.test(otpValue);
 
     const handleEmailFlow = async () => {
         // Email flow: reset captcha and show success toast
@@ -133,28 +129,6 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         onSubmit?.(email, phone);
     };
 
-    // OTP handlers
-    const handleOtpChange = (index: number, value: string) => {
-        if (!OTP_REGEX.SINGLE_DIGIT.test(value)) return;
-
-        setOtp((prev) => {
-            const next = [...prev];
-            next[index] = value;
-            return next;
-        });
-
-        // Auto focus next input
-        if (value && index < 5) {
-            otpRefs.current[index + 1]?.focus();
-        }
-    };
-
-    const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Backspace' && !otp[index] && index > 0) {
-            otpRefs.current[index - 1]?.focus();
-        }
-    };
-
     const processOtpVerification = async () => {
         const verifyOtpData: VerifyOtpRequest = {
             phone: phone,
@@ -200,7 +174,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         try {
             await dispatch(forgotPasswordAsync({ phoneNumber: phone, deviceId })).unwrap();
             setCountdown(60);
-            setOtp(new Array(6).fill(''));
+            resetOtp();
             toast.success(t('forgotPassword.successPhone'));
         } catch (error) {
             console.error('Resend OTP error:', error);
@@ -210,7 +184,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
 
     const handleBackToInput = () => {
         setStep('input');
-        setOtp(new Array(6).fill(''));
+        resetOtp();
         setCountdown(60);
     };
 
