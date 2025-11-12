@@ -80,9 +80,19 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
 
     // Helper functions to reduce cognitive complexity
     const processMarkdown = (text: string) => {
-        // Using replace() with regex flag 'g' to replace all occurrences
-        // replaceAll() doesn't support regex patterns, only string literals
-        return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        const boldRegex = /\*\*(.*?)\*\*/g;
+        const segments: string[] = [];
+        let lastIndex = 0;
+        let match: RegExpExecArray | null;
+
+        while ((match = boldRegex.exec(text)) !== null) {
+            segments.push(text.slice(lastIndex, match.index));
+            segments.push(`<strong>${match[1]}</strong>`);
+            lastIndex = match.index + match[0].length;
+        }
+
+        segments.push(text.slice(lastIndex));
+        return segments.join('');
     };
 
     const isSectionTitle = (line: string) => {

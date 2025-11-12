@@ -265,11 +265,15 @@ const AISupportBooking: React.FC = () => {
 
     // Generate GUID-like string for session ID
     const generateSessionId = (): string => {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c: string) => {
-            const r = Math.trunc(Math.random() * 16);
-            const v = c === 'x' ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        });
+        const template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+        return Array.from(template, (char) => {
+            if (char === 'x' || char === 'y') {
+                const randomHex = Math.trunc(Math.random() * 16);
+                const resolved = char === 'x' ? randomHex : (randomHex & 0x3) | 0x8;
+                return resolved.toString(16);
+            }
+            return char;
+        }).join('');
     };
 
     // Helper function to create a new chat

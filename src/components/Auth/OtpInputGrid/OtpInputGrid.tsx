@@ -1,7 +1,9 @@
 import clsx from 'clsx';
 import { CSSProperties } from 'react';
 
-type InputRef = React.MutableRefObject<Array<HTMLInputElement | null>>;
+type InputRef = {
+    current: Array<HTMLInputElement | null>;
+};
 
 interface OtpInputGridProps {
     otp: string[];

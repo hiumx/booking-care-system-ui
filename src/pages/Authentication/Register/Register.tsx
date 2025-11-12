@@ -25,6 +25,7 @@ import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 import { PasswordRequirementsList } from '@/components/PasswordRequirementsList';
 import { ContactMethodInput } from '@/components/Auth/ContactMethodInput';
+import { ContactMethodToggle } from '@/components/Auth/ContactMethodToggle';
 import { CaptchaSection } from '@/components/Auth/CaptchaSection';
 import { OtpInputGrid } from '@/components/Auth/OtpInputGrid';
 import { toast } from 'react-toastify';
@@ -520,32 +521,22 @@ const Register: React.FC = () => {
             {step === 0 && (
                 <div>
                     {/* Method toggle */}
-                    <div className="d-flex justify-content-center mb-3">
-                        <div className={clsx('method-toggle')}>
-                            <button
-                                type="button"
-                                className={clsx(
-                                    'toggle-btn',
-                                    method === 'phone' && 'toggle-btn-active'
-                                )}
-                                onClick={() => setMethod('phone')}
-                            >
-                                <Phone size={16} className="me-2" />
-                                {t('register.phone')}
-                            </button>
-                            <button
-                                type="button"
-                                className={clsx(
-                                    'toggle-btn',
-                                    method === 'email' && 'toggle-btn-active'
-                                )}
-                                onClick={() => setMethod('email')}
-                            >
-                                <Mail size={16} className="me-2" />
-                                {t('register.email')}
-                            </button>
-                        </div>
-                    </div>
+                    <ContactMethodToggle
+                        method={method}
+                        options={[
+                            {
+                                value: 'phone',
+                                label: t('register.phone'),
+                                icon: <Phone size={16} className="me-2" />,
+                            },
+                            {
+                                value: 'email',
+                                label: t('register.email'),
+                                icon: <Mail size={16} className="me-2" />,
+                            },
+                        ]}
+                        onChange={(value) => setMethod(value)}
+                    />
 
                     <form onSubmit={handleSendOtp}>
                         <div className="mb-3">

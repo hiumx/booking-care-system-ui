@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import ReCAPTCHA from 'react-google-recaptcha';
 import AuthLayout from '@/layouts/AuthLayout';
-import { Phone, ArrowLeft } from 'lucide-react';
+import { Phone, ArrowLeft, Mail } from 'lucide-react';
 import clsx from 'clsx';
 import { PATHS } from '@/routes/paths';
 import Button from '@/components/Button';
@@ -18,6 +18,7 @@ import { usePhoneInput } from '@/hooks/usePhoneInput';
 import { useOtpInput } from '@/hooks/useOtpInput';
 import { toast } from 'react-toastify';
 import { ContactMethodInput } from '@/components/Auth/ContactMethodInput';
+import { ContactMethodToggle } from '@/components/Auth/ContactMethodToggle';
 import { CaptchaSection } from '@/components/Auth/CaptchaSection';
 import { OtpInputGrid } from '@/components/Auth/OtpInputGrid';
 
@@ -207,32 +208,24 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         return maskedPart + lastThreeDigits;
     };
 
-    const renderMethodToggle = () => (
-        <div className="d-flex justify-content-center mb-3">
-            <div className="method-toggle">
-                <button
-                    type="button"
-                    className={clsx('toggle-btn', method === 'phone' && 'toggle-btn-active')}
-                    onClick={() => setMethod('phone')}
-                >
-                    <i className="feather-phone me-1"></i>
-                    {t('forgotPassword.phone')}
-                </button>
-                <button
-                    type="button"
-                    className={clsx('toggle-btn', method === 'email' && 'toggle-btn-active')}
-                    onClick={() => setMethod('email')}
-                >
-                    <i className="feather-mail me-1"></i>
-                    {t('forgotPassword.email')}
-                </button>
-            </div>
-        </div>
-    );
-
     const renderInputStep = () => (
         <form onSubmit={handleSubmit}>
-            {renderMethodToggle()}
+            <ContactMethodToggle
+                method={method}
+                options={[
+                    {
+                        value: 'phone',
+                        label: t('forgotPassword.phone'),
+                        icon: <Phone size={16} className="me-2" />,
+                    },
+                    {
+                        value: 'email',
+                        label: t('forgotPassword.email'),
+                        icon: <Mail size={16} className="me-2" />,
+                    },
+                ]}
+                onChange={(value) => setMethod(value)}
+            />
             <div className="mb-3">
                 <ContactMethodInput
                     method={method}
