@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import ReCAPTCHA from 'react-google-recaptcha';
 import { Lock, User, Phone, Mail, CheckCircle } from 'lucide-react';
 import Select from 'react-select';
 import { SocialLogin } from '@/components/SocialLogin';
@@ -25,6 +24,8 @@ import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 import { PasswordRequirementsList } from '@/components/PasswordRequirementsList';
+import { ContactMethodInput } from '@/components/Auth/ContactMethodInput';
+import { CaptchaSection } from '@/components/Auth/CaptchaSection';
 import { toast } from 'react-toastify';
 import { NAME_REGEX } from '@/constants';
 import { Gender } from '@/enums/common.enums';
@@ -547,70 +548,37 @@ const Register: React.FC = () => {
 
                     <form onSubmit={handleSendOtp}>
                         <div className="mb-3">
-                            {method === 'phone' ? (
-                                <Input
-                                    label={t('register.phone')}
-                                    type="tel"
-                                    inputMode="numeric"
-                                    placeholder={t('register.phonePlaceholder')}
-                                    leftContent={
-                                        <>
-                                            <img
-                                                src="https://flagcdn.com/w20/vn.png"
-                                                alt="VN"
-                                                width={20}
-                                                height={15}
-                                            />
-                                            <span className="text-muted" style={{ fontSize: 14 }}>
-                                                +84
-                                            </span>
-                                        </>
-                                    }
-                                    wrapVariant="phone"
-                                    value={phone}
-                                    onChange={handlePhoneChange}
-                                    onKeyDown={handlePhoneKeyDown}
-                                    onPaste={handlePhonePaste}
-                                    onFocus={() => setShowCaptcha(true)}
-                                />
-                            ) : (
-                                <Input
-                                    label={t('register.addressEmail')}
-                                    type="email"
-                                    placeholder={t('register.emailPlaceholder')}
-                                    leftIcon={<Mail size={18} className="text-muted" />}
-                                    wrapVariant="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    onFocus={() => setShowCaptcha(true)}
-                                />
-                            )}
+                            <ContactMethodInput
+                                method={method}
+                                phoneInput={{
+                                    label: t('register.phone'),
+                                    placeholder: t('register.phonePlaceholder'),
+                                    value: phone,
+                                    onChange: handlePhoneChange,
+                                    onKeyDown: handlePhoneKeyDown,
+                                    onPaste: handlePhonePaste,
+                                }}
+                                emailInput={{
+                                    label: t('register.addressEmail'),
+                                    placeholder: t('register.emailPlaceholder'),
+                                    value: email,
+                                    onChange: (event) => setEmail(event.target.value),
+                                }}
+                                onFocus={() => setShowCaptcha(true)}
+                            />
                         </div>
 
                         {/* Captcha */}
-                        {showCaptcha && (
-                            <div>
-                                {siteKey ? (
-                                    <ReCAPTCHA
-                                        sitekey={siteKey}
-                                        onChange={() => setIsHuman(true)}
-                                        onExpired={() => setIsHuman(false)}
-                                    />
-                                ) : (
-                                    <div className="d-flex align-items-center p-3 bg-light rounded-3 border">
-                                        <input
-                                            type="checkbox"
-                                            id="captcha"
-                                            className="me-2"
-                                            onChange={(e) => setIsHuman(e.target.checked)}
-                                        />
-                                        <label htmlFor="captcha" className="text-muted">
-                                            {t('common.notRobot', 'Tôi không phải là robot')}
-                                        </label>
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                        <CaptchaSection
+                            isVisible={showCaptcha}
+                            siteKey={siteKey ?? undefined}
+                            onVerify={(value) => setIsHuman(Boolean(value))}
+                            onExpired={() => setIsHuman(false)}
+                            checkboxId="register-captcha"
+                            checkboxChecked={isHuman}
+                            onCheckboxChange={setIsHuman}
+                            label={t('common.notRobot', 'Tôi không phải là robot')}
+                        />
 
                         {/* Agreement */}
                         <div className="d-flex align-items-start mb-3 mt-3">

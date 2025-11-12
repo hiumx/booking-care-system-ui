@@ -4,11 +4,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import ReCAPTCHA from 'react-google-recaptcha';
 import AuthLayout from '@/layouts/AuthLayout';
-import { Mail, Phone, ArrowLeft } from 'lucide-react';
+import { Phone, ArrowLeft } from 'lucide-react';
 import clsx from 'clsx';
 import { PATHS } from '@/routes/paths';
 import Button from '@/components/Button';
-import Input from '@/components/Input';
 import { forgotPasswordAsync, clearError } from '@/store/slices/authSlice';
 import { RootState, AppDispatch } from '@/store';
 import { ForgotPasswordRequest, ResetTokenRequest } from '@/types/auth.types';
@@ -18,6 +17,8 @@ import { OtpService } from '@/services/otp.service';
 import { usePhoneInput } from '@/hooks/usePhoneInput';
 import { useOtpInput } from '@/hooks/useOtpInput';
 import { toast } from 'react-toastify';
+import { ContactMethodInput } from '@/components/Auth/ContactMethodInput';
+import { CaptchaSection } from '@/components/Auth/CaptchaSection';
 
 interface ForgotPasswordProps {
     onSubmit?: (email: string, phone: string) => void;
@@ -53,7 +54,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         () => new Array(6).fill(0).map((_, i) => `otp-input-${i}-${Date.now()}`),
         []
     );
-    const recaptchaRef = useRef<ReCAPTCHA>(null);
+    const recaptchaRef = useRef<ReCAPTCHA | null>(null);
 
     const canSend = useMemo(() => {
         // Use AuthService for consistent email validation
@@ -232,44 +233,24 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         <form onSubmit={handleSubmit}>
             {renderMethodToggle()}
             <div className="mb-3">
-                {method === 'phone' ? (
-                    <Input
-                        label={t('forgotPassword.phone')}
-                        type="tel"
-                        inputMode="numeric"
-                        placeholder={t('forgotPassword.phonePlaceholder')}
-                        leftContent={
-                            <>
-                                <img
-                                    src="https://flagcdn.com/w20/vn.png"
-                                    alt="VN"
-                                    width={20}
-                                    height={15}
-                                />
-                                <span className="text-muted" style={{ fontSize: 14 }}>
-                                    +84
-                                </span>
-                            </>
-                        }
-                        wrapVariant="phone"
-                        value={phone}
-                        onChange={handlePhoneChange}
-                        onKeyDown={handlePhoneKeyDown}
-                        onPaste={handlePhonePaste}
-                        onFocus={() => setShowCaptcha(true)}
-                    />
-                ) : (
-                    <Input
-                        label={t('forgotPassword.email')}
-                        type="email"
-                        placeholder={t('forgotPassword.emailPlaceholder')}
-                        leftIcon={<Mail size={18} className="text-muted" />}
-                        wrapVariant="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        onFocus={() => setShowCaptcha(true)}
-                    />
-                )}
+                <ContactMethodInput
+                    method={method}
+                    phoneInput={{
+                        label: t('forgotPassword.phone'),
+                        placeholder: t('forgotPassword.phonePlaceholder'),
+                        value: phone,
+                        onChange: handlePhoneChange,
+                        onKeyDown: handlePhoneKeyDown,
+                        onPaste: handlePhonePaste,
+                    }}
+                    emailInput={{
+                        label: t('forgotPassword.email'),
+                        placeholder: t('forgotPassword.emailPlaceholder'),
+                        value: email,
+                        onChange: (event) => setEmail(event.target.value),
+                    }}
+                    onFocus={() => setShowCaptcha(true)}
+                />
             </div>
             {/* Error message */}
             {error && (
@@ -278,31 +259,17 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                 </div>
             )}
             {/* Captcha */}
-            {showCaptcha && (
-                <div>
-                    {siteKey ? (
-                        <ReCAPTCHA
-                            ref={recaptchaRef}
-                            sitekey={siteKey}
-                            onChange={(value) => setIsHuman(!!value)}
-                            onExpired={() => setIsHuman(false)}
-                        />
-                    ) : (
-                        <div className="d-flex align-items-center p-3 bg-light rounded-3 border">
-                            <input
-                                type="checkbox"
-                                id="captcha"
-                                className="me-2"
-                                checked={isHuman}
-                                onChange={(e) => setIsHuman(e.target.checked)}
-                            />
-                            <label htmlFor="captcha" className="text-muted">
-                                {t('common.notRobot', 'Tôi không phải là robot')}
-                            </label>
-                        </div>
-                    )}
-                </div>
-            )}
+            <CaptchaSection
+                isVisible={showCaptcha}
+                siteKey={siteKey ?? undefined}
+                onVerify={(value) => setIsHuman(Boolean(value))}
+                onExpired={() => setIsHuman(false)}
+                checkboxId="forgot-captcha"
+                checkboxChecked={isHuman}
+                onCheckboxChange={setIsHuman}
+                label={t('common.notRobot', 'Tôi không phải là robot')}
+                recaptchaRef={recaptchaRef}
+            />
 
             <div className="mb-3 mt-3">
                 <Button
