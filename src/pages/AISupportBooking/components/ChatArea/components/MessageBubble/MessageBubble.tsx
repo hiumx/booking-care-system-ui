@@ -1,0 +1,409 @@
+import React, { useState, useEffect } from 'react';
+import clsx from 'clsx';
+import { useSelector } from 'react-redux';
+import { Stethoscope, Edit2, Copy, Check } from 'lucide-react';
+import { RootState } from '@/store';
+import { Message } from '@/types/ai.types';
+import styles from './MessageBubble.module.scss';
+
+interface MessageBubbleProps {
+    message: Message;
+    onEdit?: (messageId: string, newContent: string) => void;
+}
+
+const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
+    const isUser = message.sender === 'user';
+    const { profile } = useSelector((state: RootState) => state.user);
+    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editContent, setEditContent] = useState(message.content);
+    const [copied, setCopied] = useState(false);
+    const [avatarError, setAvatarError] = useState(false);
+
+    useEffect(() => {
+        setEditContent(message.content);
+    }, [message.content]);
+
+    // Lấy chữ cái đầu để hiển thị trong avatar mặc định
+    const getInitials = () => {
+        if (!isAuthenticated || !profile?.fullName) {
+            return 'U';
+        }
+        const names = profile.fullName.trim().split(' ');
+        if (names.length >= 2) {
+            return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+        }
+        return names[0][0].toUpperCase();
+    };
+
+    const formatTime = (date: Date) => {
+        return new Intl.DateTimeFormat('vi-VN', {
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(date);
+    };
+
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(message.content);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
+
+    const handleEdit = () => {
+        setIsEditing(true);
+    };
+
+    const handleSaveEdit = () => {
+        if (onEdit && editContent.trim() !== message.content) {
+            onEdit(message.id, editContent.trim());
+        }
+        setIsEditing(false);
+    };
+
+    const handleCancelEdit = () => {
+        setEditContent(message.content);
+        setIsEditing(false);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSaveEdit();
+        } else if (e.key === 'Escape') {
+            handleCancelEdit();
+        }
+    };
+
+    // Helper functions to reduce cognitive complexity
+    const processMarkdown = (text: string) => {
+        return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    };
+
+    const isSectionTitle = (line: string) => {
+        return /^(Bệnh viện chuyên về|Bác sĩ chuyên về|Dựa trên các triệu chứng|Lời khuyên chung|Chuyên khoa phù hợp).*:?$/.test(
+            line
+        );
+    };
+
+    const isNameLine = (line: string) => {
+        return !isSectionTitle(line) && /^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/.test(line);
+    };
+
+    const isListItem = (line: string) => {
+        return /^[-•]/.test(line);
+    };
+
+    const renderDisclaimerTitle = (line: string, index: number) => {
+        return (
+            <React.Fragment key={`disclaimer-title-${index}`}>
+                <div className={styles.disclaimerSection}>
+                    <strong className={styles.disclaimerTitle}>{line}</strong>
+                </div>
+            </React.Fragment>
+        );
+    };
+
+    const renderDisclaimerText = (line: string, index: number) => {
+        const disclaimerText = line.slice(1, -1);
+        return (
+            <React.Fragment key={`disclaimer-text-${index}`}>
+                <div
+                    className={styles.disclaimerText}
+                    dangerouslySetInnerHTML={{ __html: disclaimerText }}
+                />
+            </React.Fragment>
+        );
+    };
+
+    const renderSectionTitle = (line: string, index: number, isLastLine: boolean) => {
+        return (
+            <React.Fragment key={`section-${index}`}>
+                <strong
+                    className={styles.sectionTitle}
+                    dangerouslySetInnerHTML={{ __html: line }}
+                />
+                {!isLastLine && <br />}
+            </React.Fragment>
+        );
+    };
+
+    const renderNameLine = (line: string, index: number) => {
+        return (
+            <React.Fragment key={`name-${index}`}>
+                <strong className={styles.boldName} dangerouslySetInnerHTML={{ __html: line }} />
+            </React.Fragment>
+        );
+    };
+
+    const renderListItem = (line: string, index: number) => {
+        return (
+            <React.Fragment key={`list-${index}`}>
+                <div className={styles.listItem}>
+                    <span dangerouslySetInnerHTML={{ __html: line }} />
+                </div>
+            </React.Fragment>
+        );
+    };
+
+    const renderContentLine = (line: string, index: number, isLastLine: boolean) => {
+        return (
+            <React.Fragment key={`content-${index}`}>
+                <span dangerouslySetInnerHTML={{ __html: line }} />
+                {!isLastLine && <br />}
+            </React.Fragment>
+        );
+    };
+
+    const renderBlockBorder = (blockStart: number, suffix: string = '') => {
+        return <div key={`border-${blockStart}${suffix}`} className={styles.dataBlockBorder}></div>;
+    };
+
+    // Helper type for tracking state
+    interface FormatState {
+        formattedLines: React.ReactNode[];
+        currentBlockStart: number;
+        isInBlock: boolean;
+        isInDisclaimer: boolean;
+        disclaimerProcessed: boolean;
+    }
+
+    // Process disclaimer title
+    const processDisclaimerTitle = (
+        trimmedLine: string,
+        index: number,
+        state: FormatState
+    ): boolean => {
+        if (trimmedLine.startsWith('Lưu ý:') && !state.disclaimerProcessed) {
+            state.isInDisclaimer = true;
+            state.formattedLines.push(renderDisclaimerTitle(trimmedLine, index));
+            return true;
+        }
+        return false;
+    };
+
+    // Process disclaimer text
+    const processDisclaimerText = (
+        trimmedLine: string,
+        index: number,
+        state: FormatState
+    ): boolean => {
+        if (
+            state.isInDisclaimer &&
+            trimmedLine.startsWith('*') &&
+            trimmedLine.endsWith('*') &&
+            !state.disclaimerProcessed
+        ) {
+            state.formattedLines.push(renderDisclaimerText(trimmedLine, index));
+            state.disclaimerProcessed = true;
+            state.isInDisclaimer = false;
+            return true;
+        }
+        return false;
+    };
+
+    // Check if should skip duplicate disclaimer
+    const shouldSkipDuplicateDisclaimer = (
+        trimmedLine: string,
+        disclaimerProcessed: boolean
+    ): boolean => {
+        return (
+            disclaimerProcessed &&
+            (trimmedLine.startsWith('Lưu ý:') ||
+                (trimmedLine.startsWith('*') && trimmedLine.endsWith('*')))
+        );
+    };
+
+    // Process name line
+    const processNameLine = (trimmedLine: string, index: number, state: FormatState): void => {
+        if (state.isInBlock && state.currentBlockStart >= 0) {
+            state.formattedLines.push(renderBlockBorder(state.currentBlockStart));
+        }
+        state.currentBlockStart = index;
+        state.isInBlock = true;
+        state.formattedLines.push(renderNameLine(trimmedLine, index));
+    };
+
+    // Process content line
+    const processContentLine = (
+        trimmedLine: string,
+        index: number,
+        isLastLine: boolean,
+        state: FormatState
+    ): void => {
+        if (isListItem(trimmedLine)) {
+            state.formattedLines.push(renderListItem(trimmedLine, index));
+        } else {
+            state.formattedLines.push(renderContentLine(trimmedLine, index, isLastLine));
+        }
+    };
+
+    // Process empty line
+    const processEmptyLine = (index: number, nextLine: string, state: FormatState): void => {
+        if (
+            state.isInBlock &&
+            (/^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/.test(nextLine) || nextLine === '')
+        ) {
+            state.formattedLines.push(
+                <React.Fragment key={`empty-${index}`}>
+                    <br key={`br-${index}`} />
+                    {renderBlockBorder(state.currentBlockStart, `-${index}`)}
+                </React.Fragment>
+            );
+            state.isInBlock = false;
+        } else {
+            state.formattedLines.push(<br key={`br-${index}`} />);
+        }
+    };
+
+    // Process a single line
+    const processSingleLine = (
+        trimmedLine: string,
+        index: number,
+        nextLine: string,
+        isLastLine: boolean,
+        state: FormatState
+    ): boolean => {
+        // Process disclaimers - return true if processed
+        if (processDisclaimerTitle(trimmedLine, index, state)) return true;
+        if (processDisclaimerText(trimmedLine, index, state)) return true;
+        if (shouldSkipDuplicateDisclaimer(trimmedLine, state.disclaimerProcessed)) return true;
+
+        // Process different line types
+        if (isSectionTitle(trimmedLine)) {
+            state.formattedLines.push(renderSectionTitle(trimmedLine, index, isLastLine));
+        } else if (isNameLine(trimmedLine)) {
+            processNameLine(trimmedLine, index, state);
+        } else if (trimmedLine) {
+            processContentLine(trimmedLine, index, isLastLine, state);
+        } else {
+            processEmptyLine(index, nextLine, state);
+        }
+        return false;
+    };
+
+    const formatTextContent = (text: string) => {
+        const processedText = processMarkdown(text);
+        const lines = processedText.split('\n');
+
+        const state: FormatState = {
+            formattedLines: [],
+            currentBlockStart: -1,
+            isInBlock: false,
+            isInDisclaimer: false,
+            disclaimerProcessed: false,
+        };
+
+        for (let index = 0; index < lines.length; index++) {
+            const trimmedLine = lines[index].trim();
+            const nextLine = index < lines.length - 1 ? lines[index + 1]?.trim() : '';
+            const isLastLine = index === lines.length - 1;
+
+            processSingleLine(trimmedLine, index, nextLine, isLastLine, state);
+        }
+
+        // Add final border if needed
+        if (state.isInBlock && state.currentBlockStart >= 0) {
+            state.formattedLines.push(renderBlockBorder(state.currentBlockStart, '-end'));
+        }
+
+        return state.formattedLines;
+    };
+
+    return (
+        <div
+            className={clsx(styles.messageBubble, {
+                [styles.userMessage]: isUser,
+                [styles.aiMessage]: !isUser,
+            })}
+        >
+            <div className={styles.avatar}>
+                {isUser ? (
+                    (() => {
+                        const hasAvatar = isAuthenticated && profile?.avatarUrl && !avatarError;
+                        if (hasAvatar) {
+                            return (
+                                <img
+                                    src={profile.avatarUrl}
+                                    alt={profile.fullName || 'User'}
+                                    onError={() => setAvatarError(true)}
+                                    className={styles.userAvatarImg}
+                                />
+                            );
+                        }
+                        return <div className={styles.userAvatarFallback}>{getInitials()}</div>;
+                    })()
+                ) : (
+                    <Stethoscope size={20} className={styles.aiIcon} />
+                )}
+            </div>
+            <div className={styles.content}>
+                <div
+                    className={clsx(styles.bubble, styles.textContent, {
+                        [styles.userBubble]: isUser,
+                        [styles.aiBubble]: !isUser,
+                    })}
+                >
+                    {isEditing ? (
+                        <textarea
+                            className={styles.editTextarea}
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            autoFocus
+                            rows={Math.min(editContent.split('\n').length, 5)}
+                        />
+                    ) : (
+                        <div className={styles.text}>
+                            {isUser ? message.content : formatTextContent(message.content)}
+                        </div>
+                    )}
+                </div>
+                <div className={styles.footer}>
+                    <span className={styles.timestamp}>{formatTime(message.timestamp)}</span>
+                    {!isEditing && (
+                        <div className={styles.actionButtons}>
+                            {isUser && (
+                                <button
+                                    className={styles.actionButton}
+                                    onClick={handleEdit}
+                                    data-tooltip="Sửa"
+                                >
+                                    <Edit2 size={14} />
+                                </button>
+                            )}
+                            <button
+                                className={styles.actionButton}
+                                onClick={handleCopy}
+                                data-tooltip={copied ? 'Đã sao chép' : 'Sao chép'}
+                            >
+                                {copied ? <Check size={14} /> : <Copy size={14} />}
+                            </button>
+                        </div>
+                    )}
+                    {isUser && isEditing && (
+                        <div className={styles.editButtons}>
+                            <button
+                                className={clsx(styles.editButton, styles.saveButton)}
+                                onClick={handleSaveEdit}
+                            >
+                                Lưu
+                            </button>
+                            <button
+                                className={clsx(styles.editButton, styles.cancelButton)}
+                                onClick={handleCancelEdit}
+                            >
+                                Hủy
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default MessageBubble;
