@@ -8,6 +8,7 @@ import TypingIndicator from './components/TypingIndicator';
 import SearchBox from '../SearchBox';
 import Carousel from '@/components/Carousel';
 import styles from './ChatArea.module.scss';
+import MiniBookingInline from './components/MiniBookingModal/MiniBookingInline';
 
 interface ChatAreaProps {
     messages: Message[];
@@ -121,6 +122,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     const [inputValue, setInputValue] = useState('');
     const [activeTab, setActiveTab] = useState<'doctor' | 'hospital'>('doctor');
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [miniBooking, setMiniBooking] = useState<{ doctorId: string; messageId: string } | null>(
+        null
+    );
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -144,13 +148,18 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     };
 
     const handleSupportBooking = (suggestionId: string, type: 'doctor' | 'hospital') => {
-        // Open support chat or show support options
-        console.log('Hỗ trợ đặt lịch cho:', type, suggestionId);
-        // TODO: Implement support booking flow
-        const supportMessage =
-            type === 'doctor'
-                ? `Tôi cần hỗ trợ đặt lịch khám với bác sĩ này`
-                : `Tôi cần hỗ trợ đặt lịch khám tại bệnh viện này`;
+        if (type === 'doctor' && suggestionId) {
+            // Show inline booking below the latest AI message that has suggestions
+            const lastMsgWithSuggestions = [...messages]
+                .reverse()
+                .find((m) => m.sender === 'ai' && m.suggestions && m.suggestions.length > 0);
+            const messageId =
+                lastMsgWithSuggestions?.id || (messages[messages.length - 1]?.id ?? '');
+            setMiniBooking({ doctorId: suggestionId, messageId });
+            return;
+        }
+        // For hospital suggestions, fall back to message prompt
+        const supportMessage = `Tôi cần hỗ trợ đặt lịch khám tại bệnh viện này`;
         setInputValue(supportMessage);
     };
 
@@ -262,6 +271,14 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                             </button>
                                         </div>
                                     </div>
+                                )}
+                                {miniBooking && miniBooking.messageId === message.id && (
+                                    <MiniBookingInline
+                                        doctorId={miniBooking.doctorId}
+                                        onClose={() => {
+                                            setMiniBooking(null);
+                                        }}
+                                    />
                                 )}
                             </div>
                         ))}
