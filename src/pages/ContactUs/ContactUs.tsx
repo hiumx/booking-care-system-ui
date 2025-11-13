@@ -347,7 +347,7 @@ const ContactUs: React.FC = () => {
                                                     <div className="col-md-12">
                                                         <div className="mb-3">
                                                             <label className="form-label">
-                                                                CMND/CCCD người đại diện
+                                                                CMND/CCCD người đại diện{' '}
                                                                 <span className="text-danger">
                                                                     *
                                                                 </span>
@@ -517,7 +517,7 @@ const ContactUs: React.FC = () => {
                                                     <div className="col-md-12">
                                                         <div className="mb-3">
                                                             <label className="form-label">
-                                                                Giấy phép hoạt động
+                                                                Giấy phép hoạt động{' '}
                                                                 <span className="text-danger">
                                                                     *
                                                                 </span>
@@ -547,7 +547,7 @@ const ContactUs: React.FC = () => {
                                                     <div className="col-md-12">
                                                         <div className="mb-3">
                                                             <label className="form-label">
-                                                                Giấy chứng nhận đăng ký doanh nghiệp
+                                                                Giấy chứng nhận đăng ký doanh nghiệp{' '}
                                                                 <span className="text-danger">
                                                                     *
                                                                 </span>
