@@ -1,31 +1,72 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { useChat } from '@/providers/ChatProvider';
 import { RootState } from '@/store';
 import { ConversationResponse, MessageType } from '@/types/communication.types';
+import { Tag } from '@/types/tag.types';
+import TagService from '@/services/tag.service';
+import ConversationTagBadge from '../../../ConversationTagBadge';
 import styles from './ChatList.module.scss';
 
 interface ChatListProps {
     searchTerm: string;
+    selectedTagIds?: string[];
 }
 
-const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
+const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) => {
     const { conversations, selectConversation, activeConversation, isLoading, onlineUsers } =
         useChat();
     const userProfile = useSelector((state: RootState) => state.user.profile);
-    // Backend uses uppercase, normalize for comparison
     const currentUserId = (userProfile?.accountId || userProfile?.id || '').toUpperCase();
+
+    const [conversationTags, setConversationTags] = useState<Map<string, Tag[]>>(new Map());
+
+    // Load tags for all conversations
+    const loadConversationTags = async () => {
+        if (!currentUserId) return;
+
+        const tagsMap = new Map<string, Tag[]>();
+
+        for (const conv of conversations || []) {
+            try {
+                const response = await TagService.getConversationTags(currentUserId, conv.id);
+                if (response.success && response.data) {
+                    tagsMap.set(conv.id, response.data);
+                }
+            } catch (error) {
+                console.error(`Failed to load tags for conversation ${conv.id}:`, error);
+            }
+        }
+
+        setConversationTags(tagsMap);
+    };
+
+    useEffect(() => {
+        if (conversations && conversations.length > 0) {
+            loadConversationTags();
+        }
+    }, [conversations?.length, currentUserId]);
+
+    // Listen for tag updates
+    useEffect(() => {
+        const handleTagsUpdated = () => {
+            loadConversationTags();
+        };
+
+        window.addEventListener('conversationTagsUpdated', handleTagsUpdated);
+        return () => {
+            window.removeEventListener('conversationTagsUpdated', handleTagsUpdated);
+        };
+    }, [conversations, currentUserId]);
 
     // Filter and sort conversations
     const filteredConversations = useMemo(() => {
-        // Ensure conversations is always an array
         const convs = conversations || [];
 
         // Filter by search term
-        const filtered = searchTerm
+        let filtered = searchTerm
             ? convs.filter((conv) => {
-                  // Search in participant names or last message
                   const participantName = conv.participantDetails
                       ?.filter((p) => (p.id || p.accountId || '').toUpperCase() !== currentUserId)
                       .map((p) => p.fullName)
@@ -39,15 +80,22 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
               })
             : convs;
 
+        // Filter by selected tags
+        if (selectedTagIds.length > 0) {
+            filtered = filtered.filter((conv) => {
+                const convTags = conversationTags.get(conv.id) || [];
+                return convTags.some((tag) => selectedTagIds.includes(tag.id));
+            });
+        }
+
         // Sort by most recent message (newest first)
-        // Use updatedAt or lastMessage.createdAt as fallback
         return filtered.sort((a, b) => {
             const timeA = a.lastMessage?.createdAt || a.updatedAt || a.createdAt;
             const timeB = b.lastMessage?.createdAt || b.updatedAt || b.createdAt;
 
             return new Date(timeB).getTime() - new Date(timeA).getTime();
         });
-    }, [conversations, searchTerm, currentUserId]);
+    }, [conversations, searchTerm, currentUserId, selectedTagIds, conversationTags]);
 
     const recentContacts = filteredConversations || []; // Ensure always array
 
@@ -141,43 +189,59 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm }) => {
                         ? isUserOnline(otherUser.id || otherUser.accountId || '')
                         : false;
                     const isActive = activeConversation?.id === conv.id;
+                    const convTags = conversationTags.get(conv.id) || [];
 
                     return (
-                        <button
+                        <li
                             key={conv.id}
-                            className={clsx('user-list-item', { active: isActive })}
-                            onClick={() => handleSelectConversation(conv.id)}
-                            type="button"
+                            style={{ marginBottom: convTags.length > 0 ? '0.5rem' : '0.75rem' }}
                         >
-                            <div className={clsx(styles.conversation, 'd-flex w-100')}>
-                                <div className={`avatar ${isOnline ? 'avatar-online' : ''}`}>
-                                    <img
-                                        src={otherUser?.avatarUrl || '/default-avatar.png'}
-                                        alt={otherUser?.fullName || 'User'}
-                                    />
-                                </div>
-                                <div className="users-list-body">
-                                    <div>
-                                        <h5>{otherUser?.fullName || 'Unknown User'}</h5>
-                                        <p>{formatLastMessagePreview(conv)}</p>
+                            <button
+                                className={clsx('user-list-item', { active: isActive })}
+                                onClick={() => handleSelectConversation(conv.id)}
+                                type="button"
+                            >
+                                <div className={clsx(styles.conversation, 'd-flex w-100')}>
+                                    <div className={`avatar ${isOnline ? 'avatar-online' : ''}`}>
+                                        <img
+                                            src={otherUser?.avatarUrl || '/default-avatar.png'}
+                                            alt={otherUser?.fullName || 'User'}
+                                        />
                                     </div>
-                                    <div className="last-chat-time">
-                                        <small className="text-muted">
-                                            {conv.lastMessage
-                                                ? formatTime(conv.lastMessage.createdAt)
-                                                : ''}
-                                        </small>
-                                        <div className="chat-pin">
-                                            {conv.unreadCount && conv.unreadCount > 0 ? (
-                                                <div className="new-message-count">
-                                                    {conv.unreadCount}
-                                                </div>
-                                            ) : null}
+                                    <div className="users-list-body">
+                                        <div>
+                                            <h5>{otherUser?.fullName || 'Unknown User'}</h5>
+                                            <p>{formatLastMessagePreview(conv)}</p>
+                                        </div>
+                                        <div className="last-chat-time">
+                                            <small className="text-muted">
+                                                {conv.lastMessage
+                                                    ? formatTime(conv.lastMessage.createdAt)
+                                                    : ''}
+                                            </small>
+                                            <div className="chat-pin">
+                                                {conv.unreadCount && conv.unreadCount > 0 ? (
+                                                    <div className="new-message-count">
+                                                        {conv.unreadCount}
+                                                    </div>
+                                                ) : null}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </button>
+                            </button>
+                            {convTags.length > 0 && (
+                                <div
+                                    style={{
+                                        paddingLeft: '3.5rem',
+                                        paddingTop: '0.25rem',
+                                        paddingBottom: '0.5rem',
+                                    }}
+                                >
+                                    <ConversationTagBadge tags={convTags} maxVisible={3} />
+                                </div>
+                            )}
+                        </li>
                     );
                 })}
             </ul>

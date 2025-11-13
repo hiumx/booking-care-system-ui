@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { useChat } from '@/providers/ChatProvider';
 import { RootState } from '@/store';
 import VideoCallWindow from '../../../VideoCallWindow';
+import TagManager from '../../../TagManager';
 import styles from './ChatHeader.module.scss';
 
 const ChatHeader = () => {
@@ -13,7 +14,9 @@ const ChatHeader = () => {
     const currentUserId = (userProfile?.accountId || userProfile?.id || '').toUpperCase();
     const [showSearch, setShowSearch] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [showTagManager, setShowTagManager] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const tagDropdownRef = useRef<HTMLDivElement>(null);
 
     // Get other participant info - support both id and accountId fields
     const otherParticipant = activeConversation?.participantDetails?.find(
@@ -29,8 +32,11 @@ const ChatHeader = () => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setShowDropdown(false);
             }
+            if (tagDropdownRef.current && !tagDropdownRef.current.contains(event.target as Node)) {
+                setShowTagManager(false);
+            }
         }
-        if (showDropdown) {
+        if (showDropdown || showTagManager) {
             document.addEventListener('mousedown', handleClickOutside);
         } else {
             document.removeEventListener('mousedown', handleClickOutside);
@@ -38,7 +44,7 @@ const ChatHeader = () => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [showDropdown]);
+    }, [showDropdown, showTagManager]);
 
     const [showVideoCall, setShowVideoCall] = useState(false);
 
@@ -105,6 +111,49 @@ const ChatHeader = () => {
                                 >
                                     <i className="fa-solid fa-magnifying-glass"></i>
                                 </button>
+                            </li>
+                            <li className="list-inline-item">
+                                <div className="dropdown" ref={tagDropdownRef}>
+                                    <button
+                                        className={clsx(
+                                            styles.chatSearchBtn,
+                                            'btn btn-outline-light'
+                                        )}
+                                        title="Quản lý nhãn"
+                                        onClick={() => setShowTagManager(!showTagManager)}
+                                        disabled={!activeConversation}
+                                    >
+                                        <i className="fa-solid fa-tag"></i>
+                                    </button>
+                                    {showTagManager && activeConversation && (
+                                        <div
+                                            className={clsx(
+                                                styles.tagDropdown,
+                                                'dropdown-menu dropdown-menu-end show'
+                                            )}
+                                            style={{
+                                                display: 'block',
+                                                position: 'absolute',
+                                                top: '3.5rem',
+                                                right: 0,
+                                                minWidth: '400px',
+                                            }}
+                                        >
+                                            <TagManager
+                                                userId={currentUserId}
+                                                conversationId={activeConversation.id}
+                                                onTagsUpdated={() => {
+                                                    console.log(
+                                                        '[ChatHeader] Tags updated, dispatching event'
+                                                    );
+                                                    window.dispatchEvent(
+                                                        new Event('conversationTagsUpdated')
+                                                    );
+                                                }}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             </li>
                             <li className="list-inline-item">
                                 <button

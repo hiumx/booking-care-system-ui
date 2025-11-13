@@ -88,6 +88,8 @@
             font-weight: 600;
             min-width: 20px;
             text-align: center;
+            position: static !important; // Override global CSS absolute positioning
+            margin-top: 0 !important;
         }
     }
 }
@@ -97,7 +99,7 @@
     display: flex;
     display: -webkit-flex;
     cursor: pointer;
-    margin-bottom: 8px;
+    margin-bottom: 0; // Remove margin as tags will handle spacing
     border: 1px solid #e6e8ee;
     box-shadow: none;
     border-radius: 8px;
