@@ -6,7 +6,6 @@ import { RootState } from '@/store';
 import { ConversationResponse, MessageType } from '@/types/communication.types';
 import { Tag } from '@/types/tag.types';
 import TagService from '@/services/tag.service';
-import ConversationTagBadge from '../../../ConversationTagBadge';
 import styles from './ChatList.module.scss';
 
 interface ChatListProps {
@@ -192,10 +191,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) 
                     const convTags = conversationTags.get(conv.id) || [];
 
                     return (
-                        <li
-                            key={conv.id}
-                            style={{ marginBottom: convTags.length > 0 ? '0.5rem' : '0.75rem' }}
-                        >
+                        <li key={conv.id}>
                             <button
                                 className={clsx('user-list-item', { active: isActive })}
                                 onClick={() => handleSelectConversation(conv.id)}
@@ -210,7 +206,49 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) 
                                     </div>
                                     <div className="users-list-body">
                                         <div>
-                                            <h5>{otherUser?.fullName || 'Unknown User'}</h5>
+                                            <div className="d-flex align-items-center">
+                                                <h5 className="me-2 mb-0">
+                                                    {otherUser?.fullName || 'Unknown User'}
+                                                </h5>
+                                                {/* Zalo-style Tag Dots */}
+                                                {convTags.length > 0 && (
+                                                    <div
+                                                        className={clsx(
+                                                            styles.tagDots,
+                                                            'd-flex align-items-center'
+                                                        )}
+                                                    >
+                                                        {convTags.slice(0, 3).map((tag, index) => (
+                                                            <span
+                                                                key={tag.id}
+                                                                className={clsx(styles.tagDot)}
+                                                                style={{
+                                                                    backgroundColor: tag.color,
+                                                                    animationDelay: `${index * 100}ms`,
+                                                                }}
+                                                                title={`${tag.name} (${String(tag.type).toLowerCase()})`}
+                                                            />
+                                                        ))}
+                                                        {convTags.length > 3 && (
+                                                            <span
+                                                                className={clsx(
+                                                                    styles.tagMoreIndicator,
+                                                                    'text-muted small'
+                                                                )}
+                                                                title={`+${convTags.length - 3} more tags: ${convTags
+                                                                    .slice(3)
+                                                                    .map(
+                                                                        (t) =>
+                                                                            `${t.name} (${String(t.type).toLowerCase()})`
+                                                                    )
+                                                                    .join(', ')}`}
+                                                            >
+                                                                +{convTags.length - 3}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
                                             <p>{formatLastMessagePreview(conv)}</p>
                                         </div>
                                         <div className="last-chat-time">
@@ -230,17 +268,6 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) 
                                     </div>
                                 </div>
                             </button>
-                            {convTags.length > 0 && (
-                                <div
-                                    style={{
-                                        paddingLeft: '3.5rem',
-                                        paddingTop: '0.25rem',
-                                        paddingBottom: '0.5rem',
-                                    }}
-                                >
-                                    <ConversationTagBadge tags={convTags} maxVisible={3} />
-                                </div>
-                            )}
                         </li>
                     );
                 })}

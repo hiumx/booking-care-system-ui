@@ -236,22 +236,49 @@ const TagManager: React.FC<TagManagerProps> = ({
 
         try {
             const isSelected = conversationTags.some((t) => t.id === tagId);
+
             if (isSelected) {
-                await TagService.removeTagFromConversation(userId, conversationId, tagId);
-                setConversationTags(conversationTags.filter((t) => t.id !== tagId));
+                // Remove tag from conversation
+                const response = await TagService.removeTagFromConversation(
+                    userId,
+                    conversationId,
+                    tagId
+                );
+                console.log('[TagManager] Remove tag response:', response);
+
+                if (response.success) {
+                    setConversationTags(conversationTags.filter((t) => t.id !== tagId));
+                    console.log('[TagManager] Tag removed successfully from UI');
+                } else {
+                    throw new Error(response.message || 'Failed to remove tag');
+                }
             } else {
-                await TagService.addTagsToConversation(userId, conversationId, [tagId]);
-                const tag = tags.find((t) => t.id === tagId);
-                if (tag) {
-                    setConversationTags([...conversationTags, tag]);
+                // Add tag to conversation
+                const response = await TagService.addTagsToConversation(userId, conversationId, [
+                    tagId,
+                ]);
+                console.log('[TagManager] Add tag response:', response);
+
+                if (response.success) {
+                    const tag = tags.find((t) => t.id === tagId);
+                    if (tag) {
+                        setConversationTags([...conversationTags, tag]);
+                        console.log('[TagManager] Tag added successfully to UI');
+                    }
+                } else {
+                    throw new Error(response.message || 'Failed to add tag');
                 }
             }
+
             // Notify parent component to refresh tags
             onTagsUpdated?.();
             // Dispatch event to notify other components
             window.dispatchEvent(new CustomEvent('conversationTagsUpdated'));
         } catch (error) {
-            console.error('Failed to toggle tag:', error);
+            console.error('[TagManager] Failed to toggle tag:', error);
+            alert(
+                `Không thể ${conversationTags.some((t) => t.id === tagId) ? 'xóa' : 'thêm'} nhãn. Vui lòng thử lại.`
+            );
         }
     };
 
@@ -314,7 +341,6 @@ const TagManager: React.FC<TagManagerProps> = ({
                                     {tag.icon && <span className="me-1">{tag.icon}</span>}
                                     {tag.name}
                                 </span>
-                                <span className={styles.tagCount}>{tag.conversationCount}</span>
                                 {/* Action buttons for CUSTOM and SYSTEM tags (user-created) */}
                                 {(tag.type === ConversationTagType.CUSTOM ||
                                     tag.type === ConversationTagType.SYSTEM ||
@@ -400,20 +426,97 @@ const TagManager: React.FC<TagManagerProps> = ({
                                     </div>
                                     <div className="mb-3">
                                         <label className="form-label">Màu sắc</label>
-                                        <div className={styles.colorPicker}>
-                                            {TAG_COLORS.map((color) => (
-                                                <button
+                                        <div
+                                            style={{
+                                                display: 'grid',
+                                                gridTemplateColumns: 'repeat(5, 1fr)',
+                                                gap: '12px',
+                                                marginTop: '12px',
+                                                padding: '4px 0',
+                                            }}
+                                        >
+                                            {TAG_COLORS.map((color, index) => (
+                                                <div
                                                     key={color}
-                                                    type="button"
-                                                    className={clsx(
-                                                        styles.colorOption,
-                                                        newTagColor === color && styles.selected
-                                                    )}
-                                                    style={{ backgroundColor: color }}
                                                     onClick={() => setNewTagColor(color)}
-                                                />
+                                                    style={{
+                                                        width: '48px',
+                                                        height: '48px',
+                                                        background: `linear-gradient(135deg, ${color}e6, ${color})`,
+                                                        borderRadius: '50%',
+                                                        cursor: 'pointer',
+                                                        position: 'relative',
+                                                        border:
+                                                            newTagColor === color
+                                                                ? '3px solid #667eea'
+                                                                : '2px solid #e2e8f0',
+                                                        boxShadow:
+                                                            newTagColor === color
+                                                                ? '0 0 0 2px rgba(102, 126, 234, 0.3), 0 4px 12px rgba(102, 126, 234, 0.2)'
+                                                                : '0 2px 8px rgba(0,0,0,0.1)',
+                                                        transition:
+                                                            'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                        transform:
+                                                            newTagColor === color
+                                                                ? 'scale(1.1)'
+                                                                : 'scale(1)',
+                                                        animationDelay: `${index * 50}ms`,
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (newTagColor !== color) {
+                                                            e.currentTarget.style.transform =
+                                                                'scale(1.15)';
+                                                            e.currentTarget.style.boxShadow =
+                                                                '0 4px 16px rgba(0,0,0,0.15)';
+                                                        }
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        if (newTagColor !== color) {
+                                                            e.currentTarget.style.transform =
+                                                                'scale(1)';
+                                                            e.currentTarget.style.boxShadow =
+                                                                '0 2px 8px rgba(0,0,0,0.1)';
+                                                        }
+                                                    }}
+                                                >
+                                                    {newTagColor === color && (
+                                                        <div
+                                                            style={{
+                                                                position: 'absolute',
+                                                                top: '50%',
+                                                                left: '50%',
+                                                                transform: 'translate(-50%, -50%)',
+                                                                width: '20px',
+                                                                height: '20px',
+                                                                backgroundColor:
+                                                                    'rgba(255,255,255,0.95)',
+                                                                borderRadius: '50%',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                boxShadow:
+                                                                    '0 2px 8px rgba(0,0,0,0.2)',
+                                                                animation: 'pulse 2s infinite',
+                                                            }}
+                                                        >
+                                                            <i
+                                                                className="fa-solid fa-check"
+                                                                style={{
+                                                                    color: '#667eea',
+                                                                    fontSize: '12px',
+                                                                }}
+                                                            ></i>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             ))}
                                         </div>
+                                        <style>{`
+                                            @keyframes pulse {
+                                                0%, 100% { transform: translate(-50%, -50%) scale(1); }
+                                                50% { transform: translate(-50%, -50%) scale(1.1); }
+                                            }
+                                        `}</style>
                                     </div>
                                     <div className="mb-3">
                                         <label className="form-label">Loại nhãn</label>
@@ -492,18 +595,89 @@ const TagManager: React.FC<TagManagerProps> = ({
                                     </div>
                                     <div className="mb-3">
                                         <label className="form-label">Màu sắc</label>
-                                        <div className={styles.colorPicker}>
-                                            {TAG_COLORS.map((color) => (
-                                                <button
+                                        <div
+                                            style={{
+                                                display: 'grid',
+                                                gridTemplateColumns: 'repeat(5, 1fr)',
+                                                gap: '12px',
+                                                marginTop: '12px',
+                                                padding: '4px 0',
+                                            }}
+                                        >
+                                            {TAG_COLORS.map((color, index) => (
+                                                <div
                                                     key={color}
-                                                    type="button"
-                                                    className={clsx(
-                                                        styles.colorOption,
-                                                        editTagColor === color && styles.selected
-                                                    )}
-                                                    style={{ backgroundColor: color }}
                                                     onClick={() => setEditTagColor(color)}
-                                                />
+                                                    style={{
+                                                        width: '48px',
+                                                        height: '48px',
+                                                        background: `linear-gradient(135deg, ${color}e6, ${color})`,
+                                                        borderRadius: '50%',
+                                                        cursor: 'pointer',
+                                                        position: 'relative',
+                                                        border:
+                                                            editTagColor === color
+                                                                ? '3px solid #667eea'
+                                                                : '2px solid #e2e8f0',
+                                                        boxShadow:
+                                                            editTagColor === color
+                                                                ? '0 0 0 2px rgba(102, 126, 234, 0.3), 0 4px 12px rgba(102, 126, 234, 0.2)'
+                                                                : '0 2px 8px rgba(0,0,0,0.1)',
+                                                        transition:
+                                                            'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                        transform:
+                                                            editTagColor === color
+                                                                ? 'scale(1.1)'
+                                                                : 'scale(1)',
+                                                        animationDelay: `${index * 50}ms`,
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (editTagColor !== color) {
+                                                            e.currentTarget.style.transform =
+                                                                'scale(1.15)';
+                                                            e.currentTarget.style.boxShadow =
+                                                                '0 4px 16px rgba(0,0,0,0.15)';
+                                                        }
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        if (editTagColor !== color) {
+                                                            e.currentTarget.style.transform =
+                                                                'scale(1)';
+                                                            e.currentTarget.style.boxShadow =
+                                                                '0 2px 8px rgba(0,0,0,0.1)';
+                                                        }
+                                                    }}
+                                                >
+                                                    {editTagColor === color && (
+                                                        <div
+                                                            style={{
+                                                                position: 'absolute',
+                                                                top: '50%',
+                                                                left: '50%',
+                                                                transform: 'translate(-50%, -50%)',
+                                                                width: '20px',
+                                                                height: '20px',
+                                                                backgroundColor:
+                                                                    'rgba(255,255,255,0.95)',
+                                                                borderRadius: '50%',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                boxShadow:
+                                                                    '0 2px 8px rgba(0,0,0,0.2)',
+                                                                animation: 'pulse 2s infinite',
+                                                            }}
+                                                        >
+                                                            <i
+                                                                className="fa-solid fa-check"
+                                                                style={{
+                                                                    color: '#667eea',
+                                                                    fontSize: '12px',
+                                                                }}
+                                                            ></i>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             ))}
                                         </div>
                                     </div>

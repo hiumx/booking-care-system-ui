@@ -29,15 +29,32 @@ const ChatHeader = () => {
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+            const target = event.target as Node;
+
+            if (dropdownRef.current && !dropdownRef.current.contains(target)) {
                 setShowDropdown(false);
             }
-            if (tagDropdownRef.current && !tagDropdownRef.current.contains(event.target as Node)) {
-                setShowTagManager(false);
+
+            if (tagDropdownRef.current && !tagDropdownRef.current.contains(target)) {
+                // Additional check: don't close if clicking on modal backdrop or modal content
+                const isModalClick = (target as Element)?.closest('.modal');
+
+                if (!isModalClick) {
+                    setShowTagManager(false);
+                }
             }
         }
+
         if (showDropdown || showTagManager) {
-            document.addEventListener('mousedown', handleClickOutside);
+            // Use setTimeout to avoid immediate closing when button is clicked
+            const timeoutId = setTimeout(() => {
+                document.addEventListener('mousedown', handleClickOutside);
+            }, 100);
+
+            return () => {
+                clearTimeout(timeoutId);
+                document.removeEventListener('mousedown', handleClickOutside);
+            };
         } else {
             document.removeEventListener('mousedown', handleClickOutside);
         }
@@ -137,6 +154,14 @@ const ChatHeader = () => {
                                                 top: '3.5rem',
                                                 right: 0,
                                                 minWidth: '400px',
+                                            }}
+                                            onMouseDown={(e) => {
+                                                // Prevent event from bubbling up to handleClickOutside
+                                                e.stopPropagation();
+                                            }}
+                                            onClick={(e) => {
+                                                // Prevent event from bubbling up
+                                                e.stopPropagation();
                                             }}
                                         >
                                             <TagManager

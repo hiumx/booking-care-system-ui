@@ -228,16 +228,29 @@ export class TagService {
         tagId: string
     ): Promise<ApiResponse<{ success: boolean }>> {
         try {
+            const payload = transformToPascalCase({ conversationId, tagId });
+            console.log('[TagService] Remove tag request:', {
+                userId,
+                conversationId,
+                tagId,
+                endpoint: TAG_ENDPOINTS.REMOVE_TAG_FROM_CONVERSATION(userId),
+                payload,
+            });
+
             const response: any = await axiosInstance.post(
                 TAG_ENDPOINTS.REMOVE_TAG_FROM_CONVERSATION(userId),
-                transformToPascalCase({ conversationId, tagId })
+                payload
             );
+
+            console.log('[TagService] Remove tag response:', response);
+
             return {
                 success: response.success ?? true,
                 data: response.data,
                 message: response.message || 'Tag removed successfully',
             };
         } catch (error: any) {
+            console.error('[TagService] Remove tag error:', error);
             throw new Error(error.message || 'Failed to remove tag');
         }
     }
