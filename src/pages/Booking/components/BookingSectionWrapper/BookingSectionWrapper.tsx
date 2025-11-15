@@ -18,6 +18,7 @@ interface BookingSectionWrapperProps {
     fieldsetId?: string;
     isShowInfoHeader?: boolean;
     disabled?: boolean;
+    showPrev?: boolean;
 }
 
 const BookingSectionWrapper: React.FC<BookingSectionWrapperProps> = ({
@@ -31,6 +32,7 @@ const BookingSectionWrapper: React.FC<BookingSectionWrapperProps> = ({
     fieldsetId,
     isShowInfoHeader,
     disabled = false,
+    showPrev = true,
 }) => {
     // Get formatted date and time from Redux state
     const formattedDateTime = useFormattedDateTime();
@@ -62,6 +64,7 @@ const BookingSectionWrapper: React.FC<BookingSectionWrapperProps> = ({
                     nextStep={nextStep}
                     prevStep={prevStep}
                     disabled={disabled}
+                    showPrev={showPrev}
                 />
             </div>
         </fieldset>

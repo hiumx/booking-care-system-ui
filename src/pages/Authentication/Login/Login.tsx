@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import AuthLayout from '@/layouts/AuthLayout';
 import clsx from 'clsx';
 import styles from './Login.module.scss';
@@ -14,6 +15,7 @@ import { AuthService } from '@/services/auth.service';
 import { toast } from 'react-toastify';
 
 const Login: React.FC = () => {
+    const { t } = useTranslation('auth');
     const navigate = useNavigate();
     const { login, isLoading, error, isAuthenticated, clearError } = useAuth();
     const [email, setEmail] = useState('');
@@ -68,7 +70,7 @@ const Login: React.FC = () => {
 
         try {
             await login(credentials);
-            toast.success('Đăng nhập thành công!');
+            toast.success(t('login.success'));
             navigate(PATHS.HOME);
         } catch (error) {
             console.error('Login error:', error);
@@ -76,10 +78,7 @@ const Login: React.FC = () => {
     };
 
     return (
-        <AuthLayout
-            title="Đăng nhập tài khoản"
-            subtitle="Trở lại với hành trình chăm sóc sức khỏe của bạn"
-        >
+        <AuthLayout title={t('login.title')} subtitle={t('login.subtitle')}>
             <form onSubmit={handleSubmit}>
                 <div className="d-flex justify-content-center mb-3">
                     <div className="method-toggle">
@@ -92,7 +91,7 @@ const Login: React.FC = () => {
                             onClick={() => setMethod('phone')}
                         >
                             <i className="feather-phone me-2"></i>
-                            Số điện thoại
+                            {t('login.phone')}
                         </button>
                         <button
                             type="button"
@@ -103,7 +102,7 @@ const Login: React.FC = () => {
                             onClick={() => setMethod('email')}
                         >
                             <i className="feather-mail me-2"></i>
-                            Email
+                            {t('login.email')}
                         </button>
                     </div>
                 </div>
@@ -114,9 +113,9 @@ const Login: React.FC = () => {
                         <Input
                             id="email"
                             name="email"
-                            label="Email"
+                            label={t('login.email')}
                             type="email"
-                            placeholder="Nhập địa chỉ email"
+                            placeholder={t('login.emailPlaceholder')}
                             leftIcon={<i className="feather-mail" />}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -126,10 +125,10 @@ const Login: React.FC = () => {
                         <Input
                             id="phone"
                             name="phone"
-                            label="Số điện thoại"
+                            label={t('login.phone')}
                             type="tel"
                             inputMode="numeric"
-                            placeholder="Nhập số điện thoại"
+                            placeholder={t('login.phonePlaceholder')}
                             leftIcon={<i className="feather-phone" />}
                             value={phone}
                             onChange={handlePhoneChange}
@@ -144,9 +143,9 @@ const Login: React.FC = () => {
                     <Input
                         id="password"
                         name="password"
-                        label="Mật khẩu"
+                        label={t('login.password')}
                         type="password"
-                        placeholder="Nhập mật khẩu"
+                        placeholder={t('login.passwordPlaceholder')}
                         leftIcon={<i className="feather-lock" />}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -167,11 +166,11 @@ const Login: React.FC = () => {
                                 defaultChecked
                             />
                             <label className="form-check-label" htmlFor="remember">
-                                Ghi nhớ đăng nhập
+                                {t('login.rememberMe')}
                             </label>
                         </div>
                         <Link to={PATHS.FORGOT_PASSWORD} className={clsx(styles.forgotPassword)}>
-                            Quên mật khẩu?
+                            {t('login.forgotPassword')}
                         </Link>
                     </div>
                 </div>
@@ -186,7 +185,7 @@ const Login: React.FC = () => {
                 {/* Submit */}
                 <div className="mb-3">
                     <Button
-                        text={isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                        text={isLoading ? t('login.submitting') : t('login.submit')}
                         type="submit"
                         className="w-100"
                         isDisabled={isLoading || !canSubmit}
@@ -203,7 +202,7 @@ const Login: React.FC = () => {
                 {/* Register link */}
                 <div className="account-signup">
                     <p>
-                        Chưa có tài khoản? <Link to={PATHS.REGISTER}>Đăng ký</Link>
+                        {t('login.noAccount')} <Link to={PATHS.REGISTER}>{t('login.signUp')}</Link>
                     </p>
                 </div>
             </form>

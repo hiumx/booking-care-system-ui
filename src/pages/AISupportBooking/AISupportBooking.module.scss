@@ -1,0 +1,313 @@
+.aiSupportBooking {
+    width: 100vw;
+    height: 100vh;
+    min-height: 100vh;
+    background-image:
+        linear-gradient(white, white), linear-gradient(90.08deg, #0e82fd 0.09%, #06aed4 70.28%);
+    background-blend-mode: overlay;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+
+    .container {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .chatLayout {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        background: #ffffff;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .sidebarOverlay {
+        display: none;
+    }
+
+    .homeButton {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 10px 16px;
+        border-radius: 24px;
+        background: #ffffff;
+        color: #0066cc; // Improved contrast ratio for WCAG AA compliance
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        text-decoration: none;
+        border: 1px solid #e0e0e0;
+        font-size: 14px;
+        font-weight: 500;
+
+        .homeIcon {
+            flex-shrink: 0;
+        }
+
+        .homeText {
+            white-space: nowrap;
+        }
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            background: #f5f5f5;
+            border-color: #0e82fd;
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+}
+
+// Responsive - Tablet
+@media (max-width: 1024px) and (min-width: 769px) {
+    .aiSupportBooking {
+        .chatLayout {
+            .sidebar {
+                width: 280px;
+            }
+        }
+    }
+}
+
+// Responsive - Mobile
+@media (max-width: 768px) {
+    .aiSupportBooking {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+
+        .sidebarOverlay {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 150;
+            transition: opacity 0.3s ease;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chatLayout {
+            flex-direction: row;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .homeButton {
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            font-size: 12px;
+            z-index: 1001;
+
+            .homeText {
+                display: none;
+            }
+        }
+    }
+}
+
+// Responsive - Small Mobile
+@media (max-width: 480px) {
+    .aiSupportBooking {
+        .homeButton {
+            top: 8px;
+            right: 8px;
+            padding: 6px 10px;
+            font-size: 11px;
+        }
+
+        .locationModal {
+            padding: 24px;
+            max-width: 95%;
+
+            .locationModalHeader {
+                margin-bottom: 24px;
+
+                .locationModalTitle {
+                    font-size: 20px;
+                }
+            }
+
+            .locationOptionButton {
+                padding: 16px;
+            }
+        }
+    }
+}
+
+// Location Modal Styles
+.locationModalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+}
+
+.locationModal {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+
+    .locationModalHeader {
+        text-align: center;
+        margin-bottom: 32px;
+
+        .locationIcon {
+            color: #0e82fd;
+            margin-bottom: 16px;
+        }
+
+        .locationModalTitle {
+            font-size: 24px;
+            font-weight: 600;
+            color: #212121;
+            margin-bottom: 12px;
+        }
+
+        .locationModalDescription {
+            font-size: 14px;
+            color: #757575;
+            line-height: 1.6;
+        }
+    }
+
+    .locationModalContent {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .locationOptionButton {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        background: #ffffff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+
+        &:hover {
+            border-color: #0e82fd;
+            background: #f5f9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 130, 253, 0.2);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        svg {
+            color: #0e82fd;
+            flex-shrink: 0;
+        }
+
+        .locationOptionContent {
+            flex: 1;
+            text-align: left;
+
+            .locationOptionTitle {
+                display: block;
+                font-size: 16px;
+                font-weight: 600;
+                color: #212121;
+                margin-bottom: 4px;
+            }
+
+            .locationOptionDescription {
+                display: block;
+                font-size: 13px;
+                color: #757575;
+            }
+        }
+
+        .loadingSpinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e0e0e0;
+            border-top-color: #0e82fd;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+    }
+
+    .locationError {
+        padding: 12px 16px;
+        background: #ffebee;
+        border: 1px solid #f44336;
+        border-radius: 8px;
+        color: #c62828;
+        font-size: 14px;
+        margin-top: 8px;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
