@@ -13,17 +13,14 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const App: React.FC = () => {
     useEffect(() => {
-        // Initialize AOS - similar to template's script.js
+        // Initialize AOS - always initialize regardless of elements presence
         const initAOS = () => {
-            // Check if there are elements with .aos class (like template does)
-            if (document.querySelector('.aos')) {
-                AOS.init({
-                    duration: 1200,
-                    easing: 'ease-in-out',
-                    once: true,
-                    mirror: false,
-                });
-            }
+            AOS.init({
+                duration: 1200,
+                easing: 'ease-in-out',
+                once: true,
+                mirror: false,
+            });
         };
 
         // Initialize after a short delay to ensure DOM is ready
@@ -64,7 +61,6 @@ const App: React.FC = () => {
                                 <AppRoutes />
                             </GlobalChatProvider>
                         </ChatHubProvider>
-                        <AppRoutes />
                         <CustomCursor />
                     </BrowserRouter>
                 </AccountNotificationProvider>

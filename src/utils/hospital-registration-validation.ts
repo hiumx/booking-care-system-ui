@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 
 // Vietnamese phone number regex: starts with 03, 05, 07, 08, or 09 followed by 8 digits
 const vietnamesePhoneRegex = /^0[35789]\d{8}$/;
@@ -31,26 +31,43 @@ const fileValidation = z
     });
 
 export const hospitalRegistrationSchema = z.object({
-    hospitalName: z
+    // Representative Information
+    representativeName: z
         .string()
-        .min(1, 'Tên bệnh viện là bắt buộc')
-        .max(255, 'Tên bệnh viện không được vượt quá 255 ký tự'),
-    email: z
+        .min(1, 'Tên người đại diện là bắt buộc')
+        .max(255, 'Tên người đại diện không được vượt quá 255 ký tự'),
+    representativeEmail: z
         .string()
-        .min(1, 'Email là bắt buộc')
+        .min(1, 'Email người đại diện là bắt buộc')
         .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Email không hợp lệ')
         .max(100, 'Email không được vượt quá 100 ký tự'),
-    phone: z
+    representativePhone: z
         .string()
-        .min(1, 'Số điện thoại là bắt buộc')
+        .min(1, 'Số điện thoại người đại diện là bắt buộc')
         .regex(
             vietnamesePhoneRegex,
             'Số điện thoại phải là số điện thoại Việt Nam hợp lệ (ví dụ: 0912345678)'
         ),
-    address: z.string().min(1, 'Địa chỉ là bắt buộc'),
-    licenseFile: fileValidation,
-    businessCertificateFile: fileValidation,
     identityCardFile: fileValidation,
+
+    // Hospital Information
+    hospitalName: z
+        .string()
+        .min(1, 'Tên bệnh viện là bắt buộc')
+        .max(255, 'Tên bệnh viện không được vượt quá 255 ký tự'),
+    hospitalEmail: z
+        .string()
+        .min(1, 'Email bệnh viện là bắt buộc')
+        .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Email không hợp lệ')
+        .max(100, 'Email không được vượt quá 100 ký tự'),
+    hospitalPhone: z
+        .string()
+        .min(1, 'Số điện thoại bệnh viện là bắt buộc')
+        .regex(
+            vietnamesePhoneRegex,
+            'Số điện thoại phải là số điện thoại Việt Nam hợp lệ (ví dụ: 0912345678)'
+        ),
+    hospitalAddress: z.string().min(1, 'Địa chỉ bệnh viện là bắt buộc'),
     taxCode: z
         .string()
         .min(1, 'Mã số thuế là bắt buộc')
@@ -58,6 +75,8 @@ export const hospitalRegistrationSchema = z.object({
             taxCodeRegex,
             'Mã số thuế không hợp lệ. Mã số thuế phải có 10 chữ số hoặc 10 chữ số theo sau bởi -XXX (ví dụ: 0123456789 hoặc 0123456789-001)'
         ),
+    licenseFile: fileValidation,
+    businessCertificateFile: fileValidation,
 });
 
 export type HospitalRegistrationFormData = z.infer<typeof hospitalRegistrationSchema>;
