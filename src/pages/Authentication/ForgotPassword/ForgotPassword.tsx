@@ -1,13 +1,13 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import ReCAPTCHA from 'react-google-recaptcha';
 import AuthLayout from '@/layouts/AuthLayout';
-import { Mail, Phone, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Phone } from 'lucide-react';
 import clsx from 'clsx';
 import { PATHS } from '@/routes/paths';
 import Button from '@/components/Button';
-import Input from '@/components/Input';
 import { forgotPasswordAsync, clearError } from '@/store/slices/authSlice';
 import { RootState, AppDispatch } from '@/store';
 import { ForgotPasswordRequest, ResetTokenRequest } from '@/types/auth.types';
@@ -15,8 +15,13 @@ import { VerifyOtpRequest } from '@/types/otp.types';
 import { AuthService } from '@/services/auth.service';
 import { OtpService } from '@/services/otp.service';
 import { usePhoneInput } from '@/hooks/usePhoneInput';
+import { useOtpInput } from '@/hooks/useOtpInput';
 import { toast } from 'react-toastify';
-import { OTP_REGEX } from '@/constants';
+import {
+    AuthContactMethodForm,
+    createAuthContactMethodFormProps,
+} from '@/components/Auth/AuthContactMethodForm';
+import { OtpInputGrid } from '@/components/Auth/OtpInputGrid';
 
 interface ForgotPasswordProps {
     onSubmit?: (email: string, phone: string) => void;
@@ -26,6 +31,7 @@ const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 const deviceId = import.meta.env.VITE_DEVICE_ID || 'booking-care-web-client';
 
 const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
+    const { t } = useTranslation('auth');
     const dispatch = useDispatch<AppDispatch>();
     const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
@@ -41,17 +47,17 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
     const [showCaptcha, setShowCaptcha] = useState(false);
 
     // OTP states
-    const [otp, setOtp] = useState<string[]>(new Array(6).fill(''));
+    const { otp, otpValue, otpRefs, canVerifyOtp, handleOtpChange, handleOtpKeyDown, resetOtp } =
+        useOtpInput({ length: 6 });
     const [isVerifying, setIsVerifying] = useState(false);
     const [countdown, setCountdown] = useState(60);
-    const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
 
     // Create stable IDs for OTP inputs to avoid using array index as key
     const otpInputIds = useMemo(
         () => new Array(6).fill(0).map((_, i) => `otp-input-${i}-${Date.now()}`),
         []
     );
-    const recaptchaRef = useRef<ReCAPTCHA>(null);
+    const recaptchaRef = useRef<ReCAPTCHA | null>(null);
 
     const canSend = useMemo(() => {
         // Use AuthService for consistent email validation
@@ -80,10 +86,6 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         return () => clearInterval(timer);
     }, [step, countdown]);
 
-    // OTP validation
-    const otpValue = useMemo(() => otp.join(''), [otp]);
-    const canVerifyOtp = otpValue.length === 6 && OTP_REGEX.SIX_DIGITS.test(otpValue);
-
     const handleEmailFlow = async () => {
         // Email flow: reset captcha and show success toast
         setIsHuman(false); // Reset human verification
@@ -96,16 +98,14 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         // Also keep captcha visible for user to verify again
         setShowCaptcha(true);
 
-        toast.success(
-            'Nếu email tồn tại trong hệ thống, bạn sẽ nhận được hướng dẫn đặt lại mật khẩu.'
-        );
+        toast.success(t('forgotPassword.successEmail'));
     };
 
     const handlePhoneFlow = async () => {
         // Phone flow: move to OTP step
         setStep('otp');
         setCountdown(60);
-        toast.success('Mã OTP đã được gửi đến số điện thoại của bạn.');
+        toast.success(t('forgotPassword.successPhone'));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -126,33 +126,11 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
             }
         } catch (error) {
             console.error('Forgot password error:', error);
-            toast.error('Gửi yêu cầu thất bại. Vui lòng thử lại.');
+            toast.error(t('forgotPassword.error'));
         }
 
         // Also call the optional onSubmit prop for backward compatibility
         onSubmit?.(email, phone);
-    };
-
-    // OTP handlers
-    const handleOtpChange = (index: number, value: string) => {
-        if (!OTP_REGEX.SINGLE_DIGIT.test(value)) return;
-
-        setOtp((prev) => {
-            const next = [...prev];
-            next[index] = value;
-            return next;
-        });
-
-        // Auto focus next input
-        if (value && index < 5) {
-            otpRefs.current[index + 1]?.focus();
-        }
-    };
-
-    const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Backspace' && !otp[index] && index > 0) {
-            otpRefs.current[index - 1]?.focus();
-        }
     };
 
     const processOtpVerification = async () => {
@@ -184,11 +162,11 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
             const verifyResponse = await processOtpVerification();
             const resetTokenResponse = await processResetToken(verifyResponse);
 
-            toast.success('Xác thực thành công! Đang chuyển hướng...');
+            toast.success(t('forgotPassword.successPhone'));
             globalThis.location.href = resetTokenResponse.data.resetUrl;
         } catch (error: any) {
             console.error('OTP verification error:', error);
-            toast.error('Xác thực OTP thất bại. Vui lòng thử lại.');
+            toast.error(t('forgotPassword.error'));
         } finally {
             setIsVerifying(false);
         }
@@ -200,28 +178,28 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         try {
             await dispatch(forgotPasswordAsync({ phoneNumber: phone, deviceId })).unwrap();
             setCountdown(60);
-            setOtp(new Array(6).fill(''));
-            toast.success('Mã OTP mới đã được gửi.');
+            resetOtp();
+            toast.success(t('forgotPassword.successPhone'));
         } catch (error) {
             console.error('Resend OTP error:', error);
-            toast.error('Gửi lại mã OTP thất bại. Vui lòng thử lại.');
+            toast.error(t('forgotPassword.error'));
         }
     };
 
     const handleBackToInput = () => {
         setStep('input');
-        setOtp(new Array(6).fill(''));
+        resetOtp();
         setCountdown(60);
     };
 
     const getTitle = () => {
-        if (step === 'otp') return 'Xác thực OTP';
-        return 'Quên mật khẩu';
+        if (step === 'otp') return t('forgotPassword.otpTitle');
+        return t('forgotPassword.title');
     };
 
     const getSubtitle = () => {
-        if (step === 'otp') return `Nhập mã OTP từ tin nhắn đã gửi đến số điện thoại`;
-        return 'Nhập email hoặc số điện thoại để khôi phục quyền truy cập vào tài khoản';
+        if (step === 'otp') return t('forgotPassword.otpSubtitle');
+        return t('forgotPassword.subtitle');
     };
 
     const maskPhoneNumber = (phoneNumber: string) => {
@@ -231,108 +209,45 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
         return maskedPart + lastThreeDigits;
     };
 
-    const renderMethodToggle = () => (
-        <div className="d-flex justify-content-center mb-3">
-            <div className="method-toggle">
-                <button
-                    type="button"
-                    className={clsx('toggle-btn', method === 'phone' && 'toggle-btn-active')}
-                    onClick={() => setMethod('phone')}
-                >
-                    <i className="feather-phone me-1"></i>
-                    Số điện thoại
-                </button>
-                <button
-                    type="button"
-                    className={clsx('toggle-btn', method === 'email' && 'toggle-btn-active')}
-                    onClick={() => setMethod('email')}
-                >
-                    <i className="feather-mail me-1"></i>
-                    Email
-                </button>
-            </div>
-        </div>
-    );
-
     const renderInputStep = () => (
         <form onSubmit={handleSubmit}>
-            {renderMethodToggle()}
-            <div className="mb-3">
-                {method === 'phone' ? (
-                    <Input
-                        label="Số điện thoại"
-                        type="tel"
-                        inputMode="numeric"
-                        placeholder="Nhập số điện thoại"
-                        leftContent={
-                            <>
-                                <img
-                                    src="https://flagcdn.com/w20/vn.png"
-                                    alt="VN"
-                                    width={20}
-                                    height={15}
-                                />
-                                <span className="text-muted" style={{ fontSize: 14 }}>
-                                    +84
-                                </span>
-                            </>
-                        }
-                        wrapVariant="phone"
-                        value={phone}
-                        onChange={handlePhoneChange}
-                        onKeyDown={handlePhoneKeyDown}
-                        onPaste={handlePhonePaste}
-                        onFocus={() => setShowCaptcha(true)}
-                    />
-                ) : (
-                    <Input
-                        label="Địa chỉ email"
-                        type="email"
-                        placeholder="Nhập địa chỉ email"
-                        leftIcon={<Mail size={18} className="text-muted" />}
-                        wrapVariant="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        onFocus={() => setShowCaptcha(true)}
-                    />
-                )}
-            </div>
+            <AuthContactMethodForm
+                {...createAuthContactMethodFormProps({
+                    method,
+                    phone,
+                    email,
+                    showCaptcha,
+                    isHuman,
+                    setMethod,
+                    handlePhoneChange,
+                    setEmail,
+                    handlePhoneKeyDown,
+                    handlePhonePaste,
+                    setShowCaptcha,
+                    setIsHuman,
+                    translations: {
+                        phoneLabel: t('forgotPassword.phone'),
+                        phonePlaceholder: t('forgotPassword.phonePlaceholder'),
+                        emailLabel: t('forgotPassword.email'),
+                        emailPlaceholder: t('forgotPassword.emailPlaceholder'),
+                        phoneToggleLabel: t('forgotPassword.phone'),
+                        emailToggleLabel: t('forgotPassword.email'),
+                        notRobotLabel: t('common.notRobot', 'Tôi không phải là robot'),
+                    },
+                    captchaId: 'forgot-captcha',
+                    siteKey: siteKey ?? undefined,
+                    recaptchaRef,
+                })}
+            />
             {/* Error message */}
             {error && (
                 <div className="alert alert-danger text-center mb-3" role="alert">
                     {error}
                 </div>
             )}
-            {/* Captcha */}
-            {showCaptcha && (
-                <div>
-                    {siteKey ? (
-                        <ReCAPTCHA
-                            ref={recaptchaRef}
-                            sitekey={siteKey}
-                            onChange={(value) => setIsHuman(!!value)}
-                            onExpired={() => setIsHuman(false)}
-                        />
-                    ) : (
-                        <div className="d-flex align-items-center p-3 bg-light rounded-3 border">
-                            <input
-                                type="checkbox"
-                                id="captcha"
-                                className="me-2"
-                                checked={isHuman}
-                                onChange={(e) => setIsHuman(e.target.checked)}
-                            />
-                            <label htmlFor="captcha" className="text-muted">
-                                Tôi không phải là robot
-                            </label>
-                        </div>
-                    )}
-                </div>
-            )}
-
             <div className="mb-3 mt-3">
                 <Button
-                    text={isLoading ? 'Đang gửi...' : 'Đặt lại mật khẩu'}
+                    text={isLoading ? t('forgotPassword.submitting') : t('forgotPassword.submit')}
                     type="submit"
                     isDisabled={!canSend || isLoading}
                     className="w-100 fw-bold"
@@ -340,7 +255,8 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
             </div>
             <div className="account-signup">
                 <p>
-                    Đã nhớ mật khẩu? <Link to={PATHS.LOGIN}>Đăng nhập ngay</Link>
+                    {t('forgotPassword.backToLogin')}{' '}
+                    <Link to={PATHS.LOGIN}>{t('register.login')}</Link>
                 </p>
             </div>
         </form>
@@ -360,42 +276,30 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                     <Phone size={24} className="text-primary" />
                 </div>
                 <p className="text-muted">
-                    Mã OTP đã được gửi đến số điện thoại{' '}
+                    {t('forgotPassword.otpSentTo')}{' '}
                     <span className="fw-medium text-dark">{maskPhoneNumber(phone)}</span>
                 </p>
             </div>
 
             <form onSubmit={handleVerifyOtp}>
                 {/* OTP Input */}
-                <div className="d-flex justify-content-center gap-2 mb-4">
-                    {otp.map((digit, idx) => (
-                        <input
-                            key={otpInputIds[idx]}
-                            ref={(el) => {
-                                otpRefs.current[idx] = el;
-                            }}
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            maxLength={1}
-                            value={digit}
-                            onChange={(e) => handleOtpChange(idx, e.target.value)}
-                            onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                            className={clsx(
-                                'text-center fw-bold border rounded',
-                                digit ? 'border-primary' : 'border-secondary',
-                                'focus:border-primary focus:ring-1 focus:ring-primary'
-                            )}
-                            style={{
-                                width: 48,
-                                height: 56,
-                                fontSize: 20,
-                                outline: 'none',
-                                transition: 'border-color 0.15s ease-in-out',
-                            }}
-                        />
-                    ))}
-                </div>
+                <OtpInputGrid
+                    otp={otp}
+                    otpRefs={otpRefs}
+                    onChange={handleOtpChange}
+                    onKeyDown={handleOtpKeyDown}
+                    containerClassName="d-flex justify-content-center gap-2 mb-4"
+                    baseInputClassName="text-center fw-bold border rounded focus:border-primary focus:ring-1 focus:ring-primary"
+                    getInputClassName={(digit) => (digit ? 'border-primary' : 'border-secondary')}
+                    inputStyle={{
+                        width: 48,
+                        height: 56,
+                        fontSize: 20,
+                        outline: 'none',
+                        transition: 'border-color 0.15s ease-in-out',
+                    }}
+                    inputKeyBuilder={(index) => otpInputIds[index]}
+                />
 
                 {/* Error message */}
                 {error && (
@@ -406,7 +310,9 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
 
                 {/* Verify Button */}
                 <Button
-                    text={isVerifying ? 'Đang xác thực...' : 'Xác thực OTP'}
+                    text={
+                        isVerifying ? t('forgotPassword.verifying') : t('forgotPassword.verifyOtp')
+                    }
                     type="submit"
                     isDisabled={!canVerifyOtp || isVerifying}
                     className={clsx(
@@ -423,19 +329,21 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
                         className="btn btn-link p-0 d-flex align-items-center text-muted"
                     >
                         <ArrowLeft size={16} className="me-1" />
-                        Quay lại
+                        {t('forgotPassword.backToLogin')}
                     </button>
 
                     <div className="text-muted">
                         {countdown > 0 ? (
-                            <span>Gửi lại sau {countdown}s</span>
+                            <span>
+                                {t('forgotPassword.resendIn')} {countdown}s
+                            </span>
                         ) : (
                             <button
                                 type="button"
                                 onClick={handleResendOtp}
                                 className="btn btn-link p-0 text-primary"
                             >
-                                Gửi lại mã OTP
+                                {t('forgotPassword.resendOtp')}
                             </button>
                         )}
                     </div>

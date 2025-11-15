@@ -1,0 +1,618 @@
+.chatArea {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.chatHeader {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .menuButton {
+        display: none;
+    }
+
+    .headerContent {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1;
+
+        .aiAvatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(90.08deg, #0e82fd 0.09%, #06aed4 70.28%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(14, 130, 253, 0.3);
+        }
+
+        .headerInfo {
+            .headerTitle {
+                font-size: 18px;
+                font-weight: 600;
+                color: #212121;
+                margin: 0 0 4px 0;
+            }
+
+            .headerSubtitle {
+                font-size: 13px;
+                color: #757575;
+                margin: 0;
+            }
+        }
+    }
+}
+
+.messagesContainer {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    background: #fafafa;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #bdbdbd;
+        border-radius: 10px;
+
+        &:hover {
+            background: #9e9e9e;
+        }
+    }
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 40px 20px;
+
+    .emptyIcon {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0066cc; // Improved contrast for WCAG AA compliance
+        margin-bottom: 24px;
+    }
+
+    .emptyTitle {
+        font-size: 24px;
+        font-weight: 600;
+        color: #212121;
+        margin: 0 0 12px 0;
+    }
+
+    .emptyDescription {
+        font-size: 15px;
+        color: #757575;
+        max-width: 500px;
+        margin: 0 0 32px 0;
+        line-height: 1.6;
+    }
+
+    .suggestedQuestions {
+        .suggestedTitle {
+            font-size: 14px;
+            font-weight: 600;
+            color: #424242;
+            margin: 0 0 16px 0;
+        }
+
+        .questionChips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+
+            .questionChip {
+                padding: 10px 20px;
+                background: #ffffff;
+                border: 2px solid #e0e0e0;
+                border-radius: 20px;
+                font-size: 14px;
+                color: #424242;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    border-color: #0e82fd;
+                    color: #0e82fd;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(14, 130, 253, 0.2);
+                }
+            }
+        }
+    }
+}
+
+.messagesList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.messageWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.aiMessageBubble {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 70%;
+
+    .aiAvatarSmall {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(90.08deg, #0e82fd 0.09%, #06aed4 70.28%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        flex-shrink: 0;
+    }
+}
+
+.suggestionsContainer {
+    margin-top: 8px;
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    .tabsContainer {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e0e0e0;
+
+        .tab {
+            padding: 10px 24px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #757575;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            &:hover {
+                color: #0066cc;
+                background: rgba(14, 130, 253, 0.05);
+            }
+
+            &.activeTab {
+                color: #0052a3; // Improved contrast for WCAG AA compliance
+                font-weight: 600;
+                background: rgba(14, 130, 253, 0.1);
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -14px;
+                    left: 0;
+                    right: 0;
+                    height: 3px;
+                    background: linear-gradient(90.08deg, #0e82fd 0.09%, #06aed4 70.28%);
+                    border-radius: 2px 2px 0 0;
+                }
+            }
+
+            .tabBadge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 20px;
+                height: 20px;
+                padding: 0 6px;
+                background: #9e9e9e;
+                color: #ffffff;
+                border-radius: 10px;
+                font-size: 12px;
+                font-weight: 600;
+                line-height: 1;
+                margin-left: 2px;
+                transition: all 0.3s ease;
+            }
+
+            &.activeTab .tabBadge {
+                background: #0066cc;
+            }
+
+            &:hover .tabBadge {
+                background: #0066cc;
+            }
+        }
+    }
+
+    .suggestionsCarousel {
+        margin-bottom: 20px;
+        margin-top: 12px; // Thêm margin-top để tránh border bị cắt khi hover (card hover translateY(-4px) + extra space)
+        width: 100%;
+
+        // Đảm bảo carousel items có chiều cao đều nhau
+        :global(.swiper-slide) {
+            height: auto;
+            display: flex;
+        }
+
+        :global(.swiper-slide > div) {
+            width: 100%;
+        }
+
+        // Điều chỉnh spacing cho carousel
+        :global(.swiper) {
+            padding-bottom: 10px; // Giảm padding-bottom để navigation buttons gần hơn
+            padding-top: 8px; // Thêm padding-top để có không gian khi hover (translateY(-4px) + buffer)
+        }
+
+        // Điều chỉnh carousel container để giảm padding-bottom
+        :global(.carouselContainer) {
+            padding-bottom: 2rem; // Giảm từ 3rem xuống 2rem
+        }
+
+        // Điều chỉnh vị trí navigation buttons để gần hơn
+        :global(.carouselNav) {
+            gap: 0.5rem !important; // Giảm gap từ 1rem xuống 0.5rem
+            bottom: 0.25rem !important; // Điều chỉnh vị trí để gần hơn (từ -0.5rem lên 0.25rem)
+        }
+    }
+
+    .actionButtons {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        padding-top: 16px;
+        border-top: 1px solid #e0e0e0;
+
+        .actionButton {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            width: auto;
+
+            &.bookButton {
+                padding: 8px 20px;
+                font-size: 0.9rem;
+                font-weight: 500;
+                border-radius: 10px;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                border: 1px solid transparent; // Đảm bảo border hiển thị
+
+                &:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(14, 130, 253, 0.3);
+                }
+            }
+
+            &.consultButton {
+                border-radius: 10px;
+            }
+        }
+    }
+}
+
+.inputContainer {
+    padding: 20px 24px;
+    border-top: 1px solid #e0e0e0;
+    background: #ffffff;
+}
+
+// Responsive - Tablet
+@media (max-width: 1024px) and (min-width: 769px) {
+    .chatArea {
+        .chatHeader {
+            padding: 18px 20px;
+        }
+
+        .messagesContainer {
+            padding: 20px;
+        }
+
+        .suggestionsContainer {
+            .suggestionsCarousel {
+                margin-bottom: 20px;
+                margin-top: 12px; // Giữ margin-top để tránh border bị cắt khi hover
+            }
+        }
+    }
+}
+
+// Responsive - Mobile
+@media (max-width: 768px) {
+    .chatArea {
+        width: 100%;
+        flex: 1;
+        min-width: 0;
+        position: relative;
+        z-index: 1;
+        margin-left: 0;
+
+        .chatHeader {
+            padding: 12px 16px;
+            min-height: 72px;
+
+            .menuButton {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                border: none;
+                background: transparent;
+                border-radius: 8px;
+                cursor: pointer;
+                color: #0e82fd;
+                flex-shrink: 0;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    background: rgba(14, 130, 253, 0.1);
+                }
+
+                &:active {
+                    transform: scale(0.95);
+                }
+            }
+
+            .headerContent {
+                gap: 12px;
+
+                .aiAvatar {
+                    width: 36px;
+                    height: 36px;
+                    flex-shrink: 0;
+                }
+
+                .headerInfo {
+                    min-width: 0;
+                    flex: 1;
+
+                    .headerTitle {
+                        font-size: 15px;
+                        margin: 0 0 2px 0;
+                    }
+
+                    .headerSubtitle {
+                        font-size: 11px;
+                    }
+                }
+            }
+        }
+
+        .messagesContainer {
+            padding: 12px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .emptyState {
+            padding: 20px 16px;
+
+            .emptyIcon {
+                width: 70px;
+                height: 70px;
+                margin-bottom: 16px;
+            }
+
+            .emptyTitle {
+                font-size: 18px;
+                margin-bottom: 8px;
+            }
+
+            .emptyDescription {
+                font-size: 13px;
+                margin-bottom: 24px;
+            }
+
+            .suggestedQuestions {
+                .suggestedTitle {
+                    font-size: 13px;
+                    margin-bottom: 12px;
+                }
+
+                .questionChips {
+                    gap: 8px;
+
+                    .questionChip {
+                        padding: 8px 16px;
+                        font-size: 13px;
+                    }
+                }
+            }
+        }
+
+        .messagesList {
+            gap: 12px;
+        }
+
+        .messageWrapper {
+            gap: 8px;
+        }
+
+        .aiMessageBubble {
+            max-width: 85%;
+        }
+
+        .suggestionsContainer {
+            padding: 12px;
+            margin-top: 8px;
+
+            .tabsContainer {
+                margin-bottom: 16px;
+                padding-bottom: 10px;
+
+                .tab {
+                    padding: 8px 16px;
+                    font-size: 14px;
+                    gap: 6px;
+
+                    .tabBadge {
+                        min-width: 18px;
+                        height: 18px;
+                        padding: 0 5px;
+                        font-size: 11px;
+                    }
+                }
+            }
+
+            .suggestionsCarousel {
+                margin-bottom: 16px;
+                margin-top: 12px; // Giữ margin-top để tránh border bị cắt khi hover
+            }
+
+            .actionButtons {
+                gap: 10px;
+                padding-top: 12px;
+
+                .actionButton {
+                    padding: 10px 16px;
+                    font-size: 13px;
+                }
+            }
+        }
+
+        .inputContainer {
+            padding: 12px;
+            position: relative;
+            z-index: 250;
+            background: #ffffff;
+        }
+    }
+}
+
+// Responsive - Small Mobile
+@media (max-width: 480px) {
+    .chatArea {
+        .chatHeader {
+            padding: 10px 12px;
+            min-height: 64px;
+
+            .headerContent {
+                gap: 10px;
+
+                .aiAvatar {
+                    width: 32px;
+                    height: 32px;
+                }
+
+                .headerInfo {
+                    .headerTitle {
+                        font-size: 14px;
+                    }
+
+                    .headerSubtitle {
+                        font-size: 10px;
+                    }
+                }
+            }
+        }
+
+        .messagesContainer {
+            padding: 10px;
+        }
+
+        .emptyState {
+            padding: 16px 12px;
+
+            .emptyIcon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .emptyTitle {
+                font-size: 16px;
+            }
+
+            .emptyDescription {
+                font-size: 12px;
+            }
+
+            .questionChips {
+                .questionChip {
+                    padding: 6px 12px;
+                    font-size: 12px;
+                }
+            }
+        }
+
+        .suggestionsContainer {
+            padding: 10px;
+
+            .tabsContainer {
+                .tab {
+                    padding: 6px 12px;
+                    font-size: 13px;
+                    gap: 4px;
+
+                    .tabBadge {
+                        min-width: 16px;
+                        height: 16px;
+                        padding: 0 4px;
+                        font-size: 10px;
+                    }
+                }
+            }
+
+            .actionButtons {
+                flex-direction: column;
+                gap: 8px;
+
+                .actionButton {
+                    width: 100%;
+                    padding: 10px;
+                }
+            }
+        }
+
+        .inputContainer {
+            padding: 10px;
+        }
+    }
+}
