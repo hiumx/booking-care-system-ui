@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import SectionHeader from 'src/pages/Home/components/ServicesSection/components/SectionHeader';
 import ServiceColumn from 'src/pages/Home/components/ServicesSection/components/ServiceColumn';
 import ServiceImageCenter from 'src/pages/Home/components/ServicesSection/components/ServiceImageCenter';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 
 interface Service {
     id: string;
@@ -17,13 +15,6 @@ interface ServiceSectionProps {
 }
 
 const ServiceSection: React.FC<ServiceSectionProps> = ({ leftServices, rightServices }) => {
-    useEffect(() => {
-        AOS.init({
-            duration: 800, // thời gian animation (ms)
-            once: false, // false => mỗi lần scroll tới lại chạy lại animation
-        });
-    }, []);
-
     return (
         <section className="service-sec-fourteen">
             <div className="section-bg">

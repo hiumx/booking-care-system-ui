@@ -34,6 +34,7 @@ const SectionItem: React.FC<SectionItemProps> = ({
             <div className="container">
                 <div
                     className={`section-header sec-header-one text-center aos ${styles.sectionHeader}`}
+                    data-aos="fade-up"
                 >
                     <div className={styles.headerContent}>
                         <div className={styles.headerText}>
@@ -53,7 +54,7 @@ const SectionItem: React.FC<SectionItemProps> = ({
                         </div>
                     )}
                 </div>
-                <div className="owl-carousel spciality-slider aos">
+                <div className="owl-carousel spciality-slider aos" data-aos="fade-up">
                     <Carousel slides={items} breakpoints={breakpoints} isAutoPlay={isAutoPlay} />
                 </div>
             </div>

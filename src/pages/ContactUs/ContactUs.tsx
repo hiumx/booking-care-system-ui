@@ -12,9 +12,14 @@ import { HospitalRegistrationService } from '@/services/hospital-registration.se
 
 const ContactUs: React.FC = () => {
     const [formData, setFormData] = useState({
+        // Representative Information
+        representativeName: '',
+        representativeEmail: '',
+        representativePhone: '',
+        // Hospital Information
         hospitalName: '',
-        email: '',
-        phone: '',
+        hospitalEmail: '',
+        hospitalPhone: '',
         address: '',
         taxCode: '',
     });
@@ -64,10 +69,13 @@ const ContactUs: React.FC = () => {
 
     const validateForm = (): boolean => {
         const validationData = {
+            representativeName: formData.representativeName,
+            representativeEmail: formData.representativeEmail,
+            representativePhone: formData.representativePhone,
             hospitalName: formData.hospitalName,
-            email: formData.email,
-            phone: formData.phone,
-            address: formData.address,
+            hospitalEmail: formData.hospitalEmail,
+            hospitalPhone: formData.hospitalPhone,
+            hospitalAddress: formData.address,
             taxCode: formData.taxCode,
             licenseFile: files.licenseFile[0] || new File([], ''),
             businessCertificateFile: files.businessCertificateFile[0] || new File([], ''),
@@ -106,9 +114,12 @@ const ContactUs: React.FC = () => {
         try {
             // Create FormData for file upload
             const formDataToSubmit = new FormData();
+            formDataToSubmit.append('RepresentativeName', formData.representativeName);
+            formDataToSubmit.append('RepresentativeEmail', formData.representativeEmail);
+            formDataToSubmit.append('RepresentativePhone', formData.representativePhone);
             formDataToSubmit.append('HospitalName', formData.hospitalName);
-            formDataToSubmit.append('Email', formData.email);
-            formDataToSubmit.append('Phone', formData.phone);
+            formDataToSubmit.append('HospitalEmail', formData.hospitalEmail);
+            formDataToSubmit.append('HospitalPhone', formData.hospitalPhone);
             formDataToSubmit.append('Address', formData.address);
             formDataToSubmit.append('TaxCode', formData.taxCode);
 
@@ -138,9 +149,12 @@ const ContactUs: React.FC = () => {
 
                 // Reset form
                 setFormData({
+                    representativeName: '',
+                    representativeEmail: '',
+                    representativePhone: '',
                     hospitalName: '',
-                    email: '',
-                    phone: '',
+                    hospitalEmail: '',
+                    hospitalPhone: '',
                     address: '',
                     taxCode: '',
                 });
@@ -237,216 +251,341 @@ const ContactUs: React.FC = () => {
                                 >
                                     <div className="card-body">
                                         <form onSubmit={handleSubmit}>
+                                            {/* Representative Information Section */}
+                                            <div className="mb-4">
+                                                <div className="d-flex align-items-center mb-3">
+                                                    <div className="section-divider-icon me-3">
+                                                        <i
+                                                            className="isax isax-user"
+                                                            style={{
+                                                                fontSize: '24px',
+                                                                color: '#0d6efd',
+                                                            }}
+                                                        ></i>
+                                                    </div>
+                                                    <h5 className="mb-0 text-primary fw-bold">
+                                                        Thông tin người đại diện
+                                                    </h5>
+                                                </div>
+                                                <p className="text-muted small mb-3">
+                                                    Vui lòng cung cấp thông tin của người đại diện
+                                                    pháp lý hoặc người được ủy quyền
+                                                </p>
+                                                <div className="row">
+                                                    {/* Representative Name */}
+                                                    <div className="col-md-12">
+                                                        <div className="mb-3">
+                                                            <Input
+                                                                label="Tên người đại diện"
+                                                                placeholder="Nhập họ và tên người đại diện"
+                                                                isRequired
+                                                                value={formData.representativeName}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        'representativeName',
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                            {errors.representativeName && (
+                                                                <div className="text-danger small mt-1">
+                                                                    {errors.representativeName}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Representative Email */}
+                                                    <div className="col-md-6">
+                                                        <div className="mb-3">
+                                                            <Input
+                                                                label="Email người đại diện"
+                                                                type="email"
+                                                                placeholder="Nhập địa chỉ email người đại diện"
+                                                                isRequired
+                                                                value={formData.representativeEmail}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        'representativeEmail',
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                            {errors.representativeEmail && (
+                                                                <div className="text-danger small mt-1">
+                                                                    {errors.representativeEmail}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Representative Phone */}
+                                                    <div className="col-md-6">
+                                                        <div className="mb-3">
+                                                            <Input
+                                                                label="Số điện thoại người đại diện"
+                                                                type="tel"
+                                                                placeholder="Nhập số điện thoại người đại diện"
+                                                                isRequired
+                                                                value={formData.representativePhone}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        'representativePhone',
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                            {errors.representativePhone && (
+                                                                <div className="text-danger small mt-1">
+                                                                    {errors.representativePhone}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Identity Card File */}
+                                                    <div className="col-md-12">
+                                                        <div className="mb-3">
+                                                            <label className="form-label">
+                                                                CMND/CCCD người đại diện{' '}
+                                                                <span className="text-danger">
+                                                                    *
+                                                                </span>
+                                                            </label>
+                                                            <CustomFileInput
+                                                                files={files.identityCardFile}
+                                                                onChange={(selectedFiles) =>
+                                                                    handleFileChange(
+                                                                        'identityCardFile',
+                                                                        selectedFiles
+                                                                    )
+                                                                }
+                                                                accept="image/*,.pdf,.doc,.docx"
+                                                                multiple={false}
+                                                                maxSize={10}
+                                                                id="identity-card-file-input"
+                                                            />
+                                                            {errors.identityCardFile && (
+                                                                <div className="text-danger small mt-1">
+                                                                    {errors.identityCardFile}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Hospital Information Section */}
+                                            <div className="mb-4">
+                                                <div className="d-flex align-items-center mb-3">
+                                                    <div className="section-divider-icon me-3">
+                                                        <i
+                                                            className="isax isax-hospital"
+                                                            style={{
+                                                                fontSize: '24px',
+                                                                color: '#28a745',
+                                                            }}
+                                                        ></i>
+                                                    </div>
+                                                    <h5 className="mb-0 text-success fw-bold">
+                                                        Thông tin bệnh viện
+                                                    </h5>
+                                                </div>
+                                                <p className="text-muted small mb-3">
+                                                    Vui lòng cung cấp thông tin chi tiết về bệnh
+                                                    viện muốn hợp tác
+                                                </p>
+                                                <div className="row">
+                                                    {/* Hospital Name */}
+                                                    <div className="col-md-12">
+                                                        <div className="mb-3">
+                                                            <Input
+                                                                label="Tên bệnh viện"
+                                                                placeholder="Nhập tên bệnh viện đầy đủ"
+                                                                isRequired
+                                                                value={formData.hospitalName}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        'hospitalName',
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                            {errors.hospitalName && (
+                                                                <div className="text-danger small mt-1">
+                                                                    {errors.hospitalName}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Hospital Email */}
+                                                    <div className="col-md-6">
+                                                        <div className="mb-3">
+                                                            <Input
+                                                                label="Email bệnh viện"
+                                                                type="email"
+                                                                placeholder="Nhập địa chỉ email chính thức của bệnh viện"
+                                                                isRequired
+                                                                value={formData.hospitalEmail}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        'hospitalEmail',
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                            {errors.hospitalEmail && (
+                                                                <div className="text-danger small mt-1">
+                                                                    {errors.hospitalEmail}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Hospital Phone */}
+                                                    <div className="col-md-6">
+                                                        <div className="mb-3">
+                                                            <Input
+                                                                label="Số điện thoại bệnh viện"
+                                                                type="tel"
+                                                                placeholder="Nhập số điện thoại chính của bệnh viện"
+                                                                isRequired
+                                                                value={formData.hospitalPhone}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        'hospitalPhone',
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                            {errors.hospitalPhone && (
+                                                                <div className="text-danger small mt-1">
+                                                                    {errors.hospitalPhone}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Address */}
+                                                    <div className="col-md-12">
+                                                        <div className="mb-3">
+                                                            <Input
+                                                                label="Địa chỉ bệnh viện"
+                                                                placeholder="Nhập địa chỉ đầy đủ của bệnh viện"
+                                                                isRequired
+                                                                value={formData.address}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        'address',
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                            {errors.address && (
+                                                                <div className="text-danger small mt-1">
+                                                                    {errors.address}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Tax Code */}
+                                                    <div className="col-md-12">
+                                                        <div className="mb-3">
+                                                            <Input
+                                                                label="Mã số thuế doanh nghiệp"
+                                                                placeholder="Nhập mã số thuế doanh nghiệp (10 chữ số hoặc 10 chữ số-XXX)"
+                                                                isRequired
+                                                                value={formData.taxCode}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        'taxCode',
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                            {errors.taxCode && (
+                                                                <div className="text-danger small mt-1">
+                                                                    {errors.taxCode}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* License File */}
+                                                    <div className="col-md-12">
+                                                        <div className="mb-3">
+                                                            <label className="form-label">
+                                                                Giấy phép hoạt động{' '}
+                                                                <span className="text-danger">
+                                                                    *
+                                                                </span>
+                                                            </label>
+                                                            <CustomFileInput
+                                                                files={files.licenseFile}
+                                                                onChange={(selectedFiles) =>
+                                                                    handleFileChange(
+                                                                        'licenseFile',
+                                                                        selectedFiles
+                                                                    )
+                                                                }
+                                                                accept="image/*,.pdf,.doc,.docx"
+                                                                multiple={false}
+                                                                maxSize={10}
+                                                                id="license-file-input"
+                                                            />
+                                                            {errors.licenseFile && (
+                                                                <div className="text-danger small mt-1">
+                                                                    {errors.licenseFile}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Business Certificate File */}
+                                                    <div className="col-md-12">
+                                                        <div className="mb-3">
+                                                            <label className="form-label">
+                                                                Giấy chứng nhận đăng ký doanh nghiệp{' '}
+                                                                <span className="text-danger">
+                                                                    *
+                                                                </span>
+                                                            </label>
+                                                            <CustomFileInput
+                                                                files={
+                                                                    files.businessCertificateFile
+                                                                }
+                                                                onChange={(selectedFiles) =>
+                                                                    handleFileChange(
+                                                                        'businessCertificateFile',
+                                                                        selectedFiles
+                                                                    )
+                                                                }
+                                                                accept="image/*,.pdf,.doc,.docx"
+                                                                multiple={false}
+                                                                maxSize={10}
+                                                                id="business-certificate-file-input"
+                                                            />
+                                                            {errors.businessCertificateFile && (
+                                                                <div className="text-danger small mt-1">
+                                                                    {errors.businessCertificateFile}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Submit Button */}
                                             <div className="row">
-                                                {/* Hospital Name */}
-                                                <div className="col-md-12">
-                                                    <div className="mb-3">
-                                                        <Input
-                                                            label="Tên bệnh viện"
-                                                            placeholder="Nhập tên bệnh viện đầy đủ"
-                                                            isRequired
-                                                            value={formData.hospitalName}
-                                                            onChange={(e) =>
-                                                                handleInputChange(
-                                                                    'hospitalName',
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                        />
-                                                        {errors.hospitalName && (
-                                                            <div className="text-danger small mt-1">
-                                                                {errors.hospitalName}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                {/* Email */}
-                                                <div className="col-md-6">
-                                                    <div className="mb-3">
-                                                        <Input
-                                                            label="Email"
-                                                            type="email"
-                                                            placeholder="Nhập địa chỉ email của bệnh viện"
-                                                            isRequired
-                                                            value={formData.email}
-                                                            onChange={(e) =>
-                                                                handleInputChange(
-                                                                    'email',
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                        />
-                                                        {errors.email && (
-                                                            <div className="text-danger small mt-1">
-                                                                {errors.email}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                {/* Phone */}
-                                                <div className="col-md-6">
-                                                    <div className="mb-3">
-                                                        <Input
-                                                            label="Số điện thoại"
-                                                            type="tel"
-                                                            placeholder="Nhập số điện thoại liên hệ"
-                                                            isRequired
-                                                            value={formData.phone}
-                                                            onChange={(e) =>
-                                                                handleInputChange(
-                                                                    'phone',
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                        />
-                                                        {errors.phone && (
-                                                            <div className="text-danger small mt-1">
-                                                                {errors.phone}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                {/* Address */}
-                                                <div className="col-md-12">
-                                                    <div className="mb-3">
-                                                        <Input
-                                                            label="Địa chỉ"
-                                                            placeholder="Nhập địa chỉ đầy đủ của bệnh viện"
-                                                            isRequired
-                                                            value={formData.address}
-                                                            onChange={(e) =>
-                                                                handleInputChange(
-                                                                    'address',
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                        />
-                                                        {errors.address && (
-                                                            <div className="text-danger small mt-1">
-                                                                {errors.address}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                {/* Tax Code */}
-                                                <div className="col-md-12">
-                                                    <div className="mb-3">
-                                                        <Input
-                                                            label="Mã số thuế"
-                                                            placeholder="Nhập mã số thuế (10 chữ số hoặc 10 chữ số-XXX)"
-                                                            isRequired
-                                                            value={formData.taxCode}
-                                                            onChange={(e) =>
-                                                                handleInputChange(
-                                                                    'taxCode',
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                        />
-                                                        {errors.taxCode && (
-                                                            <div className="text-danger small mt-1">
-                                                                {errors.taxCode}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                {/* License File */}
-                                                <div className="col-md-12">
-                                                    <div className="mb-3">
-                                                        <label className="form-label">
-                                                            Giấy phép hoạt động
-                                                            <span className="text-danger">*</span>
-                                                        </label>
-                                                        <CustomFileInput
-                                                            files={files.licenseFile}
-                                                            onChange={(selectedFiles) =>
-                                                                handleFileChange(
-                                                                    'licenseFile',
-                                                                    selectedFiles
-                                                                )
-                                                            }
-                                                            accept="image/*,.pdf,.doc,.docx"
-                                                            multiple={false}
-                                                            maxSize={10}
-                                                            id="license-file-input"
-                                                        />
-                                                        {errors.licenseFile && (
-                                                            <div className="text-danger small mt-1">
-                                                                {errors.licenseFile}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                {/* Business Certificate File */}
-                                                <div className="col-md-12">
-                                                    <div className="mb-3">
-                                                        <label className="form-label">
-                                                            Giấy chứng nhận đăng ký doanh nghiệp
-                                                            <span className="text-danger">*</span>
-                                                        </label>
-                                                        <CustomFileInput
-                                                            files={files.businessCertificateFile}
-                                                            onChange={(selectedFiles) =>
-                                                                handleFileChange(
-                                                                    'businessCertificateFile',
-                                                                    selectedFiles
-                                                                )
-                                                            }
-                                                            accept="image/*,.pdf,.doc,.docx"
-                                                            multiple={false}
-                                                            maxSize={10}
-                                                            id="business-certificate-file-input"
-                                                        />
-                                                        {errors.businessCertificateFile && (
-                                                            <div className="text-danger small mt-1">
-                                                                {errors.businessCertificateFile}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                {/* Identity Card File */}
-                                                <div className="col-md-12">
-                                                    <div className="mb-3">
-                                                        <label className="form-label">
-                                                            CMND/CCCD người đại diện
-                                                            <span className="text-danger">*</span>
-                                                        </label>
-                                                        <CustomFileInput
-                                                            files={files.identityCardFile}
-                                                            onChange={(selectedFiles) =>
-                                                                handleFileChange(
-                                                                    'identityCardFile',
-                                                                    selectedFiles
-                                                                )
-                                                            }
-                                                            accept="image/*,.pdf,.doc,.docx"
-                                                            multiple={false}
-                                                            maxSize={10}
-                                                            id="identity-card-file-input"
-                                                        />
-                                                        {errors.identityCardFile && (
-                                                            <div className="text-danger small mt-1">
-                                                                {errors.identityCardFile}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                {/* Submit Button */}
                                                 <div className="col-md-12">
                                                     <div className="form-group-btn mb-0 text-end">
                                                         <Button
                                                             text={
                                                                 isSubmitting
                                                                     ? 'Đang gửi...'
-                                                                    : 'Gửi đơn đăng ký'
+                                                                    : 'Gửi đơn đăng ký hợp tác'
                                                             }
                                                             type="submit"
                                                             isDisabled={isSubmitting}

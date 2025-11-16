@@ -3,6 +3,7 @@ export interface BookingActionProps {
     prevStep: () => void;
     nextStep: () => void;
     disabled?: boolean;
+    showPrev?: boolean;
 }
 
 const BookingAction: React.FC<BookingActionProps> = ({
@@ -10,18 +11,24 @@ const BookingAction: React.FC<BookingActionProps> = ({
     prevStep,
     nextStep,
     disabled = false,
+    showPrev = true,
 }) => {
+    const containerClass = showPrev
+        ? 'd-flex align-items-center flex-wrap rpw-gap-2 justify-content-between'
+        : 'd-flex align-items-center flex-wrap rpw-gap-2 justify-content-end';
     return (
         <div className="card-footer">
-            <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between">
-                <button
-                    className="btn btn-md btn-dark prev_btns inline-flex align-items-center rounded-pill"
-                    onClick={prevStep}
-                    disabled={disabled}
-                >
-                    <i className="isax isax-arrow-left-2 me-1"></i>
-                    Quay lại
-                </button>
+            <div className={containerClass}>
+                {showPrev && (
+                    <button
+                        className="btn btn-md btn-dark prev_btns inline-flex align-items-center rounded-pill"
+                        onClick={prevStep}
+                        disabled={disabled}
+                    >
+                        <i className="isax isax-arrow-left-2 me-1"></i>
+                        Quay lại
+                    </button>
+                )}
                 <button
                     onClick={nextStep}
                     className="btn btn-md btn-primary-gradient next_btns inline-flex align-items-center rounded-pill"

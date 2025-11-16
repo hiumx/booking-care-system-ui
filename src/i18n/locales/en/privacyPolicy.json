@@ -1,0 +1,111 @@
+{
+    "title": "Privacy Policy",
+    "breadcrumb": {
+        "home": "Home",
+        "current": "Privacy Policy"
+    },
+    "sections": {
+        "introduction": {
+            "title": "1. Introduction",
+            "description": "BookingCare is committed to protecting the privacy and personal information of users. This privacy policy explains how we collect, use, store, and protect your information when you use our services."
+        },
+        "informationCollection": {
+            "title": "2. Information We Collect",
+            "subtitle": "2.1. Personal Information",
+            "description": "We may collect the following information:",
+            "items": {
+                "registration": "Registration Information",
+                "registrationValue": "Full name, email, phone number, date of birth, gender",
+                "medical": "Medical Information",
+                "medicalValue": "Medical history, appointment booking information, examination results (if you share)",
+                "payment": "Payment Information",
+                "paymentValue": "Credit card information, bank account (processed by secure payment partners)",
+                "technical": "Technical Information",
+                "technicalValue": "IP address, browser type, device used, location data"
+            }
+        },
+        "informationUsage": {
+            "title": "3. Purpose of Information Use",
+            "description": "We use your information to:",
+            "items": [
+                "Provide and improve medical appointment booking services",
+                "Process bookings and payments",
+                "Send notifications about appointments, service updates",
+                "Personalize user experience",
+                "Analyze and improve service quality",
+                "Comply with legal requirements and regulations",
+                "Protect user rights and safety"
+            ]
+        },
+        "informationSharing": {
+            "title": "4. Information Sharing",
+            "description": "We do not sell or rent your personal information. We only share information in the following cases:",
+            "items": {
+                "healthcare": "With Doctors and Healthcare Facilities",
+                "healthcareValue": "Share necessary information to complete appointment booking services",
+                "partners": "With Service Partners",
+                "partnersValue": "Payment service providers, data storage, analytics (with confidentiality commitment)",
+                "legal": "Legal Requirements",
+                "legalValue": "When requested by competent state agencies",
+                "protection": "Protection of Rights",
+                "protectionValue": "To protect the rights, assets, or safety of BookingCare and users"
+            }
+        },
+        "informationSecurity": {
+            "title": "5. Information Security",
+            "description": "We apply advanced security measures:",
+            "items": [
+                "Data encryption during transmission (SSL/TLS)",
+                "Data encryption when stored",
+                "Strict access control",
+                "Monitor and detect unusual activities",
+                "Train staff on information security",
+                "Regular security audits"
+            ]
+        },
+        "userRights": {
+            "title": "6. User Rights",
+            "description": "According to legal regulations, you have the right to:",
+            "items": {
+                "access": "Access",
+                "accessValue": "Request to view your personal information",
+                "edit": "Edit",
+                "editValue": "Update or correct inaccurate information",
+                "delete": "Delete",
+                "deleteValue": "Request deletion of personal information (unless the law requires storage)",
+                "withdraw": "Withdraw Consent",
+                "withdrawValue": "Withdraw consent for processing personal data",
+                "complaint": "Complaint",
+                "complaintValue": "Complain about personal data processing"
+            },
+            "contactEmail": "To exercise the above rights, please contact us via email:",
+            "email": "privacy@bookingcare.vn"
+        },
+        "cookies": {
+            "title": "7. Cookies and Tracking Technologies",
+            "description": "We use cookies and similar technologies to improve user experience, analyze traffic, and personalize content. You can manage cookies through your browser settings."
+        },
+        "storage": {
+            "title": "8. Storage Period",
+            "description": "We store your personal information for the time necessary to fulfill the stated purposes or as required by law. After the storage period expires, information will be deleted or anonymized."
+        },
+        "children": {
+            "title": "9. Children Protection",
+            "description": "Our services are not intended for children under 18 years of age. We do not knowingly collect information from children. If we discover children's information, we will delete it immediately."
+        },
+        "policyChanges": {
+            "title": "10. Policy Changes",
+            "description": "We may update this privacy policy over time. Any changes will be announced on this website with the latest update date. We encourage you to regularly review this policy."
+        },
+        "contact": {
+            "title": "11. Contact",
+            "description": "If you have questions or concerns about this privacy policy, please contact:",
+            "email": "Email",
+            "emailValue": "privacy@bookingcare.vn",
+            "hotline": "Hotline",
+            "hotlineValue": "+84 236 3 822 888",
+            "address": "Address",
+            "addressValue": "Da Nang, Vietnam"
+        }
+    }
+}

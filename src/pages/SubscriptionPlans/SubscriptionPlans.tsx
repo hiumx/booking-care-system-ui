@@ -3,7 +3,6 @@ import SubscriptionPlanCard from './components';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import AOS from 'aos';
-import 'aos/dist/aos.css';
 
 interface SubscriptionPlan {
     id: number;

@@ -16,6 +16,11 @@ export const PATHS = {
     ABOUT_US: '/about-us',
     CONTACT_US: '/contact-us',
     SMART_BOOKING: '/smart-booking',
+    LEGAL_NOTICE: '/legal-notice',
+    PRIVACY_POLICY: '/privacy-policy',
+    REFUND_POLICY: '/refund-policy',
+    AI_SUPPORT_BOOKING: '/ai-support-booking',
+    AI_SUPPORT_BOOKING_CHAT: '/ai-support-booking/:chatId',
 
     // Authentication paths
     LOGIN: '/login',

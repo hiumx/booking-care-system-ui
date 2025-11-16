@@ -11,6 +11,7 @@ interface ModalAreaProps {
     onApply: (areaDisplay: string, locationId: string, provinceId?: string) => void;
     selectedProvinceId?: string;
     selectedDistrictId?: string;
+    requireSelection?: boolean; // Bắt buộc phải chọn vị trí (không cho đóng modal nếu chưa chọn)
 }
 
 const ModalArea: React.FC<ModalAreaProps> = ({
@@ -19,6 +20,7 @@ const ModalArea: React.FC<ModalAreaProps> = ({
     onApply,
     selectedProvinceId: initialProvinceId,
     selectedDistrictId: initialDistrictId,
+    requireSelection = false,
 }) => {
     const [provinces, setProvinces] = useState<Province[]>([]);
     const [districts, setDistricts] = useState<District[]>([]);
@@ -254,6 +256,13 @@ const ModalArea: React.FC<ModalAreaProps> = ({
     };
 
     const handleClearFilter = () => {
+        // Nếu bắt buộc phải chọn vị trí, không cho xóa bộ lọc và đóng modal
+        if (requireSelection && !selectedProvinceId) {
+            // Chỉ xóa search term, không đóng modal
+            setSearchTerm('');
+            return;
+        }
+
         setSearchTerm('');
         setSelectedProvinceId('');
         setSelectedDistrictId('');
@@ -341,10 +350,34 @@ const ModalArea: React.FC<ModalAreaProps> = ({
                         {renderCurrentSelection()}
                     </div>
                     <div className={styles.modalActions}>
-                        <button className={styles.clearButton} onClick={handleClearFilter}>
+                        <button
+                            className={styles.clearButton}
+                            onClick={handleClearFilter}
+                            disabled={requireSelection && !selectedProvinceId}
+                            title={
+                                requireSelection && !selectedProvinceId
+                                    ? 'Vui lòng chọn vị trí trước'
+                                    : 'Xóa bộ lọc'
+                            }
+                        >
                             Xóa bộ lọc
                         </button>
-                        <button className={styles.closeButton} onClick={onClose}>
+                        <button
+                            className={styles.closeButton}
+                            onClick={() => {
+                                // Nếu bắt buộc phải chọn và chưa chọn gì, không cho đóng
+                                if (requireSelection && !selectedProvinceId) {
+                                    return;
+                                }
+                                onClose();
+                            }}
+                            disabled={requireSelection && !selectedProvinceId}
+                            title={
+                                requireSelection && !selectedProvinceId
+                                    ? 'Vui lòng chọn vị trí trước khi đóng'
+                                    : 'Đóng'
+                            }
+                        >
                             <X size={20} />
                         </button>
                     </div>
