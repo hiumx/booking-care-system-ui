@@ -50,6 +50,8 @@ export interface HospitalInfo {
 // Appointment Response from API
 export interface AppointmentResponse {
     id: string;
+    patientId?: string;
+    patientAccountId?: string;
     cancelledBy?: string;
     cancelledAt?: string;
     appointmentDate: string;
@@ -109,6 +111,7 @@ export interface AppointmentQueryRequest {
 // Create Appointment Request
 export interface CreateAppointmentRequest {
     patientId: string;
+    patientAccountId?: string;
     doctorId?: string;
     serviceId?: string;
     specialtyId?: string;

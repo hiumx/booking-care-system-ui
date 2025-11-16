@@ -69,6 +69,7 @@ const Booking: React.FC = () => {
 
         return createAppointmentRequest({
             patientId: userState.profile.id,
+            patientAccountId: userState.profile.accountId,
             doctorId: doctorId || '',
             specialtyId: doctorState.selectedDoctor?.specialtyId,
             appointmentDate: scheduleState.selectedDate,
