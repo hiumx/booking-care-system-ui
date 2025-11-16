@@ -521,6 +521,12 @@ const SearchInput: React.FC<SearchInputProps> = ({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
+        // On ServiceHospital page, all filters/search are real-time.
+        // The search button should be clickable but perform no action.
+        if (isServiceHospitalPage) {
+            return;
+        }
+
         // If on DoctorList page and onSearchNow callback is provided, trigger immediate search
         if (isDoctorListPage && onSearchNow) {
             onSearchNow();

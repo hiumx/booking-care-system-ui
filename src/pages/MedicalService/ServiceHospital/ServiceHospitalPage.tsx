@@ -175,9 +175,13 @@ const ServiceHospitalPage: React.FC = () => {
                     districtName: currentDistrictName || undefined,
                 };
                 setAreaFilter((prev) => {
-                    const prevStr = JSON.stringify(prev);
-                    const newStr = JSON.stringify(newAreaFilter);
-                    if (prevStr !== newStr) {
+                    // Compare individual fields instead of JSON.stringify to avoid issues with key order
+                    if (
+                        prev?.provinceId !== newAreaFilter.provinceId ||
+                        prev?.districtId !== newAreaFilter.districtId ||
+                        prev?.provinceName !== newAreaFilter.provinceName ||
+                        prev?.districtName !== newAreaFilter.districtName
+                    ) {
                         return newAreaFilter;
                     }
                     return prev;
@@ -252,6 +256,15 @@ const ServiceHospitalPage: React.FC = () => {
             }
             // Remove duplicates
             const uniqueHospitalIds = Array.from(new Set(hospitalIds));
+
+            // Debug: Log area filter values
+            console.log('🔍 Fetching services with filters:', {
+                provinceId: areaFilter?.provinceId,
+                districtId: areaFilter?.districtId,
+                provinceName: areaFilter?.provinceName,
+                districtName: areaFilter?.districtName,
+                areaFilter: areaFilter,
+            });
 
             dispatch(
                 getServicesWithHospitalAsync({
@@ -363,6 +376,7 @@ const ServiceHospitalPage: React.FC = () => {
         provinceName?: string;
         districtName?: string;
     }) => {
+        console.log('📍 handleAreaFilter called with:', areaInfo);
         setAreaFilter(areaInfo);
         setCurrentPage(1);
         // Update URL params immediately
@@ -377,8 +391,59 @@ const ServiceHospitalPage: React.FC = () => {
 
     // Server-side filtering - no client-side filtering needed
     // Data is already filtered by the backend
-    const currentHospitals = hospitalData.data;
+    // Ensure we only use the services from the API response (respect pagination)
+    // Safeguard: Limit displayed services to match totalServices or pageSize to prevent display issues
+    let currentHospitals = hospitalData.data;
+    if (servicesData && servicesData.totalServices > 0) {
+        const maxExpectedServices = Math.min(
+            servicesData.pageSize,
+            servicesData.totalServices - (servicesData.page - 1) * servicesData.pageSize
+        );
+        // If we have more services than expected, limit to expected count
+        if (currentHospitals.length > maxExpectedServices) {
+            console.warn(
+                `⚠️ Limiting displayed services from ${currentHospitals.length} to ${maxExpectedServices} to match API totalServices`
+            );
+            currentHospitals = currentHospitals.slice(0, maxExpectedServices);
+        }
+    }
     const totalPages = servicesData?.totalPages || 1;
+
+    // Debug: Log data to check for discrepancies
+    useEffect(() => {
+        if (servicesData) {
+            const servicesCount = servicesData.services?.length || 0;
+            const expectedCount = Math.min(
+                servicesData.pageSize,
+                servicesData.totalServices - (servicesData.page - 1) * servicesData.pageSize
+            );
+
+            const hasDiscrepancy = servicesCount !== expectedCount;
+            let discrepancyMessage = '✅ OK';
+            if (hasDiscrepancy) {
+                discrepancyMessage = `⚠️ Mismatch: Expected ${expectedCount}, got ${servicesCount}`;
+            }
+            console.log('Services Data Debug:', {
+                totalServices: servicesData.totalServices,
+                servicesCount: servicesCount,
+                expectedCount: expectedCount,
+                page: servicesData.page,
+                pageSize: servicesData.pageSize,
+                totalPages: servicesData.totalPages,
+                discrepancy: discrepancyMessage,
+            });
+            console.log('Current Hospitals Count:', currentHospitals.length);
+
+            // Log if there's a mismatch
+            if (servicesCount !== expectedCount && servicesCount > 0) {
+                console.warn('⚠️ API returned different number of services than expected!', {
+                    expected: expectedCount,
+                    actual: servicesCount,
+                    services: servicesData.services,
+                });
+            }
+        }
+    }, [servicesData, currentHospitals.length]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -481,7 +546,7 @@ const ServiceHospitalPage: React.FC = () => {
                     <div className="row">
                         {currentHospitals.map((hospital) => (
                             <HospitalCard
-                                key={hospital.hospital.id}
+                                key={hospital.hospital.idservice} // Use service ID as key, not hospital ID
                                 name={hospital.hospital.specialty} // Service name
                                 location={hospital.hospital.location}
                                 fees={hospital.hospital.fees}
