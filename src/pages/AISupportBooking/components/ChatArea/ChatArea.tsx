@@ -14,7 +14,6 @@ interface ChatAreaProps {
     messages: Message[];
     isAITyping: boolean;
     onSendMessage: (content: string) => void;
-    onEditMessage?: (messageId: string, newContent: string) => void;
     onToggleSidebar?: () => void;
     userLocation?: { provinceId?: string; districtId?: string; displayName: string } | null;
     onLocationChange?: (location: {
@@ -114,7 +113,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     messages,
     isAITyping,
     onSendMessage,
-    onEditMessage,
     onToggleSidebar,
     userLocation,
     onLocationChange,
@@ -207,21 +205,64 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                             <div className={styles.questionChips}>
                                 <button
                                     className={styles.questionChip}
-                                    onClick={() => setInputValue('Tôi bị đau đầu')}
+                                    onClick={() =>
+                                        onSendMessage(
+                                            'Tôi bị chóng mặt thường xuyên, nên khám chuyên khoa nào?'
+                                        )
+                                    }
                                 >
-                                    Tôi bị đau đầu
+                                    Tôi bị chóng mặt thường xuyên, nên khám chuyên khoa nào?
                                 </button>
                                 <button
                                     className={styles.questionChip}
-                                    onClick={() => setInputValue('Tìm bác sĩ tim mạch')}
+                                    onClick={() =>
+                                        onSendMessage(
+                                            'Tôi cảm thấy đau tức ngực, có cần đi cấp cứu không?'
+                                        )
+                                    }
                                 >
-                                    Tìm bác sĩ tim mạch
+                                    Tôi cảm thấy đau tức ngực, có cần đi cấp cứu không?
                                 </button>
                                 <button
                                     className={styles.questionChip}
-                                    onClick={() => setInputValue('Đặt lịch khám tổng quát')}
+                                    onClick={() =>
+                                        onSendMessage(
+                                            'Tôi bị đau bụng kéo dài nhiều ngày, nên khám bác sĩ gì?'
+                                        )
+                                    }
                                 >
-                                    Đặt lịch khám tổng quát
+                                    Tôi bị đau bụng kéo dài nhiều ngày, nên khám bác sĩ gì?
+                                </button>
+                                <button
+                                    className={styles.questionChip}
+                                    onClick={() =>
+                                        onSendMessage(
+                                            'Tôi bị sốt cao không hạ, có cần đi khám ngay không?'
+                                        )
+                                    }
+                                >
+                                    Tôi bị sốt cao không hạ, có cần đi khám ngay không?
+                                </button>
+                                <button
+                                    className={styles.questionChip}
+                                    onClick={() =>
+                                        onSendMessage(
+                                            'Tôi bị khó thở và mệt nhiều, cần đến khoa nào?'
+                                        )
+                                    }
+                                >
+                                    Tôi bị khó thở và mệt nhiều, cần đến khoa nào?
+                                </button>
+                                <button
+                                    className={styles.questionChip}
+                                    onClick={() =>
+                                        onSendMessage(
+                                            'Tôi bị mất ngủ lâu ngày, có nên khám chuyên khoa tâm thần kinh không?'
+                                        )
+                                    }
+                                >
+                                    Tôi bị mất ngủ lâu ngày, có nên khám chuyên khoa tâm thần kinh
+                                    không?
                                 </button>
                             </div>
                         </div>
@@ -230,7 +271,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                     <div className={styles.messagesList}>
                         {messages.map((message) => (
                             <div key={message.id} className={styles.messageWrapper}>
-                                <MessageBubble message={message} onEdit={onEditMessage} />
+                                <MessageBubble message={message} />
                                 {message.suggestions && message.suggestions.length > 0 && (
                                     <div className={styles.suggestionsContainer}>
                                         <div className={styles.tabsContainer}>

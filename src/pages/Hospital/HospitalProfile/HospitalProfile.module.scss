@@ -20,6 +20,8 @@
             border: 1px solid #e6e9ef;
             border-radius: 10px;
             padding: 16px;
+            overflow: hidden; /* Prevent content from expanding container */
+            min-width: 0; /* Allow flex item to shrink below content size */
         }
 
         .tabs {
@@ -84,6 +86,8 @@
             margin: 16px 0;
             /* Ensure titles are visible when navigating via anchors under sticky tabs */
             scroll-margin-top: 70px;
+            overflow: hidden; /* Prevent section from expanding beyond container */
+            min-width: 0; /* Allow section to shrink */
 
             /* No extra padding needed - handled by swiper itself */
             &:has(.serviceSwiper) {
@@ -101,6 +105,7 @@
         /* Service Slider */
         .serviceSwiper {
             width: 100%;
+            max-width: 100%; /* Ensure it never exceeds container width */
             box-sizing: border-box;
             padding: 10px 0 40px; /* Add bottom padding for pagination */
             overflow: hidden; /* Keep content clipped */
@@ -111,16 +116,21 @@
                 position: relative;
                 overflow: hidden; /* Ensure slides don't overflow */
                 padding-bottom: 0; /* No extra padding needed */
+                width: 100% !important; /* Force swiper to respect container width */
+                max-width: 100% !important; /* Prevent expansion beyond container */
             }
 
             :global(.swiper-wrapper) {
                 align-items: stretch;
                 display: flex;
+                /* Allow wrapper to size based on content but not exceed container */
+                max-width: 100%;
             }
             :global(.swiper-slide) {
                 height: auto;
                 display: inline-flex;
                 width: auto; /* allow slidesPerView: 'auto' */
+                flex-shrink: 0; /* Prevent slides from shrinking */
             }
 
             /* Custom navigation buttons - centered on slide content only */
@@ -395,7 +405,9 @@
         .desktopSlider {
             display: block;
             width: 100%;
+            max-width: 100%; /* Constrain to container width */
             padding: 0; /* No padding - container already has padding */
+            overflow: hidden; /* Ensure no horizontal overflow */
         }
 
         .mobileSpecialtyList {
