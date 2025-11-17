@@ -181,20 +181,6 @@ const ChatHeader = () => {
                                 </div>
                             </li>
                             <li className="list-inline-item">
-                                <button
-                                    className={clsx(styles.chatSearchBtn, 'btn btn-outline-light')}
-                                    title="Gọi Video"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        setShowVideoCall(true);
-                                        setShowDropdown(false);
-                                    }}
-                                    disabled={!activeConversation}
-                                >
-                                    <i className="fa-solid fa-phone"></i>
-                                </button>
-                            </li>
-                            <li className="list-inline-item">
                                 <div className="dropdown" ref={dropdownRef}>
                                     <button
                                         className={clsx(
