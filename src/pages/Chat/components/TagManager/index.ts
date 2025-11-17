@@ -1,3 +1,1 @@
-import TagManager from './TagManager';
-
-export default TagManager;
+export { default } from './TagManager';

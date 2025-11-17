@@ -1,3 +1,1 @@
-import ConversationTagBadge from './ConversationTagBadge';
-
-export default ConversationTagBadge;
+export { default } from './ConversationTagBadge';

@@ -67,7 +67,7 @@
     }
 
     &:hover {
-        color: #0e82fd;
+        color: #0a6fd1;
         background: #f8fbff;
         border-color: #d1e5ff;
         box-shadow:
@@ -89,7 +89,7 @@
     }
 
     &.active {
-        color: #0e82fd;
+        color: #0a6fd1;
         background: #f0f8ff;
         border-color: #b8d9ff;
         box-shadow:
@@ -103,9 +103,9 @@
         }
 
         .tagBadge {
-            background: #0e82fd;
+            background: #0a6fd1;
             color: #ffffff;
-            border-color: #0e82fd;
+            border-color: #0a6fd1;
             box-shadow:
                 0 1px 4px rgba(14, 130, 253, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);

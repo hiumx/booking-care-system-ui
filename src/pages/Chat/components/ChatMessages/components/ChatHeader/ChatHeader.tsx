@@ -144,8 +144,8 @@ const ChatHeader = () => {
                                     </button>
                                     {showTagManager && activeConversation && (
                                         <div
-                                            role="dialog"
-                                            aria-label="Tag Manager"
+                                            role="menu"
+                                            aria-label="Tag Manager Menu"
                                             className={clsx(
                                                 styles.tagDropdown,
                                                 'dropdown-menu dropdown-menu-end show'
@@ -156,14 +156,6 @@ const ChatHeader = () => {
                                                 top: '3.5rem',
                                                 right: 0,
                                                 minWidth: '400px',
-                                            }}
-                                            onMouseDown={(e) => {
-                                                // Prevent event from bubbling up to handleClickOutside
-                                                e.stopPropagation();
-                                            }}
-                                            onClick={(e) => {
-                                                // Prevent event from bubbling up
-                                                e.stopPropagation();
                                             }}
                                         >
                                             <TagManager

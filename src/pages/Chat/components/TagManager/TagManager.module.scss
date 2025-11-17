@@ -28,7 +28,7 @@
     }
 
     .createBtn {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #5a67d8 0%, #6b3fa0 100%);
         color: white;
         border: none;
         border-radius: 50%;
@@ -96,16 +96,11 @@
         }
 
         &.selected {
-            background: linear-gradient(135deg, #e8f3ff 0%, #f0f8ff 100%);
-            border-color: #b8d9ff;
+            background: linear-gradient(135deg, #e7f3ff 0%, #f0f7ff 100%);
+            border: 1px solid #667eea;
             box-shadow:
                 0 2px 8px rgba(14, 130, 253, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
-        }
-
-        &.selected {
-            background: linear-gradient(135deg, #e7f3ff 0%, #f0f7ff 100%);
-            border: 1px solid #667eea;
         }
 
         .tagBadge {
