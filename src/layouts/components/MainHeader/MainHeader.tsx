@@ -6,7 +6,11 @@ import { toast } from 'react-toastify';
 import { PATHS } from '@/routes/paths';
 import { AppDispatch, RootState } from '@/store';
 import { logoutAsync } from '@/store/slices/authSlice';
-import { fetchUserProfile, clearUserProfile } from '@/store/slices/userSlice';
+import {
+    fetchUserProfile,
+    clearUserProfile,
+    fetchUnreadMessageCount,
+} from '@/store/slices/userSlice';
 import {
     fetchNotifications,
     fetchNotificationSummary,
@@ -34,7 +38,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
     const currentLanguage = (i18n.language || 'vi') as 'vi' | 'en';
 
     const { isAuthenticated, accessToken } = useSelector((state: RootState) => state.auth);
-    const { profile } = useSelector((state: RootState) => state.user);
+    const { profile, unreadMessageCount } = useSelector((state: RootState) => state.user);
     const { notifications, unreadCount } = useSelector((state: RootState) => state.notification);
 
     const [showNotifications, setShowNotifications] = useState(false);
@@ -51,6 +55,13 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                 });
         }
     }, [isAuthenticated, profile, dispatch]);
+
+    // Fetch unread message count when authenticated and profile is available
+    useEffect(() => {
+        if (isAuthenticated && profile?.accountId) {
+            dispatch(fetchUnreadMessageCount(profile.accountId));
+        }
+    }, [isAuthenticated, profile?.accountId, dispatch]);
 
     // Initialize SignalR and fetch notifications when authenticated
     useEffect(() => {
@@ -268,255 +279,290 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                     </Link>
                                 </li>
                                 {isAuthenticated && (
-                                    <li
-                                        className="nav-item dropdown noti-nav me-3 pe-0"
-                                        ref={notificationRef}
-                                    >
-                                        <Link
-                                            to="#"
-                                            className="dropdown-toggle nav-link p-0"
-                                            data-bs-toggle="dropdown"
-                                            style={{ position: 'relative' }}
+                                    <>
+                                        <li
+                                            className="nav-item dropdown noti-nav me-3 pe-0"
+                                            ref={notificationRef}
                                         >
-                                            <i className="isax isax-notification-bing"></i>
-                                            {unreadCount > 0 && (
-                                                <span
-                                                    className="badge badge-pill bg-danger"
+                                            <Link
+                                                to="#"
+                                                className="dropdown-toggle nav-link p-0"
+                                                data-bs-toggle="dropdown"
+                                                style={{ position: 'relative' }}
+                                            >
+                                                <i className="isax isax-notification-bing"></i>
+                                                {unreadCount > 0 && (
+                                                    <span
+                                                        className="badge badge-pill bg-danger"
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: '-5px',
+                                                            right: '-5px',
+                                                            fontSize: '10px',
+                                                            padding: '2px 6px',
+                                                            minWidth: '18px',
+                                                            height: '18px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            borderRadius: '10px',
+                                                        }}
+                                                    >
+                                                        {unreadCount > 99 ? '99+' : unreadCount}
+                                                    </span>
+                                                )}
+                                            </Link>
+                                            <div className="dropdown-menu notifications dropdown-menu-end">
+                                                <div className="topnav-dropdown-header">
+                                                    <span className="notification-title">
+                                                        Thông báo
+                                                    </span>
+                                                    {unreadCount > 0 && (
+                                                        <button
+                                                            type="button"
+                                                            className="clear-noti"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                handleMarkAllAsRead();
+                                                            }}
+                                                            style={{
+                                                                background: 'none',
+                                                                border: 'none',
+                                                                color: '#0d6efd',
+                                                                cursor: 'pointer',
+                                                                fontSize: '13px',
+                                                                fontWeight: 500,
+                                                                padding: 0,
+                                                            }}
+                                                        >
+                                                            Đọc tất cả
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <div className="noti-content">
+                                                    <ul className="notification-list">
+                                                        {notifications.length === 0 ? (
+                                                            <li className="notification-message">
+                                                                <div className="text-center py-3">
+                                                                    <p className="text-muted">
+                                                                        Chưa có thông báo nào
+                                                                    </p>
+                                                                </div>
+                                                            </li>
+                                                        ) : (
+                                                            notifications.map((notification) => {
+                                                                const localizedNotification =
+                                                                    getLocalizedNotification(
+                                                                        notification,
+                                                                        currentLanguage
+                                                                    );
+                                                                return (
+                                                                    <li
+                                                                        key={notification.id}
+                                                                        className="notification-message"
+                                                                    >
+                                                                        <Link
+                                                                            to="#"
+                                                                            onClick={(e) => {
+                                                                                e.preventDefault();
+                                                                                handleNotificationClick(
+                                                                                    notification.id,
+                                                                                    notification.actionUrl
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            <div className="notify-block d-flex">
+                                                                                <span
+                                                                                    className="avatar"
+                                                                                    style={{
+                                                                                        width: '40px',
+                                                                                        height: '40px',
+                                                                                        borderRadius:
+                                                                                            '50%',
+                                                                                        backgroundColor:
+                                                                                            '#e3f2fd',
+                                                                                        display:
+                                                                                            'flex',
+                                                                                        alignItems:
+                                                                                            'center',
+                                                                                        justifyContent:
+                                                                                            'center',
+                                                                                        flexShrink: 0,
+                                                                                    }}
+                                                                                >
+                                                                                    <i
+                                                                                        className={
+                                                                                            notification.icon ||
+                                                                                            'isax isax-notification'
+                                                                                        }
+                                                                                        style={{
+                                                                                            fontSize:
+                                                                                                '20px',
+                                                                                            color: '#1976d2',
+                                                                                        }}
+                                                                                    ></i>
+                                                                                </span>
+                                                                                <div className="media-body">
+                                                                                    <div
+                                                                                        style={{
+                                                                                            display:
+                                                                                                'flex',
+                                                                                            justifyContent:
+                                                                                                'space-between',
+                                                                                            alignItems:
+                                                                                                'flex-start',
+                                                                                            marginBottom:
+                                                                                                '4px',
+                                                                                        }}
+                                                                                    >
+                                                                                        <h6
+                                                                                            style={{
+                                                                                                marginBottom: 0,
+                                                                                            }}
+                                                                                        >
+                                                                                            {
+                                                                                                localizedNotification.title
+                                                                                            }
+                                                                                        </h6>
+                                                                                        {!notification.isRead && (
+                                                                                            <span
+                                                                                                className="badge bg-danger"
+                                                                                                style={{
+                                                                                                    fontSize:
+                                                                                                        '10px',
+                                                                                                    padding:
+                                                                                                        '2px 8px',
+                                                                                                    marginLeft:
+                                                                                                        '8px',
+                                                                                                }}
+                                                                                            >
+                                                                                                Mới
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                    <p className="noti-details">
+                                                                                        {
+                                                                                            localizedNotification.content
+                                                                                        }
+                                                                                    </p>
+                                                                                    <span
+                                                                                        className="notification-time"
+                                                                                        style={{
+                                                                                            display:
+                                                                                                'flex',
+                                                                                            alignItems:
+                                                                                                'center',
+                                                                                            gap: '4px',
+                                                                                            fontSize:
+                                                                                                '12px',
+                                                                                            color: '#6c757d',
+                                                                                        }}
+                                                                                    >
+                                                                                        <i
+                                                                                            className="isax isax-clock"
+                                                                                            style={{
+                                                                                                fontSize:
+                                                                                                    '14px',
+                                                                                            }}
+                                                                                        ></i>
+                                                                                        {formatNotificationTime(
+                                                                                            notification.createdAt
+                                                                                        )}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </Link>
+                                                                    </li>
+                                                                );
+                                                            })
+                                                        )}
+                                                    </ul>
+                                                </div>
+                                                <div
+                                                    className="topnav-dropdown-footer"
                                                     style={{
-                                                        position: 'absolute',
-                                                        top: '-5px',
-                                                        right: '-5px',
-                                                        fontSize: '10px',
-                                                        padding: '2px 6px',
-                                                        minWidth: '18px',
-                                                        height: '18px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        borderRadius: '10px',
+                                                        borderTop: '1px solid #e9ecef',
+                                                        padding: '5px 0',
+                                                        textAlign: 'center',
+                                                        backgroundColor: '#f8f9fa',
                                                     }}
                                                 >
-                                                    {unreadCount > 99 ? '99+' : unreadCount}
-                                                </span>
-                                            )}
-                                        </Link>
-                                        <div className="dropdown-menu notifications dropdown-menu-end">
-                                            <div className="topnav-dropdown-header">
-                                                <span className="notification-title">
-                                                    Thông báo
-                                                </span>
-                                                {unreadCount > 0 && (
                                                     <button
                                                         type="button"
-                                                        className="clear-noti"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            handleMarkAllAsRead();
+                                                        onClick={() => {
+                                                            // Close dropdown
+                                                            if (notificationRef.current) {
+                                                                const dropdownElement =
+                                                                    notificationRef.current.querySelector(
+                                                                        '.dropdown-menu'
+                                                                    );
+                                                                if (dropdownElement) {
+                                                                    dropdownElement.classList.remove(
+                                                                        'show'
+                                                                    );
+                                                                }
+                                                            }
+                                                            // Navigate to notifications page
+                                                            navigate(
+                                                                `${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=notifications`
+                                                            );
                                                         }}
                                                         style={{
                                                             background: 'none',
                                                             border: 'none',
                                                             color: '#0d6efd',
-                                                            cursor: 'pointer',
-                                                            fontSize: '13px',
                                                             fontWeight: 500,
-                                                            padding: 0,
+                                                            fontSize: '14px',
+                                                            cursor: 'pointer',
+                                                            padding: '8px 16px',
+                                                            width: '100%',
+                                                            transition: 'color 0.2s ease',
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.color = '#0a58ca';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.color = '#0d6efd';
                                                         }}
                                                     >
-                                                        Đọc tất cả
+                                                        Xem tất cả
                                                     </button>
-                                                )}
+                                                </div>
                                             </div>
-                                            <div className="noti-content">
-                                                <ul className="notification-list">
-                                                    {notifications.length === 0 ? (
-                                                        <li className="notification-message">
-                                                            <div className="text-center py-3">
-                                                                <p className="text-muted">
-                                                                    Chưa có thông báo nào
-                                                                </p>
-                                                            </div>
-                                                        </li>
-                                                    ) : (
-                                                        notifications.map((notification) => {
-                                                            const localizedNotification =
-                                                                getLocalizedNotification(
-                                                                    notification,
-                                                                    currentLanguage
-                                                                );
-                                                            return (
-                                                                <li
-                                                                    key={notification.id}
-                                                                    className="notification-message"
-                                                                >
-                                                                    <Link
-                                                                        to="#"
-                                                                        onClick={(e) => {
-                                                                            e.preventDefault();
-                                                                            handleNotificationClick(
-                                                                                notification.id,
-                                                                                notification.actionUrl
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        <div className="notify-block d-flex">
-                                                                            <span
-                                                                                className="avatar"
-                                                                                style={{
-                                                                                    width: '40px',
-                                                                                    height: '40px',
-                                                                                    borderRadius:
-                                                                                        '50%',
-                                                                                    backgroundColor:
-                                                                                        '#e3f2fd',
-                                                                                    display: 'flex',
-                                                                                    alignItems:
-                                                                                        'center',
-                                                                                    justifyContent:
-                                                                                        'center',
-                                                                                    flexShrink: 0,
-                                                                                }}
-                                                                            >
-                                                                                <i
-                                                                                    className={
-                                                                                        notification.icon ||
-                                                                                        'isax isax-notification'
-                                                                                    }
-                                                                                    style={{
-                                                                                        fontSize:
-                                                                                            '20px',
-                                                                                        color: '#1976d2',
-                                                                                    }}
-                                                                                ></i>
-                                                                            </span>
-                                                                            <div className="media-body">
-                                                                                <div
-                                                                                    style={{
-                                                                                        display:
-                                                                                            'flex',
-                                                                                        justifyContent:
-                                                                                            'space-between',
-                                                                                        alignItems:
-                                                                                            'flex-start',
-                                                                                        marginBottom:
-                                                                                            '4px',
-                                                                                    }}
-                                                                                >
-                                                                                    <h6
-                                                                                        style={{
-                                                                                            marginBottom: 0,
-                                                                                        }}
-                                                                                    >
-                                                                                        {
-                                                                                            localizedNotification.title
-                                                                                        }
-                                                                                    </h6>
-                                                                                    {!notification.isRead && (
-                                                                                        <span
-                                                                                            className="badge bg-danger"
-                                                                                            style={{
-                                                                                                fontSize:
-                                                                                                    '10px',
-                                                                                                padding:
-                                                                                                    '2px 8px',
-                                                                                                marginLeft:
-                                                                                                    '8px',
-                                                                                            }}
-                                                                                        >
-                                                                                            Mới
-                                                                                        </span>
-                                                                                    )}
-                                                                                </div>
-                                                                                <p className="noti-details">
-                                                                                    {
-                                                                                        localizedNotification.content
-                                                                                    }
-                                                                                </p>
-                                                                                <span
-                                                                                    className="notification-time"
-                                                                                    style={{
-                                                                                        display:
-                                                                                            'flex',
-                                                                                        alignItems:
-                                                                                            'center',
-                                                                                        gap: '4px',
-                                                                                        fontSize:
-                                                                                            '12px',
-                                                                                        color: '#6c757d',
-                                                                                    }}
-                                                                                >
-                                                                                    <i
-                                                                                        className="isax isax-clock"
-                                                                                        style={{
-                                                                                            fontSize:
-                                                                                                '14px',
-                                                                                        }}
-                                                                                    ></i>
-                                                                                    {formatNotificationTime(
-                                                                                        notification.createdAt
-                                                                                    )}
-                                                                                </span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </Link>
-                                                                </li>
-                                                            );
-                                                        })
-                                                    )}
-                                                </ul>
-                                            </div>
-                                            <div
-                                                className="topnav-dropdown-footer"
-                                                style={{
-                                                    borderTop: '1px solid #e9ecef',
-                                                    padding: '5px 0',
-                                                    textAlign: 'center',
-                                                    backgroundColor: '#f8f9fa',
-                                                }}
+                                        </li>
+                                        <li className="nav-item noti-nav me-3 pe-0">
+                                            <Link
+                                                to={PATHS.CHAT}
+                                                className="nav-link p-0"
+                                                style={{ position: 'relative' }}
                                             >
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        // Close dropdown
-                                                        if (notificationRef.current) {
-                                                            const dropdownElement =
-                                                                notificationRef.current.querySelector(
-                                                                    '.dropdown-menu'
-                                                                );
-                                                            if (dropdownElement) {
-                                                                dropdownElement.classList.remove(
-                                                                    'show'
-                                                                );
-                                                            }
-                                                        }
-                                                        // Navigate to notifications page
-                                                        navigate(
-                                                            `${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=notifications`
-                                                        );
-                                                    }}
-                                                    style={{
-                                                        background: 'none',
-                                                        border: 'none',
-                                                        color: '#0d6efd',
-                                                        fontWeight: 500,
-                                                        fontSize: '14px',
-                                                        cursor: 'pointer',
-                                                        padding: '8px 16px',
-                                                        width: '100%',
-                                                        transition: 'color 0.2s ease',
-                                                    }}
-                                                    onMouseEnter={(e) => {
-                                                        e.currentTarget.style.color = '#0a58ca';
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        e.currentTarget.style.color = '#0d6efd';
-                                                    }}
-                                                >
-                                                    Xem tất cả
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </li>
+                                                <i className="isax isax-message-2"></i>
+                                                {unreadMessageCount > 0 && (
+                                                    <span
+                                                        className="badge badge-pill bg-success"
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: '-8px',
+                                                            right: '-9px',
+                                                            fontSize: '10px',
+                                                            padding: '2px 6px',
+                                                            minWidth: '12px',
+                                                            height: '14px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            borderRadius: '10px',
+                                                            fontWeight: '600',
+                                                        }}
+                                                    >
+                                                        {unreadMessageCount > 99
+                                                            ? '99+'
+                                                            : unreadMessageCount}
+                                                    </span>
+                                                )}
+                                            </Link>
+                                        </li>
+                                    </>
                                 )}
                                 <li className="nav-item">
                                     <LanguageSwitcher />

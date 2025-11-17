@@ -108,6 +108,7 @@ export const getAppointmentDateTime = (
  */
 export interface CreateAppointmentParams {
     patientId: string;
+    patientAccountId?: string;
     doctorId: string;
     specialtyId: string | undefined;
     appointmentDate: string;
@@ -126,6 +127,7 @@ export const createAppointmentRequest = (
 ): CreateAppointmentRequest => {
     return {
         patientId: params.patientId,
+        patientAccountId: params.patientAccountId,
         doctorId: params.doctorId,
         specialtyId: params.specialtyId,
         appointmentDate: params.appointmentDate,

@@ -29,7 +29,9 @@ export const ChatHubProvider: React.FC<ChatHubProviderProps> = ({ children }) =>
     const connectionRef = useRef<signalR.HubConnection | null>(null);
     const [isConnected, setIsConnected] = useState(false);
 
-    const chatHubUrl = 'http://localhost:6005/chatHub';
+    // Connect via API Gateway instead of direct service connection
+    const chatServiceUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const chatHubUrl = `${chatServiceUrl}/chatHub`;
 
     // Create and manage SignalR connection
     useEffect(() => {

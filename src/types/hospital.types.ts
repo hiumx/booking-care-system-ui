@@ -64,6 +64,7 @@ export interface HospitalDetailResponse extends HospitalResponse {
 // Hospital Profile (get by id) - trimmed fields for UI
 export interface HospitalProfileResponse {
     id: string;
+    accountId: string;
     name: string;
     address: string;
     phone?: string;
