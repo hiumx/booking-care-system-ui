@@ -138,7 +138,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                 setNewTagType(ConversationTagType.CUSTOM);
                 onTagsUpdated?.();
                 // Dispatch event to notify other components
-                window.dispatchEvent(new CustomEvent('conversationTagsUpdated'));
+                globalThis.dispatchEvent(new CustomEvent('conversationTagsUpdated'));
             }
         } catch (error) {
             console.error('Failed to create tag:', error);
@@ -177,7 +177,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                 setEditTagType(ConversationTagType.CUSTOM);
                 onTagsUpdated?.();
                 // Dispatch event to notify other components
-                window.dispatchEvent(new CustomEvent('conversationTagsUpdated'));
+                globalThis.dispatchEvent(new CustomEvent('conversationTagsUpdated'));
             }
         } catch (error) {
             console.error('Failed to update tag:', error);
@@ -212,7 +212,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                 setConversationTags(conversationTags.filter((t) => t.id !== tagToDelete.id));
                 onTagsUpdated?.();
                 // Dispatch event to notify other components
-                window.dispatchEvent(new CustomEvent('conversationTagsUpdated'));
+                globalThis.dispatchEvent(new CustomEvent('conversationTagsUpdated'));
             }
         } catch (error) {
             console.error('Failed to delete tag:', error);
@@ -273,7 +273,7 @@ const TagManager: React.FC<TagManagerProps> = ({
             // Notify parent component to refresh tags
             onTagsUpdated?.();
             // Dispatch event to notify other components
-            window.dispatchEvent(new CustomEvent('conversationTagsUpdated'));
+            globalThis.dispatchEvent(new CustomEvent('conversationTagsUpdated'));
         } catch (error) {
             console.error('[TagManager] Failed to toggle tag:', error);
             alert(
@@ -294,7 +294,7 @@ const TagManager: React.FC<TagManagerProps> = ({
             <div className={styles.header}>
                 <h6 className={styles.title}>
                     <i className="fa-solid fa-tags me-2"></i>
-                    Quản lý nhãn
+                    {' Quản lý nhãn'}
                 </h6>
                 <button
                     className={clsx(styles.createBtn, 'btn btn-sm')}
@@ -320,11 +320,20 @@ const TagManager: React.FC<TagManagerProps> = ({
                         tags.map((tag) => (
                             <div
                                 key={tag.id}
+                                role="button"
+                                tabIndex={0}
+                                aria-label={`Toggle tag ${tag.name}`}
                                 className={clsx(
                                     styles.tagItem,
                                     isTagSelected(tag.id) && styles.selected
                                 )}
                                 onClick={() => handleToggleTag(tag.id)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleToggleTag(tag.id);
+                                    }
+                                }}
                                 style={{
                                     paddingRight:
                                         tag.type === ConversationTagType.CUSTOM ||
@@ -393,6 +402,9 @@ const TagManager: React.FC<TagManagerProps> = ({
             {showCreateModal &&
                 ReactDOM.createPortal(
                     <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="create-tag-modal-title"
                         className="modal fade show d-block"
                         tabIndex={-1}
                         style={{ zIndex: 1050 }}
@@ -401,11 +413,18 @@ const TagManager: React.FC<TagManagerProps> = ({
                                 setShowCreateModal(false);
                             }
                         }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Escape') {
+                                setShowCreateModal(false);
+                            }
+                        }}
                     >
                         <div className="modal-dialog modal-dialog-centered">
                             <div className="modal-content">
                                 <div className="modal-header">
-                                    <h5 className="modal-title">Tạo nhãn mới</h5>
+                                    <h5 className="modal-title" id="create-tag-modal-title">
+                                        Tạo nhãn mới
+                                    </h5>
                                     <button
                                         type="button"
                                         className="btn-close"
@@ -414,8 +433,11 @@ const TagManager: React.FC<TagManagerProps> = ({
                                 </div>
                                 <div className="modal-body">
                                     <div className="mb-3">
-                                        <label className="form-label">Tên nhãn</label>
+                                        <label htmlFor="create-tag-name" className="form-label">
+                                            Tên nhãn
+                                        </label>
                                         <input
+                                            id="create-tag-name"
                                             type="text"
                                             className="form-control"
                                             value={newTagName}
@@ -425,8 +447,12 @@ const TagManager: React.FC<TagManagerProps> = ({
                                         />
                                     </div>
                                     <div className="mb-3">
-                                        <label className="form-label">Màu sắc</label>
+                                        <label className="form-label" id="create-tag-color-label">
+                                            Màu sắc
+                                        </label>
                                         <div
+                                            role="group"
+                                            aria-labelledby="create-tag-color-label"
                                             style={{
                                                 display: 'grid',
                                                 gridTemplateColumns: 'repeat(5, 1fr)',
@@ -438,7 +464,16 @@ const TagManager: React.FC<TagManagerProps> = ({
                                             {TAG_COLORS.map((color, index) => (
                                                 <div
                                                     key={color}
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    aria-label={`Select color ${color}`}
                                                     onClick={() => setNewTagColor(color)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' || e.key === ' ') {
+                                                            e.preventDefault();
+                                                            setNewTagColor(color);
+                                                        }
+                                                    }}
                                                     style={{
                                                         width: '48px',
                                                         height: '48px',
@@ -519,8 +554,11 @@ const TagManager: React.FC<TagManagerProps> = ({
                                         `}</style>
                                     </div>
                                     <div className="mb-3">
-                                        <label className="form-label">Loại nhãn</label>
+                                        <label htmlFor="create-tag-type" className="form-label">
+                                            Loại nhãn
+                                        </label>
                                         <select
+                                            id="create-tag-type"
                                             className="form-select"
                                             value={newTagType}
                                             onChange={(e) => setNewTagType(Number(e.target.value))}
@@ -562,11 +600,19 @@ const TagManager: React.FC<TagManagerProps> = ({
             {showEditModal &&
                 ReactDOM.createPortal(
                     <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="edit-tag-modal-title"
                         className="modal fade show d-block"
                         tabIndex={-1}
                         style={{ zIndex: 1050 }}
                         onClick={(e) => {
                             if (e.target === e.currentTarget) {
+                                cancelEditTag();
+                            }
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Escape') {
                                 cancelEditTag();
                             }
                         }}
@@ -583,8 +629,11 @@ const TagManager: React.FC<TagManagerProps> = ({
                                 </div>
                                 <div className="modal-body">
                                     <div className="mb-3">
-                                        <label className="form-label">Tên nhãn</label>
+                                        <label htmlFor="edit-tag-name" className="form-label">
+                                            Tên nhãn
+                                        </label>
                                         <input
+                                            id="edit-tag-name"
                                             type="text"
                                             className="form-control"
                                             value={editTagName}
@@ -594,8 +643,12 @@ const TagManager: React.FC<TagManagerProps> = ({
                                         />
                                     </div>
                                     <div className="mb-3">
-                                        <label className="form-label">Màu sắc</label>
+                                        <label className="form-label" id="edit-tag-color-label">
+                                            Màu sắc
+                                        </label>
                                         <div
+                                            role="group"
+                                            aria-labelledby="edit-tag-color-label"
                                             style={{
                                                 display: 'grid',
                                                 gridTemplateColumns: 'repeat(5, 1fr)',
@@ -607,7 +660,16 @@ const TagManager: React.FC<TagManagerProps> = ({
                                             {TAG_COLORS.map((color, index) => (
                                                 <div
                                                     key={color}
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    aria-label={`Select color ${color}`}
                                                     onClick={() => setEditTagColor(color)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' || e.key === ' ') {
+                                                            e.preventDefault();
+                                                            setEditTagColor(color);
+                                                        }
+                                                    }}
                                                     style={{
                                                         width: '48px',
                                                         height: '48px',
@@ -682,8 +744,11 @@ const TagManager: React.FC<TagManagerProps> = ({
                                         </div>
                                     </div>
                                     <div className="mb-3">
-                                        <label className="form-label">Loại nhãn</label>
+                                        <label htmlFor="edit-tag-type" className="form-label">
+                                            Loại nhãn
+                                        </label>
                                         <select
+                                            id="edit-tag-type"
                                             className="form-select"
                                             value={editTagType}
                                             onChange={(e) => setEditTagType(Number(e.target.value))}

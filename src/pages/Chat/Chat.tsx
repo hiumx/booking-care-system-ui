@@ -32,7 +32,7 @@ const ChatContent = () => {
             selectConversation(state.conversationId);
             hasAutoSelectedRef.current = true;
             // Clear the state after using it
-            window.history.replaceState({}, document.title);
+            globalThis.history.replaceState({}, document.title);
         }
     }, [location.state, selectConversation, loadConversations]);
 

@@ -69,9 +69,9 @@ const ChatHeader = () => {
         function handleCloseVideoCall() {
             setShowVideoCall(false);
         }
-        window.addEventListener('closeVideoCall', handleCloseVideoCall);
+        globalThis.addEventListener('closeVideoCall', handleCloseVideoCall);
         return () => {
-            window.removeEventListener('closeVideoCall', handleCloseVideoCall);
+            globalThis.removeEventListener('closeVideoCall', handleCloseVideoCall);
         };
     }, []);
 
@@ -144,6 +144,8 @@ const ChatHeader = () => {
                                     </button>
                                     {showTagManager && activeConversation && (
                                         <div
+                                            role="dialog"
+                                            aria-label="Tag Manager"
                                             className={clsx(
                                                 styles.tagDropdown,
                                                 'dropdown-menu dropdown-menu-end show'
@@ -171,7 +173,7 @@ const ChatHeader = () => {
                                                     console.log(
                                                         '[ChatHeader] Tags updated, dispatching event'
                                                     );
-                                                    window.dispatchEvent(
+                                                    globalThis.dispatchEvent(
                                                         new Event('conversationTagsUpdated')
                                                     );
                                                 }}

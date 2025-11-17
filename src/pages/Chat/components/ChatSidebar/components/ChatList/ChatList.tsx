@@ -53,9 +53,9 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) 
             loadConversationTags();
         };
 
-        window.addEventListener('conversationTagsUpdated', handleTagsUpdated);
+        globalThis.addEventListener('conversationTagsUpdated', handleTagsUpdated);
         return () => {
-            window.removeEventListener('conversationTagsUpdated', handleTagsUpdated);
+            globalThis.removeEventListener('conversationTagsUpdated', handleTagsUpdated);
         };
     }, [conversations, currentUserId]);
 
