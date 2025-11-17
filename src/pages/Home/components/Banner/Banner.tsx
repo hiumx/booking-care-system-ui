@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import SearchInput from '@/components/SearchInput';
+import { PATHS } from '@/routes/paths';
 import styles from './Banner.module.scss';
 
 const Banner: React.FC = () => {
@@ -12,7 +13,7 @@ const Banner: React.FC = () => {
     const buttonRef = useRef<HTMLButtonElement | null>(null);
 
     const handleNavigate = () => {
-        navigate('/smart-booking');
+        navigate(PATHS.AI_SUPPORT_BOOKING);
     };
 
     const updateTooltipPosition = () => {
