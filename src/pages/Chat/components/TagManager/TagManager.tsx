@@ -289,6 +289,14 @@ const TagManager: React.FC<TagManagerProps> = ({
         return selectedTags.includes(tagId);
     };
 
+    const getDeleteMessage = (): string => {
+        if (!tagToDelete) return '';
+        if (tagToDelete.conversationCount > 0) {
+            return `Bạn có chắc muốn xóa nhãn "${tagToDelete.name}"? Nhãn này đang được sử dụng trong ${tagToDelete.conversationCount} hội thoại.`;
+        }
+        return `Bạn có chắc muốn xóa nhãn "${tagToDelete.name}"?`;
+    };
+
     return (
         <div className={styles.tagManager}>
             <div className={styles.header}>
@@ -408,16 +416,6 @@ const TagManager: React.FC<TagManagerProps> = ({
                         className="modal fade show d-block"
                         tabIndex={-1}
                         style={{ zIndex: 1050 }}
-                        onClick={(e) => {
-                            if (e.target === e.currentTarget) {
-                                setShowCreateModal(false);
-                            }
-                        }}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Escape') {
-                                setShowCreateModal(false);
-                            }
-                        }}
                     >
                         <div className="modal-dialog modal-dialog-centered">
                             <div className="modal-content">
@@ -606,16 +604,6 @@ const TagManager: React.FC<TagManagerProps> = ({
                         className="modal fade show d-block"
                         tabIndex={-1}
                         style={{ zIndex: 1050 }}
-                        onClick={(e) => {
-                            if (e.target === e.currentTarget) {
-                                cancelEditTag();
-                            }
-                        }}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Escape') {
-                                cancelEditTag();
-                            }
-                        }}
                     >
                         <div className="modal-dialog modal-dialog-centered">
                             <div className="modal-content">
@@ -792,13 +780,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                 onClose={cancelDeleteTag}
                 onConfirm={confirmDeleteTag}
                 title="Xóa nhãn"
-                message={
-                    tagToDelete
-                        ? tagToDelete.conversationCount > 0
-                            ? `Bạn có chắc muốn xóa nhãn "${tagToDelete.name}"? Nhãn này đang được sử dụng trong ${tagToDelete.conversationCount} hội thoại.`
-                            : `Bạn có chắc muốn xóa nhãn "${tagToDelete.name}"?`
-                        : ''
-                }
+                message={getDeleteMessage()}
                 confirmText="Xóa"
                 cancelText="Hủy"
                 type="danger"
