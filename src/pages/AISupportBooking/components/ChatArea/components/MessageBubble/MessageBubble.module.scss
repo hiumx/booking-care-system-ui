@@ -89,7 +89,7 @@
                 color: #212121;
                 display: block;
                 margin-top: 8px;
-                margin-bottom: 4px;
+                margin-bottom: 0;
             }
 
             .nameBorder {
@@ -202,9 +202,9 @@
             &::before {
                 content: attr(data-tooltip);
                 position: absolute;
-                bottom: 100%;
+                top: 100%;
                 left: 50%;
-                transform: translateX(-50%) translateY(-8px);
+                transform: translateX(-50%) translateY(8px);
                 padding: 6px 10px;
                 background: #212121;
                 color: #ffffff;
@@ -215,18 +215,18 @@
                 opacity: 0;
                 pointer-events: none;
                 transition: all 0.2s ease;
-                margin-bottom: 4px;
+                margin-top: 4px;
                 z-index: 1000;
             }
 
             &::after {
                 content: '';
                 position: absolute;
-                bottom: 100%;
+                top: 100%;
                 left: 50%;
-                transform: translateX(-50%) translateY(-4px);
+                transform: translateX(-50%) translateY(4px);
                 border: 5px solid transparent;
-                border-top-color: #212121;
+                border-bottom-color: #212121;
                 opacity: 0;
                 pointer-events: none;
                 transition: all 0.2s ease;

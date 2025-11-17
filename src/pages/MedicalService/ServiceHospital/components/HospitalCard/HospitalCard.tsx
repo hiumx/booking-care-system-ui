@@ -75,15 +75,25 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                                                 <i className="isax isax-tick-circle5 text-success ms-2"></i>
                                             </p>
                                             <p className="d-flex align-items-center mb-0 fs-14">
-                                                <i className="isax isax-location me-2"></i>
-                                                <span className="flex-grow-1">{location}</span>
-                                                <Link
-                                                    to="#"
-                                                    className="text-primary text-decoration-underline ms-2"
-                                                    style={{ whiteSpace: 'nowrap' }}
+                                                <i
+                                                    className="isax isax-location me-2"
+                                                    style={{ flexShrink: 0 }}
+                                                ></i>
+                                                <span
+                                                    style={{
+                                                        display: 'inline',
+                                                        wordBreak: 'break-word',
+                                                    }}
                                                 >
-                                                    {'Chỉ đường'}
-                                                </Link>
+                                                    {location}{' '}
+                                                    <Link
+                                                        to="#"
+                                                        className="text-primary text-decoration-underline"
+                                                        style={{ whiteSpace: 'nowrap' }}
+                                                    >
+                                                        {'Chỉ đường'}
+                                                    </Link>
+                                                </span>
                                             </p>
                                         </div>
                                     </div>

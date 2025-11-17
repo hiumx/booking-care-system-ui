@@ -236,6 +236,7 @@ const HospitalProfile: React.FC = () => {
                                         autoplay={{ delay: 2500, disableOnInteraction: false }}
                                         watchOverflow
                                         className={styles.serviceSwiper}
+                                        style={{ width: '100%', maxWidth: '100%' }}
                                         breakpoints={{
                                             0: { spaceBetween: 12 },
                                             480: { spaceBetween: 12 },
@@ -244,7 +245,10 @@ const HospitalProfile: React.FC = () => {
                                         }}
                                     >
                                         {specialties.map((specialty) => (
-                                            <SwiperSlide key={specialty.id}>
+                                            <SwiperSlide
+                                                key={specialty.id}
+                                                style={{ width: '160px', maxWidth: '160px' }}
+                                            >
                                                 <Link
                                                     to="/doctor/list"
                                                     className={clsx('spaciality-item')}

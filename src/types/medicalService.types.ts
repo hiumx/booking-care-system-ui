@@ -101,6 +101,10 @@ export interface ServiceWithHospitalQueryParams {
     page?: number;
     pageSize?: number;
     includeInactive?: boolean;
+    searchTerm?: string;
+    hospitalIds?: string[];
+    provinceId?: string;
+    districtId?: string;
 }
 
 // State interfaces

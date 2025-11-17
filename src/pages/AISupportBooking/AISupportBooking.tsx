@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Home } from 'lucide-react';
@@ -104,6 +104,9 @@ const AISupportBooking: React.FC = () => {
         return true;
     });
 
+    // Track newly created chat IDs to avoid loading from backend
+    const newlyCreatedChatsRef = useRef<Set<string>>(new Set());
+
     // Location state
     const [userLocation, setUserLocation] = useState<{
         provinceId?: string;
@@ -136,21 +139,21 @@ const AISupportBooking: React.FC = () => {
             let location: { provinceId?: string; districtId?: string; displayName: string } | null =
                 null;
 
-            // Ưu tiên 1: Nếu đã đăng nhập, kiểm tra address trong profile
-            if (isAuthenticated && profile?.address) {
+            // Ưu tiên 1: Kiểm tra localStorage (aiSupportLocation) - ưu tiên cao nhất
+            const saved = localStorage.getItem('aiSupportLocation');
+            if (saved) {
+                try {
+                    location = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Error parsing location from localStorage:', e);
+                }
+            }
+
+            // Ưu tiên 2: Nếu không có trong localStorage, kiểm tra address trong profile
+            if (!location && isAuthenticated && profile?.address) {
                 location = {
                     displayName: profile.address,
                 };
-            } else {
-                // Ưu tiên 2: Kiểm tra localStorage
-                const saved = localStorage.getItem('aiSupportLocation');
-                if (saved) {
-                    try {
-                        location = JSON.parse(saved);
-                    } catch (e) {
-                        console.error('Error parsing location from localStorage:', e);
-                    }
-                }
             }
 
             if (location) {
@@ -168,100 +171,164 @@ const AISupportBooking: React.FC = () => {
     }, [isAuthenticated, profile]);
 
     // Load conversation sessions when component mounts or user changes
-    useEffect(() => {
-        const loadSessions = async () => {
+    // silentReload: if true, don't show loading skeleton (used for background refresh)
+    const loadSessions = async (silentReload: boolean = false) => {
+        if (!silentReload) {
             setIsLoadingSessions(true);
-            try {
-                // Backend will get userId from authentication token
-                const response = await AIService.getUserSessions();
-                if (response.success && response.data) {
-                    // Map sessions to ChatHistory format
-                    const histories: ChatHistory[] = response.data.map((session) => {
-                        // Parse UTC time string and convert to local time
-                        // session.updatedAt is in UTC format from backend (ISO string)
-                        let formattedTime = 'Vừa xong';
-                        try {
-                            // Parse the UTC date string
-                            const utcDate = new Date(session.updatedAt);
+        }
+        try {
+            // Backend will get userId from authentication token
+            const response = await AIService.getUserSessions();
+            if (response.success && response.data) {
+                // Map sessions to ChatHistory format
+                const historiesFromBackend: ChatHistory[] = response.data.map((session) => {
+                    // Parse UTC time string and convert to local time
+                    // session.updatedAt is in UTC format from backend (ISO string)
+                    let formattedTime = 'Vừa xong';
+                    try {
+                        // Parse the UTC date string
+                        const utcDate = new Date(session.updatedAt);
 
-                            // Check if date is valid
-                            if (!Number.isNaN(utcDate.getTime())) {
-                                // Format with local timezone (no timeZone option needed, Date already converts to local)
-                                formattedTime = utcDate.toLocaleString('vi-VN', {
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    hour12: false, // Use 24-hour format
-                                });
-                            }
-                        } catch (error) {
-                            console.error('Error formatting time:', error);
-                            formattedTime = 'Vừa xong';
+                        // Check if date is valid
+                        if (!Number.isNaN(utcDate.getTime())) {
+                            // Format with local timezone (no timeZone option needed, Date already converts to local)
+                            formattedTime = utcDate.toLocaleString('vi-VN', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false, // Use 24-hour format
+                            });
                         }
+                    } catch (error) {
+                        console.error('Error formatting time:', error);
+                        formattedTime = 'Vừa xong';
+                    }
 
-                        return {
-                            id: session.sessionId,
-                            title: session.title || 'Cuộc trò chuyện mới',
-                            lastMessage: session.lastMessage || '',
-                            lastMessageTime: formattedTime,
-                            avatar: '',
-                        };
+                    return {
+                        id: session.sessionId,
+                        title: session.title || 'Cuộc trò chuyện mới',
+                        lastMessage: session.lastMessage || '',
+                        lastMessageTime: formattedTime,
+                        avatar: '',
+                    };
+                });
+
+                // MERGE with existing local chats instead of replacing
+                // This preserves newly created chats that haven't been saved to backend yet
+                if (silentReload) {
+                    setChatHistories((prevHistories) => {
+                        // Get IDs from backend
+                        const backendIds = new Set(historiesFromBackend.map((h) => h.id));
+
+                        // Remove newly created chats from tracking if they now exist in backend
+                        backendIds.forEach((id) => {
+                            if (newlyCreatedChatsRef.current.has(id)) {
+                                newlyCreatedChatsRef.current.delete(id);
+                            }
+                        });
+
+                        // Keep local chats that are not yet in backend (newly created)
+                        const localOnlyChats = prevHistories.filter(
+                            (chat) => !backendIds.has(chat.id)
+                        );
+
+                        // Merge: backend histories + local-only chats
+                        return [...historiesFromBackend, ...localOnlyChats];
                     });
-                    setChatHistories(histories);
+                } else {
+                    // Full reload (first time load), just use backend data
+                    setChatHistories(historiesFromBackend);
                 }
-            } catch (error) {
-                console.error('Error loading conversation sessions:', error);
-                // Don't show error to user, just log it
-            } finally {
+            }
+        } catch (error) {
+            console.error('Error loading conversation sessions:', error);
+            // Don't show error to user, just log it
+        } finally {
+            if (!silentReload) {
                 setIsLoadingSessions(false);
             }
-        };
+        }
+    };
 
+    // Track if initial location load has been done
+    const hasLoadedSessionsRef = useRef(false);
+
+    useEffect(() => {
         // Only load if authenticated and have location
+        // Don't reload if we're in a newly created chat to avoid "văng" UI
         if (isAuthenticated && userLocation) {
-            loadSessions();
+            // If we're in a newly created chat, always use silent reload to preserve local state
+            const isInNewChat = activeChatId && newlyCreatedChatsRef.current.has(activeChatId);
+
+            if (isInNewChat) {
+                // Always use silent reload for newly created chats (preserve local state)
+                loadSessions(true);
+            } else if (!hasLoadedSessionsRef.current) {
+                // Initial load (first time with location)
+                hasLoadedSessionsRef.current = true;
+                loadSessions(false);
+            }
+            // If already loaded and not in new chat, don't reload (avoid "văng")
         }
     }, [isAuthenticated, userLocation]);
 
     // Sync activeChatId with URL parameter
     useEffect(() => {
         const syncChatWithUrl = async () => {
-            if (chatId && chatId !== activeChatId && isAuthenticated && userLocation) {
-                // URL has a chatId, load that chat
-                setActiveChatId(chatId);
-                setIsLoadingChat(true);
+            // Nếu không authenticated hoặc không có location, không làm gì
+            if (!isAuthenticated || !userLocation) {
+                return;
+            }
 
-                // Load conversation history for this chat
-                try {
-                    const response = await AIService.getSession(chatId);
-                    if (response.success && response.data?.conversationHistory) {
-                        const history = response.data.conversationHistory;
-                        const loadedMessages: Message[] = history.map((msg: any, index: number) =>
-                            convertMessageFromAPI(msg, chatId, index)
-                        );
-                        setMessages(loadedMessages);
-                    } else {
+            // Case 1: URL có chatId và khác với activeChatId hiện tại
+            if (chatId && chatId !== activeChatId) {
+                setActiveChatId(chatId);
+
+                // Skip loading if this is a newly created chat (not saved yet)
+                const isNewlyCreated = newlyCreatedChatsRef.current.has(chatId);
+
+                if (!isNewlyCreated) {
+                    // Load from backend for existing chats
+                    setIsLoadingChat(true);
+
+                    try {
+                        const response = await AIService.getSession(chatId);
+                        if (response.success && response.data?.conversationHistory) {
+                            const history = response.data.conversationHistory;
+                            const loadedMessages: Message[] = history.map(
+                                (msg: any, index: number) =>
+                                    convertMessageFromAPI(msg, chatId, index)
+                            );
+                            setMessages(loadedMessages);
+                        } else {
+                            setMessages([]);
+                        }
+                    } catch (error) {
+                        console.error('Error loading conversation history:', error);
                         setMessages([]);
+                    } finally {
+                        setIsLoadingChat(false);
                     }
-                } catch (error) {
-                    console.error('Error loading conversation history:', error);
-                    setMessages([]);
-                } finally {
-                    setIsLoadingChat(false);
+                } else {
+                    // New chat - keep current messages, don't load from backend
                 }
-            } else if (!chatId && activeChatId) {
-                // No chatId in URL but we have an active chat, update URL
+            }
+            // Case 2: Không có chatId trong URL nhưng có activeChatId
+            else if (!chatId && activeChatId) {
+                // Sync URL với activeChatId
                 navigate(
                     replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, { chatId: activeChatId }),
                     { replace: true }
                 );
             }
+            // Case 3: Không có chatId và không có activeChatId → trang chủ AI (empty state)
+            // Không cần làm gì
         };
 
         syncChatWithUrl();
-    }, [chatId, isAuthenticated, userLocation]);
+    }, [chatId, activeChatId, isAuthenticated, userLocation, navigate]);
 
     // Generate GUID-like string for session ID
     const generateSessionId = (): string => {
@@ -395,8 +462,13 @@ const AISupportBooking: React.FC = () => {
         if (!currentChatId) {
             const newChat = createNewChat(content);
             currentChatId = newChat.id;
+
+            // Track this as a newly created chat to prevent loading from backend
+            newlyCreatedChatsRef.current.add(currentChatId);
+
             setChatHistories((prev) => [newChat, ...prev]);
             setActiveChatId(currentChatId);
+
             // Navigate to the new chat URL
             navigate(replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, { chatId: currentChatId }), {
                 replace: true,
@@ -429,9 +501,28 @@ const AISupportBooking: React.FC = () => {
 
             // Update session ID from response if provided
             if (response.data.sessionId && response.data.sessionId !== currentChatId) {
-                // Update active chat ID if backend returns a different session ID
-                setActiveChatId(response.data.sessionId);
-                currentChatId = response.data.sessionId;
+                const oldChatId = currentChatId;
+                const newChatId = response.data.sessionId;
+
+                // Update tracking: remove old ID, add new ID
+                if (newlyCreatedChatsRef.current.has(oldChatId)) {
+                    newlyCreatedChatsRef.current.delete(oldChatId);
+                    newlyCreatedChatsRef.current.add(newChatId);
+                }
+
+                // Update chatHistories: replace old chat with new ID
+                setChatHistories((prev) =>
+                    prev.map((chat) => (chat.id === oldChatId ? { ...chat, id: newChatId } : chat))
+                );
+
+                // Update active chat ID
+                setActiveChatId(newChatId);
+                currentChatId = newChatId;
+
+                // Navigate to new URL
+                navigate(replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, { chatId: newChatId }), {
+                    replace: true,
+                });
             }
 
             // Map response to suggestions
@@ -476,19 +567,15 @@ const AISupportBooking: React.FC = () => {
         } finally {
             setIsAITyping(false);
 
-            // Update chat history
-            if (currentChatId) {
-                setChatHistories((prev) =>
-                    prev.map((chat) =>
-                        chat.id === currentChatId
-                            ? {
-                                  ...chat,
-                                  lastMessage: content.trim(),
-                                  lastMessageTime: 'Vừa xong',
-                              }
-                            : chat
-                    )
-                );
+            // Chỉ reload sessions khi là message đầu tiên (để sync title từ backend)
+            // Backend sẽ tạo title dựa vào message đầu tiên của user
+            if (currentChatId && messages.length <= 1) {
+                // Reload sessions sau 2000ms để đảm bảo backend đã update title
+                // silentReload = true để không show loading skeleton (tránh văng UI)
+                // loadSessions sẽ tự động merge và remove chat khỏi newlyCreatedChatsRef
+                setTimeout(() => {
+                    loadSessions(true); // silent reload with merge
+                }, 2000); // Tăng lên 2000ms để backend chắc chắn kịp lưu
             }
         }
     };
@@ -556,15 +643,12 @@ const AISupportBooking: React.FC = () => {
     };
 
     // Helper function to parse suggestions from message
-    const parseSuggestions = (suggestionsData: any, index: number): Suggestion[] | undefined => {
+    const parseSuggestions = (suggestionsData: any): Suggestion[] | undefined => {
         if (!suggestionsData) {
-            console.log('No suggestions found for message:', index);
             return undefined;
         }
 
         try {
-            console.log('Loading suggestions for message:', index, suggestionsData);
-
             // Handle both object and already parsed structure
             const doctors =
                 suggestionsData.doctors ||
@@ -582,9 +666,6 @@ const AISupportBooking: React.FC = () => {
                 ...parseHospitalSuggestions(hospitals),
             ];
 
-            if (suggestions.length > 0) {
-                console.log('Successfully loaded suggestions:', suggestions.length, 'items');
-            }
             return suggestions;
         } catch (e) {
             console.error('Error parsing suggestions:', e, suggestionsData);
@@ -594,7 +675,7 @@ const AISupportBooking: React.FC = () => {
 
     // Helper function to convert history message to Message format
     const convertHistoryMessage = (msg: any, index: number, chatId: string): Message => {
-        const suggestions = parseSuggestions(msg.suggestions, index);
+        const suggestions = parseSuggestions(msg.suggestions);
         const sender = msg.role?.toLowerCase() === 'ai' ? 'ai' : 'user';
 
         return {
@@ -645,6 +726,15 @@ const AISupportBooking: React.FC = () => {
             return;
         }
 
+        // Nếu đang select chat đang active, skip
+        if (chatId === activeChatId) {
+            return;
+        }
+
+        // Set active chat ID và navigate URL ngay lập tức để UI responsive
+        setActiveChatId(chatId);
+        navigate(replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, { chatId }));
+
         setIsLoadingChat(true);
         try {
             const response = await AIService.getSession(chatId);
@@ -676,12 +766,6 @@ const AISupportBooking: React.FC = () => {
             // Cập nhật UI sau khi xóa (thành công hoặc thất bại)
             handleChatDeletionNavigation(chatId);
         }
-    };
-
-    const handleEditMessage = (messageId: string, newContent: string) => {
-        setMessages((prev) =>
-            prev.map((msg) => (msg.id === messageId ? { ...msg, content: newContent } : msg))
-        );
     };
 
     return (
@@ -730,7 +814,6 @@ const AISupportBooking: React.FC = () => {
                             messages={messages}
                             isAITyping={isAITyping}
                             onSendMessage={handleSendMessage}
-                            onEditMessage={handleEditMessage}
                             onToggleSidebar={() => setIsSidebarOpen(true)}
                             userLocation={userLocation}
                             onLocationChange={(location) => {

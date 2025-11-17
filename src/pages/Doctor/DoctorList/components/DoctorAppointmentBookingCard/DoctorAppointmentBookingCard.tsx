@@ -237,9 +237,26 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                         to={
                                             isRescheduleMode && rescheduleParams
                                                 ? `${replacePathParams(PATHS.BOOKING.CHOOSE_NEW_DOCTOR, { doctorId })}?rescheduleFor=${rescheduleParams.appointmentId}&token=${rescheduleParams.token}&rescheduleSpecialtyId=${rescheduleParams.rescheduleSpecialtyId}&rescheduleHospitalId=${rescheduleParams.rescheduleHospitalId}`
-                                                : replacePathParams(PATHS.BOOKING.ROOT, {
-                                                      doctorId,
-                                                  })
+                                                : (() => {
+                                                      const basePath = replacePathParams(
+                                                          PATHS.BOOKING.ROOT,
+                                                          { doctorId }
+                                                      );
+                                                      // Check if service type is online consultation
+                                                      const isOnlineConsultation =
+                                                          displayServiceInfo.serviceTypeName
+                                                              .toLowerCase()
+                                                              .includes('tư vấn online') ||
+                                                          displayServiceInfo.serviceTypeName
+                                                              .toLowerCase()
+                                                              .includes('tu van online') ||
+                                                          displayServiceInfo.serviceTypeName
+                                                              .toLowerCase()
+                                                              .includes('online');
+                                                      return isOnlineConsultation
+                                                          ? `${basePath}?appointmentType=TELEHEALTH`
+                                                          : basePath;
+                                                  })()
                                         }
                                         className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
                                     >

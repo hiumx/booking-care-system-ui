@@ -1,28 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import { useSelector } from 'react-redux';
-import { Stethoscope, Edit2, Copy, Check } from 'lucide-react';
+import { Stethoscope, Copy, Check } from 'lucide-react';
 import { RootState } from '@/store';
 import { Message } from '@/types/ai.types';
 import styles from './MessageBubble.module.scss';
 
 interface MessageBubbleProps {
     message: Message;
-    onEdit?: (messageId: string, newContent: string) => void;
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
+const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
     const isUser = message.sender === 'user';
     const { profile } = useSelector((state: RootState) => state.user);
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editContent, setEditContent] = useState(message.content);
     const [copied, setCopied] = useState(false);
     const [avatarError, setAvatarError] = useState(false);
-
-    useEffect(() => {
-        setEditContent(message.content);
-    }, [message.content]);
 
     // Lấy chữ cái đầu để hiển thị trong avatar mặc định
     const getInitials = () => {
@@ -50,31 +43,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             console.error('Failed to copy:', err);
-        }
-    };
-
-    const handleEdit = () => {
-        setIsEditing(true);
-    };
-
-    const handleSaveEdit = () => {
-        if (onEdit && editContent.trim() !== message.content) {
-            onEdit(message.id, editContent.trim());
-        }
-        setIsEditing(false);
-    };
-
-    const handleCancelEdit = () => {
-        setEditContent(message.content);
-        setIsEditing(false);
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSaveEdit();
-        } else if (e.key === 'Escape') {
-            handleCancelEdit();
         }
     };
 
@@ -130,14 +98,13 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
         );
     };
 
-    const renderSectionTitle = (line: string, index: number, isLastLine: boolean) => {
+    const renderSectionTitle = (line: string, index: number) => {
         return (
             <React.Fragment key={`section-${index}`}>
                 <strong
                     className={styles.sectionTitle}
                     dangerouslySetInnerHTML={{ __html: line }}
                 />
-                {!isLastLine && <br />}
             </React.Fragment>
         );
     };
@@ -253,7 +220,17 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
     };
 
     // Process empty line
-    const processEmptyLine = (index: number, nextLine: string, state: FormatState): void => {
+    const processEmptyLine = (
+        index: number,
+        nextLine: string,
+        prevLine: string,
+        state: FormatState
+    ): void => {
+        // Nếu empty line ngay sau section title, bỏ qua (không render <br />)
+        if (isSectionTitle(prevLine)) {
+            return;
+        }
+
         if (
             state.isInBlock &&
             (/^(Bác sĩ|BS\.|Bệnh viện|Phòng khám)/.test(nextLine) || nextLine === '')
@@ -275,6 +252,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
         trimmedLine: string,
         index: number,
         nextLine: string,
+        prevLine: string,
         isLastLine: boolean,
         state: FormatState
     ): boolean => {
@@ -285,13 +263,13 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
 
         // Process different line types
         if (isSectionTitle(trimmedLine)) {
-            state.formattedLines.push(renderSectionTitle(trimmedLine, index, isLastLine));
+            state.formattedLines.push(renderSectionTitle(trimmedLine, index));
         } else if (isNameLine(trimmedLine)) {
             processNameLine(trimmedLine, index, state);
         } else if (trimmedLine) {
             processContentLine(trimmedLine, index, isLastLine, state);
         } else {
-            processEmptyLine(index, nextLine, state);
+            processEmptyLine(index, nextLine, prevLine, state);
         }
         return false;
     };
@@ -311,9 +289,10 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
         for (let index = 0; index < lines.length; index++) {
             const trimmedLine = lines[index].trim();
             const nextLine = index < lines.length - 1 ? lines[index + 1]?.trim() : '';
+            const prevLine = index > 0 ? lines[index - 1]?.trim() : '';
             const isLastLine = index === lines.length - 1;
 
-            processSingleLine(trimmedLine, index, nextLine, isLastLine, state);
+            processSingleLine(trimmedLine, index, nextLine, prevLine, isLastLine, state);
         }
 
         // Add final border if needed
@@ -358,59 +337,21 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onEdit }) => {
                         [styles.aiBubble]: !isUser,
                     })}
                 >
-                    {isEditing ? (
-                        <textarea
-                            className={styles.editTextarea}
-                            value={editContent}
-                            onChange={(e) => setEditContent(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            autoFocus
-                            rows={Math.min(editContent.split('\n').length, 5)}
-                        />
-                    ) : (
-                        <div className={styles.text}>
-                            {isUser ? message.content : formatTextContent(message.content)}
-                        </div>
-                    )}
+                    <div className={styles.text}>
+                        {isUser ? message.content : formatTextContent(message.content)}
+                    </div>
                 </div>
                 <div className={styles.footer}>
                     <span className={styles.timestamp}>{formatTime(message.timestamp)}</span>
-                    {!isEditing && (
-                        <div className={styles.actionButtons}>
-                            {isUser && (
-                                <button
-                                    className={styles.actionButton}
-                                    onClick={handleEdit}
-                                    data-tooltip="Sửa"
-                                >
-                                    <Edit2 size={14} />
-                                </button>
-                            )}
-                            <button
-                                className={styles.actionButton}
-                                onClick={handleCopy}
-                                data-tooltip={copied ? 'Đã sao chép' : 'Sao chép'}
-                            >
-                                {copied ? <Check size={14} /> : <Copy size={14} />}
-                            </button>
-                        </div>
-                    )}
-                    {isUser && isEditing && (
-                        <div className={styles.editButtons}>
-                            <button
-                                className={clsx(styles.editButton, styles.saveButton)}
-                                onClick={handleSaveEdit}
-                            >
-                                Lưu
-                            </button>
-                            <button
-                                className={clsx(styles.editButton, styles.cancelButton)}
-                                onClick={handleCancelEdit}
-                            >
-                                Hủy
-                            </button>
-                        </div>
-                    )}
+                    <div className={styles.actionButtons}>
+                        <button
+                            className={styles.actionButton}
+                            onClick={handleCopy}
+                            data-tooltip={copied ? 'Đã sao chép' : 'Sao chép'}
+                        >
+                            {copied ? <Check size={14} /> : <Copy size={14} />}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
