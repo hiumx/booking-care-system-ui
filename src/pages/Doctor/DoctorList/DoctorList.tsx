@@ -291,14 +291,14 @@ const DoctorList: React.FC = () => {
         // Merge defaults with updates
         const allUpdates = { ...defaultParams, ...updates };
 
-        Object.entries(allUpdates).forEach(([key, value]) => {
+        for (const [key, value] of Object.entries(allUpdates)) {
             if (value !== undefined && value !== null && String(value) !== '') {
                 newParams.set(key, String(value));
             } else if (key !== 'pageNumber' && key !== 'pageSize') {
                 // Don't delete pageNumber and pageSize
                 newParams.delete(key);
             }
-        });
+        }
 
         setSearchParams(newParams, { replace: true });
     };
