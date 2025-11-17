@@ -89,6 +89,9 @@
         transition: all 0.3s ease;
         border: 1px solid transparent;
         position: relative;
+        background: none;
+        width: 100%;
+        text-align: left;
 
         &:hover {
             background-color: rgba(14, 130, 253, 0.04);

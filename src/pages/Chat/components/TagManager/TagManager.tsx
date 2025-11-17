@@ -326,22 +326,15 @@ const TagManager: React.FC<TagManagerProps> = ({
                         <p className="text-muted text-center py-3">Chưa có nhãn nào</p>
                     ) : (
                         tags.map((tag) => (
-                            <div
+                            <button
                                 key={tag.id}
-                                role="button"
-                                tabIndex={0}
+                                type="button"
                                 aria-label={`Toggle tag ${tag.name}`}
                                 className={clsx(
                                     styles.tagItem,
                                     isTagSelected(tag.id) && styles.selected
                                 )}
                                 onClick={() => handleToggleTag(tag.id)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault();
-                                        handleToggleTag(tag.id);
-                                    }
-                                }}
                                 style={{
                                     paddingRight:
                                         tag.type === ConversationTagType.CUSTOM ||
@@ -401,7 +394,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                                         </button>
                                     </div>
                                 )}
-                            </div>
+                            </button>
                         ))
                     )}
                 </div>
@@ -409,13 +402,24 @@ const TagManager: React.FC<TagManagerProps> = ({
 
             {showCreateModal &&
                 ReactDOM.createPortal(
-                    <div
-                        role="dialog"
-                        aria-modal="true"
+                    <dialog
+                        open
                         aria-labelledby="create-tag-modal-title"
                         className="modal fade show d-block"
-                        tabIndex={-1}
-                        style={{ zIndex: 1050 }}
+                        style={{
+                            zIndex: 1050,
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            border: 'none',
+                            background: 'transparent',
+                            padding: 0,
+                            margin: 0,
+                            maxWidth: 'none',
+                            maxHeight: 'none',
+                        }}
                     >
                         <div className="modal-dialog modal-dialog-centered">
                             <div className="modal-content">
@@ -445,11 +449,15 @@ const TagManager: React.FC<TagManagerProps> = ({
                                         />
                                     </div>
                                     <div className="mb-3">
-                                        <label className="form-label" id="create-tag-color-label">
+                                        <label
+                                            htmlFor="create-tag-color-group"
+                                            className="form-label"
+                                            id="create-tag-color-label"
+                                        >
                                             Màu sắc
                                         </label>
-                                        <div
-                                            role="group"
+                                        <fieldset
+                                            id="create-tag-color-group"
                                             aria-labelledby="create-tag-color-label"
                                             style={{
                                                 display: 'grid',
@@ -457,21 +465,15 @@ const TagManager: React.FC<TagManagerProps> = ({
                                                 gap: '12px',
                                                 marginTop: '12px',
                                                 padding: '4px 0',
+                                                border: 'none',
                                             }}
                                         >
                                             {TAG_COLORS.map((color, index) => (
-                                                <div
+                                                <button
                                                     key={color}
-                                                    role="button"
-                                                    tabIndex={0}
+                                                    type="button"
                                                     aria-label={`Select color ${color}`}
                                                     onClick={() => setNewTagColor(color)}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter' || e.key === ' ') {
-                                                            e.preventDefault();
-                                                            setNewTagColor(color);
-                                                        }
-                                                    }}
                                                     style={{
                                                         width: '48px',
                                                         height: '48px',
@@ -541,9 +543,9 @@ const TagManager: React.FC<TagManagerProps> = ({
                                                             ></i>
                                                         </div>
                                                     )}
-                                                </div>
+                                                </button>
                                             ))}
-                                        </div>
+                                        </fieldset>
                                         <style>{`
                                             @keyframes pulse {
                                                 0%, 100% { transform: translate(-50%, -50%) scale(1); }
@@ -590,20 +592,31 @@ const TagManager: React.FC<TagManagerProps> = ({
                                 </div>
                             </div>
                         </div>
-                    </div>,
+                    </dialog>,
                     document.body
                 )}
 
             {/* Edit Tag Modal */}
             {showEditModal &&
                 ReactDOM.createPortal(
-                    <div
-                        role="dialog"
-                        aria-modal="true"
+                    <dialog
+                        open
                         aria-labelledby="edit-tag-modal-title"
                         className="modal fade show d-block"
-                        tabIndex={-1}
-                        style={{ zIndex: 1050 }}
+                        style={{
+                            zIndex: 1050,
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            border: 'none',
+                            background: 'transparent',
+                            padding: 0,
+                            margin: 0,
+                            maxWidth: 'none',
+                            maxHeight: 'none',
+                        }}
                     >
                         <div className="modal-dialog modal-dialog-centered">
                             <div className="modal-content">
@@ -631,11 +644,15 @@ const TagManager: React.FC<TagManagerProps> = ({
                                         />
                                     </div>
                                     <div className="mb-3">
-                                        <label className="form-label" id="edit-tag-color-label">
+                                        <label
+                                            htmlFor="edit-tag-color-group"
+                                            className="form-label"
+                                            id="edit-tag-color-label"
+                                        >
                                             Màu sắc
                                         </label>
-                                        <div
-                                            role="group"
+                                        <fieldset
+                                            id="edit-tag-color-group"
                                             aria-labelledby="edit-tag-color-label"
                                             style={{
                                                 display: 'grid',
@@ -643,21 +660,15 @@ const TagManager: React.FC<TagManagerProps> = ({
                                                 gap: '12px',
                                                 marginTop: '12px',
                                                 padding: '4px 0',
+                                                border: 'none',
                                             }}
                                         >
                                             {TAG_COLORS.map((color, index) => (
-                                                <div
+                                                <button
                                                     key={color}
-                                                    role="button"
-                                                    tabIndex={0}
+                                                    type="button"
                                                     aria-label={`Select color ${color}`}
                                                     onClick={() => setEditTagColor(color)}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter' || e.key === ' ') {
-                                                            e.preventDefault();
-                                                            setEditTagColor(color);
-                                                        }
-                                                    }}
                                                     style={{
                                                         width: '48px',
                                                         height: '48px',
@@ -727,9 +738,9 @@ const TagManager: React.FC<TagManagerProps> = ({
                                                             ></i>
                                                         </div>
                                                     )}
-                                                </div>
+                                                </button>
                                             ))}
-                                        </div>
+                                        </fieldset>
                                     </div>
                                     <div className="mb-3">
                                         <label htmlFor="edit-tag-type" className="form-label">
@@ -770,7 +781,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                                 </div>
                             </div>
                         </div>
-                    </div>,
+                    </dialog>,
                     document.body
                 )}
 
