@@ -16,12 +16,13 @@ interface PaymentSectionProps {
         paymentMethodId: string,
         depositAmount: number
     ) => Promise<void>;
-    onCreateAppointmentOnly?: () => Promise<void>; // New: Create appointment without payment
+    onCreateAppointmentOnly?: () => Promise<void>;
     isProcessingPayment?: boolean;
-    isSupplementaryPayment?: boolean; // For reschedule with price difference
-    supplementaryAmount?: number; // Amount to pay for reschedule
-    rescheduleAppointmentDate?: string; // For staff-assigned doctor (skipDateTime=true)
-    rescheduleAppointmentTimeId?: string; // For staff-assigned doctor (skipDateTime=true)
+    isSupplementaryPayment?: boolean;
+    supplementaryAmount?: number;
+    rescheduleAppointmentDate?: string;
+    rescheduleAppointmentTimeId?: string;
+    appointmentTypeLabel?: string;
 }
 
 const PaymentSection: React.FC<PaymentSectionProps> = ({
@@ -34,6 +35,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     supplementaryAmount = 0,
     rescheduleAppointmentDate,
     rescheduleAppointmentTimeId,
+    appointmentTypeLabel,
 }) => {
     // Get doctor info from Redux (already fetched in DateTimeSection)
     const doctorInfo = useDoctorInfo();
@@ -281,10 +283,18 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         };
     }, [selectedDate, selectedSlots]);
 
+    const appointmentInfo = useMemo(
+        () => ({
+            ...mockAppointmentInfo,
+            appointmentType: appointmentTypeLabel ?? mockAppointmentInfo.appointmentType,
+        }),
+        [appointmentTypeLabel]
+    );
+
     return (
         <BookingSectionWrapper
             doctor={doctorInfo}
-            appointment={mockAppointmentInfo}
+            appointment={appointmentInfo}
             nextStepTitle={(() => {
                 if (isCreatingAppointment) {
                     return 'Đang xử lý...';

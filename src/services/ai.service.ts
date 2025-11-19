@@ -83,7 +83,6 @@ export interface SymptomAnalysisResponse {
     recommendedHospitals: HospitalRecommendation[];
     generalAdvice: string[];
     analysisComplete: boolean;
-    requiresImmediateAttention: boolean;
     disclaimer: string;
     timestamp: string;
 }

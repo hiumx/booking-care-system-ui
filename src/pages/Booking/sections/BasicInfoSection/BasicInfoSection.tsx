@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import BookingSectionWrapper from '../../components/BookingSectionWrapper';
 import { mockAppointmentInfo } from '../../constants/mockData';
 import { useDoctorInfo } from '../../hooks/useDoctorInfo';
@@ -22,9 +22,14 @@ import { toast } from 'react-toastify';
 interface BasicInfoSectionProps {
     nextStep: () => void;
     prevStep: () => void;
+    appointmentTypeLabel?: string;
 }
 
-const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep }) => {
+const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
+    nextStep,
+    prevStep,
+    appointmentTypeLabel,
+}) => {
     // Get doctor info from Redux (already fetched in DateTimeSection)
     const doctorInfo = useDoctorInfo();
     const dispatch = useAppDispatch();
@@ -95,10 +100,18 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep 
         nextStep();
     };
 
+    const appointmentInfo = useMemo(
+        () => ({
+            ...mockAppointmentInfo,
+            appointmentType: appointmentTypeLabel ?? mockAppointmentInfo.appointmentType,
+        }),
+        [appointmentTypeLabel]
+    );
+
     return (
         <BookingSectionWrapper
             doctor={doctorInfo}
-            appointment={mockAppointmentInfo}
+            appointment={appointmentInfo}
             nextStepTitle={isUploading ? 'Đang xử lý...' : 'Chọn phương thức thanh toán'}
             nextStep={handleNextStep}
             prevStep={prevStep}

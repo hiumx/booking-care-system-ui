@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Calendar from '@/components/Calendar';
 import SlotCategory from './components/SlotCategory';
 import styles from './DateTimeSection.module.scss';
@@ -31,6 +31,7 @@ interface DateTimeSectionProps {
     medicalServiceId?: string;
     isRescheduleMode?: boolean;
     hidePrev?: boolean;
+    appointmentTypeLabel?: string;
 }
 
 const DateTimeSection: React.FC<DateTimeSectionProps> = ({
@@ -40,6 +41,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     medicalServiceId,
     isRescheduleMode = false,
     hidePrev = false,
+    appointmentTypeLabel,
 }) => {
     const dispatch = useAppDispatch();
 
@@ -166,10 +168,18 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         }
     }, [selectedSlots, scheduleCategories]);
 
+    const appointmentInfo = useMemo(
+        () => ({
+            ...mockAppointmentInfo,
+            appointmentType: appointmentTypeLabel ?? mockAppointmentInfo.appointmentType,
+        }),
+        [appointmentTypeLabel]
+    );
+
     return (
         <BookingSectionWrapper
             doctor={doctorInfo}
-            appointment={mockAppointmentInfo}
+            appointment={appointmentInfo}
             nextStepTitle={isRescheduleMode ? 'Xác nhận đổi lịch' : 'Thêm thông tin cơ bản'}
             nextStep={nextStep}
             prevStep={prevStep}

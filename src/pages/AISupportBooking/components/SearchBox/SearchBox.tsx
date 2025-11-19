@@ -52,6 +52,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     const buttonRef = useRef<HTMLButtonElement>(null);
     const locationModalRef = useRef<HTMLDivElement>(null);
     const locationButtonRef = useRef<HTMLButtonElement>(null);
+    const locationAbortRef = useRef<AbortController | null>(null);
 
     // Use speech recognition hook
     const { isRecording, toggleRecording } = useSpeechRecognition({
@@ -99,6 +100,12 @@ const SearchBox: React.FC<SearchBoxProps> = ({
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [showAttachmentModal, showLocationModal, userLocation]);
+
+    useEffect(() => {
+        return () => {
+            locationAbortRef.current?.abort();
+        };
+    }, []);
 
     const handleSend = () => {
         if (value.trim()) {
@@ -215,8 +222,12 @@ const SearchBox: React.FC<SearchBoxProps> = ({
             async (position) => {
                 try {
                     const { latitude, longitude } = position.coords;
+                    locationAbortRef.current?.abort();
+                    const controller = new AbortController();
+                    locationAbortRef.current = controller;
                     const response = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+                        { signal: controller.signal }
                     );
                     const data = await response.json();
 
@@ -234,11 +245,16 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                     } else {
                         setLocationError('Không thể xác định vị trí từ tọa độ');
                     }
-                } catch (error) {
-                    console.error('Error getting location:', error);
-                    setLocationError('Có lỗi xảy ra khi lấy vị trí');
+                } catch (error: any) {
+                    if (error?.name === 'AbortError') {
+                        setLocationError('Yêu cầu xác định vị trí đã bị hủy. Vui lòng thử lại.');
+                    } else {
+                        console.error('Error getting location:', error);
+                        setLocationError('Có lỗi xảy ra khi lấy vị trí');
+                    }
                 } finally {
                     setIsGettingLocation(false);
+                    locationAbortRef.current = null;
                 }
             },
             (error) => {
@@ -258,6 +274,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                 }
                 setLocationError(errorMessage);
                 setIsGettingLocation(false);
+                locationAbortRef.current?.abort();
+                locationAbortRef.current = null;
             },
             {
                 enableHighAccuracy: true,

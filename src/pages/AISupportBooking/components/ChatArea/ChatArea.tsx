@@ -9,12 +9,14 @@ import SearchBox from '../SearchBox';
 import Carousel from '@/components/Carousel';
 import styles from './ChatArea.module.scss';
 import MiniBookingInline from './components/MiniBookingModal/MiniBookingInline';
+import { AppointmentType } from '@/enums/appointment.enums';
 
 interface ChatAreaProps {
     messages: Message[];
     isAITyping: boolean;
     onSendMessage: (content: string) => void;
     onToggleSidebar?: () => void;
+    activeChatId?: string | null;
     userLocation?: { provinceId?: string; districtId?: string; displayName: string } | null;
     onLocationChange?: (location: {
         provinceId?: string;
@@ -79,8 +81,11 @@ const SuggestionTabs: React.FC<{
 const createCarouselItems = (
     suggestions: any[],
     activeTab: 'doctor' | 'hospital',
-    handleBookAppointment: (id: string) => void,
-    handleSupportBooking: (id: string, type: 'doctor' | 'hospital') => void
+    handleSupportBooking: (
+        id: string,
+        type: 'doctor' | 'hospital',
+        options?: { appointmentType?: AppointmentType }
+    ) => void
 ) => {
     const filteredSuggestions = suggestions.filter((suggestion) => suggestion.type === activeTab);
 
@@ -101,8 +106,9 @@ const createCarouselItems = (
                 <SuggestionCard
                     key={suggestionId}
                     suggestion={suggestion}
-                    onBookAppointment={() => handleBookAppointment(entityId)}
-                    onSupportBooking={() => handleSupportBooking(entityId, suggestion.type)}
+                    onSupportBooking={(options) =>
+                        handleSupportBooking(entityId, suggestion.type, options)
+                    }
                 />
             ),
         };
@@ -114,15 +120,18 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     isAITyping,
     onSendMessage,
     onToggleSidebar,
+    activeChatId,
     userLocation,
     onLocationChange,
 }) => {
     const [inputValue, setInputValue] = useState('');
-    const [activeTab, setActiveTab] = useState<'doctor' | 'hospital'>('doctor');
+    const [activeTabs, setActiveTabs] = useState<Record<string, 'doctor' | 'hospital'>>({});
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [miniBooking, setMiniBooking] = useState<{ doctorId: string; messageId: string } | null>(
-        null
-    );
+    const [miniBooking, setMiniBooking] = useState<{
+        doctorId: string;
+        messageId: string;
+        appointmentType: AppointmentType;
+    } | null>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -132,6 +141,21 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         scrollToBottom();
     }, [messages, isAITyping]);
 
+    useEffect(() => {
+        setMiniBooking(null);
+    }, [activeChatId]);
+
+    const getActiveTabForMessage = (messageId: string) => {
+        return activeTabs[messageId] ?? 'doctor';
+    };
+
+    const handleTabChange = (messageId: string, tab: 'doctor' | 'hospital') => {
+        setActiveTabs((prev) => ({
+            ...prev,
+            [messageId]: tab,
+        }));
+    };
+
     const handleSend = () => {
         if (inputValue.trim()) {
             onSendMessage(inputValue);
@@ -139,13 +163,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         }
     };
 
-    const handleBookAppointment = (suggestionId: string) => {
-        // Navigate to booking page or open booking modal
-        console.log('Đặt lịch khám bệnh cho:', suggestionId);
-        // Note: Navigation is handled by handleSupportBooking function
-    };
-
-    const handleSupportBooking = (suggestionId: string, type: 'doctor' | 'hospital') => {
+    const handleSupportBooking = (
+        suggestionId: string,
+        type: 'doctor' | 'hospital',
+        options?: { appointmentType?: AppointmentType }
+    ) => {
         if (type === 'doctor' && suggestionId) {
             // Show inline booking below the latest AI message that has suggestions
             const lastMsgWithSuggestions = [...messages]
@@ -153,7 +175,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                 .find((m) => m.sender === 'ai' && m.suggestions && m.suggestions.length > 0);
             const messageId =
                 lastMsgWithSuggestions?.id || (messages[messages.length - 1]?.id ?? '');
-            setMiniBooking({ doctorId: suggestionId, messageId });
+            setMiniBooking({
+                doctorId: suggestionId,
+                messageId,
+                appointmentType: options?.appointmentType ?? AppointmentType.IN_PERSON,
+            });
             return;
         }
         // For hospital suggestions, fall back to message prompt
@@ -277,16 +303,17 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                         <div className={styles.tabsContainer}>
                                             <SuggestionTabs
                                                 suggestions={message.suggestions}
-                                                activeTab={activeTab}
-                                                onTabChange={setActiveTab}
+                                                activeTab={getActiveTabForMessage(message.id)}
+                                                onTabChange={(tab) =>
+                                                    handleTabChange(message.id, tab)
+                                                }
                                             />
                                         </div>
                                         <div className={styles.suggestionsCarousel}>
                                             <Carousel
                                                 slides={createCarouselItems(
                                                     message.suggestions,
-                                                    activeTab,
-                                                    handleBookAppointment,
+                                                    getActiveTabForMessage(message.id),
                                                     handleSupportBooking
                                                 )}
                                                 breakpoints={CAROUSEL_SUGGESTIONS_BREAKPOINTS}
@@ -316,6 +343,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                 {miniBooking && miniBooking.messageId === message.id && (
                                     <MiniBookingInline
                                         doctorId={miniBooking.doctorId}
+                                        appointmentType={miniBooking.appointmentType}
                                         onClose={() => {
                                             setMiniBooking(null);
                                         }}
