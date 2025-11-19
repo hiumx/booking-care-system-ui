@@ -6,6 +6,8 @@ import BookingHeader, {
 import BookingAction from '../BookingAction';
 import { BookingHeaderSkeleton } from '../BookingHeader';
 import { useFormattedDateTime } from '../../hooks/useFormattedDateTime';
+import { useAppSelector } from '@/store/hooks';
+import { getAppointmentTypeDisplayText } from '../../constants/mockData';
 
 interface BookingSectionWrapperProps {
     doctor: DoctorInfo;
@@ -37,13 +39,17 @@ const BookingSectionWrapper: React.FC<BookingSectionWrapperProps> = ({
     // Get formatted date and time from Redux state
     const formattedDateTime = useFormattedDateTime();
 
-    // Update appointment info with selected date and time
+    // Get appointment type from Redux state
+    const bookingState = useAppSelector((state) => state.booking);
+
+    // Update appointment info with selected date, time, and appointment type
     const updatedAppointment = useMemo(
         () => ({
             ...appointment,
             dateTime: formattedDateTime,
+            appointmentType: getAppointmentTypeDisplayText(bookingState.appointmentType),
         }),
-        [appointment, formattedDateTime]
+        [appointment, formattedDateTime, bookingState.appointmentType]
     );
 
     return (

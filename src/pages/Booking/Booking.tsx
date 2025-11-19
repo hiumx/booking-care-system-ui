@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BookingLayout from '@/layouts/BookingLayout';
 import StepWizard from '@/components/StepWizard';
 import { BOOKING_STEPS } from './data/data';
@@ -7,13 +7,13 @@ import DateTimeSection from './sections/DateTimeSection';
 import PaymentSection from './sections/PaymentSection';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { toast } from 'react-toastify';
 import { AppointmentService } from '@/services/appointment.service';
 import { AppointmentType } from '@/enums/appointment.enums';
-import { setCreatedAppointmentId } from '@/store/slices/bookingSlice';
+import { setCreatedAppointmentId, setAppointmentType } from '@/store/slices/bookingSlice';
 import PaymentService, { CreatePaymentRequest } from '@/services/payment.service';
 import { createAppointmentTimeId, createAppointmentRequest } from '@/utils/appointment-utils';
 
@@ -25,6 +25,7 @@ const Booking: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { doctorId } = useParams<{ doctorId: string }>();
+    const [searchParams] = useSearchParams();
 
     // Note: Payment success now redirects to separate confirmation page instead of step 4
 
@@ -34,6 +35,17 @@ const Booking: React.FC = () => {
     const bookingState = useAppSelector((state) => state.booking);
     const scheduleState = useAppSelector((state) => state.schedule);
     const doctorState = useAppSelector((state) => state.doctor);
+
+    // Get appointmentType from URL params and set it in Redux
+    useEffect(() => {
+        const appointmentTypeParam = searchParams.get('appointmentType');
+        if (appointmentTypeParam === 'TELEHEALTH') {
+            dispatch(setAppointmentType(AppointmentType.TELEHEALTH));
+        } else {
+            // Default to IN_PERSON if no parameter or invalid parameter
+            dispatch(setAppointmentType(AppointmentType.IN_PERSON));
+        }
+    }, [searchParams, dispatch]);
 
     const nextStep = async () => {
         // Check authentication and phone confirmation when moving from step 1 to step 2
@@ -69,6 +81,7 @@ const Booking: React.FC = () => {
 
         return createAppointmentRequest({
             patientId: userState.profile.id,
+            patientAccountId: userState.profile.accountId,
             doctorId: doctorId || '',
             specialtyId: doctorState.selectedDoctor?.specialtyId,
             appointmentDate: scheduleState.selectedDate,

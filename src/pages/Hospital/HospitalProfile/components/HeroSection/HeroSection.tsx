@@ -1,9 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
 import styles from './HeroSection.module.scss';
 import Button from '@/components/Button';
 import { PATHS } from '@/routes/paths';
-import { useNavigate } from 'react-router-dom';
 import { HospitalProfileResponse } from '@/types/hospital.types';
+import { ChatService } from '@/services/chat.service';
 
 import badgeCheck from '@/assets/img/icons/badge-check.svg';
 import gmailIcon from '@/assets/img/icons/gmail-icon.svg';
@@ -35,6 +38,11 @@ interface Props {
 
 const HeroSection: React.FC<Props> = ({ hospital }) => {
     const isMobile = useIsMobile();
+    const navigate = useNavigate();
+
+    // Get current user profile from Redux store
+    const currentUser = useSelector((state: RootState) => state.user.profile);
+    const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
     const galleryImages: string[] = useMemo(() => {
         if (hospital?.images && hospital.images.length > 0) {
@@ -47,8 +55,7 @@ const HeroSection: React.FC<Props> = ({ hospital }) => {
     const remainingCount = Math.max(galleryImages.length - displayedCount, 0);
 
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-
-    const navigate = useNavigate();
+    const [isCreatingConversation, setIsCreatingConversation] = useState(false);
 
     // lock body scroll when lightbox open
     useEffect(() => {
@@ -63,6 +70,82 @@ const HeroSection: React.FC<Props> = ({ hospital }) => {
 
     const handleClickBookNow = () => {
         navigate(PATHS.DOCTOR.ROOT);
+    };
+
+    const handleChatWithHospital = async () => {
+        // Check if user is authenticated
+        if (!isAuthenticated || !currentUser?.accountId) {
+            alert('Vui lòng đăng nhập để nhắn tin với bệnh viện');
+            navigate('/login');
+            return;
+        }
+
+        // Check if hospital has accountId
+        if (!hospital?.accountId) {
+            alert('Không thể tạo cuộc trò chuyện. Thông tin bệnh viện chưa đầy đủ.');
+            return;
+        }
+
+        // Prevent creating conversation with yourself
+        if (currentUser.accountId.toUpperCase() === hospital.accountId.toUpperCase()) {
+            alert('Bạn không thể nhắn tin với chính mình');
+            return;
+        }
+
+        setIsCreatingConversation(true);
+
+        try {
+            let conversationId: string | null = null;
+
+            // Check if conversation already exists
+            try {
+                const existingConversation = await ChatService.getConversationBetweenUsers(
+                    currentUser.accountId,
+                    hospital.accountId
+                );
+
+                if (existingConversation.success && existingConversation.data) {
+                    conversationId = existingConversation.data.id;
+                    console.log('[HeroSection] Found existing conversation:', conversationId);
+                }
+            } catch {
+                // Conversation doesn't exist, will create below
+                console.log('[HeroSection] No existing conversation, will create new one');
+            }
+
+            // If conversation doesn't exist, create new one
+            if (!conversationId) {
+                try {
+                    const newConversation = await ChatService.createConversation({
+                        participants: [currentUser.accountId, hospital.accountId],
+                    });
+
+                    if (newConversation.success && newConversation.data) {
+                        conversationId = newConversation.data.id;
+                        console.log('[HeroSection] Created new conversation:', conversationId);
+                    } else {
+                        alert('Không thể tạo cuộc trò chuyện. Vui lòng thử lại sau.');
+                        return;
+                    }
+                } catch (createError: any) {
+                    console.error('[HeroSection] Error creating conversation:', createError);
+                    alert(
+                        createError.message ||
+                            'Không thể tạo cuộc trò chuyện. Vui lòng thử lại sau.'
+                    );
+                    return;
+                }
+            }
+
+            // Navigate to chat page with conversationId to auto-select
+            if (conversationId) {
+                navigate(PATHS.CHAT, {
+                    state: { conversationId },
+                });
+            }
+        } finally {
+            setIsCreatingConversation(false);
+        }
     };
 
     return (
@@ -85,9 +168,14 @@ const HeroSection: React.FC<Props> = ({ hospital }) => {
                                                     aria-hidden="true"
                                                 ></i>
                                             </button>
-                                            <button className={styles.iconBtn} aria-label="Chia sẻ">
+                                            <button
+                                                className={styles.iconBtn}
+                                                aria-label="Nhắn tin với bệnh viện"
+                                                onClick={handleChatWithHospital}
+                                                disabled={isCreatingConversation}
+                                            >
                                                 <i
-                                                    className="fa-solid fa-share-nodes"
+                                                    className={`fa-${isCreatingConversation ? 'solid fa-spinner fa-spin' : 'regular fa-comment-dots'}`}
                                                     aria-hidden="true"
                                                 ></i>
                                             </button>
