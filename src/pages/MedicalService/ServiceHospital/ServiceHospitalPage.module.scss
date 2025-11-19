@@ -1,0 +1,18 @@
+.searchWrapper {
+    position: relative;
+    z-index: 100;
+    margin-top: 40px;
+
+    :global(.doctors-search-box) {
+        margin: -80px auto 60px !important; // Kéo lên âm để nằm giữa 2 màu
+        max-width: 100% !important;
+
+        @media (max-width: 768px) {
+            margin: -60px auto 40px !important;
+        }
+    }
+}
+
+.contentWrapper {
+    padding: 0 0 36px !important;
+}
