@@ -404,12 +404,10 @@ const AISupportBooking: React.FC = () => {
 
     const buildChatHistory = (id: string, initialContent?: string): ChatHistory => {
         const trimmed = initialContent?.trim() ?? '';
-        const title =
-            trimmed.length > 0
-                ? trimmed.length > 30
-                    ? `${trimmed.substring(0, 30)}...`
-                    : trimmed
-                : 'Cuộc trò chuyện mới';
+        let title = 'Cuộc trò chuyện mới';
+        if (trimmed.length > 0) {
+            title = trimmed.length > 30 ? `${trimmed.substring(0, 30)}...` : trimmed;
+        }
 
         return {
             id,
