@@ -227,18 +227,16 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                     isBlocked: false,
                 };
                 dispatch(toggleSlotSelection(slotPayload));
-            } else {
+            } else if (doctorId && selectedDate) {
                 // Hold failed (slot already held by another user)
                 // Refresh available slots to update UI
-                if (doctorId && selectedDate) {
-                    dispatch(
-                        fetchDoctorAvailableSlots({
-                            doctorId,
-                            date: selectedDate,
-                            medicalServiceId: medicalServiceId,
-                        })
-                    );
-                }
+                dispatch(
+                    fetchDoctorAvailableSlots({
+                        doctorId,
+                        date: selectedDate,
+                        medicalServiceId: medicalServiceId,
+                    })
+                );
             }
         },
         [

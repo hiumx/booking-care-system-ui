@@ -277,11 +277,9 @@ export const useHoldSlot = ({
     useEffect(() => {
         if (holdSlotState.isHeld && currentHeldSlot) {
             checkIntervalRef.current = setInterval(checkRemainingTime, 30000);
-        } else {
-            if (checkIntervalRef.current) {
-                clearInterval(checkIntervalRef.current);
-                checkIntervalRef.current = null;
-            }
+        } else if (checkIntervalRef.current) {
+            clearInterval(checkIntervalRef.current);
+            checkIntervalRef.current = null;
         }
 
         return () => {
