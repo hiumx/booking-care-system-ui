@@ -1,5 +1,5 @@
-import axiosInstance from '../configs/axios.config';
-import { HoldSlotRequest, ReleaseSlotRequest, HoldSlotResponse } from '../types/holdSlot.types';
+import axiosInstance from '@/configs/axios.config';
+import { HoldSlotRequest, ReleaseSlotRequest, HoldSlotResponse } from '@/types/holdSlot.types';
 import { AppointmentTime } from '@/enums/appointment.enums';
 
 // Base API endpoints for hold slot operations
