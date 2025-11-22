@@ -57,12 +57,12 @@
 
     &.variant-warning {
         background-color: #fff3e0;
-        color: #e65100; // Darker orange for better contrast (was #f57c00)
+        color: #bf360c; // Even darker orange for WCAG AA compliance (was #e65100)
         border: 1px solid #ffcc02;
         animation: pulse-warning 2s infinite;
 
         .icon {
-            color: #e65100; // Darker orange for better contrast
+            color: #bf360c; // Even darker orange for WCAG AA compliance
         }
     }
 
