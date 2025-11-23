@@ -3,7 +3,7 @@ import { NavigateFunction } from 'react-router-dom';
 import { AppointmentService } from '../services/appointment.service';
 import { PATHS } from '../routes/paths';
 import { CreateAppointmentRequest } from '../types/appointment.types';
-import { AppointmentType } from '../enums/appointment.enums';
+import { AppointmentTime, AppointmentType } from '@/enums/appointment.enums';
 
 /**
  * Utility function to load appointment data by ID
@@ -66,9 +66,13 @@ export const formatAppointmentTime = (timeId: string): string => {
 
 /**
  * Utility function to create appointment time ID from slot
+ * Returns value matching backend AppointmentTime enum (e.g. AT_08_00_08_30)
  */
-export const createAppointmentTimeId = (slot: { startTime: string; endTime: string }): string => {
-    return `AT_${slot.startTime.replace(':', '_')}_${slot.endTime.replace(':', '_')}`;
+export const createAppointmentTimeId = (slot: {
+    startTime: string;
+    endTime: string;
+}): AppointmentTime => {
+    return `AT_${slot.startTime.replace(':', '_')}_${slot.endTime.replace(':', '_')}` as AppointmentTime;
 };
 
 /**

@@ -7,7 +7,12 @@ interface SlotCategoryProps {
     checkedSlots?: number[]; // Add checkedSlots prop
 }
 
-const SlotCategory: React.FC<SlotCategoryProps> = ({ title, timeSlots, handleClickSlot }) => {
+const SlotCategory: React.FC<SlotCategoryProps> = ({
+    title,
+    timeSlots,
+    handleClickSlot,
+    checkedSlots = [],
+}) => {
     return (
         <div>
             <div className="book-title">
@@ -20,6 +25,7 @@ const SlotCategory: React.FC<SlotCategoryProps> = ({ title, timeSlots, handleCli
                         id={item.id}
                         rangeTime={item.time}
                         handleClickSlot={handleClickSlot}
+                        isChecked={checkedSlots.includes(item.id)}
                     />
                 ))}
             </div>

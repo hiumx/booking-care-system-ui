@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Calendar from '@/components/Calendar';
 import SlotCategory from './components/SlotCategory';
+import CountdownTimer from '@/components/CountdownTimer';
 import styles from './DateTimeSection.module.scss';
 import clsx from 'clsx';
 import BookingSectionWrapper from '../../components/BookingSectionWrapper';
 import { mockAppointmentInfo } from '../../constants/mockData';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { PATHS } from '@/routes/paths';
 import {
     setSelectedDate,
     setSelectedDoctor,
@@ -24,8 +27,12 @@ import {
 } from '@/store/selectors/schedule.selectors';
 import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
 import { ScheduleService } from '@/services/schedule.service';
+import { HoldSlotService } from '@/services/holdSlot.service';
+import { useHoldSlot } from '@/hooks/useHoldSlot';
+import { createAppointmentTimeId } from '@/utils/appointment-utils';
 import { useDoctorInfo } from '../../hooks/useDoctorInfo';
 import { useServiceMedicalInfo } from '../../hooks/useServiceMedicalInfo';
+import { toast } from 'react-toastify';
 
 interface DateTimeSectionProps {
     nextStep: () => void;
@@ -47,6 +54,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     hidePrev = false,
 }) => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
 
     // Determine booking type
     const isServiceMedicalBooking = !!serviceMedicalId;
@@ -60,6 +68,9 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     const selectedDoctorId = useAppSelector(selectSelectedDoctorId);
     const selectedSlots = useAppSelector(selectSelectedSlots); // Get selected slots array
 
+    // Redux state - Auth
+    const authState = useAppSelector((state) => state.auth);
+
     // Get info using custom hooks based on booking type
     const doctorInfo = useDoctorInfo();
     const serviceMedicalInfo = useServiceMedicalInfo();
@@ -67,9 +78,52 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     // Use appropriate info based on booking type
     const bookingInfo = isServiceMedicalBooking ? serviceMedicalInfo : doctorInfo;
 
+    // Hold slot hook
+    const {
+        isHeld,
+        remainingSeconds,
+        isLoading: isHoldingSlot,
+        currentHeldSlot,
+        holdSlot,
+        releaseSlot,
+        restoreHeldSlot,
+    } = useHoldSlot({
+        doctorId,
+        date: selectedDate || undefined,
+        onSlotExpired: () => {
+            // CRITICAL: Clear local state FIRST to prevent restore
+            setSlotChecked([]);
+
+            // Reset restore flag to allow restore on next mount
+            hasRestoredRef.current = false;
+
+            // Clear Redux selection to prevent restore loop
+            if (selectedSlots.length > 0) {
+                const expiredSlot = selectedSlots[0];
+                dispatch(
+                    toggleSlotSelection({
+                        startTime: expiredSlot.startTime,
+                        endTime: expiredSlot.endTime,
+                        isAvailable: true,
+                        isBlocked: false,
+                    })
+                );
+            }
+
+            toast.warning('Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.');
+        },
+    });
+
     // Local state
-    const [date, setDate] = useState<Date | null>(new Date());
+    const [date, setDate] = useState<Date | null>(() => {
+        // Restore date from Redux if available
+        if (selectedDate) {
+            return new Date(selectedDate);
+        }
+        return new Date();
+    });
     const [slotChecked, setSlotChecked] = useState<Array<number>>([]);
+    const hasRestoredRef = useRef(false); // Prevent double restore
 
     // Fetch doctor details when doctorId changes (for doctor booking)
     useEffect(() => {
@@ -137,13 +191,11 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
     // Handle slot click - single slot selection only (patient can book only 1 slot per booking)
     const handleClickSlot = useCallback(
-        (slotIndex: number) => {
-            // Toggle slot selection in local state (for UI highlighting)
-            // Single selection mode: replace current selection or clear if clicking same slot
-            if (slotChecked.includes(slotIndex)) {
-                setSlotChecked([]); // Unselect if clicking same slot
-            } else {
-                setSlotChecked([slotIndex]); // Replace with new slot (only 1 allowed)
+        async (slotIndex: number) => {
+            // Prevent clicking if already holding a slot
+            if (isHoldingSlot) {
+                toast.info('Đang xử lý giữ chỗ...');
+                return;
             }
 
             // Find the corresponding slot data
@@ -163,27 +215,174 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
             const selectedSlotData = allSlots.find((slot) => slot.globalIndex === slotIndex);
 
-            if (selectedSlotData) {
+            if (!selectedSlotData || !doctorId || !selectedDate) {
+                toast.error('Không thể chọn khung giờ này');
+                return;
+            }
+
+            // Check if clicking the same slot (to release)
+            if (slotChecked.includes(slotIndex)) {
+                // Release current held slot
+                await releaseSlot();
+                setSlotChecked([]);
+
+                // Clear Redux selection
+                dispatch(
+                    toggleSlotSelection({
+                        startTime: selectedSlotData.startTime,
+                        endTime: selectedSlotData.endTime,
+                        isAvailable: true,
+                        isBlocked: false,
+                    })
+                );
+                return;
+            }
+
+            // Check authentication before holding slot
+            if (!authState.isAuthenticated) {
+                toast.warn('Vui lòng đăng nhập để đặt lịch');
+                navigate(PATHS.LOGIN);
+                return;
+            }
+
+            // Try to hold the new slot
+            const appointmentTimeId = createAppointmentTimeId({
+                startTime: selectedSlotData.startTime,
+                endTime: selectedSlotData.endTime,
+            });
+
+            const result = await holdSlot(doctorId, selectedDate, appointmentTimeId);
+
+            // Only update UI state if hold was successful
+            if (result) {
+                setSlotChecked([slotIndex]); // Replace with new slot (only 1 allowed)
+
+                // Update Redux state
                 const slotPayload = {
                     startTime: selectedSlotData.startTime,
                     endTime: selectedSlotData.endTime,
                     isAvailable: true,
                     isBlocked: false,
                 };
-
-                // Toggle slot in Redux (replace or remove)
                 dispatch(toggleSlotSelection(slotPayload));
+            } else if (doctorId && selectedDate) {
+                // Hold failed (slot already held by another user)
+                // Refresh available slots to update UI
+                dispatch(
+                    fetchDoctorAvailableSlots({
+                        doctorId,
+                        date: selectedDate,
+                        medicalServiceId: medicalServiceId,
+                    })
+                );
             }
         },
-        [slotChecked, scheduleCategories, dispatch]
+        [
+            slotChecked,
+            scheduleCategories,
+            dispatch,
+            doctorId,
+            selectedDate,
+            medicalServiceId,
+            isHoldingSlot,
+            holdSlot,
+            releaseSlot,
+            authState.isAuthenticated,
+            navigate,
+        ]
     );
 
     // Initialize with current date on component mount
     useEffect(() => {
-        if (date && (isDoctorBooking || isServiceMedicalBooking)) {
+        // Only fetch if we don't have slots yet or date changed
+        if (date && (isDoctorBooking || isServiceMedicalBooking) && !selectedDate) {
             handleDateChange(date);
+        } else if (selectedDate && doctorId && scheduleCategories.length === 0) {
+            // If we have selectedDate but no slots, fetch them
+            handleDateChange(new Date(selectedDate));
         }
     }, [date, isDoctorBooking, isServiceMedicalBooking, selectedDate, handleDateChange]);
+
+    // Restore held slot state when component mounts
+    useEffect(() => {
+        const checkAndRestoreHeldSlot = async () => {
+            // Prevent double execution
+            if (hasRestoredRef.current) return;
+
+            // Only restore if we have valid data and no active hold
+            if (
+                doctorId &&
+                selectedDate &&
+                selectedSlots.length > 0 &&
+                !isHeld &&
+                scheduleCategories.length > 0 &&
+                slotChecked.length === 0 // Only restore if local state is empty
+            ) {
+                hasRestoredRef.current = true; // Mark as executed
+
+                // User has selected slot but countdown is not running
+                // Try to get remaining time from backend
+                const selectedSlot = selectedSlots[0];
+                const appointmentTimeId = createAppointmentTimeId({
+                    startTime: selectedSlot.startTime,
+                    endTime: selectedSlot.endTime,
+                });
+
+                try {
+                    const remainingTime = await HoldSlotService.getRemainingTime(
+                        doctorId,
+                        selectedDate,
+                        appointmentTimeId
+                    );
+
+                    if (remainingTime > 0) {
+                        // Slot is still held, restore countdown timer without calling API again
+                        restoreHeldSlot(doctorId, selectedDate, appointmentTimeId, remainingTime);
+
+                        // Immediately set slotChecked based on selectedSlot (before Redux might clear it)
+                        const allSlots = scheduleCategories.flatMap(
+                            (category) => category.timeSlots
+                        );
+                        const slotIndex = allSlots.findIndex(
+                            (slot) =>
+                                slot.startTime === selectedSlot.startTime &&
+                                slot.endTime === selectedSlot.endTime
+                        );
+
+                        if (slotIndex !== -1) {
+                            setSlotChecked([slotIndex]);
+                        }
+                    } else {
+                        // Slot expired, clear Redux selection to prevent infinite loop
+                        dispatch(
+                            toggleSlotSelection({
+                                startTime: selectedSlot.startTime,
+                                endTime: selectedSlot.endTime,
+                                isAvailable: true,
+                                isBlocked: false,
+                            })
+                        );
+                        setSlotChecked([]);
+                        toast.warning('Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.');
+                    }
+                } catch (error) {
+                    console.error('Failed to restore held slot:', error);
+                    hasRestoredRef.current = false; // Reset on error
+                }
+            }
+        };
+
+        checkAndRestoreHeldSlot();
+    }, [
+        doctorId,
+        selectedDate,
+        selectedSlots,
+        isHeld,
+        scheduleCategories,
+        slotChecked,
+        restoreHeldSlot,
+        dispatch,
+    ]);
 
     // Sync local slotChecked state with Redux selectedSlots for UI highlighting
     useEffect(() => {
@@ -198,11 +397,30 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                     )
                 )
                 .filter((index) => index !== -1);
+
             setSlotChecked(checkedIndices);
         } else {
             setSlotChecked([]);
         }
     }, [selectedSlots, scheduleCategories]);
+
+    // Note: We DON'T release held slots on unmount anymore
+    // This allows users to navigate back and forth between steps
+    // Slots will auto-expire after 5 minutes or be released when booking is completed/cancelled
+
+    // Release held slots when doctor or date changes
+    useEffect(() => {
+        if (isHeld && currentHeldSlot) {
+            // If doctor or date changed, release current held slot
+            const isDifferentDoctor = currentHeldSlot.doctorId !== doctorId;
+            const isDifferentDate = currentHeldSlot.date !== selectedDate;
+
+            if (isDifferentDoctor || isDifferentDate) {
+                releaseSlot().catch(console.error);
+                setSlotChecked([]);
+            }
+        }
+    }, [doctorId, selectedDate, isHeld, currentHeldSlot, releaseSlot]);
 
     return (
         <BookingSectionWrapper
@@ -231,6 +449,14 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                             Ngày đã chọn:{' '}
                                             {new Date(selectedDate).toLocaleDateString('vi-VN')}
                                         </small>
+                                        {isHeld && remainingSeconds > 0 && (
+                                            <div className="mt-2">
+                                                <CountdownTimer
+                                                    remainingSeconds={remainingSeconds}
+                                                    size="small"
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
