@@ -9,7 +9,9 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
     setSelectedDate,
     setSelectedDoctor,
+    setSelectedMedicalService,
     fetchDoctorAvailableSlots,
+    fetchServiceMedicalAvailableSlots,
     toggleSlotSelection,
 } from '@/store/slices/schedule.slice';
 import {
@@ -23,11 +25,13 @@ import {
 import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
 import { ScheduleService } from '@/services/schedule.service';
 import { useDoctorInfo } from '../../hooks/useDoctorInfo';
+import { useServiceMedicalInfo } from '../../hooks/useServiceMedicalInfo';
 
 interface DateTimeSectionProps {
     nextStep: () => void;
     prevStep: () => void;
     doctorId?: string;
+    serviceMedicalId?: string;
     medicalServiceId?: string;
     isRescheduleMode?: boolean;
     hidePrev?: boolean;
@@ -37,11 +41,16 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     nextStep,
     prevStep,
     doctorId,
+    serviceMedicalId,
     medicalServiceId,
     isRescheduleMode = false,
     hidePrev = false,
 }) => {
     const dispatch = useAppDispatch();
+
+    // Determine booking type
+    const isServiceMedicalBooking = !!serviceMedicalId;
+    const isDoctorBooking = !!doctorId;
 
     // Redux state - Schedule
     const scheduleCategories = useAppSelector(selectScheduleCategories);
@@ -51,50 +60,79 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     const selectedDoctorId = useAppSelector(selectSelectedDoctorId);
     const selectedSlots = useAppSelector(selectSelectedSlots); // Get selected slots array
 
-    // Get doctor info using custom hook
+    // Get info using custom hooks based on booking type
     const doctorInfo = useDoctorInfo();
+    const serviceMedicalInfo = useServiceMedicalInfo();
+
+    // Use appropriate info based on booking type
+    const bookingInfo = isServiceMedicalBooking ? serviceMedicalInfo : doctorInfo;
 
     // Local state
     const [date, setDate] = useState<Date | null>(new Date());
     const [slotChecked, setSlotChecked] = useState<Array<number>>([]);
 
-    // Fetch doctor details when doctorId changes
+    // Fetch doctor details when doctorId changes (for doctor booking)
     useEffect(() => {
-        if (doctorId && doctorId !== selectedDoctorId) {
+        if (isDoctorBooking && doctorId && doctorId !== selectedDoctorId) {
             // Set selected doctor in schedule slice
             dispatch(setSelectedDoctor(doctorId));
 
             // Fetch doctor details from API and store in doctor slice
             dispatch(getDoctorByIdAsync(doctorId));
         }
-    }, [doctorId, selectedDoctorId, dispatch]);
+    }, [doctorId, selectedDoctorId, dispatch, isDoctorBooking]);
+
+    // Set selected service medical when serviceMedicalId changes (for service medical booking)
+    useEffect(() => {
+        if (isServiceMedicalBooking && serviceMedicalId) {
+            dispatch(setSelectedMedicalService(serviceMedicalId));
+        }
+    }, [serviceMedicalId, dispatch, isServiceMedicalBooking]);
 
     // Handle date change and fetch available slots
     const handleDateChange = useCallback(
         async (newDate: Date | null) => {
             setDate(newDate);
 
-            if (newDate && doctorId) {
+            if (newDate) {
                 const formattedDate = ScheduleService.formatDateForApi(newDate);
 
                 // Update Redux state
                 dispatch(setSelectedDate(formattedDate));
 
-                // Fetch available slots for the selected date and doctor
+                // Fetch available slots based on booking type
                 try {
-                    await dispatch(
-                        fetchDoctorAvailableSlots({
-                            doctorId,
-                            date: formattedDate,
-                            ...(medicalServiceId && { medicalServiceId }),
-                        })
-                    ).unwrap();
+                    if (isDoctorBooking && doctorId) {
+                        // Fetch doctor's available slots
+                        await dispatch(
+                            fetchDoctorAvailableSlots({
+                                doctorId,
+                                date: formattedDate,
+                                ...(medicalServiceId && { medicalServiceId }),
+                            })
+                        ).unwrap();
+                    } else if (isServiceMedicalBooking && serviceMedicalId) {
+                        // Fetch service medical's available slots
+                        await dispatch(
+                            fetchServiceMedicalAvailableSlots({
+                                serviceMedicalId,
+                                date: formattedDate,
+                            })
+                        ).unwrap();
+                    }
                 } catch (error) {
                     console.error('Failed to fetch available slots:', error);
                 }
             }
         },
-        [doctorId, medicalServiceId, dispatch]
+        [
+            doctorId,
+            serviceMedicalId,
+            medicalServiceId,
+            dispatch,
+            isDoctorBooking,
+            isServiceMedicalBooking,
+        ]
     );
 
     // Handle slot click - single slot selection only (patient can book only 1 slot per booking)
@@ -142,10 +180,10 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
     // Initialize with current date on component mount
     useEffect(() => {
-        if (date && doctorId) {
+        if (date && (isDoctorBooking || isServiceMedicalBooking)) {
             handleDateChange(date);
         }
-    }, [date, doctorId, selectedDate, handleDateChange]);
+    }, [date, isDoctorBooking, isServiceMedicalBooking, selectedDate, handleDateChange]);
 
     // Sync local slotChecked state with Redux selectedSlots for UI highlighting
     useEffect(() => {
@@ -168,7 +206,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
     return (
         <BookingSectionWrapper
-            doctor={doctorInfo}
+            doctor={bookingInfo}
             appointment={mockAppointmentInfo}
             nextStepTitle={isRescheduleMode ? 'Xác nhận đổi lịch' : 'Thêm thông tin cơ bản'}
             nextStep={nextStep}

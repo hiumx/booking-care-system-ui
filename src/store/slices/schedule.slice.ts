@@ -5,6 +5,8 @@ import {
     GetDoctorScheduleRequest,
     GetDoctorAvailableSlotsRequest,
     ScheduleCategory,
+    GetServiceMedicalScheduleRequest,
+    GetServiceMedicalAvailableSlotsRequest,
 } from '../../types/schedule.types';
 import { SchedulePatterns } from '../../enums/schedule.enums';
 import { ScheduleService } from '../../services/schedule.service';
@@ -98,6 +100,33 @@ export const fetchDoctorScheduleWithSlots = createAsyncThunk(
             };
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to fetch doctor schedule and slots');
+        }
+    }
+);
+
+// Service Medical async thunks
+export const fetchServiceMedicalSchedule = createAsyncThunk(
+    'schedule/fetchServiceMedicalSchedule',
+    async (request: GetServiceMedicalScheduleRequest, { rejectWithValue }) => {
+        try {
+            const response = await ScheduleService.getServiceMedicalSchedule(request);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Failed to fetch service medical schedule');
+        }
+    }
+);
+
+export const fetchServiceMedicalAvailableSlots = createAsyncThunk(
+    'schedule/fetchServiceMedicalAvailableSlots',
+    async (request: GetServiceMedicalAvailableSlotsRequest, { rejectWithValue }) => {
+        try {
+            const response = await ScheduleService.getServiceMedicalAvailableSlots(request);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(
+                error.message || 'Failed to fetch service medical available slots'
+            );
         }
     }
 );
@@ -308,6 +337,42 @@ const scheduleSlice = createSlice({
                 state.loading.schedule = false;
                 state.loading.availableSlots = false;
                 state.error = action.payload as string;
+            });
+
+        // Fetch service medical schedule
+        builder
+            .addCase(fetchServiceMedicalSchedule.pending, (state) => {
+                state.loading.schedule = true;
+                state.error = null;
+            })
+            .addCase(fetchServiceMedicalSchedule.fulfilled, (state, action) => {
+                state.loading.schedule = false;
+                state.currentSchedule = action.payload.data as any; // Will be service medical schedule
+                state.error = null;
+            })
+            .addCase(fetchServiceMedicalSchedule.rejected, (state, action) => {
+                state.loading.schedule = false;
+                state.error = action.payload as string;
+                state.currentSchedule = null;
+            });
+
+        // Fetch service medical available slots
+        builder
+            .addCase(fetchServiceMedicalAvailableSlots.pending, (state) => {
+                state.loading.availableSlots = true;
+                state.error = null;
+            })
+            .addCase(fetchServiceMedicalAvailableSlots.fulfilled, (state, action) => {
+                state.loading.availableSlots = false;
+                state.availableSlots = action.payload.data;
+                state.scheduleCategories = groupSlotsIntoCategories(action.payload.data);
+                state.error = null;
+            })
+            .addCase(fetchServiceMedicalAvailableSlots.rejected, (state, action) => {
+                state.loading.availableSlots = false;
+                state.error = action.payload as string;
+                state.availableSlots = [];
+                state.scheduleCategories = [];
             });
     },
 });

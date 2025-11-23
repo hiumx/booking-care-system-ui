@@ -24,8 +24,15 @@ const Booking: React.FC = () => {
 
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { doctorId } = useParams<{ doctorId: string }>();
+    const { doctorId, serviceMedicalId } = useParams<{
+        doctorId?: string;
+        serviceMedicalId?: string;
+    }>();
     const [searchParams] = useSearchParams();
+
+    // Determine booking type: doctor or service medical
+    const isServiceMedicalBooking = !!serviceMedicalId;
+    const isDoctorBooking = !!doctorId;
 
     // Note: Payment success now redirects to separate confirmation page instead of step 4
 
@@ -79,18 +86,37 @@ const Booking: React.FC = () => {
         const firstSlot = scheduleState.selectedSlots[0];
         const appointmentTimeId = createAppointmentTimeId(firstSlot);
 
-        return createAppointmentRequest({
+        // Base appointment request
+        const baseRequest = {
             patientId: userState.profile.id,
             patientAccountId: userState.profile.accountId,
-            doctorId: doctorId || '',
-            specialtyId: doctorState.selectedDoctor?.specialtyId,
             appointmentDate: scheduleState.selectedDate,
             appointmentTimeId,
-            hospitalId: doctorState.selectedDoctor?.hospital?.id,
             appointmentType: bookingState.appointmentType || AppointmentType.IN_PERSON,
             symptoms: bookingState.symptoms,
             attachmentUrls: bookingState.attachmentUrls,
-        });
+        };
+
+        // For doctor booking
+        if (isDoctorBooking && doctorId) {
+            return createAppointmentRequest({
+                ...baseRequest,
+                doctorId: doctorId,
+                specialtyId: doctorState.selectedDoctor?.specialtyId,
+                hospitalId: doctorState.selectedDoctor?.hospital?.id,
+            });
+        }
+
+        // For service medical booking
+        if (isServiceMedicalBooking && serviceMedicalId) {
+            return createAppointmentRequest({
+                ...baseRequest,
+                serviceId: serviceMedicalId,
+                // hospitalId can be added if available from service medical data
+            });
+        }
+
+        return null;
     };
 
     // Helper function to ensure appointment is created and return appointmentId
@@ -222,6 +248,7 @@ const Booking: React.FC = () => {
                                         nextStep={nextStep}
                                         prevStep={prevStep}
                                         doctorId={doctorId}
+                                        serviceMedicalId={serviceMedicalId}
                                     />
                                 )}
                                 {currentStep === 2 && (
