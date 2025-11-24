@@ -292,16 +292,82 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         ]
     );
 
+    // Track if we've initialized and what date we last fetched
+    const hasInitializedRef = useRef(false);
+    const lastFetchedDateRef = useRef<string | null>(null);
+
     // Initialize with current date on component mount
     useEffect(() => {
-        // Only fetch if we don't have slots yet or date changed
-        if (date && (isDoctorBooking || isServiceMedicalBooking) && !selectedDate) {
-            handleDateChange(date);
-        } else if (selectedDate && doctorId && scheduleCategories.length === 0) {
-            // If we have selectedDate but no slots, fetch them
-            handleDateChange(new Date(selectedDate));
+        const fetchSlotsForDate = async (fetchDate: Date) => {
+            const formattedDate = ScheduleService.formatDateForApi(fetchDate);
+
+            // Update Redux state
+            dispatch(setSelectedDate(formattedDate));
+
+            // Fetch available slots based on booking type
+            try {
+                if (isDoctorBooking && doctorId) {
+                    // Fetch doctor's available slots
+                    await dispatch(
+                        fetchDoctorAvailableSlots({
+                            doctorId,
+                            date: formattedDate,
+                            ...(medicalServiceId && { medicalServiceId }),
+                        })
+                    ).unwrap();
+                } else if (isServiceMedicalBooking && serviceMedicalId) {
+                    // Fetch service medical's available slots
+                    await dispatch(
+                        fetchServiceMedicalAvailableSlots({
+                            serviceMedicalId,
+                            date: formattedDate,
+                        })
+                    ).unwrap();
+                }
+            } catch (error) {
+                console.error('Failed to fetch available slots:', error);
+            }
+        };
+
+        const shouldFetchSlots = () => {
+            // Don't fetch if not a valid booking type
+            if (!isDoctorBooking && !isServiceMedicalBooking) return false;
+
+            // Don't fetch if no date available
+            if (!date) return false;
+
+            const formattedDate = ScheduleService.formatDateForApi(date);
+
+            // Fetch if this is a new date we haven't fetched yet
+            if (lastFetchedDateRef.current !== formattedDate) {
+                return true;
+            }
+
+            // Fetch if we haven't initialized yet and don't have a selected date
+            if (!hasInitializedRef.current && !selectedDate) {
+                return true;
+            }
+
+            return false;
+        };
+
+        if (shouldFetchSlots() && date) {
+            const formattedDate = ScheduleService.formatDateForApi(date);
+            lastFetchedDateRef.current = formattedDate;
+            hasInitializedRef.current = true;
+            setDate(date); // Update local state
+            fetchSlotsForDate(date);
         }
-    }, [date, isDoctorBooking, isServiceMedicalBooking, selectedDate, handleDateChange]);
+    }, [
+        date,
+        isDoctorBooking,
+        isServiceMedicalBooking,
+        selectedDate,
+        doctorId,
+        serviceMedicalId,
+        medicalServiceId,
+        dispatch,
+    ]);
 
     // Restore held slot state when component mounts
     useEffect(() => {
