@@ -474,7 +474,12 @@ const ContractSigningPage: React.FC = () => {
                                             maxLength={6}
                                             value={otpCode}
                                             onChange={(e) =>
-                                                setOtpCode(e.target.value.replace(/\D/g, ''))
+                                                setOtpCode(
+                                                    e.target.value
+                                                        .split('')
+                                                        .filter((c) => /\d/.test(c))
+                                                        .join('')
+                                                )
                                             }
                                             style={{ letterSpacing: '0.5em', fontSize: '1.5rem' }}
                                         />
@@ -564,8 +569,8 @@ const ContractSigningPage: React.FC = () => {
                     <div className="card border-0 shadow-sm">
                         <div className="card-body text-center p-4">
                             <h5 className="mb-3">
-                                <span className="badge bg-primary me-2">3</span>
-                                Xác nhận ký hợp đồng
+                                <span className="badge bg-primary me-2">3</span> Xác nhận ký hợp
+                                đồng
                             </h5>
                             <button
                                 type="button"
