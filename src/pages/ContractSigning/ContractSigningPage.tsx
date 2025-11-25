@@ -165,8 +165,8 @@ const ContractSigningPage: React.FC = () => {
                     <div className="col-md-8">
                         <div className="alert alert-danger">
                             <h4 className="alert-heading">
-                                <i className="ti ti-alert-circle me-2"></i>
-                                Token không hợp lệ
+                                <i className="ti ti-alert-circle me-2" aria-hidden="true" /> Token
+                                không hợp lệ
                             </h4>
                             <p className="mb-0">{errorMessage}</p>
                             <hr />
@@ -210,9 +210,11 @@ const ContractSigningPage: React.FC = () => {
                                     { id: 2, title: 'Xác thực OTP' },
                                     { id: 3, title: 'Xác nhận' },
                                 ]}
-                                currentStep={
-                                    otpCode.length === 6 ? 3 : otpSent ? 2 : hasSignature ? 2 : 1
-                                }
+                                currentStep={(() => {
+                                    if (otpCode.length === 6) return 3;
+                                    if (otpSent || hasSignature) return 2;
+                                    return 1;
+                                })()}
                             />
                         </div>
                     </div>
@@ -227,8 +229,8 @@ const ContractSigningPage: React.FC = () => {
                             }}
                         >
                             <h5 className="mb-0 text-white">
-                                <i className="ti ti-file-text me-2"></i>
-                                Thông tin hợp đồng
+                                <i className="ti ti-file-text me-2" aria-hidden="true" /> Thông tin
+                                hợp đồng
                             </h5>
                         </div>
                         <div className="card-body p-4">
@@ -247,9 +249,9 @@ const ContractSigningPage: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className="flex-grow-1 ms-3">
-                                            <label className="text-muted small mb-1 d-block">
+                                            <span className="text-muted small mb-1 d-block">
                                                 Số hợp đồng
-                                            </label>
+                                            </span>
                                             <div className="fw-semibold">
                                                 {contractInfo?.contractNumber}
                                             </div>
@@ -270,9 +272,9 @@ const ContractSigningPage: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className="flex-grow-1 ms-3">
-                                            <label className="text-muted small mb-1 d-block">
+                                            <span className="text-muted small mb-1 d-block">
                                                 Bệnh viện
-                                            </label>
+                                            </span>
                                             <div className="fw-semibold">
                                                 {contractInfo?.hospitalName}
                                             </div>
@@ -293,9 +295,9 @@ const ContractSigningPage: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className="flex-grow-1 ms-3">
-                                            <label className="text-muted small mb-1 d-block">
+                                            <span className="text-muted small mb-1 d-block">
                                                 Người đại diện
-                                            </label>
+                                            </span>
                                             <div className="fw-semibold">
                                                 {contractInfo?.representativeName}
                                             </div>
@@ -316,9 +318,9 @@ const ContractSigningPage: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className="flex-grow-1 ms-3">
-                                            <label className="text-muted small mb-1 d-block">
+                                            <span className="text-muted small mb-1 d-block">
                                                 Email
-                                            </label>
+                                            </span>
                                             <div className="fw-semibold">
                                                 {contractInfo?.representativeEmail}
                                             </div>
@@ -334,7 +336,7 @@ const ContractSigningPage: React.FC = () => {
                         <div className="card-header bg-light border-0">
                             <div className="d-flex align-items-center justify-content-between">
                                 <h5 className="mb-0">
-                                    <i className="ti ti-eye me-2 text-primary"></i>
+                                    <i className="ti ti-eye me-2 text-primary" aria-hidden="true" />{' '}
                                     Xem hợp đồng
                                 </h5>
                                 <span className="badge bg-info">Bản nháp</span>
@@ -360,8 +362,8 @@ const ContractSigningPage: React.FC = () => {
                                 rel="noopener noreferrer"
                                 className="btn btn-outline-primary btn-sm"
                             >
-                                <i className="ti ti-external-link me-1"></i>
-                                Mở trong tab mới để xem rõ hơn
+                                <i className="ti ti-external-link me-1" aria-hidden="true" /> Mở
+                                trong tab mới để xem rõ hơn
                             </a>
                         </div>
                     </div>
@@ -371,15 +373,15 @@ const ContractSigningPage: React.FC = () => {
                         <div className="card-header bg-light border-0">
                             <h5 className="mb-0">
                                 <span className="badge bg-primary me-2">1</span>
-                                <i className="ti ti-writing me-2"></i>
-                                Vẽ chữ ký của bạn
+                                <i className="ti ti-writing me-2" aria-hidden="true" /> Vẽ chữ ký
+                                của bạn
                             </h5>
                         </div>
                         <div className="card-body p-4">
                             <p className="text-muted small mb-3">
-                                <i className="ti ti-info-circle me-1"></i>
-                                Vẽ chữ ký của bạn trong khung bên dưới. Chữ ký này sẽ được sử dụng
-                                để xác thực hợp đồng.
+                                <i className="ti ti-info-circle me-1" aria-hidden="true" /> Vẽ chữ
+                                ký của bạn trong khung bên dưới. Chữ ký này sẽ được sử dụng để xác
+                                thực hợp đồng.
                             </p>
                             <div
                                 className="border rounded p-2 mb-3 position-relative"
@@ -417,13 +419,13 @@ const ContractSigningPage: React.FC = () => {
                                     onClick={handleClearSignature}
                                     disabled={!hasSignature}
                                 >
-                                    <i className="ti ti-eraser me-1"></i>
-                                    Xóa và vẽ lại
+                                    <i className="ti ti-eraser me-1" aria-hidden="true" /> Xóa và vẽ
+                                    lại
                                 </button>
                                 {hasSignature && (
                                     <span className="badge bg-success align-self-center">
-                                        <i className="ti ti-check me-1"></i>
-                                        Đã có chữ ký
+                                        <i className="ti ti-check me-1" aria-hidden="true" /> Đã có
+                                        chữ ký
                                     </span>
                                 )}
                             </div>
@@ -435,61 +437,20 @@ const ContractSigningPage: React.FC = () => {
                         <div className="card-header bg-light border-0">
                             <h5 className="mb-0">
                                 <span className="badge bg-primary me-2">2</span>
-                                <i className="ti ti-shield-check me-2"></i>
-                                Xác thực OTP
+                                <i className="ti ti-shield-check me-2" aria-hidden="true" /> Xác
+                                thực OTP
                             </h5>
                         </div>
                         <div className="card-body p-4">
-                            {!otpSent ? (
-                                <div>
-                                    <div className="alert alert-info border-0 mb-3">
-                                        <i className="ti ti-info-circle me-2"></i>
-                                        <small>
-                                            Mã OTP sẽ được gửi đến email{' '}
-                                            <strong className="text-primary">
-                                                {contractInfo?.representativeEmail}
-                                            </strong>
-                                        </small>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        className="btn btn-primary"
-                                        onClick={handleSendOtp}
-                                        disabled={isSendingOtp || !hasSignature}
-                                    >
-                                        {isSendingOtp ? (
-                                            <>
-                                                <span
-                                                    className="spinner-border spinner-border-sm me-2"
-                                                    role="status"
-                                                ></span>
-                                                Đang gửi...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <i className="ti ti-mail me-2"></i>
-                                                Gửi mã OTP
-                                            </>
-                                        )}
-                                    </button>
-                                    {!hasSignature && (
-                                        <div className="alert alert-warning border-0 mt-3 mb-0">
-                                            <i className="ti ti-alert-triangle me-2"></i>
-                                            <small>
-                                                Vui lòng hoàn thành bước 1 (vẽ chữ ký) trước khi gửi
-                                                OTP
-                                            </small>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
+                            {otpSent ? (
                                 <div>
                                     <div className="alert alert-success border-0 mb-4">
                                         <div className="d-flex align-items-center">
                                             <i
                                                 className="ti ti-circle-check me-2"
                                                 style={{ fontSize: '24px' }}
-                                            ></i>
+                                                aria-hidden="true"
+                                            />
                                             <div>
                                                 <strong>Mã OTP đã được gửi!</strong>
                                                 <div className="small mt-1">
@@ -499,10 +460,14 @@ const ContractSigningPage: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="mb-3">
-                                        <label className="form-label fw-semibold">
+                                        <label
+                                            htmlFor="otp-input"
+                                            className="form-label fw-semibold"
+                                        >
                                             Nhập mã OTP (6 chữ số)
                                         </label>
                                         <input
+                                            id="otp-input"
                                             type="text"
                                             className="form-control form-control-lg text-center"
                                             placeholder="● ● ● ● ● ●"
@@ -517,7 +482,10 @@ const ContractSigningPage: React.FC = () => {
                                     <div className="d-flex align-items-center justify-content-between">
                                         {countdown > 0 ? (
                                             <p className="text-muted small mb-0">
-                                                <i className="ti ti-clock me-1"></i>
+                                                <i
+                                                    className="ti ti-clock me-1"
+                                                    aria-hidden="true"
+                                                />{' '}
                                                 Gửi lại mã sau <strong>{countdown}</strong> giây
                                             </p>
                                         ) : (
@@ -526,17 +494,67 @@ const ContractSigningPage: React.FC = () => {
                                                 className="btn btn-link p-0 text-decoration-none"
                                                 onClick={handleSendOtp}
                                             >
-                                                <i className="ti ti-refresh me-1"></i>
+                                                <i
+                                                    className="ti ti-refresh me-1"
+                                                    aria-hidden="true"
+                                                />{' '}
                                                 Gửi lại mã OTP
                                             </button>
                                         )}
                                         {otpCode.length === 6 && (
                                             <span className="badge bg-success">
-                                                <i className="ti ti-check me-1"></i>
+                                                <i
+                                                    className="ti ti-check me-1"
+                                                    aria-hidden="true"
+                                                />{' '}
                                                 Đã nhập đủ
                                             </span>
                                         )}
                                     </div>
+                                </div>
+                            ) : (
+                                <div>
+                                    <div className="alert alert-info border-0 mb-3">
+                                        <i className="ti ti-info-circle me-2" aria-hidden="true" />
+                                        <small>
+                                            {' '}
+                                            Mã OTP sẽ được gửi đến email{' '}
+                                            <strong className="text-primary">
+                                                {contractInfo?.representativeEmail}
+                                            </strong>
+                                        </small>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={handleSendOtp}
+                                        disabled={isSendingOtp || !hasSignature}
+                                    >
+                                        {isSendingOtp ? (
+                                            <>
+                                                <output className="spinner-border spinner-border-sm me-2" />{' '}
+                                                Đang gửi...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="ti ti-mail me-2" aria-hidden="true" />{' '}
+                                                Gửi mã OTP
+                                            </>
+                                        )}
+                                    </button>
+                                    {!hasSignature && (
+                                        <div className="alert alert-warning border-0 mt-3 mb-0">
+                                            <i
+                                                className="ti ti-alert-triangle me-2"
+                                                aria-hidden="true"
+                                            />
+                                            <small>
+                                                {' '}
+                                                Vui lòng hoàn thành bước 1 (vẽ chữ ký) trước khi gửi
+                                                OTP
+                                            </small>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -559,21 +577,21 @@ const ContractSigningPage: React.FC = () => {
                             >
                                 {isSigning ? (
                                     <>
-                                        <span
-                                            className="spinner-border spinner-border-sm me-2"
-                                            role="status"
-                                        ></span>
+                                        <output className="spinner-border spinner-border-sm me-2" />{' '}
                                         Đang xử lý...
                                     </>
                                 ) : (
                                     <>
-                                        <i className="ti ti-check me-2"></i>
-                                        Xác nhận ký hợp đồng
+                                        <i className="ti ti-check me-2" aria-hidden="true" /> Xác
+                                        nhận ký hợp đồng
                                     </>
                                 )}
                             </button>
                             <div className="alert alert-light border mt-3 mb-0">
-                                <i className="ti ti-shield-check me-2 text-success"></i>
+                                <i
+                                    className="ti ti-shield-check me-2 text-success"
+                                    aria-hidden="true"
+                                />{' '}
                                 <small className="text-muted">
                                     Bằng việc ký hợp đồng, bạn xác nhận đã đọc và đồng ý với tất cả
                                     các điều khoản trong hợp đồng. Chữ ký điện tử của bạn có giá trị

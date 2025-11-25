@@ -1,10 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
+
+// Pre-computed confetti particles for animation (not security-sensitive)
+// Using deterministic values based on index to avoid Math.random() in render
+const CONFETTI_COLORS = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#00f2fe'];
+const CONFETTI_COUNT = 50;
+
+// Generate deterministic but varied positions using simple hash function
+const generateConfettiParticles = () => {
+    return Array.from({ length: CONFETTI_COUNT }, (_, i) => ({
+        // Use modular arithmetic for pseudo-random but deterministic distribution
+        left: (i * 37 + 13) % 100,
+        duration: 3 + ((i * 17) % 20) / 10,
+        delay: ((i * 23) % 20) / 10,
+        color: CONFETTI_COLORS[i % 5],
+        isCircle: i % 3 === 0,
+    }));
+};
 
 const ContractSigningSuccessPage: React.FC = () => {
     const navigate = useNavigate();
     const [showContent, setShowContent] = useState(false);
+
+    // Memoize confetti particles to prevent recalculation on re-renders
+    const confettiParticles = useMemo(() => generateConfettiParticles(), []);
 
     useEffect(() => {
         // Trigger animation after mount
@@ -13,30 +33,24 @@ const ContractSigningSuccessPage: React.FC = () => {
 
     return (
         <div className="container py-5">
-            {/* Confetti Effect */}
+            {/* Confetti Effect - uses pre-computed values for visual animation only */}
             <div
                 className="position-fixed top-0 start-0 w-100 h-100"
                 style={{ pointerEvents: 'none', zIndex: 1 }}
             >
-                {[...Array(50)].map((_, i) => (
+                {confettiParticles.map((particle) => (
                     <div
-                        key={i}
+                        key={`confetti-${particle.left}-${particle.duration}`}
                         className="position-absolute"
                         style={{
-                            left: `${Math.random() * 100}%`,
+                            left: `${particle.left}%`,
                             top: '-10px',
                             width: '10px',
                             height: '10px',
-                            backgroundColor: [
-                                '#667eea',
-                                '#764ba2',
-                                '#f093fb',
-                                '#4facfe',
-                                '#00f2fe',
-                            ][i % 5],
+                            backgroundColor: particle.color,
                             opacity: 0.7,
-                            animation: `fall ${3 + Math.random() * 2}s linear ${Math.random() * 2}s infinite`,
-                            borderRadius: i % 3 === 0 ? '50%' : '0',
+                            animation: `fall ${particle.duration}s linear ${particle.delay}s infinite`,
+                            borderRadius: particle.isCircle ? '50%' : '0',
                         }}
                     />
                 ))}
@@ -171,28 +185,40 @@ const ContractSigningSuccessPage: React.FC = () => {
                                     }}
                                 >
                                     <h5 className="alert-heading text-primary">
-                                        <i className="ti ti-info-circle me-2"></i>
+                                        <i className="ti ti-info-circle me-2" aria-hidden="true" />{' '}
                                         Bước tiếp theo
                                     </h5>
                                     <hr className="border-primary opacity-25" />
                                     <ul className="mb-0 ps-3">
                                         <li className="mb-2">
-                                            <i className="ti ti-check text-success me-2"></i>
+                                            <i
+                                                className="ti ti-check text-success me-2"
+                                                aria-hidden="true"
+                                            />{' '}
                                             Hợp đồng đã được ký thành công và gửi đến hệ thống
                                             BookingCare
                                         </li>
                                         <li className="mb-2">
-                                            <i className="ti ti-clock text-warning me-2"></i>
+                                            <i
+                                                className="ti ti-clock text-warning me-2"
+                                                aria-hidden="true"
+                                            />{' '}
                                             Đội ngũ quản trị sẽ xem xét và phê duyệt hợp đồng trong
                                             thời gian sớm nhất
                                         </li>
                                         <li className="mb-2">
-                                            <i className="ti ti-mail text-info me-2"></i>
+                                            <i
+                                                className="ti ti-mail text-info me-2"
+                                                aria-hidden="true"
+                                            />{' '}
                                             Bạn sẽ nhận được email thông báo khi hợp đồng được phê
                                             duyệt
                                         </li>
                                         <li className="mb-0">
-                                            <i className="ti ti-user-check text-success me-2"></i>
+                                            <i
+                                                className="ti ti-user-check text-success me-2"
+                                                aria-hidden="true"
+                                            />{' '}
                                             Sau khi phê duyệt, tài khoản bệnh viện sẽ được kích hoạt
                                             và bạn có thể đăng nhập vào hệ thống
                                         </li>
@@ -217,7 +243,10 @@ const ContractSigningSuccessPage: React.FC = () => {
                                 >
                                     <div className="card-body p-4">
                                         <h5 className="card-title text-start mb-4">
-                                            <i className="ti ti-timeline me-2 text-primary"></i>
+                                            <i
+                                                className="ti ti-timeline me-2 text-primary"
+                                                aria-hidden="true"
+                                            />{' '}
                                             Quy trình tiếp theo
                                         </h5>
                                         <div className="timeline position-relative">
@@ -248,7 +277,10 @@ const ContractSigningSuccessPage: React.FC = () => {
                                                 <div className="flex-grow-1 ms-3 text-start">
                                                     <h6 className="mb-1 fw-bold">Ký hợp đồng</h6>
                                                     <p className="text-success small mb-0">
-                                                        <i className="ti ti-circle-check me-1"></i>
+                                                        <i
+                                                            className="ti ti-circle-check me-1"
+                                                            aria-hidden="true"
+                                                        />{' '}
                                                         Đã hoàn thành
                                                     </p>
                                                 </div>
@@ -276,7 +308,10 @@ const ContractSigningSuccessPage: React.FC = () => {
                                                         Xem xét hợp đồng
                                                     </h6>
                                                     <p className="text-warning small mb-0">
-                                                        <i className="ti ti-loader me-1"></i>
+                                                        <i
+                                                            className="ti ti-loader me-1"
+                                                            aria-hidden="true"
+                                                        />{' '}
                                                         Đang chờ admin phê duyệt
                                                     </p>
                                                     <div
@@ -312,7 +347,10 @@ const ContractSigningSuccessPage: React.FC = () => {
                                                         Kích hoạt tài khoản
                                                     </h6>
                                                     <p className="text-muted small mb-0">
-                                                        <i className="ti ti-hourglass me-1"></i>
+                                                        <i
+                                                            className="ti ti-hourglass me-1"
+                                                            aria-hidden="true"
+                                                        />{' '}
                                                         Chờ phê duyệt
                                                     </p>
                                                 </div>
@@ -339,7 +377,10 @@ const ContractSigningSuccessPage: React.FC = () => {
                                 >
                                     <div className="card-body p-4">
                                         <h6 className="mb-3 text-center">
-                                            <i className="ti ti-help-circle me-2 text-warning"></i>
+                                            <i
+                                                className="ti ti-help-circle me-2 text-warning"
+                                                aria-hidden="true"
+                                            />{' '}
                                             <strong>Cần hỗ trợ?</strong>
                                         </h6>
                                         <p className="mb-3 small text-center">
@@ -398,7 +439,11 @@ const ContractSigningSuccessPage: React.FC = () => {
                                         minWidth: '200px',
                                     }}
                                 >
-                                    <i className="ti ti-home me-2" style={{ fontSize: '20px' }}></i>
+                                    <i
+                                        className="ti ti-home me-2"
+                                        style={{ fontSize: '20px' }}
+                                        aria-hidden="true"
+                                    />{' '}
                                     Về trang chủ
                                 </button>
                             </div>
