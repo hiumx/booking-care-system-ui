@@ -192,6 +192,10 @@ const routes: RouteObject[] = [
         element: <Booking />,
     },
     {
+        path: PATHS.BOOKING.SERVICE,
+        element: <Booking />,
+    },
+    {
         path: PATHS.BOOKING.CONFIRMATION,
         element: <BookingConfirmation />,
     },

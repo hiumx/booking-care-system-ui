@@ -67,6 +67,7 @@ export const PATHS = {
     // Booking
     BOOKING: {
         ROOT: '/booking/:doctorId',
+        SERVICE: '/booking/service/:serviceMedicalId',
         CONFIRMATION: '/booking/confirmation/:appointmentId',
         RESCHEDULE: '/booking/reschedule/:appointmentId',
         CONFIRM_NEW_DOCTOR: '/booking/confirm-doctor/:appointmentId',

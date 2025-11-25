@@ -7,6 +7,10 @@ import {
     GetDoctorAvailableSlotsRequest,
     ScheduleQueryParams,
     AvailableSlot,
+    GetServiceMedicalScheduleRequest,
+    GetServiceMedicalAvailableSlotsRequest,
+    ServiceMedicalScheduleResponse,
+    ServiceMedicalAvailableSlotsResponse,
 } from '../types/schedule.types';
 
 // Base API endpoints for schedules
@@ -14,6 +18,11 @@ const SCHEDULE_ENDPOINTS = {
     DOCTOR_SCHEDULE: '/schedules/doctor-schedule',
     AVAILABLE_SLOTS: '/schedules/doctor-schedule/{doctorId}/available-slots',
     DOCTOR_SCHEDULE_EXCEPTION: '/schedules/doctor-schedule-exception',
+    // Service Medical endpoints
+    SERVICE_MEDICAL_SCHEDULE: '/schedules/service-medical-schedules',
+    SERVICE_MEDICAL_AVAILABLE_SLOTS:
+        '/schedules/service-medical-schedules/{serviceMedicalId}/available-slots',
+    SERVICE_MEDICAL_SCHEDULE_EXCEPTION: '/schedules/service-medical-schedule-exceptions',
 } as const;
 
 /**
@@ -142,5 +151,62 @@ export class ScheduleService {
             afternoon,
             evening,
         };
+    }
+
+    /**
+     * Get service medical schedule for a specific date
+     */
+    static async getServiceMedicalSchedule(
+        request: GetServiceMedicalScheduleRequest
+    ): Promise<ServiceMedicalScheduleResponse> {
+        try {
+            const queryParams = new URLSearchParams({
+                date: request.date,
+            });
+
+            const response: any = await axiosInstance.get(
+                `${SCHEDULE_ENDPOINTS.SERVICE_MEDICAL_SCHEDULE}/${request.serviceMedicalId}?${queryParams.toString()}`
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data || response,
+                message: response.message,
+            };
+        } catch (error: any) {
+            throw new Error(error.message || 'Failed to fetch service medical schedule');
+        }
+    }
+
+    /**
+     * Get available slots for a service medical on a specific date
+     */
+    static async getServiceMedicalAvailableSlots(
+        request: GetServiceMedicalAvailableSlotsRequest
+    ): Promise<ServiceMedicalAvailableSlotsResponse> {
+        try {
+            const queryParams = new URLSearchParams({
+                date: request.date,
+            });
+
+            const endpoint = SCHEDULE_ENDPOINTS.SERVICE_MEDICAL_AVAILABLE_SLOTS.replace(
+                '{serviceMedicalId}',
+                request.serviceMedicalId
+            );
+            const fullUrl = `${endpoint}?${queryParams.toString()}`;
+
+            const response: any = await axiosInstance.get(fullUrl);
+
+            const result = {
+                success: response.success ?? true,
+                data: response.data || response,
+                message: response.message,
+            };
+
+            return result;
+        } catch (error: any) {
+            console.error('API Error:', error);
+            throw new Error(error.message || 'Failed to fetch service medical available slots');
+        }
     }
 }

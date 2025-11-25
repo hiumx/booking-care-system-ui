@@ -71,6 +71,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                         <img
                             src={userData.avatarUrl || '/assets/img/default-avatar-male.png'}
                             alt={`${userData.fullName} avatar`}
+                            className={styles.avatarImage}
                         />
                     </Link>
                     <div className="profile-det-info">

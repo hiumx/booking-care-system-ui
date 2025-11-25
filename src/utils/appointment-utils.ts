@@ -3,7 +3,7 @@ import { NavigateFunction } from 'react-router-dom';
 import { AppointmentService } from '../services/appointment.service';
 import { PATHS } from '../routes/paths';
 import { CreateAppointmentRequest } from '../types/appointment.types';
-import { AppointmentType } from '../enums/appointment.enums';
+import { AppointmentTime, AppointmentType } from '@/enums/appointment.enums';
 
 /**
  * Utility function to load appointment data by ID
@@ -66,9 +66,13 @@ export const formatAppointmentTime = (timeId: string): string => {
 
 /**
  * Utility function to create appointment time ID from slot
+ * Returns value matching backend AppointmentTime enum (e.g. AT_08_00_08_30)
  */
-export const createAppointmentTimeId = (slot: { startTime: string; endTime: string }): string => {
-    return `AT_${slot.startTime.replace(':', '_')}_${slot.endTime.replace(':', '_')}`;
+export const createAppointmentTimeId = (slot: {
+    startTime: string;
+    endTime: string;
+}): AppointmentTime => {
+    return `AT_${slot.startTime.replace(':', '_')}_${slot.endTime.replace(':', '_')}` as AppointmentTime;
 };
 
 /**
@@ -109,11 +113,12 @@ export const getAppointmentDateTime = (
 export interface CreateAppointmentParams {
     patientId: string;
     patientAccountId?: string;
-    doctorId: string;
-    specialtyId: string | undefined;
+    doctorId?: string;
+    serviceId?: string;
+    specialtyId?: string | undefined;
     appointmentDate: string;
     appointmentTimeId: string;
-    hospitalId: string | undefined;
+    hospitalId?: string | undefined;
     appointmentType: AppointmentType;
     symptoms: string;
     attachmentUrls: string[];
@@ -129,6 +134,7 @@ export const createAppointmentRequest = (
         patientId: params.patientId,
         patientAccountId: params.patientAccountId,
         doctorId: params.doctorId,
+        serviceId: params.serviceId,
         specialtyId: params.specialtyId,
         appointmentDate: params.appointmentDate,
         appointmentTimeId: params.appointmentTimeId,
