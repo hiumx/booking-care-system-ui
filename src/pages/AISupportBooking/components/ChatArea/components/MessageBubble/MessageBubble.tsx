@@ -340,6 +340,67 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                     <div className={styles.text}>
                         {isUser ? message.content : formatTextContent(message.content)}
                     </div>
+
+                    {/* Question Progress Indicator */}
+                    {!isUser &&
+                        message.questionCount !== undefined &&
+                        !message.analysisComplete && (
+                            <div className={styles.questionProgress}>
+                                <div className={styles.progressBar}>
+                                    <div
+                                        className={styles.progressFill}
+                                        style={{ width: `${(message.questionCount / 3) * 100}%` }}
+                                    />
+                                </div>
+                                <span className={styles.progressText}>
+                                    Câu hỏi {message.questionCount}/3
+                                </span>
+                            </div>
+                        )}
+
+                    {/* Disease Conclusion */}
+                    {!isUser && message.disease && message.analysisComplete && (
+                        <div className={styles.diseaseConclusion}>
+                            <div className={styles.conclusionHeader}>
+                                <h4>🔍 Kết luận</h4>
+                            </div>
+                            <div className={styles.conclusionBody}>
+                                <div className={styles.diseaseName}>
+                                    <strong>{message.disease.name}</strong>
+                                </div>
+                                <div className={styles.confidence}>
+                                    <span className={styles.confidenceLabel}>Độ tin cậy:</span>
+                                    <div className={styles.confidenceBar}>
+                                        <div
+                                            className={styles.confidenceFill}
+                                            style={{
+                                                width: `${message.disease.confidence * 100}%`,
+                                                backgroundColor:
+                                                    message.disease.confidence >= 0.7
+                                                        ? '#10b981'
+                                                        : message.disease.confidence >= 0.5
+                                                          ? '#f59e0b'
+                                                          : '#ef4444',
+                                            }}
+                                        />
+                                    </div>
+                                    <span className={styles.confidenceValue}>
+                                        {(message.disease.confidence * 100).toFixed(0)}%
+                                    </span>
+                                </div>
+                                {message.disease.reasons && message.disease.reasons.length > 0 && (
+                                    <div className={styles.reasons}>
+                                        <strong>Lý do:</strong>
+                                        <ul>
+                                            {message.disease.reasons.map((reason, idx) => (
+                                                <li key={idx}>{reason}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
                 <div className={styles.footer}>
                     <span className={styles.timestamp}>{formatTime(message.timestamp)}</span>

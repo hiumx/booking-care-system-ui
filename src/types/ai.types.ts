@@ -4,6 +4,16 @@ export interface Message {
     sender: 'user' | 'ai';
     timestamp: Date;
     suggestions?: Suggestion[];
+    questionCount?: number; // Number of questions asked so far (0-3)
+    disease?: DiseaseConclusion; // Disease conclusion (only when analysisComplete = true)
+    analysisComplete?: boolean; // Whether the analysis is complete
+}
+
+// Disease conclusion with confidence and reasoning
+export interface DiseaseConclusion {
+    name: string;
+    confidence: number; // 0-1
+    reasons: string[];
 }
 
 export interface Doctor {

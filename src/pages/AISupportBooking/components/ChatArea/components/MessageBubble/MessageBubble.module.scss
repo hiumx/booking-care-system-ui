@@ -297,6 +297,152 @@
         opacity: 1;
     }
 
+    // Question Progress Indicator
+    .questionProgress {
+        margin-top: 12px;
+        padding: 12px;
+        background: #f0f9ff;
+        border-left: 3px solid #0ea5e9;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .progressBar {
+            flex: 1;
+            height: 8px;
+            background: #e0f2fe;
+            border-radius: 4px;
+            overflow: hidden;
+
+            .progressFill {
+                height: 100%;
+                background: linear-gradient(90deg, #0ea5e9 0%, #06b6d4 100%);
+                border-radius: 4px;
+                transition: width 0.3s ease;
+            }
+        }
+
+        .progressText {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0369a1;
+            white-space: nowrap;
+        }
+    }
+
+    // Disease Conclusion
+    .diseaseConclusion {
+        margin-top: 16px;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 2px solid #f59e0b;
+        border-radius: 12px;
+        overflow: hidden;
+        animation: slideIn 0.4s ease;
+
+        .conclusionHeader {
+            background: #f59e0b;
+            padding: 12px 16px;
+
+            h4 {
+                margin: 0;
+                font-size: 16px;
+                font-weight: 700;
+                color: #ffffff;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+        }
+
+        .conclusionBody {
+            padding: 16px;
+            background: #ffffff;
+
+            .diseaseName {
+                font-size: 18px;
+                color: #92400e;
+                margin-bottom: 12px;
+                padding-bottom: 12px;
+                border-bottom: 2px solid #fef3c7;
+
+                strong {
+                    font-weight: 700;
+                }
+            }
+
+            .confidence {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 16px;
+
+                .confidenceLabel {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #78350f;
+                    white-space: nowrap;
+                }
+
+                .confidenceBar {
+                    flex: 1;
+                    height: 10px;
+                    background: #fef3c7;
+                    border-radius: 5px;
+                    overflow: hidden;
+
+                    .confidenceFill {
+                        height: 100%;
+                        border-radius: 5px;
+                        transition:
+                            width 0.5s ease,
+                            background-color 0.3s ease;
+                    }
+                }
+
+                .confidenceValue {
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #92400e;
+                    white-space: nowrap;
+                }
+            }
+
+            .reasons {
+                margin-top: 12px;
+                padding: 12px;
+                background: #fffbeb;
+                border-radius: 8px;
+                border-left: 3px solid #f59e0b;
+
+                strong {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #92400e;
+                    display: block;
+                    margin-bottom: 8px;
+                }
+
+                ul {
+                    margin: 0;
+                    padding-left: 20px;
+                    list-style-type: disc;
+
+                    li {
+                        font-size: 14px;
+                        color: #78350f;
+                        line-height: 1.6;
+                        margin-bottom: 4px;
+
+                        &:last-child {
+                            margin-bottom: 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     .listItem {
         padding-left: 20px;
         margin: 4px 0;
@@ -312,6 +458,17 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 

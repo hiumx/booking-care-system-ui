@@ -85,7 +85,8 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({ suggestion, onSupportBo
     if (suggestion.type === 'doctor' && suggestion.doctor) {
         const doctor = suggestion.doctor;
         const getInitials = () => {
-            const names = doctor.name.trim().split(' ');
+            const name = doctor.name || '';
+            const names = name.trim().split(' ');
             if (names.length >= 2) {
                 return (names[0][0] + names[names.length - 1][0]).toUpperCase();
             }
@@ -124,15 +125,17 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({ suggestion, onSupportBo
                             data-tooltip="Xem thông tin bác sĩ"
                             aria-label={`Xem thông tin bác sĩ ${doctor.name}`}
                         >
-                            {doctor.name}
+                            {doctor.name || 'Bác sĩ'}
                         </h4>
-                        <p className={styles.cardSubtitle}>Chuyên khoa: {doctor.specialtyName}</p>
+                        <p className={styles.cardSubtitle}>
+                            Chuyên khoa: {doctor.specialtyName || 'Chưa xác định'}
+                        </p>
                     </div>
                 </div>
                 <div className={styles.cardBody}>
                     <div className={styles.cardDetail}>
                         <Building2 size={16} />
-                        <span>{doctor.hospitalName}</span>
+                        <span>{doctor.hospitalName || 'Chưa có thông tin'}</span>
                     </div>
                     {doctor.serviceTypeName && (
                         <div className={styles.cardDetail}>
@@ -174,7 +177,8 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({ suggestion, onSupportBo
         const remainingCount = specialties.length - 3;
 
         const getInitials = () => {
-            const words = hospital.name.trim().split(' ');
+            const name = hospital.name || '';
+            const words = name.trim().split(' ');
             if (words.length >= 2) {
                 return (words[0][0] + words[words.length - 1][0]).toUpperCase();
             }
@@ -208,16 +212,16 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({ suggestion, onSupportBo
                             role="button"
                             tabIndex={0}
                             data-tooltip="Xem thông tin bệnh viện"
-                            aria-label={`Xem thông tin bệnh viện ${hospital.name}`}
+                            aria-label={`Xem thông tin bệnh viện ${hospital.name || ''}`}
                         >
-                            {hospital.name}
+                            {hospital.name || 'Bệnh viện'}
                         </h4>
                     </div>
                 </div>
                 <div className={styles.cardBody}>
                     <div className={styles.cardDetail}>
                         <MapPin size={16} />
-                        <span>{hospital.address}</span>
+                        <span>{hospital.address || 'Chưa có địa chỉ'}</span>
                     </div>
                     {specialties.length > 0 && (
                         <div className={styles.specialties}>

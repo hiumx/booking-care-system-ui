@@ -73,6 +73,12 @@ export interface HospitalRecommendation {
     imageUrl?: string;
 }
 
+export interface DiseaseConclusion {
+    name: string;
+    confidence: number; // 0-1
+    reasons: string[];
+}
+
 export interface SymptomAnalysisResponse {
     sessionId: string;
     message: string;
@@ -85,6 +91,8 @@ export interface SymptomAnalysisResponse {
     analysisComplete: boolean;
     disclaimer: string;
     timestamp: string;
+    questionCount?: number; // Number of questions asked so far (0-3)
+    disease?: DiseaseConclusion; // Disease conclusion (only when analysisComplete = true)
 }
 
 export class AIService {
@@ -195,6 +203,27 @@ export class AIService {
             };
         } catch (error: any) {
             throw new Error(error.message || 'Failed to delete session');
+        }
+    }
+
+    /**
+     * Get conversation history for a session
+     */
+    static async getConversationHistory(
+        sessionId: string
+    ): Promise<ApiResponse<ConversationMessage[]>> {
+        try {
+            const response: any = await axiosInstance.get(
+                `${AI_ENDPOINTS.BASE}/sessions/${sessionId}/history`
+            );
+            return {
+                success: response.success ?? true,
+                data: response.data || [],
+                message: response.message || 'Conversation history retrieved successfully',
+            };
+        } catch (error: any) {
+            console.error('Error loading conversation history:', error);
+            throw new Error(error.message || 'Failed to load conversation history');
         }
     }
 }

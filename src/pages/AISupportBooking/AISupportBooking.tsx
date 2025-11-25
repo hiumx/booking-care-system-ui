@@ -18,15 +18,17 @@ import { AIService, SymptomAnalysisRequest } from '@/services/ai.service';
 const parseDoctorData = (d: any) => ({
     type: 'doctor' as const,
     doctor: {
-        id: d.id || d.doctor?.id,
-        name: d.name || d.doctor?.name,
-        specialtyName: d.specialtyName || d.doctor?.specialtyName,
-        hospitalName: d.hospitalName || d.doctor?.hospitalName,
-        rating: d.rating || d.doctor?.rating || 0,
-        yearOfExperience: d.yearOfExperience || d.doctor?.yearOfExperience || 0,
-        serviceTypeName: d.serviceTypeName || d.doctor?.serviceTypeName || undefined,
-        price: d.price || d.doctor?.price || undefined,
-        avatarUrl: d.avatarUrl || d.doctor?.avatarUrl || undefined,
+        id: d.id || d.Id || d.doctor?.id,
+        name: d.name || d.Name || d.doctor?.name,
+        specialtyName: d.specialtyName || d.SpecialtyName || d.doctor?.specialtyName,
+        hospitalName: d.hospitalName || d.HospitalName || d.doctor?.hospitalName,
+        rating: d.rating || d.Rating || d.doctor?.rating || 0,
+        yearOfExperience:
+            d.yearOfExperience || d.YearOfExperience || d.doctor?.yearOfExperience || 0,
+        serviceTypeName:
+            d.serviceTypeName || d.ServiceTypeName || d.doctor?.serviceTypeName || undefined,
+        price: d.price || d.Price || d.doctor?.price || undefined,
+        avatarUrl: d.avatarUrl || d.AvatarUrl || d.doctor?.avatarUrl || undefined,
     },
 });
 
@@ -34,12 +36,12 @@ const parseDoctorData = (d: any) => ({
 const parseHospitalData = (h: any) => ({
     type: 'hospital' as const,
     hospital: {
-        id: h.id || h.hospital?.id,
-        name: h.name || h.hospital?.name,
-        address: h.address || h.hospital?.address,
+        id: h.id || h.Id || h.hospital?.id,
+        name: h.name || h.Name || h.hospital?.name,
+        address: h.address || h.Address || h.hospital?.address,
         specialtyId: [],
-        specialtyName: h.specialtyNames || h.hospital?.specialtyName || [],
-        imageUrl: h.imageUrl || h.hospital?.imageUrl || undefined,
+        specialtyName: h.specialtyNames || h.SpecialtyNames || h.hospital?.specialtyName || [],
+        imageUrl: h.imageUrl || h.ImageUrl || h.hospital?.imageUrl || undefined,
     },
 });
 
@@ -60,10 +62,12 @@ const parseSuggestions = (suggestionsData: any): Suggestion[] | undefined => {
                 ? suggestionsData.filter((s: any) => s.type === 'hospital')
                 : []);
 
-        return [
-            ...(Array.isArray(doctors) ? doctors : []).map(parseDoctorData),
-            ...(Array.isArray(hospitals) ? hospitals : []).map(parseHospitalData),
-        ];
+        const parsedDoctors = (Array.isArray(doctors) ? doctors : []).map(parseDoctorData);
+        const parsedHospitals = (Array.isArray(hospitals) ? hospitals : []).map(parseHospitalData);
+
+        const result = [...parsedDoctors, ...parsedHospitals];
+
+        return result;
     } catch (e) {
         console.error('Error parsing suggestions:', e);
         return undefined;
@@ -81,15 +85,28 @@ const convertMessageFromAPI = (msg: any, chatId: string, index: number): Message
         sender: sender,
         timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
         suggestions: suggestions,
+        questionCount: msg.questionCount,
+        disease: msg.disease,
+        analysisComplete: msg.analysisComplete,
     };
 };
 
 // Helper function to convert history message to Message format
 const convertHistoryMessage = (msg: any, index: number, chatId: string): Message => {
     const baseMessage = convertMessageFromAPI(msg, chatId, index);
-    const parsedSuggestions = parseSuggestions(msg.suggestions);
+    const parsedSuggestions = parseSuggestions(msg.suggestions || msg.Suggestions);
 
-    if (!msg.timestamp && !parsedSuggestions) {
+    // Parse disease data (support both camelCase and PascalCase)
+    const diseaseData = msg.disease || msg.Disease;
+    const parsedDisease = diseaseData
+        ? {
+              name: diseaseData.name || diseaseData.Name || '',
+              confidence: diseaseData.confidence ?? diseaseData.Confidence ?? 0,
+              reasons: diseaseData.reasons || diseaseData.Reasons || [],
+          }
+        : undefined;
+
+    if (!msg.timestamp && !parsedSuggestions && !parsedDisease) {
         return baseMessage;
     }
 
@@ -97,6 +114,10 @@ const convertHistoryMessage = (msg: any, index: number, chatId: string): Message
         ...baseMessage,
         timestamp: msg.timestamp ? new Date(msg.timestamp) : baseMessage.timestamp,
         suggestions: parsedSuggestions ?? baseMessage.suggestions,
+        disease: parsedDisease ?? baseMessage.disease,
+        questionCount: msg.questionCount ?? msg.QuestionCount ?? baseMessage.questionCount,
+        analysisComplete:
+            msg.analysisComplete ?? msg.AnalysisComplete ?? baseMessage.analysisComplete,
     };
 };
 
@@ -280,12 +301,12 @@ const AISupportBooking: React.FC = () => {
     const fetchChatMessages = useCallback(async (sessionId: string) => {
         setIsLoadingChat(true);
         try {
-            const response = await AIService.getSession(sessionId);
+            const response = await AIService.getConversationHistory(sessionId);
             if (activeChatIdRef.current !== sessionId) {
                 return;
             }
-            if (response.success && response.data?.conversationHistory) {
-                const history = response.data.conversationHistory;
+            if (response.success && response.data) {
+                const history = response.data;
                 setMessages(
                     history.map((msg: any, index: number) =>
                         convertHistoryMessage(msg, index, sessionId)
@@ -596,6 +617,9 @@ const AISupportBooking: React.FC = () => {
                 sender: 'ai',
                 timestamp: new Date(response.data.timestamp || new Date().toISOString()),
                 suggestions: suggestions.length > 0 ? suggestions : undefined,
+                questionCount: response.data.questionCount,
+                disease: response.data.disease,
+                analysisComplete: response.data.analysisComplete,
             };
 
             setMessages((prev) => [...prev, aiMessage]);
