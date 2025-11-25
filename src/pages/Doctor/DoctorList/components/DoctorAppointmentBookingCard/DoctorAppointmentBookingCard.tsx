@@ -246,13 +246,13 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                                       const isOnlineConsultation =
                                                           displayServiceInfo.serviceTypeName
                                                               .toLowerCase()
-                                                              .includes('tư vấn online') ||
+                                                              .includes('tư vấn trực tiếp') ||
                                                           displayServiceInfo.serviceTypeName
                                                               .toLowerCase()
-                                                              .includes('tu van online') ||
+                                                              .includes('tu van truc tiep') ||
                                                           displayServiceInfo.serviceTypeName
                                                               .toLowerCase()
-                                                              .includes('online');
+                                                              .includes('truc tiep');
                                                       return isOnlineConsultation
                                                           ? `${basePath}?appointmentType=TELEHEALTH`
                                                           : basePath;
