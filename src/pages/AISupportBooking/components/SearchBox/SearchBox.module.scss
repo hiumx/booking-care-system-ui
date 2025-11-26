@@ -340,10 +340,59 @@
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    min-width: 220px;
-    padding: 8px;
+    min-width: 500px;
+    padding: 12px;
     z-index: 1000;
     animation: slideUp 0.2s ease;
+
+    .attachmentGrid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .comingSoonCard {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+        border: 1px dashed #cbd5e0;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 120px;
+        cursor: not-allowed;
+        opacity: 0.7;
+        transition: all 0.3s ease;
+
+        &:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+        }
+
+        .comingSoonIcon {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+
+        .comingSoonTitle {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            text-align: center;
+        }
+
+        .comingSoonBadge {
+            font-size: 11px;
+            padding: 4px 12px;
+            background: #edf2f7;
+            color: #718096;
+            border-radius: 12px;
+            border: 1px solid #cbd5e0;
+            font-weight: 500;
+        }
+    }
 
     .menuItem {
         width: 100%;

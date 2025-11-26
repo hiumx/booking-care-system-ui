@@ -7,6 +7,37 @@ export interface Message {
     questionCount?: number; // Number of questions asked so far (0-3)
     disease?: DiseaseConclusion; // Disease conclusion (only when analysisComplete = true)
     analysisComplete?: boolean; // Whether the analysis is complete
+    fileAttachment?: FileAttachment; // File attachment (for lab results)
+    labResult?: LabResultAnalysis; // Lab result analysis
+}
+
+// File attachment
+export interface FileAttachment {
+    fileName: string;
+    fileUrl: string;
+    fileType: string;
+}
+
+// Lab result analysis
+export interface LabResultAnalysis {
+    normalIndicators: LabIndicator[];
+    abnormalIndicators: AbnormalLabIndicator[];
+}
+
+// Lab indicator
+export interface LabIndicator {
+    name: string;
+    value: string;
+    unit: string;
+    referenceRange: string;
+}
+
+// Abnormal lab indicator
+export interface AbnormalLabIndicator extends LabIndicator {
+    explanation: string;
+    advice: string;
+    possibleDiagnosis: string;
+    recommendedSpecialties?: string[];
 }
 
 // Disease conclusion with confidence and reasoning
@@ -49,4 +80,18 @@ export interface ChatHistory {
     lastMessage: string;
     lastMessageTime: string;
     avatar: string;
+}
+
+// Lab result analysis response from API
+export interface LabResultAnalysisResponse {
+    sessionId: string;
+    message?: string;
+    imageUrl: string;
+    extractedText: string;
+    normalIndicators: LabIndicator[];
+    abnormalIndicators: AbnormalLabIndicator[];
+    recommendedDoctors: Doctor[];
+    recommendedHospitals: Hospital[];
+    disclaimer: string;
+    timestamp: string;
 }

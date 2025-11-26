@@ -523,6 +523,56 @@ const AISupportBooking: React.FC = () => {
         return 'Xin lỗi, đã có lỗi xảy ra khi phân tích triệu chứng của bạn. Vui lòng thử lại sau.';
     };
 
+    // Helper function to build lab result message
+    const buildLabResultMessage = (data: any): string => {
+        const lines: string[] = [];
+        lines.push('**KẾT QUẢ PHÂN TÍCH XÉT NGHIỆM:**');
+        lines.push('');
+
+        // Normal indicators
+        if (data.normalIndicators && data.normalIndicators.length > 0) {
+            lines.push('**Các chỉ số bình thường:**');
+            data.normalIndicators.forEach((indicator: any) => {
+                lines.push(
+                    `- ${indicator.name}: ${indicator.value} ${indicator.unit} (Tham chiếu: ${indicator.referenceRange})`
+                );
+            });
+            lines.push('');
+        }
+
+        // Abnormal indicators
+        if (data.abnormalIndicators && data.abnormalIndicators.length > 0) {
+            lines.push('**Các chỉ số bất thường:**');
+            data.abnormalIndicators.forEach((indicator: any) => {
+                lines.push(
+                    `- **${indicator.name}**: ${indicator.value} ${indicator.unit} (Tham chiếu: ${indicator.referenceRange})`
+                );
+                lines.push(`  - Giải thích: ${indicator.explanation}`);
+                lines.push(`  - Lời khuyên: ${indicator.advice}`);
+                if (indicator.possibleDiagnosis) {
+                    lines.push(`  - Chẩn đoán có thể: ${indicator.possibleDiagnosis}`);
+                    if (
+                        indicator.recommendedSpecialties &&
+                        indicator.recommendedSpecialties.length > 0
+                    ) {
+                        const specialtyNames = indicator.recommendedSpecialties
+                            .map((s: any) => s.specialtyName || s)
+                            .join(', ');
+                        lines.push(`    - Chuyên khoa phù hợp: ${specialtyNames}`);
+                    }
+                }
+                lines.push('');
+            });
+        }
+
+        // Disclaimer
+        if (data.disclaimer) {
+            lines.push(data.disclaimer);
+        }
+
+        return lines.join('\n');
+    };
+
     const handleSendMessage = async (content: string) => {
         if (!content.trim()) return;
 
@@ -583,11 +633,12 @@ const AISupportBooking: React.FC = () => {
                 const oldChatId = currentChatId;
                 const newChatId = response.data.sessionId;
 
-                // Update tracking: remove old ID, add new ID
+                // Update tracking: keep new ID as newly created to prevent fetchChatMessages
+                // It will be removed from tracking when loadSessions confirms backend has it
                 if (newlyCreatedChatsRef.current.has(oldChatId)) {
                     newlyCreatedChatsRef.current.delete(oldChatId);
-                    newlyCreatedChatsRef.current.add(newChatId);
                 }
+                newlyCreatedChatsRef.current.add(newChatId);
 
                 // Update chatHistories: replace old chat with new ID
                 setChatHistories((prev) =>
@@ -598,10 +649,8 @@ const AISupportBooking: React.FC = () => {
                 setActiveChatId(newChatId);
                 currentChatId = newChatId;
 
-                // Navigate to new URL
-                navigate(replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, { chatId: newChatId }), {
-                    replace: true,
-                });
+                // Don't navigate here - let the useEffect handle URL sync
+                // This prevents triggering fetchChatMessages before backend saves the messages
             }
 
             // Map response to suggestions
@@ -609,7 +658,8 @@ const AISupportBooking: React.FC = () => {
 
             // Build AI message content
             // Message từ backend đã bao gồm disclaimer và intro text nếu có recommendations
-            const aiMessageContent = response.data.message || '';
+            // Process message content to handle escaped newlines
+            const aiMessageContent = (response.data.message || '').replace(/\\n/g, '\n');
 
             const aiMessage: Message = {
                 id: Date.now().toString(),
@@ -742,6 +792,116 @@ const AISupportBooking: React.FC = () => {
         }
     };
 
+    const handleLabResultFileSelect = async (file: File) => {
+        // Kiểm tra authentication
+        if (!isAuthenticated) {
+            navigate(
+                `${PATHS.LOGIN}?returnUrl=${encodeURIComponent(globalThis.location.pathname)}`
+            );
+            return;
+        }
+
+        // Kiểm tra vị trí
+        if (!userLocation) {
+            toast.error('Vui lòng chọn vị trí trước khi phân tích kết quả xét nghiệm');
+            return;
+        }
+
+        // Create user message with file attachment
+        const userMessage: Message = {
+            id: Date.now().toString(),
+            content: 'Đã gửi file kết quả xét nghiệm để phân tích',
+            sender: 'user',
+            timestamp: new Date(),
+            fileAttachment: {
+                fileName: file.name,
+                fileType: file.type,
+                fileUrl: URL.createObjectURL(file),
+            },
+        };
+
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
+
+        // Create new chat if no active chat
+        let currentChatId = ensureChatSession('Phân tích kết quả xét nghiệm');
+
+        // Call AI API to analyze lab result
+        setIsAITyping(true);
+
+        try {
+            const response = await AIService.analyzeLabResult(file, userLocation, currentChatId);
+
+            // Update session ID from response if provided
+            if (response.data.sessionId && response.data.sessionId !== currentChatId) {
+                const oldChatId = currentChatId;
+                const newChatId = response.data.sessionId;
+
+                // Update tracking: keep new ID as newly created to prevent fetchChatMessages
+                // It will be removed from tracking when loadSessions confirms backend has it
+                if (newlyCreatedChatsRef.current.has(oldChatId)) {
+                    newlyCreatedChatsRef.current.delete(oldChatId);
+                }
+                newlyCreatedChatsRef.current.add(newChatId);
+
+                // Update chatHistories: replace old chat with new ID
+                setChatHistories((prev) =>
+                    prev.map((chat) => (chat.id === oldChatId ? { ...chat, id: newChatId } : chat))
+                );
+
+                // Update active chat ID
+                setActiveChatId(newChatId);
+                currentChatId = newChatId;
+
+                // Don't navigate here - let the useEffect handle URL sync
+                // This prevents triggering fetchChatMessages before backend saves the messages
+            }
+
+            // Map response to suggestions
+            const suggestions = mapResponseToSuggestions(response);
+
+            // Build AI message content from lab result data
+            const aiMessageContent = response.data.message
+                ? response.data.message.replace(/\\n/g, '\n')
+                : buildLabResultMessage(response.data);
+
+            const aiMessage: Message = {
+                id: Date.now().toString(),
+                content: aiMessageContent.trim(),
+                sender: 'ai',
+                timestamp: new Date(response.data.timestamp || new Date().toISOString()),
+                suggestions: suggestions.length > 0 ? suggestions : undefined,
+            };
+
+            setMessages((prev) => [...prev, aiMessage]);
+            toast.success('Đã phân tích kết quả xét nghiệm thành công');
+        } catch (error: any) {
+            console.error('Error analyzing lab result:', error);
+
+            // Show error message to user
+            const errorContent = getErrorMessage(error);
+
+            const errorMessage: Message = {
+                id: Date.now().toString(),
+                content: errorContent,
+                sender: 'ai',
+                timestamp: new Date(),
+            };
+
+            setMessages((prev) => [...prev, errorMessage]);
+            toast.error('Không thể phân tích kết quả xét nghiệm. Vui lòng thử lại.');
+        } finally {
+            setIsAITyping(false);
+
+            // Reload sessions to sync title from backend
+            if (currentChatId && updatedMessages.length === 1) {
+                setTimeout(() => {
+                    loadSessions(true);
+                }, 2000);
+            }
+        }
+    };
+
     return (
         <div className={styles.aiSupportBooking}>
             <Link to={PATHS.HOME} className={styles.homeButton}>
@@ -795,6 +955,7 @@ const AISupportBooking: React.FC = () => {
                                 setUserLocation(location);
                                 localStorage.setItem('aiSupportLocation', JSON.stringify(location));
                             }}
+                            onLabResultFileSelect={handleLabResultFileSelect}
                         />
                     )}
                 </div>

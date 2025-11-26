@@ -493,3 +493,29 @@
         }
     }
 }
+
+// File Attachment Styles
+.fileAttachment {
+    margin-top: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+
+    .attachmentImage {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        display: block;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .fileName {
+        padding: 10px 12px;
+        font-size: 13px;
+        color: #495057;
+        background: #ffffff;
+        border-top: 1px solid #e9ecef;
+        font-weight: 500;
+    }
+}

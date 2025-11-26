@@ -8,6 +8,7 @@ const AI_ENDPOINTS = {
     HEALTH: '/symptoms/health',
     SESSION: (sessionId: string) => `/symptoms/sessions/${sessionId}`,
     SAVE_SESSION: (sessionId: string) => `/symptoms/sessions/${sessionId}/save`,
+    LAB_RESULT_ANALYZE: '/lab-results/analyze',
 } as const;
 
 // Types
@@ -224,6 +225,53 @@ export class AIService {
         } catch (error: any) {
             console.error('Error loading conversation history:', error);
             throw new Error(error.message || 'Failed to load conversation history');
+        }
+    }
+
+    /**
+     * Analyze lab result image
+     */
+    static async analyzeLabResult(
+        file: File,
+        location?: LocationContext,
+        sessionId?: string
+    ): Promise<ApiResponse<import('@/types/ai.types').LabResultAnalysisResponse>> {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            if (sessionId) {
+                formData.append('sessionId', sessionId);
+            }
+
+            if (location) {
+                formData.append('location.provinceId', location.provinceId || '');
+                formData.append('location.districtId', location.districtId || '');
+                formData.append('location.displayName', location.displayName);
+            }
+
+            const response: any = await axiosInstance.post(
+                AI_ENDPOINTS.LAB_RESULT_ANALYZE,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Lab result analyzed successfully',
+            };
+        } catch (error: any) {
+            console.error('Error analyzing lab result:', error);
+            throw new Error(
+                error.response?.data?.message ||
+                    error.message ||
+                    'Failed to analyze lab result. Please try again.'
+            );
         }
     }
 }

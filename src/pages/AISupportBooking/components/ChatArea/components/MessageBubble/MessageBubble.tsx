@@ -341,6 +341,22 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                         {isUser ? message.content : formatTextContent(message.content)}
                     </div>
 
+                    {/* File Attachment (for lab results) */}
+                    {message.fileAttachment && (
+                        <div className={styles.fileAttachment}>
+                            {message.fileAttachment.fileType.startsWith('image/') && (
+                                <img
+                                    src={message.fileAttachment.fileUrl}
+                                    alt={message.fileAttachment.fileName}
+                                    className={styles.attachmentImage}
+                                />
+                            )}
+                            <div className={styles.fileName}>
+                                📎 {message.fileAttachment.fileName}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Question Progress Indicator */}
                     {!isUser &&
                         message.questionCount !== undefined &&
@@ -362,7 +378,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                     {!isUser && message.disease && message.analysisComplete && (
                         <div className={styles.diseaseConclusion}>
                             <div className={styles.conclusionHeader}>
-                                <h4>🔍 Kết luận</h4>
+                                <h4>Kết luận</h4>
                             </div>
                             <div className={styles.conclusionBody}>
                                 <div className={styles.diseaseName}>

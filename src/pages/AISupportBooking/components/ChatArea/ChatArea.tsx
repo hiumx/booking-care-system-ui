@@ -23,6 +23,7 @@ interface ChatAreaProps {
         districtId?: string;
         displayName: string;
     }) => void;
+    onLabResultFileSelect?: (file: File) => void;
 }
 
 // Breakpoints cho SuggestionCard Carousel
@@ -123,6 +124,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     activeChatId,
     userLocation,
     onLocationChange,
+    onLabResultFileSelect,
 }) => {
     const [inputValue, setInputValue] = useState('');
     const [activeTabs, setActiveTabs] = useState<Record<string, 'doctor' | 'hospital'>>({});
@@ -373,6 +375,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                     onSend={handleSend}
                     userLocation={userLocation}
                     onLocationChange={onLocationChange}
+                    onLabResultFileSelect={onLabResultFileSelect}
                 />
             </div>
         </div>
