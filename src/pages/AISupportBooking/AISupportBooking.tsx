@@ -223,8 +223,22 @@ const AISupportBooking: React.FC = () => {
             // Backend will get userId from authentication token
             const response = await AIService.getUserSessions();
             if (response.success && response.data) {
-                // Map sessions to ChatHistory format
-                const historiesFromBackend: ChatHistory[] = response.data.map((session) => {
+                // Sort sessions by updatedAt (newest first) before mapping
+                const sortedSessions = [...response.data].sort((a, b) => {
+                    try {
+                        const dateA = new Date(a.updatedAt);
+                        const dateB = new Date(b.updatedAt);
+                        // If dates are invalid, treat as newest
+                        if (Number.isNaN(dateA.getTime())) return -1;
+                        if (Number.isNaN(dateB.getTime())) return 1;
+                        return dateB.getTime() - dateA.getTime(); // Newest first
+                    } catch {
+                        return 0;
+                    }
+                });
+
+                // Map sorted sessions to ChatHistory format
+                const historiesFromBackend: ChatHistory[] = sortedSessions.map((session) => {
                     // Parse UTC time string and convert to local time
                     // session.updatedAt is in UTC format from backend (ISO string)
                     let formattedTime = 'Vừa xong';
@@ -273,15 +287,16 @@ const AISupportBooking: React.FC = () => {
                         });
 
                         // Keep local chats that are not yet in backend (newly created)
+                        // These are the newest chats, so they should be at the top
                         const localOnlyChats = prevHistories.filter(
                             (chat) => !backendIds.has(chat.id)
                         );
 
-                        // Merge: backend histories + local-only chats
-                        return [...historiesFromBackend, ...localOnlyChats];
+                        // Merge: local-only chats (newest) first, then sorted backend histories
+                        return [...localOnlyChats, ...historiesFromBackend];
                     });
                 } else {
-                    // Full reload (first time load), just use backend data
+                    // Full reload (first time load), already sorted by updatedAt (newest first)
                     setChatHistories(historiesFromBackend);
                 }
             }
@@ -727,6 +742,8 @@ const AISupportBooking: React.FC = () => {
             const remainingChats = prev.filter((chat) => chat.id !== chatId);
             // Nếu chat bị xóa là chat đang active, chuyển sang chat khác hoặc reset
             if (activeChatId === chatId) {
+                // Clear messages ngay lập tức để tránh hiển thị nội dung chat đã xóa
+                setMessages([]);
                 if (remainingChats.length > 0) {
                     const newActiveId = remainingChats[0].id;
                     setActiveChatId(newActiveId);
@@ -737,7 +754,6 @@ const AISupportBooking: React.FC = () => {
                     );
                 } else {
                     setActiveChatId(null);
-                    setMessages([]);
                     navigate(PATHS.AI_SUPPORT_BOOKING);
                 }
             }

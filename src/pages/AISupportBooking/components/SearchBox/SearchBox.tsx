@@ -1,9 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
-import { Paperclip, Trash2, Mic, Send, MapPin, Navigation } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import {
+    Paperclip,
+    Trash2,
+    Mic,
+    Send,
+    MapPin,
+    Navigation,
+    FileText,
+    Stethoscope,
+    Pill,
+    ClipboardList,
+    Image,
+    Lightbulb,
+    Telescope,
+    BookOpen,
+    MoreHorizontal,
+    ChevronRight,
+} from 'lucide-react';
 import ModalArea from '@/components/ModalArea/ModalArea';
-import LabResultAnalysisCard from './components/LabResultAnalysisCard/LabResultAnalysisCard';
 import styles from './SearchBox.module.scss';
 
 interface SearchBoxProps {
@@ -20,6 +37,30 @@ interface SearchBoxProps {
     forceShowLocationModal?: boolean;
     onLabResultFileSelect?: (file: File) => void;
 }
+
+interface ComingSoonFeature {
+    id: string;
+    icon: LucideIcon;
+    title: string;
+}
+
+const comingSoonFeatures: ComingSoonFeature[] = [
+    {
+        id: 'medical-imaging',
+        icon: Stethoscope,
+        title: 'Phân tích hình ảnh y tế',
+    },
+    {
+        id: 'medicine-lookup',
+        icon: Pill,
+        title: 'Tra cứu thuốc',
+    },
+    {
+        id: 'medical-history',
+        icon: ClipboardList,
+        title: 'Lịch sử khám bệnh',
+    },
+];
 
 const SearchBox: React.FC<SearchBoxProps> = ({
     value,
@@ -38,6 +79,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     const [isGettingLocation, setIsGettingLocation] = useState(false);
     const [locationError, setLocationError] = useState<string | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const labFileInputRef = useRef<HTMLInputElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const locationModalRef = useRef<HTMLDivElement>(null);
@@ -149,10 +191,41 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         setShowAttachmentModal(!showAttachmentModal);
     };
 
-    const handleLabResultFileSelect = (file: File) => {
+    const handleFileUpload = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*,application/pdf,.doc,.docx';
+        input.multiple = true;
+        input.onchange = (e) => {
+            const files = (e.target as HTMLInputElement).files;
+            if (files && files.length > 0) {
+                // Handle file upload - Implementation pending
+                // This feature will be implemented in the next sprint
+                console.log('Files selected:', files);
+            }
+        };
+        input.click();
         setShowAttachmentModal(false);
-        if (onLabResultFileSelect) {
+    };
+
+    const handleMenuItemClick = (action: string) => {
+        console.log('Menu item clicked:', action);
+        setShowAttachmentModal(false);
+        // Implement actions for each menu item - Implementation pending
+        // This feature will be implemented in the next sprint
+    };
+
+    const handleLabCardClick = () => {
+        labFileInputRef.current?.click();
+    };
+
+    const handleLabCardFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && onLabResultFileSelect) {
             onLabResultFileSelect(file);
+        }
+        if (e.target) {
+            e.target.value = '';
         }
     };
 
@@ -290,6 +363,50 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                 [styles.multiLine]: isMultiLine,
             })}
         >
+            <div className={styles.quickActions}>
+                <div
+                    className={clsx(styles.quickActionCard, styles.labActionCard)}
+                    onClick={handleLabCardClick}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleLabCardClick();
+                        }
+                    }}
+                >
+                    <div className={styles.quickActionIcon}>
+                        <FileText size={28} />
+                    </div>
+                    <div className={styles.quickActionContent}>
+                        <p className={styles.quickActionTitle}>Phân tích kết quả xét nghiệm</p>
+                    </div>
+                </div>
+
+                {comingSoonFeatures.map((feature) => {
+                    const Icon = feature.icon;
+                    return (
+                        <div key={feature.id} className={styles.quickActionCard}>
+                            <div className={styles.quickActionIcon}>
+                                <Icon size={24} />
+                            </div>
+                            <div className={styles.quickActionContent}>
+                                <p className={styles.quickActionTitle}>{feature.title}</p>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <input
+                ref={labFileInputRef}
+                type="file"
+                accept="image/*,.pdf"
+                style={{ display: 'none' }}
+                onChange={handleLabCardFileChange}
+            />
+
             <textarea
                 ref={textareaRef}
                 placeholder={placeholder}
@@ -318,33 +435,47 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                         </button>
                         {showAttachmentModal && (
                             <div ref={modalRef} className={styles.attachmentModal}>
-                                <div className={styles.attachmentGrid}>
-                                    <LabResultAnalysisCard
-                                        onFileSelect={handleLabResultFileSelect}
-                                    />
-
-                                    <div className={styles.comingSoonCard}>
-                                        <div className={styles.comingSoonIcon}>🩺</div>
-                                        <div className={styles.comingSoonTitle}>
-                                            Phân tích hình ảnh y tế
-                                        </div>
-                                        <div className={styles.comingSoonBadge}>Sắp ra mắt</div>
-                                    </div>
-
-                                    <div className={styles.comingSoonCard}>
-                                        <div className={styles.comingSoonIcon}>💊</div>
-                                        <div className={styles.comingSoonTitle}>Tra cứu thuốc</div>
-                                        <div className={styles.comingSoonBadge}>Sắp ra mắt</div>
-                                    </div>
-
-                                    <div className={styles.comingSoonCard}>
-                                        <div className={styles.comingSoonIcon}>📋</div>
-                                        <div className={styles.comingSoonTitle}>
-                                            Lịch sử khám bệnh
-                                        </div>
-                                        <div className={styles.comingSoonBadge}>Sắp ra mắt</div>
-                                    </div>
-                                </div>
+                                <button className={styles.menuItem} onClick={handleFileUpload}>
+                                    <Paperclip size={18} />
+                                    <span>Add photos & files</span>
+                                </button>
+                                <div className={styles.menuDivider}></div>
+                                <button
+                                    className={styles.menuItem}
+                                    onClick={() => handleMenuItemClick('create-image')}
+                                >
+                                    <Image size={18} />
+                                    <span>Create image</span>
+                                </button>
+                                <button
+                                    className={styles.menuItem}
+                                    onClick={() => handleMenuItemClick('thinking')}
+                                >
+                                    <Lightbulb size={18} />
+                                    <span>Thinking</span>
+                                </button>
+                                <button
+                                    className={styles.menuItem}
+                                    onClick={() => handleMenuItemClick('deep-research')}
+                                >
+                                    <Telescope size={18} />
+                                    <span>Deep research</span>
+                                </button>
+                                <button
+                                    className={styles.menuItem}
+                                    onClick={() => handleMenuItemClick('study-learn')}
+                                >
+                                    <BookOpen size={18} />
+                                    <span>Study and learn</span>
+                                </button>
+                                <button
+                                    className={styles.menuItem}
+                                    onClick={() => handleMenuItemClick('more')}
+                                >
+                                    <MoreHorizontal size={18} />
+                                    <span>... More</span>
+                                    <ChevronRight size={16} className={styles.chevronIcon} />
+                                </button>
                             </div>
                         )}
                     </div>
