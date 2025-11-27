@@ -1,25 +1,30 @@
 import { useAppSelector } from '../../../store/hooks';
-import { DoctorInfo } from '../components/BookingHeader/BookingHeader';
+import { BookingEntityInfo } from '../components/BookingHeader/BookingHeader';
 
 /**
  * Custom hook to get service medical info formatted for booking sections
  * This ensures consistent service medical data across all booking steps
- * Reuses DoctorInfo interface for compatibility with existing UI components
+ * Uses BookingEntityInfo interface for flexible display in BookingHeader
  */
-export const useServiceMedicalInfo = (): DoctorInfo => {
-    const serviceMedicalId = useAppSelector((state) => state.schedule.selectedMedicalServiceId);
+export const useServiceMedicalInfo = (): BookingEntityInfo => {
+    // Use selectedServiceWithHospital which contains full hospital info
+    const selectedServiceWithHospital = useAppSelector(
+        (state) => state.medicalService.serviceCategories.selectedServiceWithHospital
+    );
 
-    // TODO: When service medical store is implemented, fetch from there
-    // For now, return placeholder data
-    const serviceMedicalInfo: DoctorInfo = serviceMedicalId
+    // Map service with hospital data from Redux to BookingEntityInfo format
+    const serviceMedicalInfo: BookingEntityInfo = selectedServiceWithHospital
         ? {
-              name: 'Dịch vụ y tế', // TODO: Get from service medical store
-              specialty: 'Dịch vụ khám chữa bệnh',
-              rating: 4.5,
-              location: 'Địa chỉ bệnh viện',
-              avatar: '/assets/img/default-avatar.jpg',
+              name: selectedServiceWithHospital.name,
+              subtitle: selectedServiceWithHospital.hospital?.name || 'Bệnh viện',
+              rating: selectedServiceWithHospital.reviewStatistics?.averageRating, // Services don't have ratings
+              location: selectedServiceWithHospital.hospital?.address || 'Địa chỉ bệnh viện',
+              avatar: selectedServiceWithHospital.imageUrl || '/assets/img/default-service.jpg',
+              bookingType: 'service',
+              price: selectedServiceWithHospital.price,
+              duration: selectedServiceWithHospital.durationTime,
           }
-        : (new Object() as DoctorInfo);
+        : ({} as BookingEntityInfo);
 
     return serviceMedicalInfo;
 };
