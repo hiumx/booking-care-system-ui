@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { HoldSlotService } from '@/services/holdSlot.service';
+import { HoldSlotTargetType } from '@/types/holdSlot.types';
 import { AppointmentTime } from '@/enums/appointment.enums';
 import { toast } from 'react-toastify';
 
@@ -11,7 +12,8 @@ interface HoldSlotState {
 }
 
 interface UseHoldSlotProps {
-    doctorId?: string;
+    targetId?: string; // Can be doctorId or serviceMedicalId
+    targetType?: HoldSlotTargetType;
     date?: string;
     onSlotExpired?: () => void;
 }
@@ -22,19 +24,22 @@ interface UseHoldSlotReturn {
     isLoading: boolean;
     error: string | null;
     currentHeldSlot: {
-        doctorId: string;
+        targetId: string;
+        targetType: HoldSlotTargetType;
         date: string;
         appointmentTimeId: AppointmentTime;
     } | null;
     holdSlot: (
-        targetDoctorId: string,
+        targetId: string,
+        targetType: HoldSlotTargetType,
         targetDate: string,
         appointmentTimeId: AppointmentTime
     ) => Promise<boolean>;
     releaseSlot: () => Promise<void>;
     releaseAllSlots: () => Promise<void>;
     restoreHeldSlot: (
-        targetDoctorId: string,
+        targetId: string,
+        targetType: HoldSlotTargetType,
         targetDate: string,
         appointmentTimeId: AppointmentTime,
         remainingSeconds: number
@@ -42,7 +47,8 @@ interface UseHoldSlotReturn {
 }
 
 export const useHoldSlot = ({
-    doctorId: _doctorId,
+    targetId: _targetId,
+    targetType: _targetType = HoldSlotTargetType.Doctor,
     date: _date,
     onSlotExpired,
 }: UseHoldSlotProps = {}): UseHoldSlotReturn => {
@@ -54,7 +60,8 @@ export const useHoldSlot = ({
     });
 
     const [currentHeldSlot, setCurrentHeldSlot] = useState<{
-        doctorId: string;
+        targetId: string;
+        targetType: HoldSlotTargetType;
         date: string;
         appointmentTimeId: AppointmentTime;
     } | null>(null);
@@ -153,7 +160,8 @@ export const useHoldSlot = ({
     // Hold a slot
     const holdSlot = useCallback(
         async (
-            targetDoctorId: string,
+            targetId: string,
+            targetType: HoldSlotTargetType,
             targetDate: string,
             appointmentTimeId: AppointmentTime
         ): Promise<boolean> => {
@@ -166,14 +174,16 @@ export const useHoldSlot = ({
                 }
 
                 const response = await HoldSlotService.holdSlot({
-                    doctorId: targetDoctorId,
+                    targetId,
+                    targetType,
                     date: targetDate,
                     appointmentTimeId,
                 });
 
                 if (response.success) {
                     setCurrentHeldSlot({
-                        doctorId: targetDoctorId,
+                        targetId,
+                        targetType,
                         date: targetDate,
                         appointmentTimeId,
                     });
@@ -217,7 +227,8 @@ export const useHoldSlot = ({
 
         try {
             await HoldSlotService.releaseSlot({
-                doctorId: currentHeldSlot.doctorId,
+                targetId: currentHeldSlot.targetId,
+                targetType: currentHeldSlot.targetType,
                 date: currentHeldSlot.date,
                 appointmentTimeId: currentHeldSlot.appointmentTimeId,
             });
@@ -252,7 +263,8 @@ export const useHoldSlot = ({
 
         try {
             const remainingSeconds = await HoldSlotService.getRemainingTime(
-                currentHeldSlot.doctorId,
+                currentHeldSlot.targetId,
+                currentHeldSlot.targetType,
                 currentHeldSlot.date,
                 currentHeldSlot.appointmentTimeId
             );
@@ -292,13 +304,15 @@ export const useHoldSlot = ({
     // Restore held slot state (for when user navigates back)
     const restoreHeldSlot = useCallback(
         (
-            targetDoctorId: string,
+            targetId: string,
+            targetType: HoldSlotTargetType,
             targetDate: string,
             appointmentTimeId: AppointmentTime,
             remainingSeconds: number
         ) => {
             setCurrentHeldSlot({
-                doctorId: targetDoctorId,
+                targetId,
+                targetType,
                 date: targetDate,
                 appointmentTimeId,
             });
