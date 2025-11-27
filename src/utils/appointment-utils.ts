@@ -122,6 +122,10 @@ export interface CreateAppointmentParams {
     appointmentType: AppointmentType;
     symptoms: string;
     attachmentUrls: string[];
+    /** Original consultation/service fee at the time of booking (before any discounts) */
+    amount?: number;
+    /** Patient relative ID if booking for a family member */
+    relativeId?: string;
 }
 
 /**
@@ -142,5 +146,7 @@ export const createAppointmentRequest = (
         appointmentType: params.appointmentType || AppointmentType.IN_PERSON,
         symptoms: params.symptoms,
         attachmentUrls: params.attachmentUrls.join(','),
+        amount: params.amount,
+        relativeId: params.relativeId,
     };
 };

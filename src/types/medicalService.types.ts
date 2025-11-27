@@ -71,6 +71,12 @@ export interface HospitalResponse {
     avatarUrl: string;
 }
 
+// Service review statistics response
+export interface ServiceReviewStatisticsResponse {
+    averageRating: number;
+    totalReviews: number;
+}
+
 export interface ServiceWithHospitalResponse {
     id: string;
     name: string;
@@ -83,6 +89,7 @@ export interface ServiceWithHospitalResponse {
     status: Status;
     parentCategoryName: string;
     hospital: HospitalResponse;
+    reviewStatistics?: ServiceReviewStatisticsResponse;
 }
 
 export interface ServiceWithHospitalListResponse {
@@ -113,6 +120,7 @@ export interface ServiceCategoryState {
     parentServiceCategories: ServiceCategoryParentsResponse[];
     selectedServiceCategory: ServiceCategoryResponse | null;
     servicesWithHospital: ServiceWithHospitalListResponse | null;
+    selectedServiceWithHospital: ServiceWithHospitalResponse | null; // Selected service for booking
     isLoading: boolean;
     error: string | null;
     pagination: {
