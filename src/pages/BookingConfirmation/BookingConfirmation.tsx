@@ -51,6 +51,11 @@ const BookingConfirmation: React.FC = () => {
         fetchAppointment();
     }, [appointmentId, navigate]);
 
+    // Determine booking type based on appointment data
+    const isServiceMedicalBooking = useMemo(() => {
+        return !!appointment?.serviceInfo && !appointment?.doctorInfo;
+    }, [appointment]);
+
     // Format appointment info from API data
     const formattedAppointmentInfo = useMemo(() => {
         if (!appointment) {
@@ -59,6 +64,7 @@ const BookingConfirmation: React.FC = () => {
                 dateTime: 'Đang tải...',
                 timeSlot: null,
                 doctor: null,
+                service: null,
                 hospital: null,
             };
         }
@@ -90,14 +96,18 @@ const BookingConfirmation: React.FC = () => {
                 : formattedDate,
             timeSlot,
             doctor: appointment.doctorInfo,
+            service: appointment.serviceInfo,
             hospital: appointment.hospitalInfo,
         };
     }, [appointment]);
 
-    // Breadcrumb configuration
+    // Breadcrumb configuration - dynamic based on booking type
     const breadcrumbItems = [
         { label: 'Trang chủ', path: PATHS.HOME },
-        { label: 'Đặt lịch khám', path: PATHS.DOCTOR.ROOT },
+        {
+            label: isServiceMedicalBooking ? 'Dịch vụ y tế' : 'Đặt lịch khám',
+            path: isServiceMedicalBooking ? PATHS.Service.ROOT : PATHS.DOCTOR.ROOT,
+        },
         { label: 'Xác nhận đặt lịch', isActive: true },
     ];
 
@@ -140,26 +150,52 @@ const BookingConfirmation: React.FC = () => {
                                                         <span className="avatar avatar-lg avatar-rounded me-2 flex-shrink-0">
                                                             <img
                                                                 src={
-                                                                    formattedAppointmentInfo.doctor
-                                                                        ?.avatarUrl ||
-                                                                    '/src/assets/img/clients/client-16.jpg'
+                                                                    isServiceMedicalBooking
+                                                                        ? formattedAppointmentInfo
+                                                                              .service?.imageUrl ||
+                                                                          '/src/assets/img/icons/medical-service.svg'
+                                                                        : formattedAppointmentInfo
+                                                                              .doctor?.avatarUrl ||
+                                                                          '/src/assets/img/clients/client-16.jpg'
                                                                 }
-                                                                alt="doctor-avatar"
+                                                                alt={
+                                                                    isServiceMedicalBooking
+                                                                        ? 'service-avatar'
+                                                                        : 'doctor-avatar'
+                                                                }
                                                             />
                                                         </span>
                                                         <p className="mb-0">
-                                                            Lịch khám của bạn đã được xác nhận với{' '}
+                                                            {isServiceMedicalBooking ? (
+                                                                <>
+                                                                    Lịch hẹn dịch vụ{' '}
+                                                                    <span className="text-dark">
+                                                                        {formattedAppointmentInfo
+                                                                            .service?.name ||
+                                                                            'Dịch vụ y tế'}
+                                                                    </span>{' '}
+                                                                    của bạn đã được xác nhận.
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    Lịch khám của bạn đã được xác
+                                                                    nhận với{' '}
+                                                                    <span className="text-dark">
+                                                                        {
+                                                                            formattedAppointmentInfo
+                                                                                .doctor
+                                                                                ?.positionName
+                                                                        }{' '}
+                                                                        {formattedAppointmentInfo
+                                                                            .doctor?.fullName ||
+                                                                            'Bác sĩ'}
+                                                                    </span>
+                                                                    .
+                                                                </>
+                                                            )}{' '}
+                                                            Vui lòng đến trước{' '}
                                                             <span className="text-dark">
-                                                                {
-                                                                    formattedAppointmentInfo.doctor
-                                                                        ?.positionName
-                                                                }{' '}
-                                                                {formattedAppointmentInfo.doctor
-                                                                    ?.fullName || 'Bác sĩ'}{' '}
-                                                            </span>
-                                                            . Vui lòng đến trước{' '}
-                                                            <span className="text-dark">
-                                                                15 phút{' '}
+                                                                15 phút
                                                             </span>{' '}
                                                             so với giờ hẹn.
                                                         </p>
@@ -176,43 +212,78 @@ const BookingConfirmation: React.FC = () => {
                                                             </Link>
                                                         </div>
                                                         <div className="row">
-                                                            {/* Doctor Information */}
-                                                            {formattedAppointmentInfo.doctor && (
-                                                                <>
-                                                                    <div className="col-md-6">
-                                                                        <div className="mb-3">
-                                                                            <div className="form-label">
-                                                                                Bác sĩ
-                                                                            </div>
-                                                                            <div className="form-plain-text">
-                                                                                {
-                                                                                    formattedAppointmentInfo
-                                                                                        .doctor
-                                                                                        .positionName
-                                                                                }{' '}
-                                                                                {
-                                                                                    formattedAppointmentInfo
-                                                                                        .doctor
-                                                                                        .fullName
-                                                                                }
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="col-md-6">
-                                                                        <div className="mb-3">
-                                                                            <div className="form-label">
-                                                                                Chuyên khoa
-                                                                            </div>
-                                                                            <div className="form-plain-text">
-                                                                                {formattedAppointmentInfo
-                                                                                    .doctor
-                                                                                    .specialtyName ||
-                                                                                    'Chưa cập nhật'}
+                                                            {/* Doctor Information - only show for doctor booking */}
+                                                            {!isServiceMedicalBooking &&
+                                                                formattedAppointmentInfo.doctor && (
+                                                                    <>
+                                                                        <div className="col-md-6">
+                                                                            <div className="mb-3">
+                                                                                <div className="form-label">
+                                                                                    Bác sĩ
+                                                                                </div>
+                                                                                <div className="form-plain-text">
+                                                                                    {
+                                                                                        formattedAppointmentInfo
+                                                                                            .doctor
+                                                                                            .positionName
+                                                                                    }{' '}
+                                                                                    {
+                                                                                        formattedAppointmentInfo
+                                                                                            .doctor
+                                                                                            .fullName
+                                                                                    }
+                                                                                </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
-                                                                </>
-                                                            )}
+                                                                        <div className="col-md-6">
+                                                                            <div className="mb-3">
+                                                                                <div className="form-label">
+                                                                                    Chuyên khoa
+                                                                                </div>
+                                                                                <div className="form-plain-text">
+                                                                                    {formattedAppointmentInfo
+                                                                                        .doctor
+                                                                                        .specialtyName ||
+                                                                                        'Chưa cập nhật'}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </>
+                                                                )}
+
+                                                            {/* Service Information - only show for service medical booking */}
+                                                            {isServiceMedicalBooking &&
+                                                                formattedAppointmentInfo.service && (
+                                                                    <>
+                                                                        <div className="col-md-6">
+                                                                            <div className="mb-3">
+                                                                                <div className="form-label">
+                                                                                    Dịch vụ
+                                                                                </div>
+                                                                                <div className="form-plain-text">
+                                                                                    {
+                                                                                        formattedAppointmentInfo
+                                                                                            .service
+                                                                                            .name
+                                                                                    }
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="col-md-6">
+                                                                            <div className="mb-3">
+                                                                                <div className="form-label">
+                                                                                    Giá dịch vụ
+                                                                                </div>
+                                                                                <div className="form-plain-text">
+                                                                                    {formattedAppointmentInfo.service.price?.toLocaleString(
+                                                                                        'vi-VN'
+                                                                                    )}{' '}
+                                                                                    VNĐ
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </>
+                                                                )}
 
                                                             {/* Date */}
                                                             <div className="col-md-6">
@@ -269,20 +340,22 @@ const BookingConfirmation: React.FC = () => {
                                                                 </div>
                                                             )}
 
-                                                            {/* Appointment Type */}
-                                                            <div className="col-md-6">
-                                                                <div className="mb-3">
-                                                                    <div className="form-label">
-                                                                        Hình thức khám
-                                                                    </div>
-                                                                    <div className="form-plain-text">
-                                                                        {appointment?.appointmentType ===
-                                                                        'IN_PERSON'
-                                                                            ? 'Tại phòng khám'
-                                                                            : 'Trực tuyến'}
+                                                            {/* Appointment Type - only show for doctor booking */}
+                                                            {!isServiceMedicalBooking && (
+                                                                <div className="col-md-6">
+                                                                    <div className="mb-3">
+                                                                        <div className="form-label">
+                                                                            Hình thức khám
+                                                                        </div>
+                                                                        <div className="form-plain-text">
+                                                                            {appointment?.appointmentType ===
+                                                                            'IN_PERSON'
+                                                                                ? 'Tại phòng khám'
+                                                                                : 'Trực tuyến'}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
+                                                            )}
 
                                                             {/* Hospital Information */}
                                                             <div className="col-md-6">
@@ -384,7 +457,11 @@ const BookingConfirmation: React.FC = () => {
                                                             Thêm vào lịch
                                                         </button>
                                                         <Link
-                                                            to={PATHS.DOCTOR.ROOT}
+                                                            to={
+                                                                isServiceMedicalBooking
+                                                                    ? PATHS.Service.ROOT
+                                                                    : PATHS.DOCTOR.ROOT
+                                                            }
                                                             className="btn w-100 btn-md btn-primary-gradient next_btns inline-flex align-items-center rounded-pill"
                                                         >
                                                             Đặt lịch mới

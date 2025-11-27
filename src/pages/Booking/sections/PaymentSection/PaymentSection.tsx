@@ -2,11 +2,14 @@ import { useState, useMemo, useEffect } from 'react';
 import BookingSectionWrapper from '../../components/BookingSectionWrapper';
 import { mockAppointmentInfo } from '../../constants/mockData';
 import { useDoctorInfo } from '../../hooks';
+import { useServiceMedicalInfo } from '../../hooks/useServiceMedicalInfo';
 import { useAppSelector } from '@/store/hooks';
+import { useParams } from 'react-router-dom';
 import { selectSelectedDate, selectSelectedSlots } from '@/store/selectors/schedule.selectors';
 import TimeSlotBadge from '../../components/TimeSlotBadge';
 import PaymentService, { PaymentMethod } from '@/services/payment.service';
 import { toast } from 'react-toastify';
+import { AppointmentType } from '@/enums/appointment.enums';
 
 interface PaymentSectionProps {
     nextStep: () => void;
@@ -35,8 +38,15 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     rescheduleAppointmentDate,
     rescheduleAppointmentTimeId,
 }) => {
-    // Get doctor info from Redux (already fetched in DateTimeSection)
+    const { serviceMedicalId } = useParams<{ serviceMedicalId?: string }>();
+
+    // Determine booking type
+    const isServiceMedicalBooking = !!serviceMedicalId;
+
+    // Get entity info based on booking type (already fetched in DateTimeSection)
     const doctorInfo = useDoctorInfo();
+    const serviceMedicalInfo = useServiceMedicalInfo();
+    const entityInfo = isServiceMedicalBooking ? serviceMedicalInfo : doctorInfo;
 
     // Get selected date and time slots (or use reschedule values if provided)
     const selectedDateFromRedux = useAppSelector(selectSelectedDate);
@@ -99,13 +109,32 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     // Note: Appointment will be created on-demand during payment process
 
     const doctorState = useAppSelector((state) => state.doctor);
+    const bookingState = useAppSelector((state) => state.booking);
+    const serviceMedicalState = useAppSelector(
+        (state) => state.medicalService.serviceCategories.selectedServiceWithHospital
+    );
+
+    // Helper function to get consultation fee based on appointment type
+    const getConsultationFee = (): number => {
+        if (!isServiceMedicalBooking && doctorState.selectedDoctor?.prices) {
+            const appointmentType = bookingState.appointmentType || AppointmentType.IN_PERSON;
+            const serviceTypeName =
+                appointmentType === AppointmentType.IN_PERSON ? 'Khám trực tiếp' : 'Tư vấn online';
+            const price = doctorState.selectedDoctor.prices.find(
+                (p) => p.serviceTypeName === serviceTypeName
+            );
+            return price?.amount || 0;
+        }
+        if (isServiceMedicalBooking && serviceMedicalState?.price) {
+            return serviceMedicalState.price;
+        }
+        return 0;
+    };
 
     // Constants for payment calculation
     // For supplementary payment: use the provided amount
-    // For regular payment: calculate 30% deposit from doctor's price
-    const TOTAL_AMOUNT = isSupplementaryPayment
-        ? supplementaryAmount
-        : doctorState.selectedDoctor?.prices?.[0]?.amount || 0;
+    // For regular payment: calculate 30% deposit from doctor's price or service price
+    const TOTAL_AMOUNT = isSupplementaryPayment ? supplementaryAmount : getConsultationFee();
     const DEPOSIT_PERCENTAGE = 0.3; // 30% deposit
     const DEPOSIT_AMOUNT = isSupplementaryPayment
         ? supplementaryAmount
@@ -283,7 +312,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
 
     return (
         <BookingSectionWrapper
-            doctor={doctorInfo}
+            doctor={entityInfo}
             appointment={mockAppointmentInfo}
             nextStepTitle={(() => {
                 if (isCreatingAppointment) {
@@ -530,24 +559,32 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                 </div>
                             )}
 
-                            {doctorInfo?.name && (
+                            {entityInfo?.name && (
                                 <>
                                     <div className="mb-3">
-                                        <div className="fw-medium">Bác sĩ</div>
-                                        <div className="form-plain-text">{doctorInfo.name}</div>
+                                        <div className="fw-medium">
+                                            {isServiceMedicalBooking ? 'Dịch vụ' : 'Bác sĩ'}
+                                        </div>
+                                        <div className="form-plain-text">{entityInfo.name}</div>
                                     </div>
                                     <div className="mb-3">
-                                        <div className="fw-medium">Chuyên khoa</div>
+                                        <div className="fw-medium">
+                                            {isServiceMedicalBooking ? 'Bệnh viện' : 'Chuyên khoa'}
+                                        </div>
                                         <div className="form-plain-text">
-                                            {doctorInfo.specialty || 'Chưa cập nhật'}
+                                            {'subtitle' in entityInfo
+                                                ? entityInfo.subtitle
+                                                : entityInfo.specialty || 'Chưa cập nhật'}
                                         </div>
                                     </div>
-                                    <div className="mb-3">
-                                        <div className="fw-medium">Bệnh viện</div>
-                                        <div className="form-plain-text">
-                                            {doctorInfo.location || 'Chưa cập nhật'}
+                                    {!isServiceMedicalBooking && (
+                                        <div className="mb-3">
+                                            <div className="fw-medium">Bệnh viện</div>
+                                            <div className="form-plain-text">
+                                                {entityInfo.location || 'Chưa cập nhật'}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </>
                             )}
                             {/* Only show payment info if NOT no-payment option */}
@@ -630,7 +667,8 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                     aria-hidden="true"
                                                 ></i>{' '}
                                                 Không tìm thấy thông tin giá khám. Vui lòng quay lại
-                                                và chọn lại bác sĩ.
+                                                và chọn lại{' '}
+                                                {isServiceMedicalBooking ? 'dịch vụ' : 'bác sĩ'}.
                                             </div>
                                         )}
                                     </div>
