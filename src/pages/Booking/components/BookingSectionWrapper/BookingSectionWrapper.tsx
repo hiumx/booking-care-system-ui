@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import BookingHeader, {
     type DoctorInfo,
+    type BookingEntityInfo,
     type AppointmentInfo,
 } from '../BookingHeader/BookingHeader';
 import BookingAction from '../BookingAction';
@@ -10,7 +11,7 @@ import { useAppSelector } from '@/store/hooks';
 import { getAppointmentTypeDisplayText } from '../../constants/mockData';
 
 interface BookingSectionWrapperProps {
-    doctor: DoctorInfo;
+    doctor: DoctorInfo | BookingEntityInfo;
     appointment: AppointmentInfo;
     nextStepTitle: string;
     nextStep: () => void;

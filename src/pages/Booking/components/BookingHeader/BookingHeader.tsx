@@ -2,10 +2,27 @@ import clsx from 'clsx';
 import React from 'react';
 import styles from './BookingHeader.module.scss';
 
+// Booking type enum
+export type BookingType = 'doctor' | 'service';
+
+// Base info interface for both booking types
+export interface BookingEntityInfo {
+    name: string;
+    subtitle: string; // specialty for doctor, hospital name for service
+    rating?: number;
+    location: string;
+    avatar: string;
+    bookingType: BookingType;
+    // Additional fields for service medical
+    price?: number;
+    duration?: number; // in minutes
+}
+
+// Legacy interface for backward compatibility
 export interface DoctorInfo {
     name: string;
     specialty: string;
-    rating: number;
+    rating?: number;
     location: string;
     avatar: string;
 }
@@ -18,7 +35,7 @@ export interface AppointmentInfo {
 }
 
 interface BookingHeaderProps {
-    doctor: DoctorInfo;
+    doctor: DoctorInfo | BookingEntityInfo;
     appointment: AppointmentInfo;
     isShowInfo?: boolean;
 }
@@ -44,6 +61,13 @@ const BookingHeader: React.FC<BookingHeaderProps> = ({
 
     const { date, timeSlots } = parseDateTime(appointment.dateTime);
 
+    // Check if this is a BookingEntityInfo (has bookingType) or legacy DoctorInfo
+    const isBookingEntityInfo = 'bookingType' in doctor;
+
+    // Get subtitle based on booking type
+    const subtitle = isBookingEntityInfo ? doctor.subtitle : doctor.specialty;
+    const rating = doctor.rating;
+
     return (
         <div className="card-header pt-3">
             <div className="booking-header pb-0">
@@ -61,12 +85,14 @@ const BookingHeader: React.FC<BookingHeaderProps> = ({
                             <div>
                                 <h4 className="mb-1 d-flex align-items-center gap-1">
                                     <span>{doctor.name}</span>
-                                    <span className="badge bg-orange fs-12">
-                                        <i className="fa-solid fa-star me-1"></i>
-                                        {doctor.rating}
-                                    </span>
+                                    {rating !== undefined && rating > 0 && (
+                                        <span className="badge bg-orange fs-12">
+                                            <i className="fa-solid fa-star me-1"></i>
+                                            {rating}
+                                        </span>
+                                    )}
                                 </h4>
-                                <p className="text-indigo mb-3 fw-medium">{doctor.specialty}</p>
+                                <p className="text-indigo mb-3 fw-medium">{subtitle}</p>
                                 <p className="mb-0">
                                     <i className="isax isax-location me-2"></i>
                                     {doctor.location}

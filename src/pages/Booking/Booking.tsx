@@ -42,6 +42,9 @@ const Booking: React.FC = () => {
     const bookingState = useAppSelector((state) => state.booking);
     const scheduleState = useAppSelector((state) => state.schedule);
     const doctorState = useAppSelector((state) => state.doctor);
+    const serviceMedicalState = useAppSelector(
+        (state) => state.medicalService.serviceCategories.selectedServiceWithHospital
+    );
 
     // Get appointmentType from URL params and set it in Redux
     useEffect(() => {
@@ -77,6 +80,23 @@ const Booking: React.FC = () => {
         setCurrentStep((prev) => prev + 1);
     };
 
+    // Helper function to get consultation fee based on appointment type
+    const getConsultationFee = (): number | undefined => {
+        if (isDoctorBooking && doctorState.selectedDoctor?.prices) {
+            const appointmentType = bookingState.appointmentType || AppointmentType.IN_PERSON;
+            const serviceTypeName =
+                appointmentType === AppointmentType.IN_PERSON ? 'Khám trực tiếp' : 'Tư vấn online';
+            const price = doctorState.selectedDoctor.prices.find(
+                (p) => p.serviceTypeName === serviceTypeName
+            );
+            return price?.amount;
+        }
+        if (isServiceMedicalBooking && serviceMedicalState?.price) {
+            return serviceMedicalState.price;
+        }
+        return undefined;
+    };
+
     // Helper function to create appointment request from schedule
     const createAppointmentFromSchedule = () => {
         if (!scheduleState.selectedSlots[0] || !userState.profile || !scheduleState.selectedDate) {
@@ -85,6 +105,9 @@ const Booking: React.FC = () => {
 
         const firstSlot = scheduleState.selectedSlots[0];
         const appointmentTimeId = createAppointmentTimeId(firstSlot);
+
+        // Get the original consultation/service fee at booking time
+        const amount = getConsultationFee();
 
         // Base appointment request
         const baseRequest = {
@@ -95,6 +118,12 @@ const Booking: React.FC = () => {
             appointmentType: bookingState.appointmentType || AppointmentType.IN_PERSON,
             symptoms: bookingState.symptoms,
             attachmentUrls: bookingState.attachmentUrls,
+            amount, // Include original fee for statistics
+            // Include relativeId if booking for a relative
+            ...(bookingState.isBookingForRelative &&
+                bookingState.relativeId && {
+                    relativeId: bookingState.relativeId,
+                }),
         };
 
         // For doctor booking
@@ -112,7 +141,7 @@ const Booking: React.FC = () => {
             return createAppointmentRequest({
                 ...baseRequest,
                 serviceId: serviceMedicalId,
-                // hospitalId can be added if available from service medical data
+                hospitalId: serviceMedicalState?.hospital?.id,
             });
         }
 
@@ -176,10 +205,15 @@ const Booking: React.FC = () => {
             const appointmentId = await ensureAppointmentCreated();
 
             // Step 2: Create payment request
+            // Get hospitalId based on booking type
+            const hospitalId = isServiceMedicalBooking
+                ? serviceMedicalState?.hospital?.id
+                : doctorState.selectedDoctor?.hospital?.id;
+
             const paymentRequest: CreatePaymentRequest = {
                 appointmentId,
                 patientId: userState.profile.id,
-                hospitalId: doctorState.selectedDoctor?.hospital?.id,
+                hospitalId,
                 amount: depositAmount,
                 paymentMethodId,
             };
@@ -227,10 +261,22 @@ const Booking: React.FC = () => {
         }
     };
 
-    const prevStep = () => setCurrentStep((prev) => prev - 1);
+    const prevStep = () => {
+        if (currentStep === 1) {
+            // Navigate back to previous page based on booking type
+            navigate(-1); // Go back to the previous page in history
+        } else {
+            setCurrentStep((prev) => prev - 1);
+        }
+    };
 
     if (currentStep < 1 || currentStep > BOOKING_STEPS.length) {
-        navigate(PATHS.DOCTOR.ROOT);
+        // Navigate based on booking type
+        if (isServiceMedicalBooking) {
+            navigate(-1); // Go back to previous page for service medical
+        } else {
+            navigate(PATHS.DOCTOR.ROOT);
+        }
     }
 
     return (
