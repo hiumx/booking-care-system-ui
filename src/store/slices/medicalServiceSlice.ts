@@ -7,6 +7,7 @@ import {
     ServiceCategoryQueryParams,
     MedicalServiceQueryParams,
     ServiceWithHospitalQueryParams,
+    ServiceWithHospitalResponse,
 } from '@/types/medicalService.types';
 
 // Initial state for service categories
@@ -15,6 +16,7 @@ const initialServiceCategoryState: ServiceCategoryState = {
     parentServiceCategories: [],
     selectedServiceCategory: null,
     servicesWithHospital: null,
+    selectedServiceWithHospital: null, // Selected service for booking
     isLoading: false,
     error: null,
     pagination: {
@@ -133,6 +135,20 @@ export const getMedicalServiceByIdAsync = createAsyncThunk(
     }
 );
 
+// Async thunk to get service with hospital info by ID (for booking flow)
+export const getServiceWithHospitalByIdAsync = createAsyncThunk(
+    'medicalService/getServiceWithHospitalById',
+    async (serviceId: string, { rejectWithValue }) => {
+        try {
+            const response =
+                await MedicalServiceCategoriesService.getServiceWithHospitalById(serviceId);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Failed to get service with hospital');
+        }
+    }
+);
+
 // Medical Service Slice
 const medicalServiceSlice = createSlice({
     name: 'medicalService',
@@ -166,6 +182,16 @@ const medicalServiceSlice = createSlice({
                 totalCount: 0,
                 totalPages: 0,
             };
+        },
+        // Set selected service with hospital for booking
+        setSelectedServiceWithHospital: (
+            state,
+            action: { payload: ServiceWithHospitalResponse | null }
+        ) => {
+            state.serviceCategories.selectedServiceWithHospital = action.payload;
+        },
+        clearSelectedServiceWithHospital: (state) => {
+            state.serviceCategories.selectedServiceWithHospital = null;
         },
         // Medical Service reducers
         clearMedicalServiceError: (state) => {
@@ -290,6 +316,20 @@ const medicalServiceSlice = createSlice({
             .addCase(getMedicalServiceByIdAsync.rejected, (state, action) => {
                 state.medicalServices.isLoading = false;
                 state.medicalServices.error = action.payload as string;
+            })
+            // Get service with hospital by ID cases (for booking flow)
+            .addCase(getServiceWithHospitalByIdAsync.pending, (state) => {
+                state.serviceCategories.isLoading = true;
+                state.serviceCategories.error = null;
+            })
+            .addCase(getServiceWithHospitalByIdAsync.fulfilled, (state, action) => {
+                state.serviceCategories.isLoading = false;
+                state.serviceCategories.selectedServiceWithHospital = action.payload;
+                state.serviceCategories.error = null;
+            })
+            .addCase(getServiceWithHospitalByIdAsync.rejected, (state, action) => {
+                state.serviceCategories.isLoading = false;
+                state.serviceCategories.error = action.payload as string;
             });
     },
 });
@@ -301,6 +341,8 @@ export const {
     setServiceCategoryFilters,
     clearServiceCategoryFilters,
     clearServiceCategories,
+    setSelectedServiceWithHospital,
+    clearSelectedServiceWithHospital,
     // Medical Service actions
     clearMedicalServiceError,
     clearSelectedMedicalService,

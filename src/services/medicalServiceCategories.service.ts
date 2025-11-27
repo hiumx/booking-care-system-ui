@@ -8,6 +8,7 @@ import {
     ServiceCategoryQueryParams,
     ServiceWithHospitalListResponse,
     ServiceWithHospitalQueryParams,
+    ServiceWithHospitalResponse,
 } from '@/types/medicalService.types';
 
 // Base API endpoints for service categories
@@ -19,6 +20,8 @@ const SERVICE_CATEGORY_ENDPOINTS = {
     CHILDREN: (parentId: string) => `/medical-services/servicecategories/${parentId}/children`,
     SERVICES_WITH_HOSPITAL: (categoryId: string) =>
         `/medical-services/services/category/${categoryId}/with-hospital`,
+    SERVICE_WITH_HOSPITAL_BY_ID: (serviceId: string) =>
+        `/medical-services/services/${serviceId}/with-hospital`,
 } as const;
 
 /**
@@ -239,6 +242,31 @@ export class MedicalServiceCategoriesService {
         } catch (error: any) {
             throw new Error(
                 error.response?.data?.message || 'Failed to fetch services with hospital'
+            );
+        }
+    }
+
+    /**
+     * Get single service with hospital info by service ID
+     */
+    static async getServiceWithHospitalById(
+        serviceId: string
+    ): Promise<ApiResponse<ServiceWithHospitalResponse>> {
+        try {
+            const response: any = await axiosInstance.get(
+                SERVICE_CATEGORY_ENDPOINTS.SERVICE_WITH_HOSPITAL_BY_ID(serviceId)
+            );
+
+            const apiData = response.data || response;
+
+            return {
+                success: true,
+                data: apiData,
+                message: 'Service with hospital retrieved successfully',
+            };
+        } catch (error: any) {
+            throw new Error(
+                error.response?.data?.message || 'Failed to fetch service with hospital'
             );
         }
     }

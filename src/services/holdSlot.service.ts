@@ -1,5 +1,10 @@
 import axiosInstance from '@/configs/axios.config';
-import { HoldSlotRequest, ReleaseSlotRequest, HoldSlotResponse } from '@/types/holdSlot.types';
+import {
+    HoldSlotRequest,
+    ReleaseSlotRequest,
+    HoldSlotResponse,
+    HoldSlotTargetType,
+} from '@/types/holdSlot.types';
 import { AppointmentTime } from '@/enums/appointment.enums';
 
 // Base API endpoints for hold slot operations
@@ -62,13 +67,15 @@ export class HoldSlotService {
      * Get remaining time for a held slot
      */
     static async getRemainingTime(
-        doctorId: string,
+        targetId: string,
+        targetType: HoldSlotTargetType,
         date: string,
         appointmentTimeId: AppointmentTime
     ): Promise<number> {
         try {
             const params = new URLSearchParams({
-                doctorId,
+                targetId,
+                targetType: targetType.toString(),
                 date,
                 appointmentTimeId: appointmentTimeId.toString(),
             });

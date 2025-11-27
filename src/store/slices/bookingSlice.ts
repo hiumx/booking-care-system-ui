@@ -11,6 +11,10 @@ export interface BookingState {
     symptoms: string;
     attachmentUrls: string[];
 
+    // Booking for relative (optional)
+    relativeId: string | null;
+    isBookingForRelative: boolean;
+
     // Step 3: Payment (future)
     appointmentType: AppointmentType;
 
@@ -24,6 +28,8 @@ const initialState: BookingState = {
     doctorId: null,
     symptoms: '',
     attachmentUrls: [],
+    relativeId: null,
+    isBookingForRelative: false,
     appointmentType: AppointmentType.IN_PERSON,
     createdAppointmentId: null,
 };
@@ -62,6 +68,13 @@ const bookingSlice = createSlice({
         setCreatedAppointmentId: (state, action: PayloadAction<string>) => {
             state.createdAppointmentId = action.payload;
         },
+        setBookingRelative: (
+            state,
+            action: PayloadAction<{ relativeId: string | null; isBookingForRelative: boolean }>
+        ) => {
+            state.relativeId = action.payload.relativeId;
+            state.isBookingForRelative = action.payload.isBookingForRelative;
+        },
         clearBookingState: (state) => {
             Object.assign(state, initialState);
         },
@@ -78,6 +91,7 @@ export const {
     clearAttachmentUrls,
     setAppointmentType,
     setCreatedAppointmentId,
+    setBookingRelative,
     clearBookingState,
 } = bookingSlice.actions;
 

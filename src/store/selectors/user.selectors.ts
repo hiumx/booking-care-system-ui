@@ -6,6 +6,7 @@ export const selectUserLoading = (state: RootState) => state.user.isLoading;
 export const selectUserError = (state: RootState) => state.user.error;
 
 // Specific user info selectors
+export const selectUserId = (state: RootState) => state.user.profile?.id || '';
 export const selectUserFirstName = (state: RootState) => state.user.profile?.firstName || '';
 export const selectUserLastName = (state: RootState) => state.user.profile?.lastName || '';
 export const selectUserFullName = (state: RootState) => state.user.profile?.fullName || '';
