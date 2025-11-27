@@ -10,6 +10,8 @@ import {
     getDisplayEmail,
     getDisplayPhone,
     getDisplayLabel,
+    getDisplayFeeText,
+    isServiceAppointment,
 } from '@/types/appointment.types';
 import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
 
@@ -251,14 +253,9 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                                 </Link>
                             )}
                         </div>
-                        {/* Hiển thị phí tư vấn cho tất cả trạng thái */}
+                        {/* Hiển thị phí tư vấn cho tất cả trạng thái - flexible lấy theo bác sĩ hoặc service */}
                         <div className="consult-fees">
-                            <h6>
-                                Phí Tư Vấn:{' '}
-                                {appointment.doctorInfo?.consultationFee
-                                    ? `${appointment.doctorInfo?.consultationFee.toLocaleString('vi-VN')} VNĐ`
-                                    : 'Đang cập nhật...'}
-                            </h6>
+                            <h6>Phí Tư Vấn: {getDisplayFeeText(appointment)}</h6>
                         </div>
                         <ul>
                             <li>
@@ -266,38 +263,40 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                                     <i className="isax isax-messages-25"></i>
                                 </Link>
                             </li>
-                            {/* Option 1: Reschedule with same doctor */}
-                            {(appointment.status === AppointmentStatus.PENDING ||
-                                appointment.status === AppointmentStatus.CONFIRMED) && (
-                                <li>
-                                    <Link
-                                        to="#"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            onReschedule?.(appointment, 'SAME_DOCTOR');
-                                        }}
-                                        title="Đổi lịch với cùng bác sĩ"
-                                    >
-                                        <i className="isax isax-calendar-edit"></i>
-                                    </Link>
-                                </li>
-                            )}
-                            {/* Option 3: Choose new doctor */}
-                            {(appointment.status === AppointmentStatus.PENDING ||
-                                appointment.status === AppointmentStatus.CONFIRMED) && (
-                                <li>
-                                    <Link
-                                        to="#"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            onReschedule?.(appointment, 'NEW_DOCTOR');
-                                        }}
-                                        title="Chọn bác sĩ mới"
-                                    >
-                                        <i className="isax isax-user-search"></i>
-                                    </Link>
-                                </li>
-                            )}
+                            {/* Option 1: Reschedule with same doctor - only for doctor appointments */}
+                            {!isServiceAppointment(appointment) &&
+                                (appointment.status === AppointmentStatus.PENDING ||
+                                    appointment.status === AppointmentStatus.CONFIRMED) && (
+                                    <li>
+                                        <Link
+                                            to="#"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                onReschedule?.(appointment, 'SAME_DOCTOR');
+                                            }}
+                                            title="Đổi lịch với cùng bác sĩ"
+                                        >
+                                            <i className="isax isax-calendar-edit"></i>
+                                        </Link>
+                                    </li>
+                                )}
+                            {/* Option 3: Choose new doctor - only for doctor appointments */}
+                            {!isServiceAppointment(appointment) &&
+                                (appointment.status === AppointmentStatus.PENDING ||
+                                    appointment.status === AppointmentStatus.CONFIRMED) && (
+                                    <li>
+                                        <Link
+                                            to="#"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                onReschedule?.(appointment, 'NEW_DOCTOR');
+                                            }}
+                                            title="Chọn bác sĩ mới"
+                                        >
+                                            <i className="isax isax-user-search"></i>
+                                        </Link>
+                                    </li>
+                                )}
                             {/* Option 4: Cancel/Refund */}
                             {config.showCancelButton && (
                                 <li>
