@@ -6,6 +6,38 @@
 }
 // Date Range Picker styling
 .dateRangePickerWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .clearDateBtn {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #dc3545;
+        border: none;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+
+        &:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+        }
+
+        &:active {
+            transform: scale(0.95);
+        }
+
+        i {
+            font-size: 12px;
+        }
+    }
+
     .appointmentDatePicker {
         max-width: 320px;
         :global(.dateRangePicker) {
