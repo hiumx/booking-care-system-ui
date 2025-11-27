@@ -11,6 +11,7 @@ import SettingsContainer from './Setting/SettingsContainer/SettingsContainer';
 import Invoices from './Invoices';
 import Wallet from './Wallet';
 import Notifications from './Notifications';
+import PatientRelatives from './PatientRelatives';
 import { RootState, AppDispatch } from '@/store';
 import { fetchUnreadMessageCount } from '@/store/slices/userSlice';
 
@@ -37,6 +38,7 @@ const UserProfile = () => {
             'appointments',
             'appointment-detail',
             'favourites',
+            'relatives',
             'dependent',
             'medical-records',
             'wallet',
@@ -70,6 +72,7 @@ const UserProfile = () => {
         const tabConfig: Record<string, { label: string; title: string }> = {
             appointments: { label: 'My Appointments', title: 'My Appointments' },
             favourites: { label: 'Favourites', title: 'Favourites' },
+            relatives: { label: 'Người Thân', title: 'Quản lý người thân' },
             dependent: { label: 'Dependants', title: 'Dependants' },
             'medical-records': { label: 'Medical Records', title: 'Medical Records' },
             wallet: { label: 'Wallet', title: 'Lịch sử hoàn tiền' },
@@ -100,7 +103,8 @@ const UserProfile = () => {
                 return <AppointmentDetailPage />;
             case 'favourites':
                 return <Favourite patientId={profile?.id} />;
-
+            case 'relatives':
+                return <PatientRelatives />;
             case 'wallet':
                 return <Wallet />;
             case 'settings':

@@ -115,6 +115,12 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                                 <span>Yêu Thích</span>
                             </Link>
                         </li>
+                        <li className={isActive('relatives') ? 'active' : ''}>
+                            <Link to="/user/profile?tab=relatives">
+                                <i className="isax isax-people"></i>
+                                <span>Người Thân</span>
+                            </Link>
+                        </li>
                         <li className={isActive('dependent') ? 'active' : ''}>
                             <Link to="/user/profile?tab=dependent">
                                 <i className="isax isax-user-octagon"></i>
