@@ -80,6 +80,40 @@ export class ReviewService {
     }
 
     /**
+     * Get reviews for a specific hospital with pagination
+     * GET /api/v1.0/Reviews/hospital/{hospitalId}
+     * @param params - Query parameters (hospitalId, page, pageSize)
+     * @returns Promise with paginated hospital reviews
+     */
+    static async getHospitalReviews(params: {
+        hospitalId: string;
+        page?: number;
+        pageSize?: number;
+    }): Promise<ApiResponse<ReviewsResponse>> {
+        const { hospitalId, page = 1, pageSize = 10 } = params;
+        const response = await axiosInstance.get<any, ApiResponse<ReviewsResponse>>(
+            `${this.BASE_PATH}/hospital/${hospitalId}`,
+            {
+                params: { page, pageSize },
+            }
+        );
+        return response;
+    }
+
+    /**
+     * Get review statistics for a specific hospital
+     * GET /api/v1.0/Reviews/hospital/{hospitalId}/statistics
+     * @param hospitalId - Hospital's ID
+     * @returns Promise with statistics data
+     */
+    static async getHospitalStatistics(hospitalId: string): Promise<ApiResponse<ReviewStatistics>> {
+        const response = await axiosInstance.get<any, ApiResponse<ReviewStatistics>>(
+            `${this.BASE_PATH}/hospital/${hospitalId}/statistics`
+        );
+        return response;
+    }
+
+    /**
      * Create a new review (requires completed appointment with target doctor/service)
      * @param data - Review data with targetType (0 = DOCTOR, 1 = SERVICE)
      * @returns Promise with created review
