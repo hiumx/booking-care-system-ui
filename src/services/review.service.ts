@@ -80,21 +80,29 @@ export class ReviewService {
     }
 
     /**
-     * Get reviews for a specific hospital with pagination
+     * Get reviews for a specific hospital with pagination and filtering
      * GET /api/v1.0/Reviews/hospital/{hospitalId}
-     * @param params - Query parameters (hospitalId, page, pageSize)
+     * @param params - Query parameters (hospitalId, page, pageSize, minRating)
      * @returns Promise with paginated hospital reviews
      */
     static async getHospitalReviews(params: {
         hospitalId: string;
         page?: number;
         pageSize?: number;
+        minRating?: number;
     }): Promise<ApiResponse<ReviewsResponse>> {
-        const { hospitalId, page = 1, pageSize = 10 } = params;
+        const { hospitalId, page = 1, pageSize = 10, minRating } = params;
+        const queryParams: any = { page, pageSize };
+
+        // Add minRating to query if provided
+        if (minRating !== undefined) {
+            queryParams.minRating = minRating;
+        }
+
         const response = await axiosInstance.get<any, ApiResponse<ReviewsResponse>>(
             `${this.BASE_PATH}/hospital/${hospitalId}`,
             {
-                params: { page, pageSize },
+                params: queryParams,
             }
         );
         return response;

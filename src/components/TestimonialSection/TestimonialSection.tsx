@@ -41,13 +41,17 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ hospitalId }) =
         const fetchReviews = async () => {
             try {
                 setLoading(true);
+                // Fetch 20 high-quality reviews (4-5 stars) filtered at backend
+                // This is more efficient than filtering on frontend
                 const response = await ReviewService.getHospitalReviews({
                     hospitalId,
                     page: 1,
-                    pageSize: 10,
+                    pageSize: 20,
+                    minRating: 4, // Filter at backend for better performance
                 });
 
                 if (response.success && response.data.reviews.length > 0) {
+                    // Map reviews to testimonial format (already filtered by backend)
                     const reviewTestimonials = response.data.reviews.map((review: Review) => ({
                         id: review.id,
                         image: review.patientInfo?.avatarUrl || client01,
@@ -57,7 +61,25 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ hospitalId }) =
                     }));
                     setTestimonials(reviewTestimonials);
                 } else {
-                    setTestimonials([]);
+                    // If no high-quality reviews, try fetching all reviews
+                    const fallbackResponse = await ReviewService.getHospitalReviews({
+                        hospitalId,
+                        page: 1,
+                        pageSize: 10,
+                    });
+
+                    if (fallbackResponse.success && fallbackResponse.data.reviews.length > 0) {
+                        const allReviews = fallbackResponse.data.reviews.map((review: Review) => ({
+                            id: review.id,
+                            image: review.patientInfo?.avatarUrl || client01,
+                            name: review.patientInfo?.fullName || 'Người dùng',
+                            text: review.comment,
+                            rating: review.rating,
+                        }));
+                        setTestimonials(allReviews);
+                    } else {
+                        setTestimonials([]);
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching hospital reviews:', error);
