@@ -35,11 +35,7 @@ export const useReviewForm = ({
      * @param termsAccepted - Whether terms are accepted
      * @param currentRating - Current rating value (can override internal rating state)
      */
-    const validateForm = (
-        requireTerms: boolean = false,
-        termsAccepted: boolean = false,
-        currentRating?: number
-    ): boolean => {
+    const validateForm = (currentRating?: number): boolean => {
         // Clear previous errors
         setDescriptionError('');
 
@@ -68,15 +64,6 @@ export const useReviewForm = ({
         if (trimmedLength < minChars) {
             setDescriptionError(`Nội dung review phải có ít nhất ${minChars} ký tự`);
             toast.error(`Nội dung đánh giá phải có ít nhất ${minChars} ký tự`, {
-                position: 'top-center',
-                autoClose: 3000,
-            });
-            return false;
-        }
-
-        // Validate terms if required (for WriteReview)
-        if (requireTerms && termsAccepted === false) {
-            toast.warning('Vui lòng đồng ý với điều khoản & điều kiện', {
                 position: 'top-center',
                 autoClose: 3000,
             });
