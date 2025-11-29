@@ -113,6 +113,117 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ hospitalId }) =
         }
     };
 
+    const renderContent = () => {
+        if (loading) {
+            return (
+                <div className="text-center py-5">
+                    <div className="spinner-border">
+                        <output className="visually-hidden">Đang tải đánh giá...</output>
+                    </div>
+                </div>
+            );
+        }
+
+        if (hasNoReviews) {
+            return (
+                <div className="text-center py-5">
+                    <div className={styles.emptyState}>
+                        <h4>Chưa có đánh giá</h4>
+                        <p>Hãy là người đầu tiên đánh giá bệnh viện này!</p>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <div className="testimonial-slider slick">
+                <Swiper
+                    ref={swiperRef}
+                    modules={[Navigation, Pagination, Autoplay]}
+                    spaceBetween={30}
+                    slidesPerView={1}
+                    loop={true}
+                    speed={2000}
+                    autoplay={{
+                        delay: 5000,
+                        disableOnInteraction: false,
+                    }}
+                    pagination={{
+                        clickable: true,
+                        el: '.swiper-pagination',
+                    }}
+                >
+                    {testimonials.map((testimonial) => (
+                        <SwiperSlide key={testimonial.id}>
+                            <div className="testimonial-grid">
+                                <div className="testimonial-info">
+                                    <div className="testimonial-img">
+                                        <img
+                                            src={testimonial.image}
+                                            className="img-fluid"
+                                            alt="client-image"
+                                        />
+                                    </div>
+                                    <div className="testimonial-content">
+                                        <div className="section-inner-header testimonial-header">
+                                            <h6>Cảm nhận</h6>
+                                            <h2>Khách hàng nói gì</h2>
+                                        </div>
+                                        <div className="testimonial-details">
+                                            <p>{testimonial.text}</p>
+                                            <h6>
+                                                <span>{testimonial.name}</span>
+                                            </h6>
+                                            {testimonial.rating > 0 && (
+                                                <div className={styles.ratingContainer}>
+                                                    {Array(5)
+                                                        .fill(0)
+                                                        .map((_, index) => (
+                                                            <svg
+                                                                key={`star-${testimonial.id}-${index}`}
+                                                                className={`${styles.star} ${
+                                                                    index < testimonial.rating
+                                                                        ? styles.starFilled
+                                                                        : styles.starEmpty
+                                                                }`}
+                                                                viewBox="0 0 24 24"
+                                                                fill="currentColor"
+                                                            >
+                                                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                                            </svg>
+                                                        ))}
+                                                    <span className={styles.ratingText}>
+                                                        {testimonial.rating}/5
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
+
+                {/* Custom Navigation Arrows */}
+                <button
+                    className={`${styles.swiperNavBtn} ${styles.swiperNavPrev}`}
+                    onClick={goPrev}
+                    aria-label="Previous testimonial"
+                >
+                    <ChevronLeft />
+                </button>
+                <button
+                    className={`${styles.swiperNavBtn} ${styles.swiperNavNext}`}
+                    onClick={goNext}
+                    aria-label="Next testimonial"
+                >
+                    <ChevronRight />
+                </button>
+            </div>
+        );
+    };
+
     return (
         <section className="testimonial-section">
             <div className="testimonial-shape-img">
@@ -126,119 +237,7 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ hospitalId }) =
 
             <div className="container">
                 <div className="row">
-                    <div className="col-md-12">
-                        {loading ? (
-                            <div className="text-center py-5">
-                                <div className="spinner-border">
-                                    <output className="visually-hidden">
-                                        Đang tải đánh giá...
-                                    </output>
-                                </div>
-                            </div>
-                        ) : hasNoReviews ? (
-                            <div className="text-center py-5">
-                                <div className={styles.emptyState}>
-                                    <h4>Chưa có đánh giá</h4>
-                                    <p>Hãy là người đầu tiên đánh giá bệnh viện này!</p>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="testimonial-slider slick">
-                                <Swiper
-                                    ref={swiperRef}
-                                    modules={[Navigation, Pagination, Autoplay]}
-                                    spaceBetween={30}
-                                    slidesPerView={1}
-                                    loop={true}
-                                    speed={2000}
-                                    autoplay={{
-                                        delay: 5000,
-                                        disableOnInteraction: false,
-                                    }}
-                                    pagination={{
-                                        clickable: true,
-                                        el: '.swiper-pagination',
-                                    }}
-                                >
-                                    {testimonials.map((testimonial) => (
-                                        <SwiperSlide key={testimonial.id}>
-                                            <div className="testimonial-grid">
-                                                <div className="testimonial-info">
-                                                    <div className="testimonial-img">
-                                                        <img
-                                                            src={testimonial.image}
-                                                            className="img-fluid"
-                                                            alt="client-image"
-                                                        />
-                                                    </div>
-                                                    <div className="testimonial-content">
-                                                        <div className="section-inner-header testimonial-header">
-                                                            <h6>Cảm nhận</h6>
-                                                            <h2>Khách hàng nói gì</h2>
-                                                        </div>
-                                                        <div className="testimonial-details">
-                                                            <p>{testimonial.text}</p>
-                                                            <h6>
-                                                                <span>{testimonial.name}</span>
-                                                            </h6>
-                                                            {testimonial.rating > 0 && (
-                                                                <div
-                                                                    className={
-                                                                        styles.ratingContainer
-                                                                    }
-                                                                >
-                                                                    {[...new Array(5)].map(
-                                                                        (_, index) => (
-                                                                            <svg
-                                                                                key={`star-${testimonial.id}-${index}`}
-                                                                                className={`${styles.star} ${
-                                                                                    index <
-                                                                                    testimonial.rating
-                                                                                        ? styles.starFilled
-                                                                                        : styles.starEmpty
-                                                                                }`}
-                                                                                viewBox="0 0 24 24"
-                                                                                fill="currentColor"
-                                                                            >
-                                                                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                                                            </svg>
-                                                                        )
-                                                                    )}
-                                                                    <span
-                                                                        className={
-                                                                            styles.ratingText
-                                                                        }
-                                                                    >
-                                                                        {testimonial.rating}/5
-                                                                    </span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </SwiperSlide>
-                                    ))}
-                                </Swiper>
-
-                                {/* Custom Navigation Arrows */}
-                                <button
-                                    className={`${styles.swiperNavBtn} ${styles.swiperNavPrev}`}
-                                    onClick={goPrev}
-                                    aria-label="Previous testimonial"
-                                >
-                                    <ChevronLeft />
-                                </button>
-                                <button
-                                    className={`${styles.swiperNavBtn} ${styles.swiperNavNext}`}
-                                    onClick={goNext}
-                                    aria-label="Next testimonial"
-                                >
-                                    <ChevronRight />
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                    <div className="col-md-12">{renderContent()}</div>
                 </div>
             </div>
         </section>
