@@ -31,6 +31,7 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ hospitalId }) =
     const swiperRef = useRef<any>(null);
     const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
     const [loading, setLoading] = useState(false);
+    const [hasNoReviews, setHasNoReviews] = useState(false);
 
     useEffect(() => {
         if (!hospitalId) {
@@ -60,32 +61,40 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ hospitalId }) =
                         rating: review.rating,
                     }));
                     setTestimonials(reviewTestimonials);
+                    setHasNoReviews(false);
                 } else {
                     // If no high-quality reviews, try fetching all reviews
-                    const fallbackResponse = await ReviewService.getHospitalReviews({
-                        hospitalId,
-                        page: 1,
-                        pageSize: 10,
-                    });
-
-                    if (fallbackResponse.success && fallbackResponse.data.reviews.length > 0) {
-                        const allReviews = fallbackResponse.data.reviews.map((review: Review) => ({
-                            id: review.id,
-                            image: review.patientInfo?.avatarUrl || client01,
-                            name: review.patientInfo?.fullName || 'Người dùng',
-                            text: review.comment,
-                            rating: review.rating,
-                        }));
-                        setTestimonials(allReviews);
-                    } else {
-                        setTestimonials([]);
-                    }
+                    await handleFallbackReviews(hospitalId);
                 }
             } catch (error) {
                 console.error('Error fetching hospital reviews:', error);
                 setTestimonials([]);
+                setHasNoReviews(true);
             } finally {
                 setLoading(false);
+            }
+        };
+
+        const handleFallbackReviews = async (hospitalId: string) => {
+            const fallbackResponse = await ReviewService.getHospitalReviews({
+                hospitalId,
+                page: 1,
+                pageSize: 10,
+            });
+
+            if (fallbackResponse.success && fallbackResponse.data.reviews.length > 0) {
+                const allReviews = fallbackResponse.data.reviews.map((review: Review) => ({
+                    id: review.id,
+                    image: review.patientInfo?.avatarUrl || client01,
+                    name: review.patientInfo?.fullName || 'Người dùng',
+                    text: review.comment,
+                    rating: review.rating,
+                }));
+                setTestimonials(allReviews);
+                setHasNoReviews(false);
+            } else {
+                setTestimonials([]);
+                setHasNoReviews(true);
             }
         };
 
@@ -126,7 +135,7 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ hospitalId }) =
                                     </output>
                                 </div>
                             </div>
-                        ) : testimonials.length === 0 ? (
+                        ) : hasNoReviews ? (
                             <div className="text-center py-5">
                                 <div className={styles.emptyState}>
                                     <h4>Chưa có đánh giá</h4>
@@ -172,13 +181,13 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ hospitalId }) =
                                                             <h6>
                                                                 <span>{testimonial.name}</span>
                                                             </h6>
-                                                            {testimonial.rating && (
+                                                            {testimonial.rating > 0 && (
                                                                 <div
                                                                     className={
                                                                         styles.ratingContainer
                                                                     }
                                                                 >
-                                                                    {[...Array(5)].map(
+                                                                    {[...new Array(5)].map(
                                                                         (_, index) => (
                                                                             <svg
                                                                                 key={`star-${testimonial.id}-${index}`}
