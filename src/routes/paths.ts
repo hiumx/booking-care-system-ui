@@ -81,6 +81,12 @@ export const PATHS = {
         SETTINGS: 'settings',
     },
 
+    // Contract Signing paths
+    CONTRACT_SIGNING: {
+        ROOT: '/contract-signing/:token',
+        SUCCESS: '/contract-signing-success',
+    },
+
     // Not Found path
     NOT_FOUND: '*',
 } as const;
