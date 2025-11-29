@@ -9,6 +9,7 @@ const AI_ENDPOINTS = {
     SESSION: (sessionId: string) => `/symptoms/sessions/${sessionId}`,
     SAVE_SESSION: (sessionId: string) => `/symptoms/sessions/${sessionId}/save`,
     LAB_RESULT_ANALYZE: '/lab-results/analyze',
+    DERMATOLOGY_ANALYZE: '/dermatology/analyze',
 } as const;
 
 // Types
@@ -271,6 +272,57 @@ export class AIService {
                 error.response?.data?.message ||
                     error.message ||
                     'Failed to analyze lab result. Please try again.'
+            );
+        }
+    }
+
+    /**
+     * Analyze dermatology image
+     */
+    static async analyzeDermatology(
+        file: File,
+        location?: LocationContext,
+        sessionId?: string
+    ): Promise<ApiResponse<import('@/types/ai.types').DermatologyAnalysisResponse>> {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            if (sessionId) {
+                formData.append('sessionId', sessionId);
+            }
+
+            if (location) {
+                if (location.provinceId) {
+                    formData.append('provinceId', location.provinceId);
+                }
+                if (location.districtId) {
+                    formData.append('districtId', location.districtId);
+                }
+                formData.append('locationDisplayName', location.displayName);
+            }
+
+            const response: any = await axiosInstance.post(
+                AI_ENDPOINTS.DERMATOLOGY_ANALYZE,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Dermatology image analyzed successfully',
+            };
+        } catch (error: any) {
+            console.error('Error analyzing dermatology image:', error);
+            throw new Error(
+                error.response?.data?.message ||
+                    error.message ||
+                    'Failed to analyze dermatology image. Please try again.'
             );
         }
     }

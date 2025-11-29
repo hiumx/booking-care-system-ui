@@ -588,6 +588,57 @@ const AISupportBooking: React.FC = () => {
         return lines.join('\n');
     };
 
+    // Helper function to build dermatology message
+    const buildDermatologyMessage = (data: any): string => {
+        const lines: string[] = [];
+        lines.push('**KẾT QUẢ PHÂN TÍCH ẢNH DA:**');
+        lines.push('');
+
+        // Diagnosis
+        if (data.diagnosis) {
+            lines.push(`**Chẩn đoán khả năng:** ${data.diagnosis.conditionName}`);
+            lines.push(`**Độ tin cậy:** ${(data.diagnosis.confidence * 100).toFixed(0)}%`);
+            if (data.diagnosis.severity) {
+                lines.push(`**Mức độ nghiêm trọng:** ${data.diagnosis.severity}`);
+            }
+            lines.push('');
+        }
+
+        // Malignancy risk
+        if (data.malignancyRisk) {
+            lines.push(`**Đánh giá nguy cơ ác tính:** ${data.malignancyRisk.riskCategory}`);
+            lines.push(
+                `**Mức độ nghi ngờ:** ${(data.malignancyRisk.suspicionLevel * 100).toFixed(0)}%`
+            );
+            lines.push('');
+        }
+
+        // Biopsy recommendation
+        if (data.biopsyRecommended) {
+            lines.push('**Khuyến nghị sinh thiết:** Có');
+            if (data.biopsyReason) {
+                lines.push(`**Lý do:** ${data.biopsyReason}`);
+            }
+            lines.push('');
+        }
+
+        // General advice
+        if (data.generalAdvice && data.generalAdvice.length > 0) {
+            lines.push('**Lời khuyên:**');
+            data.generalAdvice.forEach((advice: string) => {
+                lines.push(`- ${advice}`);
+            });
+            lines.push('');
+        }
+
+        // Disclaimer
+        if (data.disclaimer) {
+            lines.push(data.disclaimer);
+        }
+
+        return lines.join('\n');
+    };
+
     const handleSendMessage = async (content: string) => {
         if (!content.trim()) return;
 
@@ -918,6 +969,112 @@ const AISupportBooking: React.FC = () => {
         }
     };
 
+    const handleDermatologyFileSelect = async (file: File) => {
+        // Kiểm tra authentication
+        if (!isAuthenticated) {
+            navigate(
+                `${PATHS.LOGIN}?returnUrl=${encodeURIComponent(globalThis.location.pathname)}`
+            );
+            return;
+        }
+
+        // Kiểm tra vị trí
+        if (!userLocation) {
+            toast.error('Vui lòng chọn vị trí trước khi phân tích ảnh da');
+            return;
+        }
+
+        // Create user message with file attachment
+        const userMessage: Message = {
+            id: Date.now().toString(),
+            content: 'Đã gửi ảnh da để phân tích',
+            sender: 'user',
+            timestamp: new Date(),
+            fileAttachment: {
+                fileName: file.name,
+                fileType: file.type,
+                fileUrl: URL.createObjectURL(file),
+            },
+        };
+
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
+
+        // Create new chat if no active chat
+        let currentChatId = ensureChatSession('Phân tích ảnh da');
+
+        // Call AI API to analyze dermatology image
+        setIsAITyping(true);
+
+        try {
+            const response = await AIService.analyzeDermatology(file, userLocation, currentChatId);
+
+            // Update session ID from response if provided
+            if (response.data.sessionId && response.data.sessionId !== currentChatId) {
+                const oldChatId = currentChatId;
+                const newChatId = response.data.sessionId;
+
+                // Update tracking: keep new ID as newly created to prevent fetchChatMessages
+                if (newlyCreatedChatsRef.current.has(oldChatId)) {
+                    newlyCreatedChatsRef.current.delete(oldChatId);
+                }
+                newlyCreatedChatsRef.current.add(newChatId);
+
+                // Update chatHistories: replace old chat with new ID
+                setChatHistories((prev) =>
+                    prev.map((chat) => (chat.id === oldChatId ? { ...chat, id: newChatId } : chat))
+                );
+
+                // Update active chat ID
+                setActiveChatId(newChatId);
+                currentChatId = newChatId;
+            }
+
+            // Map response to suggestions
+            const suggestions = mapResponseToSuggestions(response);
+
+            // Build AI message content from dermatology data
+            const aiMessageContent = response.data.message
+                ? response.data.message.replace(/\\n/g, '\n')
+                : buildDermatologyMessage(response.data);
+
+            const aiMessage: Message = {
+                id: Date.now().toString(),
+                content: aiMessageContent.trim(),
+                sender: 'ai',
+                timestamp: new Date(response.data.timestamp || new Date().toISOString()),
+                suggestions: suggestions.length > 0 ? suggestions : undefined,
+            };
+
+            setMessages((prev) => [...prev, aiMessage]);
+            toast.success('Đã phân tích ảnh da thành công');
+        } catch (error: any) {
+            console.error('Error analyzing dermatology image:', error);
+
+            // Show error message to user
+            const errorContent = getErrorMessage(error);
+
+            const errorMessage: Message = {
+                id: Date.now().toString(),
+                content: errorContent,
+                sender: 'ai',
+                timestamp: new Date(),
+            };
+
+            setMessages((prev) => [...prev, errorMessage]);
+            toast.error('Không thể phân tích ảnh da. Vui lòng thử lại.');
+        } finally {
+            setIsAITyping(false);
+
+            // Reload sessions to sync title from backend
+            if (currentChatId && updatedMessages.length === 1) {
+                setTimeout(() => {
+                    loadSessions(true);
+                }, 2000);
+            }
+        }
+    };
+
     return (
         <div className={styles.aiSupportBooking}>
             <Link to={PATHS.HOME} className={styles.homeButton}>
@@ -972,6 +1129,7 @@ const AISupportBooking: React.FC = () => {
                                 localStorage.setItem('aiSupportLocation', JSON.stringify(location));
                             }}
                             onLabResultFileSelect={handleLabResultFileSelect}
+                            onDermatologyFileSelect={handleDermatologyFileSelect}
                         />
                     )}
                 </div>

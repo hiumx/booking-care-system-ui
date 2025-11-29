@@ -95,3 +95,35 @@ export interface LabResultAnalysisResponse {
     disclaimer: string;
     timestamp: string;
 }
+
+// Dermatology analysis response from API
+export interface DermatologyAnalysisResponse {
+    sessionId: string;
+    imageUrl: string;
+    diagnosis: SkinConditionDiagnosis;
+    malignancyRisk: MalignancyAssessment;
+    generalAdvice: string[];
+    biopsyRecommended: boolean;
+    biopsyReason?: string;
+    recommendedDoctors: Doctor[];
+    recommendedHospitals: Hospital[];
+    disclaimer: string;
+    timestamp: string;
+    message?: string; // Optional formatted message from backend
+}
+
+// Skin condition diagnosis
+export interface SkinConditionDiagnosis {
+    conditionName: string;
+    confidence: number; // 0-1
+    severity?: string; // Mild, Moderate, Severe
+    icdCode?: string;
+}
+
+// Malignancy assessment
+export interface MalignancyAssessment {
+    suspicionLevel: number; // 0-1
+    riskCategory: string; // Low, Medium, High
+    urgencyLevel?: string; // NORMAL, URGENT
+    riskFactors: string[];
+}

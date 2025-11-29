@@ -36,6 +36,7 @@ interface SearchBoxProps {
     userLocation?: { provinceId?: string; districtId?: string; displayName: string } | null;
     forceShowLocationModal?: boolean;
     onLabResultFileSelect?: (file: File) => void;
+    onDermatologyFileSelect?: (file: File) => void;
 }
 
 interface ComingSoonFeature {
@@ -45,11 +46,6 @@ interface ComingSoonFeature {
 }
 
 const comingSoonFeatures: ComingSoonFeature[] = [
-    {
-        id: 'medical-imaging',
-        icon: Stethoscope,
-        title: 'Phân tích hình ảnh y tế',
-    },
     {
         id: 'medicine-lookup',
         icon: Pill,
@@ -71,6 +67,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     userLocation,
     forceShowLocationModal = false,
     onLabResultFileSelect,
+    onDermatologyFileSelect,
 }) => {
     const [isMultiLine, setIsMultiLine] = useState(false);
     const [showAttachmentModal, setShowAttachmentModal] = useState(false);
@@ -80,6 +77,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     const [locationError, setLocationError] = useState<string | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const labFileInputRef = useRef<HTMLInputElement>(null);
+    const dermatologyFileInputRef = useRef<HTMLInputElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const locationModalRef = useRef<HTMLDivElement>(null);
@@ -223,6 +221,20 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         const file = e.target.files?.[0];
         if (file && onLabResultFileSelect) {
             onLabResultFileSelect(file);
+        }
+        if (e.target) {
+            e.target.value = '';
+        }
+    };
+
+    const handleDermatologyCardClick = () => {
+        dermatologyFileInputRef.current?.click();
+    };
+
+    const handleDermatologyCardFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && onDermatologyFileSelect) {
+            onDermatologyFileSelect(file);
         }
         if (e.target) {
             e.target.value = '';
@@ -384,6 +396,26 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                     </div>
                 </div>
 
+                <div
+                    className={clsx(styles.quickActionCard, styles.dermatologyActionCard)}
+                    onClick={handleDermatologyCardClick}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleDermatologyCardClick();
+                        }
+                    }}
+                >
+                    <div className={styles.quickActionIcon}>
+                        <Stethoscope size={28} />
+                    </div>
+                    <div className={styles.quickActionContent}>
+                        <p className={styles.quickActionTitle}>Phân tích hình ảnh y tế</p>
+                    </div>
+                </div>
+
                 {comingSoonFeatures.map((feature) => {
                     const Icon = feature.icon;
                     return (
@@ -405,6 +437,14 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                 accept="image/*,.pdf"
                 style={{ display: 'none' }}
                 onChange={handleLabCardFileChange}
+            />
+
+            <input
+                ref={dermatologyFileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/bmp,image/tiff"
+                style={{ display: 'none' }}
+                onChange={handleDermatologyCardFileChange}
             />
 
             <textarea
