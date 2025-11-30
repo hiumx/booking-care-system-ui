@@ -155,9 +155,16 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         index: number,
         state: FormatState
     ): boolean => {
-        if (trimmedLine.startsWith('Lưu ý:') && !state.disclaimerProcessed) {
+        // Support both old format "Lưu ý:" and new format "> [!WARNING]"
+        if (
+            (trimmedLine.startsWith('Lưu ý:') || trimmedLine === '> [!WARNING]') &&
+            !state.disclaimerProcessed
+        ) {
             state.isInDisclaimer = true;
-            state.formattedLines.push(renderDisclaimerTitle(trimmedLine, index));
+            // Only render title for old format
+            if (trimmedLine.startsWith('Lưu ý:')) {
+                state.formattedLines.push(renderDisclaimerTitle(trimmedLine, index));
+            }
             return true;
         }
         return false;
@@ -169,16 +176,26 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         index: number,
         state: FormatState
     ): boolean => {
-        if (
-            state.isInDisclaimer &&
-            trimmedLine.startsWith('*') &&
-            trimmedLine.endsWith('*') &&
-            !state.disclaimerProcessed
-        ) {
-            state.formattedLines.push(renderDisclaimerText(trimmedLine, index));
-            state.disclaimerProcessed = true;
-            state.isInDisclaimer = false;
-            return true;
+        if (state.isInDisclaimer && !state.disclaimerProcessed) {
+            // Old format: *text*
+            if (trimmedLine.startsWith('*') && trimmedLine.endsWith('*')) {
+                state.formattedLines.push(renderDisclaimerText(trimmedLine, index));
+                state.disclaimerProcessed = true;
+                state.isInDisclaimer = false;
+                return true;
+            }
+            // New format: > **text**
+            if (trimmedLine.startsWith('> **') && trimmedLine.endsWith('**')) {
+                const disclaimerText = trimmedLine.slice(4, -2); // Remove "> **" and "**"
+                state.formattedLines.push(
+                    <div key={`disclaimer-warning-${index}`} className={styles.disclaimerWarning}>
+                        <strong>{disclaimerText}</strong>
+                    </div>
+                );
+                state.disclaimerProcessed = true;
+                state.isInDisclaimer = false;
+                return true;
+            }
         }
         return false;
     };

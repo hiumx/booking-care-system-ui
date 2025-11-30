@@ -887,9 +887,10 @@ const AISupportBooking: React.FC = () => {
         }
 
         // Create user message with file attachment
+        // Note: Content format must match backend marker text for upload limit check
         const userMessage: Message = {
             id: Date.now().toString(),
-            content: 'Đã gửi file kết quả xét nghiệm để phân tích',
+            content: `Đã gửi file xét nghiệm: ${file.name}`,
             sender: 'user',
             timestamp: new Date(),
             fileAttachment: {
@@ -957,17 +958,36 @@ const AISupportBooking: React.FC = () => {
         } catch (error: any) {
             console.error('Error analyzing lab result:', error);
 
-            // Show error message to user
+            // Check if error is about upload limit
+            // Backend returns BadRequest with message in error.response.data.message
+            const errorMessage = error?.response?.data?.message || error?.message || '';
+
+            if (
+                errorMessage
+                    .toLowerCase()
+                    .includes('mỗi cuộc trò chuyện chỉ hỗ trợ phân tích một file xét nghiệm')
+            ) {
+                // Show clear message to user
+                toast.info(
+                    'Mỗi cuộc trò chuyện chỉ hỗ trợ phân tích một file xét nghiệm. Vui lòng tạo cuộc trò chuyện mới để tiếp tục với file khác nhé!'
+                );
+                // Remove the user message since upload was rejected
+                setMessages(messages);
+                setIsAITyping(false);
+                return;
+            }
+
+            // Show generic error message to user
             const errorContent = getErrorMessage(error);
 
-            const errorMessage: Message = {
+            const errorMsg: Message = {
                 id: Date.now().toString(),
                 content: errorContent,
                 sender: 'ai',
                 timestamp: new Date(),
             };
 
-            setMessages((prev) => [...prev, errorMessage]);
+            setMessages((prev) => [...prev, errorMsg]);
             toast.error('Không thể phân tích kết quả xét nghiệm. Vui lòng thử lại.');
         } finally {
             setIsAITyping(false);
