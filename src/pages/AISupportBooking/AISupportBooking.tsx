@@ -86,8 +86,11 @@ const convertMessageFromAPI = (msg: any, chatId: string, index: number): Message
         timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
         suggestions: suggestions,
         questionCount: msg.questionCount,
+        currentRound: msg.currentRound,
+        maxQuestions: msg.maxQuestions,
         disease: msg.disease,
         analysisComplete: msg.analysisComplete,
+        canRequestMoreQuestions: msg.canRequestMoreQuestions,
     };
 };
 
@@ -116,8 +119,14 @@ const convertHistoryMessage = (msg: any, index: number, chatId: string): Message
         suggestions: parsedSuggestions ?? baseMessage.suggestions,
         disease: parsedDisease ?? baseMessage.disease,
         questionCount: msg.questionCount ?? msg.QuestionCount ?? baseMessage.questionCount,
+        currentRound: msg.currentRound ?? msg.CurrentRound ?? baseMessage.currentRound,
+        maxQuestions: msg.maxQuestions ?? msg.MaxQuestions ?? baseMessage.maxQuestions,
         analysisComplete:
             msg.analysisComplete ?? msg.AnalysisComplete ?? baseMessage.analysisComplete,
+        canRequestMoreQuestions:
+            msg.canRequestMoreQuestions ??
+            msg.CanRequestMoreQuestions ??
+            baseMessage.canRequestMoreQuestions,
     };
 };
 
@@ -734,8 +743,11 @@ const AISupportBooking: React.FC = () => {
                 timestamp: new Date(response.data.timestamp || new Date().toISOString()),
                 suggestions: suggestions.length > 0 ? suggestions : undefined,
                 questionCount: response.data.questionCount,
+                currentRound: response.data.currentRound,
+                maxQuestions: response.data.maxQuestions,
                 disease: response.data.disease,
                 analysisComplete: response.data.analysisComplete,
+                canRequestMoreQuestions: response.data.canRequestMoreQuestions,
             };
 
             setMessages((prev) => [...prev, aiMessage]);

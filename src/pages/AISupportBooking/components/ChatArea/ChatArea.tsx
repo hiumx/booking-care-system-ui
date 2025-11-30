@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
 import { Stethoscope, MessageCircle, Menu } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { Message } from '@/types/ai.types';
 import MessageBubble from './components/MessageBubble';
 import SuggestionCard from './components/SuggestionCard';
@@ -162,6 +163,29 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
     const handleSend = () => {
         if (inputValue.trim()) {
+            // Check if last AI message has high confidence (>= 90%) or max rounds reached
+            const lastAIMessage = [...messages].reverse().find((m) => m.sender === 'ai');
+
+            if (lastAIMessage?.disease?.confidence && lastAIMessage.disease.confidence >= 0.9) {
+                toast.warning('Chẩn đoán đã đạt độ tin cậy cao. Vui lòng tạo cuộc tư vấn mới.', {
+                    position: 'top-right',
+                    autoClose: 4000,
+                });
+                return;
+            }
+
+            if (
+                lastAIMessage?.currentRound &&
+                lastAIMessage.currentRound >= 2 &&
+                lastAIMessage.analysisComplete
+            ) {
+                toast.info('Đã đạt số vòng tư vấn tối đa. Vui lòng bắt đầu cuộc trò chuyện mới.', {
+                    position: 'top-right',
+                    autoClose: 4000,
+                });
+                return;
+            }
+
             onSendMessage(inputValue);
             setInputValue('');
         }
@@ -325,23 +349,29 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                                 isAutoPlay={false}
                                             />
                                         </div>
-                                        <div className={styles.actionButtons}>
-                                            <button
-                                                className={clsx(
-                                                    'btn',
-                                                    'btn-md',
-                                                    'btn-primary-gradient',
-                                                    'd-inline-flex',
-                                                    'align-items-center',
-                                                    styles.actionButton,
-                                                    styles.consultButton
-                                                )}
-                                                onClick={handleConsultMore}
-                                            >
-                                                <MessageCircle size={18} className="me-2" />
-                                                <span>Tư vấn thêm</span>
-                                            </button>
-                                        </div>
+                                        {/* Consultation button - inside suggestions, below carousel */}
+                                        {(() => {
+                                            const shouldShow = message.canRequestMoreQuestions;
+                                            return shouldShow ? (
+                                                <div className={styles.actionButtons}>
+                                                    <button
+                                                        className={clsx(
+                                                            'btn',
+                                                            'btn-md',
+                                                            'btn-primary-gradient',
+                                                            'd-inline-flex',
+                                                            'align-items-center',
+                                                            styles.actionButton,
+                                                            styles.consultButton
+                                                        )}
+                                                        onClick={handleConsultMore}
+                                                    >
+                                                        <MessageCircle size={18} className="me-2" />
+                                                        <span>Tư vấn thêm</span>
+                                                    </button>
+                                                </div>
+                                            ) : null;
+                                        })()}
                                     </div>
                                 )}
                                 {miniBooking && miniBooking.messageId === message.id && (

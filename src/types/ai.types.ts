@@ -4,9 +4,12 @@ export interface Message {
     sender: 'user' | 'ai';
     timestamp: Date;
     suggestions?: Suggestion[];
-    questionCount?: number; // Number of questions asked so far (0-3)
+    questionCount?: number; // Number of questions in current round (1-3)
+    currentRound?: number; // Current consultation round (1 or 2)
+    maxQuestions?: number; // Maximum questions per round (always 3)
     disease?: DiseaseConclusion; // Disease conclusion (only when analysisComplete = true)
     analysisComplete?: boolean; // Whether the analysis is complete
+    canRequestMoreQuestions?: boolean; // Whether user can request more questions (true when round 1 && confidence < 90%)
     fileAttachment?: FileAttachment; // File attachment (for lab results)
     labResult?: LabResultAnalysis; // Lab result analysis
 }

@@ -199,15 +199,13 @@ const SearchBox: React.FC<SearchBoxProps> = ({
             if (files && files.length > 0) {
                 // Handle file upload - Implementation pending
                 // This feature will be implemented in the next sprint
-                console.log('Files selected:', files);
             }
         };
         input.click();
         setShowAttachmentModal(false);
     };
 
-    const handleMenuItemClick = (action: string) => {
-        console.log('Menu item clicked:', action);
+    const handleMenuItemClick = (_action: string) => {
         setShowAttachmentModal(false);
         // Implement actions for each menu item - Implementation pending
         // This feature will be implemented in the next sprint
@@ -272,7 +270,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
             } catch {
                 // Một số trình duyệt không hỗ trợ permissions API, tiếp tục với getCurrentPosition
                 // Hoặc có thể do lỗi khác, vẫn tiếp tục thử lấy vị trí
-                console.log('Permissions API check failed, continuing with getCurrentPosition...');
             }
         }
 
