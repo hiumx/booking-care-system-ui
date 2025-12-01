@@ -73,6 +73,8 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
 
     // Tính toán service type và giá hiển thị dựa trên filter
     const displayServiceInfo = useMemo(() => {
+        const DEFAULT_SERVICE_TYPE = 'Khám trực tiếp';
+
         // Nếu có filter service type, tìm giá tương ứng
         if (serviceTypeFilters.length > 0 && prices.length > 0) {
             // Tìm giá của service type đầu tiên trong filter
@@ -87,8 +89,16 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
             }
         }
 
-        // Mặc định: hiển thị giá đầu tiên
+        // Mặc định: ưu tiên hiển thị giá "Khám trực tiếp"
         if (prices.length > 0) {
+            const defaultPrice = prices.find((p) => p.serviceTypeName === DEFAULT_SERVICE_TYPE);
+            if (defaultPrice) {
+                return {
+                    serviceTypeName: defaultPrice.serviceTypeName,
+                    amount: defaultPrice.amount,
+                };
+            }
+            // Fallback: nếu không có "Khám trực tiếp", lấy giá đầu tiên
             return {
                 serviceTypeName: prices[0].serviceTypeName,
                 amount: prices[0].amount,
@@ -246,13 +256,13 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                                       const isOnlineConsultation =
                                                           displayServiceInfo.serviceTypeName
                                                               .toLowerCase()
-                                                              .includes('tư vấn online') ||
+                                                              .includes('tư vấn trực tuyến') ||
                                                           displayServiceInfo.serviceTypeName
                                                               .toLowerCase()
-                                                              .includes('tu van online') ||
+                                                              .includes('tu van truc tuyen') ||
                                                           displayServiceInfo.serviceTypeName
                                                               .toLowerCase()
-                                                              .includes('online');
+                                                              .includes('truc tuyen');
                                                       return isOnlineConsultation
                                                           ? `${basePath}?appointmentType=TELEHEALTH`
                                                           : basePath;
