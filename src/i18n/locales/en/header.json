@@ -1,5 +1,6 @@
 {
     "menu": {
+        "quickBooking": "Quick Booking",
         "booking": {
             "title": "Book Appointment",
             "doctor": "Book Doctor",

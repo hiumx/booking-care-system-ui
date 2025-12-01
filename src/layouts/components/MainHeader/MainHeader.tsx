@@ -692,6 +692,17 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                         </li>
                                     </>
                                 )}
+                                {/* Quick Booking CTA Button - Animated border light effect */}
+                                <li className="nav-item quick-booking-btn">
+                                    <Link to={PATHS.HOSPITAL.ROOT} className="quick-booking-link">
+                                        <span className="light-span"></span>
+                                        <span className="light-span"></span>
+                                        <span className="light-span"></span>
+                                        <span className="light-span"></span>
+                                        <i className="isax isax-calendar-tick me-1"></i>
+                                        <span>{t('menu.quickBooking', 'Đặt khám nhanh')}</span>
+                                    </Link>
+                                </li>
                             </ul>
                         </div>
                     )}
