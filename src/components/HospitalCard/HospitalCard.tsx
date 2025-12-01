@@ -1,7 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
 import styles from './HospitalCard.module.scss';
+import Button from '@/components/Button';
 
 export interface HospitalCardProps {
     clinic: {
@@ -15,6 +16,7 @@ export interface HospitalCardProps {
         description?: string;
     };
     className?: string;
+    showBookingButton?: boolean;
 }
 
 const HospitalCard: React.FC<HospitalCardProps> = ({
@@ -37,8 +39,14 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
             'Leading healthcare facility with state-of-the-art equipment and experienced medical professionals.',
     },
     className,
+    showBookingButton = false,
 }) => {
+    const navigate = useNavigate();
     const { id, name, image, specialties, location, distance, specialtyCount } = clinic;
+
+    const handleBookingClick = () => {
+        navigate(PATHS.BOOKING.HOSPITAL.replace(':hospitalId', id));
+    };
 
     return (
         <Link to={`${PATHS.HOSPITAL.ROOT}/${id}`} className={styles.clinicCarouselItem}>
@@ -109,6 +117,23 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                             )}
                         </div>
                     </div>
+
+                    {/* Quick Booking Button */}
+                    {showBookingButton && (
+                        <div
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }}
+                        >
+                            <Button
+                                type="button"
+                                text="Đặt lịch ngay"
+                                className={styles.bookingButton}
+                                onClick={handleBookingClick}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         </Link>
