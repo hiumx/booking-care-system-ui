@@ -67,6 +67,7 @@ export const PATHS = {
     // Booking
     BOOKING: {
         ROOT: '/booking/:doctorId',
+        SERVICE: '/booking/service/:serviceMedicalId',
         CONFIRMATION: '/booking/confirmation/:appointmentId',
         RESCHEDULE: '/booking/reschedule/:appointmentId',
         CONFIRM_NEW_DOCTOR: '/booking/confirm-doctor/:appointmentId',
@@ -78,6 +79,12 @@ export const PATHS = {
     DASHBOARD: {
         ROOT: '/dashboard',
         SETTINGS: 'settings',
+    },
+
+    // Contract Signing paths
+    CONTRACT_SIGNING: {
+        ROOT: '/contract-signing/:token',
+        SUCCESS: '/contract-signing-success',
     },
 
     // Not Found path

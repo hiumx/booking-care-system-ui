@@ -550,12 +550,12 @@ const AISupportBooking: React.FC = () => {
     // Helper function to build lab result message
     const buildLabResultMessage = (data: any): string => {
         const lines: string[] = [];
-        lines.push('**KẾT QUẢ PHÂN TÍCH XÉT NGHIỆM:**');
+        lines.push('KẾT QUẢ PHÂN TÍCH XÉT NGHIỆM:');
         lines.push('');
 
         // Normal indicators
         if (data.normalIndicators && data.normalIndicators.length > 0) {
-            lines.push('**Các chỉ số bình thường:**');
+            lines.push('Các chỉ số bình thường:');
             data.normalIndicators.forEach((indicator: any) => {
                 lines.push(
                     `- ${indicator.name}: ${indicator.value} ${indicator.unit} (Tham chiếu: ${indicator.referenceRange})`
@@ -566,10 +566,10 @@ const AISupportBooking: React.FC = () => {
 
         // Abnormal indicators
         if (data.abnormalIndicators && data.abnormalIndicators.length > 0) {
-            lines.push('**Các chỉ số bất thường:**');
+            lines.push('Các chỉ số bất thường:');
             data.abnormalIndicators.forEach((indicator: any) => {
                 lines.push(
-                    `- **${indicator.name}**: ${indicator.value} ${indicator.unit} (Tham chiếu: ${indicator.referenceRange})`
+                    `- ${indicator.name}: ${indicator.value} ${indicator.unit} (Tham chiếu: ${indicator.referenceRange})`
                 );
                 lines.push(`  - Giải thích: ${indicator.explanation}`);
                 lines.push(`  - Lời khuyên: ${indicator.advice}`);
@@ -600,28 +600,28 @@ const AISupportBooking: React.FC = () => {
     // Helper function to build dermatology message
     const buildDermatologyMessage = (data: any): string => {
         const lines: string[] = [];
-        lines.push('**KẾT QUẢ PHÂN TÍCH ẢNH DA:**');
+        lines.push('KẾT QUẢ PHÂN TÍCH ẢNH DA:');
         lines.push('');
 
         // Diagnosis
         if (data.diagnosis) {
-            lines.push(`**Chẩn đoán khả năng:** ${data.diagnosis.conditionName}`);
-            lines.push(`**Độ tin cậy:** ${(data.diagnosis.confidence * 100).toFixed(0)}%`);
+            lines.push(`Chẩn đoán khả năng: ${data.diagnosis.conditionName}`);
+            lines.push(`Độ tin cậy: ${(data.diagnosis.confidence * 100).toFixed(0)}%`);
             lines.push('');
         }
 
         // Biopsy recommendation
         if (data.biopsyRecommended) {
-            lines.push('**Khuyến nghị sinh thiết:** Có');
+            lines.push('Khuyến nghị sinh thiết: Có');
             if (data.biopsyReason) {
-                lines.push(`**Lý do:** ${data.biopsyReason}`);
+                lines.push(`Lý do: ${data.biopsyReason}`);
             }
             lines.push('');
         }
 
         // General advice
         if (data.generalAdvice && data.generalAdvice.length > 0) {
-            lines.push('**Lời khuyên:**');
+            lines.push('Lời khuyên:');
             data.generalAdvice.forEach((advice: string) => {
                 lines.push(`- ${advice}`);
             });

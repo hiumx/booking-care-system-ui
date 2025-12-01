@@ -296,16 +296,17 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                                         className="badge badge-pill bg-danger"
                                                         style={{
                                                             position: 'absolute',
-                                                            top: '-5px',
-                                                            right: '-5px',
+                                                            top: '-8px',
+                                                            right: '-9px',
                                                             fontSize: '10px',
                                                             padding: '2px 6px',
-                                                            minWidth: '18px',
-                                                            height: '18px',
+                                                            minWidth: '12px',
+                                                            height: '14px',
                                                             display: 'flex',
                                                             alignItems: 'center',
                                                             justifyContent: 'center',
                                                             borderRadius: '10px',
+                                                            fontWeight: '600',
                                                         }}
                                                     >
                                                         {unreadCount > 99 ? '99+' : unreadCount}

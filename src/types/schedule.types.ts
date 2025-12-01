@@ -61,12 +61,50 @@ export interface GetDoctorAvailableSlotsRequest {
     medicalServiceId?: string;
 }
 
+// Service Medical Schedule interfaces
+export interface ServiceMedicalDailySchedule {
+    id: string;
+    serviceMedicalId: string;
+    scheduleDate: string; // ISO date string
+    schedulePatterns: SchedulePatterns[];
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface ServiceMedicalScheduleException {
+    id: string;
+    serviceMedicalId: string;
+    exceptionDate: string; // ISO date string
+    appointmentTime?: string; // Nullable - if null means full day off
+    exceptionType: ExceptionType;
+    isAvailable: boolean;
+    reason?: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+// Request DTOs for Service Medical
+export interface GetServiceMedicalScheduleRequest {
+    serviceMedicalId: string;
+    date: string; // ISO date string (YYYY-MM-DD)
+}
+
+export interface GetServiceMedicalAvailableSlotsRequest {
+    serviceMedicalId: string;
+    date: string; // ISO date string (YYYY-MM-DD)
+}
+
 // Response DTOs
 export type DoctorScheduleResponse = ApiResponse<DoctorDailySchedule>;
 
 export type DoctorScheduleListResponse = ApiResponse<DoctorDailySchedule[]>;
 
 export type AvailableSlotsResponse = ApiResponse<AvailableSlot[]>;
+
+// Service Medical Response DTOs
+export type ServiceMedicalScheduleResponse = ApiResponse<ServiceMedicalDailySchedule>;
+
+export type ServiceMedicalAvailableSlotsResponse = ApiResponse<AvailableSlot[]>;
 
 // Time slot for UI
 export interface TimeSlot {
