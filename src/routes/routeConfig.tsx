@@ -40,6 +40,8 @@ import ServiceList from '@/pages/MedicalService/MedicalService/MedicalServicePag
 import ServiceHospitals from '@/pages/MedicalService/ServiceHospital/ServiceHospitalPage';
 import ServiceDetail from '@/pages/MedicalService/ServiceDetail/ServiceDetailPage';
 import AISupportBooking from '@/pages/AISupportBooking';
+import ContractSigningPage from '@/pages/ContractSigning/ContractSigningPage';
+import ContractSigningSuccessPage from '@/pages/ContractSigning/ContractSigningSuccessPage';
 
 const routes: RouteObject[] = [
     {
@@ -223,6 +225,14 @@ const routes: RouteObject[] = [
             { path: PATHS.DASHBOARD.ROOT, element: <h1>Dashboard</h1> },
             { path: PATHS.DASHBOARD.SETTINGS, element: <h1>Setting</h1> },
         ],
+    },
+    {
+        path: PATHS.CONTRACT_SIGNING.ROOT,
+        element: <ContractSigningPage />,
+    },
+    {
+        path: PATHS.CONTRACT_SIGNING.SUCCESS,
+        element: <ContractSigningSuccessPage />,
     },
     {
         path: PATHS.NOT_FOUND,
