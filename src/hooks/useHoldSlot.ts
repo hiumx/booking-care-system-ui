@@ -5,6 +5,7 @@ import { AppointmentTime } from '@/enums/appointment.enums';
 import { toast } from 'react-toastify';
 import { useBaseHoldSlot } from './useBaseHoldSlot';
 import { usePeriodicCheck } from './usePeriodicCheck';
+import { executeHoldSlot } from './useHoldSlotShared';
 
 interface UseHoldSlotProps {
     targetId?: string; // Can be doctorId or serviceMedicalId
@@ -70,65 +71,6 @@ export const useHoldSlot = ({
         setCurrentHeldSlot(null);
     }, [resetHoldSlotState]);
 
-    // Hold a slot
-    const holdSlot = useCallback(
-        async (
-            targetId: string,
-            targetType: HoldSlotTargetType,
-            targetDate: string,
-            appointmentTimeId: AppointmentTime
-        ): Promise<boolean> => {
-            setLoading(true);
-            setError(null);
-
-            try {
-                // Release any existing held slot first
-                if (currentHeldSlot) {
-                    await releaseSlot();
-                }
-
-                const response = await HoldSlotService.holdSlot({
-                    targetId,
-                    targetType,
-                    date: targetDate,
-                    appointmentTimeId,
-                });
-
-                if (response.success) {
-                    setCurrentHeldSlot({
-                        targetId,
-                        targetType,
-                        date: targetDate,
-                        appointmentTimeId,
-                    });
-
-                    setHoldSlotState((prev) => ({
-                        ...prev,
-                        isHeld: true,
-                        isLoading: false,
-                        error: null,
-                    }));
-
-                    startCountdown(response.remainingSeconds);
-                    toast.success(response.message);
-                    return true; // Success
-                } else {
-                    setLoading(false);
-                    setError(response.message);
-                    toast.error(response.message);
-                    return false; // Failed
-                }
-            } catch (error: any) {
-                const errorMessage = error.message || 'Không thể giữ chỗ';
-                setLoading(false);
-                setError(errorMessage);
-                toast.error(errorMessage);
-                return false; // Failed
-            }
-        },
-        [currentHeldSlot, startCountdown]
-    );
-
     // Release current held slot
     const releaseSlot = useCallback(async () => {
         if (!currentHeldSlot) return;
@@ -149,6 +91,48 @@ export const useHoldSlot = ({
             stopCountdown();
         }
     }, [currentHeldSlot, stopCountdown]);
+
+    // Hold a slot
+    const holdSlot = useCallback(
+        async (
+            targetId: string,
+            targetType: HoldSlotTargetType,
+            targetDate: string,
+            appointmentTimeId: AppointmentTime
+        ): Promise<boolean> => {
+            return executeHoldSlot({
+                currentHeldSlot,
+                setCurrentHeldSlot,
+                setHoldSlotState,
+                startCountdown,
+                setLoading,
+                setError,
+                releaseExistingSlot: releaseSlot,
+                executeHoldRequest: () =>
+                    HoldSlotService.holdSlot({
+                        targetId,
+                        targetType,
+                        date: targetDate,
+                        appointmentTimeId,
+                    }),
+                buildSlot: () => ({
+                    targetId,
+                    targetType,
+                    date: targetDate,
+                    appointmentTimeId,
+                }),
+            });
+        },
+        [
+            currentHeldSlot,
+            setCurrentHeldSlot,
+            setHoldSlotState,
+            startCountdown,
+            setLoading,
+            setError,
+            releaseSlot,
+        ]
+    );
 
     // Release all held slots
     const releaseAllSlots = useCallback(async () => {

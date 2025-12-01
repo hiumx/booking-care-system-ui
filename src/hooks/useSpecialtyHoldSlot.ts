@@ -4,6 +4,7 @@ import { AppointmentTime } from '@/enums/appointment.enums';
 import { toast } from 'react-toastify';
 import { useBaseHoldSlot } from './useBaseHoldSlot';
 import { usePeriodicCheck } from './usePeriodicCheck';
+import { executeHoldSlot } from './useHoldSlotShared';
 
 interface UseSpecialtyHoldSlotProps {
     hospitalId?: string;
@@ -69,68 +70,6 @@ export const useSpecialtyHoldSlot = ({
         setCurrentHeldSlot(null);
     }, [resetHoldSlotState]);
 
-    // Hold a specialty slot
-    const holdSlot = useCallback(
-        async (
-            hospitalId: string,
-            specialtyId: string,
-            date: string,
-            appointmentTimeId: AppointmentTime,
-            maxCapacity: number
-        ): Promise<boolean> => {
-            setLoading(true);
-            setError(null);
-
-            try {
-                // Release any existing held slot first
-                if (currentHeldSlot) {
-                    await releaseSlot();
-                }
-
-                const response = await HoldSlotService.holdSpecialtySlot({
-                    hospitalId,
-                    specialtyId,
-                    date,
-                    appointmentTimeId,
-                    maxCapacity,
-                });
-
-                if (response.success) {
-                    setCurrentHeldSlot({
-                        hospitalId,
-                        specialtyId,
-                        date,
-                        appointmentTimeId,
-                        maxCapacity,
-                    });
-
-                    setHoldSlotState((prev) => ({
-                        ...prev,
-                        isHeld: true,
-                        isLoading: false,
-                        error: null,
-                    }));
-
-                    startCountdown(response.remainingSeconds);
-                    toast.success(response.message);
-                    return true;
-                } else {
-                    setLoading(false);
-                    setError(response.message);
-                    toast.error(response.message);
-                    return false;
-                }
-            } catch (error: any) {
-                const errorMessage = error.message || 'Không thể giữ chỗ';
-                setLoading(false);
-                setError(errorMessage);
-                toast.error(errorMessage);
-                return false;
-            }
-        },
-        [currentHeldSlot, startCountdown]
-    );
-
     // Release current held slot
     const releaseSlot = useCallback(async () => {
         if (!currentHeldSlot) return;
@@ -150,6 +89,51 @@ export const useSpecialtyHoldSlot = ({
             stopCountdown();
         }
     }, [currentHeldSlot, stopCountdown]);
+
+    // Hold a specialty slot
+    const holdSlot = useCallback(
+        async (
+            hospitalId: string,
+            specialtyId: string,
+            date: string,
+            appointmentTimeId: AppointmentTime,
+            maxCapacity: number
+        ): Promise<boolean> => {
+            return executeHoldSlot<CurrentHeldSpecialtySlot>({
+                currentHeldSlot,
+                setCurrentHeldSlot,
+                setHoldSlotState,
+                startCountdown,
+                setLoading,
+                setError,
+                releaseExistingSlot: releaseSlot,
+                executeHoldRequest: () =>
+                    HoldSlotService.holdSpecialtySlot({
+                        hospitalId,
+                        specialtyId,
+                        date,
+                        appointmentTimeId,
+                        maxCapacity,
+                    }),
+                buildSlot: () => ({
+                    hospitalId,
+                    specialtyId,
+                    date,
+                    appointmentTimeId,
+                    maxCapacity,
+                }),
+            });
+        },
+        [
+            currentHeldSlot,
+            setCurrentHeldSlot,
+            setHoldSlotState,
+            startCountdown,
+            setLoading,
+            setError,
+            releaseSlot,
+        ]
+    );
 
     // Check remaining time for current held slot
     const checkRemainingTime = useCallback(async () => {
