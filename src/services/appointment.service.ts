@@ -144,6 +144,7 @@ export class AppointmentService {
                 success: response.success ?? true,
                 data: response.data,
                 message: response.message || 'Attachment uploaded successfully',
+                errors: response.errors,
             };
         } catch (error: any) {
             throw new Error(error.message || 'Failed to upload attachment');

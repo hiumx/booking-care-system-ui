@@ -1,15 +1,10 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { HoldSlotService } from '@/services/holdSlot.service';
 import { HoldSlotTargetType } from '@/types/holdSlot.types';
 import { AppointmentTime } from '@/enums/appointment.enums';
 import { toast } from 'react-toastify';
-
-interface HoldSlotState {
-    isHeld: boolean;
-    remainingSeconds: number;
-    isLoading: boolean;
-    error: string | null;
-}
+import { useBaseHoldSlot } from './useBaseHoldSlot';
+import { usePeriodicCheck } from './usePeriodicCheck';
 
 interface UseHoldSlotProps {
     targetId?: string; // Can be doctorId or serviceMedicalId
@@ -52,12 +47,15 @@ export const useHoldSlot = ({
     date: _date,
     onSlotExpired,
 }: UseHoldSlotProps = {}): UseHoldSlotReturn => {
-    const [holdSlotState, setHoldSlotState] = useState<HoldSlotState>({
-        isHeld: false,
-        remainingSeconds: 0,
-        isLoading: false,
-        error: null,
-    });
+    const {
+        holdSlotState,
+        setHoldSlotState,
+        startCountdown,
+        resetHoldSlotState,
+        setLoading,
+        setError,
+        checkIntervalRef,
+    } = useBaseHoldSlot({ onSlotExpired });
 
     const [currentHeldSlot, setCurrentHeldSlot] = useState<{
         targetId: string;
@@ -66,96 +64,11 @@ export const useHoldSlot = ({
         appointmentTimeId: AppointmentTime;
     } | null>(null);
 
-    const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
-    const checkIntervalRef = useRef<NodeJS.Timeout | null>(null);
-    const hasNotifiedExpirationRef = useRef(false); // Prevent double expiration notification
-    const onSlotExpiredRef = useRef(onSlotExpired);
-
-    // Keep onSlotExpired ref updated
-    useEffect(() => {
-        onSlotExpiredRef.current = onSlotExpired;
-    }, [onSlotExpired]);
-
-    // Clear all intervals on unmount
-    useEffect(() => {
-        return () => {
-            if (countdownIntervalRef.current) {
-                clearInterval(countdownIntervalRef.current);
-            }
-            if (checkIntervalRef.current) {
-                clearInterval(checkIntervalRef.current);
-            }
-        };
-    }, []);
-
-    // Start countdown timer
-    const startCountdown = useCallback(
-        (initialSeconds: number) => {
-            // Reset expiration notification flag for new countdown
-            hasNotifiedExpirationRef.current = false;
-
-            setHoldSlotState((prev) => ({
-                ...prev,
-                remainingSeconds: initialSeconds,
-            }));
-
-            // Clear existing interval
-            if (countdownIntervalRef.current) {
-                clearInterval(countdownIntervalRef.current);
-            }
-
-            countdownIntervalRef.current = setInterval(() => {
-                setHoldSlotState((prev) => {
-                    const newSeconds = prev.remainingSeconds - 1;
-
-                    if (newSeconds <= 0) {
-                        // Slot expired
-                        if (countdownIntervalRef.current) {
-                            clearInterval(countdownIntervalRef.current);
-                            countdownIntervalRef.current = null;
-                        }
-
-                        setCurrentHeldSlot(null);
-
-                        // Only notify once per expiration - double safety check
-                        if (!hasNotifiedExpirationRef.current) {
-                            hasNotifiedExpirationRef.current = true;
-                            // Use ref to get latest callback
-                            onSlotExpiredRef.current?.();
-                        }
-
-                        return {
-                            ...prev,
-                            isHeld: false,
-                            remainingSeconds: 0,
-                        };
-                    }
-
-                    return {
-                        ...prev,
-                        remainingSeconds: newSeconds,
-                    };
-                });
-            }, 1000);
-        },
-        [onSlotExpired]
-    );
-
     // Stop countdown timer
     const stopCountdown = useCallback(() => {
-        if (countdownIntervalRef.current) {
-            clearInterval(countdownIntervalRef.current);
-            countdownIntervalRef.current = null;
-        }
-
-        setHoldSlotState((prev) => ({
-            ...prev,
-            isHeld: false,
-            remainingSeconds: 0,
-        }));
-
+        resetHoldSlotState();
         setCurrentHeldSlot(null);
-    }, []);
+    }, [resetHoldSlotState]);
 
     // Hold a slot
     const holdSlot = useCallback(
@@ -165,7 +78,8 @@ export const useHoldSlot = ({
             targetDate: string,
             appointmentTimeId: AppointmentTime
         ): Promise<boolean> => {
-            setHoldSlotState((prev) => ({ ...prev, isLoading: true, error: null }));
+            setLoading(true);
+            setError(null);
 
             try {
                 // Release any existing held slot first
@@ -199,21 +113,15 @@ export const useHoldSlot = ({
                     toast.success(response.message);
                     return true; // Success
                 } else {
-                    setHoldSlotState((prev) => ({
-                        ...prev,
-                        isLoading: false,
-                        error: response.message,
-                    }));
+                    setLoading(false);
+                    setError(response.message);
                     toast.error(response.message);
                     return false; // Failed
                 }
             } catch (error: any) {
                 const errorMessage = error.message || 'Không thể giữ chỗ';
-                setHoldSlotState((prev) => ({
-                    ...prev,
-                    isLoading: false,
-                    error: errorMessage,
-                }));
+                setLoading(false);
+                setError(errorMessage);
                 toast.error(errorMessage);
                 return false; // Failed
             }
@@ -286,20 +194,11 @@ export const useHoldSlot = ({
     }, [currentHeldSlot, stopCountdown]);
 
     // Periodically check remaining time with server (every 30 seconds)
-    useEffect(() => {
-        if (holdSlotState.isHeld && currentHeldSlot) {
-            checkIntervalRef.current = setInterval(checkRemainingTime, 30000);
-        } else if (checkIntervalRef.current) {
-            clearInterval(checkIntervalRef.current);
-            checkIntervalRef.current = null;
-        }
-
-        return () => {
-            if (checkIntervalRef.current) {
-                clearInterval(checkIntervalRef.current);
-            }
-        };
-    }, [holdSlotState.isHeld, currentHeldSlot, checkRemainingTime]);
+    usePeriodicCheck({
+        isHeld: holdSlotState.isHeld && !!currentHeldSlot,
+        checkIntervalRef,
+        checkCallback: checkRemainingTime,
+    });
 
     // Restore held slot state (for when user navigates back)
     const restoreHeldSlot = useCallback(

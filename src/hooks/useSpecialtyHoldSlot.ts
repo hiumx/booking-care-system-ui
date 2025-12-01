@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { HoldSlotService } from '@/services/holdSlot.service';
 import { AppointmentTime } from '@/enums/appointment.enums';
 import { toast } from 'react-toastify';
 import { useBaseHoldSlot } from './useBaseHoldSlot';
+import { usePeriodicCheck } from './usePeriodicCheck';
 
 interface UseSpecialtyHoldSlotProps {
     hospitalId?: string;
@@ -176,20 +177,11 @@ export const useSpecialtyHoldSlot = ({
     }, [currentHeldSlot, stopCountdown]);
 
     // Periodically check remaining time with server (every 30 seconds)
-    useEffect(() => {
-        if (holdSlotState.isHeld && currentHeldSlot) {
-            checkIntervalRef.current = setInterval(checkRemainingTime, 30000);
-        } else if (checkIntervalRef.current) {
-            clearInterval(checkIntervalRef.current);
-            checkIntervalRef.current = null;
-        }
-
-        return () => {
-            if (checkIntervalRef.current) {
-                clearInterval(checkIntervalRef.current);
-            }
-        };
-    }, [holdSlotState.isHeld, currentHeldSlot, checkRemainingTime]);
+    usePeriodicCheck({
+        isHeld: holdSlotState.isHeld && !!currentHeldSlot,
+        checkIntervalRef,
+        checkCallback: checkRemainingTime,
+    });
 
     // Restore held slot state (for when user navigates back)
     const restoreHeldSlot = useCallback(
