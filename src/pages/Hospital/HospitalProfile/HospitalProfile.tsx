@@ -15,6 +15,7 @@ import TestimonialSection from '@/components/TestimonialSection';
 import HeroSection from './components/HeroSection/HeroSection';
 import ServiceCard from './components/ServiceCard';
 import ExpandableText from '@/components/ExpandableText';
+import { SpecialtyItem } from './components/SpecialtyItem';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '@/store';
 import { getHospitalByIdAsync } from '@/store/slices/hospitalSlice';
@@ -282,52 +283,10 @@ const HospitalProfile: React.FC = () => {
                                                 key={specialty.id}
                                                 style={{ width: '160px', maxWidth: '160px' }}
                                             >
-                                                <div
-                                                    className={clsx('spaciality-item')}
-                                                    onClick={() =>
-                                                        handleSpecialtyClick(specialty.id)
-                                                    }
-                                                    style={{ cursor: 'pointer' }}
-                                                    role="button"
-                                                    tabIndex={0}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter' || e.key === ' ') {
-                                                            handleSpecialtyClick(specialty.id);
-                                                        }
-                                                    }}
-                                                >
-                                                    <div className={clsx('spaciality-img')}>
-                                                        <img
-                                                            src={specialty.img}
-                                                            alt={specialty.name}
-                                                            className={styles.specialityImgEl}
-                                                        />
-                                                        <span
-                                                            className={clsx(
-                                                                'spaciality-icon',
-                                                                styles.specialityIcon
-                                                            )}
-                                                        >
-                                                            {specialty.icon && (
-                                                                <img
-                                                                    src={specialty.icon}
-                                                                    alt="icon"
-                                                                />
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                    <h6 className={styles.specialityTitle}>
-                                                        {specialty.name}
-                                                    </h6>
-                                                    <p
-                                                        className={clsx(
-                                                            'mb-0',
-                                                            styles.specialityMeta
-                                                        )}
-                                                    >
-                                                        {specialty.doctorCount || 0} Bác sĩ
-                                                    </p>
-                                                </div>
+                                                <SpecialtyItem
+                                                    specialty={specialty}
+                                                    onClick={handleSpecialtyClick}
+                                                />
                                             </SwiperSlide>
                                         ))}
                                     </Swiper>
@@ -336,43 +295,11 @@ const HospitalProfile: React.FC = () => {
                                 {/* Mobile Grid */}
                                 <div className={styles.mobileSpecialtyList}>
                                     {specialties.map((specialty) => (
-                                        <div
+                                        <SpecialtyItem
                                             key={specialty.id}
-                                            className={clsx('spaciality-item')}
-                                            onClick={() => handleSpecialtyClick(specialty.id)}
-                                            style={{ cursor: 'pointer' }}
-                                            role="button"
-                                            tabIndex={0}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' || e.key === ' ') {
-                                                    handleSpecialtyClick(specialty.id);
-                                                }
-                                            }}
-                                        >
-                                            <div className={clsx('spaciality-img')}>
-                                                <img
-                                                    src={specialty.img}
-                                                    alt={specialty.name}
-                                                    className={styles.specialityImgEl}
-                                                />
-                                                <span
-                                                    className={clsx(
-                                                        'spaciality-icon',
-                                                        styles.specialityIcon
-                                                    )}
-                                                >
-                                                    {specialty.icon && (
-                                                        <img src={specialty.icon} alt="icon" />
-                                                    )}
-                                                </span>
-                                            </div>
-                                            <h6 className={styles.specialityTitle}>
-                                                {specialty.name}
-                                            </h6>
-                                            <p className={clsx('mb-0', styles.specialityMeta)}>
-                                                {specialty.doctorCount || 0} Bác sĩ
-                                            </p>
-                                        </div>
+                                            specialty={specialty}
+                                            onClick={handleSpecialtyClick}
+                                        />
                                     ))}
                                 </div>
                             </div>

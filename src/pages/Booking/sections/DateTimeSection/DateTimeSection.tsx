@@ -41,6 +41,107 @@ import { useHospitalBookingInfo } from '../../hooks/useHospitalBookingInfo';
 import { toast } from 'react-toastify';
 import { AppointmentType } from '@/enums/appointment.enums';
 
+// Helper function to restore slot and update UI
+const restoreSlotHelper = (
+    effectiveScheduleCategories: any[],
+    selectedSlot: any,
+    setSlotChecked: (indices: number[]) => void,
+    dispatch: any,
+    toggleSlotSelection: any
+) => {
+    const allSlots = effectiveScheduleCategories.flatMap((category) => category.timeSlots);
+    const slotIndex = allSlots.findIndex(
+        (slot) => slot.startTime === selectedSlot.startTime && slot.endTime === selectedSlot.endTime
+    );
+
+    if (slotIndex !== -1) {
+        setSlotChecked([slotIndex]);
+    } else {
+        // Slot expired, clear Redux selection
+        dispatch(
+            toggleSlotSelection({
+                startTime: selectedSlot.startTime,
+                endTime: selectedSlot.endTime,
+                isAvailable: true,
+                isBlocked: false,
+            })
+        );
+        setSlotChecked([]);
+        toast.warning('Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.');
+    }
+};
+
+// Helper function to fetch available slots based on booking type
+const fetchAvailableSlotsHelper = async (
+    dispatch: any,
+    formattedDate: string,
+    isDoctorBooking: boolean,
+    isServiceMedicalBooking: boolean,
+    isHospitalBooking: boolean,
+    doctorId?: string,
+    serviceMedicalId?: string,
+    medicalServiceId?: string,
+    hospitalBookingDoctorId?: string | null,
+    hospitalBookingServiceId?: string | null,
+    hospitalBookingSpecialtyId?: string | null,
+    hospitalId?: string,
+    hospitalBookingAppointmentType?: AppointmentType
+) => {
+    try {
+        // Direct doctor booking
+        if (isDoctorBooking && doctorId) {
+            await dispatch(
+                fetchDoctorAvailableSlots({
+                    doctorId,
+                    date: formattedDate,
+                    ...(medicalServiceId && { medicalServiceId }),
+                })
+            ).unwrap();
+        }
+        // Direct service medical booking
+        else if (isServiceMedicalBooking && serviceMedicalId) {
+            await dispatch(
+                fetchServiceMedicalAvailableSlots({
+                    serviceMedicalId,
+                    date: formattedDate,
+                })
+            ).unwrap();
+        }
+        // Hospital booking flow
+        else if (isHospitalBooking) {
+            if (hospitalBookingDoctorId) {
+                await dispatch(
+                    fetchDoctorAvailableSlots({
+                        doctorId: hospitalBookingDoctorId,
+                        date: formattedDate,
+                        ...(hospitalBookingServiceId && {
+                            medicalServiceId: hospitalBookingServiceId,
+                        }),
+                    })
+                ).unwrap();
+            } else if (hospitalBookingServiceId) {
+                await dispatch(
+                    fetchServiceMedicalAvailableSlots({
+                        serviceMedicalId: hospitalBookingServiceId,
+                        date: formattedDate,
+                    })
+                ).unwrap();
+            } else if (hospitalBookingSpecialtyId && hospitalId && hospitalBookingAppointmentType) {
+                await dispatch(
+                    fetchSpecialtyAvailableSlots({
+                        hospitalId,
+                        specialtyId: hospitalBookingSpecialtyId,
+                        date: formattedDate,
+                        appointmentType: hospitalBookingAppointmentType,
+                    })
+                ).unwrap();
+            }
+        }
+    } catch (error) {
+        console.error('Failed to fetch available slots:', error);
+    }
+};
+
 interface DateTimeSectionProps {
     nextStep: () => void;
     prevStep: () => void;
@@ -351,62 +452,21 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                 dispatch(setSelectedDate(formattedDate));
 
                 // Fetch available slots based on booking type
-                try {
-                    // Direct doctor booking
-                    if (isDoctorBooking && doctorId) {
-                        await dispatch(
-                            fetchDoctorAvailableSlots({
-                                doctorId,
-                                date: formattedDate,
-                                ...(medicalServiceId && { medicalServiceId }),
-                            })
-                        ).unwrap();
-                    }
-                    // Direct service medical booking
-                    else if (isServiceMedicalBooking && serviceMedicalId) {
-                        await dispatch(
-                            fetchServiceMedicalAvailableSlots({
-                                serviceMedicalId,
-                                date: formattedDate,
-                            })
-                        ).unwrap();
-                    }
-                    // Hospital booking flow - fetch based on selected doctor, service, or specialty
-                    else if (isHospitalBooking) {
-                        if (hospitalBookingDoctorId) {
-                            // Hospital booking with selected doctor
-                            await dispatch(
-                                fetchDoctorAvailableSlots({
-                                    doctorId: hospitalBookingDoctorId,
-                                    date: formattedDate,
-                                    ...(hospitalBookingServiceId && {
-                                        medicalServiceId: hospitalBookingServiceId,
-                                    }),
-                                })
-                            ).unwrap();
-                        } else if (hospitalBookingServiceId) {
-                            // Hospital booking with selected service (no specific doctor)
-                            await dispatch(
-                                fetchServiceMedicalAvailableSlots({
-                                    serviceMedicalId: hospitalBookingServiceId,
-                                    date: formattedDate,
-                                })
-                            ).unwrap();
-                        } else if (hospitalBookingSpecialtyId && hospitalId) {
-                            // Specialty booking (hospital assigns doctor mode)
-                            await dispatch(
-                                fetchSpecialtyAvailableSlots({
-                                    hospitalId,
-                                    specialtyId: hospitalBookingSpecialtyId,
-                                    date: formattedDate,
-                                    appointmentType: hospitalBookingAppointmentType,
-                                })
-                            ).unwrap();
-                        }
-                    }
-                } catch (error) {
-                    console.error('Failed to fetch available slots:', error);
-                }
+                await fetchAvailableSlotsHelper(
+                    dispatch,
+                    formattedDate,
+                    isDoctorBooking,
+                    isServiceMedicalBooking,
+                    isHospitalBooking,
+                    doctorId,
+                    serviceMedicalId,
+                    medicalServiceId,
+                    hospitalBookingDoctorId ?? undefined,
+                    hospitalBookingServiceId ?? undefined,
+                    hospitalBookingSpecialtyId ?? undefined,
+                    hospitalId,
+                    hospitalBookingAppointmentType
+                );
             }
         },
         [
@@ -623,60 +683,21 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             }
 
             // Fetch available slots based on booking type
-            try {
-                // Direct doctor booking
-                if (isDoctorBooking && doctorId) {
-                    await dispatch(
-                        fetchDoctorAvailableSlots({
-                            doctorId,
-                            date: formattedDate,
-                            ...(medicalServiceId && { medicalServiceId }),
-                        })
-                    ).unwrap();
-                }
-                // Direct service medical booking
-                else if (isServiceMedicalBooking && serviceMedicalId) {
-                    await dispatch(
-                        fetchServiceMedicalAvailableSlots({
-                            serviceMedicalId,
-                            date: formattedDate,
-                        })
-                    ).unwrap();
-                }
-                // Hospital booking flow
-                else if (isHospitalBooking) {
-                    if (hospitalBookingDoctorId) {
-                        await dispatch(
-                            fetchDoctorAvailableSlots({
-                                doctorId: hospitalBookingDoctorId,
-                                date: formattedDate,
-                                ...(hospitalBookingServiceId && {
-                                    medicalServiceId: hospitalBookingServiceId,
-                                }),
-                            })
-                        ).unwrap();
-                    } else if (hospitalBookingServiceId) {
-                        await dispatch(
-                            fetchServiceMedicalAvailableSlots({
-                                serviceMedicalId: hospitalBookingServiceId,
-                                date: formattedDate,
-                            })
-                        ).unwrap();
-                    } else if (hospitalBookingSpecialtyId && hospitalId) {
-                        // Specialty booking (hospital assigns doctor mode)
-                        await dispatch(
-                            fetchSpecialtyAvailableSlots({
-                                hospitalId,
-                                specialtyId: hospitalBookingSpecialtyId,
-                                date: formattedDate,
-                                appointmentType: hospitalBookingAppointmentType,
-                            })
-                        ).unwrap();
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to fetch available slots:', error);
-            }
+            await fetchAvailableSlotsHelper(
+                dispatch,
+                formattedDate,
+                isDoctorBooking,
+                isServiceMedicalBooking,
+                isHospitalBooking,
+                doctorId,
+                serviceMedicalId,
+                medicalServiceId,
+                hospitalBookingDoctorId,
+                hospitalBookingServiceId,
+                hospitalBookingSpecialtyId,
+                hospitalId,
+                hospitalBookingAppointmentType
+            );
         };
 
         const shouldFetchSlots = () => {
@@ -793,30 +814,21 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                             );
 
                             // Set slotChecked based on selectedSlot
-                            const allSlots = effectiveScheduleCategories.flatMap(
-                                (category) => category.timeSlots
+                            restoreSlotHelper(
+                                effectiveScheduleCategories,
+                                selectedSlot,
+                                setSlotChecked,
+                                dispatch,
+                                toggleSlotSelection
                             );
-                            const slotIndex = allSlots.findIndex(
-                                (slot) =>
-                                    slot.startTime === selectedSlot.startTime &&
-                                    slot.endTime === selectedSlot.endTime
-                            );
-
-                            if (slotIndex !== -1) {
-                                setSlotChecked([slotIndex]);
-                            }
                         } else {
-                            // Slot expired, clear Redux selection
-                            dispatch(
-                                toggleSlotSelection({
-                                    startTime: selectedSlot.startTime,
-                                    endTime: selectedSlot.endTime,
-                                    isAvailable: true,
-                                    isBlocked: false,
-                                })
+                            restoreSlotHelper(
+                                effectiveScheduleCategories,
+                                selectedSlot,
+                                setSlotChecked,
+                                dispatch,
+                                toggleSlotSelection
                             );
-                            setSlotChecked([]);
-                            toast.warning('Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.');
                         }
                     } catch (error) {
                         console.error('Failed to restore specialty held slot:', error);
@@ -852,31 +864,20 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                 );
 
                                 // Set slotChecked based on selectedSlot
-                                const allSlots = effectiveScheduleCategories.flatMap(
-                                    (category) => category.timeSlots
+                                restoreSlotHelper(
+                                    effectiveScheduleCategories,
+                                    selectedSlot,
+                                    setSlotChecked,
+                                    dispatch,
+                                    toggleSlotSelection
                                 );
-                                const slotIndex = allSlots.findIndex(
-                                    (slot) =>
-                                        slot.startTime === selectedSlot.startTime &&
-                                        slot.endTime === selectedSlot.endTime
-                                );
-
-                                if (slotIndex !== -1) {
-                                    setSlotChecked([slotIndex]);
-                                }
                             } else {
-                                // Slot expired, clear Redux selection
-                                dispatch(
-                                    toggleSlotSelection({
-                                        startTime: selectedSlot.startTime,
-                                        endTime: selectedSlot.endTime,
-                                        isAvailable: true,
-                                        isBlocked: false,
-                                    })
-                                );
-                                setSlotChecked([]);
-                                toast.warning(
-                                    'Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.'
+                                restoreSlotHelper(
+                                    effectiveScheduleCategories,
+                                    selectedSlot,
+                                    setSlotChecked,
+                                    dispatch,
+                                    toggleSlotSelection
                                 );
                             }
                         } catch (error) {
