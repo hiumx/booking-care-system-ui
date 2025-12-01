@@ -525,6 +525,59 @@ const AISupportBooking: React.FC = () => {
         return [...doctorSuggestions, ...hospitalSuggestions];
     };
 
+    // Helper function to handle AI response: sync sessionId, build suggestions & AI message
+    const handleAiResponse = (
+        response: any,
+        currentChatId: string,
+        options?: {
+            buildContent?: (response: any) => string;
+            extraMessageFields?: Partial<Message>;
+        }
+    ): string => {
+        // Update session ID from response if provided
+        if (response.data.sessionId && response.data.sessionId !== currentChatId) {
+            const oldChatId = currentChatId;
+            const newChatId = response.data.sessionId;
+
+            // Update tracking: keep new ID as newly created to prevent fetchChatMessages
+            // It will be removed from tracking when loadSessions confirms backend has it
+            if (newlyCreatedChatsRef.current.has(oldChatId)) {
+                newlyCreatedChatsRef.current.delete(oldChatId);
+            }
+            newlyCreatedChatsRef.current.add(newChatId);
+
+            // Update chatHistories: replace old chat with new ID
+            setChatHistories((prev) =>
+                prev.map((chat) => (chat.id === oldChatId ? { ...chat, id: newChatId } : chat))
+            );
+
+            // Update active chat ID
+            setActiveChatId(newChatId);
+            currentChatId = newChatId;
+        }
+
+        // Map response to suggestions
+        const suggestions = mapResponseToSuggestions(response);
+
+        // Build AI message content
+        const aiMessageContent = options?.buildContent
+            ? options.buildContent(response)
+            : (response.data.message || '').replace(/\\n/g, '\n');
+
+        const aiMessage: Message = {
+            id: Date.now().toString(),
+            content: aiMessageContent.trim(),
+            sender: 'ai',
+            timestamp: new Date(response.data.timestamp || new Date().toISOString()),
+            suggestions: suggestions.length > 0 ? suggestions : undefined,
+            ...options?.extraMessageFields,
+        };
+
+        setMessages((prev) => [...prev, aiMessage]);
+
+        return currentChatId;
+    };
+
     // Helper function to prepare conversation history
     const prepareConversationHistory = (messages: Message[]) => {
         return messages
@@ -691,54 +744,16 @@ const AISupportBooking: React.FC = () => {
 
             const response = await AIService.analyzeSymptoms(request);
 
-            // Update session ID from response if provided
-            if (response.data.sessionId && response.data.sessionId !== currentChatId) {
-                const oldChatId = currentChatId;
-                const newChatId = response.data.sessionId;
-
-                // Update tracking: keep new ID as newly created to prevent fetchChatMessages
-                // It will be removed from tracking when loadSessions confirms backend has it
-                if (newlyCreatedChatsRef.current.has(oldChatId)) {
-                    newlyCreatedChatsRef.current.delete(oldChatId);
-                }
-                newlyCreatedChatsRef.current.add(newChatId);
-
-                // Update chatHistories: replace old chat with new ID
-                setChatHistories((prev) =>
-                    prev.map((chat) => (chat.id === oldChatId ? { ...chat, id: newChatId } : chat))
-                );
-
-                // Update active chat ID
-                setActiveChatId(newChatId);
-                currentChatId = newChatId;
-
-                // Don't navigate here - let the useEffect handle URL sync
-                // This prevents triggering fetchChatMessages before backend saves the messages
-            }
-
-            // Map response to suggestions
-            const suggestions = mapResponseToSuggestions(response);
-
-            // Build AI message content
-            // Message từ backend đã bao gồm disclaimer và intro text nếu có recommendations
-            // Process message content to handle escaped newlines
-            const aiMessageContent = (response.data.message || '').replace(/\\n/g, '\n');
-
-            const aiMessage: Message = {
-                id: Date.now().toString(),
-                content: aiMessageContent.trim(),
-                sender: 'ai',
-                timestamp: new Date(response.data.timestamp || new Date().toISOString()),
-                suggestions: suggestions.length > 0 ? suggestions : undefined,
-                questionCount: response.data.questionCount,
-                currentRound: response.data.currentRound,
-                maxQuestions: response.data.maxQuestions,
-                disease: response.data.disease,
-                analysisComplete: response.data.analysisComplete,
-                canRequestMoreQuestions: response.data.canRequestMoreQuestions,
-            };
-
-            setMessages((prev) => [...prev, aiMessage]);
+            currentChatId = handleAiResponse(response, currentChatId, {
+                extraMessageFields: {
+                    questionCount: response.data.questionCount,
+                    currentRound: response.data.currentRound,
+                    maxQuestions: response.data.maxQuestions,
+                    disease: response.data.disease,
+                    analysisComplete: response.data.analysisComplete,
+                    canRequestMoreQuestions: response.data.canRequestMoreQuestions,
+                },
+            });
         } catch (error: any) {
             console.error('Error analyzing symptoms:', error);
 
@@ -900,48 +915,12 @@ const AISupportBooking: React.FC = () => {
         try {
             const response = await AIService.analyzeLabResult(file, userLocation, currentChatId);
 
-            // Update session ID from response if provided
-            if (response.data.sessionId && response.data.sessionId !== currentChatId) {
-                const oldChatId = currentChatId;
-                const newChatId = response.data.sessionId;
-
-                // Update tracking: keep new ID as newly created to prevent fetchChatMessages
-                // It will be removed from tracking when loadSessions confirms backend has it
-                if (newlyCreatedChatsRef.current.has(oldChatId)) {
-                    newlyCreatedChatsRef.current.delete(oldChatId);
-                }
-                newlyCreatedChatsRef.current.add(newChatId);
-
-                // Update chatHistories: replace old chat with new ID
-                setChatHistories((prev) =>
-                    prev.map((chat) => (chat.id === oldChatId ? { ...chat, id: newChatId } : chat))
-                );
-
-                // Update active chat ID
-                setActiveChatId(newChatId);
-                currentChatId = newChatId;
-
-                // Don't navigate here - let the useEffect handle URL sync
-                // This prevents triggering fetchChatMessages before backend saves the messages
-            }
-
-            // Map response to suggestions
-            const suggestions = mapResponseToSuggestions(response);
-
-            // Build AI message content from lab result data
-            const aiMessageContent = response.data.message
-                ? response.data.message.replace(/\\n/g, '\n')
-                : buildLabResultMessage(response.data);
-
-            const aiMessage: Message = {
-                id: Date.now().toString(),
-                content: aiMessageContent.trim(),
-                sender: 'ai',
-                timestamp: new Date(response.data.timestamp || new Date().toISOString()),
-                suggestions: suggestions.length > 0 ? suggestions : undefined,
-            };
-
-            setMessages((prev) => [...prev, aiMessage]);
+            currentChatId = handleAiResponse(response, currentChatId, {
+                buildContent: (resp) =>
+                    resp.data.message
+                        ? resp.data.message.replace(/\\n/g, '\n')
+                        : buildLabResultMessage(resp.data),
+            });
             toast.success('Đã phân tích kết quả xét nghiệm thành công');
         } catch (error: any) {
             console.error('Error analyzing lab result:', error);
@@ -1029,44 +1008,12 @@ const AISupportBooking: React.FC = () => {
         try {
             const response = await AIService.analyzeDermatology(file, userLocation, currentChatId);
 
-            // Update session ID from response if provided
-            if (response.data.sessionId && response.data.sessionId !== currentChatId) {
-                const oldChatId = currentChatId;
-                const newChatId = response.data.sessionId;
-
-                // Update tracking: keep new ID as newly created to prevent fetchChatMessages
-                if (newlyCreatedChatsRef.current.has(oldChatId)) {
-                    newlyCreatedChatsRef.current.delete(oldChatId);
-                }
-                newlyCreatedChatsRef.current.add(newChatId);
-
-                // Update chatHistories: replace old chat with new ID
-                setChatHistories((prev) =>
-                    prev.map((chat) => (chat.id === oldChatId ? { ...chat, id: newChatId } : chat))
-                );
-
-                // Update active chat ID
-                setActiveChatId(newChatId);
-                currentChatId = newChatId;
-            }
-
-            // Map response to suggestions
-            const suggestions = mapResponseToSuggestions(response);
-
-            // Build AI message content from dermatology data
-            const aiMessageContent = response.data.message
-                ? response.data.message.replace(/\\n/g, '\n')
-                : buildDermatologyMessage(response.data);
-
-            const aiMessage: Message = {
-                id: Date.now().toString(),
-                content: aiMessageContent.trim(),
-                sender: 'ai',
-                timestamp: new Date(response.data.timestamp || new Date().toISOString()),
-                suggestions: suggestions.length > 0 ? suggestions : undefined,
-            };
-
-            setMessages((prev) => [...prev, aiMessage]);
+            currentChatId = handleAiResponse(response, currentChatId, {
+                buildContent: (resp) =>
+                    resp.data.message
+                        ? resp.data.message.replace(/\\n/g, '\n')
+                        : buildDermatologyMessage(resp.data),
+            });
             toast.success('Đã phân tích ảnh da thành công');
         } catch (error: any) {
             console.error('Error analyzing dermatology image:', error);
