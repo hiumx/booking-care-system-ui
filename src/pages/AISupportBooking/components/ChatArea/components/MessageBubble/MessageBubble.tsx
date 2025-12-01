@@ -392,48 +392,60 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                         )}
 
                     {/* Disease Conclusion */}
-                    {!isUser && message.disease && message.analysisComplete && (
-                        <div className={styles.diseaseConclusion}>
-                            <div className={styles.conclusionHeader}>
-                                <h4>Kết luận</h4>
-                            </div>
-                            <div className={styles.conclusionBody}>
-                                <div className={styles.diseaseName}>
-                                    <strong>{message.disease.name}</strong>
-                                </div>
-                                <div className={styles.confidence}>
-                                    <span className={styles.confidenceLabel}>Độ tin cậy:</span>
-                                    <div className={styles.confidenceBar}>
-                                        <div
-                                            className={styles.confidenceFill}
-                                            style={{
-                                                width: `${message.disease.confidence * 100}%`,
-                                                backgroundColor:
-                                                    message.disease.confidence >= 0.7
-                                                        ? '#10b981'
-                                                        : message.disease.confidence >= 0.5
-                                                          ? '#f59e0b'
-                                                          : '#ef4444',
-                                            }}
-                                        />
+                    {!isUser &&
+                        message.disease &&
+                        message.analysisComplete &&
+                        (() => {
+                            const confidence = message.disease.confidence;
+                            let confidenceColor = '#ef4444';
+
+                            if (confidence >= 0.7) {
+                                confidenceColor = '#10b981';
+                            } else if (confidence >= 0.5) {
+                                confidenceColor = '#f59e0b';
+                            }
+
+                            return (
+                                <div className={styles.diseaseConclusion}>
+                                    <div className={styles.conclusionHeader}>
+                                        <h4>Kết luận</h4>
                                     </div>
-                                    <span className={styles.confidenceValue}>
-                                        {(message.disease.confidence * 100).toFixed(0)}%
-                                    </span>
-                                </div>
-                                {message.disease.reasons && message.disease.reasons.length > 0 && (
-                                    <div className={styles.reasons}>
-                                        <strong>Lý do:</strong>
-                                        <ul>
-                                            {message.disease.reasons.map((reason, idx) => (
-                                                <li key={idx}>{reason}</li>
-                                            ))}
-                                        </ul>
+                                    <div className={styles.conclusionBody}>
+                                        <div className={styles.diseaseName}>
+                                            <strong>{message.disease.name}</strong>
+                                        </div>
+                                        <div className={styles.confidence}>
+                                            <span className={styles.confidenceLabel}>
+                                                Độ tin cậy:
+                                            </span>
+                                            <div className={styles.confidenceBar}>
+                                                <div
+                                                    className={styles.confidenceFill}
+                                                    style={{
+                                                        width: `${confidence * 100}%`,
+                                                        backgroundColor: confidenceColor,
+                                                    }}
+                                                />
+                                            </div>
+                                            <span className={styles.confidenceValue}>
+                                                {(confidence * 100).toFixed(0)}%
+                                            </span>
+                                        </div>
+                                        {message.disease.reasons &&
+                                            message.disease.reasons.length > 0 && (
+                                                <div className={styles.reasons}>
+                                                    <strong>Lý do:</strong>
+                                                    <ul>
+                                                        {message.disease.reasons.map((reason) => (
+                                                            <li key={reason}>{reason}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
                                     </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
+                                </div>
+                            );
+                        })()}
                 </div>
                 <div className={styles.footer}>
                     <span className={styles.timestamp}>{formatTime(message.timestamp)}</span>

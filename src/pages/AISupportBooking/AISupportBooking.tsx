@@ -939,7 +939,7 @@ const AISupportBooking: React.FC = () => {
                     'Mỗi cuộc trò chuyện chỉ hỗ trợ phân tích một file xét nghiệm. Vui lòng tạo cuộc trò chuyện mới để tiếp tục với file khác nhé!'
                 );
                 // Remove the user message since upload was rejected
-                setMessages(messages);
+                setMessages((prev) => prev.filter((m) => m.id !== userMessage.id));
                 setIsAITyping(false);
                 return;
             }
