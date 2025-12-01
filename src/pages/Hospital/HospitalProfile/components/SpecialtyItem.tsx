@@ -15,21 +15,8 @@ interface SpecialtyItemProps {
 export const SpecialtyItem = ({ specialty, onClick }: SpecialtyItemProps) => {
     const handleClick = () => onClick(specialty.id);
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            onClick(specialty.id);
-        }
-    };
-
     return (
-        <div
-            className={clsx('spaciality-item')}
-            onClick={handleClick}
-            style={{ cursor: 'pointer' }}
-            role="button"
-            tabIndex={0}
-            onKeyDown={handleKeyDown}
-        >
+        <button type="button" className={clsx('spaciality-item')} onClick={handleClick}>
             <div className={clsx('spaciality-img')}>
                 <img src={specialty.img} alt={specialty.name} className={styles.specialityImgEl} />
                 <span className={clsx('spaciality-icon', styles.specialityIcon)}>
@@ -40,6 +27,6 @@ export const SpecialtyItem = ({ specialty, onClick }: SpecialtyItemProps) => {
             <p className={clsx('mb-0', styles.specialityMeta)}>
                 {specialty.doctorCount || 0} Bác sĩ
             </p>
-        </div>
+        </button>
     );
 };

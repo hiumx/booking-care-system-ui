@@ -1,8 +1,12 @@
 import { useEffect } from 'react';
 
+type TimeoutRef = {
+    current: NodeJS.Timeout | null;
+};
+
 interface UsePeriodicCheckProps {
     isHeld: boolean;
-    checkIntervalRef: React.MutableRefObject<NodeJS.Timeout | null>;
+    checkIntervalRef: TimeoutRef;
     checkCallback: () => Promise<void>;
 }
 

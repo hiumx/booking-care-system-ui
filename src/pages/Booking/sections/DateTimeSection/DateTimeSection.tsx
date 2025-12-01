@@ -54,9 +54,7 @@ const restoreSlotHelper = (
         (slot) => slot.startTime === selectedSlot.startTime && slot.endTime === selectedSlot.endTime
     );
 
-    if (slotIndex !== -1) {
-        setSlotChecked([slotIndex]);
-    } else {
+    if (slotIndex === -1) {
         // Slot expired, clear Redux selection
         dispatch(
             toggleSlotSelection({
@@ -68,25 +66,44 @@ const restoreSlotHelper = (
         );
         setSlotChecked([]);
         toast.warning('Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.');
+        return;
     }
+
+    setSlotChecked([slotIndex]);
 };
 
+interface FetchAvailableSlotsParams {
+    dispatch: any;
+    formattedDate: string;
+    isDoctorBooking: boolean;
+    isServiceMedicalBooking: boolean;
+    isHospitalBooking: boolean;
+    doctorId?: string;
+    serviceMedicalId?: string;
+    medicalServiceId?: string;
+    hospitalBookingDoctorId?: string | null;
+    hospitalBookingServiceId?: string | null;
+    hospitalBookingSpecialtyId?: string | null;
+    hospitalId?: string;
+    hospitalBookingAppointmentType?: AppointmentType;
+}
+
 // Helper function to fetch available slots based on booking type
-const fetchAvailableSlotsHelper = async (
-    dispatch: any,
-    formattedDate: string,
-    isDoctorBooking: boolean,
-    isServiceMedicalBooking: boolean,
-    isHospitalBooking: boolean,
-    doctorId?: string,
-    serviceMedicalId?: string,
-    medicalServiceId?: string,
-    hospitalBookingDoctorId?: string | null,
-    hospitalBookingServiceId?: string | null,
-    hospitalBookingSpecialtyId?: string | null,
-    hospitalId?: string,
-    hospitalBookingAppointmentType?: AppointmentType
-) => {
+const fetchAvailableSlotsHelper = async ({
+    dispatch,
+    formattedDate,
+    isDoctorBooking,
+    isServiceMedicalBooking,
+    isHospitalBooking,
+    doctorId,
+    serviceMedicalId,
+    medicalServiceId,
+    hospitalBookingDoctorId,
+    hospitalBookingServiceId,
+    hospitalBookingSpecialtyId,
+    hospitalId,
+    hospitalBookingAppointmentType,
+}: FetchAvailableSlotsParams) => {
     try {
         // Direct doctor booking
         if (isDoctorBooking && doctorId) {
@@ -452,7 +469,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                 dispatch(setSelectedDate(formattedDate));
 
                 // Fetch available slots based on booking type
-                await fetchAvailableSlotsHelper(
+                await fetchAvailableSlotsHelper({
                     dispatch,
                     formattedDate,
                     isDoctorBooking,
@@ -461,12 +478,12 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                     doctorId,
                     serviceMedicalId,
                     medicalServiceId,
-                    hospitalBookingDoctorId ?? undefined,
-                    hospitalBookingServiceId ?? undefined,
-                    hospitalBookingSpecialtyId ?? undefined,
+                    hospitalBookingDoctorId: hospitalBookingDoctorId ?? undefined,
+                    hospitalBookingServiceId: hospitalBookingServiceId ?? undefined,
+                    hospitalBookingSpecialtyId: hospitalBookingSpecialtyId ?? undefined,
                     hospitalId,
-                    hospitalBookingAppointmentType
-                );
+                    hospitalBookingAppointmentType,
+                });
             }
         },
         [
@@ -683,7 +700,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             }
 
             // Fetch available slots based on booking type
-            await fetchAvailableSlotsHelper(
+            await fetchAvailableSlotsHelper({
                 dispatch,
                 formattedDate,
                 isDoctorBooking,
@@ -696,8 +713,8 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                 hospitalBookingServiceId,
                 hospitalBookingSpecialtyId,
                 hospitalId,
-                hospitalBookingAppointmentType
-            );
+                hospitalBookingAppointmentType,
+            });
         };
 
         const shouldFetchSlots = () => {

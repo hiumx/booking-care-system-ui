@@ -27,11 +27,12 @@ export const useHospitalBookingInfo = (): BookingEntityInfo => {
     )?.name;
 
     // Get selected doctor name if available
-    const selectedDoctorName = selectedDoctor
-        ? `${selectedDoctor.lastName} ${selectedDoctor.firstName}`
-        : bookingState.selectedDoctorId
-          ? 'Bác sĩ được chọn'
-          : undefined;
+    let selectedDoctorName: string | undefined;
+    if (selectedDoctor) {
+        selectedDoctorName = `${selectedDoctor.lastName} ${selectedDoctor.firstName}`;
+    } else if (bookingState.selectedDoctorId) {
+        selectedDoctorName = 'Bác sĩ được chọn';
+    }
 
     // Map hospital data from Redux to BookingEntityInfo format
     const hospitalBookingInfo: BookingEntityInfo = selectedHospital
