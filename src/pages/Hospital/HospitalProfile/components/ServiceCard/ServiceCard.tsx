@@ -6,11 +6,19 @@ import medicalImg1 from '@/assets/img/medical-img1.jpg';
 interface ServiceCardProps {
     name: string;
     img: string;
+    onClick?: () => void;
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ name, img }) => {
+const ServiceCard: React.FC<ServiceCardProps> = ({ name, img, onClick }) => {
+    const handleClick = (e: React.MouseEvent) => {
+        if (onClick) {
+            e.preventDefault();
+            onClick();
+        }
+    };
+
     return (
-        <Link to="/doctor/list" className={styles.serviceCard}>
+        <Link to="/doctor/list" className={styles.serviceCard} onClick={handleClick}>
             <div className={styles.serviceCardContent}>
                 <div className={styles.serviceImage}>
                     <img

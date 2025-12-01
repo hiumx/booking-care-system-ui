@@ -69,7 +69,9 @@ const HeroSection: React.FC<Props> = ({ hospital }) => {
     }, [isLightboxOpen]);
 
     const handleClickBookNow = () => {
-        navigate(PATHS.DOCTOR.ROOT);
+        if (hospital?.id) {
+            navigate(PATHS.BOOKING.HOSPITAL.replace(':hospitalId', hospital.id));
+        }
     };
 
     const handleChatWithHospital = async () => {
