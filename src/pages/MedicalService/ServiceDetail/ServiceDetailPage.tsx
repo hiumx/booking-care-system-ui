@@ -23,7 +23,6 @@ import badgeCheck from '@/assets/img/icons/badge-check.svg';
 import watchIcon from '@/assets/img/icons/watch-icon.svg';
 import thumbIcon from '@/assets/img/icons/count-02.svg';
 import buildingIcon from '@/assets/img/icons/building-icon.svg';
-import deviceMessageIcon from '@/assets/img/icons/device-message2.svg';
 import calendarIcon from '@/assets/img/icons/calendar3.svg';
 
 // Icon CSS
@@ -290,19 +289,6 @@ const ServiceDetailPage: React.FC = () => {
                                                     {totalReviews} Đánh giá
                                                 </Link>
                                             </div>
-                                            <ul className="contact-doctors">
-                                                <li>
-                                                    <Link to="/chat-doctor">
-                                                        <span>
-                                                            <img
-                                                                src={deviceMessageIcon}
-                                                                alt="Chat"
-                                                            />
-                                                        </span>
-                                                        {'Chat'}
-                                                    </Link>
-                                                </li>
-                                            </ul>
                                         </li>
                                     </ul>
                                 </div>
