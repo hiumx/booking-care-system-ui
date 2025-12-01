@@ -61,7 +61,7 @@ const EditReviewForm: React.FC<EditReviewFormProps> = ({ review, onSubmitEdit, o
         e.preventDefault();
 
         // Validate form (pass rating from useStarRating)
-        if (!validateForm(false, false, rating)) {
+        if (!validateForm(rating)) {
             return;
         }
 

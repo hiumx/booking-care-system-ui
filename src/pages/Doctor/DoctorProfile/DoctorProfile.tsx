@@ -31,7 +31,6 @@ import badgeCheck from '@/assets/img/icons/badge-check.svg';
 import watchIcon from '@/assets/img/icons/watch-icon.svg';
 import thumbIcon from '@/assets/img/icons/gmail-icon.svg';
 import genderIcon from '@/assets/img/icons/gender-icon.svg';
-import deviceMessageIcon from '@/assets/img/icons/device-message2.svg';
 import calendarIcon from '@/assets/img/icons/calendar3.svg';
 import bullseyeIcon from '@/assets/img/icons/bullseye.svg';
 
@@ -325,35 +324,6 @@ const DoctorProfile: React.FC = () => {
                                                     {totalReviews} Đánh giá
                                                 </Link>
                                             </div>
-                                            <ul className="contact-doctors">
-                                                <li>
-                                                    <Link to="/chat-doctor">
-                                                        <span>
-                                                            <img
-                                                                src={deviceMessageIcon}
-                                                                alt="Chat"
-                                                            />
-                                                        </span>{' '}
-                                                        Chat
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link to="/voice-call">
-                                                        <span className="bg-violet">
-                                                            <i className="feather-phone-forwarded"></i>
-                                                        </span>{' '}
-                                                        Audio Call
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link to="/video-call">
-                                                        <span className="bg-indigo">
-                                                            <i className="fa-solid fa-video"></i>
-                                                        </span>{' '}
-                                                        Video Call
-                                                    </Link>
-                                                </li>
-                                            </ul>
                                         </li>
                                     </ul>
                                 </div>
