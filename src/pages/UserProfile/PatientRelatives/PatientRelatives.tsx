@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import Select from 'react-select';
+import { Skeleton } from '@mui/material';
 import { PatientRelativeService } from '@/services/patientRelative.service';
 import {
     PatientRelativeResponse,
@@ -443,14 +444,41 @@ const PatientRelatives: React.FC = () => {
                     {t('patientRelatives.relatives', 'người thân')}.
                 </div>
 
-                {/* Loading state */}
+                {/* Loading state - Skeleton */}
                 {isLoading ? (
-                    <div className="text-center py-5">
-                        <div className="spinner-border text-primary" role="status">
-                            <span className="visually-hidden">
-                                {t('common:loading', 'Đang tải...')}
-                            </span>
-                        </div>
+                    <div className="row">
+                        {[1, 2, 3].map((index) => (
+                            <div key={index} className="col-md-6 col-lg-4 mb-3">
+                                <div className="card h-100">
+                                    <div className="card-body">
+                                        <div className="d-flex align-items-center mb-3">
+                                            <Skeleton variant="circular" width={50} height={50} />
+                                            <div className="ms-3 flex-grow-1">
+                                                <Skeleton variant="text" width="70%" height={24} />
+                                                <Skeleton variant="text" width="50%" height={18} />
+                                            </div>
+                                        </div>
+                                        <Skeleton variant="text" width="60%" height={18} />
+                                        <Skeleton variant="text" width="80%" height={18} />
+                                        <Skeleton variant="text" width="40%" height={18} />
+                                        <div className="d-flex gap-2 mt-3">
+                                            <Skeleton
+                                                variant="rectangular"
+                                                width={70}
+                                                height={32}
+                                                sx={{ borderRadius: 1 }}
+                                            />
+                                            <Skeleton
+                                                variant="rectangular"
+                                                width={70}
+                                                height={32}
+                                                sx={{ borderRadius: 1 }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : relatives.length === 0 ? (
                     /* Empty state */
@@ -777,7 +805,7 @@ const PatientRelatives: React.FC = () => {
                                 <div className="modal-footer">
                                     <button
                                         type="button"
-                                        className="btn btn-secondary"
+                                        className="btn btn-danger"
                                         onClick={handleCloseModal}
                                         disabled={isSubmitting}
                                     >
