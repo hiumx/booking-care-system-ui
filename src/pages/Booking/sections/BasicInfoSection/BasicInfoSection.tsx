@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import BookingSectionWrapper from '../../components/BookingSectionWrapper';
 import { mockAppointmentInfo } from '../../constants/mockData';
 import { useDoctorInfo } from '../../hooks/useDoctorInfo';
 import { useServiceMedicalInfo } from '../../hooks/useServiceMedicalInfo';
+import { useHospitalBookingInfo } from '../../hooks/useHospitalBookingInfo';
 import { useParams, Link } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import {
@@ -14,6 +15,8 @@ import {
 } from '@/store/selectors/user.selectors';
 import CustomFileInput from '@/components/CustomFileInput/CustomFileInput';
 import Input from '@/components/Input';
+import Select from '@/components/Select/Select';
+import { Skeleton } from '@mui/material';
 import {
     setBookingSymptoms,
     addAttachmentUrl,
@@ -33,15 +36,24 @@ interface BasicInfoSectionProps {
 
 const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep }) => {
     const { t } = useTranslation(['booking', 'common']);
-    const { serviceMedicalId } = useParams<{ serviceMedicalId?: string }>();
+    const { serviceMedicalId, hospitalId } = useParams<{
+        serviceMedicalId?: string;
+        hospitalId?: string;
+    }>();
 
     // Determine booking type
     const isServiceMedicalBooking = !!serviceMedicalId;
+    const isHospitalBooking = !!hospitalId;
 
     // Get entity info based on booking type (already fetched in DateTimeSection)
     const doctorInfo = useDoctorInfo();
     const serviceMedicalInfo = useServiceMedicalInfo();
-    const entityInfo = isServiceMedicalBooking ? serviceMedicalInfo : doctorInfo;
+    const hospitalBookingInfo = useHospitalBookingInfo();
+    const entityInfo = isHospitalBooking
+        ? hospitalBookingInfo
+        : isServiceMedicalBooking
+          ? serviceMedicalInfo
+          : doctorInfo;
     const dispatch = useAppDispatch();
 
     // Get user profile from Redux
@@ -121,6 +133,14 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep 
             })
         );
     };
+
+    // Transform relatives to Select items
+    const relativeSelectItems = useMemo(() => {
+        return relatives.map((relative) => ({
+            label: `${relative.fullName} (${relative.relationshipDisplay}) - ${relative.age} tuổi`,
+            value: relative.id,
+        }));
+    }, [relatives]);
 
     // Handle file selection (không upload ngay)
     const handleFileChange = (files: File[]) => {
@@ -240,10 +260,12 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep 
                                     <span className="text-danger">*</span>
                                 </label>
                                 {isLoadingRelatives ? (
-                                    <div className="d-flex align-items-center text-muted">
-                                        <span className="spinner-border spinner-border-sm me-2"></span>
-                                        {t('common:loading', 'Đang tải...')}
-                                    </div>
+                                    <Skeleton
+                                        variant="rectangular"
+                                        width="100%"
+                                        height={46}
+                                        sx={{ borderRadius: 1 }}
+                                    />
                                 ) : relatives.length === 0 ? (
                                     <div className="alert alert-warning py-2">
                                         <i className="fa fa-exclamation-triangle me-2"></i>
@@ -259,25 +281,15 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep 
                                         </Link>
                                     </div>
                                 ) : (
-                                    <select
-                                        className="form-select"
+                                    <Select
+                                        title={t(
+                                            'booking:basicInfo.selectRelativePlaceholder',
+                                            '-- Chọn người thân --'
+                                        )}
+                                        items={relativeSelectItems}
                                         value={selectedRelativeId}
-                                        onChange={(e) => handleRelativeChange(e.target.value)}
-                                        required
-                                    >
-                                        <option value="">
-                                            {t(
-                                                'booking:basicInfo.selectRelativePlaceholder',
-                                                '-- Chọn người thân --'
-                                            )}
-                                        </option>
-                                        {relatives.map((relative) => (
-                                            <option key={relative.id} value={relative.id}>
-                                                {relative.fullName} ({relative.relationshipDisplay})
-                                                - {relative.age} tuổi
-                                            </option>
-                                        ))}
-                                    </select>
+                                        onChange={handleRelativeChange}
+                                    />
                                 )}
                                 <small className="text-muted mt-1 d-block">
                                     <Link to="/user/profile?tab=relatives">

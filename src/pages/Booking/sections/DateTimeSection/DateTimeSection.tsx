@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Calendar from '@/components/Calendar';
 import SlotCategory from './components/SlotCategory';
@@ -15,6 +15,7 @@ import {
     setSelectedMedicalService,
     fetchDoctorAvailableSlots,
     fetchServiceMedicalAvailableSlots,
+    fetchSpecialtyAvailableSlots,
     toggleSlotSelection,
 } from '@/store/slices/schedule.slice';
 import {
@@ -31,11 +32,14 @@ import { getServiceWithHospitalByIdAsync } from '@/store/slices/medicalServiceSl
 import { ScheduleService } from '@/services/schedule.service';
 import { HoldSlotService } from '@/services/holdSlot.service';
 import { useHoldSlot } from '@/hooks/useHoldSlot';
+import { useSpecialtyHoldSlot } from '@/hooks/useSpecialtyHoldSlot';
 import { HoldSlotTargetType } from '@/types/holdSlot.types';
 import { createAppointmentTimeId } from '@/utils/appointment-utils';
 import { useDoctorInfo } from '../../hooks/useDoctorInfo';
 import { useServiceMedicalInfo } from '../../hooks/useServiceMedicalInfo';
+import { useHospitalBookingInfo } from '../../hooks/useHospitalBookingInfo';
 import { toast } from 'react-toastify';
+import { AppointmentType } from '@/enums/appointment.enums';
 
 interface DateTimeSectionProps {
     nextStep: () => void;
@@ -43,6 +47,7 @@ interface DateTimeSectionProps {
     doctorId?: string;
     serviceMedicalId?: string;
     medicalServiceId?: string;
+    hospitalId?: string; // For hospital booking flow
     isRescheduleMode?: boolean;
     hidePrev?: boolean;
 }
@@ -53,6 +58,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     doctorId,
     serviceMedicalId,
     medicalServiceId,
+    hospitalId,
     isRescheduleMode = false,
     hidePrev = false,
 }) => {
@@ -62,6 +68,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     // Determine booking type
     const isServiceMedicalBooking = !!serviceMedicalId;
     const isDoctorBooking = !!doctorId;
+    const isHospitalBooking = !!hospitalId;
 
     // Redux state - Schedule
     const scheduleCategories = useAppSelector(selectScheduleCategories);
@@ -75,28 +82,113 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     // Redux state - Auth
     const authState = useAppSelector((state) => state.auth);
 
+    // Get booking state for hospital booking flow
+    const bookingState = useAppSelector((state) => state.booking);
+
+    // For hospital booking: get doctorId or serviceMedicalId from booking state
+    const hospitalBookingDoctorId = isHospitalBooking ? bookingState.selectedDoctorId : null;
+    const hospitalBookingServiceId = isHospitalBooking
+        ? bookingState.selectedServiceMedicalId
+        : null;
+    const hospitalBookingSpecialtyId = isHospitalBooking ? bookingState.selectedSpecialtyId : null;
+    const hospitalBookingAppointmentType =
+        bookingState.appointmentType || AppointmentType.IN_PERSON;
+
+    // Determine if this is a specialty booking (hospital assigns doctor mode)
+    // Specialty booking: has specialtyId but NO doctorId selected
+    const isSpecialtyBooking =
+        isHospitalBooking && !!hospitalBookingSpecialtyId && !hospitalBookingDoctorId;
+
+    // Get specialty schedule data from Redux
+    const specialtyScheduleCategories = useAppSelector(
+        (state) => state.schedule.specialtyScheduleCategories
+    );
+    const specialtyScheduleInfo = useAppSelector((state) => state.schedule.specialtyScheduleInfo);
+    const isLoadingSpecialtySlots = useAppSelector(
+        (state) => state.schedule.loading.specialtySlots
+    );
+
+    // Use appropriate schedule categories based on booking type
+    const rawScheduleCategories = isSpecialtyBooking
+        ? specialtyScheduleCategories
+        : scheduleCategories;
+    const effectiveIsLoadingSlots = isSpecialtyBooking ? isLoadingSpecialtySlots : isLoadingSlots;
+
+    // Minimum hours buffer before appointment (patient needs time to prepare and travel)
+    const MIN_HOURS_BUFFER = 2;
+
+    // Filter out past time slots when selected date is today
+    // This ensures users can only book slots that are at least MIN_HOURS_BUFFER hours from now
+    const effectiveScheduleCategories = useMemo(() => {
+        if (!selectedDate) return rawScheduleCategories;
+
+        const today = new Date();
+        const selectedDateObj = new Date(selectedDate);
+
+        // Check if selected date is today
+        const isToday =
+            today.getFullYear() === selectedDateObj.getFullYear() &&
+            today.getMonth() === selectedDateObj.getMonth() &&
+            today.getDate() === selectedDateObj.getDate();
+
+        // If not today, return all slots
+        if (!isToday) return rawScheduleCategories;
+
+        // Calculate minimum allowed time (current time + buffer)
+        const minAllowedTime = new Date(today.getTime() + MIN_HOURS_BUFFER * 60 * 60 * 1000);
+        const minHours = minAllowedTime.getHours();
+        const minMinutes = minAllowedTime.getMinutes();
+
+        // Filter slots that start after minimum allowed time
+        return rawScheduleCategories
+            .map((category) => ({
+                ...category,
+                timeSlots: category.timeSlots.filter((slot) => {
+                    // Parse slot start time (format: "HH:mm")
+                    const [slotHours, slotMinutes] = slot.startTime.split(':').map(Number);
+
+                    // Compare with minimum allowed time
+                    if (slotHours > minHours) return true;
+                    if (slotHours === minHours && slotMinutes >= minMinutes) return true;
+                    return false;
+                }),
+            }))
+            .filter((category) => category.timeSlots.length > 0); // Remove empty categories
+    }, [rawScheduleCategories, selectedDate]);
+
     // Get info using custom hooks based on booking type
     const doctorInfo = useDoctorInfo();
     const serviceMedicalInfo = useServiceMedicalInfo();
+    const hospitalBookingInfo = useHospitalBookingInfo();
 
     // Use appropriate info based on booking type
-    const bookingInfo = isServiceMedicalBooking ? serviceMedicalInfo : doctorInfo;
+    const bookingInfo = isHospitalBooking
+        ? hospitalBookingInfo
+        : isServiceMedicalBooking
+          ? serviceMedicalInfo
+          : doctorInfo;
 
     // Determine target ID and type for hold slot
-    const holdSlotTargetId = isDoctorBooking ? doctorId : serviceMedicalId;
-    const holdSlotTargetType = isDoctorBooking
+    // For hospital booking: use selected doctor or service from booking state
+    const effectiveDoctorId = isDoctorBooking ? doctorId : hospitalBookingDoctorId;
+    const effectiveServiceId = isServiceMedicalBooking
+        ? serviceMedicalId
+        : hospitalBookingServiceId;
+
+    const holdSlotTargetId = effectiveDoctorId || effectiveServiceId || undefined;
+    const holdSlotTargetType = effectiveDoctorId
         ? HoldSlotTargetType.Doctor
         : HoldSlotTargetType.ServiceMedical;
 
-    // Hold slot hook
+    // Hold slot hook for doctor/service booking
     const {
-        isHeld,
-        remainingSeconds,
-        isLoading: isHoldingSlot,
-        currentHeldSlot,
-        holdSlot,
-        releaseSlot,
-        restoreHeldSlot,
+        isHeld: isDoctorServiceHeld,
+        remainingSeconds: doctorServiceRemainingSeconds,
+        isLoading: isDoctorServiceHoldingSlot,
+        currentHeldSlot: doctorServiceCurrentHeldSlot,
+        holdSlot: holdDoctorServiceSlot,
+        releaseSlot: releaseDoctorServiceSlot,
+        restoreHeldSlot: restoreDoctorServiceHeldSlot,
     } = useHoldSlot({
         targetId: holdSlotTargetId,
         targetType: holdSlotTargetType,
@@ -124,6 +216,54 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             toast.warning('Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.');
         },
     });
+
+    // Hold slot hook for specialty booking (hospital assigns doctor mode)
+    const {
+        isHeld: isSpecialtyHeld,
+        remainingSeconds: specialtyRemainingSeconds,
+        isLoading: isSpecialtyHoldingSlot,
+        currentHeldSlot: specialtyCurrentHeldSlot,
+        holdSlot: holdSpecialtySlot,
+        releaseSlot: releaseSpecialtySlot,
+        restoreHeldSlot: restoreSpecialtyHeldSlot,
+    } = useSpecialtyHoldSlot({
+        hospitalId: hospitalId,
+        specialtyId: hospitalBookingSpecialtyId || undefined,
+        date: selectedDate || undefined,
+        onSlotExpired: () => {
+            // CRITICAL: Clear local state FIRST to prevent restore
+            setSlotChecked([]);
+
+            // Reset restore flag to allow restore on next mount
+            hasRestoredRef.current = false;
+
+            // Clear Redux selection to prevent restore loop
+            if (selectedSlots.length > 0) {
+                const expiredSlot = selectedSlots[0];
+                dispatch(
+                    toggleSlotSelection({
+                        startTime: expiredSlot.startTime,
+                        endTime: expiredSlot.endTime,
+                        isAvailable: true,
+                        isBlocked: false,
+                    })
+                );
+            }
+
+            toast.warning('Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.');
+        },
+    });
+
+    // Use appropriate hold slot state based on booking type
+    const isHeld = isSpecialtyBooking ? isSpecialtyHeld : isDoctorServiceHeld;
+    const remainingSeconds = isSpecialtyBooking
+        ? specialtyRemainingSeconds
+        : doctorServiceRemainingSeconds;
+    const isHoldingSlot = isSpecialtyBooking ? isSpecialtyHoldingSlot : isDoctorServiceHoldingSlot;
+    const releaseSlot = isSpecialtyBooking ? releaseSpecialtySlot : releaseDoctorServiceSlot;
+
+    // Note: holdSlot and restoreHeldSlot have different signatures for specialty vs doctor/service
+    // We'll handle them separately in the click handler and restore logic
 
     // Local state
     const [date, setDate] = useState<Date | null>(() => {
@@ -169,6 +309,36 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         }
     }, [serviceMedicalId, selectedMedicalServiceId, dispatch, isServiceMedicalBooking]);
 
+    // Auto-fetch specialty available slots on mount (for "hospital assigns doctor" mode)
+    // This ensures slots are loaded for today's date when entering the step
+    useEffect(() => {
+        if (isSpecialtyBooking && hospitalId && hospitalBookingSpecialtyId && date) {
+            const formattedDate = ScheduleService.formatDateForApi(date);
+
+            // Only update Redux date if it actually changed (to avoid clearing selectedSlots)
+            if (formattedDate !== selectedDate) {
+                dispatch(setSelectedDate(formattedDate));
+            }
+
+            // Fetch specialty available slots
+            dispatch(
+                fetchSpecialtyAvailableSlots({
+                    hospitalId,
+                    specialtyId: hospitalBookingSpecialtyId,
+                    date: formattedDate,
+                    appointmentType: hospitalBookingAppointmentType,
+                })
+            );
+        }
+    }, [
+        isSpecialtyBooking,
+        hospitalId,
+        hospitalBookingSpecialtyId,
+        hospitalBookingAppointmentType,
+        selectedDate,
+        dispatch,
+    ]); // Note: 'date' is intentionally excluded to only run on mount/booking type change
+
     // Handle date change and fetch available slots
     const handleDateChange = useCallback(
         async (newDate: Date | null) => {
@@ -182,8 +352,8 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
                 // Fetch available slots based on booking type
                 try {
+                    // Direct doctor booking
                     if (isDoctorBooking && doctorId) {
-                        // Fetch doctor's available slots
                         await dispatch(
                             fetchDoctorAvailableSlots({
                                 doctorId,
@@ -191,14 +361,48 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                 ...(medicalServiceId && { medicalServiceId }),
                             })
                         ).unwrap();
-                    } else if (isServiceMedicalBooking && serviceMedicalId) {
-                        // Fetch service medical's available slots
+                    }
+                    // Direct service medical booking
+                    else if (isServiceMedicalBooking && serviceMedicalId) {
                         await dispatch(
                             fetchServiceMedicalAvailableSlots({
                                 serviceMedicalId,
                                 date: formattedDate,
                             })
                         ).unwrap();
+                    }
+                    // Hospital booking flow - fetch based on selected doctor, service, or specialty
+                    else if (isHospitalBooking) {
+                        if (hospitalBookingDoctorId) {
+                            // Hospital booking with selected doctor
+                            await dispatch(
+                                fetchDoctorAvailableSlots({
+                                    doctorId: hospitalBookingDoctorId,
+                                    date: formattedDate,
+                                    ...(hospitalBookingServiceId && {
+                                        medicalServiceId: hospitalBookingServiceId,
+                                    }),
+                                })
+                            ).unwrap();
+                        } else if (hospitalBookingServiceId) {
+                            // Hospital booking with selected service (no specific doctor)
+                            await dispatch(
+                                fetchServiceMedicalAvailableSlots({
+                                    serviceMedicalId: hospitalBookingServiceId,
+                                    date: formattedDate,
+                                })
+                            ).unwrap();
+                        } else if (hospitalBookingSpecialtyId && hospitalId) {
+                            // Specialty booking (hospital assigns doctor mode)
+                            await dispatch(
+                                fetchSpecialtyAvailableSlots({
+                                    hospitalId,
+                                    specialtyId: hospitalBookingSpecialtyId,
+                                    date: formattedDate,
+                                    appointmentType: hospitalBookingAppointmentType,
+                                })
+                            ).unwrap();
+                        }
                     }
                 } catch (error) {
                     console.error('Failed to fetch available slots:', error);
@@ -212,6 +416,12 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             dispatch,
             isDoctorBooking,
             isServiceMedicalBooking,
+            isHospitalBooking,
+            hospitalBookingDoctorId,
+            hospitalBookingServiceId,
+            hospitalBookingSpecialtyId,
+            hospitalId,
+            hospitalBookingAppointmentType,
         ]
     );
 
@@ -226,8 +436,9 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
             // Find the corresponding slot data
             // Create a flat array with correct globalIndex for each slot
+            // Use effectiveScheduleCategories to support both doctor/service and specialty booking
             let globalIdx = 0;
-            const allSlots = scheduleCategories.flatMap((category, catIdx) =>
+            const allSlots = effectiveScheduleCategories.flatMap((category, catIdx) =>
                 category.timeSlots.map((slot, slotIdx) => {
                     const slotData = {
                         ...slot,
@@ -246,7 +457,13 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                 ? !!doctorId
                 : isServiceMedicalBooking
                   ? !!serviceMedicalId
-                  : false;
+                  : isHospitalBooking
+                    ? !!(
+                          hospitalBookingDoctorId ||
+                          hospitalBookingServiceId ||
+                          hospitalBookingSpecialtyId
+                      )
+                    : false;
 
             if (!selectedSlotData || !hasValidBookingTarget || !selectedDate) {
                 toast.error('Không thể chọn khung giờ này');
@@ -285,16 +502,40 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             });
 
             // Hold slot based on booking type
-            const holdTargetId = isDoctorBooking ? doctorId! : serviceMedicalId!;
-            const holdTargetType = isDoctorBooking
-                ? HoldSlotTargetType.Doctor
-                : HoldSlotTargetType.ServiceMedical;
-            const result = await holdSlot(
-                holdTargetId,
-                holdTargetType,
-                selectedDate,
-                appointmentTimeId
-            );
+            let result = false;
+
+            if (isSpecialtyBooking && hospitalId && hospitalBookingSpecialtyId) {
+                // Specialty booking (hospital assigns doctor mode)
+                // Get maxCapacity from specialty schedule info
+                const maxCapacity =
+                    specialtyScheduleInfo?.availableSlots?.find(
+                        (s) => s.startTime === selectedSlotData.startTime
+                    )?.availableDoctorCount || 1;
+
+                result = await holdSpecialtySlot(
+                    hospitalId,
+                    hospitalBookingSpecialtyId,
+                    selectedDate,
+                    appointmentTimeId,
+                    maxCapacity
+                );
+            } else {
+                // Doctor or service booking
+                const holdTargetId = effectiveDoctorId || effectiveServiceId;
+                if (!holdTargetId) {
+                    toast.error('Không thể giữ chỗ - thiếu thông tin bác sĩ hoặc dịch vụ');
+                    return;
+                }
+                const holdTargetType = effectiveDoctorId
+                    ? HoldSlotTargetType.Doctor
+                    : HoldSlotTargetType.ServiceMedical;
+                result = await holdDoctorServiceSlot(
+                    holdTargetId,
+                    holdTargetType,
+                    selectedDate,
+                    appointmentTimeId
+                );
+            }
 
             // Only update UI state if hold was successful
             if (result) {
@@ -311,7 +552,16 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             } else if (selectedDate) {
                 // Hold failed (slot already held by another user)
                 // Refresh available slots to update UI based on booking type
-                if (isDoctorBooking && doctorId) {
+                if (isSpecialtyBooking && hospitalId && hospitalBookingSpecialtyId) {
+                    dispatch(
+                        fetchSpecialtyAvailableSlots({
+                            hospitalId,
+                            specialtyId: hospitalBookingSpecialtyId,
+                            date: selectedDate,
+                            appointmentType: hospitalBookingAppointmentType,
+                        })
+                    );
+                } else if (isDoctorBooking && doctorId) {
                     dispatch(
                         fetchDoctorAvailableSlots({
                             doctorId,
@@ -331,19 +581,30 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         },
         [
             slotChecked,
-            scheduleCategories,
+            effectiveScheduleCategories,
             dispatch,
             doctorId,
             serviceMedicalId,
             selectedDate,
             medicalServiceId,
             isHoldingSlot,
-            holdSlot,
+            holdDoctorServiceSlot,
+            holdSpecialtySlot,
             releaseSlot,
             authState.isAuthenticated,
             navigate,
             isDoctorBooking,
             isServiceMedicalBooking,
+            isHospitalBooking,
+            isSpecialtyBooking,
+            hospitalId,
+            hospitalBookingDoctorId,
+            hospitalBookingServiceId,
+            hospitalBookingSpecialtyId,
+            hospitalBookingAppointmentType,
+            effectiveDoctorId,
+            effectiveServiceId,
+            specialtyScheduleInfo,
         ]
     );
 
@@ -363,8 +624,8 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
             // Fetch available slots based on booking type
             try {
+                // Direct doctor booking
                 if (isDoctorBooking && doctorId) {
-                    // Fetch doctor's available slots
                     await dispatch(
                         fetchDoctorAvailableSlots({
                             doctorId,
@@ -372,8 +633,9 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                             ...(medicalServiceId && { medicalServiceId }),
                         })
                     ).unwrap();
-                } else if (isServiceMedicalBooking && serviceMedicalId) {
-                    // Fetch service medical's available slots
+                }
+                // Direct service medical booking
+                else if (isServiceMedicalBooking && serviceMedicalId) {
                     await dispatch(
                         fetchServiceMedicalAvailableSlots({
                             serviceMedicalId,
@@ -381,14 +643,57 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                         })
                     ).unwrap();
                 }
+                // Hospital booking flow
+                else if (isHospitalBooking) {
+                    if (hospitalBookingDoctorId) {
+                        await dispatch(
+                            fetchDoctorAvailableSlots({
+                                doctorId: hospitalBookingDoctorId,
+                                date: formattedDate,
+                                ...(hospitalBookingServiceId && {
+                                    medicalServiceId: hospitalBookingServiceId,
+                                }),
+                            })
+                        ).unwrap();
+                    } else if (hospitalBookingServiceId) {
+                        await dispatch(
+                            fetchServiceMedicalAvailableSlots({
+                                serviceMedicalId: hospitalBookingServiceId,
+                                date: formattedDate,
+                            })
+                        ).unwrap();
+                    } else if (hospitalBookingSpecialtyId && hospitalId) {
+                        // Specialty booking (hospital assigns doctor mode)
+                        await dispatch(
+                            fetchSpecialtyAvailableSlots({
+                                hospitalId,
+                                specialtyId: hospitalBookingSpecialtyId,
+                                date: formattedDate,
+                                appointmentType: hospitalBookingAppointmentType,
+                            })
+                        ).unwrap();
+                    }
+                }
             } catch (error) {
                 console.error('Failed to fetch available slots:', error);
             }
         };
 
         const shouldFetchSlots = () => {
-            // Don't fetch if not a valid booking type
-            if (!isDoctorBooking && !isServiceMedicalBooking) return false;
+            // Check if we have a valid booking target
+            const hasValidTarget = isDoctorBooking
+                ? !!doctorId
+                : isServiceMedicalBooking
+                  ? !!serviceMedicalId
+                  : isHospitalBooking
+                    ? !!(
+                          hospitalBookingDoctorId ||
+                          hospitalBookingServiceId ||
+                          hospitalBookingSpecialtyId
+                      )
+                    : false;
+
+            if (!hasValidTarget) return false;
 
             // Don't fetch if no date available
             if (!date) return false;
@@ -419,114 +724,192 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         date,
         isDoctorBooking,
         isServiceMedicalBooking,
+        isHospitalBooking,
         selectedDate,
         doctorId,
         serviceMedicalId,
         medicalServiceId,
+        hospitalBookingDoctorId,
+        hospitalBookingServiceId,
+        hospitalBookingSpecialtyId,
+        hospitalId,
+        hospitalBookingAppointmentType,
         dispatch,
     ]);
 
     // Restore held slot state when component mounts
+    // Supports both doctor/service booking and specialty booking
     useEffect(() => {
         const checkAndRestoreHeldSlot = async () => {
             // Prevent double execution within same mount cycle
             if (hasRestoredRef.current) return;
 
-            // Determine target based on booking type
-            const restoreTargetId = isDoctorBooking ? doctorId : serviceMedicalId;
-            const restoreTargetType = isDoctorBooking
-                ? HoldSlotTargetType.Doctor
-                : HoldSlotTargetType.ServiceMedical;
-
             // Only restore if we have valid data and no active hold
-            // Note: isHeld will be false on remount, so we check backend for actual hold status
+            // Note: We don't check slotChecked here because sync effect may have set it
+            // The !isHeld and !isSpecialtyHeld conditions below handle the "already holding" case
             if (
-                restoreTargetId &&
                 selectedDate &&
                 selectedSlots.length > 0 &&
-                !isHeld &&
-                scheduleCategories.length > 0
+                effectiveScheduleCategories.length > 0
             ) {
-                hasRestoredRef.current = true; // Mark as executed
-
-                // User has selected slot but countdown is not running
-                // Try to get remaining time from backend
                 const selectedSlot = selectedSlots[0];
                 const appointmentTimeId = createAppointmentTimeId({
                     startTime: selectedSlot.startTime,
                     endTime: selectedSlot.endTime,
                 });
 
-                try {
-                    const remainingTime = await HoldSlotService.getRemainingTime(
-                        restoreTargetId,
-                        restoreTargetType,
-                        selectedDate,
-                        appointmentTimeId
-                    );
+                // Handle specialty booking restore
+                if (
+                    isSpecialtyBooking &&
+                    hospitalId &&
+                    hospitalBookingSpecialtyId &&
+                    !isSpecialtyHeld
+                ) {
+                    hasRestoredRef.current = true;
 
-                    if (remainingTime > 0) {
-                        // Slot is still held, restore countdown timer without calling API again
-                        restoreHeldSlot(
-                            restoreTargetId,
-                            restoreTargetType,
+                    try {
+                        const remainingTime = await HoldSlotService.getSpecialtyRemainingTime(
+                            hospitalId,
+                            hospitalBookingSpecialtyId,
                             selectedDate,
-                            appointmentTimeId,
-                            remainingTime
+                            appointmentTimeId
                         );
 
-                        // Immediately set slotChecked based on selectedSlot (before Redux might clear it)
-                        const allSlots = scheduleCategories.flatMap(
-                            (category) => category.timeSlots
-                        );
-                        const slotIndex = allSlots.findIndex(
-                            (slot) =>
-                                slot.startTime === selectedSlot.startTime &&
-                                slot.endTime === selectedSlot.endTime
-                        );
+                        if (remainingTime > 0) {
+                            // Get maxCapacity from specialty schedule info
+                            const maxCapacity =
+                                specialtyScheduleInfo?.availableSlots?.find(
+                                    (s) => s.startTime === selectedSlot.startTime
+                                )?.availableDoctorCount || 1;
 
-                        if (slotIndex !== -1) {
-                            setSlotChecked([slotIndex]);
+                            // Restore specialty held slot
+                            restoreSpecialtyHeldSlot(
+                                hospitalId,
+                                hospitalBookingSpecialtyId,
+                                selectedDate,
+                                appointmentTimeId,
+                                maxCapacity,
+                                remainingTime
+                            );
+
+                            // Set slotChecked based on selectedSlot
+                            const allSlots = effectiveScheduleCategories.flatMap(
+                                (category) => category.timeSlots
+                            );
+                            const slotIndex = allSlots.findIndex(
+                                (slot) =>
+                                    slot.startTime === selectedSlot.startTime &&
+                                    slot.endTime === selectedSlot.endTime
+                            );
+
+                            if (slotIndex !== -1) {
+                                setSlotChecked([slotIndex]);
+                            }
+                        } else {
+                            // Slot expired, clear Redux selection
+                            dispatch(
+                                toggleSlotSelection({
+                                    startTime: selectedSlot.startTime,
+                                    endTime: selectedSlot.endTime,
+                                    isAvailable: true,
+                                    isBlocked: false,
+                                })
+                            );
+                            setSlotChecked([]);
+                            toast.warning('Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.');
                         }
-                    } else {
-                        // Slot expired, clear Redux selection to prevent infinite loop
-                        dispatch(
-                            toggleSlotSelection({
-                                startTime: selectedSlot.startTime,
-                                endTime: selectedSlot.endTime,
-                                isAvailable: true,
-                                isBlocked: false,
-                            })
-                        );
-                        setSlotChecked([]);
-                        toast.warning('Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.');
+                    } catch (error) {
+                        console.error('Failed to restore specialty held slot:', error);
+                        hasRestoredRef.current = false;
                     }
-                } catch (error) {
-                    console.error('Failed to restore held slot:', error);
-                    hasRestoredRef.current = false; // Reset on error
+                }
+                // Handle doctor/service booking restore
+                else if (!isSpecialtyBooking && !isHeld) {
+                    const restoreTargetId = effectiveDoctorId || effectiveServiceId;
+                    const restoreTargetType = effectiveDoctorId
+                        ? HoldSlotTargetType.Doctor
+                        : HoldSlotTargetType.ServiceMedical;
+
+                    if (restoreTargetId) {
+                        hasRestoredRef.current = true;
+
+                        try {
+                            const remainingTime = await HoldSlotService.getRemainingTime(
+                                restoreTargetId,
+                                restoreTargetType,
+                                selectedDate,
+                                appointmentTimeId
+                            );
+
+                            if (remainingTime > 0) {
+                                // Slot is still held, restore countdown timer
+                                restoreDoctorServiceHeldSlot(
+                                    restoreTargetId,
+                                    restoreTargetType,
+                                    selectedDate,
+                                    appointmentTimeId,
+                                    remainingTime
+                                );
+
+                                // Set slotChecked based on selectedSlot
+                                const allSlots = effectiveScheduleCategories.flatMap(
+                                    (category) => category.timeSlots
+                                );
+                                const slotIndex = allSlots.findIndex(
+                                    (slot) =>
+                                        slot.startTime === selectedSlot.startTime &&
+                                        slot.endTime === selectedSlot.endTime
+                                );
+
+                                if (slotIndex !== -1) {
+                                    setSlotChecked([slotIndex]);
+                                }
+                            } else {
+                                // Slot expired, clear Redux selection
+                                dispatch(
+                                    toggleSlotSelection({
+                                        startTime: selectedSlot.startTime,
+                                        endTime: selectedSlot.endTime,
+                                        isAvailable: true,
+                                        isBlocked: false,
+                                    })
+                                );
+                                setSlotChecked([]);
+                                toast.warning(
+                                    'Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.'
+                                );
+                            }
+                        } catch (error) {
+                            console.error('Failed to restore held slot:', error);
+                            hasRestoredRef.current = false;
+                        }
+                    }
                 }
             }
         };
 
         checkAndRestoreHeldSlot();
     }, [
-        doctorId,
-        serviceMedicalId,
-        isDoctorBooking,
+        effectiveDoctorId,
+        effectiveServiceId,
         selectedDate,
         selectedSlots,
         isHeld,
-        scheduleCategories,
-        // Note: Intentionally excluding slotChecked to prevent infinite loops
-        // restoreHeldSlot is stable from useCallback
-        restoreHeldSlot,
+        isSpecialtyHeld,
+        isSpecialtyBooking,
+        effectiveScheduleCategories,
+        hospitalId,
+        hospitalBookingSpecialtyId,
+        specialtyScheduleInfo,
+        restoreDoctorServiceHeldSlot,
+        restoreSpecialtyHeldSlot,
         dispatch,
     ]);
 
     // Sync local slotChecked state with Redux selectedSlots for UI highlighting
     useEffect(() => {
-        if (selectedSlots.length > 0 && scheduleCategories.length > 0) {
-            const allSlots = scheduleCategories.flatMap((category) => category.timeSlots);
+        if (selectedSlots.length > 0 && effectiveScheduleCategories.length > 0) {
+            const allSlots = effectiveScheduleCategories.flatMap((category) => category.timeSlots);
 
             const checkedIndices = selectedSlots
                 .map((selectedSlot) =>
@@ -542,7 +925,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         } else {
             setSlotChecked([]);
         }
-    }, [selectedSlots, scheduleCategories]);
+    }, [selectedSlots, effectiveScheduleCategories]);
 
     // Note: We DON'T release held slots on unmount anymore
     // This allows users to navigate back and forth between steps
@@ -550,27 +933,43 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
     // Release held slots when target or date changes
     useEffect(() => {
-        if (isHeld && currentHeldSlot) {
-            // Determine current target based on booking type
-            const currentTargetId = isDoctorBooking ? doctorId : serviceMedicalId;
+        // For doctor/service booking
+        if (!isSpecialtyBooking && isDoctorServiceHeld && doctorServiceCurrentHeldSlot) {
+            // Determine current target based on booking type (including hospital booking)
+            const currentTargetId = effectiveDoctorId || effectiveServiceId;
 
             // If target or date changed, release current held slot
-            const isDifferentTarget = currentHeldSlot.targetId !== currentTargetId;
-            const isDifferentDate = currentHeldSlot.date !== selectedDate;
+            const isDifferentTarget =
+                currentTargetId && doctorServiceCurrentHeldSlot.targetId !== currentTargetId;
+            const isDifferentDate = doctorServiceCurrentHeldSlot.date !== selectedDate;
 
             if (isDifferentTarget || isDifferentDate) {
-                releaseSlot().catch(console.error);
+                releaseDoctorServiceSlot().catch(console.error);
+                setSlotChecked([]);
+            }
+        }
+
+        // For specialty booking
+        if (isSpecialtyBooking && isSpecialtyHeld && specialtyCurrentHeldSlot) {
+            // If date changed, release current held slot
+            const isDifferentDate = specialtyCurrentHeldSlot.date !== selectedDate;
+
+            if (isDifferentDate) {
+                releaseSpecialtySlot().catch(console.error);
                 setSlotChecked([]);
             }
         }
     }, [
-        doctorId,
-        serviceMedicalId,
-        isDoctorBooking,
+        effectiveDoctorId,
+        effectiveServiceId,
         selectedDate,
-        isHeld,
-        currentHeldSlot,
-        releaseSlot,
+        isSpecialtyBooking,
+        isDoctorServiceHeld,
+        doctorServiceCurrentHeldSlot,
+        releaseDoctorServiceSlot,
+        isSpecialtyHeld,
+        specialtyCurrentHeldSlot,
+        releaseSpecialtySlot,
     ]);
 
     return (
@@ -591,6 +990,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                 <Calendar
                                     value={date}
                                     onChange={handleDateChange}
+                                    minDate={new Date()}
                                     usePopper={false}
                                     styles={{ width: '100%' }}
                                 />
@@ -617,7 +1017,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                 className={clsx(styles.slotContainer, 'card booking-wizard-slots')}
                             >
                                 <div className={clsx(styles.timeSlot, 'card-body')}>
-                                    {isLoadingSlots && (
+                                    {effectiveIsLoadingSlots && (
                                         <div
                                             className={clsx(
                                                 styles.loadingContainer,
@@ -638,9 +1038,9 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                         </div>
                                     )}
 
-                                    {!isLoadingSlots &&
+                                    {!effectiveIsLoadingSlots &&
                                         !scheduleError &&
-                                        scheduleCategories.length === 0 &&
+                                        effectiveScheduleCategories.length === 0 &&
                                         selectedDate && (
                                             <div
                                                 className={clsx(
@@ -658,56 +1058,63 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                             </div>
                                         )}
 
-                                    {!isLoadingSlots &&
+                                    {!effectiveIsLoadingSlots &&
                                         !scheduleError &&
-                                        scheduleCategories.length > 0 && (
+                                        effectiveScheduleCategories.length > 0 && (
                                             <>
-                                                {scheduleCategories.map((category, categoryIdx) => {
-                                                    // Calculate checked slot IDs for this category
-                                                    const categoryStartIndex = scheduleCategories
-                                                        .slice(0, categoryIdx)
-                                                        .reduce(
-                                                            (acc, cat) =>
-                                                                acc + cat.timeSlots.length,
-                                                            0
-                                                        );
+                                                {effectiveScheduleCategories.map(
+                                                    (category, categoryIdx) => {
+                                                        // Calculate checked slot IDs for this category
+                                                        const categoryStartIndex =
+                                                            effectiveScheduleCategories
+                                                                .slice(0, categoryIdx)
+                                                                .reduce(
+                                                                    (acc, cat) =>
+                                                                        acc + cat.timeSlots.length,
+                                                                    0
+                                                                );
 
-                                                    const checkedSlotIds = slotChecked
-                                                        .filter(
-                                                            (checkedIdx) =>
-                                                                checkedIdx >= categoryStartIndex &&
-                                                                checkedIdx <
+                                                        const checkedSlotIds = slotChecked
+                                                            .filter(
+                                                                (checkedIdx) =>
+                                                                    checkedIdx >=
+                                                                        categoryStartIndex &&
+                                                                    checkedIdx <
+                                                                        categoryStartIndex +
+                                                                            category.timeSlots
+                                                                                .length
+                                                            )
+                                                            .map(
+                                                                (checkedIdx) =>
+                                                                    checkedIdx -
                                                                     categoryStartIndex +
-                                                                        category.timeSlots.length
-                                                        )
-                                                        .map(
-                                                            (checkedIdx) =>
-                                                                checkedIdx - categoryStartIndex + 1
-                                                        );
+                                                                    1
+                                                            );
 
-                                                    return (
-                                                        <SlotCategory
-                                                            key={category.title}
-                                                            title={category.title}
-                                                            timeSlots={category.timeSlots.map(
-                                                                (slot, slotIdx) => ({
-                                                                    id: slotIdx + 1, // 1-based ID for display
-                                                                    time: `${slot.startTime} - ${slot.endTime}`,
-                                                                })
-                                                            )}
-                                                            handleClickSlot={(slotId) => {
-                                                                // slotId is 1-based, convert to global 0-based index
-                                                                // slotId - 1 converts to 0-based index within category
-                                                                // categoryStartIndex is the global offset
-                                                                const globalIndex =
-                                                                    categoryStartIndex +
-                                                                    (slotId - 1);
-                                                                handleClickSlot(globalIndex);
-                                                            }}
-                                                            checkedSlots={checkedSlotIds}
-                                                        />
-                                                    );
-                                                })}
+                                                        return (
+                                                            <SlotCategory
+                                                                key={category.title}
+                                                                title={category.title}
+                                                                timeSlots={category.timeSlots.map(
+                                                                    (slot, slotIdx) => ({
+                                                                        id: slotIdx + 1, // 1-based ID for display
+                                                                        time: `${slot.startTime} - ${slot.endTime}`,
+                                                                    })
+                                                                )}
+                                                                handleClickSlot={(slotId) => {
+                                                                    // slotId is 1-based, convert to global 0-based index
+                                                                    // slotId - 1 converts to 0-based index within category
+                                                                    // categoryStartIndex is the global offset
+                                                                    const globalIndex =
+                                                                        categoryStartIndex +
+                                                                        (slotId - 1);
+                                                                    handleClickSlot(globalIndex);
+                                                                }}
+                                                                checkedSlots={checkedSlotIds}
+                                                            />
+                                                        );
+                                                    }
+                                                )}
                                             </>
                                         )}
 

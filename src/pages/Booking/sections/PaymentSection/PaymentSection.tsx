@@ -3,6 +3,7 @@ import BookingSectionWrapper from '../../components/BookingSectionWrapper';
 import { mockAppointmentInfo } from '../../constants/mockData';
 import { useDoctorInfo } from '../../hooks';
 import { useServiceMedicalInfo } from '../../hooks/useServiceMedicalInfo';
+import { useHospitalBookingInfo } from '../../hooks/useHospitalBookingInfo';
 import { useAppSelector } from '@/store/hooks';
 import { useParams } from 'react-router-dom';
 import { selectSelectedDate, selectSelectedSlots } from '@/store/selectors/schedule.selectors';
@@ -38,15 +39,24 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     rescheduleAppointmentDate,
     rescheduleAppointmentTimeId,
 }) => {
-    const { serviceMedicalId } = useParams<{ serviceMedicalId?: string }>();
+    const { serviceMedicalId, hospitalId } = useParams<{
+        serviceMedicalId?: string;
+        hospitalId?: string;
+    }>();
 
     // Determine booking type
     const isServiceMedicalBooking = !!serviceMedicalId;
+    const isHospitalBooking = !!hospitalId;
 
     // Get entity info based on booking type (already fetched in DateTimeSection)
     const doctorInfo = useDoctorInfo();
     const serviceMedicalInfo = useServiceMedicalInfo();
-    const entityInfo = isServiceMedicalBooking ? serviceMedicalInfo : doctorInfo;
+    const hospitalBookingInfo = useHospitalBookingInfo();
+    const entityInfo = isHospitalBooking
+        ? hospitalBookingInfo
+        : isServiceMedicalBooking
+          ? serviceMedicalInfo
+          : doctorInfo;
 
     // Get selected date and time slots (or use reschedule values if provided)
     const selectedDateFromRedux = useAppSelector(selectSelectedDate);
@@ -80,6 +90,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(true);
 
     // Payment option state (new business requirement)
+    // For specialty booking, default to 'no-payment' since there's no price yet
     const [paymentOption, setPaymentOption] = useState<'deposit' | 'no-payment'>('deposit');
 
     // Fetch payment methods on component mount
@@ -113,21 +124,70 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     const serviceMedicalState = useAppSelector(
         (state) => state.medicalService.serviceCategories.selectedServiceWithHospital
     );
+    const hospitalState = useAppSelector((state) => state.hospital);
+
+    // Determine if this is a specialty booking (hospital assigns doctor mode)
+    // Specialty booking: has specialtyId but NO doctorId and NO serviceId selected
+    const isSpecialtyBooking =
+        isHospitalBooking &&
+        !!bookingState.selectedSpecialtyId &&
+        !bookingState.selectedDoctorId &&
+        !bookingState.selectedServiceMedicalId;
+
+    // Auto-select 'no-payment' for specialty booking (no price available yet)
+    useEffect(() => {
+        if (isSpecialtyBooking) {
+            setPaymentOption('no-payment');
+        }
+    }, [isSpecialtyBooking]);
 
     // Helper function to get consultation fee based on appointment type
     const getConsultationFee = (): number => {
+        // Hospital booking flow
+        if (isHospitalBooking) {
+            const appointmentType = bookingState.appointmentType || AppointmentType.IN_PERSON;
+            const serviceTypeName =
+                appointmentType === AppointmentType.IN_PERSON
+                    ? 'Khám trực tiếp'
+                    : 'Tư vấn trực tuyến';
+
+            // If doctor is selected, get price from doctor
+            if (bookingState.selectedDoctorId && doctorState.selectedDoctor?.prices) {
+                const price = doctorState.selectedDoctor.prices.find(
+                    (p) => p.serviceTypeName === serviceTypeName
+                );
+                return price?.amount || 0;
+            }
+
+            // If service is selected (no doctor), get price from hospital's service
+            if (bookingState.selectedServiceMedicalId && hospitalState.selectedHospital) {
+                const service = hospitalState.selectedHospital.serviceMedicals?.find(
+                    (s) => s.id === bookingState.selectedServiceMedicalId
+                );
+                return service?.price || 0;
+            }
+
+            return 0;
+        }
+
+        // Direct doctor booking
         if (!isServiceMedicalBooking && doctorState.selectedDoctor?.prices) {
             const appointmentType = bookingState.appointmentType || AppointmentType.IN_PERSON;
             const serviceTypeName =
-                appointmentType === AppointmentType.IN_PERSON ? 'Khám trực tiếp' : 'Tư vấn online';
+                appointmentType === AppointmentType.IN_PERSON
+                    ? 'Khám trực tiếp'
+                    : 'Tư vấn trực tuyến';
             const price = doctorState.selectedDoctor.prices.find(
                 (p) => p.serviceTypeName === serviceTypeName
             );
             return price?.amount || 0;
         }
+
+        // Direct service medical booking
         if (isServiceMedicalBooking && serviceMedicalState?.price) {
             return serviceMedicalState.price;
         }
+
         return 0;
     };
 
@@ -338,8 +398,11 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
             disabled={
                 isCreatingAppointment ||
                 isProcessingPayment ||
-                !TOTAL_AMOUNT ||
-                TOTAL_AMOUNT <= 0 ||
+                // For specialty booking with no-payment, don't require TOTAL_AMOUNT
+                // For other cases, require valid price
+                (!isSpecialtyBooking &&
+                    paymentOption === 'deposit' &&
+                    (!TOTAL_AMOUNT || TOTAL_AMOUNT <= 0)) ||
                 // Only require payment method selection if deposit option is chosen
                 (paymentOption === 'deposit' && !selectedPayment)
             }
@@ -358,85 +421,109 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                     Chọn phương thức đặt lịch
                                 </h5>
 
+                                {/* Specialty booking notice */}
+                                {isSpecialtyBooking && (
+                                    <div className="alert alert-info mb-4">
+                                        <i
+                                            className="isax isax-info-circle me-2"
+                                            aria-hidden="true"
+                                        ></i>
+                                        <strong>Lưu ý:</strong> Với hình thức đặt lịch theo chuyên
+                                        khoa, bệnh viện sẽ phân công bác sĩ phù hợp cho bạn. Chi phí
+                                        khám sẽ được thông báo sau khi bác sĩ được phân công và bạn
+                                        sẽ thanh toán trực tiếp tại bệnh viện.
+                                    </div>
+                                )}
+
                                 <div className="row">
-                                    {/* Option 1: Deposit Payment with 10% Discount */}
-                                    <div className="col-md-6 mb-3">
-                                        <div
-                                            className={`payment-option-card ${paymentOption === 'deposit' ? 'active' : ''}`}
-                                            onClick={() => setPaymentOption('deposit')}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' || e.key === ' ') {
-                                                    e.preventDefault();
-                                                    setPaymentOption('deposit');
-                                                }
-                                            }}
-                                            role="button"
-                                            tabIndex={0}
-                                            aria-label="Đặt cọc và thanh toán ngay - Giảm ngay 10% tổng chi phí khi khám"
-                                            aria-pressed={paymentOption === 'deposit'}
-                                        >
-                                            <div className="payment-option-header">
-                                                <div className="form-check">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="radio"
-                                                        name="paymentOption"
-                                                        id="depositOption"
-                                                        checked={paymentOption === 'deposit'}
-                                                        onChange={() => setPaymentOption('deposit')}
-                                                    />
-                                                    <label
-                                                        className="form-check-label fw-bold"
-                                                        htmlFor="depositOption"
-                                                    >
-                                                        💳 Đặt cọc và thanh toán ngay
-                                                    </label>
-                                                </div>
-                                                <div className="discount-badge">
-                                                    <span className="badge bg-success">
-                                                        Tiết kiệm 10%
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div className="payment-option-content">
-                                                <div className="benefits-list">
-                                                    <div className="benefit-item">
-                                                        <i
-                                                            className="isax isax-tick-circle text-success me-2"
-                                                            aria-hidden="true"
-                                                        ></i>
-                                                        <span>
-                                                            Giảm ngay <strong>10%</strong> tổng chi
-                                                            phí khi khám
-                                                        </span>
+                                    {/* Option 1: Deposit Payment with 10% Discount - Hidden for specialty booking */}
+                                    {!isSpecialtyBooking && (
+                                        <div className="col-md-6 mb-3">
+                                            <div
+                                                className={`payment-option-card ${paymentOption === 'deposit' ? 'active' : ''}`}
+                                                onClick={() => setPaymentOption('deposit')}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        e.preventDefault();
+                                                        setPaymentOption('deposit');
+                                                    }
+                                                }}
+                                                role="button"
+                                                tabIndex={0}
+                                                aria-label="Đặt cọc và thanh toán ngay - Giảm ngay 10% tổng chi phí khi khám"
+                                                aria-pressed={paymentOption === 'deposit'}
+                                            >
+                                                <div className="payment-option-header">
+                                                    <div className="form-check">
+                                                        <input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            name="paymentOption"
+                                                            id="depositOption"
+                                                            checked={paymentOption === 'deposit'}
+                                                            onChange={() =>
+                                                                setPaymentOption('deposit')
+                                                            }
+                                                        />
+                                                        <label
+                                                            className="form-check-label fw-bold"
+                                                            htmlFor="depositOption"
+                                                        >
+                                                            💳 Đặt cọc và thanh toán ngay
+                                                        </label>
                                                     </div>
-                                                    <div className="benefit-item">
-                                                        <i
-                                                            className="isax isax-tick-circle text-success me-2"
-                                                            aria-hidden="true"
-                                                        ></i>
-                                                        <span>Đảm bảo giữ chỗ khám bệnh</span>
+                                                    <div className="discount-badge">
+                                                        <span className="badge bg-success">
+                                                            Tiết kiệm 10%
+                                                        </span>
                                                     </div>
                                                 </div>
 
-                                                <div className="price-info mt-3">
-                                                    <div className="current-price">
-                                                        <span className="text-muted">
-                                                            Cọc thanh toán:
-                                                        </span>
-                                                        <span className="fw-bold text-primary ms-2">
-                                                            {DEPOSIT_AMOUNT.toLocaleString('vi-VN')}{' '}
-                                                            đ
-                                                        </span>
+                                                <div className="payment-option-content">
+                                                    <div className="benefits-list">
+                                                        <div className="benefit-item">
+                                                            <i
+                                                                className="isax isax-tick-circle text-success me-2"
+                                                                aria-hidden="true"
+                                                            ></i>
+                                                            <span>
+                                                                Giảm ngay <strong>10%</strong> tổng
+                                                                chi phí khi khám
+                                                            </span>
+                                                        </div>
+                                                        <div className="benefit-item">
+                                                            <i
+                                                                className="isax isax-tick-circle text-success me-2"
+                                                                aria-hidden="true"
+                                                            ></i>
+                                                            <span>Đảm bảo giữ chỗ khám bệnh</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="price-info mt-3">
+                                                        <div className="current-price">
+                                                            <span className="text-muted">
+                                                                Cọc thanh toán:
+                                                            </span>
+                                                            <span className="fw-bold text-primary ms-2">
+                                                                {DEPOSIT_AMOUNT.toLocaleString(
+                                                                    'vi-VN'
+                                                                )}{' '}
+                                                                đ
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
 
-                                    {/* Option 2: No Payment */}
-                                    <div className="col-md-6 mb-3">
+                                    {/* Option 2: No Payment - Full width for specialty booking */}
+                                    <div
+                                        className={
+                                            isSpecialtyBooking ? 'col-12 mb-3' : 'col-md-6 mb-3'
+                                        }
+                                    >
                                         <div
                                             className={`payment-option-card ${paymentOption === 'no-payment' ? 'active' : ''}`}
                                             onClick={() => setPaymentOption('no-payment')}
@@ -561,32 +648,102 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
 
                             {entityInfo?.name && (
                                 <>
-                                    <div className="mb-3">
-                                        <div className="fw-medium">
-                                            {isServiceMedicalBooking ? 'Dịch vụ' : 'Bác sĩ'}
-                                        </div>
-                                        <div className="form-plain-text">{entityInfo.name}</div>
-                                    </div>
-                                    <div className="mb-3">
-                                        <div className="fw-medium">
-                                            {isServiceMedicalBooking ? 'Bệnh viện' : 'Chuyên khoa'}
-                                        </div>
-                                        <div className="form-plain-text">
-                                            {'subtitle' in entityInfo
-                                                ? entityInfo.subtitle
-                                                : entityInfo.specialty || 'Chưa cập nhật'}
-                                        </div>
-                                    </div>
-                                    {!isServiceMedicalBooking && (
-                                        <div className="mb-3">
-                                            <div className="fw-medium">Bệnh viện</div>
-                                            <div className="form-plain-text">
-                                                {entityInfo.location || 'Chưa cập nhật'}
+                                    {/* Hospital Booking Flow */}
+                                    {isHospitalBooking &&
+                                    'bookingType' in entityInfo &&
+                                    entityInfo.bookingType === 'hospital' ? (
+                                        <>
+                                            <div className="mb-3">
+                                                <div className="fw-medium">Bệnh viện</div>
+                                                <div className="form-plain-text">
+                                                    {entityInfo.name}
+                                                </div>
                                             </div>
-                                        </div>
+                                            {entityInfo.selectedSpecialty && (
+                                                <div className="mb-3">
+                                                    <div className="fw-medium">Chuyên khoa</div>
+                                                    <div className="form-plain-text">
+                                                        {entityInfo.selectedSpecialty}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {entityInfo.selectedService && (
+                                                <div className="mb-3">
+                                                    <div className="fw-medium">Dịch vụ</div>
+                                                    <div className="form-plain-text">
+                                                        {entityInfo.selectedService}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {entityInfo.selectedDoctor && (
+                                                <div className="mb-3">
+                                                    <div className="fw-medium">Bác sĩ</div>
+                                                    <div className="form-plain-text">
+                                                        {entityInfo.selectedDoctor}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : isServiceMedicalBooking ? (
+                                        /* Service Medical Booking Flow */
+                                        <>
+                                            <div className="mb-3">
+                                                <div className="fw-medium">Dịch vụ</div>
+                                                <div className="form-plain-text">
+                                                    {entityInfo.name}
+                                                </div>
+                                            </div>
+                                            <div className="mb-3">
+                                                <div className="fw-medium">Bệnh viện</div>
+                                                <div className="form-plain-text">
+                                                    {'subtitle' in entityInfo
+                                                        ? entityInfo.subtitle
+                                                        : 'Chưa cập nhật'}
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        /* Doctor Booking Flow */
+                                        <>
+                                            <div className="mb-3">
+                                                <div className="fw-medium">Bác sĩ</div>
+                                                <div className="form-plain-text">
+                                                    {entityInfo.name}
+                                                </div>
+                                            </div>
+                                            <div className="mb-3">
+                                                <div className="fw-medium">Chuyên khoa</div>
+                                                <div className="form-plain-text">
+                                                    {'specialty' in entityInfo
+                                                        ? entityInfo.specialty
+                                                        : 'Chưa cập nhật'}
+                                                </div>
+                                            </div>
+                                            <div className="mb-3">
+                                                <div className="fw-medium">Bệnh viện</div>
+                                                <div className="form-plain-text">
+                                                    {entityInfo.location || 'Chưa cập nhật'}
+                                                </div>
+                                            </div>
+                                        </>
                                     )}
                                 </>
                             )}
+                            {/* Show specialty booking payment note */}
+                            {isSpecialtyBooking && paymentOption === 'no-payment' && (
+                                <div className="pt-3 border-top">
+                                    <div className="alert alert-success mb-0">
+                                        <i
+                                            className="isax isax-tick-circle me-2"
+                                            aria-hidden="true"
+                                        ></i>
+                                        <strong>Thanh toán tại bệnh viện:</strong> Bạn sẽ thanh toán
+                                        chi phí khám trực tiếp tại bệnh viện sau khi được phân công
+                                        bác sĩ.
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Only show payment info if NOT no-payment option */}
                             {paymentOption !== 'no-payment' && (
                                 <>
