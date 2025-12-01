@@ -4,6 +4,7 @@ import { AppointmentTime } from '@/enums/appointment.enums';
 export enum HoldSlotTargetType {
     Doctor = 0,
     ServiceMedical = 1,
+    Specialty = 2, // For "hospital assigns doctor" mode
 }
 
 export interface HoldSlotRequest {
@@ -44,4 +45,31 @@ export interface RemainingTimeResponse {
 
 export interface ReleaseAllResponse {
     releasedCount: number;
+}
+
+// Specialty Hold Slot types (for "hospital assigns doctor" mode)
+export interface HoldSpecialtySlotRequest {
+    hospitalId: string;
+    specialtyId: string;
+    date: string; // YYYY-MM-DD format
+    appointmentTimeId: AppointmentTime;
+    maxCapacity: number; // Total doctors available for this slot
+}
+
+export interface ReleaseSpecialtySlotRequest {
+    hospitalId: string;
+    specialtyId: string;
+    date: string; // YYYY-MM-DD format
+    appointmentTimeId: AppointmentTime;
+}
+
+export interface SpecialtyHoldSlotInfo {
+    hospitalId: string;
+    specialtyId: string;
+    date: string;
+    appointmentTimeId: AppointmentTime;
+    userId: string;
+    heldAt: string;
+    expiresAt: string;
+    remainingSeconds: number;
 }

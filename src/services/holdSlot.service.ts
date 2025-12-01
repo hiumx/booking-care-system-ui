@@ -4,6 +4,8 @@ import {
     ReleaseSlotRequest,
     HoldSlotResponse,
     HoldSlotTargetType,
+    HoldSpecialtySlotRequest,
+    ReleaseSpecialtySlotRequest,
 } from '@/types/holdSlot.types';
 import { AppointmentTime } from '@/enums/appointment.enums';
 
@@ -13,6 +15,10 @@ const HOLD_SLOT_ENDPOINTS = {
     RELEASE: '/schedules/hold-slot/release',
     REMAINING_TIME: '/schedules/hold-slot/remaining-time',
     RELEASE_ALL: '/schedules/hold-slot/release-all',
+    // Specialty hold slot endpoints (for "hospital assigns doctor" mode)
+    SPECIALTY_HOLD: '/schedules/hold-slot/specialty/hold',
+    SPECIALTY_RELEASE: '/schedules/hold-slot/specialty/release',
+    SPECIALTY_REMAINING_TIME: '/schedules/hold-slot/specialty/remaining-time',
 } as const;
 
 /**
@@ -101,6 +107,83 @@ export class HoldSlotService {
         } catch (error: any) {
             console.error('Release all slots error:', error);
             throw new Error(error.message || 'Không thể hủy tất cả slot đang giữ');
+        }
+    }
+
+    /**
+     * Hold a specialty slot for 5 minutes (for "hospital assigns doctor" mode)
+     */
+    static async holdSpecialtySlot(request: HoldSpecialtySlotRequest): Promise<HoldSlotResponse> {
+        try {
+            const response: any = await axiosInstance.post(
+                HOLD_SLOT_ENDPOINTS.SPECIALTY_HOLD,
+                request
+            );
+
+            return {
+                success: response.success ?? true,
+                message: response.message || 'Đã giữ chỗ thành công',
+                holdSlot: response.data?.holdSlot,
+                remainingSeconds: response.data?.remainingSeconds || 300,
+            };
+        } catch (error: any) {
+            console.error('Hold specialty slot error:', error);
+
+            if (error.response?.status === 400) {
+                return {
+                    success: false,
+                    message:
+                        error.response.data?.message ||
+                        'Khung giờ này đã hết chỗ. Vui lòng chọn khung giờ khác.',
+                    remainingSeconds: 0,
+                };
+            }
+
+            throw new Error(error.message || 'Không thể giữ chỗ');
+        }
+    }
+
+    /**
+     * Release a held specialty slot
+     */
+    static async releaseSpecialtySlot(request: ReleaseSpecialtySlotRequest): Promise<boolean> {
+        try {
+            const response: any = await axiosInstance.post(
+                HOLD_SLOT_ENDPOINTS.SPECIALTY_RELEASE,
+                request
+            );
+            return response.success ?? true;
+        } catch (error: any) {
+            console.error('Release specialty slot error:', error);
+            throw new Error(error.message || 'Không thể hủy giữ chỗ');
+        }
+    }
+
+    /**
+     * Get remaining time for a held specialty slot
+     */
+    static async getSpecialtyRemainingTime(
+        hospitalId: string,
+        specialtyId: string,
+        date: string,
+        appointmentTimeId: AppointmentTime
+    ): Promise<number> {
+        try {
+            const params = new URLSearchParams({
+                hospitalId,
+                specialtyId,
+                date,
+                appointmentTimeId: appointmentTimeId.toString(),
+            });
+
+            const response: any = await axiosInstance.get(
+                `${HOLD_SLOT_ENDPOINTS.SPECIALTY_REMAINING_TIME}?${params.toString()}`
+            );
+
+            return response.data?.remainingSeconds || 0;
+        } catch (error: any) {
+            console.error('Get specialty remaining time error:', error);
+            return 0;
         }
     }
 
