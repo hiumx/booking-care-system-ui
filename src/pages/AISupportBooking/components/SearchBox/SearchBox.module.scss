@@ -39,11 +39,11 @@
 .quickActionCard {
     border: 1px solid #ebeff5;
     border-radius: 12px;
-    padding: 5px 14px;
+    padding: 8px 12px;
     background: #f8fafc;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     position: relative;
     transition: all 0.2s ease;
 
@@ -55,27 +55,75 @@
 }
 
 .labActionCard {
-    background: linear-gradient(135deg, #eef2ff 0%, #e0f2fe 100%);
-    border-color: #c7d2fe;
+    background: linear-gradient(135deg, #e6f4ff 0%, #d0ebff 100%);
+    border-color: #91d5ff;
     cursor: pointer;
-    box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 12px 30px rgba(14, 130, 253, 0.15);
 
     &:hover {
-        background: linear-gradient(135deg, #e0e7ff 0%, #bae6fd 100%);
+        background: linear-gradient(135deg, #d0ebff 0%, #b3e0ff 100%);
+        border-color: #0e82fd;
+        box-shadow: 0 12px 30px rgba(14, 130, 253, 0.25);
+
+        .quickActionIcon {
+            background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+            box-shadow: 0 6px 16px rgba(14, 130, 253, 0.4);
+            transform: scale(1.05);
+        }
+    }
+}
+
+.dermatologyActionCard {
+    background: linear-gradient(135deg, #e6f4ff 0%, #d0ebff 100%);
+    border-color: #91d5ff;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(14, 130, 253, 0.15);
+
+    &:hover {
+        background: linear-gradient(135deg, #d0ebff 0%, #b3e0ff 100%);
+        border-color: #0e82fd;
+        box-shadow: 0 12px 30px rgba(14, 130, 253, 0.25);
+
+        .quickActionIcon {
+            background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+            box-shadow: 0 6px 16px rgba(14, 130, 253, 0.4);
+            transform: scale(1.05);
+        }
+    }
+}
+
+.comingSoonCard {
+    background: linear-gradient(135deg, #e6f4ff 0%, #d0ebff 100%);
+    border-color: #91d5ff;
+    box-shadow: 0 12px 30px rgba(14, 130, 253, 0.15);
+    cursor: default;
+
+    &:hover {
+        background: linear-gradient(135deg, #d0ebff 0%, #b3e0ff 100%);
+        border-color: #0e82fd;
+        box-shadow: 0 12px 30px rgba(14, 130, 253, 0.25);
+
+        .quickActionIcon {
+            background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+            box-shadow: 0 6px 16px rgba(14, 130, 253, 0.4);
+            transform: scale(1.05);
+        }
     }
 }
 
 .quickActionIcon {
-    width: 52px;
-    height: 52px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: #ffffff;
+    background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    color: #0f172a;
-    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+    font-size: 20px;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(14, 130, 253, 0.3);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
 }
 
 .quickActionContent {

@@ -607,18 +607,6 @@ const AISupportBooking: React.FC = () => {
         if (data.diagnosis) {
             lines.push(`**Chẩn đoán khả năng:** ${data.diagnosis.conditionName}`);
             lines.push(`**Độ tin cậy:** ${(data.diagnosis.confidence * 100).toFixed(0)}%`);
-            if (data.diagnosis.severity) {
-                lines.push(`**Mức độ nghiêm trọng:** ${data.diagnosis.severity}`);
-            }
-            lines.push('');
-        }
-
-        // Malignancy risk
-        if (data.malignancyRisk) {
-            lines.push(`**Đánh giá nguy cơ ác tính:** ${data.malignancyRisk.riskCategory}`);
-            lines.push(
-                `**Mức độ nghi ngờ:** ${(data.malignancyRisk.suspicionLevel * 100).toFixed(0)}%`
-            );
             lines.push('');
         }
 

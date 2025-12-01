@@ -386,7 +386,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                     }}
                 >
                     <div className={styles.quickActionIcon}>
-                        <FileText size={28} />
+                        <FileText size={20} />
                     </div>
                     <div className={styles.quickActionContent}>
                         <p className={styles.quickActionTitle}>Phân tích kết quả xét nghiệm</p>
@@ -406,7 +406,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                     }}
                 >
                     <div className={styles.quickActionIcon}>
-                        <Stethoscope size={28} />
+                        <Stethoscope size={20} />
                     </div>
                     <div className={styles.quickActionContent}>
                         <p className={styles.quickActionTitle}>Phân tích hình ảnh y tế</p>
@@ -416,9 +416,12 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                 {comingSoonFeatures.map((feature) => {
                     const Icon = feature.icon;
                     return (
-                        <div key={feature.id} className={styles.quickActionCard}>
+                        <div
+                            key={feature.id}
+                            className={clsx(styles.quickActionCard, styles.comingSoonCard)}
+                        >
                             <div className={styles.quickActionIcon}>
-                                <Icon size={24} />
+                                <Icon size={20} />
                             </div>
                             <div className={styles.quickActionContent}>
                                 <p className={styles.quickActionTitle}>{feature.title}</p>
