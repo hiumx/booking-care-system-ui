@@ -7,6 +7,9 @@ import {
     ScheduleCategory,
     GetServiceMedicalScheduleRequest,
     GetServiceMedicalAvailableSlotsRequest,
+    GetSpecialtyAvailableSlotsRequest,
+    SpecialtyAvailableSlotsResponse,
+    SpecialtyAvailableSlot,
 } from '../../types/schedule.types';
 import { SchedulePatterns } from '../../enums/schedule.enums';
 import { ScheduleService } from '../../services/schedule.service';
@@ -18,17 +21,24 @@ export interface ScheduleState {
     availableSlots: AvailableSlot[];
     scheduleCategories: ScheduleCategory[];
 
+    // Specialty schedule data (for "hospital assigns doctor" mode)
+    specialtyAvailableSlots: SpecialtyAvailableSlot[];
+    specialtyScheduleCategories: ScheduleCategory[];
+    specialtyScheduleInfo: SpecialtyAvailableSlotsResponse | null;
+
     // Selected values
     selectedDate: string | null; // ISO date string
     selectedDoctorId: string | null;
     selectedMedicalServiceId: string | null;
     selectedSlot: AvailableSlot | null; // Keep for backward compatibility
     selectedSlots: AvailableSlot[]; // Multiple slots support
+    selectedSpecialtySlot: SpecialtyAvailableSlot | null; // For specialty booking
 
     // Loading states
     loading: {
         schedule: boolean;
         availableSlots: boolean;
+        specialtySlots: boolean;
     };
 
     // Error state
@@ -44,14 +54,21 @@ const initialState: ScheduleState = {
     currentSchedule: null,
     availableSlots: [],
     scheduleCategories: [],
+    // Specialty schedule data
+    specialtyAvailableSlots: [],
+    specialtyScheduleCategories: [],
+    specialtyScheduleInfo: null,
+    // Selected values
     selectedDate: null,
     selectedDoctorId: null,
     selectedMedicalServiceId: null,
     selectedSlot: null,
-    selectedSlots: [], // Initialize empty array
+    selectedSlots: [],
+    selectedSpecialtySlot: null,
     loading: {
         schedule: false,
         availableSlots: false,
+        specialtySlots: false,
     },
     error: null,
     isDateSelected: false,
@@ -131,9 +148,72 @@ export const fetchServiceMedicalAvailableSlots = createAsyncThunk(
     }
 );
 
+// Specialty Schedule async thunk (for "hospital assigns doctor" mode)
+export const fetchSpecialtyAvailableSlots = createAsyncThunk(
+    'schedule/fetchSpecialtyAvailableSlots',
+    async (request: GetSpecialtyAvailableSlotsRequest, { rejectWithValue }) => {
+        try {
+            const response = await ScheduleService.getSpecialtyAvailableSlots(request);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Failed to fetch specialty available slots');
+        }
+    }
+);
+
 // Helper function to group slots into categories
 const groupSlotsIntoCategories = (slots: AvailableSlot[]): ScheduleCategory[] => {
     const grouped = ScheduleService.groupSlotsByPeriod(slots);
+
+    const categories: ScheduleCategory[] = [];
+
+    if (grouped.morning.length > 0) {
+        categories.push({
+            title: 'Buổi sáng (8:00 - 12:00)',
+            pattern: SchedulePatterns.MORNING,
+            timeSlots: grouped.morning.map((slot) => ({
+                startTime: slot.startTime,
+                endTime: slot.endTime,
+            })),
+        });
+    }
+
+    if (grouped.afternoon.length > 0) {
+        categories.push({
+            title: 'Buổi chiều (12:00 - 17:00)',
+            pattern: SchedulePatterns.AFTERNOON,
+            timeSlots: grouped.afternoon.map((slot) => ({
+                startTime: slot.startTime,
+                endTime: slot.endTime,
+            })),
+        });
+    }
+
+    if (grouped.evening.length > 0) {
+        categories.push({
+            title: 'Buổi tối (17:00 - 21:00)',
+            pattern: SchedulePatterns.EVENING,
+            timeSlots: grouped.evening.map((slot) => ({
+                startTime: slot.startTime,
+                endTime: slot.endTime,
+            })),
+        });
+    }
+
+    return categories;
+};
+
+// Helper function to group specialty slots into categories
+const groupSpecialtySlotsIntoCategories = (slots: SpecialtyAvailableSlot[]): ScheduleCategory[] => {
+    // Convert SpecialtyAvailableSlot to AvailableSlot format for grouping
+    const convertedSlots: AvailableSlot[] = slots.map((slot) => ({
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        isAvailable: slot.isAvailable,
+        isBlocked: false,
+    }));
+
+    const grouped = ScheduleService.groupSlotsByPeriod(convertedSlots);
 
     const categories: ScheduleCategory[] = [];
 
@@ -270,6 +350,7 @@ const scheduleSlice = createSlice({
             state.selectedMedicalServiceId = null;
             state.selectedSlot = null;
             state.selectedSlots = [];
+            state.selectedSpecialtySlot = null;
             state.isDateSelected = false;
             state.isSlotSelected = false;
         },
@@ -282,6 +363,19 @@ const scheduleSlice = createSlice({
         // Reset schedule state
         resetScheduleState: (state) => {
             Object.assign(state, initialState);
+        },
+
+        // Specialty slot actions
+        setSelectedSpecialtySlot: (state, action: PayloadAction<SpecialtyAvailableSlot | null>) => {
+            state.selectedSpecialtySlot = action.payload;
+            state.isSlotSelected = action.payload !== null;
+        },
+
+        clearSpecialtySlots: (state) => {
+            state.specialtyAvailableSlots = [];
+            state.specialtyScheduleCategories = [];
+            state.specialtyScheduleInfo = null;
+            state.selectedSpecialtySlot = null;
         },
     },
     extraReducers: (builder) => {
@@ -374,6 +468,29 @@ const scheduleSlice = createSlice({
                 state.availableSlots = [];
                 state.scheduleCategories = [];
             });
+
+        // Fetch specialty available slots (for "hospital assigns doctor" mode)
+        builder
+            .addCase(fetchSpecialtyAvailableSlots.pending, (state) => {
+                state.loading.specialtySlots = true;
+                state.error = null;
+            })
+            .addCase(fetchSpecialtyAvailableSlots.fulfilled, (state, action) => {
+                state.loading.specialtySlots = false;
+                state.specialtyAvailableSlots = action.payload.data.availableSlots;
+                state.specialtyScheduleCategories = groupSpecialtySlotsIntoCategories(
+                    action.payload.data.availableSlots
+                );
+                state.specialtyScheduleInfo = action.payload.data;
+                state.error = null;
+            })
+            .addCase(fetchSpecialtyAvailableSlots.rejected, (state, action) => {
+                state.loading.specialtySlots = false;
+                state.error = action.payload as string;
+                state.specialtyAvailableSlots = [];
+                state.specialtyScheduleCategories = [];
+                state.specialtyScheduleInfo = null;
+            });
     },
 });
 
@@ -389,6 +506,8 @@ export const {
     clearSelections,
     clearError,
     resetScheduleState,
+    setSelectedSpecialtySlot,
+    clearSpecialtySlots,
 } = scheduleSlice.actions;
 
 // Export reducer

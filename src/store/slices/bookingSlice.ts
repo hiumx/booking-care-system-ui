@@ -1,13 +1,27 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppointmentType } from '@/enums/appointment.enums';
 
+// Booking flow type
+export type BookingFlowType = 'doctor' | 'service' | 'hospital';
+
 export interface BookingState {
-    // Step 1: Date & Time
+    // Booking flow type
+    bookingFlowType: BookingFlowType | null;
+
+    // Hospital booking specific - Step 1: Specialty/Service Selection
+    hospitalId: string | null;
+    selectedSpecialtyId: string | null;
+    selectedServiceMedicalId: string | null; // Service of hospital (not doctor service)
+
+    // Hospital booking specific - Step 2: Appointment Type & Doctor
+    selectedDoctorId: string | null; // Optional doctor selection for hospital booking
+
+    // Common - Date & Time
     selectedDate: string | null;
     selectedTimeSlots: Array<{ startTime: string; endTime: string }>;
-    doctorId: string | null;
+    doctorId: string | null; // For doctor booking flow
 
-    // Step 2: Basic Info & Symptoms
+    // Common - Basic Info & Symptoms
     symptoms: string;
     attachmentUrls: string[];
 
@@ -15,7 +29,7 @@ export interface BookingState {
     relativeId: string | null;
     isBookingForRelative: boolean;
 
-    // Step 3: Payment (future)
+    // Common - Payment
     appointmentType: AppointmentType;
 
     // Created appointment ID
@@ -23,6 +37,11 @@ export interface BookingState {
 }
 
 const initialState: BookingState = {
+    bookingFlowType: null,
+    hospitalId: null,
+    selectedSpecialtyId: null,
+    selectedServiceMedicalId: null,
+    selectedDoctorId: null,
     selectedDate: null,
     selectedTimeSlots: [],
     doctorId: null,
@@ -38,6 +57,34 @@ const bookingSlice = createSlice({
     name: 'booking',
     initialState,
     reducers: {
+        // Set booking flow type
+        setBookingFlowType: (state, action: PayloadAction<BookingFlowType>) => {
+            state.bookingFlowType = action.payload;
+        },
+
+        // Hospital booking actions
+        setHospitalId: (state, action: PayloadAction<string>) => {
+            state.hospitalId = action.payload;
+        },
+        setSelectedSpecialtyId: (state, action: PayloadAction<string | null>) => {
+            state.selectedSpecialtyId = action.payload;
+            // Clear service when specialty is selected
+            if (action.payload) {
+                state.selectedServiceMedicalId = null;
+            }
+        },
+        setSelectedServiceMedicalId: (state, action: PayloadAction<string | null>) => {
+            state.selectedServiceMedicalId = action.payload;
+            // Clear specialty when service is selected
+            if (action.payload) {
+                state.selectedSpecialtyId = null;
+            }
+        },
+        setSelectedDoctorId: (state, action: PayloadAction<string | null>) => {
+            state.selectedDoctorId = action.payload;
+        },
+
+        // Common actions
         setBookingDate: (state, action: PayloadAction<string>) => {
             state.selectedDate = action.payload;
         },
@@ -65,8 +112,9 @@ const bookingSlice = createSlice({
         setAppointmentType: (state, action: PayloadAction<AppointmentType>) => {
             state.appointmentType = action.payload;
         },
-        setCreatedAppointmentId: (state, action: PayloadAction<string>) => {
-            state.createdAppointmentId = action.payload;
+        setCreatedAppointmentId: (state, action: PayloadAction<string | null>) => {
+            // Handle empty string as null for consistency
+            state.createdAppointmentId = action.payload || null;
         },
         setBookingRelative: (
             state,
@@ -82,6 +130,11 @@ const bookingSlice = createSlice({
 });
 
 export const {
+    setBookingFlowType,
+    setHospitalId,
+    setSelectedSpecialtyId,
+    setSelectedServiceMedicalId,
+    setSelectedDoctorId,
     setBookingDate,
     setBookingTimeSlots,
     setBookingDoctorId,

@@ -46,6 +46,14 @@ export interface HospitalInfo {
     avatarUrl?: string;
 }
 
+// Specialty Information from API (for hospital assigns doctor mode)
+export interface SpecialtyInfo {
+    id: string;
+    name?: string;
+    description?: string;
+    imageUrl?: string;
+}
+
 // Relative Information from API
 export interface RelativeInfo {
     id: string;
@@ -86,6 +94,8 @@ export interface AppointmentResponse {
     doctorInfo?: DoctorInfo;
     serviceInfo?: ServiceInfo;
     hospitalInfo?: HospitalInfo;
+    /** Specialty info for hospital assigns doctor mode (no doctor selected yet) */
+    specialtyInfo?: SpecialtyInfo;
 }
 
 // Status counts for all appointment statuses

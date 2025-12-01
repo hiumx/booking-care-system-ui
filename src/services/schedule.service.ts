@@ -11,6 +11,8 @@ import {
     GetServiceMedicalAvailableSlotsRequest,
     ServiceMedicalScheduleResponse,
     ServiceMedicalAvailableSlotsResponse,
+    GetSpecialtyAvailableSlotsRequest,
+    SpecialtyAvailableSlotsApiResponse,
 } from '../types/schedule.types';
 
 // Base API endpoints for schedules
@@ -23,6 +25,9 @@ const SCHEDULE_ENDPOINTS = {
     SERVICE_MEDICAL_AVAILABLE_SLOTS:
         '/schedules/service-medical-schedules/{serviceMedicalId}/available-slots',
     SERVICE_MEDICAL_SCHEDULE_EXCEPTION: '/schedules/service-medical-schedule-exceptions',
+    // Specialty Schedule endpoints (for "hospital assigns doctor" mode)
+    SPECIALTY_AVAILABLE_SLOTS:
+        '/schedules/specialty-schedules/{hospitalId}/specialties/{specialtyId}/available-slots',
 } as const;
 
 /**
@@ -207,6 +212,37 @@ export class ScheduleService {
         } catch (error: any) {
             console.error('API Error:', error);
             throw new Error(error.message || 'Failed to fetch service medical available slots');
+        }
+    }
+
+    /**
+     * Get available slots for a specialty on a specific date (for "hospital assigns doctor" mode)
+     * Returns aggregated slots with capacity information
+     */
+    static async getSpecialtyAvailableSlots(
+        request: GetSpecialtyAvailableSlotsRequest
+    ): Promise<SpecialtyAvailableSlotsApiResponse> {
+        try {
+            const queryParams = new URLSearchParams({
+                date: request.date,
+                appointmentType: request.appointmentType,
+            });
+
+            const url = SCHEDULE_ENDPOINTS.SPECIALTY_AVAILABLE_SLOTS.replace(
+                '{hospitalId}',
+                request.hospitalId
+            ).replace('{specialtyId}', request.specialtyId);
+
+            const response: any = await axiosInstance.get(`${url}?${queryParams.toString()}`);
+
+            return {
+                success: response.success ?? true,
+                data: response.data || response,
+                message: response.message,
+            };
+        } catch (error: any) {
+            console.error('API Error:', error);
+            throw new Error(error.message || 'Failed to fetch specialty available slots');
         }
     }
 }
