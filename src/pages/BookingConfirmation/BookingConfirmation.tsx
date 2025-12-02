@@ -180,7 +180,7 @@ const BookingConfirmation: React.FC = () => {
                 <span className="text-dark">
                     {formattedAppointmentInfo.doctor?.positionName}{' '}
                     {formattedAppointmentInfo.doctor?.fullName || 'Bác sĩ'}
-                </span>
+                </span>{' '}
                 .
             </>
         );

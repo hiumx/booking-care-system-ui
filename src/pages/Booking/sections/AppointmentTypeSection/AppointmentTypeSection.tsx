@@ -381,6 +381,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                     isServiceSelected && 'selected-locked'
                                 )}
                                 htmlFor="appointmentTypeInPerson"
+                                aria-label="Khám trực tiếp"
                             >
                                 <input
                                     id="appointmentTypeInPerson"
@@ -405,6 +406,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                     isServiceSelected && styles.disabled
                                 )}
                                 htmlFor="appointmentTypeTelehealth"
+                                aria-label="Tư vấn trực tuyến"
                             >
                                 <input
                                     id="appointmentTypeTelehealth"
@@ -452,6 +454,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                             doctorSelectionMode === 'hospital' && 'active'
                                         )}
                                         htmlFor="doctorSelectionModeHospital"
+                                        aria-label="Bệnh viện phân công bác sĩ"
                                     >
                                         <input
                                             id="doctorSelectionModeHospital"
@@ -933,6 +936,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                     'active'
                                                             )}
                                                             htmlFor={`doctorSelection-${doctor.id}`}
+                                                            aria-label={`Chọn bác sĩ ${doctor.fullName}`}
                                                         >
                                                             <input
                                                                 id={`doctorSelection-${doctor.id}`}

@@ -526,6 +526,49 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         ]
     );
 
+    // Helper function to refresh available slots - extracted to reduce cognitive complexity
+    const refreshAvailableSlots = useCallback(
+        (date: string) => {
+            if (isSpecialtyBooking && hospitalId && hospitalBookingSpecialtyId) {
+                dispatch(
+                    fetchSpecialtyAvailableSlots({
+                        hospitalId,
+                        specialtyId: hospitalBookingSpecialtyId,
+                        date,
+                        appointmentType: hospitalBookingAppointmentType,
+                    })
+                );
+            } else if (isDoctorBooking && doctorId) {
+                dispatch(
+                    fetchDoctorAvailableSlots({
+                        doctorId,
+                        date,
+                        medicalServiceId: medicalServiceId,
+                    })
+                );
+            } else if (isServiceMedicalBooking && serviceMedicalId) {
+                dispatch(
+                    fetchServiceMedicalAvailableSlots({
+                        serviceMedicalId,
+                        date,
+                    })
+                );
+            }
+        },
+        [
+            dispatch,
+            isSpecialtyBooking,
+            isDoctorBooking,
+            isServiceMedicalBooking,
+            hospitalId,
+            hospitalBookingSpecialtyId,
+            hospitalBookingAppointmentType,
+            doctorId,
+            medicalServiceId,
+            serviceMedicalId,
+        ]
+    );
+
     // Handle slot click - single slot selection only (patient can book only 1 slot per booking)
     const handleClickSlot = useCallback(
         async (slotIndex: number) => {
@@ -642,60 +685,29 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                 dispatch(toggleSlotSelection(slotPayload));
             } else if (selectedDate) {
                 // Hold failed (slot already held by another user)
-                // Refresh available slots to update UI based on booking type
-                if (isSpecialtyBooking && hospitalId && hospitalBookingSpecialtyId) {
-                    dispatch(
-                        fetchSpecialtyAvailableSlots({
-                            hospitalId,
-                            specialtyId: hospitalBookingSpecialtyId,
-                            date: selectedDate,
-                            appointmentType: hospitalBookingAppointmentType,
-                        })
-                    );
-                } else if (isDoctorBooking && doctorId) {
-                    dispatch(
-                        fetchDoctorAvailableSlots({
-                            doctorId,
-                            date: selectedDate,
-                            medicalServiceId: medicalServiceId,
-                        })
-                    );
-                } else if (isServiceMedicalBooking && serviceMedicalId) {
-                    dispatch(
-                        fetchServiceMedicalAvailableSlots({
-                            serviceMedicalId,
-                            date: selectedDate,
-                        })
-                    );
-                }
+                // Refresh available slots to update UI
+                refreshAvailableSlots(selectedDate);
             }
         },
         [
             slotChecked,
             effectiveScheduleCategories,
             dispatch,
-            doctorId,
-            serviceMedicalId,
             selectedDate,
-            medicalServiceId,
             isHoldingSlot,
             holdDoctorServiceSlot,
             holdSpecialtySlot,
             releaseSlot,
             authState.isAuthenticated,
             navigate,
-            isDoctorBooking,
-            isServiceMedicalBooking,
-            isHospitalBooking,
             isSpecialtyBooking,
             hospitalId,
-            hospitalBookingDoctorId,
-            hospitalBookingServiceId,
             hospitalBookingSpecialtyId,
-            hospitalBookingAppointmentType,
             effectiveDoctorId,
             effectiveServiceId,
             specialtyScheduleInfo,
+            refreshAvailableSlots,
+            getValidBookingTarget,
         ]
     );
 

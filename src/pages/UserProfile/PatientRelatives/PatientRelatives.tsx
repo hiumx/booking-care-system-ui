@@ -547,6 +547,17 @@ const PatientRelatives: React.FC = () => {
         );
     };
 
+    // Helper function to get submit button text - extracted to avoid nested ternary
+    const getSubmitButtonText = (): string => {
+        if (isSubmitting) {
+            return t('common:actions.processing', 'Đang xử lý...');
+        }
+        if (editingRelative) {
+            return t('common:actions.update', 'Cập nhật');
+        }
+        return t('common:actions.add', 'Thêm mới');
+    };
+
     return (
         <div className="card">
             <div className="card-header d-flex justify-content-between align-items-center">
@@ -836,11 +847,7 @@ const PatientRelatives: React.FC = () => {
                                         {isSubmitting && (
                                             <span className="spinner-border spinner-border-sm me-1"></span>
                                         )}
-                                        {isSubmitting
-                                            ? t('common:actions.processing', 'Đang xử lý...')
-                                            : editingRelative
-                                              ? t('common:actions.update', 'Cập nhật')
-                                              : t('common:actions.add', 'Thêm mới')}
+                                        {getSubmitButtonText()}
                                     </button>
                                 </div>
                             </form>

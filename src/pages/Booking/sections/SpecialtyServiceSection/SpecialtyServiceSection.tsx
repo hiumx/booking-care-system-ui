@@ -334,6 +334,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                     'active'
                                             )}
                                             htmlFor={`specialty-${specialty.id}`}
+                                            aria-label={`Chọn chuyên khoa ${specialty.name}`}
                                         >
                                             <input
                                                 id={`specialty-${specialty.id}`}
@@ -455,6 +456,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                     'active'
                                             )}
                                             htmlFor={`service-${service.id}`}
+                                            aria-label={`Chọn dịch vụ ${service.name}`}
                                         >
                                             <input
                                                 id={`service-${service.id}`}
