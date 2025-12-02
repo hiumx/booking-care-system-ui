@@ -38,8 +38,8 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview, o
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validate form with terms requirement (pass rating to validateForm)
-        if (!validateForm(true, termsAccepted, rating)) {
+        // Validate form (pass rating to validateForm)
+        if (!validateForm(rating)) {
             return;
         }
 

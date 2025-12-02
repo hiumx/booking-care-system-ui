@@ -718,7 +718,7 @@ const HospitalProfile: React.FC = () => {
             </section>
             {/* Testimonial Section */}
             <section className={styles.testimonialSection}>
-                <TestimonialSection />
+                <TestimonialSection hospitalId={id} />
             </section>
         </MainLayout>
     );
