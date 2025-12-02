@@ -199,6 +199,46 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         return 0;
     };
 
+    // Helper function to render booking entity info - extracted to avoid nested ternary
+    const renderBookingEntityInfo = () => {
+        if (isServiceMedicalBooking) {
+            return (
+                <>
+                    <div className="mb-3">
+                        <div className="fw-medium">Dịch vụ</div>
+                        <div className="form-plain-text">{entityInfo.name}</div>
+                    </div>
+                    <div className="mb-3">
+                        <div className="fw-medium">Bệnh viện</div>
+                        <div className="form-plain-text">
+                            {'subtitle' in entityInfo ? entityInfo.subtitle : 'Chưa cập nhật'}
+                        </div>
+                    </div>
+                </>
+            );
+        }
+
+        // Doctor Booking Flow
+        return (
+            <>
+                <div className="mb-3">
+                    <div className="fw-medium">Bác sĩ</div>
+                    <div className="form-plain-text">{entityInfo.name}</div>
+                </div>
+                <div className="mb-3">
+                    <div className="fw-medium">Chuyên khoa</div>
+                    <div className="form-plain-text">
+                        {'specialty' in entityInfo ? entityInfo.specialty : 'Chưa cập nhật'}
+                    </div>
+                </div>
+                <div className="mb-3">
+                    <div className="fw-medium">Bệnh viện</div>
+                    <div className="form-plain-text">{entityInfo.location || 'Chưa cập nhật'}</div>
+                </div>
+            </>
+        );
+    };
+
     // Constants for payment calculation
     // For supplementary payment: use the provided amount
     // For regular payment: calculate 30% deposit from doctor's price or service price
@@ -692,48 +732,8 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                 </div>
                                             )}
                                         </>
-                                    ) : isServiceMedicalBooking ? (
-                                        /* Service Medical Booking Flow */
-                                        <>
-                                            <div className="mb-3">
-                                                <div className="fw-medium">Dịch vụ</div>
-                                                <div className="form-plain-text">
-                                                    {entityInfo.name}
-                                                </div>
-                                            </div>
-                                            <div className="mb-3">
-                                                <div className="fw-medium">Bệnh viện</div>
-                                                <div className="form-plain-text">
-                                                    {'subtitle' in entityInfo
-                                                        ? entityInfo.subtitle
-                                                        : 'Chưa cập nhật'}
-                                                </div>
-                                            </div>
-                                        </>
                                     ) : (
-                                        /* Doctor Booking Flow */
-                                        <>
-                                            <div className="mb-3">
-                                                <div className="fw-medium">Bác sĩ</div>
-                                                <div className="form-plain-text">
-                                                    {entityInfo.name}
-                                                </div>
-                                            </div>
-                                            <div className="mb-3">
-                                                <div className="fw-medium">Chuyên khoa</div>
-                                                <div className="form-plain-text">
-                                                    {'specialty' in entityInfo
-                                                        ? entityInfo.specialty
-                                                        : 'Chưa cập nhật'}
-                                                </div>
-                                            </div>
-                                            <div className="mb-3">
-                                                <div className="fw-medium">Bệnh viện</div>
-                                                <div className="form-plain-text">
-                                                    {entityInfo.location || 'Chưa cập nhật'}
-                                                </div>
-                                            </div>
-                                        </>
+                                        renderBookingEntityInfo()
                                     )}
                                 </>
                             )}

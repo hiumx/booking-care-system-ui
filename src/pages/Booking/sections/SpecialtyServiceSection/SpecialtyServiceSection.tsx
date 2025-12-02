@@ -283,6 +283,44 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
         );
     }
 
+    // Helper function to render specialty empty state - extracted to avoid nested ternary
+    const renderSpecialtyEmptyState = () => {
+        if (specialtySearch.trim()) {
+            return (
+                <div className="col-12">
+                    <div className={styles.noResults}>
+                        <i className="isax isax-search-status" aria-hidden="true"></i>
+                        <p className="mb-0">Không tìm thấy chuyên khoa phù hợp</p>
+                    </div>
+                </div>
+            );
+        }
+        return (
+            <div className="col-12">
+                <p className="text-muted mb-0">Bệnh viện chưa có chuyên khoa nào</p>
+            </div>
+        );
+    };
+
+    // Helper function to render service empty state - extracted to avoid nested ternary
+    const renderServiceEmptyState = () => {
+        if (serviceSearch.trim()) {
+            return (
+                <div className="col-12">
+                    <div className={styles.noResults}>
+                        <i className="isax isax-search-status" aria-hidden="true"></i>
+                        <p className="mb-0">Không tìm thấy dịch vụ phù hợp</p>
+                    </div>
+                </div>
+            );
+        }
+        return (
+            <div className="col-12">
+                <p className="text-muted mb-0">Bệnh viện chưa có dịch vụ y tế nào</p>
+            </div>
+        );
+    };
+
     return (
         <BookingSectionWrapper
             doctor={hospitalInfo}
@@ -300,8 +338,8 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                     <div className="mb-4 pb-4 border-bottom">
                         <div className="d-flex align-items-center justify-content-between mb-3">
                             <h6 className="mb-0">
-                                <i className="isax isax-hospital me-2"></i>
-                                Chọn chuyên khoa
+                                <i className="isax isax-hospital me-2" aria-hidden="true"></i> Chọn
+                                chuyên khoa
                             </h6>
                         </div>
 
@@ -322,76 +360,67 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                         )}
 
                         <div className="row">
-                            {displayedSpecialties.length > 0 ? (
-                                displayedSpecialties.map((specialty) => (
-                                    <div key={specialty.id} className="col-lg-4 col-md-6 mb-3">
-                                        <label
-                                            className={clsx(
-                                                styles.serviceItem,
-                                                'service-item',
-                                                selectionType === 'specialty' &&
-                                                    selectedId === specialty.id &&
-                                                    'active'
-                                            )}
-                                            htmlFor={`specialty-${specialty.id}`}
-                                            aria-label={`Chọn chuyên khoa ${specialty.name}`}
-                                        >
-                                            <input
-                                                id={`specialty-${specialty.id}`}
-                                                className="form-check-input ms-0 mt-0"
-                                                type="radio"
-                                                name="specialtyService"
-                                                checked={
-                                                    selectionType === 'specialty' &&
-                                                    selectedId === specialty.id
-                                                }
-                                                onChange={() => handleSpecialtySelect(specialty.id)}
-                                            />
-                                            <span className="form-check-label ms-2 w-100">
-                                                <div className={styles.itemContent}>
-                                                    {specialty.imageUrl ? (
-                                                        <img
-                                                            src={specialty.imageUrl}
-                                                            alt={specialty.name}
-                                                            className={styles.itemImage}
-                                                        />
-                                                    ) : (
-                                                        <div
-                                                            className={styles.itemImagePlaceholder}
-                                                        >
-                                                            <i className="isax isax-hospital"></i>
-                                                        </div>
-                                                    )}
-                                                    <div className={styles.itemInfo}>
-                                                        <span className="service-title d-block mb-1">
-                                                            {specialty.name}
-                                                        </span>
-                                                        {specialty.doctorCount !== undefined && (
-                                                            <span className="fs-14 text-muted d-block">
-                                                                <i className="isax isax-user me-1"></i>
-                                                                {specialty.doctorCount} bác sĩ
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </span>
-                                        </label>
-                                    </div>
-                                ))
-                            ) : specialtySearch.trim() ? (
-                                <div className="col-12">
-                                    <div className={styles.noResults}>
-                                        <i className="isax isax-search-status"></i>
-                                        <p className="mb-0">Không tìm thấy chuyên khoa phù hợp</p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="col-12">
-                                    <p className="text-muted mb-0">
-                                        Bệnh viện chưa có chuyên khoa nào
-                                    </p>
-                                </div>
-                            )}
+                            {displayedSpecialties.length > 0
+                                ? displayedSpecialties.map((specialty) => (
+                                      <div key={specialty.id} className="col-lg-4 col-md-6 mb-3">
+                                          <label
+                                              className={clsx(
+                                                  styles.serviceItem,
+                                                  'service-item',
+                                                  selectionType === 'specialty' &&
+                                                      selectedId === specialty.id &&
+                                                      'active'
+                                              )}
+                                              htmlFor={`specialty-${specialty.id}`}
+                                              aria-label={`Chọn chuyên khoa ${specialty.name}`}
+                                          >
+                                              <input
+                                                  id={`specialty-${specialty.id}`}
+                                                  className="form-check-input ms-0 mt-0"
+                                                  type="radio"
+                                                  name="specialtyService"
+                                                  checked={
+                                                      selectionType === 'specialty' &&
+                                                      selectedId === specialty.id
+                                                  }
+                                                  onChange={() =>
+                                                      handleSpecialtySelect(specialty.id)
+                                                  }
+                                              />
+                                              <span className="form-check-label ms-2 w-100">
+                                                  <div className={styles.itemContent}>
+                                                      {specialty.imageUrl ? (
+                                                          <img
+                                                              src={specialty.imageUrl}
+                                                              alt={specialty.name}
+                                                              className={styles.itemImage}
+                                                          />
+                                                      ) : (
+                                                          <div
+                                                              className={
+                                                                  styles.itemImagePlaceholder
+                                                              }
+                                                          >
+                                                              <i className="isax isax-hospital"></i>
+                                                          </div>
+                                                      )}
+                                                      <div className={styles.itemInfo}>
+                                                          <span className="service-title d-block mb-1">
+                                                              {specialty.name}
+                                                          </span>
+                                                          {specialty.doctorCount !== undefined && (
+                                                              <span className="fs-14 text-muted d-block">
+                                                                  <i className="isax isax-user me-1"></i>
+                                                                  {specialty.doctorCount} bác sĩ
+                                                              </span>
+                                                          )}
+                                                      </div>
+                                                  </div>
+                                              </span>
+                                          </label>
+                                      </div>
+                                  ))
+                                : renderSpecialtyEmptyState()}
                         </div>
 
                         {/* Show more button for specialties */}
@@ -422,8 +451,8 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                     <div>
                         <div className="d-flex align-items-center justify-content-between mb-3">
                             <h6 className="mb-0">
-                                <i className="isax isax-briefcase me-2"></i>
-                                Hoặc chọn dịch vụ y tế
+                                <i className="isax isax-briefcase me-2" aria-hidden="true"></i> Hoặc
+                                chọn dịch vụ y tế
                             </h6>
                         </div>
 
@@ -444,73 +473,62 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                         )}
 
                         <div className="row">
-                            {displayedServices.length > 0 ? (
-                                displayedServices.map((service) => (
-                                    <div key={service.id} className="col-lg-4 col-md-6 mb-3">
-                                        <label
-                                            className={clsx(
-                                                styles.serviceItem,
-                                                'service-item',
-                                                selectionType === 'service' &&
-                                                    selectedId === service.id &&
-                                                    'active'
-                                            )}
-                                            htmlFor={`service-${service.id}`}
-                                            aria-label={`Chọn dịch vụ ${service.name}`}
-                                        >
-                                            <input
-                                                id={`service-${service.id}`}
-                                                className="form-check-input ms-0 mt-0"
-                                                type="radio"
-                                                name="specialtyService"
-                                                checked={
-                                                    selectionType === 'service' &&
-                                                    selectedId === service.id
-                                                }
-                                                onChange={() => handleServiceSelect(service.id)}
-                                            />
-                                            <span className="form-check-label ms-2 w-100">
-                                                <div className={styles.itemContent}>
-                                                    {service.imageUrl ? (
-                                                        <img
-                                                            src={service.imageUrl}
-                                                            alt={service.name}
-                                                            className={styles.itemImage}
-                                                        />
-                                                    ) : (
-                                                        <div
-                                                            className={styles.itemImagePlaceholder}
-                                                        >
-                                                            <i className="isax isax-briefcase"></i>
-                                                        </div>
-                                                    )}
-                                                    <div className={styles.itemInfo}>
-                                                        <span className="service-title d-block mb-1">
-                                                            {service.name}
-                                                        </span>
-                                                        <span className="fs-14 text-primary fw-medium d-block">
-                                                            {formatCurrency(service.price)}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </span>
-                                        </label>
-                                    </div>
-                                ))
-                            ) : serviceSearch.trim() ? (
-                                <div className="col-12">
-                                    <div className={styles.noResults}>
-                                        <i className="isax isax-search-status"></i>
-                                        <p className="mb-0">Không tìm thấy dịch vụ phù hợp</p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="col-12">
-                                    <p className="text-muted mb-0">
-                                        Bệnh viện chưa có dịch vụ y tế nào
-                                    </p>
-                                </div>
-                            )}
+                            {displayedServices.length > 0
+                                ? displayedServices.map((service) => (
+                                      <div key={service.id} className="col-lg-4 col-md-6 mb-3">
+                                          <label
+                                              className={clsx(
+                                                  styles.serviceItem,
+                                                  'service-item',
+                                                  selectionType === 'service' &&
+                                                      selectedId === service.id &&
+                                                      'active'
+                                              )}
+                                              htmlFor={`service-${service.id}`}
+                                              aria-label={`Chọn dịch vụ ${service.name}`}
+                                          >
+                                              <input
+                                                  id={`service-${service.id}`}
+                                                  className="form-check-input ms-0 mt-0"
+                                                  type="radio"
+                                                  name="specialtyService"
+                                                  checked={
+                                                      selectionType === 'service' &&
+                                                      selectedId === service.id
+                                                  }
+                                                  onChange={() => handleServiceSelect(service.id)}
+                                              />
+                                              <span className="form-check-label ms-2 w-100">
+                                                  <div className={styles.itemContent}>
+                                                      {service.imageUrl ? (
+                                                          <img
+                                                              src={service.imageUrl}
+                                                              alt={service.name}
+                                                              className={styles.itemImage}
+                                                          />
+                                                      ) : (
+                                                          <div
+                                                              className={
+                                                                  styles.itemImagePlaceholder
+                                                              }
+                                                          >
+                                                              <i className="isax isax-briefcase"></i>
+                                                          </div>
+                                                      )}
+                                                      <div className={styles.itemInfo}>
+                                                          <span className="service-title d-block mb-1">
+                                                              {service.name}
+                                                          </span>
+                                                          <span className="fs-14 text-primary fw-medium d-block">
+                                                              {formatCurrency(service.price)}
+                                                          </span>
+                                                      </div>
+                                                  </div>
+                                              </span>
+                                          </label>
+                                      </div>
+                                  ))
+                                : renderServiceEmptyState()}
                         </div>
 
                         {/* Show more button for services */}
@@ -540,8 +558,8 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                     {/* Selection hint */}
                     {!canProceed && (
                         <div className="alert alert-info mt-3 mb-0">
-                            <i className="isax isax-info-circle me-2"></i>
-                            Vui lòng chọn một chuyên khoa hoặc một dịch vụ y tế để tiếp tục
+                            <i className="isax isax-info-circle me-2" aria-hidden="true"></i> Vui
+                            lòng chọn một chuyên khoa hoặc một dịch vụ y tế để tiếp tục
                         </div>
                     )}
                 </div>

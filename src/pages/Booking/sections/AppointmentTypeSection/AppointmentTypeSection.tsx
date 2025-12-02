@@ -358,6 +358,34 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
             selectedType === AppointmentType.IN_PERSON ? 'Khám trực tiếp' : 'Tư vấn trực tuyến',
     };
 
+    // Helper function to get price filter value - extracted to avoid nested ternary
+    const getPriceFilterValue = (): string => {
+        if (filters.minPrice === 0 && filters.maxPrice === 300000) {
+            return 'low';
+        }
+        if (filters.minPrice === 300000 && filters.maxPrice === 500000) {
+            return 'medium';
+        }
+        if (filters.minPrice === 500000 && filters.maxPrice === undefined) {
+            return 'high';
+        }
+        return '';
+    };
+
+    // Helper function to get experience filter value - extracted to avoid nested ternary
+    const getExperienceFilterValue = (): string => {
+        if (filters.minExperience === 1 && filters.maxExperience === 3) {
+            return '1-3';
+        }
+        if (filters.minExperience === 4 && filters.maxExperience === 7) {
+            return '4-7';
+        }
+        if (filters.minExperience === 8 && filters.maxExperience === undefined) {
+            return '8+';
+        }
+        return '';
+    };
+
     return (
         <BookingSectionWrapper
             doctor={hospitalInfo}
@@ -427,8 +455,8 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
 
                     {isServiceSelected && (
                         <div className="alert alert-warning mb-4">
-                            <i className="isax isax-info-circle me-2"></i>
-                            Dịch vụ y tế chỉ hỗ trợ khám trực tiếp tại bệnh viện
+                            <i className="isax isax-info-circle me-2" aria-hidden="true"></i> Dịch
+                            vụ y tế chỉ hỗ trợ khám trực tiếp tại bệnh viện
                         </div>
                     )}
 
@@ -436,7 +464,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                     {isSpecialtySelected && (
                         <div className="mt-4 pt-4 border-top">
                             <h6 className="mb-3">
-                                <i className="isax isax-user-octagon me-2"></i>
+                                <i className="isax isax-user-octagon me-2" aria-hidden="true"></i>{' '}
                                 Chọn bác sĩ (không bắt buộc)
                             </h6>
                             <p className="text-muted fs-14 mb-3">
@@ -499,6 +527,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                 styles.disabled
                                         )}
                                         htmlFor="doctorSelectionModeSelf"
+                                        aria-label="Tự chọn bác sĩ"
                                     >
                                         <input
                                             id="doctorSelectionModeSelf"
@@ -641,22 +670,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                             <div className="col-md-6">
                                                                 <Select
                                                                     title="Tất cả mức giá"
-                                                                    value={
-                                                                        filters.minPrice === 0 &&
-                                                                        filters.maxPrice === 300000
-                                                                            ? 'low'
-                                                                            : filters.minPrice ===
-                                                                                    300000 &&
-                                                                                filters.maxPrice ===
-                                                                                    500000
-                                                                              ? 'medium'
-                                                                              : filters.minPrice ===
-                                                                                      500000 &&
-                                                                                  filters.maxPrice ===
-                                                                                      undefined
-                                                                                ? 'high'
-                                                                                : ''
-                                                                    }
+                                                                    value={getPriceFilterValue()}
                                                                     onChange={(value) => {
                                                                         if (value === '') {
                                                                             handleFilterChange(
@@ -764,23 +778,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                             <div className="col-md-6">
                                                                 <Select
                                                                     title="Tất cả kinh nghiệm"
-                                                                    value={
-                                                                        filters.minExperience ===
-                                                                            1 &&
-                                                                        filters.maxExperience === 3
-                                                                            ? '1-3'
-                                                                            : filters.minExperience ===
-                                                                                    4 &&
-                                                                                filters.maxExperience ===
-                                                                                    7
-                                                                              ? '4-7'
-                                                                              : filters.minExperience ===
-                                                                                      8 &&
-                                                                                  filters.maxExperience ===
-                                                                                      undefined
-                                                                                ? '8+'
-                                                                                : ''
-                                                                    }
+                                                                    value={getExperienceFilterValue()}
                                                                     onChange={(value) => {
                                                                         if (value === '') {
                                                                             handleFilterChange(
@@ -907,7 +905,10 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                     className="btn btn-sm btn-link text-danger p-0"
                                                                     onClick={handleResetFilters}
                                                                 >
-                                                                    <i className="isax isax-refresh me-1"></i>
+                                                                    <i
+                                                                        className="isax isax-refresh me-1"
+                                                                        aria-hidden="true"
+                                                                    ></i>{' '}
                                                                     Xóa bộ lọc
                                                                 </button>
                                                             </div>
@@ -1064,7 +1065,10 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                             {/* No results after filtering */}
                                             {doctors.length === 0 && hasAppliedFilters && (
                                                 <div className="alert alert-info mb-3">
-                                                    <i className="isax isax-info-circle me-2"></i>
+                                                    <i
+                                                        className="isax isax-info-circle me-2"
+                                                        aria-hidden="true"
+                                                    ></i>{' '}
                                                     Không tìm thấy bác sĩ phù hợp với bộ lọc. Hãy
                                                     thử điều chỉnh bộ lọc hoặc{' '}
                                                     <button
@@ -1072,7 +1076,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                         onClick={handleResetFilters}
                                                     >
                                                         xóa bộ lọc
-                                                    </button>
+                                                    </button>{' '}
                                                     .
                                                 </div>
                                             )}
@@ -1094,7 +1098,10 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                             {/* Hint when no doctor selected yet */}
                                             {!selectedDoctor && doctors.length > 0 && (
                                                 <div className="alert alert-warning mb-3 mt-2">
-                                                    <i className="isax isax-info-circle me-2"></i>
+                                                    <i
+                                                        className="isax isax-info-circle me-2"
+                                                        aria-hidden="true"
+                                                    ></i>{' '}
                                                     Vui lòng chọn một bác sĩ hoặc quay lại chọn "Để
                                                     bệnh viện phân công"
                                                 </div>
@@ -1102,7 +1109,10 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                         </div>
                                     ) : (
                                         <div className="alert alert-info mb-0">
-                                            <i className="isax isax-info-circle me-2"></i>
+                                            <i
+                                                className="isax isax-info-circle me-2"
+                                                aria-hidden="true"
+                                            ></i>{' '}
                                             Không tìm thấy bác sĩ phù hợp. Vui lòng chọn "Để bệnh
                                             viện phân công".
                                         </div>
