@@ -39,7 +39,7 @@ import { useDoctorInfo } from '../../hooks/useDoctorInfo';
 import { useServiceMedicalInfo } from '../../hooks/useServiceMedicalInfo';
 import { useHospitalBookingInfo } from '../../hooks/useHospitalBookingInfo';
 import { toast } from 'react-toastify';
-import { AppointmentType } from '@/enums/appointment.enums';
+import { AppointmentType, AppointmentTime } from '@/enums/appointment.enums';
 
 // Helper function to restore slot and update UI
 const restoreSlotHelper = (
@@ -715,6 +715,83 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     const hasInitializedRef = useRef(false);
     const lastFetchedDateRef = useRef<string | null>(null);
 
+    // Helper function to restore specialty held slot - extracted to reduce cognitive complexity
+    const handleRestoreSpecialtySlot = async (
+        selectedSlot: { startTime: string; endTime: string },
+        appointmentTimeId: string
+    ): Promise<void> => {
+        if (!hospitalId || !hospitalBookingSpecialtyId || !selectedDate) return;
+
+        const remainingTime = await HoldSlotService.getSpecialtyRemainingTime(
+            hospitalId,
+            hospitalBookingSpecialtyId,
+            selectedDate,
+            appointmentTimeId as AppointmentTime
+        );
+
+        if (remainingTime > 0) {
+            const maxCapacity =
+                specialtyScheduleInfo?.availableSlots?.find(
+                    (s) => s.startTime === selectedSlot.startTime
+                )?.availableDoctorCount || 1;
+
+            restoreSpecialtyHeldSlot(
+                hospitalId,
+                hospitalBookingSpecialtyId,
+                selectedDate,
+                appointmentTimeId as AppointmentTime,
+                maxCapacity,
+                remainingTime
+            );
+        }
+
+        restoreSlotHelper(
+            effectiveScheduleCategories,
+            selectedSlot,
+            setSlotChecked,
+            dispatch,
+            toggleSlotSelection
+        );
+    };
+
+    // Helper function to restore doctor/service held slot - extracted to reduce cognitive complexity
+    const handleRestoreDoctorServiceSlot = async (
+        selectedSlot: { startTime: string; endTime: string },
+        appointmentTimeId: string
+    ): Promise<void> => {
+        const restoreTargetId = effectiveDoctorId || effectiveServiceId;
+        const restoreTargetType = effectiveDoctorId
+            ? HoldSlotTargetType.Doctor
+            : HoldSlotTargetType.ServiceMedical;
+
+        if (!restoreTargetId || !selectedDate) return;
+
+        const remainingTime = await HoldSlotService.getRemainingTime(
+            restoreTargetId,
+            restoreTargetType,
+            selectedDate,
+            appointmentTimeId as AppointmentTime
+        );
+
+        if (remainingTime > 0) {
+            restoreDoctorServiceHeldSlot(
+                restoreTargetId,
+                restoreTargetType,
+                selectedDate,
+                appointmentTimeId as AppointmentTime,
+                remainingTime
+            );
+        }
+
+        restoreSlotHelper(
+            effectiveScheduleCategories,
+            selectedSlot,
+            setSlotChecked,
+            dispatch,
+            toggleSlotSelection
+        );
+    };
+
     // Initialize with current date on component mount
     useEffect(() => {
         const fetchSlotsForDate = async (fetchDate: Date) => {
@@ -799,130 +876,48 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             if (hasRestoredRef.current) return;
 
             // Only restore if we have valid data and no active hold
-            // Note: We don't check slotChecked here because sync effect may have set it
-            // The !isHeld and !isSpecialtyHeld conditions below handle the "already holding" case
-            if (
-                selectedDate &&
-                selectedSlots.length > 0 &&
-                effectiveScheduleCategories.length > 0
-            ) {
-                const selectedSlot = selectedSlots[0];
-                const appointmentTimeId = createAppointmentTimeId({
-                    startTime: selectedSlot.startTime,
-                    endTime: selectedSlot.endTime,
-                });
+            const hasValidData =
+                selectedDate && selectedSlots.length > 0 && effectiveScheduleCategories.length > 0;
+            if (!hasValidData) return;
 
-                // Handle specialty booking restore
-                if (
-                    isSpecialtyBooking &&
-                    hospitalId &&
-                    hospitalBookingSpecialtyId &&
-                    !isSpecialtyHeld
-                ) {
-                    hasRestoredRef.current = true;
+            const selectedSlot = selectedSlots[0];
+            const appointmentTimeId = createAppointmentTimeId({
+                startTime: selectedSlot.startTime,
+                endTime: selectedSlot.endTime,
+            });
 
-                    try {
-                        const remainingTime = await HoldSlotService.getSpecialtyRemainingTime(
-                            hospitalId,
-                            hospitalBookingSpecialtyId,
-                            selectedDate,
-                            appointmentTimeId
-                        );
+            // Handle specialty booking restore
+            const shouldRestoreSpecialty =
+                isSpecialtyBooking && hospitalId && hospitalBookingSpecialtyId && !isSpecialtyHeld;
 
-                        if (remainingTime > 0) {
-                            // Get maxCapacity from specialty schedule info
-                            const maxCapacity =
-                                specialtyScheduleInfo?.availableSlots?.find(
-                                    (s) => s.startTime === selectedSlot.startTime
-                                )?.availableDoctorCount || 1;
-
-                            // Restore specialty held slot
-                            restoreSpecialtyHeldSlot(
-                                hospitalId,
-                                hospitalBookingSpecialtyId,
-                                selectedDate,
-                                appointmentTimeId,
-                                maxCapacity,
-                                remainingTime
-                            );
-
-                            // Set slotChecked based on selectedSlot
-                            restoreSlotHelper(
-                                effectiveScheduleCategories,
-                                selectedSlot,
-                                setSlotChecked,
-                                dispatch,
-                                toggleSlotSelection
-                            );
-                        } else {
-                            restoreSlotHelper(
-                                effectiveScheduleCategories,
-                                selectedSlot,
-                                setSlotChecked,
-                                dispatch,
-                                toggleSlotSelection
-                            );
-                        }
-                    } catch (error) {
-                        console.error('Failed to restore specialty held slot:', error);
-                        hasRestoredRef.current = false;
-                    }
+            if (shouldRestoreSpecialty) {
+                hasRestoredRef.current = true;
+                try {
+                    await handleRestoreSpecialtySlot(selectedSlot, appointmentTimeId);
+                } catch (error) {
+                    console.error('Failed to restore specialty held slot:', error);
+                    hasRestoredRef.current = false;
                 }
-                // Handle doctor/service booking restore
-                else if (!isSpecialtyBooking && !isHeld) {
-                    const restoreTargetId = effectiveDoctorId || effectiveServiceId;
-                    const restoreTargetType = effectiveDoctorId
-                        ? HoldSlotTargetType.Doctor
-                        : HoldSlotTargetType.ServiceMedical;
+                return;
+            }
 
-                    if (restoreTargetId) {
-                        hasRestoredRef.current = true;
+            // Handle doctor/service booking restore
+            const shouldRestoreDoctorService =
+                !isSpecialtyBooking && !isHeld && (effectiveDoctorId || effectiveServiceId);
 
-                        try {
-                            const remainingTime = await HoldSlotService.getRemainingTime(
-                                restoreTargetId,
-                                restoreTargetType,
-                                selectedDate,
-                                appointmentTimeId
-                            );
-
-                            if (remainingTime > 0) {
-                                // Slot is still held, restore countdown timer
-                                restoreDoctorServiceHeldSlot(
-                                    restoreTargetId,
-                                    restoreTargetType,
-                                    selectedDate,
-                                    appointmentTimeId,
-                                    remainingTime
-                                );
-
-                                // Set slotChecked based on selectedSlot
-                                restoreSlotHelper(
-                                    effectiveScheduleCategories,
-                                    selectedSlot,
-                                    setSlotChecked,
-                                    dispatch,
-                                    toggleSlotSelection
-                                );
-                            } else {
-                                restoreSlotHelper(
-                                    effectiveScheduleCategories,
-                                    selectedSlot,
-                                    setSlotChecked,
-                                    dispatch,
-                                    toggleSlotSelection
-                                );
-                            }
-                        } catch (error) {
-                            console.error('Failed to restore held slot:', error);
-                            hasRestoredRef.current = false;
-                        }
-                    }
+            if (shouldRestoreDoctorService) {
+                hasRestoredRef.current = true;
+                try {
+                    await handleRestoreDoctorServiceSlot(selectedSlot, appointmentTimeId);
+                } catch (error) {
+                    console.error('Failed to restore held slot:', error);
+                    hasRestoredRef.current = false;
                 }
             }
         };
 
         checkAndRestoreHeldSlot();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         effectiveDoctorId,
         effectiveServiceId,
@@ -934,10 +929,6 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         effectiveScheduleCategories,
         hospitalId,
         hospitalBookingSpecialtyId,
-        specialtyScheduleInfo,
-        restoreDoctorServiceHeldSlot,
-        restoreSpecialtyHeldSlot,
-        dispatch,
     ]);
 
     // Sync local slotChecked state with Redux selectedSlots for UI highlighting

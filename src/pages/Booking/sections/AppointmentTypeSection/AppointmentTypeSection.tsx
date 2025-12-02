@@ -386,6 +386,14 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
         return '';
     };
 
+    // Helper function to render no doctors available message - extracted to avoid nested ternary
+    const renderNoDoctorsMessage = () => (
+        <div className="alert alert-info mb-0">
+            <i className="isax isax-info-circle me-2" aria-hidden="true"></i> Không tìm thấy bác sĩ
+            phù hợp. Vui lòng chọn "Để bệnh viện phân công".
+        </div>
+    );
+
     return (
         <BookingSectionWrapper
             doctor={hospitalInfo}
@@ -1108,14 +1116,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                             )}
                                         </div>
                                     ) : (
-                                        <div className="alert alert-info mb-0">
-                                            <i
-                                                className="isax isax-info-circle me-2"
-                                                aria-hidden="true"
-                                            ></i>{' '}
-                                            Không tìm thấy bác sĩ phù hợp. Vui lòng chọn "Để bệnh
-                                            viện phân công".
-                                        </div>
+                                        renderNoDoctorsMessage()
                                     )}
                                 </>
                             )}
