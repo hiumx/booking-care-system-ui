@@ -289,6 +289,37 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         }
     };
 
+    // Helper function to check if next step should be disabled - extracted to reduce cognitive complexity
+    const isNextStepDisabled = (): boolean => {
+        if (isCreatingAppointment || isProcessingPayment) {
+            return true;
+        }
+        // For specialty booking with no-payment, don't require TOTAL_AMOUNT
+        // For other cases, require valid price
+        if (
+            !isSpecialtyBooking &&
+            paymentOption === 'deposit' &&
+            (!TOTAL_AMOUNT || TOTAL_AMOUNT <= 0)
+        ) {
+            return true;
+        }
+        // Only require payment method selection if deposit option is chosen
+        if (paymentOption === 'deposit' && !selectedPayment) {
+            return true;
+        }
+        return false;
+    };
+
+    // Helper function to check if hospital booking flow should render - extracted to reduce cognitive complexity
+    const shouldRenderHospitalBookingFlow = (): boolean => {
+        return (
+            isHospitalBooking &&
+            entityInfo !== null &&
+            'bookingType' in entityInfo &&
+            entityInfo.bookingType === 'hospital'
+        );
+    };
+
     // Render payment method content
     const renderPaymentMethodContent = () => {
         if (isLoadingPaymentMethods) {
@@ -443,17 +474,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
             nextStep={handleNextStep}
             prevStep={prevStep}
             isShowInfoHeader={false}
-            disabled={
-                isCreatingAppointment ||
-                isProcessingPayment ||
-                // For specialty booking with no-payment, don't require TOTAL_AMOUNT
-                // For other cases, require valid price
-                (!isSpecialtyBooking &&
-                    paymentOption === 'deposit' &&
-                    (!TOTAL_AMOUNT || TOTAL_AMOUNT <= 0)) ||
-                // Only require payment method selection if deposit option is chosen
-                (paymentOption === 'deposit' && !selectedPayment)
-            }
+            disabled={isNextStepDisabled()}
         >
             {/* Payment Options Selection */}
             {!isSupplementaryPayment && (
@@ -697,9 +718,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                             {entityInfo?.name && (
                                 <>
                                     {/* Hospital Booking Flow */}
-                                    {isHospitalBooking &&
-                                    'bookingType' in entityInfo &&
-                                    entityInfo.bookingType === 'hospital' ? (
+                                    {shouldRenderHospitalBookingFlow() ? (
                                         <>
                                             <div className="mb-3">
                                                 <div className="fw-medium">Bệnh viện</div>
@@ -707,30 +726,33 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                     {entityInfo.name}
                                                 </div>
                                             </div>
-                                            {entityInfo.selectedSpecialty && (
-                                                <div className="mb-3">
-                                                    <div className="fw-medium">Chuyên khoa</div>
-                                                    <div className="form-plain-text">
-                                                        {entityInfo.selectedSpecialty}
+                                            {'selectedSpecialty' in entityInfo &&
+                                                entityInfo.selectedSpecialty && (
+                                                    <div className="mb-3">
+                                                        <div className="fw-medium">Chuyên khoa</div>
+                                                        <div className="form-plain-text">
+                                                            {entityInfo.selectedSpecialty}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
-                                            {entityInfo.selectedService && (
-                                                <div className="mb-3">
-                                                    <div className="fw-medium">Dịch vụ</div>
-                                                    <div className="form-plain-text">
-                                                        {entityInfo.selectedService}
+                                                )}
+                                            {'selectedService' in entityInfo &&
+                                                entityInfo.selectedService && (
+                                                    <div className="mb-3">
+                                                        <div className="fw-medium">Dịch vụ</div>
+                                                        <div className="form-plain-text">
+                                                            {entityInfo.selectedService}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
-                                            {entityInfo.selectedDoctor && (
-                                                <div className="mb-3">
-                                                    <div className="fw-medium">Bác sĩ</div>
-                                                    <div className="form-plain-text">
-                                                        {entityInfo.selectedDoctor}
+                                                )}
+                                            {'selectedDoctor' in entityInfo &&
+                                                entityInfo.selectedDoctor && (
+                                                    <div className="mb-3">
+                                                        <div className="fw-medium">Bác sĩ</div>
+                                                        <div className="form-plain-text">
+                                                            {entityInfo.selectedDoctor}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
+                                                )}
                                         </>
                                     ) : (
                                         renderBookingEntityInfo()

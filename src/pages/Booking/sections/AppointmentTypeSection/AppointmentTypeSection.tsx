@@ -260,27 +260,34 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
         setFilters(defaultFilters);
     };
 
+    // Helper function to check if filters are active - extracted to reduce cognitive complexity
+    const checkFiltersActive = (filterObj: typeof filters): boolean => {
+        const hasSearchTerm = filterObj.searchTerm !== '';
+        const hasPriceFilter =
+            (filterObj.minPrice !== undefined && filterObj.minPrice >= 0) ||
+            filterObj.maxPrice !== undefined;
+        const hasRatingFilter = filterObj.minRating !== undefined;
+        const hasExperienceFilter =
+            (filterObj.minExperience !== undefined && filterObj.minExperience >= 0) ||
+            filterObj.maxExperience !== undefined;
+        const hasGenderFilter = filterObj.gender !== undefined && filterObj.gender !== '';
+        const hasLanguageFilter = filterObj.language !== undefined && filterObj.language !== '';
+
+        return (
+            hasSearchTerm ||
+            hasPriceFilter ||
+            hasRatingFilter ||
+            hasExperienceFilter ||
+            hasGenderFilter ||
+            hasLanguageFilter
+        );
+    };
+
     // Check if any filter is active (for UI display)
-    const hasActiveFilters =
-        filters.searchTerm !== '' ||
-        (filters.minPrice !== undefined && filters.minPrice >= 0) ||
-        filters.maxPrice !== undefined ||
-        filters.minRating !== undefined ||
-        (filters.minExperience !== undefined && filters.minExperience >= 0) ||
-        filters.maxExperience !== undefined ||
-        (filters.gender !== undefined && filters.gender !== '') ||
-        (filters.language !== undefined && filters.language !== '');
+    const hasActiveFilters = checkFiltersActive(filters);
 
     // Check if any debounced filter is applied (for logic)
-    const hasAppliedFilters =
-        debouncedFilters.searchTerm !== '' ||
-        (debouncedFilters.minPrice !== undefined && debouncedFilters.minPrice >= 0) ||
-        debouncedFilters.maxPrice !== undefined ||
-        debouncedFilters.minRating !== undefined ||
-        (debouncedFilters.minExperience !== undefined && debouncedFilters.minExperience >= 0) ||
-        debouncedFilters.maxExperience !== undefined ||
-        (debouncedFilters.gender !== undefined && debouncedFilters.gender !== '') ||
-        (debouncedFilters.language !== undefined && debouncedFilters.language !== '');
+    const hasAppliedFilters = checkFiltersActive(debouncedFilters);
 
     const handleTypeSelect = (type: AppointmentType) => {
         if (isServiceSelected) return; // Cannot change type for service
@@ -391,6 +398,34 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
         <div className="alert alert-info mb-0">
             <i className="isax isax-info-circle me-2" aria-hidden="true"></i> Không tìm thấy bác sĩ
             phù hợp. Vui lòng chọn "Để bệnh viện phân công".
+        </div>
+    );
+
+    // Helper function to render loading skeleton - extracted to reduce cognitive complexity
+    const renderDoctorListSkeleton = () => (
+        <div className="mt-3 pt-3 border-top">
+            <div className="row">
+                {[1, 2, 3, 4, 5, 6].map((index) => (
+                    <div key={index} className="col-md-6 col-lg-4 mb-3">
+                        <div className="card h-100">
+                            <div className="card-body p-3">
+                                <div className="d-flex align-items-start">
+                                    <Skeleton variant="circular" width={60} height={60} />
+                                    <div className="ms-3 flex-grow-1">
+                                        <Skeleton variant="text" width="80%" height={22} />
+                                        <Skeleton variant="text" width="60%" height={18} />
+                                        <Skeleton variant="text" width="40%" height={16} />
+                                    </div>
+                                </div>
+                                <div className="mt-3">
+                                    <Skeleton variant="text" width="50%" height={16} />
+                                    <Skeleton variant="text" width="70%" height={16} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 
@@ -571,553 +606,524 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                             {/* Doctor List - Only show when self select mode is chosen */}
                             {doctorSelectionMode === 'self' && (
                                 <>
-                                    {isLoadingDoctors ? (
-                                        <div className="mt-3 pt-3 border-top">
-                                            {/* Doctor List Skeleton */}
-                                            <div className="row">
-                                                {[1, 2, 3, 4, 5, 6].map((index) => (
-                                                    <div
-                                                        key={index}
-                                                        className="col-md-6 col-lg-4 mb-3"
-                                                    >
-                                                        <div className="card h-100">
-                                                            <div className="card-body p-3">
-                                                                <div className="d-flex align-items-start">
-                                                                    <Skeleton
-                                                                        variant="circular"
-                                                                        width={60}
-                                                                        height={60}
-                                                                    />
-                                                                    <div className="ms-3 flex-grow-1">
-                                                                        <Skeleton
-                                                                            variant="text"
-                                                                            width="80%"
-                                                                            height={22}
-                                                                        />
-                                                                        <Skeleton
-                                                                            variant="text"
-                                                                            width="60%"
-                                                                            height={18}
-                                                                        />
-                                                                        <Skeleton
-                                                                            variant="text"
-                                                                            width="40%"
-                                                                            height={16}
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                                <div className="mt-3">
-                                                                    <Skeleton
-                                                                        variant="text"
-                                                                        width="50%"
-                                                                        height={16}
-                                                                    />
-                                                                    <Skeleton
-                                                                        variant="text"
-                                                                        width="70%"
-                                                                        height={16}
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ) : totalDoctors > 0 || hasAppliedFilters ? (
-                                        <div
-                                            className={clsx(
-                                                styles.doctorListWrapper,
-                                                'mt-3 pt-3 border-top'
-                                            )}
-                                        >
-                                            {/* Filter Section */}
-                                            <div className="mb-3">
-                                                <div className="d-flex align-items-center justify-content-between mb-2">
-                                                    <p className="text-muted fs-14 mb-0">
-                                                        <i className="isax isax-info-circle me-1"></i>
-                                                        {doctors.length > 0
-                                                            ? 'Chọn bác sĩ bạn muốn khám'
-                                                            : 'Không tìm thấy bác sĩ phù hợp'}
-                                                    </p>
-                                                    <button
-                                                        className="btn btn-sm btn-outline-primary"
-                                                        onClick={() => setShowFilters(!showFilters)}
-                                                    >
-                                                        <i className={`isax isax-filter me-1`}></i>
-                                                        Bộ lọc
-                                                        {hasActiveFilters && (
-                                                            <span className="badge bg-primary ms-1">
-                                                                !
-                                                            </span>
-                                                        )}
-                                                    </button>
-                                                </div>
+                                    {/* Loading skeleton */}
+                                    {isLoadingDoctors && renderDoctorListSkeleton()}
 
-                                                {/* Filter Panel */}
-                                                {showFilters && (
-                                                    <div className="card card-body bg-light mb-3">
-                                                        <div className="row g-2">
-                                                            {/* Search */}
-                                                            <div className="col-md-6">
-                                                                <input
-                                                                    type="text"
-                                                                    className="form-control form-control-sm"
-                                                                    placeholder="Tìm theo tên bác sĩ..."
-                                                                    value={filters.searchTerm}
-                                                                    onChange={(e) =>
-                                                                        handleFilterChange(
-                                                                            'searchTerm',
-                                                                            e.target.value
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
+                                    {/* No doctors available message */}
+                                    {!isLoadingDoctors &&
+                                        !(totalDoctors > 0 || hasAppliedFilters) &&
+                                        renderNoDoctorsMessage()}
 
-                                                            {/* Price Range */}
-                                                            <div className="col-md-6">
-                                                                <Select
-                                                                    title="Tất cả mức giá"
-                                                                    value={getPriceFilterValue()}
-                                                                    onChange={(value) => {
-                                                                        if (value === '') {
-                                                                            handleFilterChange(
-                                                                                'minPrice',
-                                                                                undefined
-                                                                            );
-                                                                            handleFilterChange(
-                                                                                'maxPrice',
-                                                                                undefined
-                                                                            );
-                                                                        } else if (
-                                                                            value === 'low'
-                                                                        ) {
-                                                                            handleFilterChange(
-                                                                                'minPrice',
-                                                                                0
-                                                                            );
-                                                                            handleFilterChange(
-                                                                                'maxPrice',
-                                                                                300000
-                                                                            );
-                                                                        } else if (
-                                                                            value === 'medium'
-                                                                        ) {
-                                                                            handleFilterChange(
-                                                                                'minPrice',
-                                                                                300000
-                                                                            );
-                                                                            handleFilterChange(
-                                                                                'maxPrice',
-                                                                                500000
-                                                                            );
-                                                                        } else if (
-                                                                            value === 'high'
-                                                                        ) {
-                                                                            handleFilterChange(
-                                                                                'minPrice',
-                                                                                500000
-                                                                            );
-                                                                            handleFilterChange(
-                                                                                'maxPrice',
-                                                                                undefined
-                                                                            );
-                                                                        }
-                                                                    }}
-                                                                    items={[
-                                                                        {
-                                                                            label: 'Tất cả mức giá',
-                                                                            value: '',
-                                                                        },
-                                                                        {
-                                                                            label: 'Dưới 300K',
-                                                                            value: 'low',
-                                                                        },
-                                                                        {
-                                                                            label: '300K - 500K',
-                                                                            value: 'medium',
-                                                                        },
-                                                                        {
-                                                                            label: 'Trên 500K',
-                                                                            value: 'high',
-                                                                        },
-                                                                    ]}
-                                                                />
-                                                            </div>
-
-                                                            {/* Rating */}
-                                                            <div className="col-md-6">
-                                                                <Select
-                                                                    title="Tất cả đánh giá"
-                                                                    value={
-                                                                        filters.minRating?.toString() ||
-                                                                        ''
-                                                                    }
-                                                                    onChange={(value) =>
-                                                                        handleFilterChange(
-                                                                            'minRating',
-                                                                            value
-                                                                                ? Number(value)
-                                                                                : undefined
-                                                                        )
-                                                                    }
-                                                                    items={[
-                                                                        {
-                                                                            label: 'Tất cả đánh giá',
-                                                                            value: '',
-                                                                        },
-                                                                        {
-                                                                            label: '4+ sao',
-                                                                            value: '4',
-                                                                        },
-                                                                        {
-                                                                            label: '3+ sao',
-                                                                            value: '3',
-                                                                        },
-                                                                        {
-                                                                            label: '2+ sao',
-                                                                            value: '2',
-                                                                        },
-                                                                    ]}
-                                                                />
-                                                            </div>
-
-                                                            {/* Experience */}
-                                                            <div className="col-md-6">
-                                                                <Select
-                                                                    title="Tất cả kinh nghiệm"
-                                                                    value={getExperienceFilterValue()}
-                                                                    onChange={(value) => {
-                                                                        if (value === '') {
-                                                                            handleFilterChange(
-                                                                                'minExperience',
-                                                                                undefined
-                                                                            );
-                                                                            handleFilterChange(
-                                                                                'maxExperience',
-                                                                                undefined
-                                                                            );
-                                                                        } else if (
-                                                                            value === '1-3'
-                                                                        ) {
-                                                                            handleFilterChange(
-                                                                                'minExperience',
-                                                                                1
-                                                                            );
-                                                                            handleFilterChange(
-                                                                                'maxExperience',
-                                                                                3
-                                                                            );
-                                                                        } else if (
-                                                                            value === '4-7'
-                                                                        ) {
-                                                                            handleFilterChange(
-                                                                                'minExperience',
-                                                                                4
-                                                                            );
-                                                                            handleFilterChange(
-                                                                                'maxExperience',
-                                                                                7
-                                                                            );
-                                                                        } else if (value === '8+') {
-                                                                            handleFilterChange(
-                                                                                'minExperience',
-                                                                                8
-                                                                            );
-                                                                            handleFilterChange(
-                                                                                'maxExperience',
-                                                                                undefined
-                                                                            );
-                                                                        }
-                                                                    }}
-                                                                    items={[
-                                                                        {
-                                                                            label: 'Tất cả kinh nghiệm',
-                                                                            value: '',
-                                                                        },
-                                                                        {
-                                                                            label: '1-3 năm',
-                                                                            value: '1-3',
-                                                                        },
-                                                                        {
-                                                                            label: '4-7 năm',
-                                                                            value: '4-7',
-                                                                        },
-                                                                        {
-                                                                            label: '8+ năm',
-                                                                            value: '8+',
-                                                                        },
-                                                                    ]}
-                                                                />
-                                                            </div>
-
-                                                            {/* Gender */}
-                                                            <div className="col-md-6">
-                                                                <Select
-                                                                    title="Tất cả giới tính"
-                                                                    value={filters.gender || ''}
-                                                                    onChange={(value) =>
-                                                                        handleFilterChange(
-                                                                            'gender',
-                                                                            value || undefined
-                                                                        )
-                                                                    }
-                                                                    items={[
-                                                                        {
-                                                                            label: 'Tất cả giới tính',
-                                                                            value: '',
-                                                                        },
-                                                                        {
-                                                                            label: 'Nam',
-                                                                            value: 'MALE',
-                                                                        },
-                                                                        {
-                                                                            label: 'Nữ',
-                                                                            value: 'FEMALE',
-                                                                        },
-                                                                    ]}
-                                                                />
-                                                            </div>
-
-                                                            {/* Language */}
-                                                            <div className="col-md-6">
-                                                                <Select
-                                                                    title="Tất cả ngôn ngữ"
-                                                                    value={filters.language || ''}
-                                                                    onChange={(value) =>
-                                                                        handleFilterChange(
-                                                                            'language',
-                                                                            value || undefined
-                                                                        )
-                                                                    }
-                                                                    items={[
-                                                                        {
-                                                                            label: 'Tất cả ngôn ngữ',
-                                                                            value: '',
-                                                                        },
-                                                                        ...availableLanguages.map(
-                                                                            (lang) => ({
-                                                                                label: lang.name,
-                                                                                value: lang.name,
-                                                                            })
-                                                                        ),
-                                                                    ]}
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Reset button */}
-                                                        {hasActiveFilters && (
-                                                            <div className="mt-2 text-end">
-                                                                <button
-                                                                    className="btn btn-sm btn-link text-danger p-0"
-                                                                    onClick={handleResetFilters}
-                                                                >
-                                                                    <i
-                                                                        className="isax isax-refresh me-1"
-                                                                        aria-hidden="true"
-                                                                    ></i>{' '}
-                                                                    Xóa bộ lọc
-                                                                </button>
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                    {/* Doctor list with filters */}
+                                    {!isLoadingDoctors &&
+                                        (totalDoctors > 0 || hasAppliedFilters) && (
+                                            <div
+                                                className={clsx(
+                                                    styles.doctorListWrapper,
+                                                    'mt-3 pt-3 border-top'
                                                 )}
-
-                                                {/* Filter result count */}
-                                                {hasAppliedFilters && (
-                                                    <p className="text-muted fs-13 mb-2">
-                                                        Tìm thấy {totalDoctors} bác sĩ phù hợp
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="row">
-                                                {doctors.map((doctor: DoctorForSelection) => (
-                                                    <div
-                                                        key={doctor.id}
-                                                        className="col-lg-6 col-md-6 mb-3"
-                                                    >
-                                                        <label
-                                                            className={clsx(
-                                                                styles.doctorCard,
-                                                                'service-item',
-                                                                selectedDoctor === doctor.id &&
-                                                                    'active'
-                                                            )}
-                                                            htmlFor={`doctorSelection-${doctor.id}`}
-                                                            aria-label={`Chọn bác sĩ ${doctor.fullName}`}
+                                            >
+                                                {/* Filter Section */}
+                                                <div className="mb-3">
+                                                    <div className="d-flex align-items-center justify-content-between mb-2">
+                                                        <p className="text-muted fs-14 mb-0">
+                                                            <i className="isax isax-info-circle me-1"></i>
+                                                            {doctors.length > 0
+                                                                ? 'Chọn bác sĩ bạn muốn khám'
+                                                                : 'Không tìm thấy bác sĩ phù hợp'}
+                                                        </p>
+                                                        <button
+                                                            className="btn btn-sm btn-outline-primary"
+                                                            onClick={() =>
+                                                                setShowFilters(!showFilters)
+                                                            }
                                                         >
-                                                            <input
-                                                                id={`doctorSelection-${doctor.id}`}
-                                                                className="form-check-input ms-0 mt-0"
-                                                                type="radio"
-                                                                name="doctorSelection"
-                                                                checked={
-                                                                    selectedDoctor === doctor.id
-                                                                }
-                                                                onChange={() =>
-                                                                    handleDoctorSelect(doctor.id)
-                                                                }
-                                                            />
-                                                            <span className="form-check-label ms-2 flex-grow-1">
-                                                                <div className="d-flex">
-                                                                    {/* Avatar */}
-                                                                    <div
-                                                                        className={
-                                                                            styles.doctorAvatar
+                                                            <i
+                                                                className={`isax isax-filter me-1`}
+                                                            ></i>
+                                                            Bộ lọc
+                                                            {hasActiveFilters && (
+                                                                <span className="badge bg-primary ms-1">
+                                                                    !
+                                                                </span>
+                                                            )}
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Filter Panel */}
+                                                    {showFilters && (
+                                                        <div className="card card-body bg-light mb-3">
+                                                            <div className="row g-2">
+                                                                {/* Search */}
+                                                                <div className="col-md-6">
+                                                                    <input
+                                                                        type="text"
+                                                                        className="form-control form-control-sm"
+                                                                        placeholder="Tìm theo tên bác sĩ..."
+                                                                        value={filters.searchTerm}
+                                                                        onChange={(e) =>
+                                                                            handleFilterChange(
+                                                                                'searchTerm',
+                                                                                e.target.value
+                                                                            )
                                                                         }
-                                                                    >
-                                                                        <img
-                                                                            src={
-                                                                                doctor.avatarUrl ||
-                                                                                '/assets/img/doctor-placeholder.png'
-                                                                            }
-                                                                            alt={doctor.fullName}
-                                                                            className="rounded-circle"
-                                                                        />
-                                                                    </div>
-
-                                                                    {/* Info */}
-                                                                    <div
-                                                                        className={
-                                                                            styles.doctorInfo
-                                                                        }
-                                                                    >
-                                                                        {/* Line 1: Name + Rating */}
-                                                                        <div className="d-flex align-items-center gap-2 mb-1">
-                                                                            <span
-                                                                                className={
-                                                                                    styles.doctorName
-                                                                                }
-                                                                            >
-                                                                                BS.{' '}
-                                                                                {doctor.fullName}
-                                                                            </span>
-                                                                            <span className="text-warning fs-13">
-                                                                                <i className="fa-solid fa-star me-1"></i>
-                                                                                {doctor.rating !==
-                                                                                    undefined &&
-                                                                                doctor.rating > 0
-                                                                                    ? doctor.rating.toFixed(
-                                                                                          1
-                                                                                      )
-                                                                                    : '0'}
-                                                                                <span className="text-muted ms-1">
-                                                                                    (
-                                                                                    {doctor.totalReviews ??
-                                                                                        0}
-                                                                                    )
-                                                                                </span>
-                                                                            </span>
-                                                                        </div>
-
-                                                                        {/* Line 2: Position + Specialty */}
-                                                                        <div className="text-muted fs-13 mb-1">
-                                                                            <i className="isax isax-health me-1"></i>
-                                                                            {[
-                                                                                doctor.positionName,
-                                                                                doctor.specialtyName,
-                                                                            ]
-                                                                                .filter(Boolean)
-                                                                                .join(' - ') ||
-                                                                                'Chưa cập nhật'}
-                                                                        </div>
-
-                                                                        {/* Line 3: Languages */}
-                                                                        {doctor.languages &&
-                                                                            doctor.languages
-                                                                                .length > 0 && (
-                                                                                <div className="text-muted fs-13 mb-1">
-                                                                                    <i className="isax isax-translate me-1"></i>
-                                                                                    {doctor.languages.join(
-                                                                                        ', '
-                                                                                    )}
-                                                                                </div>
-                                                                            )}
-
-                                                                        {/* Line 4: Experience */}
-                                                                        {doctor.yearsOfExperience !==
-                                                                            undefined &&
-                                                                            doctor.yearsOfExperience >
-                                                                                0 && (
-                                                                                <div className="text-muted fs-13 mb-1">
-                                                                                    <i className="isax isax-briefcase me-1"></i>
-                                                                                    {
-                                                                                        doctor.yearsOfExperience
-                                                                                    }{' '}
-                                                                                    năm kinh nghiệm
-                                                                                </div>
-                                                                            )}
-
-                                                                        {/* Line 5: Price */}
-                                                                        {doctor.consultationFee !==
-                                                                            undefined &&
-                                                                            doctor.consultationFee >
-                                                                                0 && (
-                                                                                <div className="text-success fw-medium fs-13">
-                                                                                    <i className="isax isax-money me-1"></i>
-                                                                                    {doctor.consultationFee.toLocaleString(
-                                                                                        'vi-VN'
-                                                                                    )}
-                                                                                    đ
-                                                                                </div>
-                                                                            )}
-                                                                    </div>
+                                                                    />
                                                                 </div>
-                                                            </span>
-                                                        </label>
+
+                                                                {/* Price Range */}
+                                                                <div className="col-md-6">
+                                                                    <Select
+                                                                        title="Tất cả mức giá"
+                                                                        value={getPriceFilterValue()}
+                                                                        onChange={(value) => {
+                                                                            if (value === '') {
+                                                                                handleFilterChange(
+                                                                                    'minPrice',
+                                                                                    undefined
+                                                                                );
+                                                                                handleFilterChange(
+                                                                                    'maxPrice',
+                                                                                    undefined
+                                                                                );
+                                                                            } else if (
+                                                                                value === 'low'
+                                                                            ) {
+                                                                                handleFilterChange(
+                                                                                    'minPrice',
+                                                                                    0
+                                                                                );
+                                                                                handleFilterChange(
+                                                                                    'maxPrice',
+                                                                                    300000
+                                                                                );
+                                                                            } else if (
+                                                                                value === 'medium'
+                                                                            ) {
+                                                                                handleFilterChange(
+                                                                                    'minPrice',
+                                                                                    300000
+                                                                                );
+                                                                                handleFilterChange(
+                                                                                    'maxPrice',
+                                                                                    500000
+                                                                                );
+                                                                            } else if (
+                                                                                value === 'high'
+                                                                            ) {
+                                                                                handleFilterChange(
+                                                                                    'minPrice',
+                                                                                    500000
+                                                                                );
+                                                                                handleFilterChange(
+                                                                                    'maxPrice',
+                                                                                    undefined
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                        items={[
+                                                                            {
+                                                                                label: 'Tất cả mức giá',
+                                                                                value: '',
+                                                                            },
+                                                                            {
+                                                                                label: 'Dưới 300K',
+                                                                                value: 'low',
+                                                                            },
+                                                                            {
+                                                                                label: '300K - 500K',
+                                                                                value: 'medium',
+                                                                            },
+                                                                            {
+                                                                                label: 'Trên 500K',
+                                                                                value: 'high',
+                                                                            },
+                                                                        ]}
+                                                                    />
+                                                                </div>
+
+                                                                {/* Rating */}
+                                                                <div className="col-md-6">
+                                                                    <Select
+                                                                        title="Tất cả đánh giá"
+                                                                        value={
+                                                                            filters.minRating?.toString() ||
+                                                                            ''
+                                                                        }
+                                                                        onChange={(value) =>
+                                                                            handleFilterChange(
+                                                                                'minRating',
+                                                                                value
+                                                                                    ? Number(value)
+                                                                                    : undefined
+                                                                            )
+                                                                        }
+                                                                        items={[
+                                                                            {
+                                                                                label: 'Tất cả đánh giá',
+                                                                                value: '',
+                                                                            },
+                                                                            {
+                                                                                label: '4+ sao',
+                                                                                value: '4',
+                                                                            },
+                                                                            {
+                                                                                label: '3+ sao',
+                                                                                value: '3',
+                                                                            },
+                                                                            {
+                                                                                label: '2+ sao',
+                                                                                value: '2',
+                                                                            },
+                                                                        ]}
+                                                                    />
+                                                                </div>
+
+                                                                {/* Experience */}
+                                                                <div className="col-md-6">
+                                                                    <Select
+                                                                        title="Tất cả kinh nghiệm"
+                                                                        value={getExperienceFilterValue()}
+                                                                        onChange={(value) => {
+                                                                            if (value === '') {
+                                                                                handleFilterChange(
+                                                                                    'minExperience',
+                                                                                    undefined
+                                                                                );
+                                                                                handleFilterChange(
+                                                                                    'maxExperience',
+                                                                                    undefined
+                                                                                );
+                                                                            } else if (
+                                                                                value === '1-3'
+                                                                            ) {
+                                                                                handleFilterChange(
+                                                                                    'minExperience',
+                                                                                    1
+                                                                                );
+                                                                                handleFilterChange(
+                                                                                    'maxExperience',
+                                                                                    3
+                                                                                );
+                                                                            } else if (
+                                                                                value === '4-7'
+                                                                            ) {
+                                                                                handleFilterChange(
+                                                                                    'minExperience',
+                                                                                    4
+                                                                                );
+                                                                                handleFilterChange(
+                                                                                    'maxExperience',
+                                                                                    7
+                                                                                );
+                                                                            } else if (
+                                                                                value === '8+'
+                                                                            ) {
+                                                                                handleFilterChange(
+                                                                                    'minExperience',
+                                                                                    8
+                                                                                );
+                                                                                handleFilterChange(
+                                                                                    'maxExperience',
+                                                                                    undefined
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                        items={[
+                                                                            {
+                                                                                label: 'Tất cả kinh nghiệm',
+                                                                                value: '',
+                                                                            },
+                                                                            {
+                                                                                label: '1-3 năm',
+                                                                                value: '1-3',
+                                                                            },
+                                                                            {
+                                                                                label: '4-7 năm',
+                                                                                value: '4-7',
+                                                                            },
+                                                                            {
+                                                                                label: '8+ năm',
+                                                                                value: '8+',
+                                                                            },
+                                                                        ]}
+                                                                    />
+                                                                </div>
+
+                                                                {/* Gender */}
+                                                                <div className="col-md-6">
+                                                                    <Select
+                                                                        title="Tất cả giới tính"
+                                                                        value={filters.gender || ''}
+                                                                        onChange={(value) =>
+                                                                            handleFilterChange(
+                                                                                'gender',
+                                                                                value || undefined
+                                                                            )
+                                                                        }
+                                                                        items={[
+                                                                            {
+                                                                                label: 'Tất cả giới tính',
+                                                                                value: '',
+                                                                            },
+                                                                            {
+                                                                                label: 'Nam',
+                                                                                value: 'MALE',
+                                                                            },
+                                                                            {
+                                                                                label: 'Nữ',
+                                                                                value: 'FEMALE',
+                                                                            },
+                                                                        ]}
+                                                                    />
+                                                                </div>
+
+                                                                {/* Language */}
+                                                                <div className="col-md-6">
+                                                                    <Select
+                                                                        title="Tất cả ngôn ngữ"
+                                                                        value={
+                                                                            filters.language || ''
+                                                                        }
+                                                                        onChange={(value) =>
+                                                                            handleFilterChange(
+                                                                                'language',
+                                                                                value || undefined
+                                                                            )
+                                                                        }
+                                                                        items={[
+                                                                            {
+                                                                                label: 'Tất cả ngôn ngữ',
+                                                                                value: '',
+                                                                            },
+                                                                            ...availableLanguages.map(
+                                                                                (lang) => ({
+                                                                                    label: lang.name,
+                                                                                    value: lang.name,
+                                                                                })
+                                                                            ),
+                                                                        ]}
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Reset button */}
+                                                            {hasActiveFilters && (
+                                                                <div className="mt-2 text-end">
+                                                                    <button
+                                                                        className="btn btn-sm btn-link text-danger p-0"
+                                                                        onClick={handleResetFilters}
+                                                                    >
+                                                                        <i
+                                                                            className="isax isax-refresh me-1"
+                                                                            aria-hidden="true"
+                                                                        ></i>{' '}
+                                                                        Xóa bộ lọc
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Filter result count */}
+                                                    {hasAppliedFilters && (
+                                                        <p className="text-muted fs-13 mb-2">
+                                                            Tìm thấy {totalDoctors} bác sĩ phù hợp
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <div className="row">
+                                                    {doctors.map((doctor: DoctorForSelection) => (
+                                                        <div
+                                                            key={doctor.id}
+                                                            className="col-lg-6 col-md-6 mb-3"
+                                                        >
+                                                            <label
+                                                                className={clsx(
+                                                                    styles.doctorCard,
+                                                                    'service-item',
+                                                                    selectedDoctor === doctor.id &&
+                                                                        'active'
+                                                                )}
+                                                                htmlFor={`doctorSelection-${doctor.id}`}
+                                                                aria-label={`Chọn bác sĩ ${doctor.fullName}`}
+                                                            >
+                                                                <input
+                                                                    id={`doctorSelection-${doctor.id}`}
+                                                                    className="form-check-input ms-0 mt-0"
+                                                                    type="radio"
+                                                                    name="doctorSelection"
+                                                                    checked={
+                                                                        selectedDoctor === doctor.id
+                                                                    }
+                                                                    onChange={() =>
+                                                                        handleDoctorSelect(
+                                                                            doctor.id
+                                                                        )
+                                                                    }
+                                                                />
+                                                                <span className="form-check-label ms-2 flex-grow-1">
+                                                                    <div className="d-flex">
+                                                                        {/* Avatar */}
+                                                                        <div
+                                                                            className={
+                                                                                styles.doctorAvatar
+                                                                            }
+                                                                        >
+                                                                            <img
+                                                                                src={
+                                                                                    doctor.avatarUrl ||
+                                                                                    '/assets/img/doctor-placeholder.png'
+                                                                                }
+                                                                                alt={
+                                                                                    doctor.fullName
+                                                                                }
+                                                                                className="rounded-circle"
+                                                                            />
+                                                                        </div>
+
+                                                                        {/* Info */}
+                                                                        <div
+                                                                            className={
+                                                                                styles.doctorInfo
+                                                                            }
+                                                                        >
+                                                                            {/* Line 1: Name + Rating */}
+                                                                            <div className="d-flex align-items-center gap-2 mb-1">
+                                                                                <span
+                                                                                    className={
+                                                                                        styles.doctorName
+                                                                                    }
+                                                                                >
+                                                                                    BS.{' '}
+                                                                                    {
+                                                                                        doctor.fullName
+                                                                                    }
+                                                                                </span>
+                                                                                <span className="text-warning fs-13">
+                                                                                    <i className="fa-solid fa-star me-1"></i>
+                                                                                    {doctor.rating !==
+                                                                                        undefined &&
+                                                                                    doctor.rating >
+                                                                                        0
+                                                                                        ? doctor.rating.toFixed(
+                                                                                              1
+                                                                                          )
+                                                                                        : '0'}
+                                                                                    <span className="text-muted ms-1">
+                                                                                        (
+                                                                                        {doctor.totalReviews ??
+                                                                                            0}
+                                                                                        )
+                                                                                    </span>
+                                                                                </span>
+                                                                            </div>
+
+                                                                            {/* Line 2: Position + Specialty */}
+                                                                            <div className="text-muted fs-13 mb-1">
+                                                                                <i className="isax isax-health me-1"></i>
+                                                                                {[
+                                                                                    doctor.positionName,
+                                                                                    doctor.specialtyName,
+                                                                                ]
+                                                                                    .filter(Boolean)
+                                                                                    .join(' - ') ||
+                                                                                    'Chưa cập nhật'}
+                                                                            </div>
+
+                                                                            {/* Line 3: Languages */}
+                                                                            {doctor.languages &&
+                                                                                doctor.languages
+                                                                                    .length > 0 && (
+                                                                                    <div className="text-muted fs-13 mb-1">
+                                                                                        <i className="isax isax-translate me-1"></i>
+                                                                                        {doctor.languages.join(
+                                                                                            ', '
+                                                                                        )}
+                                                                                    </div>
+                                                                                )}
+
+                                                                            {/* Line 4: Experience */}
+                                                                            {doctor.yearsOfExperience !==
+                                                                                undefined &&
+                                                                                doctor.yearsOfExperience >
+                                                                                    0 && (
+                                                                                    <div className="text-muted fs-13 mb-1">
+                                                                                        <i className="isax isax-briefcase me-1"></i>
+                                                                                        {
+                                                                                            doctor.yearsOfExperience
+                                                                                        }{' '}
+                                                                                        năm kinh
+                                                                                        nghiệm
+                                                                                    </div>
+                                                                                )}
+
+                                                                            {/* Line 5: Price */}
+                                                                            {doctor.consultationFee !==
+                                                                                undefined &&
+                                                                                doctor.consultationFee >
+                                                                                    0 && (
+                                                                                    <div className="text-success fw-medium fs-13">
+                                                                                        <i className="isax isax-money me-1"></i>
+                                                                                        {doctor.consultationFee.toLocaleString(
+                                                                                            'vi-VN'
+                                                                                        )}
+                                                                                        đ
+                                                                                    </div>
+                                                                                )}
+                                                                        </div>
+                                                                    </div>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                {/* No results after filtering */}
+                                                {doctors.length === 0 && hasAppliedFilters && (
+                                                    <div className="alert alert-info mb-3">
+                                                        <i
+                                                            className="isax isax-info-circle me-2"
+                                                            aria-hidden="true"
+                                                        ></i>{' '}
+                                                        Không tìm thấy bác sĩ phù hợp với bộ lọc.
+                                                        Hãy thử điều chỉnh bộ lọc hoặc{' '}
+                                                        <button
+                                                            className="btn btn-link p-0 text-primary"
+                                                            onClick={handleResetFilters}
+                                                        >
+                                                            xóa bộ lọc
+                                                        </button>{' '}
+                                                        .
                                                     </div>
-                                                ))}
+                                                )}
+
+                                                {/* Pagination */}
+                                                {totalPages > 1 && (
+                                                    <div className="border-top mb-3">
+                                                        <div className="d-flex justify-content-center">
+                                                            <Pagination
+                                                                currentPage={currentPage}
+                                                                totalPages={totalPages}
+                                                                onPageChange={handlePageChange}
+                                                                maxVisiblePages={5}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Hint when no doctor selected yet */}
+                                                {!selectedDoctor && doctors.length > 0 && (
+                                                    <div className="alert alert-warning mb-3 mt-2">
+                                                        <i
+                                                            className="isax isax-info-circle me-2"
+                                                            aria-hidden="true"
+                                                        ></i>{' '}
+                                                        Vui lòng chọn một bác sĩ hoặc quay lại chọn
+                                                        "Để bệnh viện phân công"
+                                                    </div>
+                                                )}
                                             </div>
-
-                                            {/* No results after filtering */}
-                                            {doctors.length === 0 && hasAppliedFilters && (
-                                                <div className="alert alert-info mb-3">
-                                                    <i
-                                                        className="isax isax-info-circle me-2"
-                                                        aria-hidden="true"
-                                                    ></i>{' '}
-                                                    Không tìm thấy bác sĩ phù hợp với bộ lọc. Hãy
-                                                    thử điều chỉnh bộ lọc hoặc{' '}
-                                                    <button
-                                                        className="btn btn-link p-0 text-primary"
-                                                        onClick={handleResetFilters}
-                                                    >
-                                                        xóa bộ lọc
-                                                    </button>{' '}
-                                                    .
-                                                </div>
-                                            )}
-
-                                            {/* Pagination */}
-                                            {totalPages > 1 && (
-                                                <div className="border-top mb-3">
-                                                    <div className="d-flex justify-content-center">
-                                                        <Pagination
-                                                            currentPage={currentPage}
-                                                            totalPages={totalPages}
-                                                            onPageChange={handlePageChange}
-                                                            maxVisiblePages={5}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Hint when no doctor selected yet */}
-                                            {!selectedDoctor && doctors.length > 0 && (
-                                                <div className="alert alert-warning mb-3 mt-2">
-                                                    <i
-                                                        className="isax isax-info-circle me-2"
-                                                        aria-hidden="true"
-                                                    ></i>{' '}
-                                                    Vui lòng chọn một bác sĩ hoặc quay lại chọn "Để
-                                                    bệnh viện phân công"
-                                                </div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        renderNoDoctorsMessage()
-                                    )}
+                                        )}
                                 </>
                             )}
                         </div>
