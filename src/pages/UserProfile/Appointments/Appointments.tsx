@@ -41,7 +41,7 @@ const Appointments: React.FC = () => {
     const [viewMode, setViewMode] = useState<ViewMode>('list');
     const [selectedFilters, setSelectedFilters] = useState({
         appointmentType: [] as AppointmentType[],
-        visitType: [] as string[],
+        forRelative: undefined as boolean | undefined,
         dateRange: { from: '', to: '' },
     });
     const [currentPage, setCurrentPage] = useState(1);
@@ -86,12 +86,10 @@ const Appointments: React.FC = () => {
             telehealth: false,
             directVisit: false,
         },
-        visitTypeFilters: {
-            allVisit: true,
-            general: false,
-            consultation: false,
-            followUp: false,
-            directVisit: false,
+        bookingForFilters: {
+            all: true,
+            self: false,
+            relative: false,
         },
     });
 
@@ -164,6 +162,11 @@ const Appointments: React.FC = () => {
                     query.appointmentType = selectedFilters.appointmentType[0];
                 }
 
+                // Add forRelative filter if selected
+                if (selectedFilters.forRelative !== undefined) {
+                    query.forRelative = selectedFilters.forRelative;
+                }
+
                 // Call API
                 const response = await AppointmentService.getAppointmentsByPatient(query);
 
@@ -211,10 +214,19 @@ const Appointments: React.FC = () => {
         selectedFilters.dateRange.from,
         selectedFilters.dateRange.to,
         selectedFilters.appointmentType,
+        selectedFilters.forRelative,
         currentPage,
         itemsPerPage,
         refreshTrigger, // Thêm refreshTrigger để fetch lại data sau khi cancel
     ]);
+
+    // Helper function to format date to YYYY-MM-DD in local timezone
+    const formatDateToLocal = (date: Date): string => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
     // Handle date range change
     const handleDateRangeChange = (ranges: RangeKeyDict) => {
@@ -229,17 +241,28 @@ const Appointments: React.FC = () => {
             ]);
 
             // Update selectedFilters to sync with existing filter logic
+            // Use local date format to avoid timezone issues
             setSelectedFilters({
                 ...selectedFilters,
                 dateRange: {
-                    from: selection.startDate.toISOString().split('T')[0],
-                    to: selection.endDate.toISOString().split('T')[0],
+                    from: formatDateToLocal(selection.startDate),
+                    to: formatDateToLocal(selection.endDate),
                 },
             });
 
             // Reset to first page when date range changes
             setCurrentPage(1);
         }
+    };
+
+    // Clear date range filter
+    const handleClearDateRange = () => {
+        setDateRanges(createDefaultDateRange());
+        setSelectedFilters({
+            ...selectedFilters,
+            dateRange: { from: '', to: '' },
+        });
+        setCurrentPage(1);
     };
 
     // Apply client-side search - comprehensive search across all fields
@@ -329,7 +352,7 @@ const Appointments: React.FC = () => {
     const resetFilters = () => {
         setSelectedFilters({
             appointmentType: [],
-            visitType: [],
+            forRelative: undefined,
             dateRange: { from: '', to: '' },
         });
         setDateRanges(createDefaultDateRange());
@@ -340,12 +363,10 @@ const Appointments: React.FC = () => {
                 telehealth: false,
                 directVisit: false,
             },
-            visitTypeFilters: {
-                allVisit: true,
-                general: false,
-                consultation: false,
-                followUp: false,
-                directVisit: false,
+            bookingForFilters: {
+                all: true,
+                self: false,
+                relative: false,
             },
         });
         setSearchTerm('');
@@ -387,27 +408,25 @@ const Appointments: React.FC = () => {
         }
     };
 
-    const handleVisitTypeChange = (type: string, checked: boolean) => {
-        if (type === 'allVisit') {
+    const handleBookingForChange = (type: string, checked: boolean) => {
+        if (type === 'all') {
             setFilterState({
                 ...filterState,
-                visitTypeFilters: {
-                    allVisit: checked,
-                    general: checked ? filterState.visitTypeFilters.general : false,
-                    consultation: checked ? filterState.visitTypeFilters.consultation : false,
-                    followUp: checked ? filterState.visitTypeFilters.followUp : false,
-                    directVisit: checked ? filterState.visitTypeFilters.directVisit : false,
+                bookingForFilters: {
+                    all: checked,
+                    self: false,
+                    relative: false,
                 },
             });
         } else {
             const newFilters = {
-                ...filterState.visitTypeFilters,
+                ...filterState.bookingForFilters,
                 [type]: checked,
-                allVisit: false, // Uncheck "all" when selecting individual items
+                all: false, // Uncheck "all" when selecting individual items
             };
             setFilterState({
                 ...filterState,
-                visitTypeFilters: newFilters,
+                bookingForFilters: newFilters,
             });
         }
     };
@@ -418,12 +437,12 @@ const Appointments: React.FC = () => {
     };
 
     const handleFilterApply = () => {
-        const { appointmentTypes, visitTypes } = convertFilterStateToSelectedFilters();
+        const { appointmentTypes, forRelative } = convertFilterStateToSelectedFilters();
 
         setSelectedFilters({
             ...selectedFilters,
             appointmentType: appointmentTypes,
-            visitType: visitTypes,
+            forRelative: forRelative,
         });
 
         // Also update search term
@@ -636,7 +655,7 @@ const Appointments: React.FC = () => {
     // Extract complex logic to separate function to reduce cognitive complexity
     const convertFilterStateToSelectedFilters = () => {
         const appointmentTypes: AppointmentType[] = [];
-        const visitTypes: string[] = [];
+        let forRelative: boolean | undefined = undefined;
 
         // Convert appointment type filters - use positive conditions
         const appointmentTypeFilters = filterState.appointmentTypeFilters;
@@ -653,24 +672,18 @@ const Appointments: React.FC = () => {
             }
         }
 
-        // Convert visit type filters - use positive conditions
-        const visitTypeFilters = filterState.visitTypeFilters;
-        if (visitTypeFilters.allVisit === false) {
-            const visitTypeMap = {
-                general: 'General Visit',
-                consultation: 'Consultation',
-                followUp: 'Follow-up',
-                directVisit: 'Direct Visit',
-            };
-
-            for (const [key, value] of Object.entries(visitTypeMap)) {
-                if (visitTypeFilters[key as keyof typeof visitTypeFilters]) {
-                    visitTypes.push(value);
-                }
+        // Convert booking for filters
+        const bookingForFilters = filterState.bookingForFilters;
+        if (bookingForFilters.all === false) {
+            if (bookingForFilters.self && !bookingForFilters.relative) {
+                forRelative = false; // Only self
+            } else if (bookingForFilters.relative && !bookingForFilters.self) {
+                forRelative = true; // Only relatives
             }
+            // If both are selected or neither, forRelative stays undefined (all)
         }
 
-        return { appointmentTypes, visitTypes };
+        return { appointmentTypes, forRelative };
     };
 
     // Extract nested ternary to separate function
@@ -760,7 +773,7 @@ const Appointments: React.FC = () => {
         const hasActiveFilters =
             searchTerm ||
             selectedFilters.appointmentType.length > 0 ||
-            selectedFilters.visitType.length > 0;
+            selectedFilters.forRelative !== undefined;
 
         return (
             <div className="text-center py-5">
@@ -891,6 +904,16 @@ const Appointments: React.FC = () => {
                             months={calendarMonths}
                             direction="horizontal"
                         />
+                        {(selectedFilters.dateRange.from || selectedFilters.dateRange.to) && (
+                            <button
+                                type="button"
+                                className={styles.clearDateBtn}
+                                onClick={handleClearDateRange}
+                                title="Xóa bộ lọc ngày"
+                            >
+                                <i className="fa fa-times"></i>
+                            </button>
+                        )}
                     </div>
 
                     <AppointmentFilters
@@ -899,7 +922,7 @@ const Appointments: React.FC = () => {
                         filterState={filterState}
                         onFilterSearchChange={handleFilterSearchChange}
                         onAppointmentTypeChange={handleAppointmentTypeChange}
-                        onVisitTypeChange={handleVisitTypeChange}
+                        onBookingForChange={handleBookingForChange}
                         onReset={handleFilterReset}
                         onApply={handleFilterApply}
                     />

@@ -122,19 +122,24 @@ const DoctorList: React.FC = () => {
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Fetch service types on mount to ensure they're available
-    useEffect(() => {
-        if (serviceTypes.length === 0) {
-            dispatch(getServiceTypesAsync());
-        }
-    }, [dispatch, serviceTypes.length]);
+    // Track if initial data has been fetched
+    const hasFetchedInitialData = useRef(false);
 
-    // Fetch languages on mount to ensure they're available
+    // Track last search params to prevent duplicate API calls
+    const lastSearchParamsRef = useRef<string>('');
+
+    // Fetch service types and languages on mount - ONLY ONCE
     useEffect(() => {
-        if (languages.length === 0) {
-            dispatch(getLanguagesAsync());
+        if (!hasFetchedInitialData.current) {
+            hasFetchedInitialData.current = true;
+            if (serviceTypes.length === 0) {
+                dispatch(getServiceTypesAsync());
+            }
+            if (languages.length === 0) {
+                dispatch(getLanguagesAsync());
+            }
         }
-    }, [dispatch, languages.length]);
+    }, [dispatch, serviceTypes.length, languages.length]);
 
     // Debounce searchTerm - only update debouncedSearchTerm after 2 seconds of no typing
     useEffect(() => {
@@ -337,13 +342,23 @@ const DoctorList: React.FC = () => {
         consultationTypeFilter: getTrimmedString(consultationTypeFilter),
     });
 
+    // Helper function to get default serviceType filter
+    const getDefaultServiceTypeFilters = (): string[] | undefined => {
+        // If serviceTypeFilters is set, use it
+        if (serviceTypeFilters.length > 0) {
+            return serviceTypeFilters;
+        }
+        // Default to "Khám trực tiếp" if no serviceType filter is set
+        return ['Khám trực tiếp'];
+    };
+
     // Helper function to build array filter parameters
     const buildArrayFilters = () => ({
         specialtyFilters: getArrayOrUndefined(specialtyFilters),
         hospitalFilters: getArrayOrUndefined(hospitalFilters),
         positionFilters: getArrayOrUndefined(positionFilters),
         languageFilters: getArrayOrUndefined(languageFilters),
-        serviceTypeFilters: getArrayOrUndefined(serviceTypeFilters),
+        serviceTypeFilters: getDefaultServiceTypeFilters(),
         ratingFilters: getArrayOrUndefined(ratingFilters),
         experienceFilters: getArrayOrUndefined(experienceFilters),
         genderFilters: getArrayOrUndefined(genderFilters),
@@ -359,11 +374,15 @@ const DoctorList: React.FC = () => {
     };
 
     // Helper function to check if advanced filtering is needed
+    // Note: Default serviceType "Khám trực tiếp" is always applied, so we check if user has set custom filters
     const shouldUseAdvancedFiltering = () => {
+        // Check if serviceTypeFilters has custom values (not just default)
+        const hasCustomServiceTypeFilter = serviceTypeFilters.length > 0;
+
         return (
             positionFilters.length > 0 ||
             languageFilters.length > 0 ||
-            serviceTypeFilters.length > 0 ||
+            hasCustomServiceTypeFilter ||
             ratingFilters.length > 0 ||
             experienceFilters.length > 0 ||
             genderFilters.length > 0 ||
@@ -498,6 +517,14 @@ const DoctorList: React.FC = () => {
         }
 
         const params = buildSearchParams();
+
+        // Prevent duplicate API calls with same params
+        const paramsKey = JSON.stringify(params);
+        if (paramsKey === lastSearchParamsRef.current) {
+            return;
+        }
+        lastSearchParamsRef.current = paramsKey;
+
         const useAdvancedFiltering = shouldUseAdvancedFiltering();
 
         if (useAdvancedFiltering) {
@@ -505,6 +532,7 @@ const DoctorList: React.FC = () => {
         } else {
             dispatch(searchDoctorsAsync(params));
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         dispatch,
         currentPage,
@@ -530,10 +558,9 @@ const DoctorList: React.FC = () => {
         genderFilters,
         priceFilter,
         areaFilter,
-        serviceTypeFromUrl,
-        serviceTypes,
         isRescheduleFlow,
-        languages,
+        // Note: serviceTypes and languages removed from deps to prevent infinite loop
+        // They are only used in shouldWaitFor... checks, not in the actual search params
     ]);
 
     // Helper function to check if doctor passes availability filter
@@ -549,11 +576,12 @@ const DoctorList: React.FC = () => {
     };
 
     // Helper function to check if doctor passes price filter
-    const passesPriceFilter = (doctor: any) => {
-        if (!priceFilter) return true;
-        const doctorPrice = doctor.prices?.[0]?.amount || 0;
-        return doctorPrice >= priceFilter.min && doctorPrice <= priceFilter.max;
-    };
+    // NOTE: This is now handled by backend API, kept for reference only
+    // const passesPriceFilter = (doctor: any) => {
+    //     if (!priceFilter) return true;
+    //     const doctorPrice = doctor.prices?.[0]?.amount || 0;
+    //     return doctorPrice >= priceFilter.min && doctorPrice <= priceFilter.max;
+    // };
 
     // Helper function to get doctor price
     const getDoctorPrice = (doctor: any) => {
@@ -574,12 +602,12 @@ const DoctorList: React.FC = () => {
 
     // Use doctors directly from API - backend handles filtering and pagination
     // Only apply local filters that are not handled by backend
+    // Note: Price filter is now handled by backend, so we don't apply it here
     const filteredAndSortedDoctors = [...doctors]
         .filter((doctor) => {
             return (
-                passesAvailabilityFilter(doctor) &&
-                passesConsultationTypeFilter(doctor) &&
-                passesPriceFilter(doctor)
+                passesAvailabilityFilter(doctor) && passesConsultationTypeFilter(doctor)
+                // passesPriceFilter removed - backend already handles price filtering
             );
         })
         .sort((a, b) => {

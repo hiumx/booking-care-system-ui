@@ -3,6 +3,7 @@ export interface BookingActionProps {
     prevStep: () => void;
     nextStep: () => void;
     disabled?: boolean;
+    loading?: boolean;
     showPrev?: boolean;
 }
 
@@ -11,6 +12,7 @@ const BookingAction: React.FC<BookingActionProps> = ({
     prevStep,
     nextStep,
     disabled = false,
+    loading = false,
     showPrev = true,
 }) => {
     const containerClass = showPrev
@@ -23,7 +25,7 @@ const BookingAction: React.FC<BookingActionProps> = ({
                     <button
                         className="btn btn-md btn-dark prev_btns inline-flex align-items-center rounded-pill"
                         onClick={prevStep}
-                        disabled={disabled}
+                        disabled={loading}
                     >
                         <i className="isax isax-arrow-left-2 me-1"></i>
                         Quay lại
@@ -32,11 +34,11 @@ const BookingAction: React.FC<BookingActionProps> = ({
                 <button
                     onClick={nextStep}
                     className="btn btn-md btn-primary-gradient next_btns inline-flex align-items-center rounded-pill"
-                    disabled={disabled}
+                    disabled={disabled || loading}
                 >
-                    {disabled && <i className="fa fa-spinner fa-spin me-2"></i>}
+                    {loading && <i className="fa fa-spinner fa-spin me-2"></i>}
                     {nextStepTitle}
-                    {!disabled && <i className="isax isax-arrow-right-3 ms-1"></i>}
+                    {!loading && <i className="isax isax-arrow-right-3 ms-1"></i>}
                 </button>
             </div>
         </div>

@@ -32,9 +32,8 @@ export interface DoctorInfo {
 export interface ServiceInfo {
     id: string;
     name?: string;
-    description?: string;
     price?: number;
-    category?: string;
+    imageUrl?: string;
 }
 
 // Hospital Information from API
@@ -47,11 +46,35 @@ export interface HospitalInfo {
     avatarUrl?: string;
 }
 
+// Specialty Information from API (for hospital assigns doctor mode)
+export interface SpecialtyInfo {
+    id: string;
+    name?: string;
+    description?: string;
+    imageUrl?: string;
+}
+
+// Relative Information from API
+export interface RelativeInfo {
+    id: string;
+    firstName?: string;
+    lastName?: string;
+    fullName?: string;
+    gender?: string;
+    dateOfBirth?: string;
+    age?: number;
+    phone?: string;
+    relationship?: string;
+    relationshipDisplay?: string;
+}
+
 // Appointment Response from API
 export interface AppointmentResponse {
     id: string;
     patientId?: string;
     patientAccountId?: string;
+    /** Relative ID when booking for a family member (null = booking for self) */
+    relativeId?: string;
     cancelledBy?: string;
     cancelledAt?: string;
     appointmentDate: string;
@@ -60,13 +83,18 @@ export interface AppointmentResponse {
     status: AppointmentStatus;
     reason?: string;
     result?: string;
+    /** Original consultation/service fee at the time of booking (before any discounts) */
+    amount?: number;
     consultationFees: number;
     createdAt: string;
     updatedAt: string;
     patientInfo?: PatientInfo;
+    relativeInfo?: RelativeInfo;
     doctorInfo?: DoctorInfo;
     serviceInfo?: ServiceInfo;
     hospitalInfo?: HospitalInfo;
+    /** Specialty info for hospital assigns doctor mode (no doctor selected yet) */
+    specialtyInfo?: SpecialtyInfo;
 }
 
 // Status counts for all appointment statuses
@@ -106,12 +134,16 @@ export interface AppointmentQueryRequest {
     sortBy?: string;
     sortDescending?: boolean;
     includeStatusCounts?: boolean;
+    /** Filter for appointments booked for relatives (true = only relatives, false = only self, undefined = all) */
+    forRelative?: boolean;
 }
 
 // Create Appointment Request
 export interface CreateAppointmentRequest {
     patientId: string;
     patientAccountId?: string;
+    /** Relative ID when booking for a family member (null/undefined = booking for self) */
+    relativeId?: string;
     doctorId?: string;
     serviceId?: string;
     specialtyId?: string;
@@ -123,6 +155,8 @@ export interface CreateAppointmentRequest {
     symptoms?: string;
     attachmentUrls?: string;
     skipPayment?: boolean; // If true, skip payment and send confirmation email immediately
+    /** Original consultation/service fee at the time of booking (before any discounts) */
+    amount?: number;
 }
 
 // Reschedule Requests
@@ -492,6 +526,9 @@ export const getDisplayAvatar = (appointment: AppointmentCardData): string => {
     if (appointment.doctorInfo?.avatarUrl) {
         return appointment.doctorInfo.avatarUrl;
     }
+    if (appointment.serviceInfo?.imageUrl) {
+        return appointment.serviceInfo.imageUrl;
+    }
     if (appointment.hospitalInfo?.avatarUrl) {
         return appointment.hospitalInfo.avatarUrl;
     }
@@ -523,16 +560,14 @@ export const getDisplayPhone = (appointment: AppointmentCardData): string => {
 };
 
 /**
- * Get display specialty/category
+ * Get display specialty (for doctor appointments only)
  */
 export const getDisplaySpecialty = (appointment: AppointmentCardData): string => {
     if (appointment.doctorInfo?.specialtyName) {
         return appointment.doctorInfo.specialtyName;
     }
-    if (appointment.serviceInfo?.category) {
-        return appointment.serviceInfo.category;
-    }
-    return '';
+    // Service appointments don't have specialty/category in basic info
+    return 'Dịch vụ';
 };
 
 /**
@@ -581,4 +616,37 @@ export const getAppointmentTypeIcon = (type: AppointmentType): string => {
         default:
             return 'isax isax-calendar';
     }
+};
+
+/**
+ * Get display fee based on priority: Doctor consultationFee > Service price
+ * Returns the fee amount or undefined if not available
+ */
+export const getDisplayFee = (appointment: AppointmentCardData): number | undefined => {
+    if (appointment.doctorInfo?.consultationFee) {
+        return appointment.doctorInfo.consultationFee;
+    }
+    if (appointment.serviceInfo?.price) {
+        return appointment.serviceInfo.price;
+    }
+    return undefined;
+};
+
+/**
+ * Get formatted display fee string
+ * Returns formatted VNĐ string or fallback text
+ */
+export const getDisplayFeeText = (appointment: AppointmentCardData): string => {
+    const fee = getDisplayFee(appointment);
+    if (fee) {
+        return `${fee.toLocaleString('vi-VN')} VNĐ`;
+    }
+    return 'Đang cập nhật...';
+};
+
+/**
+ * Check if appointment is a service appointment (no doctor, has service)
+ */
+export const isServiceAppointment = (appointment: AppointmentCardData): boolean => {
+    return !appointment.doctorInfo?.id && !!appointment.serviceInfo?.id;
 };

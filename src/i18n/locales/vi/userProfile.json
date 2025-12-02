@@ -1,4 +1,75 @@
 {
+    "patientRelatives": {
+        "title": "Quản lý người thân",
+        "addButton": "Thêm người thân",
+        "note": "Lưu ý",
+        "maxRelatives": "Bạn có thể thêm tối đa 10 người thân để đặt lịch khám thay.",
+        "currentCount": "Hiện tại",
+        "relatives": "người thân",
+        "yearsOld": "tuổi",
+        "gender": {
+            "male": "Nam",
+            "female": "Nữ",
+            "other": "Khác"
+        },
+        "fields": {
+            "firstName": "Họ",
+            "lastName": "Tên",
+            "gender": "Giới tính",
+            "dateOfBirth": "Ngày sinh",
+            "relationship": "Mối quan hệ",
+            "phone": "Số điện thoại",
+            "healthInsurance": "Số BHYT",
+            "identityNumber": "Số CMND/CCCD",
+            "notes": "Ghi chú"
+        },
+        "placeholder": {
+            "firstName": "Nhập họ",
+            "lastName": "Nhập tên",
+            "gender": "Chọn giới tính",
+            "dateOfBirth": "Chọn ngày sinh",
+            "relationship": "Chọn mối quan hệ",
+            "phone": "Nhập số điện thoại",
+            "healthInsurance": "Nhập số bảo hiểm y tế",
+            "identityNumber": "Nhập số CMND/CCCD",
+            "notes": "Ghi chú thêm (tiền sử bệnh, dị ứng...)"
+        },
+        "validation": {
+            "firstNameRequired": "Vui lòng nhập họ",
+            "firstNameMinLength": "Họ phải có ít nhất 2 ký tự",
+            "lastNameRequired": "Vui lòng nhập tên",
+            "lastNameMinLength": "Tên phải có ít nhất 2 ký tự",
+            "dateOfBirthRequired": "Vui lòng chọn ngày sinh",
+            "phoneInvalid": "Số điện thoại không hợp lệ",
+            "identityNumberInvalid": "Số CMND/CCCD phải từ 9-12 ký tự"
+        },
+        "modal": {
+            "createTitle": "Thêm người thân mới",
+            "editTitle": "Cập nhật thông tin người thân"
+        },
+        "empty": {
+            "title": "Chưa có người thân nào",
+            "description": "Thêm người thân để có thể đặt lịch khám thay cho họ",
+            "addFirst": "Thêm người thân đầu tiên"
+        },
+        "delete": {
+            "title": "Xác nhận xóa",
+            "message": "Bạn có chắc chắn muốn xóa người thân này không?",
+            "warning": "Hành động này không thể hoàn tác.",
+            "deleting": "Đang xóa..."
+        },
+        "success": {
+            "created": "Thêm người thân thành công",
+            "updated": "Cập nhật thông tin người thân thành công",
+            "deleted": "Xóa người thân thành công"
+        },
+        "errors": {
+            "loadFailed": "Không thể tải danh sách người thân",
+            "saveFailed": "Có lỗi xảy ra",
+            "deleteFailed": "Không thể xóa người thân",
+            "validationFailed": "Vui lòng kiểm tra lại thông tin"
+        }
+    },
     "profile": {
         "title": "Thông tin cá nhân",
         "avatar": {

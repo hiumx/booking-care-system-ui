@@ -562,8 +562,8 @@ const ServiceHospitalPage: React.FC = () => {
                                     serviceschildId: serviceschildId!.toString(),
                                     servicesId: hospital.hospital.idservice,
                                 })}
-                                linkBooking={replacePathParams(PATHS.BOOKING.ROOT, {
-                                    doctorId: hospital.hospital.idservice,
+                                linkBooking={replacePathParams(PATHS.BOOKING.SERVICE, {
+                                    serviceMedicalId: hospital.hospital.idservice,
                                 })}
                                 linkProfileHospital={replacePathParams(PATHS.HOSPITAL.DETAIL, {
                                     id: hospital.hospital.id,

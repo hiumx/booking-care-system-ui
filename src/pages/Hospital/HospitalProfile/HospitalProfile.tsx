@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Breadcrumb from '@/components/Breadcrumb';
 import styles from './HospitalProfile.module.scss';
@@ -15,11 +15,13 @@ import TestimonialSection from '@/components/TestimonialSection';
 import HeroSection from './components/HeroSection/HeroSection';
 import ServiceCard from './components/ServiceCard';
 import ExpandableText from '@/components/ExpandableText';
+import { SpecialtyItem } from './components/SpecialtyItem';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '@/store';
 import { getHospitalByIdAsync } from '@/store/slices/hospitalSlice';
 import { HospitalProfileResponse } from '@/types/hospital.types';
 import { RootState } from '@/store';
+import { PATHS } from '@/routes/paths';
 
 interface BreadcrumbItem {
     label: string;
@@ -29,11 +31,43 @@ interface BreadcrumbItem {
 
 const HospitalProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const selectedHospital = useSelector(
         (state: RootState) => state.hospital.selectedHospital
     ) as HospitalProfileResponse | null;
     const isLoading = useSelector((state: RootState) => state.hospital.isLoading);
+
+    // Navigate to hospital booking page
+    const handleBookingClick = useCallback(() => {
+        if (id) {
+            navigate(PATHS.BOOKING.HOSPITAL.replace(':hospitalId', id));
+        }
+    }, [id, navigate]);
+
+    // Navigate to booking with pre-selected specialty
+    const handleSpecialtyClick = useCallback(
+        (specialtyId: string) => {
+            if (id) {
+                navigate(
+                    `${PATHS.BOOKING.HOSPITAL.replace(':hospitalId', id)}?specialtyId=${specialtyId}`
+                );
+            }
+        },
+        [id, navigate]
+    );
+
+    // Navigate to booking with pre-selected service
+    const handleServiceClick = useCallback(
+        (serviceId: string) => {
+            if (id) {
+                navigate(
+                    `${PATHS.BOOKING.HOSPITAL.replace(':hospitalId', id)}?serviceId=${serviceId}`
+                );
+            }
+        },
+        [id, navigate]
+    );
     const breadcrumbData: { items: BreadcrumbItem[]; title: string } = {
         items: [
             { label: 'Trang Chủ', path: '/', isActive: false },
@@ -249,42 +283,10 @@ const HospitalProfile: React.FC = () => {
                                                 key={specialty.id}
                                                 style={{ width: '160px', maxWidth: '160px' }}
                                             >
-                                                <Link
-                                                    to="/doctor/list"
-                                                    className={clsx('spaciality-item')}
-                                                >
-                                                    <div className={clsx('spaciality-img')}>
-                                                        <img
-                                                            src={specialty.img}
-                                                            alt={specialty.name}
-                                                            className={styles.specialityImgEl}
-                                                        />
-                                                        <span
-                                                            className={clsx(
-                                                                'spaciality-icon',
-                                                                styles.specialityIcon
-                                                            )}
-                                                        >
-                                                            {specialty.icon && (
-                                                                <img
-                                                                    src={specialty.icon}
-                                                                    alt="icon"
-                                                                />
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                    <h6 className={styles.specialityTitle}>
-                                                        {specialty.name}
-                                                    </h6>
-                                                    <p
-                                                        className={clsx(
-                                                            'mb-0',
-                                                            styles.specialityMeta
-                                                        )}
-                                                    >
-                                                        {specialty.doctorCount || 0} Bác sĩ
-                                                    </p>
-                                                </Link>
+                                                <SpecialtyItem
+                                                    specialty={specialty}
+                                                    onClick={handleSpecialtyClick}
+                                                />
                                             </SwiperSlide>
                                         ))}
                                     </Swiper>
@@ -293,35 +295,11 @@ const HospitalProfile: React.FC = () => {
                                 {/* Mobile Grid */}
                                 <div className={styles.mobileSpecialtyList}>
                                     {specialties.map((specialty) => (
-                                        <Link
+                                        <SpecialtyItem
                                             key={specialty.id}
-                                            to="/doctor/list"
-                                            className={clsx('spaciality-item')}
-                                        >
-                                            <div className={clsx('spaciality-img')}>
-                                                <img
-                                                    src={specialty.img}
-                                                    alt={specialty.name}
-                                                    className={styles.specialityImgEl}
-                                                />
-                                                <span
-                                                    className={clsx(
-                                                        'spaciality-icon',
-                                                        styles.specialityIcon
-                                                    )}
-                                                >
-                                                    {specialty.icon && (
-                                                        <img src={specialty.icon} alt="icon" />
-                                                    )}
-                                                </span>
-                                            </div>
-                                            <h6 className={styles.specialityTitle}>
-                                                {specialty.name}
-                                            </h6>
-                                            <p className={clsx('mb-0', styles.specialityMeta)}>
-                                                {specialty.doctorCount || 0} Bác sĩ
-                                            </p>
-                                        </Link>
+                                            specialty={specialty}
+                                            onClick={handleSpecialtyClick}
+                                        />
                                     ))}
                                 </div>
                             </div>
@@ -489,6 +467,9 @@ const HospitalProfile: React.FC = () => {
                                                         key={service.id}
                                                         name={service.name}
                                                         img={service.img}
+                                                        onClick={() =>
+                                                            handleServiceClick(service.id)
+                                                        }
                                                     />
                                                 ))}
                                             </div>
@@ -626,7 +607,7 @@ const HospitalProfile: React.FC = () => {
                                         <span className={styles.stepLabel}>Bước 4:</span>
                                         <span className={styles.stepContent}>
                                             Lựa chọn thời gian, bác sĩ và hình thức khám (tại bệnh
-                                            viện hoặc tư vấn trực tiếp).
+                                            viện hoặc tư vấn trực tuyến).
                                         </span>
                                     </div>
 
@@ -692,6 +673,7 @@ const HospitalProfile: React.FC = () => {
                                     className={clsx(styles.mapBookBtn)}
                                     text="Đặt khám ngay"
                                     type="button"
+                                    onClick={handleBookingClick}
                                 />
                             </div>
                             <div className={styles.mapCard}>

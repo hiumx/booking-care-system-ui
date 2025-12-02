@@ -332,7 +332,11 @@ const AppointmentDetailPage: React.FC = () => {
                     reasonLabel="Lý do hủy"
                     reasonPlaceholder="Vui lòng nhập lý do hủy lịch hẹn (tối thiểu 10 ký tự)..."
                     minReasonLength={10}
-                    refundInfo={getRefundInfo(appointmentData.appointmentDate, undefined, false)} // Patient cancellation
+                    refundInfo={
+                        appointmentData.consultationFees > 0
+                            ? getRefundInfo(appointmentData.appointmentDate, undefined, false) // Patient cancellation - only show refund info if has payment
+                            : undefined
+                    }
                 />
             )}
         </>

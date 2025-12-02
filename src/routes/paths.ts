@@ -68,6 +68,7 @@ export const PATHS = {
     BOOKING: {
         ROOT: '/booking/:doctorId',
         SERVICE: '/booking/service/:serviceMedicalId',
+        HOSPITAL: '/booking/hospital/:hospitalId',
         CONFIRMATION: '/booking/confirmation/:appointmentId',
         RESCHEDULE: '/booking/reschedule/:appointmentId',
         CONFIRM_NEW_DOCTOR: '/booking/confirm-doctor/:appointmentId',

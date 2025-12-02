@@ -38,8 +38,41 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
         );
     }
 
+    // Check if this is a service appointment (no doctor, has service)
+    const isServiceAppointment = !appointment.doctorInfo?.id && !!appointment.serviceInfo?.id;
+
     // Full variant - render actions based on status
     const renderActionButtons = () => {
+        // Service appointments: only show view icon + cancel
+        if (isServiceAppointment) {
+            return (
+                <>
+                    <li>
+                        <Link
+                            to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
+                            title="Xem chi tiết"
+                        >
+                            <i className="isax isax-eye4"></i>
+                        </Link>
+                    </li>
+                    {/* Cancel appointment */}
+                    <li>
+                        <Link
+                            to="#"
+                            title="Hủy lịch hẹn"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onCancel?.(appointment);
+                            }}
+                        >
+                            <i className="isax isax-close-circle5"></i>
+                        </Link>
+                    </li>
+                </>
+            );
+        }
+
+        // Doctor appointments: show all actions
         return (
             <>
                 <li>

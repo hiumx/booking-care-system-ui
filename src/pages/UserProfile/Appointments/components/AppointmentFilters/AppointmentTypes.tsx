@@ -5,11 +5,9 @@ export interface FilterState {
         telehealth: boolean;
         directVisit: boolean;
     };
-    visitTypeFilters: {
-        allVisit: boolean;
-        general: boolean;
-        consultation: boolean;
-        followUp: boolean;
-        directVisit: boolean;
+    bookingForFilters: {
+        all: boolean;
+        self: boolean;
+        relative: boolean;
     };
 }

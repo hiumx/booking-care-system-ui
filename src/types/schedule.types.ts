@@ -133,3 +133,36 @@ export interface ScheduleQueryParams {
     page?: number;
     limit?: number;
 }
+
+// Specialty Available Slots (for "hospital assigns doctor" mode)
+export interface SpecialtyAvailableSlot {
+    id: string;
+    startTime: string;
+    endTime: string;
+    /** Number of doctors available for this time slot */
+    availableDoctorCount: number;
+    /** Number of slots currently held by other users */
+    heldCount: number;
+    /** Whether this slot is available for booking (availableDoctorCount - heldCount > 0) */
+    isAvailable: boolean;
+}
+
+export interface SpecialtyAvailableSlotsResponse {
+    hospitalId: string;
+    specialtyId: string;
+    date: string;
+    appointmentType: string;
+    /** Total number of doctors available for this specialty on this date */
+    totalDoctorsAvailable: number;
+    /** List of available time slots with capacity information */
+    availableSlots: SpecialtyAvailableSlot[];
+}
+
+export interface GetSpecialtyAvailableSlotsRequest {
+    hospitalId: string;
+    specialtyId: string;
+    date: string; // ISO date string (YYYY-MM-DD)
+    appointmentType: 'IN_PERSON' | 'TELEHEALTH';
+}
+
+export type SpecialtyAvailableSlotsApiResponse = ApiResponse<SpecialtyAvailableSlotsResponse>;

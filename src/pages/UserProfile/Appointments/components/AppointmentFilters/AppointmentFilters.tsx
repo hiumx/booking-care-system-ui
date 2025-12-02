@@ -11,7 +11,7 @@ interface AppointmentFiltersProps {
     filterState: FilterState;
     onFilterSearchChange: (value: string) => void;
     onAppointmentTypeChange: (type: string, checked: boolean) => void;
-    onVisitTypeChange: (type: string, checked: boolean) => void;
+    onBookingForChange: (type: string, checked: boolean) => void;
     onReset: () => void;
     onApply: () => void;
 }
@@ -22,7 +22,7 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
     filterState,
     onFilterSearchChange,
     onAppointmentTypeChange,
-    onVisitTypeChange,
+    onBookingForChange,
     onReset,
     onApply,
 }) => {
@@ -215,7 +215,7 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                             </div>
                         </div>
 
-                        {/* Visit Type Filter */}
+                        {/* Booking For Filter */}
                         <div className={clsx(styles.filterSetContent, 'filter-set-content')}>
                             <div
                                 className={clsx(
@@ -231,7 +231,7 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                     aria-expanded="false"
                                     aria-controls="collapseThree"
                                 >
-                                    Loại khám
+                                    Đặt lịch cho
                                 </button>
                             </div>
                             <div
@@ -248,12 +248,9 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                             <label className={clsx(styles.checkBoxs, 'checkboxs')}>
                                                 <input
                                                     type="checkbox"
-                                                    checked={filterState.visitTypeFilters.allVisit}
+                                                    checked={filterState.bookingForFilters.all}
                                                     onChange={(e) =>
-                                                        onVisitTypeChange(
-                                                            'allVisit',
-                                                            e.target.checked
-                                                        )
+                                                        onBookingForChange('all', e.target.checked)
                                                     }
                                                 />
                                                 <span className="checkmarks"></span>{' '}
@@ -266,16 +263,13 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                             <label className={clsx(styles.checkBoxs, 'checkboxs')}>
                                                 <input
                                                     type="checkbox"
-                                                    checked={filterState.visitTypeFilters.general}
+                                                    checked={filterState.bookingForFilters.self}
                                                     onChange={(e) =>
-                                                        onVisitTypeChange(
-                                                            'general',
-                                                            e.target.checked
-                                                        )
+                                                        onBookingForChange('self', e.target.checked)
                                                     }
                                                 />
                                                 <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Khám tổng quát</span>
+                                                <span className="check-title">Bản thân</span>
                                             </label>
                                         </div>
                                     </li>
@@ -284,56 +278,16 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                             <label className={clsx(styles.checkBoxs, 'checkboxs')}>
                                                 <input
                                                     type="checkbox"
-                                                    checked={
-                                                        filterState.visitTypeFilters.consultation
-                                                    }
+                                                    checked={filterState.bookingForFilters.relative}
                                                     onChange={(e) =>
-                                                        onVisitTypeChange(
-                                                            'consultation',
+                                                        onBookingForChange(
+                                                            'relative',
                                                             e.target.checked
                                                         )
                                                     }
                                                 />
                                                 <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Tư vấn</span>
-                                            </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div className={clsx(styles.filterChecks, 'filter-checks')}>
-                                            <label className={clsx(styles.checkBoxs, 'checkboxs')}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={filterState.visitTypeFilters.followUp}
-                                                    onChange={(e) =>
-                                                        onVisitTypeChange(
-                                                            'followUp',
-                                                            e.target.checked
-                                                        )
-                                                    }
-                                                />
-                                                <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Tái khám</span>
-                                            </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div className={clsx(styles.filterChecks, 'filter-checks')}>
-                                            <label className={clsx(styles.checkBoxs, 'checkboxs')}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={
-                                                        filterState.visitTypeFilters.directVisit
-                                                    }
-                                                    onChange={(e) =>
-                                                        onVisitTypeChange(
-                                                            'directVisit',
-                                                            e.target.checked
-                                                        )
-                                                    }
-                                                />
-                                                <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Khám trực tiếp</span>
+                                                <span className="check-title">Người thân</span>
                                             </label>
                                         </div>
                                     </li>

@@ -2,10 +2,31 @@ import clsx from 'clsx';
 import React from 'react';
 import styles from './BookingHeader.module.scss';
 
+// Booking type enum
+export type BookingType = 'doctor' | 'service' | 'hospital';
+
+// Base info interface for all booking types
+export interface BookingEntityInfo {
+    name: string;
+    subtitle: string; // specialty for doctor, hospital name for service, address for hospital
+    rating?: number;
+    location: string;
+    avatar: string;
+    bookingType: BookingType;
+    // Additional fields for service medical
+    price?: number;
+    duration?: number; // in minutes
+    // Additional fields for hospital booking
+    selectedSpecialty?: string;
+    selectedService?: string;
+    selectedDoctor?: string;
+}
+
+// Legacy interface for backward compatibility
 export interface DoctorInfo {
     name: string;
     specialty: string;
-    rating: number;
+    rating?: number;
     location: string;
     avatar: string;
 }
@@ -18,7 +39,7 @@ export interface AppointmentInfo {
 }
 
 interface BookingHeaderProps {
-    doctor: DoctorInfo;
+    doctor: DoctorInfo | BookingEntityInfo;
     appointment: AppointmentInfo;
     isShowInfo?: boolean;
 }
@@ -44,6 +65,13 @@ const BookingHeader: React.FC<BookingHeaderProps> = ({
 
     const { date, timeSlots } = parseDateTime(appointment.dateTime);
 
+    // Check if this is a BookingEntityInfo (has bookingType) or legacy DoctorInfo
+    const isBookingEntityInfo = 'bookingType' in doctor;
+
+    // Get subtitle based on booking type
+    const subtitle = isBookingEntityInfo ? doctor.subtitle : doctor.specialty;
+    const rating = doctor.rating;
+
     return (
         <div className="card-header pt-3">
             <div className="booking-header pb-0">
@@ -61,12 +89,38 @@ const BookingHeader: React.FC<BookingHeaderProps> = ({
                             <div>
                                 <h4 className="mb-1 d-flex align-items-center gap-1">
                                     <span>{doctor.name}</span>
-                                    <span className="badge bg-orange fs-12">
-                                        <i className="fa-solid fa-star me-1"></i>
-                                        {doctor.rating}
-                                    </span>
+                                    {rating !== undefined && rating > 0 && (
+                                        <span className="badge bg-orange fs-12">
+                                            <i className="fa-solid fa-star me-1"></i>
+                                            {rating}
+                                        </span>
+                                    )}
                                 </h4>
-                                <p className="text-indigo mb-3 fw-medium">{doctor.specialty}</p>
+                                <p className="text-indigo mb-3 fw-medium">{subtitle}</p>
+                                {/* Hospital booking additional info */}
+                                {isBookingEntityInfo && doctor.bookingType === 'hospital' && (
+                                    <div className="mb-2">
+                                        {doctor.selectedSpecialty && (
+                                            <p className="mb-1 text-muted">
+                                                <i className="isax isax-hospital me-2"></i>
+                                                <strong>Chuyên khoa:</strong>{' '}
+                                                {doctor.selectedSpecialty}
+                                            </p>
+                                        )}
+                                        {doctor.selectedService && (
+                                            <p className="mb-1 text-muted">
+                                                <i className="isax isax-health me-2"></i>
+                                                <strong>Dịch vụ:</strong> {doctor.selectedService}
+                                            </p>
+                                        )}
+                                        {doctor.selectedDoctor && (
+                                            <p className="mb-1 text-muted">
+                                                <i className="isax isax-user me-2"></i>
+                                                <strong>Bác sĩ:</strong> {doctor.selectedDoctor}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
                                 <p className="mb-0">
                                     <i className="isax isax-location me-2"></i>
                                     {doctor.location}

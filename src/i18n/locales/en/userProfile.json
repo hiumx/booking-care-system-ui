@@ -1,4 +1,75 @@
 {
+    "patientRelatives": {
+        "title": "Manage Family Members",
+        "addButton": "Add Family Member",
+        "note": "Note",
+        "maxRelatives": "You can add up to 10 family members to book appointments on their behalf.",
+        "currentCount": "Currently",
+        "relatives": "family members",
+        "yearsOld": "years old",
+        "gender": {
+            "male": "Male",
+            "female": "Female",
+            "other": "Other"
+        },
+        "fields": {
+            "firstName": "First Name",
+            "lastName": "Last Name",
+            "gender": "Gender",
+            "dateOfBirth": "Date of Birth",
+            "relationship": "Relationship",
+            "phone": "Phone Number",
+            "healthInsurance": "Health Insurance Number",
+            "identityNumber": "ID Card Number",
+            "notes": "Notes"
+        },
+        "placeholder": {
+            "firstName": "Enter first name",
+            "lastName": "Enter last name",
+            "gender": "Select gender",
+            "dateOfBirth": "Select date of birth",
+            "relationship": "Select relationship",
+            "phone": "Enter phone number",
+            "healthInsurance": "Enter health insurance number",
+            "identityNumber": "Enter ID card number",
+            "notes": "Additional notes (medical history, allergies...)"
+        },
+        "validation": {
+            "firstNameRequired": "Please enter first name",
+            "firstNameMinLength": "First name must be at least 2 characters",
+            "lastNameRequired": "Please enter last name",
+            "lastNameMinLength": "Last name must be at least 2 characters",
+            "dateOfBirthRequired": "Please select date of birth",
+            "phoneInvalid": "Invalid phone number",
+            "identityNumberInvalid": "ID card number must be 9-12 characters"
+        },
+        "modal": {
+            "createTitle": "Add New Family Member",
+            "editTitle": "Update Family Member Information"
+        },
+        "empty": {
+            "title": "No family members yet",
+            "description": "Add family members to book appointments on their behalf",
+            "addFirst": "Add your first family member"
+        },
+        "delete": {
+            "title": "Confirm Delete",
+            "message": "Are you sure you want to delete this family member?",
+            "warning": "This action cannot be undone.",
+            "deleting": "Deleting..."
+        },
+        "success": {
+            "created": "Family member added successfully",
+            "updated": "Family member information updated successfully",
+            "deleted": "Family member deleted successfully"
+        },
+        "errors": {
+            "loadFailed": "Failed to load family members",
+            "saveFailed": "An error occurred",
+            "deleteFailed": "Failed to delete family member",
+            "validationFailed": "Please check the information"
+        }
+    },
     "profile": {
         "title": "Personal Information",
         "avatar": {

@@ -1,0 +1,94 @@
+.relativeCard {
+    transition: all 0.2s ease;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .cardHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+
+        .relativeName {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin: 0;
+        }
+
+        .relationshipBadge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: #e3f2fd;
+            color: #0d47a1; // Darker blue for better contrast
+        }
+    }
+
+    .cardInfo {
+        margin-bottom: 16px;
+
+        .infoItem {
+            display: flex;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 0.875rem;
+            color: #666;
+
+            i {
+                width: 20px;
+                color: #999;
+            }
+        }
+    }
+
+    .cardActions {
+        display: flex;
+        gap: 8px;
+
+        .btnEdit,
+        .btnDelete {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+
+            i {
+                margin-right: 6px;
+            }
+        }
+
+        .btnEdit {
+            background-color: #f0f7ff;
+            border: 1px solid #0a58ca; // Darker blue for better contrast
+            color: #0a58ca;
+
+            &:hover {
+                background-color: #0d6efd;
+                color: white;
+            }
+        }
+
+        .btnDelete {
+            background-color: #fff5f5;
+            border: 1px solid #b02a37; // Darker red for better contrast
+            color: #b02a37;
+
+            &:hover {
+                background-color: #dc3545;
+                color: white;
+            }
+        }
+    }
+}

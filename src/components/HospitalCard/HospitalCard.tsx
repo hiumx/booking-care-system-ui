@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
 import styles from './HospitalCard.module.scss';
 
@@ -15,6 +15,7 @@ export interface HospitalCardProps {
         description?: string;
     };
     className?: string;
+    showBookingButton?: boolean;
 }
 
 const HospitalCard: React.FC<HospitalCardProps> = ({
@@ -37,8 +38,14 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
             'Leading healthcare facility with state-of-the-art equipment and experienced medical professionals.',
     },
     className,
+    showBookingButton = false,
 }) => {
+    const navigate = useNavigate();
     const { id, name, image, specialties, location, distance, specialtyCount } = clinic;
+
+    const handleBookingClick = () => {
+        navigate(PATHS.BOOKING.HOSPITAL.replace(':hospitalId', id));
+    };
 
     return (
         <Link to={`${PATHS.HOSPITAL.ROOT}/${id}`} className={styles.clinicCarouselItem}>
@@ -109,6 +116,22 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                             )}
                         </div>
                     </div>
+
+                    {/* Quick Booking Button */}
+                    {showBookingButton && (
+                        <button
+                            type="button"
+                            className={`btn btn-primary-gradient ${styles.bookingButton}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleBookingClick();
+                            }}
+                            aria-label="Đặt lịch ngay"
+                        >
+                            Đặt lịch ngay
+                        </button>
+                    )}
                 </div>
             </div>
         </Link>

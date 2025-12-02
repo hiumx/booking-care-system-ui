@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import BookingHeader, {
     type DoctorInfo,
+    type BookingEntityInfo,
     type AppointmentInfo,
 } from '../BookingHeader/BookingHeader';
 import BookingAction from '../BookingAction';
@@ -10,7 +11,7 @@ import { useAppSelector } from '@/store/hooks';
 import { getAppointmentTypeDisplayText } from '../../constants/mockData';
 
 interface BookingSectionWrapperProps {
-    doctor: DoctorInfo;
+    doctor: DoctorInfo | BookingEntityInfo;
     appointment: AppointmentInfo;
     nextStepTitle: string;
     nextStep: () => void;
@@ -20,6 +21,7 @@ interface BookingSectionWrapperProps {
     fieldsetId?: string;
     isShowInfoHeader?: boolean;
     disabled?: boolean;
+    loading?: boolean;
     showPrev?: boolean;
 }
 
@@ -34,6 +36,7 @@ const BookingSectionWrapper: React.FC<BookingSectionWrapperProps> = ({
     fieldsetId,
     isShowInfoHeader,
     disabled = false,
+    loading = false,
     showPrev = true,
 }) => {
     // Get formatted date and time from Redux state
@@ -70,6 +73,7 @@ const BookingSectionWrapper: React.FC<BookingSectionWrapperProps> = ({
                     nextStep={nextStep}
                     prevStep={prevStep}
                     disabled={disabled}
+                    loading={loading}
                     showPrev={showPrev}
                 />
             </div>

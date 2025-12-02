@@ -142,7 +142,7 @@ export interface DoctorSearchParams {
     serviceTypeFilters?: string[]; // Support multiple service type filters
     priceRange?: {
         min: number;
-        max: number;
+        max?: number; // Optional - when undefined, means no upper limit
     };
     ratingFilter?: number;
     ratingFilters?: number[]; // Support multiple rating filters

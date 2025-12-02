@@ -393,6 +393,39 @@ $font-weight-bold: 700;
     }
 }
 
+// Quick Booking Button
+.bookingButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 16px;
+    margin-top: 16px;
+    background: linear-gradient(135deg, #0ce0ff 0%, #15558d 100%);
+    border: none;
+    border-radius: $border-radius-sm;
+    color: $white;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    transition: $transition-base;
+    box-shadow: 0 4px 15px rgba(12, 224, 255, 0.25);
+
+    i {
+        font-size: 1.1rem;
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(12, 224, 255, 0.35);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
 // Skeleton specific styles
 .skeletonIndicator {
     background: transparent !important;

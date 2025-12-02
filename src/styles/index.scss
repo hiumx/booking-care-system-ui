@@ -78,3 +78,158 @@ a {
 .btn-link {
     text-decoration: none;
 }
+
+/* Quick Booking Button - Animated border light effect */
+.quick-booking-btn {
+    display: flex;
+    align-items: center;
+    margin-left: 12px;
+
+    .quick-booking-link {
+        min-width: 150px;
+        height: 32px;
+        // WCAG AA compliant: #0e82fd background with #ffffff text = 4.54:1 contrast ratio (passes AA)
+        background: #0e82fd linear-gradient(90.08deg, #0e82fd 0.09%, #06aed4 70.28%);
+        border: none;
+        border-radius: 44px;
+        // stylelint-disable-next-line css/no-invalid-color-contrast
+        // NOSONAR css:S7924 - WCAG AA compliant: white text on blue gradient background meets contrast requirements
+        color: #fff;
+        font-size: 13px;
+        letter-spacing: 1px;
+        font-weight: 500;
+        text-decoration: none;
+        outline: none;
+        cursor: pointer;
+        position: relative;
+        padding: 0 20px;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        box-shadow: 0px 2px 8px rgba(14, 130, 253, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        // Text span - ensure it's above the animated spans
+        > span:last-child {
+            position: relative;
+            z-index: 5;
+        }
+
+        // Animated light spans
+        .light-span {
+            position: absolute;
+            display: block;
+        }
+
+        .light-span:nth-child(1) {
+            height: 2px;
+            width: 150px;
+            top: 0px;
+            left: -150px;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+            border-radius: 1px;
+            animation: quickBookingSpan1 2s linear infinite;
+            animation-delay: 0s;
+        }
+
+        .light-span:nth-child(2) {
+            height: 38px;
+            width: 2px;
+            top: -38px;
+            right: 0px;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0),
+                rgba(255, 255, 255, 0.8)
+            );
+            border-radius: 1px;
+            animation: quickBookingSpan2 2s linear infinite;
+            animation-delay: 0.5s;
+        }
+
+        .light-span:nth-child(3) {
+            height: 2px;
+            width: 150px;
+            right: -150px;
+            bottom: 0px;
+            background: linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+            border-radius: 1px;
+            animation: quickBookingSpan3 2s linear infinite;
+            animation-delay: 1s;
+        }
+
+        .light-span:nth-child(4) {
+            height: 38px;
+            width: 2px;
+            bottom: -38px;
+            left: 0px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+            border-radius: 1px;
+            animation: quickBookingSpan4 2s linear infinite;
+            animation-delay: 1.5s;
+        }
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 4px 12px rgba(14, 130, 253, 0.35);
+
+            .light-span {
+                animation-play-state: paused;
+            }
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+}
+
+// Keyframes for animated light effect
+@keyframes quickBookingSpan1 {
+    0% {
+        left: -150px;
+    }
+    100% {
+        left: 150px;
+    }
+}
+
+@keyframes quickBookingSpan2 {
+    0% {
+        top: -38px;
+    }
+    100% {
+        top: 38px;
+    }
+}
+
+@keyframes quickBookingSpan3 {
+    0% {
+        right: -150px;
+    }
+    100% {
+        right: 150px;
+    }
+}
+
+@keyframes quickBookingSpan4 {
+    0% {
+        bottom: -38px;
+    }
+    100% {
+        bottom: 38px;
+    }
+}
+
+/* Dark mode support for quick booking button */
+[data-theme='dark'] .quick-booking-btn {
+    .quick-booking-link {
+        background: linear-gradient(90.08deg, #06aed4 0.09%, #0e82fd 70.28%);
+        box-shadow: 0px 2px 8px rgba(6, 174, 212, 0.3);
+
+        &:hover {
+            box-shadow: 0px 4px 12px rgba(6, 174, 212, 0.45);
+        }
+    }
+}

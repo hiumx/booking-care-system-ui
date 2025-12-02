@@ -579,6 +579,7 @@ const HospitalList: React.FC = () => {
                                                                 specialtyCount:
                                                                     hospital.totalSpecialties || 0,
                                                             }}
+                                                            showBookingButton={true}
                                                         />
                                                     </div>
                                                 );
