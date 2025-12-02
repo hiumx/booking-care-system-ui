@@ -58,10 +58,16 @@ const customSelectStyles = {
         borderColor: '#e9ecef',
         '&:hover': { borderColor: '#0d6efd' },
     }),
-    option: (base: any, state: any) => ({
-        ...base,
-        backgroundColor: state.isSelected ? '#0d6efd' : state.isFocused ? '#e9ecef' : 'white',
-    }),
+    option: (base: any, state: any) => {
+        // Extract nested ternary into separate logic
+        let backgroundColor = 'white';
+        if (state.isSelected) {
+            backgroundColor = '#0d6efd';
+        } else if (state.isFocused) {
+            backgroundColor = '#e9ecef';
+        }
+        return { ...base, backgroundColor };
+    },
 };
 
 const PatientRelatives: React.FC = () => {
@@ -135,74 +141,74 @@ const PatientRelatives: React.FC = () => {
         setIdentityNumberError('');
     };
 
-    // Validate field on change
+    // Individual field validators - extracted to reduce cognitive complexity
+    const validateFirstName = (value: string): string => {
+        if (!value.trim()) {
+            return t('patientRelatives.validation.firstNameRequired', 'Vui lòng nhập họ');
+        }
+        if (value.trim().length < 2) {
+            return t(
+                'patientRelatives.validation.firstNameMinLength',
+                'Họ phải có ít nhất 2 ký tự'
+            );
+        }
+        return '';
+    };
+
+    const validateLastName = (value: string): string => {
+        if (!value.trim()) {
+            return t('patientRelatives.validation.lastNameRequired', 'Vui lòng nhập tên');
+        }
+        if (value.trim().length < 2) {
+            return t(
+                'patientRelatives.validation.lastNameMinLength',
+                'Tên phải có ít nhất 2 ký tự'
+            );
+        }
+        return '';
+    };
+
+    const validateDateOfBirth = (value: string): string => {
+        if (!value) {
+            return t('patientRelatives.validation.dateOfBirthRequired', 'Vui lòng chọn ngày sinh');
+        }
+        return '';
+    };
+
+    const validatePhone = (value: string): string => {
+        if (value.trim() && !AuthService.validatePhoneNumber(value)) {
+            return t('patientRelatives.validation.phoneInvalid', 'Số điện thoại không hợp lệ');
+        }
+        return '';
+    };
+
+    const validateIdentityNumber = (value: string): string => {
+        const trimmed = value.trim();
+        if (trimmed && (trimmed.length < 9 || trimmed.length > 12)) {
+            return t(
+                'patientRelatives.validation.identityNumberInvalid',
+                'Số CMND/CCCD phải từ 9-12 ký tự'
+            );
+        }
+        return '';
+    };
+
+    // Validate field on change - using object mapping to reduce cognitive complexity
     const validateField = (field: string, value: string) => {
-        switch (field) {
-            case 'firstName':
-                if (!value.trim()) {
-                    setFirstNameError(
-                        t('patientRelatives.validation.firstNameRequired', 'Vui lòng nhập họ')
-                    );
-                } else if (value.trim().length < 2) {
-                    setFirstNameError(
-                        t(
-                            'patientRelatives.validation.firstNameMinLength',
-                            'Họ phải có ít nhất 2 ký tự'
-                        )
-                    );
-                } else {
-                    setFirstNameError('');
-                }
-                break;
-            case 'lastName':
-                if (!value.trim()) {
-                    setLastNameError(
-                        t('patientRelatives.validation.lastNameRequired', 'Vui lòng nhập tên')
-                    );
-                } else if (value.trim().length < 2) {
-                    setLastNameError(
-                        t(
-                            'patientRelatives.validation.lastNameMinLength',
-                            'Tên phải có ít nhất 2 ký tự'
-                        )
-                    );
-                } else {
-                    setLastNameError('');
-                }
-                break;
-            case 'dateOfBirth':
-                if (!value) {
-                    setDateOfBirthError(
-                        t(
-                            'patientRelatives.validation.dateOfBirthRequired',
-                            'Vui lòng chọn ngày sinh'
-                        )
-                    );
-                } else {
-                    setDateOfBirthError('');
-                }
-                break;
-            case 'phone':
-                if (value.trim() && !AuthService.validatePhoneNumber(value)) {
-                    setPhoneError(
-                        t('patientRelatives.validation.phoneInvalid', 'Số điện thoại không hợp lệ')
-                    );
-                } else {
-                    setPhoneError('');
-                }
-                break;
-            case 'identityNumber':
-                if (value.trim() && (value.trim().length < 9 || value.trim().length > 12)) {
-                    setIdentityNumberError(
-                        t(
-                            'patientRelatives.validation.identityNumberInvalid',
-                            'Số CMND/CCCD phải từ 9-12 ký tự'
-                        )
-                    );
-                } else {
-                    setIdentityNumberError('');
-                }
-                break;
+        const validators: Record<
+            string,
+            { validate: (v: string) => string; setError: (e: string) => void }
+        > = {
+            firstName: { validate: validateFirstName, setError: setFirstNameError },
+            lastName: { validate: validateLastName, setError: setLastNameError },
+            dateOfBirth: { validate: validateDateOfBirth, setError: setDateOfBirthError },
+            phone: { validate: validatePhone, setError: setPhoneError },
+            identityNumber: { validate: validateIdentityNumber, setError: setIdentityNumberError },
+        };
+
+        const validator = validators[field];
+        if (validator) {
+            validator.setError(validator.validate(value));
         }
     };
 
@@ -415,6 +421,132 @@ const PatientRelatives: React.FC = () => {
         }
     };
 
+    // Helper function to render relatives content - extracted to avoid nested ternary
+    const renderRelativesContent = () => {
+        // Loading state - Skeleton
+        if (isLoading) {
+            return (
+                <div className="row">
+                    {[1, 2, 3].map((index) => (
+                        <div key={index} className="col-md-6 col-lg-4 mb-3">
+                            <div className="card h-100">
+                                <div className="card-body">
+                                    <div className="d-flex align-items-center mb-3">
+                                        <Skeleton variant="circular" width={50} height={50} />
+                                        <div className="ms-3 flex-grow-1">
+                                            <Skeleton variant="text" width="70%" height={24} />
+                                            <Skeleton variant="text" width="50%" height={18} />
+                                        </div>
+                                    </div>
+                                    <Skeleton variant="text" width="60%" height={18} />
+                                    <Skeleton variant="text" width="80%" height={18} />
+                                    <Skeleton variant="text" width="40%" height={18} />
+                                    <div className="d-flex gap-2 mt-3">
+                                        <Skeleton
+                                            variant="rectangular"
+                                            width={70}
+                                            height={32}
+                                            sx={{ borderRadius: 1 }}
+                                        />
+                                        <Skeleton
+                                            variant="rectangular"
+                                            width={70}
+                                            height={32}
+                                            sx={{ borderRadius: 1 }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+
+        // Empty state
+        if (relatives.length === 0) {
+            return (
+                <div className="text-center py-5">
+                    <i className="isax isax-people text-muted" style={{ fontSize: '4rem' }}></i>
+                    <h5 className="mt-3 text-muted">
+                        {t('patientRelatives.empty.title', 'Chưa có người thân nào')}
+                    </h5>
+                    <p className="text-muted">
+                        {t(
+                            'patientRelatives.empty.description',
+                            'Thêm người thân để có thể đặt lịch khám thay cho họ'
+                        )}
+                    </p>
+                    <button className="btn btn-primary" onClick={handleOpenCreate}>
+                        <i className="fa fa-plus me-1"></i>
+                        {t('patientRelatives.empty.addFirst', 'Thêm người thân đầu tiên')}
+                    </button>
+                </div>
+            );
+        }
+
+        // Relatives list
+        return (
+            <div className="row">
+                {relatives.map((relative) => (
+                    <div key={relative.id} className="col-md-6 col-lg-4 mb-3">
+                        <div className={`card h-100 ${styles.relativeCard}`}>
+                            <div className="card-body">
+                                <div className={styles.cardHeader}>
+                                    <h5 className={styles.relativeName}>{relative.fullName}</h5>
+                                    <span className={styles.relationshipBadge}>
+                                        {relative.relationshipDisplay}
+                                    </span>
+                                </div>
+                                <div className={styles.cardInfo}>
+                                    <div className={styles.infoItem}>
+                                        <i className="fa fa-venus-mars"></i>
+                                        {relative.genderDisplay}
+                                    </div>
+                                    <div className={styles.infoItem}>
+                                        <i className="fa fa-birthday-cake"></i>
+                                        {new Date(relative.dateOfBirth).toLocaleDateString(
+                                            'vi-VN'
+                                        )}{' '}
+                                        ({relative.age} {t('patientRelatives.yearsOld', 'tuổi')})
+                                    </div>
+                                    {relative.phone && (
+                                        <div className={styles.infoItem}>
+                                            <i className="fa fa-phone"></i>
+                                            {relative.phone}
+                                        </div>
+                                    )}
+                                    {relative.healthInsuranceNumber && (
+                                        <div className={styles.infoItem}>
+                                            <i className="fa fa-id-card"></i>
+                                            BHYT: {relative.healthInsuranceNumber}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className={styles.cardActions}>
+                                    <button
+                                        className={styles.btnEdit}
+                                        onClick={() => handleOpenEdit(relative)}
+                                    >
+                                        <i className="fa fa-edit"></i>
+                                        {t('common:actions.edit', 'Chỉnh sửa')}
+                                    </button>
+                                    <button
+                                        className={styles.btnDelete}
+                                        onClick={() => setDeleteConfirm(relative.id)}
+                                    >
+                                        <i className="fa fa-trash"></i>
+                                        {t('common:actions.delete', 'Xóa')}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
     return (
         <div className="card">
             <div className="card-header d-flex justify-content-between align-items-center">
@@ -444,123 +576,8 @@ const PatientRelatives: React.FC = () => {
                     {t('patientRelatives.relatives', 'người thân')}.
                 </div>
 
-                {/* Loading state - Skeleton */}
-                {isLoading ? (
-                    <div className="row">
-                        {[1, 2, 3].map((index) => (
-                            <div key={index} className="col-md-6 col-lg-4 mb-3">
-                                <div className="card h-100">
-                                    <div className="card-body">
-                                        <div className="d-flex align-items-center mb-3">
-                                            <Skeleton variant="circular" width={50} height={50} />
-                                            <div className="ms-3 flex-grow-1">
-                                                <Skeleton variant="text" width="70%" height={24} />
-                                                <Skeleton variant="text" width="50%" height={18} />
-                                            </div>
-                                        </div>
-                                        <Skeleton variant="text" width="60%" height={18} />
-                                        <Skeleton variant="text" width="80%" height={18} />
-                                        <Skeleton variant="text" width="40%" height={18} />
-                                        <div className="d-flex gap-2 mt-3">
-                                            <Skeleton
-                                                variant="rectangular"
-                                                width={70}
-                                                height={32}
-                                                sx={{ borderRadius: 1 }}
-                                            />
-                                            <Skeleton
-                                                variant="rectangular"
-                                                width={70}
-                                                height={32}
-                                                sx={{ borderRadius: 1 }}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : relatives.length === 0 ? (
-                    /* Empty state */
-                    <div className="text-center py-5">
-                        <i className="isax isax-people text-muted" style={{ fontSize: '4rem' }}></i>
-                        <h5 className="mt-3 text-muted">
-                            {t('patientRelatives.empty.title', 'Chưa có người thân nào')}
-                        </h5>
-                        <p className="text-muted">
-                            {t(
-                                'patientRelatives.empty.description',
-                                'Thêm người thân để có thể đặt lịch khám thay cho họ'
-                            )}
-                        </p>
-                        <button className="btn btn-primary" onClick={handleOpenCreate}>
-                            <i className="fa fa-plus me-1"></i>
-                            {t('patientRelatives.empty.addFirst', 'Thêm người thân đầu tiên')}
-                        </button>
-                    </div>
-                ) : (
-                    /* Relatives list */
-                    <div className="row">
-                        {relatives.map((relative) => (
-                            <div key={relative.id} className="col-md-6 col-lg-4 mb-3">
-                                <div className={`card h-100 ${styles.relativeCard}`}>
-                                    <div className="card-body">
-                                        <div className={styles.cardHeader}>
-                                            <h5 className={styles.relativeName}>
-                                                {relative.fullName}
-                                            </h5>
-                                            <span className={styles.relationshipBadge}>
-                                                {relative.relationshipDisplay}
-                                            </span>
-                                        </div>
-                                        <div className={styles.cardInfo}>
-                                            <div className={styles.infoItem}>
-                                                <i className="fa fa-venus-mars"></i>
-                                                {relative.genderDisplay}
-                                            </div>
-                                            <div className={styles.infoItem}>
-                                                <i className="fa fa-birthday-cake"></i>
-                                                {new Date(relative.dateOfBirth).toLocaleDateString(
-                                                    'vi-VN'
-                                                )}{' '}
-                                                ({relative.age}{' '}
-                                                {t('patientRelatives.yearsOld', 'tuổi')})
-                                            </div>
-                                            {relative.phone && (
-                                                <div className={styles.infoItem}>
-                                                    <i className="fa fa-phone"></i>
-                                                    {relative.phone}
-                                                </div>
-                                            )}
-                                            {relative.healthInsuranceNumber && (
-                                                <div className={styles.infoItem}>
-                                                    <i className="fa fa-id-card"></i>
-                                                    BHYT: {relative.healthInsuranceNumber}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className={styles.cardActions}>
-                                            <button
-                                                className={styles.btnEdit}
-                                                onClick={() => handleOpenEdit(relative)}
-                                            >
-                                                <i className="fa fa-edit"></i>
-                                                {t('common:actions.edit', 'Chỉnh sửa')}
-                                            </button>
-                                            <button
-                                                className={styles.btnDelete}
-                                                onClick={() => setDeleteConfirm(relative.id)}
-                                            >
-                                                <i className="fa fa-trash"></i>
-                                                {t('common:actions.delete', 'Xóa')}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                {/* Relatives content - using helper function to avoid nested ternary */}
+                {renderRelativesContent()}
             </div>
 
             {/* Create/Edit Modal */}
@@ -816,16 +833,14 @@ const PatientRelatives: React.FC = () => {
                                         className="btn btn-primary"
                                         disabled={isSubmitting}
                                     >
-                                        {isSubmitting ? (
-                                            <>
-                                                <span className="spinner-border spinner-border-sm me-1"></span>
-                                                {t('common:actions.processing', 'Đang xử lý...')}
-                                            </>
-                                        ) : editingRelative ? (
-                                            t('common:actions.update', 'Cập nhật')
-                                        ) : (
-                                            t('common:actions.add', 'Thêm mới')
+                                        {isSubmitting && (
+                                            <span className="spinner-border spinner-border-sm me-1"></span>
                                         )}
+                                        {isSubmitting
+                                            ? t('common:actions.processing', 'Đang xử lý...')
+                                            : editingRelative
+                                              ? t('common:actions.update', 'Cập nhật')
+                                              : t('common:actions.add', 'Thêm mới')}
                                     </button>
                                 </div>
                             </form>

@@ -150,6 +150,42 @@ const BookingConfirmation: React.FC = () => {
         return PATHS.DOCTOR.ROOT;
     };
 
+    // Helper function to render confirmation message - extracted from nested ternary
+    const renderConfirmationMessage = () => {
+        if (isServiceMedicalBooking) {
+            return (
+                <>
+                    Lịch hẹn dịch vụ{' '}
+                    <span className="text-dark">
+                        {formattedAppointmentInfo.service?.name || 'Dịch vụ y tế'}
+                    </span>{' '}
+                    của bạn đã được xác nhận.
+                </>
+            );
+        }
+        if (isSpecialtyBooking) {
+            return (
+                <>
+                    Lịch khám chuyên khoa{' '}
+                    <span className="text-dark">
+                        {formattedAppointmentInfo.specialty?.name || 'Chuyên khoa'}
+                    </span>{' '}
+                    của bạn đã được tiếp nhận. Bệnh viện sẽ phân công bác sĩ phù hợp cho bạn.
+                </>
+            );
+        }
+        return (
+            <>
+                Lịch khám của bạn đã được xác nhận với{' '}
+                <span className="text-dark">
+                    {formattedAppointmentInfo.doctor?.positionName}{' '}
+                    {formattedAppointmentInfo.doctor?.fullName || 'Bác sĩ'}
+                </span>
+                .
+            </>
+        );
+    };
+
     // Breadcrumb configuration - dynamic based on booking type
     const breadcrumbItems = [
         { label: 'Trang chủ', path: PATHS.HOME },
@@ -203,46 +239,8 @@ const BookingConfirmation: React.FC = () => {
                                                             />
                                                         </span>
                                                         <p className="mb-0">
-                                                            {isServiceMedicalBooking ? (
-                                                                <>
-                                                                    Lịch hẹn dịch vụ{' '}
-                                                                    <span className="text-dark">
-                                                                        {formattedAppointmentInfo
-                                                                            .service?.name ||
-                                                                            'Dịch vụ y tế'}
-                                                                    </span>{' '}
-                                                                    của bạn đã được xác nhận.
-                                                                </>
-                                                            ) : isSpecialtyBooking ? (
-                                                                <>
-                                                                    Lịch khám chuyên khoa{' '}
-                                                                    <span className="text-dark">
-                                                                        {formattedAppointmentInfo
-                                                                            .specialty?.name ||
-                                                                            'Chuyên khoa'}
-                                                                    </span>{' '}
-                                                                    của bạn đã được tiếp nhận. Bệnh
-                                                                    viện sẽ phân công bác sĩ phù hợp
-                                                                    cho bạn.
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    Lịch khám của bạn đã được xác
-                                                                    nhận với{' '}
-                                                                    <span className="text-dark">
-                                                                        {
-                                                                            formattedAppointmentInfo
-                                                                                .doctor
-                                                                                ?.positionName
-                                                                        }{' '}
-                                                                        {formattedAppointmentInfo
-                                                                            .doctor?.fullName ||
-                                                                            'Bác sĩ'}
-                                                                    </span>
-                                                                    .
-                                                                </>
-                                                            )}{' '}
-                                                            Vui lòng đến trước{' '}
+                                                            {renderConfirmationMessage()} Vui lòng
+                                                            đến trước{' '}
                                                             <span className="text-dark">
                                                                 15 phút
                                                             </span>{' '}
@@ -325,7 +323,7 @@ const BookingConfirmation: React.FC = () => {
                                                                                     Bác sĩ
                                                                                 </div>
                                                                                 <div className="form-plain-text text-warning">
-                                                                                    <i className="isax isax-timer me-1"></i>
+                                                                                    <i className="isax isax-timer me-1"></i>{' '}
                                                                                     Đang chờ phân
                                                                                     công
                                                                                 </div>

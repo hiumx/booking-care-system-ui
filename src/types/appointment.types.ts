@@ -85,7 +85,6 @@ export interface AppointmentResponse {
     result?: string;
     /** Original consultation/service fee at the time of booking (before any discounts) */
     amount?: number;
-    /** @deprecated Use amount instead */
     consultationFees: number;
     createdAt: string;
     updatedAt: string;

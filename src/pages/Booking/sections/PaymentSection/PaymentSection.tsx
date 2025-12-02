@@ -52,11 +52,14 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     const doctorInfo = useDoctorInfo();
     const serviceMedicalInfo = useServiceMedicalInfo();
     const hospitalBookingInfo = useHospitalBookingInfo();
-    const entityInfo = isHospitalBooking
-        ? hospitalBookingInfo
-        : isServiceMedicalBooking
-          ? serviceMedicalInfo
-          : doctorInfo;
+
+    // Helper function to get entity info - extracted to avoid nested ternary
+    const getEntityInfo = () => {
+        if (isHospitalBooking) return hospitalBookingInfo;
+        if (isServiceMedicalBooking) return serviceMedicalInfo;
+        return doctorInfo;
+    };
+    const entityInfo = getEntityInfo();
 
     // Get selected date and time slots (or use reschedule values if provided)
     const selectedDateFromRedux = useAppSelector(selectSelectedDate);
@@ -141,46 +144,51 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         }
     }, [isSpecialtyBooking]);
 
+    // Helper to get service type name based on appointment type
+    const getServiceTypeName = (): string => {
+        const appointmentType = bookingState.appointmentType || AppointmentType.IN_PERSON;
+        return appointmentType === AppointmentType.IN_PERSON
+            ? 'Khám trực tiếp'
+            : 'Tư vấn trực tuyến';
+    };
+
+    // Helper to get price from doctor's prices
+    const getDoctorPrice = (): number => {
+        if (!doctorState.selectedDoctor?.prices) return 0;
+        const price = doctorState.selectedDoctor.prices.find(
+            (p) => p.serviceTypeName === getServiceTypeName()
+        );
+        return price?.amount || 0;
+    };
+
+    // Helper to get price from hospital's service
+    const getHospitalServicePrice = (): number => {
+        if (!hospitalState.selectedHospital?.serviceMedicals) return 0;
+        const service = hospitalState.selectedHospital.serviceMedicals.find(
+            (s) => s.id === bookingState.selectedServiceMedicalId
+        );
+        return service?.price || 0;
+    };
+
     // Helper function to get consultation fee based on appointment type
+    // Refactored to reduce cognitive complexity
     const getConsultationFee = (): number => {
         // Hospital booking flow
         if (isHospitalBooking) {
-            const appointmentType = bookingState.appointmentType || AppointmentType.IN_PERSON;
-            const serviceTypeName =
-                appointmentType === AppointmentType.IN_PERSON
-                    ? 'Khám trực tiếp'
-                    : 'Tư vấn trực tuyến';
-
             // If doctor is selected, get price from doctor
-            if (bookingState.selectedDoctorId && doctorState.selectedDoctor?.prices) {
-                const price = doctorState.selectedDoctor.prices.find(
-                    (p) => p.serviceTypeName === serviceTypeName
-                );
-                return price?.amount || 0;
+            if (bookingState.selectedDoctorId) {
+                return getDoctorPrice();
             }
-
             // If service is selected (no doctor), get price from hospital's service
-            if (bookingState.selectedServiceMedicalId && hospitalState.selectedHospital) {
-                const service = hospitalState.selectedHospital.serviceMedicals?.find(
-                    (s) => s.id === bookingState.selectedServiceMedicalId
-                );
-                return service?.price || 0;
+            if (bookingState.selectedServiceMedicalId) {
+                return getHospitalServicePrice();
             }
-
             return 0;
         }
 
         // Direct doctor booking
         if (!isServiceMedicalBooking && doctorState.selectedDoctor?.prices) {
-            const appointmentType = bookingState.appointmentType || AppointmentType.IN_PERSON;
-            const serviceTypeName =
-                appointmentType === AppointmentType.IN_PERSON
-                    ? 'Khám trực tiếp'
-                    : 'Tư vấn trực tuyến';
-            const price = doctorState.selectedDoctor.prices.find(
-                (p) => p.serviceTypeName === serviceTypeName
-            );
-            return price?.amount || 0;
+            return getDoctorPrice();
         }
 
         // Direct service medical booking

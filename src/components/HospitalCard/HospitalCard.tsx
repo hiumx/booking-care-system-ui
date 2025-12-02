@@ -2,7 +2,6 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
 import styles from './HospitalCard.module.scss';
-import Button from '@/components/Button';
 
 export interface HospitalCardProps {
     clinic: {
@@ -120,29 +119,18 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
 
                     {/* Quick Booking Button */}
                     {showBookingButton && (
-                        <span
+                        <button
+                            type="button"
+                            className={`btn btn-primary-gradient ${styles.bookingButton}`}
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
+                                handleBookingClick();
                             }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleBookingClick();
-                                }
-                            }}
-                            role="button"
-                            tabIndex={0}
                             aria-label="Đặt lịch ngay"
                         >
-                            <Button
-                                type="button"
-                                text="Đặt lịch ngay"
-                                className={styles.bookingButton}
-                                onClick={handleBookingClick}
-                            />
-                        </span>
+                            Đặt lịch ngay
+                        </button>
                     )}
                 </div>
             </div>

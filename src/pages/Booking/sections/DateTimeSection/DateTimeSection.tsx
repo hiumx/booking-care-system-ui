@@ -217,6 +217,29 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     const isSpecialtyBooking =
         isHospitalBooking && !!hospitalBookingSpecialtyId && !hospitalBookingDoctorId;
 
+    // Helper function to validate booking target - used in multiple places
+    const getValidBookingTarget = useCallback(() => {
+        if (isDoctorBooking) return !!doctorId;
+        if (isServiceMedicalBooking) return !!serviceMedicalId;
+        if (isHospitalBooking) {
+            return !!(
+                hospitalBookingDoctorId ||
+                hospitalBookingServiceId ||
+                hospitalBookingSpecialtyId
+            );
+        }
+        return false;
+    }, [
+        isDoctorBooking,
+        isServiceMedicalBooking,
+        isHospitalBooking,
+        doctorId,
+        serviceMedicalId,
+        hospitalBookingDoctorId,
+        hospitalBookingServiceId,
+        hospitalBookingSpecialtyId,
+    ]);
+
     // Get specialty schedule data from Redux
     const specialtyScheduleCategories = useAppSelector(
         (state) => state.schedule.specialtyScheduleCategories
@@ -530,19 +553,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
             const selectedSlotData = allSlots.find((slot) => slot.globalIndex === slotIndex);
 
-            // Validate based on booking type
-            const getValidBookingTarget = () => {
-                if (isDoctorBooking) return !!doctorId;
-                if (isServiceMedicalBooking) return !!serviceMedicalId;
-                if (isHospitalBooking) {
-                    return !!(
-                        hospitalBookingDoctorId ||
-                        hospitalBookingServiceId ||
-                        hospitalBookingSpecialtyId
-                    );
-                }
-                return false;
-            };
+            // Validate based on booking type - use shared function
             const hasValidBookingTarget = getValidBookingTarget();
 
             if (!selectedSlotData || !hasValidBookingTarget || !selectedDate) {
@@ -720,21 +731,8 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             });
         };
 
-        const getValidBookingTarget = () => {
-            if (isDoctorBooking) return !!doctorId;
-            if (isServiceMedicalBooking) return !!serviceMedicalId;
-            if (isHospitalBooking) {
-                return !!(
-                    hospitalBookingDoctorId ||
-                    hospitalBookingServiceId ||
-                    hospitalBookingSpecialtyId
-                );
-            }
-            return false;
-        };
-
         const shouldFetchSlots = () => {
-            // Check if we have a valid booking target
+            // Check if we have a valid booking target - use shared function
             const hasValidTarget = getValidBookingTarget();
 
             if (!hasValidTarget) return false;

@@ -27,7 +27,7 @@
             font-size: 0.75rem;
             font-weight: 500;
             background-color: #e3f2fd;
-            color: #1976d2;
+            color: #0d47a1; // Darker blue for better contrast
         }
     }
 
@@ -71,8 +71,8 @@
 
         .btnEdit {
             background-color: #f0f7ff;
-            border: 1px solid #0d6efd;
-            color: #0d6efd;
+            border: 1px solid #0a58ca; // Darker blue for better contrast
+            color: #0a58ca;
 
             &:hover {
                 background-color: #0d6efd;
@@ -82,8 +82,8 @@
 
         .btnDelete {
             background-color: #fff5f5;
-            border: 1px solid #dc3545;
-            color: #dc3545;
+            border: 1px solid #b02a37; // Darker red for better contrast
+            color: #b02a37;
 
             &:hover {
                 background-color: #dc3545;

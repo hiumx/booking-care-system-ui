@@ -334,15 +334,6 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                     'active'
                                             )}
                                             htmlFor={`specialty-${specialty.id}`}
-                                            onClick={() => handleSpecialtySelect(specialty.id)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' || e.key === ' ') {
-                                                    e.preventDefault();
-                                                    handleSpecialtySelect(specialty.id);
-                                                }
-                                            }}
-                                            role="button"
-                                            tabIndex={0}
                                         >
                                             <input
                                                 id={`specialty-${specialty.id}`}
@@ -464,15 +455,6 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                     'active'
                                             )}
                                             htmlFor={`service-${service.id}`}
-                                            onClick={() => handleServiceSelect(service.id)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' || e.key === ' ') {
-                                                    e.preventDefault();
-                                                    handleServiceSelect(service.id);
-                                                }
-                                            }}
-                                            role="button"
-                                            tabIndex={0}
                                         >
                                             <input
                                                 id={`service-${service.id}`}
