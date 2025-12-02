@@ -49,10 +49,6 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
         };
     }, [appointmentType, dispatch]);
 
-    const getAppointmentTypeLabel = (type: AppointmentType) =>
-        type === AppointmentType.TELEHEALTH ? 'Tư vấn trực tuyến' : 'Khám trực tiếp';
-    const appointmentTypeLabel = getAppointmentTypeLabel(appointmentType);
-
     // Build AI guide text per step
     const getGuideText = (step: Step): string => {
         if (step === 'datetime') return 'Mời bạn chọn ngày và khung giờ phù hợp';
@@ -142,18 +138,11 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
                     prevStep={prevStep}
                     doctorId={doctorId}
                     hidePrev={true}
-                    appointmentTypeLabel={appointmentTypeLabel}
                 />
             );
         }
         if (currentStep === 'basic') {
-            return (
-                <BasicInfoSection
-                    nextStep={nextStep}
-                    prevStep={prevStep}
-                    appointmentTypeLabel={appointmentTypeLabel}
-                />
-            );
+            return <BasicInfoSection nextStep={nextStep} prevStep={prevStep} />;
         }
         return (
             <PaymentSection
@@ -201,7 +190,6 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
                     }
                 }}
                 isProcessingPayment={false}
-                appointmentTypeLabel={appointmentTypeLabel}
             />
         );
     };
