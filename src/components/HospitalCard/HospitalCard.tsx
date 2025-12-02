@@ -120,11 +120,21 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
 
                     {/* Quick Booking Button */}
                     {showBookingButton && (
-                        <div
+                        <span
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                             }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleBookingClick();
+                                }
+                            }}
+                            role="button"
+                            tabIndex={0}
+                            aria-label="Đặt lịch ngay"
                         >
                             <Button
                                 type="button"
@@ -132,7 +142,7 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                                 className={styles.bookingButton}
                                 onClick={handleBookingClick}
                             />
-                        </div>
+                        </span>
                     )}
                 </div>
             </div>

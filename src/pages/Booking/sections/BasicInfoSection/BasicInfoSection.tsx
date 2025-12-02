@@ -49,11 +49,14 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep 
     const doctorInfo = useDoctorInfo();
     const serviceMedicalInfo = useServiceMedicalInfo();
     const hospitalBookingInfo = useHospitalBookingInfo();
-    const entityInfo = isHospitalBooking
-        ? hospitalBookingInfo
-        : isServiceMedicalBooking
-          ? serviceMedicalInfo
-          : doctorInfo;
+
+    const getEntityInfo = () => {
+        if (isHospitalBooking) return hospitalBookingInfo;
+        if (isServiceMedicalBooking) return serviceMedicalInfo;
+        return doctorInfo;
+    };
+
+    const entityInfo = getEntityInfo();
     const dispatch = useAppDispatch();
 
     // Get user profile from Redux
@@ -199,6 +202,33 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep 
         nextStep();
     };
 
+    const renderRelativeSelection = () => {
+        if (isLoadingRelatives) {
+            return (
+                <Skeleton variant="rectangular" width="100%" height={46} sx={{ borderRadius: 1 }} />
+            );
+        }
+        if (relatives.length === 0) {
+            return (
+                <div className="alert alert-warning py-2">
+                    <i className="fa fa-exclamation-triangle me-2"></i>
+                    {t('booking:basicInfo.noRelatives', 'Bạn chưa có người thân nào.')}{' '}
+                    <Link to="/user/profile?tab=relatives" className="alert-link">
+                        {t('booking:basicInfo.addRelative', 'Thêm người thân')}
+                    </Link>
+                </div>
+            );
+        }
+        return (
+            <Select
+                title={t('booking:basicInfo.selectRelativePlaceholder', '-- Chọn người thân --')}
+                items={relativeSelectItems}
+                value={selectedRelativeId}
+                onChange={handleRelativeChange}
+            />
+        );
+    };
+
     return (
         <BookingSectionWrapper
             doctor={entityInfo}
@@ -259,38 +289,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep 
                                     {t('booking:basicInfo.selectRelative', 'Chọn người thân')}{' '}
                                     <span className="text-danger">*</span>
                                 </label>
-                                {isLoadingRelatives ? (
-                                    <Skeleton
-                                        variant="rectangular"
-                                        width="100%"
-                                        height={46}
-                                        sx={{ borderRadius: 1 }}
-                                    />
-                                ) : relatives.length === 0 ? (
-                                    <div className="alert alert-warning py-2">
-                                        <i className="fa fa-exclamation-triangle me-2"></i>
-                                        {t(
-                                            'booking:basicInfo.noRelatives',
-                                            'Bạn chưa có người thân nào.'
-                                        )}{' '}
-                                        <Link
-                                            to="/user/profile?tab=relatives"
-                                            className="alert-link"
-                                        >
-                                            {t('booking:basicInfo.addRelative', 'Thêm người thân')}
-                                        </Link>
-                                    </div>
-                                ) : (
-                                    <Select
-                                        title={t(
-                                            'booking:basicInfo.selectRelativePlaceholder',
-                                            '-- Chọn người thân --'
-                                        )}
-                                        items={relativeSelectItems}
-                                        value={selectedRelativeId}
-                                        onChange={handleRelativeChange}
-                                    />
-                                )}
+                                {renderRelativeSelection()}
                                 <small className="text-muted mt-1 d-block">
                                     <Link to="/user/profile?tab=relatives">
                                         <i className="fa fa-cog me-1"></i>

@@ -280,11 +280,12 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     const hospitalBookingInfo = useHospitalBookingInfo();
 
     // Use appropriate info based on booking type
-    const bookingInfo = isHospitalBooking
-        ? hospitalBookingInfo
-        : isServiceMedicalBooking
-          ? serviceMedicalInfo
-          : doctorInfo;
+    const getBookingInfo = () => {
+        if (isHospitalBooking) return hospitalBookingInfo;
+        if (isServiceMedicalBooking) return serviceMedicalInfo;
+        return doctorInfo;
+    };
+    const bookingInfo = getBookingInfo();
 
     // Determine target ID and type for hold slot
     // For hospital booking: use selected doctor or service from booking state
@@ -530,17 +531,19 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             const selectedSlotData = allSlots.find((slot) => slot.globalIndex === slotIndex);
 
             // Validate based on booking type
-            const hasValidBookingTarget = isDoctorBooking
-                ? !!doctorId
-                : isServiceMedicalBooking
-                  ? !!serviceMedicalId
-                  : isHospitalBooking
-                    ? !!(
-                          hospitalBookingDoctorId ||
-                          hospitalBookingServiceId ||
-                          hospitalBookingSpecialtyId
-                      )
-                    : false;
+            const getValidBookingTarget = () => {
+                if (isDoctorBooking) return !!doctorId;
+                if (isServiceMedicalBooking) return !!serviceMedicalId;
+                if (isHospitalBooking) {
+                    return !!(
+                        hospitalBookingDoctorId ||
+                        hospitalBookingServiceId ||
+                        hospitalBookingSpecialtyId
+                    );
+                }
+                return false;
+            };
+            const hasValidBookingTarget = getValidBookingTarget();
 
             if (!selectedSlotData || !hasValidBookingTarget || !selectedDate) {
                 toast.error('Không thể chọn khung giờ này');
@@ -717,19 +720,22 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             });
         };
 
+        const getValidBookingTarget = () => {
+            if (isDoctorBooking) return !!doctorId;
+            if (isServiceMedicalBooking) return !!serviceMedicalId;
+            if (isHospitalBooking) {
+                return !!(
+                    hospitalBookingDoctorId ||
+                    hospitalBookingServiceId ||
+                    hospitalBookingSpecialtyId
+                );
+            }
+            return false;
+        };
+
         const shouldFetchSlots = () => {
             // Check if we have a valid booking target
-            const hasValidTarget = isDoctorBooking
-                ? !!doctorId
-                : isServiceMedicalBooking
-                  ? !!serviceMedicalId
-                  : isHospitalBooking
-                    ? !!(
-                          hospitalBookingDoctorId ||
-                          hospitalBookingServiceId ||
-                          hospitalBookingSpecialtyId
-                      )
-                    : false;
+            const hasValidTarget = getValidBookingTarget();
 
             if (!hasValidTarget) return false;
 

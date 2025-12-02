@@ -248,6 +248,13 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
         setFilters((prev) => ({ ...prev, [key]: value }));
     };
 
+    // Helper function to get doctor count text
+    const getDoctorCountText = () => {
+        if (isLoadingDoctors) return 'Đang tải...';
+        if (totalDoctors > 0) return `${totalDoctors} bác sĩ có sẵn`;
+        return 'Không có bác sĩ';
+    };
+
     // Reset filters
     const handleResetFilters = () => {
         setFilters(defaultFilters);
@@ -367,15 +374,25 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                     <h6 className="mb-3">Chọn loại khám</h6>
                     <div className="row mb-4">
                         <div className="col-xl col-md-6 col-sm-6">
-                            <div
+                            <label
                                 className={clsx(
                                     'radio-select text-center',
                                     selectedType === AppointmentType.IN_PERSON && 'active',
                                     isServiceSelected && 'selected-locked'
                                 )}
+                                htmlFor="appointmentTypeInPerson"
                                 onClick={() => handleTypeSelect(AppointmentType.IN_PERSON)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleTypeSelect(AppointmentType.IN_PERSON);
+                                    }
+                                }}
+                                role="button"
+                                tabIndex={isServiceSelected ? -1 : 0}
                             >
                                 <input
+                                    id="appointmentTypeInPerson"
                                     className="form-check-input ms-0 mt-0"
                                     type="radio"
                                     name="appointmentType"
@@ -383,25 +400,38 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                     onChange={() => handleTypeSelect(AppointmentType.IN_PERSON)}
                                     disabled={isServiceSelected}
                                 />
-                                <label className="form-check-label">
+                                <span className="form-check-label">
                                     <i className="isax isax-hospital5"></i>
                                     <span className="service-title d-block">Khám trực tiếp</span>
-                                </label>
-                            </div>
+                                </span>
+                            </label>
                         </div>
                         <div className="col-xl col-md-6 col-sm-6">
-                            <div
+                            <label
                                 className={clsx(
                                     'radio-select text-center',
                                     selectedType === AppointmentType.TELEHEALTH && 'active',
                                     isServiceSelected && styles.disabled
                                 )}
+                                htmlFor="appointmentTypeTelehealth"
                                 onClick={() =>
                                     !isServiceSelected &&
                                     handleTypeSelect(AppointmentType.TELEHEALTH)
                                 }
+                                onKeyDown={(e) => {
+                                    if (
+                                        (e.key === 'Enter' || e.key === ' ') &&
+                                        !isServiceSelected
+                                    ) {
+                                        e.preventDefault();
+                                        handleTypeSelect(AppointmentType.TELEHEALTH);
+                                    }
+                                }}
+                                role="button"
+                                tabIndex={isServiceSelected ? -1 : 0}
                             >
                                 <input
+                                    id="appointmentTypeTelehealth"
                                     className="form-check-input ms-0 mt-0"
                                     type="radio"
                                     name="appointmentType"
@@ -409,11 +439,11 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                     onChange={() => handleTypeSelect(AppointmentType.TELEHEALTH)}
                                     disabled={isServiceSelected}
                                 />
-                                <label className="form-check-label">
+                                <span className="form-check-label">
                                     <i className="isax isax-video5"></i>
                                     <span className="service-title d-block">Tư vấn trực tuyến</span>
-                                </label>
-                            </div>
+                                </span>
+                            </label>
                         </div>
                     </div>
 
@@ -508,11 +538,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                         Tự chọn bác sĩ
                                                     </span>
                                                     <span className="fs-14 text-muted">
-                                                        {isLoadingDoctors
-                                                            ? 'Đang tải...'
-                                                            : totalDoctors > 0
-                                                              ? `${totalDoctors} bác sĩ có sẵn`
-                                                              : 'Không có bác sĩ'}
+                                                        {getDoctorCountText()}
                                                     </span>
                                                 </span>
                                             </span>

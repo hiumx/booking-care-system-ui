@@ -111,6 +111,32 @@ const BookingConfirmation: React.FC = () => {
         };
     }, [appointment]);
 
+    // Helper functions to extract nested ternaries
+    const getAvatarSrc = () => {
+        if (isServiceMedicalBooking) {
+            return (
+                formattedAppointmentInfo.service?.imageUrl ||
+                '/src/assets/img/icons/medical-service.svg'
+            );
+        }
+        if (isSpecialtyBooking) {
+            return (
+                formattedAppointmentInfo.specialty?.imageUrl ||
+                formattedAppointmentInfo.hospital?.avatarUrl ||
+                '/src/assets/img/icons/specialty.svg'
+            );
+        }
+        return (
+            formattedAppointmentInfo.doctor?.avatarUrl || '/src/assets/img/clients/client-16.jpg'
+        );
+    };
+
+    const getAvatarAlt = () => {
+        if (isServiceMedicalBooking) return 'service-avatar';
+        if (isSpecialtyBooking) return 'specialty-avatar';
+        return 'doctor-avatar';
+    };
+
     // Get booking type label for breadcrumb
     const getBookingTypeLabel = () => {
         if (isServiceMedicalBooking) return 'Dịch vụ y tế';
@@ -172,31 +198,8 @@ const BookingConfirmation: React.FC = () => {
                                                     <div className="card-header d-flex align-items-center flex-wrap rpw-gap-2">
                                                         <span className="avatar avatar-lg avatar-rounded me-2 flex-shrink-0">
                                                             <img
-                                                                src={
-                                                                    isServiceMedicalBooking
-                                                                        ? formattedAppointmentInfo
-                                                                              .service?.imageUrl ||
-                                                                          '/src/assets/img/icons/medical-service.svg'
-                                                                        : isSpecialtyBooking
-                                                                          ? formattedAppointmentInfo
-                                                                                .specialty
-                                                                                ?.imageUrl ||
-                                                                            formattedAppointmentInfo
-                                                                                .hospital
-                                                                                ?.avatarUrl ||
-                                                                            '/src/assets/img/icons/specialty.svg'
-                                                                          : formattedAppointmentInfo
-                                                                                .doctor
-                                                                                ?.avatarUrl ||
-                                                                            '/src/assets/img/clients/client-16.jpg'
-                                                                }
-                                                                alt={
-                                                                    isServiceMedicalBooking
-                                                                        ? 'service-avatar'
-                                                                        : isSpecialtyBooking
-                                                                          ? 'specialty-avatar'
-                                                                          : 'doctor-avatar'
-                                                                }
+                                                                src={getAvatarSrc()}
+                                                                alt={getAvatarAlt()}
                                                             />
                                                         </span>
                                                         <p className="mb-0">
@@ -547,10 +550,10 @@ const BookingConfirmation: React.FC = () => {
                                                         </span>
                                                         <span className="d-block mb-3">
                                                             <QRCodeSVG
-                                                                value={`${window.location.origin}/user/profile?tab=appointment-detail&id=${appointmentId}&status=${isSpecialtyBooking ? 'waiting' : 'upcoming'}`}
+                                                                value={`${globalThis.location.origin}/user/profile?tab=appointment-detail&id=${appointmentId}&status=${isSpecialtyBooking ? 'waiting' : 'upcoming'}`}
                                                                 size={150}
                                                                 level="M"
-                                                                includeMargin={true}
+                                                                marginSize={4}
                                                                 bgColor="#ffffff"
                                                                 fgColor="#000000"
                                                             />

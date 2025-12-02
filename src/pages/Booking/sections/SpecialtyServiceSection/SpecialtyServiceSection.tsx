@@ -187,14 +187,15 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
         bookingType: 'service',
     };
 
+    const getServiceType = () => {
+        if (selectionType === 'specialty') return 'Chuyên khoa';
+        if (selectionType === 'service') return 'Dịch vụ';
+        return 'Chưa chọn';
+    };
+
     const appointmentInfo: AppointmentInfo = {
         service: getSelectedItemName(),
-        serviceType:
-            selectionType === 'specialty'
-                ? 'Chuyên khoa'
-                : selectionType === 'service'
-                  ? 'Dịch vụ'
-                  : 'Chưa chọn',
+        serviceType: getServiceType(),
         dateTime: 'Chưa chọn',
         appointmentType: 'Chưa chọn',
     };
@@ -324,7 +325,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                             {displayedSpecialties.length > 0 ? (
                                 displayedSpecialties.map((specialty) => (
                                     <div key={specialty.id} className="col-lg-4 col-md-6 mb-3">
-                                        <div
+                                        <label
                                             className={clsx(
                                                 styles.serviceItem,
                                                 'service-item',
@@ -332,9 +333,19 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                     selectedId === specialty.id &&
                                                     'active'
                                             )}
+                                            htmlFor={`specialty-${specialty.id}`}
                                             onClick={() => handleSpecialtySelect(specialty.id)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault();
+                                                    handleSpecialtySelect(specialty.id);
+                                                }
+                                            }}
+                                            role="button"
+                                            tabIndex={0}
                                         >
                                             <input
+                                                id={`specialty-${specialty.id}`}
                                                 className="form-check-input ms-0 mt-0"
                                                 type="radio"
                                                 name="specialtyService"
@@ -344,7 +355,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                 }
                                                 onChange={() => handleSpecialtySelect(specialty.id)}
                                             />
-                                            <label className="form-check-label ms-2 w-100">
+                                            <span className="form-check-label ms-2 w-100">
                                                 <div className={styles.itemContent}>
                                                     {specialty.imageUrl ? (
                                                         <img
@@ -371,8 +382,8 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                         )}
                                                     </div>
                                                 </div>
-                                            </label>
-                                        </div>
+                                            </span>
+                                        </label>
                                     </div>
                                 ))
                             ) : specialtySearch.trim() ? (
@@ -444,7 +455,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                             {displayedServices.length > 0 ? (
                                 displayedServices.map((service) => (
                                     <div key={service.id} className="col-lg-4 col-md-6 mb-3">
-                                        <div
+                                        <label
                                             className={clsx(
                                                 styles.serviceItem,
                                                 'service-item',
@@ -452,9 +463,19 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                     selectedId === service.id &&
                                                     'active'
                                             )}
+                                            htmlFor={`service-${service.id}`}
                                             onClick={() => handleServiceSelect(service.id)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault();
+                                                    handleServiceSelect(service.id);
+                                                }
+                                            }}
+                                            role="button"
+                                            tabIndex={0}
                                         >
                                             <input
+                                                id={`service-${service.id}`}
                                                 className="form-check-input ms-0 mt-0"
                                                 type="radio"
                                                 name="specialtyService"
@@ -464,7 +485,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                 }
                                                 onChange={() => handleServiceSelect(service.id)}
                                             />
-                                            <label className="form-check-label ms-2 w-100">
+                                            <span className="form-check-label ms-2 w-100">
                                                 <div className={styles.itemContent}>
                                                     {service.imageUrl ? (
                                                         <img
@@ -488,8 +509,8 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                         </span>
                                                     </div>
                                                 </div>
-                                            </label>
-                                        </div>
+                                            </span>
+                                        </label>
                                     </div>
                                 ))
                             ) : serviceSearch.trim() ? (
