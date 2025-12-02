@@ -446,12 +446,19 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                     <div className="row mb-4">
                         <div className="col-xl col-md-6 col-sm-6">
                             <div
+                                role="button"
+                                tabIndex={0}
                                 className={clsx(
                                     'radio-select text-center',
                                     selectedType === AppointmentType.IN_PERSON && 'active',
                                     isServiceSelected && 'selected-locked'
                                 )}
                                 onClick={() => handleTypeSelect(AppointmentType.IN_PERSON)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        handleTypeSelect(AppointmentType.IN_PERSON);
+                                    }
+                                }}
                             >
                                 <input
                                     id="appointmentTypeInPerson"
@@ -470,6 +477,8 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                         </div>
                         <div className="col-xl col-md-6 col-sm-6">
                             <div
+                                role="button"
+                                tabIndex={0}
                                 className={clsx(
                                     'radio-select text-center',
                                     selectedType === AppointmentType.TELEHEALTH && 'active',
@@ -479,6 +488,11 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                     !isServiceSelected &&
                                     handleTypeSelect(AppointmentType.TELEHEALTH)
                                 }
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        handleTypeSelect(AppointmentType.TELEHEALTH);
+                                    }
+                                }}
                             >
                                 <input
                                     id="appointmentTypeTelehealth"
@@ -489,7 +503,10 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                     onChange={() => handleTypeSelect(AppointmentType.TELEHEALTH)}
                                     disabled={isServiceSelected}
                                 />
-                                <label className="form-check-label">
+                                <label
+                                    className="form-check-label"
+                                    htmlFor="appointmentTypeTelehealth"
+                                >
                                     <i className="isax isax-video5" aria-hidden="true"></i>
                                     <span className="service-title d-block">Tư vấn trực tuyến</span>
                                 </label>
@@ -520,12 +537,19 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                 {/* Option: Hospital assigns doctor */}
                                 <div className="col-md-6 mb-3 mb-md-0">
                                     <div
+                                        role="button"
+                                        tabIndex={0}
                                         className={clsx(
                                             styles.doctorItem,
                                             'service-item',
                                             doctorSelectionMode === 'hospital' && 'active'
                                         )}
                                         onClick={() => handleDoctorSelectionModeChange('hospital')}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                handleDoctorSelectionModeChange('hospital');
+                                            }
+                                        }}
                                     >
                                         <input
                                             id="doctorSelectionModeHospital"
@@ -537,7 +561,10 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                 handleDoctorSelectionModeChange('hospital')
                                             }
                                         />
-                                        <label className="form-check-label ms-2">
+                                        <label
+                                            className="form-check-label ms-2"
+                                            htmlFor="doctorSelectionModeHospital"
+                                        >
                                             <span className="d-flex align-items-center">
                                                 <span className="avatar avatar-md me-2 bg-light rounded-circle d-flex align-items-center justify-content-center">
                                                     <i
@@ -561,6 +588,8 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                 {/* Option: Self select doctor */}
                                 <div className="col-md-6">
                                     <div
+                                        role="button"
+                                        tabIndex={0}
                                         className={clsx(
                                             styles.doctorItem,
                                             'service-item',
@@ -573,6 +602,11 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                             totalDoctors > 0 &&
                                             handleDoctorSelectionModeChange('self')
                                         }
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                handleDoctorSelectionModeChange('self');
+                                            }
+                                        }}
                                     >
                                         <input
                                             id="doctorSelectionModeSelf"
@@ -583,7 +617,10 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                             onChange={() => handleDoctorSelectionModeChange('self')}
                                             disabled={totalDoctors === 0 && !isLoadingDoctors}
                                         />
-                                        <label className="form-check-label ms-2">
+                                        <label
+                                            className="form-check-label ms-2"
+                                            htmlFor="doctorSelectionModeSelf"
+                                        >
                                             <span className="d-flex align-items-center">
                                                 <span className="avatar avatar-md me-2 bg-light rounded-circle d-flex align-items-center justify-content-center">
                                                     <i
@@ -940,6 +977,8 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                             className="col-lg-6 col-md-6 mb-3"
                                                         >
                                                             <div
+                                                                role="button"
+                                                                tabIndex={0}
                                                                 className={clsx(
                                                                     styles.doctorCard,
                                                                     'service-item',
@@ -949,6 +988,16 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                 onClick={() =>
                                                                     handleDoctorSelect(doctor.id)
                                                                 }
+                                                                onKeyDown={(e) => {
+                                                                    if (
+                                                                        e.key === 'Enter' ||
+                                                                        e.key === ' '
+                                                                    ) {
+                                                                        handleDoctorSelect(
+                                                                            doctor.id
+                                                                        );
+                                                                    }
+                                                                }}
                                                             >
                                                                 <input
                                                                     id={`doctorSelection-${doctor.id}`}
@@ -964,7 +1013,10 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                         )
                                                                     }
                                                                 />
-                                                                <label className="form-check-label ms-2 flex-grow-1">
+                                                                <label
+                                                                    className="form-check-label ms-2 flex-grow-1"
+                                                                    htmlFor={`doctorSelection-${doctor.id}`}
+                                                                >
                                                                     <div className="d-flex">
                                                                         {/* Avatar */}
                                                                         <div

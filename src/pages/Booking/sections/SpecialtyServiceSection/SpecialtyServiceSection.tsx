@@ -364,6 +364,8 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                 ? displayedSpecialties.map((specialty) => (
                                       <div key={specialty.id} className="col-lg-4 col-md-6 mb-3">
                                           <div
+                                              role="button"
+                                              tabIndex={0}
                                               className={clsx(
                                                   styles.serviceItem,
                                                   'service-item',
@@ -372,6 +374,11 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                       'active'
                                               )}
                                               onClick={() => handleSpecialtySelect(specialty.id)}
+                                              onKeyDown={(e) => {
+                                                  if (e.key === 'Enter' || e.key === ' ') {
+                                                      handleSpecialtySelect(specialty.id);
+                                                  }
+                                              }}
                                           >
                                               <input
                                                   id={`specialty-${specialty.id}`}
@@ -476,6 +483,8 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                 ? displayedServices.map((service) => (
                                       <div key={service.id} className="col-lg-4 col-md-6 mb-3">
                                           <div
+                                              role="button"
+                                              tabIndex={0}
                                               className={clsx(
                                                   styles.serviceItem,
                                                   'service-item',
@@ -484,6 +493,11 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                       'active'
                                               )}
                                               onClick={() => handleServiceSelect(service.id)}
+                                              onKeyDown={(e) => {
+                                                  if (e.key === 'Enter' || e.key === ' ') {
+                                                      handleServiceSelect(service.id);
+                                                  }
+                                              }}
                                           >
                                               <input
                                                   id={`service-${service.id}`}
