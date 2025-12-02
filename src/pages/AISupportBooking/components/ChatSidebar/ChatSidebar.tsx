@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { MessageSquare, Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { AppDispatch, RootState } from '@/store';
-import { fetchUserProfile } from '@/store/slices/userSlice';
+import { RootState } from '@/store';
 import { PATHS } from '@/routes/paths';
 import { ChatHistory } from '@/types/ai.types';
 import styles from './ChatSidebar.module.scss';
@@ -77,19 +76,9 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
     onToggle,
 }) => {
     const navigate = useNavigate();
-    const dispatch = useDispatch<AppDispatch>();
     const { profile } = useSelector((state: RootState) => state.user);
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
     const [avatarError, setAvatarError] = useState(false);
-
-    // Fetch user profile when authenticated and profile is null
-    useEffect(() => {
-        if (isAuthenticated && profile === null) {
-            dispatch(fetchUserProfile()).catch((error) => {
-                console.error('Failed to fetch user profile:', error);
-            });
-        }
-    }, [isAuthenticated, profile, dispatch]);
 
     // Reset avatar error when profile changes
     useEffect(() => {

@@ -14,15 +14,20 @@ import DateTimeSection from '@/pages/Booking/sections/DateTimeSection';
 import BasicInfoSection from '@/pages/Booking/sections/BasicInfoSection';
 import PaymentSection from '@/pages/Booking/sections/PaymentSection';
 import PaymentService, { CreatePaymentRequest } from '@/services/payment.service';
-import { setCreatedAppointmentId } from '@/store/slices/bookingSlice';
+import { setAppointmentType, setCreatedAppointmentId } from '@/store/slices/bookingSlice';
 import styles from '../../ChatArea.module.scss';
 
 interface MiniBookingInlineProps {
     doctorId: string;
     onClose: () => void;
+    appointmentType?: AppointmentType;
 }
 
-const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({ doctorId, onClose }) => {
+const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
+    doctorId,
+    onClose,
+    appointmentType = AppointmentType.IN_PERSON,
+}) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { profile } = useSelector((state: RootState) => state.user);
@@ -36,6 +41,17 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({ doctorId, onClose
     const [isGuideTyping, setIsGuideTyping] = useState(true);
     const [guideText, setGuideText] = useState<string>('Mời bạn chọn ngày và khung giờ phù hợp');
     const [showStep, setShowStep] = useState(false);
+
+    useEffect(() => {
+        dispatch(setAppointmentType(appointmentType));
+        return () => {
+            dispatch(setAppointmentType(AppointmentType.IN_PERSON));
+        };
+    }, [appointmentType, dispatch]);
+
+    const getAppointmentTypeLabel = (type: AppointmentType) =>
+        type === AppointmentType.TELEHEALTH ? 'Tư vấn trực tuyến' : 'Khám trực tiếp';
+    const appointmentTypeLabel = getAppointmentTypeLabel(appointmentType);
 
     // Build AI guide text per step
     const getGuideText = (step: Step): string => {
@@ -86,7 +102,7 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({ doctorId, onClose
             appointmentDate: scheduleState.selectedDate,
             appointmentTimeId,
             hospitalId: doctorState.selectedDoctor?.hospital?.id,
-            appointmentType: AppointmentType.IN_PERSON,
+            appointmentType,
             symptoms: '',
             attachmentUrls: [],
         });
@@ -126,11 +142,18 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({ doctorId, onClose
                     prevStep={prevStep}
                     doctorId={doctorId}
                     hidePrev={true}
+                    appointmentTypeLabel={appointmentTypeLabel}
                 />
             );
         }
         if (currentStep === 'basic') {
-            return <BasicInfoSection nextStep={nextStep} prevStep={prevStep} />;
+            return (
+                <BasicInfoSection
+                    nextStep={nextStep}
+                    prevStep={prevStep}
+                    appointmentTypeLabel={appointmentTypeLabel}
+                />
+            );
         }
         return (
             <PaymentSection
@@ -178,6 +201,7 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({ doctorId, onClose
                     }
                 }}
                 isProcessingPayment={false}
+                appointmentTypeLabel={appointmentTypeLabel}
             />
         );
     };

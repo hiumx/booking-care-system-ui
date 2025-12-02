@@ -5,7 +5,7 @@ import { AppointmentType } from '@/enums/appointment.enums';
 export const getAppointmentTypeDisplayText = (appointmentType: AppointmentType): string => {
     switch (appointmentType) {
         case AppointmentType.TELEHEALTH:
-            return 'Tư vấn online';
+            return 'Tư vấn trực tiếp';
         case AppointmentType.IN_PERSON:
             return 'Khám trực tiếp';
         default:

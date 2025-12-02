@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Calendar from '@/components/Calendar';
 import SlotCategory from './components/SlotCategory';
@@ -42,6 +42,7 @@ interface DateTimeSectionProps {
     medicalServiceId?: string;
     isRescheduleMode?: boolean;
     hidePrev?: boolean;
+    appointmentTypeLabel?: string;
 }
 
 const DateTimeSection: React.FC<DateTimeSectionProps> = ({
@@ -52,6 +53,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     medicalServiceId,
     isRescheduleMode = false,
     hidePrev = false,
+    appointmentTypeLabel,
 }) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -470,6 +472,14 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         }
     }, [selectedSlots, scheduleCategories]);
 
+    const appointmentInfo = useMemo(
+        () => ({
+            ...mockAppointmentInfo,
+            appointmentType: appointmentTypeLabel ?? mockAppointmentInfo.appointmentType,
+        }),
+        [appointmentTypeLabel]
+    );
+
     // Note: We DON'T release held slots on unmount anymore
     // This allows users to navigate back and forth between steps
     // Slots will auto-expire after 5 minutes or be released when booking is completed/cancelled
@@ -491,7 +501,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     return (
         <BookingSectionWrapper
             doctor={bookingInfo}
-            appointment={mockAppointmentInfo}
+            appointment={appointmentInfo}
             nextStepTitle={isRescheduleMode ? 'Xác nhận đổi lịch' : 'Thêm thông tin cơ bản'}
             nextStep={nextStep}
             prevStep={prevStep}

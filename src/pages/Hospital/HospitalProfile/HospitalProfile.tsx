@@ -626,7 +626,7 @@ const HospitalProfile: React.FC = () => {
                                         <span className={styles.stepLabel}>Bước 4:</span>
                                         <span className={styles.stepContent}>
                                             Lựa chọn thời gian, bác sĩ và hình thức khám (tại bệnh
-                                            viện hoặc tư vấn online).
+                                            viện hoặc tư vấn trực tiếp).
                                         </span>
                                     </div>
 

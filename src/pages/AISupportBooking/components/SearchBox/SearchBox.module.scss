@@ -21,6 +21,133 @@
     }
 }
 
+.quickActions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.quickActionCard {
+    border: 1px solid #ebeff5;
+    border-radius: 12px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: #d0dbe8;
+        background: #f1f5f9;
+        transform: translateY(-2px);
+    }
+}
+
+.labActionCard {
+    background: linear-gradient(135deg, #e6f4ff 0%, #d0ebff 100%);
+    border-color: #91d5ff;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(14, 130, 253, 0.15);
+
+    &:hover {
+        background: linear-gradient(135deg, #d0ebff 0%, #b3e0ff 100%);
+        border-color: #0e82fd;
+        box-shadow: 0 12px 30px rgba(14, 130, 253, 0.25);
+
+        .quickActionIcon {
+            background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+            box-shadow: 0 6px 16px rgba(14, 130, 253, 0.4);
+            transform: scale(1.05);
+        }
+    }
+}
+
+.dermatologyActionCard {
+    background: linear-gradient(135deg, #e6f4ff 0%, #d0ebff 100%);
+    border-color: #91d5ff;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(14, 130, 253, 0.15);
+
+    &:hover {
+        background: linear-gradient(135deg, #d0ebff 0%, #b3e0ff 100%);
+        border-color: #0e82fd;
+        box-shadow: 0 12px 30px rgba(14, 130, 253, 0.25);
+
+        .quickActionIcon {
+            background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+            box-shadow: 0 6px 16px rgba(14, 130, 253, 0.4);
+            transform: scale(1.05);
+        }
+    }
+}
+
+.comingSoonCard {
+    background: linear-gradient(135deg, #e6f4ff 0%, #d0ebff 100%);
+    border-color: #91d5ff;
+    box-shadow: 0 12px 30px rgba(14, 130, 253, 0.15);
+    cursor: default;
+
+    &:hover {
+        background: linear-gradient(135deg, #d0ebff 0%, #b3e0ff 100%);
+        border-color: #0e82fd;
+        box-shadow: 0 12px 30px rgba(14, 130, 253, 0.25);
+
+        .quickActionIcon {
+            background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+            box-shadow: 0 6px 16px rgba(14, 130, 253, 0.4);
+            transform: scale(1.05);
+        }
+    }
+}
+
+.quickActionIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(14, 130, 253, 0.3);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.quickActionContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: center;
+}
+
+.quickActionTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+}
+
+.quickActionDescription {
+    font-size: 13px;
+    color: #475569;
+    margin: 0;
+    line-height: 1.4;
+}
+
 .textarea {
     width: 100%;
     border: none;
@@ -340,10 +467,59 @@
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    min-width: 220px;
+    min-width: 200px;
     padding: 8px;
     z-index: 1000;
     animation: slideUp 0.2s ease;
+
+    .attachmentGrid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .comingSoonCard {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+        border: 1px dashed #cbd5e0;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 120px;
+        cursor: not-allowed;
+        opacity: 0.7;
+        transition: all 0.3s ease;
+
+        &:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+        }
+
+        .comingSoonIcon {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+
+        .comingSoonTitle {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            text-align: center;
+        }
+
+        .comingSoonBadge {
+            font-size: 11px;
+            padding: 4px 12px;
+            background: #edf2f7;
+            color: #718096;
+            border-radius: 12px;
+            border: 1px solid #cbd5e0;
+            font-weight: 500;
+        }
+    }
 
     .menuItem {
         width: 100%;
