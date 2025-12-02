@@ -5,46 +5,63 @@ import { Suggestion } from '@/types/ai.types';
 import { PATHS, replacePathParams } from '@/routes/paths';
 import clsx from 'clsx';
 import styles from './SuggestionCard.module.scss';
+import { AppointmentType } from '@/enums/appointment.enums';
+
+type SupportBookingOptions = {
+    appointmentType?: AppointmentType;
+};
 
 interface SuggestionCardProps {
     suggestion: Suggestion;
-    onBookAppointment: () => void;
-    onSupportBooking?: () => void;
+    onSupportBooking?: (options?: SupportBookingOptions) => void;
 }
 
 interface CardFooterProps {
-    onBookAppointment: () => void;
-    onSupportBooking?: () => void;
+    showOnlineButton?: boolean;
+    onlineButtonLabel?: string;
+    onSupportBooking?: (options?: SupportBookingOptions) => void;
+    onlineAppointmentType?: AppointmentType;
 }
 
-const CardFooter: React.FC<CardFooterProps> = ({ onBookAppointment, onSupportBooking }) => (
-    <div className={styles.cardFooter}>
-        <div className={styles.buttonGroup}>
-            <button
-                className={clsx('btn', 'btn-outline-primary', styles.bookButton)}
-                onClick={onBookAppointment}
-            >
-                <Stethoscope size={16} />
-                <span>Đặt lịch khám bệnh</span>
-            </button>
-            {onSupportBooking && (
-                <button
-                    className={clsx('btn', 'btn-primary', styles.supportButton)}
-                    onClick={onSupportBooking}
-                >
-                    <HelpCircle size={16} />
-                    <span>Hỗ trợ đặt lịch</span>
-                </button>
-            )}
-        </div>
-    </div>
-);
-
-const SuggestionCard: React.FC<SuggestionCardProps> = ({
-    suggestion,
-    onBookAppointment,
+const CardFooter: React.FC<CardFooterProps> = ({
+    showOnlineButton,
+    onlineButtonLabel = 'Tư vấn trực tuyến',
     onSupportBooking,
+    onlineAppointmentType = AppointmentType.TELEHEALTH,
 }) => {
+    if (!showOnlineButton && !onSupportBooking) {
+        return null;
+    }
+
+    return (
+        <div className={styles.cardFooter}>
+            <div className={styles.buttonGroup}>
+                {showOnlineButton && onSupportBooking && (
+                    <button
+                        className={clsx('btn', 'btn-outline-primary', styles.bookButton)}
+                        onClick={() => onSupportBooking({ appointmentType: onlineAppointmentType })}
+                    >
+                        <Stethoscope size={16} />
+                        <span>{onlineButtonLabel}</span>
+                    </button>
+                )}
+                {onSupportBooking && (
+                    <button
+                        className={clsx('btn', 'btn-primary', styles.supportButton)}
+                        onClick={() =>
+                            onSupportBooking({ appointmentType: AppointmentType.IN_PERSON })
+                        }
+                    >
+                        <HelpCircle size={16} />
+                        <span>Hỗ trợ đặt lịch</span>
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+};
+
+const SuggestionCard: React.FC<SuggestionCardProps> = ({ suggestion, onSupportBooking }) => {
     const navigate = useNavigate();
     const [doctorAvatarError, setDoctorAvatarError] = useState(false);
     const [hospitalImageError, setHospitalImageError] = useState(false);
@@ -68,12 +85,16 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
     if (suggestion.type === 'doctor' && suggestion.doctor) {
         const doctor = suggestion.doctor;
         const getInitials = () => {
-            const names = doctor.name.trim().split(' ');
+            const name = doctor.name || '';
+            const names = name.trim().split(' ');
             if (names.length >= 2) {
                 return (names[0][0] + names[names.length - 1][0]).toUpperCase();
             }
             return names[0]?.[0]?.toUpperCase() || 'D';
         };
+
+        const hasOnlineConsultation =
+            doctor.serviceTypeName?.trim().toLowerCase() === 'tư vấn trực tuyến';
 
         return (
             <div className={styles.suggestionCard}>
@@ -104,15 +125,17 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                             data-tooltip="Xem thông tin bác sĩ"
                             aria-label={`Xem thông tin bác sĩ ${doctor.name}`}
                         >
-                            {doctor.name}
+                            {doctor.name || 'Bác sĩ'}
                         </h4>
-                        <p className={styles.cardSubtitle}>Chuyên khoa: {doctor.specialtyName}</p>
+                        <p className={styles.cardSubtitle}>
+                            Chuyên khoa: {doctor.specialtyName || 'Chưa xác định'}
+                        </p>
                     </div>
                 </div>
                 <div className={styles.cardBody}>
                     <div className={styles.cardDetail}>
                         <Building2 size={16} />
-                        <span>{doctor.hospitalName}</span>
+                        <span>{doctor.hospitalName || 'Chưa có thông tin'}</span>
                     </div>
                     {doctor.serviceTypeName && (
                         <div className={styles.cardDetail}>
@@ -137,7 +160,9 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                     </div>
                 </div>
                 <CardFooter
-                    onBookAppointment={onBookAppointment}
+                    showOnlineButton={hasOnlineConsultation}
+                    onlineButtonLabel="Tư vấn trực tuyến"
+                    onlineAppointmentType={AppointmentType.TELEHEALTH}
                     onSupportBooking={onSupportBooking}
                 />
             </div>
@@ -152,7 +177,8 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
         const remainingCount = specialties.length - 3;
 
         const getInitials = () => {
-            const words = hospital.name.trim().split(' ');
+            const name = hospital.name || '';
+            const words = name.trim().split(' ');
             if (words.length >= 2) {
                 return (words[0][0] + words[words.length - 1][0]).toUpperCase();
             }
@@ -186,16 +212,16 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                             role="button"
                             tabIndex={0}
                             data-tooltip="Xem thông tin bệnh viện"
-                            aria-label={`Xem thông tin bệnh viện ${hospital.name}`}
+                            aria-label={`Xem thông tin bệnh viện ${hospital.name || ''}`}
                         >
-                            {hospital.name}
+                            {hospital.name || 'Bệnh viện'}
                         </h4>
                     </div>
                 </div>
                 <div className={styles.cardBody}>
                     <div className={styles.cardDetail}>
                         <MapPin size={16} />
-                        <span>{hospital.address}</span>
+                        <span>{hospital.address || 'Chưa có địa chỉ'}</span>
                     </div>
                     {specialties.length > 0 && (
                         <div className={styles.specialties}>
@@ -218,10 +244,7 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                         </div>
                     )}
                 </div>
-                <CardFooter
-                    onBookAppointment={onBookAppointment}
-                    onSupportBooking={onSupportBooking}
-                />
+                <CardFooter onSupportBooking={onSupportBooking} />
             </div>
         );
     }

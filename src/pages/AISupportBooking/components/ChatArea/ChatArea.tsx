@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
 import { Stethoscope, MessageCircle, Menu } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { Message } from '@/types/ai.types';
 import MessageBubble from './components/MessageBubble';
 import SuggestionCard from './components/SuggestionCard';
@@ -9,18 +10,22 @@ import SearchBox from '../SearchBox';
 import Carousel from '@/components/Carousel';
 import styles from './ChatArea.module.scss';
 import MiniBookingInline from './components/MiniBookingModal/MiniBookingInline';
+import { AppointmentType } from '@/enums/appointment.enums';
 
 interface ChatAreaProps {
     messages: Message[];
     isAITyping: boolean;
     onSendMessage: (content: string) => void;
     onToggleSidebar?: () => void;
+    activeChatId?: string | null;
     userLocation?: { provinceId?: string; districtId?: string; displayName: string } | null;
     onLocationChange?: (location: {
         provinceId?: string;
         districtId?: string;
         displayName: string;
     }) => void;
+    onLabResultFileSelect?: (file: File) => void;
+    onDermatologyFileSelect?: (file: File) => void;
 }
 
 // Breakpoints cho SuggestionCard Carousel
@@ -79,8 +84,11 @@ const SuggestionTabs: React.FC<{
 const createCarouselItems = (
     suggestions: any[],
     activeTab: 'doctor' | 'hospital',
-    handleBookAppointment: (id: string) => void,
-    handleSupportBooking: (id: string, type: 'doctor' | 'hospital') => void
+    handleSupportBooking: (
+        id: string,
+        type: 'doctor' | 'hospital',
+        options?: { appointmentType?: AppointmentType }
+    ) => void
 ) => {
     const filteredSuggestions = suggestions.filter((suggestion) => suggestion.type === activeTab);
 
@@ -101,8 +109,9 @@ const createCarouselItems = (
                 <SuggestionCard
                     key={suggestionId}
                     suggestion={suggestion}
-                    onBookAppointment={() => handleBookAppointment(entityId)}
-                    onSupportBooking={() => handleSupportBooking(entityId, suggestion.type)}
+                    onSupportBooking={(options) =>
+                        handleSupportBooking(entityId, suggestion.type, options)
+                    }
                 />
             ),
         };
@@ -114,15 +123,20 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     isAITyping,
     onSendMessage,
     onToggleSidebar,
+    activeChatId,
     userLocation,
     onLocationChange,
+    onLabResultFileSelect,
+    onDermatologyFileSelect,
 }) => {
     const [inputValue, setInputValue] = useState('');
-    const [activeTab, setActiveTab] = useState<'doctor' | 'hospital'>('doctor');
+    const [activeTabs, setActiveTabs] = useState<Record<string, 'doctor' | 'hospital'>>({});
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [miniBooking, setMiniBooking] = useState<{ doctorId: string; messageId: string } | null>(
-        null
-    );
+    const [miniBooking, setMiniBooking] = useState<{
+        doctorId: string;
+        messageId: string;
+        appointmentType: AppointmentType;
+    } | null>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -132,20 +146,56 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         scrollToBottom();
     }, [messages, isAITyping]);
 
+    useEffect(() => {
+        setMiniBooking(null);
+    }, [activeChatId]);
+
+    const getActiveTabForMessage = (messageId: string) => {
+        return activeTabs[messageId] ?? 'doctor';
+    };
+
+    const handleTabChange = (messageId: string, tab: 'doctor' | 'hospital') => {
+        setActiveTabs((prev) => ({
+            ...prev,
+            [messageId]: tab,
+        }));
+    };
+
     const handleSend = () => {
         if (inputValue.trim()) {
+            // Check if last AI message has high confidence (>= 90%) or max rounds reached
+            const lastAIMessage = [...messages].reverse().find((m) => m.sender === 'ai');
+
+            if (lastAIMessage?.disease?.confidence && lastAIMessage.disease.confidence >= 0.9) {
+                toast.warning('Chẩn đoán đã đạt độ tin cậy cao. Vui lòng tạo cuộc tư vấn mới.', {
+                    position: 'top-right',
+                    autoClose: 4000,
+                });
+                return;
+            }
+
+            if (
+                lastAIMessage?.currentRound &&
+                lastAIMessage.currentRound >= 2 &&
+                lastAIMessage.analysisComplete
+            ) {
+                toast.info('Đã đạt số vòng tư vấn tối đa. Vui lòng bắt đầu cuộc trò chuyện mới.', {
+                    position: 'top-right',
+                    autoClose: 4000,
+                });
+                return;
+            }
+
             onSendMessage(inputValue);
             setInputValue('');
         }
     };
 
-    const handleBookAppointment = (suggestionId: string) => {
-        // Navigate to booking page or open booking modal
-        console.log('Đặt lịch khám bệnh cho:', suggestionId);
-        // Note: Navigation is handled by handleSupportBooking function
-    };
-
-    const handleSupportBooking = (suggestionId: string, type: 'doctor' | 'hospital') => {
+    const handleSupportBooking = (
+        suggestionId: string,
+        type: 'doctor' | 'hospital',
+        options?: { appointmentType?: AppointmentType }
+    ) => {
         if (type === 'doctor' && suggestionId) {
             // Show inline booking below the latest AI message that has suggestions
             const lastMsgWithSuggestions = [...messages]
@@ -153,7 +203,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                 .find((m) => m.sender === 'ai' && m.suggestions && m.suggestions.length > 0);
             const messageId =
                 lastMsgWithSuggestions?.id || (messages[messages.length - 1]?.id ?? '');
-            setMiniBooking({ doctorId: suggestionId, messageId });
+            setMiniBooking({
+                doctorId: suggestionId,
+                messageId,
+                appointmentType: options?.appointmentType ?? AppointmentType.IN_PERSON,
+            });
             return;
         }
         // For hospital suggestions, fall back to message prompt
@@ -277,16 +331,17 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                         <div className={styles.tabsContainer}>
                                             <SuggestionTabs
                                                 suggestions={message.suggestions}
-                                                activeTab={activeTab}
-                                                onTabChange={setActiveTab}
+                                                activeTab={getActiveTabForMessage(message.id)}
+                                                onTabChange={(tab) =>
+                                                    handleTabChange(message.id, tab)
+                                                }
                                             />
                                         </div>
                                         <div className={styles.suggestionsCarousel}>
                                             <Carousel
                                                 slides={createCarouselItems(
                                                     message.suggestions,
-                                                    activeTab,
-                                                    handleBookAppointment,
+                                                    getActiveTabForMessage(message.id),
                                                     handleSupportBooking
                                                 )}
                                                 breakpoints={CAROUSEL_SUGGESTIONS_BREAKPOINTS}
@@ -294,28 +349,35 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                                 isAutoPlay={false}
                                             />
                                         </div>
-                                        <div className={styles.actionButtons}>
-                                            <button
-                                                className={clsx(
-                                                    'btn',
-                                                    'btn-md',
-                                                    'btn-primary-gradient',
-                                                    'd-inline-flex',
-                                                    'align-items-center',
-                                                    styles.actionButton,
-                                                    styles.consultButton
-                                                )}
-                                                onClick={handleConsultMore}
-                                            >
-                                                <MessageCircle size={18} className="me-2" />
-                                                <span>Tư vấn thêm</span>
-                                            </button>
-                                        </div>
+                                        {/* Consultation button - inside suggestions, below carousel */}
+                                        {(() => {
+                                            const shouldShow = message.canRequestMoreQuestions;
+                                            return shouldShow ? (
+                                                <div className={styles.actionButtons}>
+                                                    <button
+                                                        className={clsx(
+                                                            'btn',
+                                                            'btn-md',
+                                                            'btn-primary-gradient',
+                                                            'd-inline-flex',
+                                                            'align-items-center',
+                                                            styles.actionButton,
+                                                            styles.consultButton
+                                                        )}
+                                                        onClick={handleConsultMore}
+                                                    >
+                                                        <MessageCircle size={18} className="me-2" />
+                                                        <span>Tư vấn thêm</span>
+                                                    </button>
+                                                </div>
+                                            ) : null;
+                                        })()}
                                     </div>
                                 )}
                                 {miniBooking && miniBooking.messageId === message.id && (
                                     <MiniBookingInline
                                         doctorId={miniBooking.doctorId}
+                                        appointmentType={miniBooking.appointmentType}
                                         onClose={() => {
                                             setMiniBooking(null);
                                         }}
@@ -345,6 +407,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                     onSend={handleSend}
                     userLocation={userLocation}
                     onLocationChange={onLocationChange}
+                    onLabResultFileSelect={onLabResultFileSelect}
+                    onDermatologyFileSelect={onDermatologyFileSelect}
                 />
             </div>
         </div>

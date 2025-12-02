@@ -1,19 +1,24 @@
 import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
+import type { LucideIcon } from 'lucide-react';
 import {
     Paperclip,
     Trash2,
     Mic,
     Send,
+    MapPin,
+    Navigation,
+    FileText,
+    Stethoscope,
+    Pill,
+    ClipboardList,
     Image,
     Lightbulb,
     Telescope,
     BookOpen,
     MoreHorizontal,
     ChevronRight,
-    MapPin,
-    Navigation,
 } from 'lucide-react';
 import ModalArea from '@/components/ModalArea/ModalArea';
 import styles from './SearchBox.module.scss';
@@ -30,7 +35,28 @@ interface SearchBoxProps {
     }) => void;
     userLocation?: { provinceId?: string; districtId?: string; displayName: string } | null;
     forceShowLocationModal?: boolean;
+    onLabResultFileSelect?: (file: File) => void;
+    onDermatologyFileSelect?: (file: File) => void;
 }
+
+interface ComingSoonFeature {
+    id: string;
+    icon: LucideIcon;
+    title: string;
+}
+
+const comingSoonFeatures: ComingSoonFeature[] = [
+    {
+        id: 'medicine-lookup',
+        icon: Pill,
+        title: 'Tra cứu thuốc',
+    },
+    {
+        id: 'medical-history',
+        icon: ClipboardList,
+        title: 'Lịch sử khám bệnh',
+    },
+];
 
 const SearchBox: React.FC<SearchBoxProps> = ({
     value,
@@ -40,6 +66,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     onLocationChange,
     userLocation,
     forceShowLocationModal = false,
+    onLabResultFileSelect,
+    onDermatologyFileSelect,
 }) => {
     const [isMultiLine, setIsMultiLine] = useState(false);
     const [showAttachmentModal, setShowAttachmentModal] = useState(false);
@@ -48,10 +76,13 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     const [isGettingLocation, setIsGettingLocation] = useState(false);
     const [locationError, setLocationError] = useState<string | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const labFileInputRef = useRef<HTMLInputElement>(null);
+    const dermatologyFileInputRef = useRef<HTMLInputElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const locationModalRef = useRef<HTMLDivElement>(null);
     const locationButtonRef = useRef<HTMLButtonElement>(null);
+    const locationAbortRef = useRef<AbortController | null>(null);
 
     // Use speech recognition hook
     const { isRecording, toggleRecording } = useSpeechRecognition({
@@ -99,6 +130,12 @@ const SearchBox: React.FC<SearchBoxProps> = ({
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [showAttachmentModal, showLocationModal, userLocation]);
+
+    useEffect(() => {
+        return () => {
+            locationAbortRef.current?.abort();
+        };
+    }, []);
 
     const handleSend = () => {
         if (value.trim()) {
@@ -162,18 +199,44 @@ const SearchBox: React.FC<SearchBoxProps> = ({
             if (files && files.length > 0) {
                 // Handle file upload - Implementation pending
                 // This feature will be implemented in the next sprint
-                console.log('Files selected:', files);
             }
         };
         input.click();
         setShowAttachmentModal(false);
     };
 
-    const handleMenuItemClick = (action: string) => {
-        console.log('Menu item clicked:', action);
+    const handleMenuItemClick = (_action: string) => {
         setShowAttachmentModal(false);
         // Implement actions for each menu item - Implementation pending
         // This feature will be implemented in the next sprint
+    };
+
+    const handleLabCardClick = () => {
+        labFileInputRef.current?.click();
+    };
+
+    const handleLabCardFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && onLabResultFileSelect) {
+            onLabResultFileSelect(file);
+        }
+        if (e.target) {
+            e.target.value = '';
+        }
+    };
+
+    const handleDermatologyCardClick = () => {
+        dermatologyFileInputRef.current?.click();
+    };
+
+    const handleDermatologyCardFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && onDermatologyFileSelect) {
+            onDermatologyFileSelect(file);
+        }
+        if (e.target) {
+            e.target.value = '';
+        }
     };
 
     const handleLocationClick = () => {
@@ -207,7 +270,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
             } catch {
                 // Một số trình duyệt không hỗ trợ permissions API, tiếp tục với getCurrentPosition
                 // Hoặc có thể do lỗi khác, vẫn tiếp tục thử lấy vị trí
-                console.log('Permissions API check failed, continuing with getCurrentPosition...');
             }
         }
 
@@ -215,8 +277,12 @@ const SearchBox: React.FC<SearchBoxProps> = ({
             async (position) => {
                 try {
                     const { latitude, longitude } = position.coords;
+                    locationAbortRef.current?.abort();
+                    const controller = new AbortController();
+                    locationAbortRef.current = controller;
                     const response = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+                        { signal: controller.signal }
                     );
                     const data = await response.json();
 
@@ -234,11 +300,16 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                     } else {
                         setLocationError('Không thể xác định vị trí từ tọa độ');
                     }
-                } catch (error) {
-                    console.error('Error getting location:', error);
-                    setLocationError('Có lỗi xảy ra khi lấy vị trí');
+                } catch (error: any) {
+                    if (error?.name === 'AbortError') {
+                        setLocationError('Yêu cầu xác định vị trí đã bị hủy. Vui lòng thử lại.');
+                    } else {
+                        console.error('Error getting location:', error);
+                        setLocationError('Có lỗi xảy ra khi lấy vị trí');
+                    }
                 } finally {
                     setIsGettingLocation(false);
+                    locationAbortRef.current = null;
                 }
             },
             (error) => {
@@ -258,6 +329,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                 }
                 setLocationError(errorMessage);
                 setIsGettingLocation(false);
+                locationAbortRef.current?.abort();
+                locationAbortRef.current = null;
             },
             {
                 enableHighAccuracy: true,
@@ -299,6 +372,81 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                 [styles.multiLine]: isMultiLine,
             })}
         >
+            <div className={styles.quickActions}>
+                <div
+                    className={clsx(styles.quickActionCard, styles.labActionCard)}
+                    onClick={handleLabCardClick}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleLabCardClick();
+                        }
+                    }}
+                >
+                    <div className={styles.quickActionIcon}>
+                        <FileText size={20} />
+                    </div>
+                    <div className={styles.quickActionContent}>
+                        <p className={styles.quickActionTitle}>Phân tích kết quả xét nghiệm</p>
+                    </div>
+                </div>
+
+                <div
+                    className={clsx(styles.quickActionCard, styles.dermatologyActionCard)}
+                    onClick={handleDermatologyCardClick}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleDermatologyCardClick();
+                        }
+                    }}
+                >
+                    <div className={styles.quickActionIcon}>
+                        <Stethoscope size={20} />
+                    </div>
+                    <div className={styles.quickActionContent}>
+                        <p className={styles.quickActionTitle}>Phân tích hình ảnh y tế</p>
+                    </div>
+                </div>
+
+                {comingSoonFeatures.map((feature) => {
+                    const Icon = feature.icon;
+                    return (
+                        <div
+                            key={feature.id}
+                            className={clsx(styles.quickActionCard, styles.comingSoonCard)}
+                        >
+                            <div className={styles.quickActionIcon}>
+                                <Icon size={20} />
+                            </div>
+                            <div className={styles.quickActionContent}>
+                                <p className={styles.quickActionTitle}>{feature.title}</p>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <input
+                ref={labFileInputRef}
+                type="file"
+                accept="image/*,.pdf"
+                style={{ display: 'none' }}
+                onChange={handleLabCardFileChange}
+            />
+
+            <input
+                ref={dermatologyFileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/bmp,image/tiff"
+                style={{ display: 'none' }}
+                onChange={handleDermatologyCardFileChange}
+            />
+
             <textarea
                 ref={textareaRef}
                 placeholder={placeholder}

@@ -8,6 +8,8 @@ const AI_ENDPOINTS = {
     HEALTH: '/symptoms/health',
     SESSION: (sessionId: string) => `/symptoms/sessions/${sessionId}`,
     SAVE_SESSION: (sessionId: string) => `/symptoms/sessions/${sessionId}/save`,
+    LAB_RESULT_ANALYZE: '/lab-results/analyze',
+    DERMATOLOGY_ANALYZE: '/dermatology/analyze',
 } as const;
 
 // Types
@@ -73,6 +75,12 @@ export interface HospitalRecommendation {
     imageUrl?: string;
 }
 
+export interface DiseaseConclusion {
+    name: string;
+    confidence: number; // 0-1
+    reasons: string[];
+}
+
 export interface SymptomAnalysisResponse {
     sessionId: string;
     message: string;
@@ -83,9 +91,13 @@ export interface SymptomAnalysisResponse {
     recommendedHospitals: HospitalRecommendation[];
     generalAdvice: string[];
     analysisComplete: boolean;
-    requiresImmediateAttention: boolean;
     disclaimer: string;
     timestamp: string;
+    questionCount?: number; // Number of questions in current round (1-3)
+    currentRound?: number; // Current consultation round (1 or 2)
+    maxQuestions?: number; // Maximum questions per round (always 3)
+    disease?: DiseaseConclusion; // Disease conclusion (only when analysisComplete = true)
+    canRequestMoreQuestions?: boolean; // Whether user can request more questions (true when round 1 && confidence < 90%)
 }
 
 export class AIService {
@@ -196,6 +208,125 @@ export class AIService {
             };
         } catch (error: any) {
             throw new Error(error.message || 'Failed to delete session');
+        }
+    }
+
+    /**
+     * Get conversation history for a session
+     */
+    static async getConversationHistory(
+        sessionId: string
+    ): Promise<ApiResponse<ConversationMessage[]>> {
+        try {
+            const response: any = await axiosInstance.get(
+                `${AI_ENDPOINTS.BASE}/sessions/${sessionId}/history`
+            );
+            return {
+                success: response.success ?? true,
+                data: response.data || [],
+                message: response.message || 'Conversation history retrieved successfully',
+            };
+        } catch (error: any) {
+            console.error('Error loading conversation history:', error);
+            throw new Error(error.message || 'Failed to load conversation history');
+        }
+    }
+
+    /**
+     * Analyze lab result image
+     */
+    static async analyzeLabResult(
+        file: File,
+        location?: LocationContext,
+        sessionId?: string
+    ): Promise<ApiResponse<import('@/types/ai.types').LabResultAnalysisResponse>> {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            if (sessionId) {
+                formData.append('sessionId', sessionId);
+            }
+
+            if (location) {
+                formData.append('location.provinceId', location.provinceId || '');
+                formData.append('location.districtId', location.districtId || '');
+                formData.append('location.displayName', location.displayName);
+            }
+
+            const response: any = await axiosInstance.post(
+                AI_ENDPOINTS.LAB_RESULT_ANALYZE,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Lab result analyzed successfully',
+            };
+        } catch (error: any) {
+            console.error('Error analyzing lab result:', error);
+            throw new Error(
+                error.response?.data?.message ||
+                    error.message ||
+                    'Failed to analyze lab result. Please try again.'
+            );
+        }
+    }
+
+    /**
+     * Analyze dermatology image
+     */
+    static async analyzeDermatology(
+        file: File,
+        location?: LocationContext,
+        sessionId?: string
+    ): Promise<ApiResponse<import('@/types/ai.types').DermatologyAnalysisResponse>> {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            if (sessionId) {
+                formData.append('sessionId', sessionId);
+            }
+
+            if (location) {
+                if (location.provinceId) {
+                    formData.append('provinceId', location.provinceId);
+                }
+                if (location.districtId) {
+                    formData.append('districtId', location.districtId);
+                }
+                formData.append('locationDisplayName', location.displayName);
+            }
+
+            const response: any = await axiosInstance.post(
+                AI_ENDPOINTS.DERMATOLOGY_ANALYZE,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Dermatology image analyzed successfully',
+            };
+        } catch (error: any) {
+            console.error('Error analyzing dermatology image:', error);
+            throw new Error(
+                error.response?.data?.message ||
+                    error.message ||
+                    'Failed to analyze dermatology image. Please try again.'
+            );
         }
     }
 }

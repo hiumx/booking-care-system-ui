@@ -155,9 +155,16 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         index: number,
         state: FormatState
     ): boolean => {
-        if (trimmedLine.startsWith('Lưu ý:') && !state.disclaimerProcessed) {
+        // Support both old format "Lưu ý:" and new format "> [!WARNING]"
+        if (
+            (trimmedLine.startsWith('Lưu ý:') || trimmedLine === '> [!WARNING]') &&
+            !state.disclaimerProcessed
+        ) {
             state.isInDisclaimer = true;
-            state.formattedLines.push(renderDisclaimerTitle(trimmedLine, index));
+            // Only render title for old format
+            if (trimmedLine.startsWith('Lưu ý:')) {
+                state.formattedLines.push(renderDisclaimerTitle(trimmedLine, index));
+            }
             return true;
         }
         return false;
@@ -169,16 +176,26 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         index: number,
         state: FormatState
     ): boolean => {
-        if (
-            state.isInDisclaimer &&
-            trimmedLine.startsWith('*') &&
-            trimmedLine.endsWith('*') &&
-            !state.disclaimerProcessed
-        ) {
-            state.formattedLines.push(renderDisclaimerText(trimmedLine, index));
-            state.disclaimerProcessed = true;
-            state.isInDisclaimer = false;
-            return true;
+        if (state.isInDisclaimer && !state.disclaimerProcessed) {
+            // Old format: *text*
+            if (trimmedLine.startsWith('*') && trimmedLine.endsWith('*')) {
+                state.formattedLines.push(renderDisclaimerText(trimmedLine, index));
+                state.disclaimerProcessed = true;
+                state.isInDisclaimer = false;
+                return true;
+            }
+            // New format: > **text**
+            if (trimmedLine.startsWith('> **') && trimmedLine.endsWith('**')) {
+                const disclaimerText = trimmedLine.slice(4, -2); // Remove "> **" and "**"
+                state.formattedLines.push(
+                    <div key={`disclaimer-warning-${index}`} className={styles.disclaimerWarning}>
+                        <strong>{disclaimerText}</strong>
+                    </div>
+                );
+                state.disclaimerProcessed = true;
+                state.isInDisclaimer = false;
+                return true;
+            }
         }
         return false;
     };
@@ -340,6 +357,95 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                     <div className={styles.text}>
                         {isUser ? message.content : formatTextContent(message.content)}
                     </div>
+
+                    {/* File Attachment (for lab results) */}
+                    {message.fileAttachment && (
+                        <div className={styles.fileAttachment}>
+                            {message.fileAttachment.fileType.startsWith('image/') && (
+                                <img
+                                    src={message.fileAttachment.fileUrl}
+                                    alt={message.fileAttachment.fileName}
+                                    className={styles.attachmentImage}
+                                />
+                            )}
+                            <div className={styles.fileName}>
+                                📎 {message.fileAttachment.fileName}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Question Progress Indicator */}
+                    {!isUser &&
+                        message.questionCount !== undefined &&
+                        !message.analysisComplete && (
+                            <div className={styles.questionProgress}>
+                                <div className={styles.progressBar}>
+                                    <div
+                                        className={styles.progressFill}
+                                        style={{ width: `${(message.questionCount / 3) * 100}%` }}
+                                    />
+                                </div>
+                                <span className={styles.progressText}>
+                                    Câu hỏi {message.questionCount}/3
+                                </span>
+                            </div>
+                        )}
+
+                    {/* Disease Conclusion */}
+                    {!isUser &&
+                        message.disease &&
+                        message.analysisComplete &&
+                        (() => {
+                            const confidence = message.disease.confidence;
+                            let confidenceColor = '#ef4444';
+
+                            if (confidence >= 0.7) {
+                                confidenceColor = '#10b981';
+                            } else if (confidence >= 0.5) {
+                                confidenceColor = '#f59e0b';
+                            }
+
+                            return (
+                                <div className={styles.diseaseConclusion}>
+                                    <div className={styles.conclusionHeader}>
+                                        <h4>Kết luận</h4>
+                                    </div>
+                                    <div className={styles.conclusionBody}>
+                                        <div className={styles.diseaseName}>
+                                            <strong>{message.disease.name}</strong>
+                                        </div>
+                                        <div className={styles.confidence}>
+                                            <span className={styles.confidenceLabel}>
+                                                Độ tin cậy:
+                                            </span>
+                                            <div className={styles.confidenceBar}>
+                                                <div
+                                                    className={styles.confidenceFill}
+                                                    style={{
+                                                        width: `${confidence * 100}%`,
+                                                        backgroundColor: confidenceColor,
+                                                    }}
+                                                />
+                                            </div>
+                                            <span className={styles.confidenceValue}>
+                                                {(confidence * 100).toFixed(0)}%
+                                            </span>
+                                        </div>
+                                        {message.disease.reasons &&
+                                            message.disease.reasons.length > 0 && (
+                                                <div className={styles.reasons}>
+                                                    <strong>Lý do:</strong>
+                                                    <ul>
+                                                        {message.disease.reasons.map((reason) => (
+                                                            <li key={reason}>{reason}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                    </div>
+                                </div>
+                            );
+                        })()}
                 </div>
                 <div className={styles.footer}>
                     <span className={styles.timestamp}>{formatTime(message.timestamp)}</span>

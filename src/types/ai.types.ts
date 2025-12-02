@@ -4,6 +4,50 @@ export interface Message {
     sender: 'user' | 'ai';
     timestamp: Date;
     suggestions?: Suggestion[];
+    questionCount?: number; // Number of questions in current round (1-3)
+    currentRound?: number; // Current consultation round (1 or 2)
+    maxQuestions?: number; // Maximum questions per round (always 3)
+    disease?: DiseaseConclusion; // Disease conclusion (only when analysisComplete = true)
+    analysisComplete?: boolean; // Whether the analysis is complete
+    canRequestMoreQuestions?: boolean; // Whether user can request more questions (true when round 1 && confidence < 90%)
+    fileAttachment?: FileAttachment; // File attachment (for lab results)
+    labResult?: LabResultAnalysis; // Lab result analysis
+}
+
+// File attachment
+export interface FileAttachment {
+    fileName: string;
+    fileUrl: string;
+    fileType: string;
+}
+
+// Lab result analysis
+export interface LabResultAnalysis {
+    normalIndicators: LabIndicator[];
+    abnormalIndicators: AbnormalLabIndicator[];
+}
+
+// Lab indicator
+export interface LabIndicator {
+    name: string;
+    value: string;
+    unit: string;
+    referenceRange: string;
+}
+
+// Abnormal lab indicator
+export interface AbnormalLabIndicator extends LabIndicator {
+    explanation: string;
+    advice: string;
+    possibleDiagnosis: string;
+    recommendedSpecialties?: string[];
+}
+
+// Disease conclusion with confidence and reasoning
+export interface DiseaseConclusion {
+    name: string;
+    confidence: number; // 0-1
+    reasons: string[];
 }
 
 export interface Doctor {
@@ -39,4 +83,50 @@ export interface ChatHistory {
     lastMessage: string;
     lastMessageTime: string;
     avatar: string;
+}
+
+// Lab result analysis response from API
+export interface LabResultAnalysisResponse {
+    sessionId: string;
+    message?: string;
+    imageUrl: string;
+    extractedText: string;
+    normalIndicators: LabIndicator[];
+    abnormalIndicators: AbnormalLabIndicator[];
+    recommendedDoctors: Doctor[];
+    recommendedHospitals: Hospital[];
+    disclaimer: string;
+    timestamp: string;
+}
+
+// Dermatology analysis response from API
+export interface DermatologyAnalysisResponse {
+    sessionId: string;
+    imageUrl: string;
+    diagnosis: SkinConditionDiagnosis;
+    malignancyRisk: MalignancyAssessment;
+    generalAdvice: string[];
+    biopsyRecommended: boolean;
+    biopsyReason?: string;
+    recommendedDoctors: Doctor[];
+    recommendedHospitals: Hospital[];
+    disclaimer: string;
+    timestamp: string;
+    message?: string; // Optional formatted message from backend
+}
+
+// Skin condition diagnosis
+export interface SkinConditionDiagnosis {
+    conditionName: string;
+    confidence: number; // 0-1
+    severity?: string; // Mild, Moderate, Severe
+    icdCode?: string;
+}
+
+// Malignancy assessment
+export interface MalignancyAssessment {
+    suspicionLevel: number; // 0-1
+    riskCategory: string; // Low, Medium, High
+    urgencyLevel?: string; // NORMAL, URGENT
+    riskFactors: string[];
 }
