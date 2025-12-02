@@ -445,14 +445,13 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                     <h6 className="mb-3">Chọn loại khám</h6>
                     <div className="row mb-4">
                         <div className="col-xl col-md-6 col-sm-6">
-                            <label
+                            <div
                                 className={clsx(
                                     'radio-select text-center',
                                     selectedType === AppointmentType.IN_PERSON && 'active',
                                     isServiceSelected && 'selected-locked'
                                 )}
-                                htmlFor="appointmentTypeInPerson"
-                                aria-label="Khám trực tiếp"
+                                onClick={() => handleTypeSelect(AppointmentType.IN_PERSON)}
                             >
                                 <input
                                     id="appointmentTypeInPerson"
@@ -463,21 +462,23 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                     onChange={() => handleTypeSelect(AppointmentType.IN_PERSON)}
                                     disabled={isServiceSelected}
                                 />
-                                <span className="form-check-label">
+                                <label className="form-check-label">
                                     <i className="isax isax-hospital5" aria-hidden="true"></i>
                                     <span className="service-title d-block">Khám trực tiếp</span>
-                                </span>
-                            </label>
+                                </label>
+                            </div>
                         </div>
                         <div className="col-xl col-md-6 col-sm-6">
-                            <label
+                            <div
                                 className={clsx(
                                     'radio-select text-center',
                                     selectedType === AppointmentType.TELEHEALTH && 'active',
                                     isServiceSelected && styles.disabled
                                 )}
-                                htmlFor="appointmentTypeTelehealth"
-                                aria-label="Tư vấn trực tuyến"
+                                onClick={() =>
+                                    !isServiceSelected &&
+                                    handleTypeSelect(AppointmentType.TELEHEALTH)
+                                }
                             >
                                 <input
                                     id="appointmentTypeTelehealth"
@@ -488,11 +489,11 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                     onChange={() => handleTypeSelect(AppointmentType.TELEHEALTH)}
                                     disabled={isServiceSelected}
                                 />
-                                <span className="form-check-label">
+                                <label className="form-check-label">
                                     <i className="isax isax-video5" aria-hidden="true"></i>
                                     <span className="service-title d-block">Tư vấn trực tuyến</span>
-                                </span>
-                            </label>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -518,14 +519,13 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                             <div className="row mb-3">
                                 {/* Option: Hospital assigns doctor */}
                                 <div className="col-md-6 mb-3 mb-md-0">
-                                    <label
+                                    <div
                                         className={clsx(
                                             styles.doctorItem,
                                             'service-item',
                                             doctorSelectionMode === 'hospital' && 'active'
                                         )}
-                                        htmlFor="doctorSelectionModeHospital"
-                                        aria-label="Bệnh viện phân công bác sĩ"
+                                        onClick={() => handleDoctorSelectionModeChange('hospital')}
                                     >
                                         <input
                                             id="doctorSelectionModeHospital"
@@ -537,7 +537,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                 handleDoctorSelectionModeChange('hospital')
                                             }
                                         />
-                                        <span className="form-check-label ms-2">
+                                        <label className="form-check-label ms-2">
                                             <span className="d-flex align-items-center">
                                                 <span className="avatar avatar-md me-2 bg-light rounded-circle d-flex align-items-center justify-content-center">
                                                     <i
@@ -554,13 +554,13 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                     </span>
                                                 </span>
                                             </span>
-                                        </span>
-                                    </label>
+                                        </label>
+                                    </div>
                                 </div>
 
                                 {/* Option: Self select doctor */}
                                 <div className="col-md-6">
-                                    <label
+                                    <div
                                         className={clsx(
                                             styles.doctorItem,
                                             'service-item',
@@ -569,8 +569,10 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                 !isLoadingDoctors &&
                                                 styles.disabled
                                         )}
-                                        htmlFor="doctorSelectionModeSelf"
-                                        aria-label="Tự chọn bác sĩ"
+                                        onClick={() =>
+                                            totalDoctors > 0 &&
+                                            handleDoctorSelectionModeChange('self')
+                                        }
                                     >
                                         <input
                                             id="doctorSelectionModeSelf"
@@ -581,7 +583,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                             onChange={() => handleDoctorSelectionModeChange('self')}
                                             disabled={totalDoctors === 0 && !isLoadingDoctors}
                                         />
-                                        <span className="form-check-label ms-2">
+                                        <label className="form-check-label ms-2">
                                             <span className="d-flex align-items-center">
                                                 <span className="avatar avatar-md me-2 bg-light rounded-circle d-flex align-items-center justify-content-center">
                                                     <i
@@ -598,8 +600,8 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                     </span>
                                                 </span>
                                             </span>
-                                        </span>
-                                    </label>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
 
@@ -937,15 +939,16 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                             key={doctor.id}
                                                             className="col-lg-6 col-md-6 mb-3"
                                                         >
-                                                            <label
+                                                            <div
                                                                 className={clsx(
                                                                     styles.doctorCard,
                                                                     'service-item',
                                                                     selectedDoctor === doctor.id &&
                                                                         'active'
                                                                 )}
-                                                                htmlFor={`doctorSelection-${doctor.id}`}
-                                                                aria-label={`Chọn bác sĩ ${doctor.fullName}`}
+                                                                onClick={() =>
+                                                                    handleDoctorSelect(doctor.id)
+                                                                }
                                                             >
                                                                 <input
                                                                     id={`doctorSelection-${doctor.id}`}
@@ -961,7 +964,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                         )
                                                                     }
                                                                 />
-                                                                <span className="form-check-label ms-2 flex-grow-1">
+                                                                <label className="form-check-label ms-2 flex-grow-1">
                                                                     <div className="d-flex">
                                                                         {/* Avatar */}
                                                                         <div
@@ -1072,8 +1075,8 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                                 )}
                                                                         </div>
                                                                     </div>
-                                                                </span>
-                                                            </label>
+                                                                </label>
+                                                            </div>
                                                         </div>
                                                     ))}
                                                 </div>

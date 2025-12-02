@@ -363,7 +363,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                             {displayedSpecialties.length > 0
                                 ? displayedSpecialties.map((specialty) => (
                                       <div key={specialty.id} className="col-lg-4 col-md-6 mb-3">
-                                          <label
+                                          <div
                                               className={clsx(
                                                   styles.serviceItem,
                                                   'service-item',
@@ -371,8 +371,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                       selectedId === specialty.id &&
                                                       'active'
                                               )}
-                                              htmlFor={`specialty-${specialty.id}`}
-                                              aria-label={`Chọn chuyên khoa ${specialty.name}`}
+                                              onClick={() => handleSpecialtySelect(specialty.id)}
                                           >
                                               <input
                                                   id={`specialty-${specialty.id}`}
@@ -387,7 +386,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                       handleSpecialtySelect(specialty.id)
                                                   }
                                               />
-                                              <span className="form-check-label ms-2 w-100">
+                                              <label className="form-check-label ms-2 w-100">
                                                   <div className={styles.itemContent}>
                                                       {specialty.imageUrl ? (
                                                           <img
@@ -416,8 +415,8 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                           )}
                                                       </div>
                                                   </div>
-                                              </span>
-                                          </label>
+                                              </label>
+                                          </div>
                                       </div>
                                   ))
                                 : renderSpecialtyEmptyState()}
@@ -476,7 +475,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                             {displayedServices.length > 0
                                 ? displayedServices.map((service) => (
                                       <div key={service.id} className="col-lg-4 col-md-6 mb-3">
-                                          <label
+                                          <div
                                               className={clsx(
                                                   styles.serviceItem,
                                                   'service-item',
@@ -484,8 +483,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                       selectedId === service.id &&
                                                       'active'
                                               )}
-                                              htmlFor={`service-${service.id}`}
-                                              aria-label={`Chọn dịch vụ ${service.name}`}
+                                              onClick={() => handleServiceSelect(service.id)}
                                           >
                                               <input
                                                   id={`service-${service.id}`}
@@ -498,7 +496,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                   }
                                                   onChange={() => handleServiceSelect(service.id)}
                                               />
-                                              <span className="form-check-label ms-2 w-100">
+                                              <label className="form-check-label ms-2 w-100">
                                                   <div className={styles.itemContent}>
                                                       {service.imageUrl ? (
                                                           <img
@@ -524,8 +522,8 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                           </span>
                                                       </div>
                                                   </div>
-                                              </span>
-                                          </label>
+                                              </label>
+                                          </div>
                                       </div>
                                   ))
                                 : renderServiceEmptyState()}
