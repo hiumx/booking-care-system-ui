@@ -58020,8 +58020,8 @@ ul li {
   -ms-transform: translate(-50%, -50%);
 }
 .spaciality-item .spaciality-img .spaciality-icon img {
-  width: auto;
-  height: auto;
+  width: 40px;
+  height: 40px;
 }
 .spaciality-item .spaciality-img::before {
   position: absolute;

@@ -12,7 +12,7 @@ import { fetchUserProfile } from '@/store/slices/userSlice';
 import styles from './AISupportBooking.module.scss';
 import { Message, ChatHistory, Suggestion } from '@/types/ai.types';
 import { PATHS, replacePathParams } from '@/routes/paths';
-import { AIService, SymptomAnalysisRequest } from '@/services/ai.service';
+import { AIService, SymptomAnalysisRequest, SymptomAnalysisResponse } from '@/services/ai.service';
 
 // Helper function to parse doctor data
 const parseDoctorData = (d: any) => ({
@@ -138,6 +138,7 @@ const AISupportBooking: React.FC = () => {
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
     const [messages, setMessages] = useState<Message[]>([]);
+    const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
     const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
     const [activeChatId, setActiveChatId] = useState<string | null>(null);
     const [isAITyping, setIsAITyping] = useState(false);
@@ -154,10 +155,28 @@ const AISupportBooking: React.FC = () => {
     // Track newly created chat IDs to avoid loading from backend
     const newlyCreatedChatsRef = useRef<Set<string>>(new Set());
     const activeChatIdRef = useRef<string | null>(null);
+    const streamControllerRef = useRef<AbortController | null>(null);
 
+    const abortActiveStream = useCallback(() => {
+        if (streamControllerRef.current) {
+            streamControllerRef.current.abort();
+            streamControllerRef.current = null;
+            setIsAITyping(false);
+            setStreamingMessageId(null);
+        }
+    }, []);
     useEffect(() => {
         activeChatIdRef.current = activeChatId;
     }, [activeChatId]);
+
+    useEffect(() => {
+        return () => {
+            if (streamControllerRef.current) {
+                streamControllerRef.current.abort();
+                streamControllerRef.current = null;
+            }
+        };
+    }, []);
 
     // Location state
     const [userLocation, setUserLocation] = useState<{
@@ -494,8 +513,15 @@ const AISupportBooking: React.FC = () => {
     };
 
     // Helper function to map API response to suggestions
-    const mapResponseToSuggestions = (response: any): Suggestion[] => {
-        const doctorSuggestions = (response.data.recommendedDoctors || []).map((d: any) => ({
+    const mapResponseToSuggestions = (
+        response: SymptomAnalysisResponse | { data: SymptomAnalysisResponse }
+    ): Suggestion[] => {
+        const data =
+            'data' in response
+                ? (response as { data: SymptomAnalysisResponse }).data
+                : (response as SymptomAnalysisResponse);
+
+        const doctorSuggestions = (data.recommendedDoctors || []).map((d: any) => ({
             type: 'doctor' as const,
             doctor: {
                 id: d.id,
@@ -510,7 +536,7 @@ const AISupportBooking: React.FC = () => {
             },
         }));
 
-        const hospitalSuggestions = (response.data.recommendedHospitals || []).map((h: any) => ({
+        const hospitalSuggestions = (data.recommendedHospitals || []).map((h: any) => ({
             type: 'hospital' as const,
             hospital: {
                 id: h.id,
@@ -525,6 +551,29 @@ const AISupportBooking: React.FC = () => {
         return [...doctorSuggestions, ...hospitalSuggestions];
     };
 
+    const syncSessionIdFromResponse = (
+        response: SymptomAnalysisResponse,
+        previousChatId: string
+    ): string => {
+        const responseSessionId = response.sessionId;
+        if (!responseSessionId || responseSessionId === previousChatId) {
+            return previousChatId;
+        }
+
+        if (newlyCreatedChatsRef.current.has(previousChatId)) {
+            newlyCreatedChatsRef.current.delete(previousChatId);
+        }
+        newlyCreatedChatsRef.current.add(responseSessionId);
+
+        setChatHistories((prev) =>
+            prev.map((chat) =>
+                chat.id === previousChatId ? { ...chat, id: responseSessionId } : chat
+            )
+        );
+        setActiveChatId(responseSessionId);
+        return responseSessionId;
+    };
+
     // Helper function to handle AI response: sync sessionId, build suggestions & AI message
     const handleAiResponse = (
         response: any,
@@ -535,37 +584,20 @@ const AISupportBooking: React.FC = () => {
         }
     ): string => {
         // Update session ID from response if provided
-        if (response.data.sessionId && response.data.sessionId !== currentChatId) {
-            const oldChatId = currentChatId;
-            const newChatId = response.data.sessionId;
-
-            // Update tracking: keep new ID as newly created to prevent fetchChatMessages
-            // It will be removed from tracking when loadSessions confirms backend has it
-            if (newlyCreatedChatsRef.current.has(oldChatId)) {
-                newlyCreatedChatsRef.current.delete(oldChatId);
-            }
-            newlyCreatedChatsRef.current.add(newChatId);
-
-            // Update chatHistories: replace old chat with new ID
-            setChatHistories((prev) =>
-                prev.map((chat) => (chat.id === oldChatId ? { ...chat, id: newChatId } : chat))
-            );
-
-            // Update active chat ID
-            setActiveChatId(newChatId);
-            currentChatId = newChatId;
-        }
+        currentChatId = syncSessionIdFromResponse(response.data, currentChatId);
 
         // Map response to suggestions
         const suggestions = mapResponseToSuggestions(response);
 
-        // Build AI message content
+        // Build AI message content (full content, sẽ được hiển thị dạng "streaming" ở UI)
         const aiMessageContent = options?.buildContent
             ? options.buildContent(response)
             : (response.data.message || '').replace(/\\n/g, '\n');
 
+        const aiMessageId = Date.now().toString();
+
         const aiMessage: Message = {
-            id: Date.now().toString(),
+            id: aiMessageId,
             content: aiMessageContent.trim(),
             sender: 'ai',
             timestamp: new Date(response.data.timestamp || new Date().toISOString()),
@@ -574,6 +606,7 @@ const AISupportBooking: React.FC = () => {
         };
 
         setMessages((prev) => [...prev, aiMessage]);
+        setStreamingMessageId(aiMessageId);
 
         return currentChatId;
     };
@@ -716,9 +749,11 @@ const AISupportBooking: React.FC = () => {
 
         const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
+        // Reset trạng thái streaming khi bắt đầu gửi message mới
+        setStreamingMessageId(null);
 
         // Create new chat if no active chat
-        let currentChatId = ensureChatSession(trimmedContent);
+        const currentChatId = activeChatId ?? undefined;
 
         // Call real AI API
         setIsAITyping(true);
@@ -727,7 +762,7 @@ const AISupportBooking: React.FC = () => {
             // Prepare conversation history
             const conversationHistory = prepareConversationHistory(updatedMessages);
 
-            // Backend will get userId from authentication token
+            // Backend sẽ tự tạo session nếu sessionId null
             const request: SymptomAnalysisRequest = {
                 sessionId: currentChatId,
                 message: trimmedContent,
@@ -744,16 +779,48 @@ const AISupportBooking: React.FC = () => {
 
             const response = await AIService.analyzeSymptoms(request);
 
-            currentChatId = handleAiResponse(response, currentChatId, {
-                extraMessageFields: {
-                    questionCount: response.data.questionCount,
-                    currentRound: response.data.currentRound,
-                    maxQuestions: response.data.maxQuestions,
-                    disease: response.data.disease,
-                    analysisComplete: response.data.analysisComplete,
-                    canRequestMoreQuestions: response.data.canRequestMoreQuestions,
-                },
-            });
+            // Đồng bộ sessionId từ backend
+            const finalChatId = response.data.sessionId;
+            if (!activeChatId) {
+                const history = buildChatHistory(finalChatId, trimmedContent);
+                setChatHistories((prev) => [history, ...prev]);
+            } else if (activeChatId !== finalChatId) {
+                setChatHistories((prev) =>
+                    prev.map((chat) =>
+                        chat.id === activeChatId ? { ...chat, id: finalChatId } : chat
+                    )
+                );
+            }
+            setActiveChatId(finalChatId);
+
+            // Hiển thị message AI + typewriter
+            const aiMessageId = `ai-${Date.now()}`;
+            const aiMessageContent = (response.data.message || '').replace(/\\n/g, '\n');
+
+            const suggestions = mapResponseToSuggestions(response);
+            const aiMessage: Message = {
+                id: aiMessageId,
+                content: aiMessageContent.trim(),
+                sender: 'ai',
+                timestamp: new Date(response.data.timestamp || new Date().toISOString()),
+                suggestions: suggestions.length > 0 ? suggestions : undefined,
+                questionCount: response.data.questionCount,
+                currentRound: response.data.currentRound,
+                maxQuestions: response.data.maxQuestions,
+                disease: response.data.disease,
+                analysisComplete: response.data.analysisComplete,
+                canRequestMoreQuestions: response.data.canRequestMoreQuestions,
+            };
+
+            setMessages((prev) => [...prev, aiMessage]);
+            setStreamingMessageId(aiMessageId);
+
+            // Chỉ reload sessions khi là message đầu tiên (để sync title từ backend)
+            if (!currentChatId && updatedMessages.length === 1) {
+                setTimeout(() => {
+                    loadSessions(true);
+                }, 2000);
+            }
         } catch (error: any) {
             console.error('Error analyzing symptoms:', error);
 
@@ -770,17 +837,6 @@ const AISupportBooking: React.FC = () => {
             setMessages((prev) => [...prev, errorMessage]);
         } finally {
             setIsAITyping(false);
-
-            // Chỉ reload sessions khi là message đầu tiên (để sync title từ backend)
-            // Backend sẽ tạo title dựa vào message đầu tiên của user
-            if (currentChatId && updatedMessages.length === 1) {
-                // Reload sessions sau 2000ms để đảm bảo backend đã update title
-                // silentReload = true để không show loading skeleton (tránh văng UI)
-                // loadSessions sẽ tự động merge và remove chat khỏi newlyCreatedChatsRef
-                setTimeout(() => {
-                    loadSessions(true); // silent reload with merge
-                }, 2000); // Tăng lên 2000ms để backend chắc chắn kịp lưu
-            }
         }
     };
 
@@ -798,6 +854,8 @@ const AISupportBooking: React.FC = () => {
             // Modal vị trí sẽ tự động hiển thị trong SearchBox
             return;
         }
+
+        abortActiveStream();
 
         startLocalChat(undefined, { preserveMessages: false, replaceHistory: false });
     };
@@ -846,6 +904,8 @@ const AISupportBooking: React.FC = () => {
         if (chatId === activeChatId) {
             return;
         }
+
+        abortActiveStream();
 
         // Set active chat ID và navigate URL ngay lập tức để UI responsive
         setActiveChatId(chatId);
@@ -1086,6 +1146,7 @@ const AISupportBooking: React.FC = () => {
                     ) : (
                         <ChatArea
                             messages={messages}
+                            streamingMessageId={streamingMessageId}
                             isAITyping={isAITyping}
                             onSendMessage={handleSendMessage}
                             onToggleSidebar={() => setIsSidebarOpen(true)}

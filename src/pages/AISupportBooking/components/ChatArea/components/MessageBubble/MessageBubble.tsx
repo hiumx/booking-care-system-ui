@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useSelector } from 'react-redux';
 import { Stethoscope, Copy, Check } from 'lucide-react';
@@ -8,14 +8,43 @@ import styles from './MessageBubble.module.scss';
 
 interface MessageBubbleProps {
     message: Message;
+    isStreaming?: boolean;
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
+const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isStreaming }) => {
     const isUser = message.sender === 'user';
     const { profile } = useSelector((state: RootState) => state.user);
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
     const [copied, setCopied] = useState(false);
     const [avatarError, setAvatarError] = useState(false);
+    const [displayedContent, setDisplayedContent] = useState(message.content);
+
+    // Hiệu ứng "gõ từng chữ" cho message của AI
+    useEffect(() => {
+        // Chỉ áp dụng cho message của AI và khi được đánh dấu streaming
+        if (!isStreaming || isUser) {
+            setDisplayedContent(message.content);
+            return;
+        }
+
+        let currentIndex = 0;
+        const fullText = message.content;
+
+        setDisplayedContent('');
+
+        const interval = window.setInterval(() => {
+            currentIndex += 1;
+            setDisplayedContent(fullText.slice(0, currentIndex));
+
+            if (currentIndex >= fullText.length) {
+                window.clearInterval(interval);
+            }
+        }, 15); // tốc độ gõ
+
+        return () => {
+            window.clearInterval(interval);
+        };
+    }, [isStreaming, message.content, isUser]);
 
     // Lấy chữ cái đầu để hiển thị trong avatar mặc định
     const getInitials = () => {
@@ -355,7 +384,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                     })}
                 >
                     <div className={styles.text}>
-                        {isUser ? message.content : formatTextContent(message.content)}
+                        {isUser ? message.content : formatTextContent(displayedContent)}
                     </div>
 
                     {/* File Attachment (for lab results) */}

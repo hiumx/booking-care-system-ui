@@ -14,6 +14,7 @@ import { AppointmentType } from '@/enums/appointment.enums';
 
 interface ChatAreaProps {
     messages: Message[];
+    streamingMessageId?: string | null;
     isAITyping: boolean;
     onSendMessage: (content: string) => void;
     onToggleSidebar?: () => void;
@@ -120,6 +121,7 @@ const createCarouselItems = (
 
 const ChatArea: React.FC<ChatAreaProps> = ({
     messages,
+    streamingMessageId,
     isAITyping,
     onSendMessage,
     onToggleSidebar,
@@ -325,7 +327,14 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                     <div className={styles.messagesList}>
                         {messages.map((message) => (
                             <div key={message.id} className={styles.messageWrapper}>
-                                <MessageBubble message={message} />
+                                <MessageBubble
+                                    message={message}
+                                    isStreaming={
+                                        !!streamingMessageId &&
+                                        message.sender === 'ai' &&
+                                        message.id === streamingMessageId
+                                    }
+                                />
                                 {message.suggestions && message.suggestions.length > 0 && (
                                     <div className={styles.suggestionsContainer}>
                                         <div className={styles.tabsContainer}>

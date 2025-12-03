@@ -5,6 +5,7 @@ import axiosInstance, { ApiResponse } from '@/configs/axios.config';
 const AI_ENDPOINTS = {
     BASE: '/symptoms',
     ANALYZE: '/symptoms/analyze',
+    ANALYZE_STREAM: '/symptoms/analyze/stream',
     HEALTH: '/symptoms/health',
     SESSION: (sessionId: string) => `/symptoms/sessions/${sessionId}`,
     SAVE_SESSION: (sessionId: string) => `/symptoms/sessions/${sessionId}/save`,
@@ -139,6 +140,85 @@ export class AIService {
                     'Failed to analyze symptoms. Please try again.'
             );
         }
+    }
+
+    /**
+     * Stream analyze symptoms response via SSE
+     */
+    static streamAnalyzeSymptoms(
+        request: SymptomAnalysisRequest,
+        handlers: {
+            onChunk: (chunk: string) => void;
+            onDone: (response: SymptomAnalysisResponse) => void;
+            onError?: (errorMessage: string) => void;
+        }
+    ): AbortController {
+        const controller = new AbortController();
+        const baseUrl = (axiosInstance.defaults?.baseURL as string) || '';
+        const url = `${baseUrl}${AI_ENDPOINTS.ANALYZE_STREAM}`;
+
+        (async () => {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(request),
+                    signal: controller.signal,
+                    credentials: 'include',
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(
+                        errorText || 'Không thể bắt đầu streaming phân tích triệu chứng.'
+                    );
+                }
+
+                if (!response.body) {
+                    throw new Error('Trình duyệt không hỗ trợ nhận dữ liệu streaming.');
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let shouldStop = false;
+
+                while (!shouldStop) {
+                    const { value, done } = await reader.read();
+                    if (done) {
+                        break;
+                    }
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const result = AIService.processSseBuffer(buffer, handlers);
+                    buffer = result.buffer;
+                    shouldStop = result.shouldStop;
+                }
+
+                if (!shouldStop && buffer.trim().length > 0) {
+                    const finalResult = AIService.processSseBuffer(buffer + '\n\n', handlers);
+                    buffer = finalResult.buffer;
+                    shouldStop = finalResult.shouldStop;
+                }
+
+                if (!shouldStop) {
+                    handlers.onError?.('Luồng phản hồi bị gián đoạn. Vui lòng thử lại.');
+                }
+            } catch (error: any) {
+                if (controller.signal.aborted) {
+                    return;
+                }
+
+                console.error('Error streaming symptom analysis:', error);
+                handlers.onError?.(
+                    error?.message || 'Không thể kết nối tới dịch vụ AI. Vui lòng thử lại.'
+                );
+            }
+        })();
+
+        return controller;
     }
 
     /**
@@ -328,6 +408,66 @@ export class AIService {
                     'Failed to analyze dermatology image. Please try again.'
             );
         }
+    }
+
+    private static processSseBuffer(
+        buffer: string,
+        handlers: {
+            onChunk: (chunk: string) => void;
+            onDone: (response: SymptomAnalysisResponse) => void;
+            onError?: (errorMessage: string) => void;
+        }
+    ): { buffer: string; shouldStop: boolean } {
+        let working = buffer;
+        let shouldStop = false;
+
+        const extractPayload = (rawEvent: string) => {
+            const dataLine = rawEvent
+                .split('\n')
+                .map((line) => line.trim())
+                .find((line) => line.startsWith('data:'));
+            if (!dataLine) {
+                return null;
+            }
+
+            const payload = dataLine.slice(5).trim();
+            return payload.length ? payload : null;
+        };
+
+        let boundaryIndex = working.indexOf('\n\n');
+
+        while (boundaryIndex !== -1) {
+            const rawEvent = working.slice(0, boundaryIndex).trim();
+            working = working.slice(boundaryIndex + 2);
+
+            if (rawEvent.length > 0) {
+                const payload = extractPayload(rawEvent);
+                if (payload) {
+                    try {
+                        const parsed = JSON.parse(payload);
+                        if (parsed.type === 'chunk') {
+                            handlers.onChunk(parsed.content ?? '');
+                        } else if (parsed.type === 'done') {
+                            handlers.onDone(parsed.data as SymptomAnalysisResponse);
+                            shouldStop = true;
+                            break;
+                        } else if (parsed.type === 'error') {
+                            handlers.onError?.(
+                                parsed.message || 'Đã xảy ra lỗi khi phân tích triệu chứng.'
+                            );
+                            shouldStop = true;
+                            break;
+                        }
+                    } catch (error) {
+                        console.error('Invalid SSE payload:', error, payload);
+                    }
+                }
+            }
+
+            boundaryIndex = working.indexOf('\n\n');
+        }
+
+        return { buffer: working, shouldStop };
     }
 }
 
