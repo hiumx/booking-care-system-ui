@@ -204,6 +204,33 @@ const SpecialtyDetailPage: React.FC = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    // Helpers
+    const formatDoctorPrices = (prices?: DoctorResponse['prices']) =>
+        prices?.map(({ id, serviceTypeId, serviceTypeName, amount }) => ({
+            id,
+            serviceTypeId,
+            serviceTypeName,
+            amount,
+        })) || [];
+
+    const renderDoctorCard = (doctor: DoctorResponse) => (
+        <DoctorAppointmentBookingCard
+            key={doctor.id}
+            doctorId={doctor.id}
+            patientId={patientId}
+            name={`${doctor.lastName} ${doctor.firstName}`}
+            specialty={doctor.specialty?.name || 'Chưa cập nhật'}
+            position={doctor.position?.name || 'Chưa cập nhật'}
+            prices={formatDoctorPrices(doctor.prices)}
+            rating={doctor.reviewStatistics?.averageRating || 0}
+            location={doctor.hospital?.name || doctor.address || 'Chưa cập nhật'}
+            yearsOfExperience={doctor.yearsOfExperience}
+            isFavorite={doctor.isFavorited || false}
+            languages={doctor.languages || []}
+            image={doctor.avatarUrl || '/default-doctor.png'}
+        />
+    );
+
     // Render helpers to avoid nested ternary
     const renderDoctorListContent = () => {
         if (doctorsLoading) {
@@ -217,30 +244,7 @@ const SpecialtyDetailPage: React.FC = () => {
         }
 
         if (doctors.length > 0) {
-            return doctors.map((doctor) => (
-                <DoctorAppointmentBookingCard
-                    key={doctor.id}
-                    doctorId={doctor.id}
-                    patientId={patientId}
-                    name={`${doctor.lastName} ${doctor.firstName}`}
-                    specialty={doctor.specialty?.name || 'Chưa cập nhật'}
-                    position={doctor.position?.name || 'Chưa cập nhật'}
-                    prices={
-                        doctor.prices?.map((price) => ({
-                            id: price.id,
-                            serviceTypeId: price.serviceTypeId,
-                            serviceTypeName: price.serviceTypeName,
-                            amount: price.amount,
-                        })) || []
-                    }
-                    rating={doctor.reviewStatistics?.averageRating || 0}
-                    location={doctor.hospital?.name || doctor.address || 'Chưa cập nhật'}
-                    yearsOfExperience={doctor.yearsOfExperience}
-                    isFavorite={doctor.isFavorited || false}
-                    languages={doctor.languages || []}
-                    image={doctor.avatarUrl || '/default-doctor.png'}
-                />
-            ));
+            return doctors.map(renderDoctorCard);
         }
 
         return (
