@@ -12,6 +12,7 @@ import ForgotPassword from '@/pages/Authentication/ForgotPassword';
 import ResetPassword from '@/pages/Authentication/ResetPassword';
 import DoctorProfile from '@/pages/Doctor/DoctorProfile';
 import SpecialtiesList from '@/pages/Specialties/SpecialtiesList';
+import SpecialtyDetail from '@/pages/Specialties/SpecialtyDetail/SpecialtyDetailPage';
 import SubscriptionPlans from '@/pages/SubscriptionPlans';
 import Hospital from '@/pages/Hospital/HospitalList';
 import { PATHS } from './paths';
@@ -153,6 +154,10 @@ const routes: RouteObject[] = [
         path: PATHS.SPECIALTIES.ROOT,
         element: <SpecialtiesList />,
         // children: [{ path: PATHS.SPECIALTIES.PROFILE, element: <SpecialtiesProfile /> }],
+    },
+    {
+        path: PATHS.SPECIALTIES.DETAIL,
+        element: <SpecialtyDetail />,
     },
 
     {
