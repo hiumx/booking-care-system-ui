@@ -368,11 +368,18 @@ const SideBar: React.FC<SideBarProps> = ({
             const positionIdsFromUrl = searchParams.getAll('positionId');
             const languageIdsFromUrl = searchParams.getAll('languageId');
             const genderIdsFromUrl = searchParams.getAll('gender');
+            const serviceTypeIdsFromUrl = (() => {
+                if (initialServiceTypeFilters && initialServiceTypeFilters.length > 0) {
+                    return initialServiceTypeFilters;
+                }
+                const paramValue = searchParams.get('serviceTypeId');
+                return paramValue ? [paramValue] : [];
+            })();
 
             syncPositionCheckboxes(updated, positionIdsFromUrl);
             syncLanguageCheckboxes(updated, languageIdsFromUrl);
             syncGenderCheckboxes(updated, genderIdsFromUrl);
-            syncServiceTypeCheckboxes(updated, initialServiceTypeFilters);
+            syncServiceTypeCheckboxes(updated, serviceTypeIdsFromUrl);
             syncRatingCheckboxes(updated, initialRating);
 
             return updated;
@@ -843,7 +850,10 @@ const SideBar: React.FC<SideBarProps> = ({
                     <Link
                         to="#"
                         className={clsx(`viewall-button-${index + 1}`, 'btn btn-light btn-sm')}
-                        onClick={() => toggleViewMore(section.title)}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            toggleViewMore(section.title);
+                        }}
                     >
                         {viewMoreSections[section.title] ? 'Thu gọn' : 'Xem thêm'}
                     </Link>
