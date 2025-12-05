@@ -7,7 +7,7 @@ import Breadcrumb from '@/components/Breadcrumb';
 import { DoctorAppointmentBookingCard } from '@/pages/Doctor/DoctorList/components/DoctorAppointmentBookingCard';
 import HospitalCard from '@/components/HospitalCard';
 import { PATHS } from '@/routes/paths';
-import SpecialtySidebar from './components/SpecialtySidebar';
+import SpecialtySidebar from './components/SpecialtySidebar/SpecialtySidebar';
 import ModalArea from '@/components/ModalArea';
 import Pagination from '@/components/Pagination';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
@@ -202,6 +202,136 @@ const SpecialtyDetailPage: React.FC = () => {
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Render helpers to avoid nested ternary
+    const renderDoctorListContent = () => {
+        if (doctorsLoading) {
+            return (
+                <div className="text-center py-5">
+                    <div className="spinner-border text-primary">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            );
+        }
+
+        if (doctors.length > 0) {
+            return doctors.map((doctor) => (
+                <DoctorAppointmentBookingCard
+                    key={doctor.id}
+                    doctorId={doctor.id}
+                    patientId={patientId}
+                    name={`${doctor.lastName} ${doctor.firstName}`}
+                    specialty={doctor.specialty?.name || 'Chưa cập nhật'}
+                    position={doctor.position?.name || 'Chưa cập nhật'}
+                    prices={
+                        doctor.prices?.map((price) => ({
+                            id: price.id,
+                            serviceTypeId: price.serviceTypeId,
+                            serviceTypeName: price.serviceTypeName,
+                            amount: price.amount,
+                        })) || []
+                    }
+                    rating={doctor.reviewStatistics?.averageRating || 0}
+                    location={doctor.hospital?.name || doctor.address || 'Chưa cập nhật'}
+                    yearsOfExperience={doctor.yearsOfExperience}
+                    isFavorite={doctor.isFavorited || false}
+                    languages={doctor.languages || []}
+                    image={doctor.avatarUrl || '/default-doctor.png'}
+                />
+            ));
+        }
+
+        return (
+            <div className={styles.emptyState}>
+                <div className={styles.emptyStateIcon}>
+                    <i className="fa-solid fa-user-doctor"></i>
+                </div>
+                <h4 className={styles.emptyStateTitle}>Không tìm thấy bác sĩ nào</h4>
+                <p className={styles.emptyStateDescription}>
+                    Vui lòng thử lại với từ khóa khác hoặc bộ lọc khác.
+                </p>
+                {(debouncedSearch || provinceId || districtId) && (
+                    <button
+                        className={clsx(
+                            'btn',
+                            'btn-outline-primary',
+                            'btn-sm',
+                            styles.clearFiltersButton
+                        )}
+                        onClick={() => {
+                            handleClearArea();
+                            setSearch('');
+                        }}
+                    >
+                        Xóa tất cả bộ lọc
+                    </button>
+                )}
+            </div>
+        );
+    };
+
+    const renderHospitalListContent = () => {
+        if (hospitalsLoading) {
+            return (
+                <div className="text-center py-5">
+                    <div className="spinner-border text-primary">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            );
+        }
+
+        if (hospitals.length > 0) {
+            return (
+                <div className="row">
+                    {hospitals.map((hospital) => (
+                        <div key={hospital.id} className="col-md-6 mb-4">
+                            <HospitalCard
+                                clinic={{
+                                    id: hospital.id,
+                                    name: hospital.name,
+                                    image: hospital.avatarUrl || '/default-hospital.png',
+                                    specialties: hospital.specialties?.map((s) => s.name) || [],
+                                    location: hospital.address,
+                                    specialtyCount: hospital.totalSpecialties || 0,
+                                }}
+                                showBookingButton={true}
+                            />
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+
+        return (
+            <div className={styles.emptyState}>
+                <div className={styles.emptyStateIcon}>
+                    <i className="fa-solid fa-hospital"></i>
+                </div>
+                <h4 className={styles.emptyStateTitle}>Không tìm thấy bệnh viện nào</h4>
+                <p className={styles.emptyStateDescription}>
+                    Vui lòng thử lại với từ khóa khác hoặc bộ lọc khác.
+                </p>
+                {(debouncedSearch || provinceId || districtId) && (
+                    <button
+                        className={clsx(
+                            'btn',
+                            'btn-outline-primary',
+                            'btn-sm',
+                            styles.clearFiltersButton
+                        )}
+                        onClick={() => {
+                            handleClearArea();
+                            setSearch('');
+                        }}
+                    >
+                        Xóa tất cả bộ lọc
+                    </button>
+                )}
+            </div>
+        );
     };
 
     const breadcrumbData = {
@@ -456,91 +586,7 @@ const SpecialtyDetailPage: React.FC = () => {
                                     <div className={styles.tabContent}>
                                         {activeTab === 'doctor' && (
                                             <div className={styles.cardsList}>
-                                                {doctorsLoading ? (
-                                                    <div className="text-center py-5">
-                                                        <div className="spinner-border text-primary">
-                                                            <span className="visually-hidden">
-                                                                Loading...
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                ) : doctors.length > 0 ? (
-                                                    doctors.map((doctor) => (
-                                                        <DoctorAppointmentBookingCard
-                                                            key={doctor.id}
-                                                            doctorId={doctor.id}
-                                                            patientId={patientId}
-                                                            name={`${doctor.lastName} ${doctor.firstName}`}
-                                                            specialty={
-                                                                doctor.specialty?.name ||
-                                                                'Chưa cập nhật'
-                                                            }
-                                                            position={
-                                                                doctor.position?.name ||
-                                                                'Chưa cập nhật'
-                                                            }
-                                                            prices={
-                                                                doctor.prices?.map((price) => ({
-                                                                    id: price.id,
-                                                                    serviceTypeId:
-                                                                        price.serviceTypeId,
-                                                                    serviceTypeName:
-                                                                        price.serviceTypeName,
-                                                                    amount: price.amount,
-                                                                })) || []
-                                                            }
-                                                            rating={
-                                                                doctor.reviewStatistics
-                                                                    ?.averageRating || 0
-                                                            }
-                                                            location={
-                                                                doctor.hospital?.name ||
-                                                                doctor.address ||
-                                                                'Chưa cập nhật'
-                                                            }
-                                                            yearsOfExperience={
-                                                                doctor.yearsOfExperience
-                                                            }
-                                                            isFavorite={doctor.isFavorited || false}
-                                                            languages={doctor.languages || []}
-                                                            image={
-                                                                doctor.avatarUrl ||
-                                                                '/default-doctor.png'
-                                                            }
-                                                        />
-                                                    ))
-                                                ) : (
-                                                    <div className={styles.emptyState}>
-                                                        <div className={styles.emptyStateIcon}>
-                                                            <i className="fa-solid fa-user-doctor"></i>
-                                                        </div>
-                                                        <h4 className={styles.emptyStateTitle}>
-                                                            Không tìm thấy bác sĩ nào
-                                                        </h4>
-                                                        <p className={styles.emptyStateDescription}>
-                                                            Vui lòng thử lại với từ khóa khác hoặc
-                                                            bộ lọc khác.
-                                                        </p>
-                                                        {(debouncedSearch ||
-                                                            provinceId ||
-                                                            districtId) && (
-                                                            <button
-                                                                className={clsx(
-                                                                    'btn',
-                                                                    'btn-outline-primary',
-                                                                    'btn-sm',
-                                                                    styles.clearFiltersButton
-                                                                )}
-                                                                onClick={() => {
-                                                                    handleClearArea();
-                                                                    setSearch('');
-                                                                }}
-                                                            >
-                                                                Xóa tất cả bộ lọc
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                )}
+                                                {renderDoctorListContent()}
                                                 {/* Pagination for Doctors */}
                                                 {doctorsTotalPages > 1 && (
                                                     <div
@@ -563,74 +609,7 @@ const SpecialtyDetailPage: React.FC = () => {
 
                                         {activeTab === 'hospital' && (
                                             <div className={styles.cardsList}>
-                                                {hospitalsLoading ? (
-                                                    <div className="text-center py-5">
-                                                        <div className="spinner-border text-primary">
-                                                            <span className="visually-hidden">
-                                                                Loading...
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                ) : hospitals.length > 0 ? (
-                                                    <div className="row">
-                                                        {hospitals.map((hospital) => (
-                                                            <div
-                                                                key={hospital.id}
-                                                                className="col-md-6 mb-4"
-                                                            >
-                                                                <HospitalCard
-                                                                    clinic={{
-                                                                        id: hospital.id,
-                                                                        name: hospital.name,
-                                                                        image:
-                                                                            hospital.avatarUrl ||
-                                                                            '/default-hospital.png',
-                                                                        specialties:
-                                                                            hospital.specialties?.map(
-                                                                                (s) => s.name
-                                                                            ) || [],
-                                                                        location: hospital.address,
-                                                                        specialtyCount:
-                                                                            hospital.totalSpecialties ||
-                                                                            0,
-                                                                    }}
-                                                                    showBookingButton={true}
-                                                                />
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <div className={styles.emptyState}>
-                                                        <div className={styles.emptyStateIcon}>
-                                                            <i className="fa-solid fa-hospital"></i>
-                                                        </div>
-                                                        <h4 className={styles.emptyStateTitle}>
-                                                            Không tìm thấy bệnh viện nào
-                                                        </h4>
-                                                        <p className={styles.emptyStateDescription}>
-                                                            Vui lòng thử lại với từ khóa khác hoặc
-                                                            bộ lọc khác.
-                                                        </p>
-                                                        {(debouncedSearch ||
-                                                            provinceId ||
-                                                            districtId) && (
-                                                            <button
-                                                                className={clsx(
-                                                                    'btn',
-                                                                    'btn-outline-primary',
-                                                                    'btn-sm',
-                                                                    styles.clearFiltersButton
-                                                                )}
-                                                                onClick={() => {
-                                                                    handleClearArea();
-                                                                    setSearch('');
-                                                                }}
-                                                            >
-                                                                Xóa tất cả bộ lọc
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                )}
+                                                {renderHospitalListContent()}
                                                 {/* Pagination for Hospitals */}
                                                 {hospitalsTotalPages > 1 && (
                                                     <div

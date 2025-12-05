@@ -9,7 +9,7 @@
 
 // Custom column widths: 8.5 - 3.5 (70.83% - 29.17%)
 .leftColumn {
-    flex: 0 0 70.83%; // 8.5/12 = 70.83%
+    flex: 0 0 70.83%; // 8.5/12
     max-width: 70.83%;
     padding-right: 15px;
 
@@ -21,7 +21,7 @@
 }
 
 .rightColumn {
-    flex: 0 0 29.17%; // 3.5/12 = 29.17%
+    flex: 0 0 29.17%; // 3.5/12
     max-width: 29.17%;
     padding-left: 15px;
 
@@ -29,6 +29,7 @@
         flex: 0 0 100%;
         max-width: 100%;
         padding-left: 0;
+        margin-top: 24px;
     }
 }
 
