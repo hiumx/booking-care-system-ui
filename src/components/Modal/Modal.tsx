@@ -39,7 +39,7 @@ const Modal: React.FC<ModalProps> = ({
         setSelectedItems(initialSelectedItems || []);
     }, [initialSelectedItems]);
 
-    // Debounce search term - wait 2 seconds after user stops typing
+    // Debounce search term - wait 1 seconds after user stops typing
     useEffect(() => {
         // Show loading if searchTerm is different from debouncedSearchTerm
         if (searchTerm !== debouncedSearchTerm && searchTerm) {
@@ -51,7 +51,7 @@ const Modal: React.FC<ModalProps> = ({
         const timer = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
             setIsSearching(false);
-        }, 2000);
+        }, 1000);
 
         return () => {
             clearTimeout(timer);

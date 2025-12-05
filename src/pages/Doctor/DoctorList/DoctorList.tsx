@@ -1091,14 +1091,12 @@ const DoctorList: React.FC = () => {
                                 {error ? (
                                     <div className="col-md-12 mb-4">
                                         <div
-                                            className="alert alert-danger border-0 shadow-sm rounded-3"
+                                            className="alert alert-danger border-0 shadow-sm rounded-3 text-center"
                                             role="alert"
                                         >
-                                            <div className="d-flex align-items-center mb-3">
-                                                <div className="flex-shrink-0 me-3">
-                                                    <i className="fas fa-exclamation-triangle fs-2 text-danger"></i>
-                                                </div>
-                                                <div className="flex-grow-1">
+                                            <div className="d-flex align-items-center justify-content-center mb-3">
+                                                <i className="fas fa-exclamation-triangle fs-2 text-danger me-3"></i>
+                                                <div>
                                                     <h4 className="alert-heading mb-1 fw-bold">
                                                         Không thể tải dữ liệu
                                                     </h4>
@@ -1106,7 +1104,7 @@ const DoctorList: React.FC = () => {
                                                 </div>
                                             </div>
                                             <hr className="my-3" />
-                                            <div className="d-flex gap-2 flex-wrap">
+                                            <div className="d-flex gap-2 flex-wrap justify-content-center">
                                                 <button
                                                     className="btn btn-primary btn-sm px-3 py-2 rounded-pill fw-semibold"
                                                     onClick={() => globalThis.location.reload()}
