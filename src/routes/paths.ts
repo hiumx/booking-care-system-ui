@@ -54,6 +54,7 @@ export const PATHS = {
     SPECIALTIES: {
         ROOT: '/specialties',
         PROFILE: 'profile',
+        DETAIL: '/specialties/:id',
     },
 
     // Service paths
