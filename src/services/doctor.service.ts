@@ -317,8 +317,8 @@ export class DoctorService {
                 hospitalIds: params.hospitalFilters, // Add multiple hospital support
                 serviceType: params.serviceTypeFilter,
                 serviceTypes: params.serviceTypeFilters,
-                language: params.languageFilter,
-                languages: params.languageFilters,
+                languageId: params.languageFilter, // prefer ID for single-select
+                languageIds: params.languageFilters ?? params.languageIds, // prefer IDs for multi-select
                 minRating: params.ratingFilter,
                 minRatings: params.ratingFilters,
                 sortBy: params.sortBy,
