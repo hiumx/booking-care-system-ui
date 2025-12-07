@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import BookingLayout from '@/layouts/BookingLayout';
@@ -17,6 +17,7 @@ import {
 /**
  * RequestRefund Page - Option 4
  * Patient requests refund for cancelled appointment
+ * Supports: Doctor, Service, and Hospital appointments
  */
 const RequestRefund: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +30,44 @@ const RequestRefund: React.FC = () => {
 
     const rescheduleToken = searchParams.get('token');
 
-    // Use the utility function from appointment-utils
+    // Determine appointment type and get display info
+    const displayInfo = useMemo(() => {
+        if (!appointmentData) return null;
+
+        const hasDoctor = !!appointmentData.doctorInfo?.id;
+        const hasService = !!appointmentData.serviceInfo?.id;
+
+        if (hasDoctor) {
+            return {
+                type: 'doctor' as const,
+                label: appointmentData.doctorInfo?.positionName || 'Bác sĩ',
+                name: appointmentData.doctorInfo?.fullName || 'Bác sĩ',
+                avatar: appointmentData.doctorInfo?.avatarUrl,
+                specialty: appointmentData.doctorInfo?.specialtyName,
+                fee: appointmentData.consultationFees,
+            };
+        }
+
+        if (hasService) {
+            return {
+                type: 'service' as const,
+                label: 'Dịch vụ',
+                name: appointmentData.serviceInfo?.name || 'Dịch vụ',
+                avatar: appointmentData.serviceInfo?.imageUrl,
+                specialty: null,
+                fee: appointmentData.consultationFees || appointmentData.serviceInfo?.price,
+            };
+        }
+
+        return {
+            type: 'hospital' as const,
+            label: 'Bệnh viện',
+            name: appointmentData.hospitalInfo?.name || 'Bệnh viện',
+            avatar: appointmentData.hospitalInfo?.avatarUrl,
+            specialty: null,
+            fee: appointmentData.consultationFees,
+        };
+    }, [appointmentData]);
 
     useEffect(() => {
         if (!validateAppointmentParams(appointmentId || null, rescheduleToken, navigate)) {
@@ -81,203 +119,193 @@ const RequestRefund: React.FC = () => {
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-8 mx-auto">
-                            <div className="card shadow-sm">
-                                <div className="card-header bg-primary text-white">
-                                    <h4 className="mb-0 d-flex align-items-center">
-                                        <i
-                                            className="isax isax-receipt-2 me-2"
-                                            aria-hidden="true"
-                                        ></i>{' '}
-                                        Yêu cầu hoàn tiền
-                                    </h4>
-                                </div>
-                                <div className="card-body p-4">
-                                    {/* Appointment Information Card */}
-                                    <div className="bg-light rounded-3 p-4 mb-4">
-                                        <h5 className="mb-3 d-flex align-items-center text-dark">
-                                            <i
-                                                className="isax isax-calendar-1 me-2"
-                                                aria-hidden="true"
-                                            ></i>{' '}
-                                            Thông tin lịch hẹn
+                            <div className="card booking-card">
+                                <div className="card-body booking-body pb-1">
+                                    {/* Header */}
+                                    <div className="card-header pt-3">
+                                        <h5 className="d-flex align-items-center flex-wrap gap-2">
+                                            <i className="isax isax-receipt-2 text-primary me-2"></i>
+                                            Yêu cầu hoàn tiền
                                         </h5>
-
-                                        {/* Doctor Info */}
-                                        <div className="d-flex align-items-center mb-3 pb-3 border-bottom">
-                                            <div className="me-3 flex-shrink-0">
-                                                <img
-                                                    src={
-                                                        appointmentData?.doctorInfo?.avatarUrl ||
-                                                        '/src/assets/img/clients/client-16.jpg'
-                                                    }
-                                                    alt="doctor"
-                                                    className="rounded-circle"
-                                                    style={{
-                                                        width: '60px',
-                                                        height: '60px',
-                                                        objectFit: 'cover',
-                                                        aspectRatio: '1/1',
-                                                    }}
-                                                />
-                                            </div>
-                                            <div className="flex-grow-1">
-                                                <h6 className="mb-1 text-dark">
-                                                    {appointmentData?.doctorInfo?.positionName}{' '}
-                                                    {appointmentData?.doctorInfo?.fullName ||
-                                                        'Bác sĩ'}
-                                                </h6>
-                                                <p className="text-muted mb-0">
-                                                    <i
-                                                        className="isax isax-health me-1"
-                                                        aria-hidden="true"
-                                                    ></i>
-                                                    {appointmentData?.doctorInfo?.specialtyName ||
-                                                        'Chưa cập nhật'}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Appointment Details */}
-                                        <div className="row g-3">
-                                            <div className="col-md-6">
-                                                <div className="d-flex align-items-start">
-                                                    <i
-                                                        className="isax isax-calendar-2 text-primary me-2 mt-1"
-                                                        aria-hidden="true"
-                                                    ></i>
-                                                    <div>
-                                                        <small className="text-muted d-block">
-                                                            Ngày khám
-                                                        </small>
-                                                        <span className="fw-medium text-dark">
-                                                            {new Date(
-                                                                appointmentData?.appointmentDate ||
-                                                                    ''
-                                                            ).toLocaleDateString('vi-VN', {
-                                                                weekday: 'long',
-                                                                year: 'numeric',
-                                                                month: 'long',
-                                                                day: 'numeric',
-                                                            })}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-md-6">
-                                                <div className="d-flex align-items-start">
-                                                    <i
-                                                        className="isax isax-clock text-primary me-2 mt-1"
-                                                        aria-hidden="true"
-                                                    ></i>
-                                                    <div>
-                                                        <small className="text-muted d-block">
-                                                            Giờ khám
-                                                        </small>
-                                                        <span className="fw-medium text-dark">
-                                                            {formatAppointmentTime(
-                                                                appointmentData?.appointmentTimeId ||
-                                                                    ''
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-md-6">
-                                                <div className="d-flex align-items-start">
-                                                    <i className="isax isax-hospital text-primary me-2 mt-1"></i>
-                                                    <div>
-                                                        <small className="text-muted d-block">
-                                                            Địa điểm
-                                                        </small>
-                                                        <span className="fw-medium text-dark">
-                                                            {appointmentData?.hospitalInfo?.name ||
-                                                                'Chưa cập nhật'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-md-6">
-                                                <div className="d-flex align-items-start">
-                                                    <i className="isax isax-dollar-circle text-success me-2 mt-1"></i>
-                                                    <div>
-                                                        <small className="text-muted d-block">
-                                                            Phí khám
-                                                        </small>
-                                                        <span className="fw-bold text-success ">
-                                                            {appointmentData?.consultationFees?.toLocaleString(
-                                                                'vi-VN'
-                                                            ) || '0'}{' '}
-                                                            VNĐ
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
 
-                                    <form onSubmit={handleSubmit}>
-                                        {/* Info Alert */}
-                                        <div className="alert alert-info d-flex align-items-start border-0 shadow-sm mb-4">
-                                            <i className="isax isax-info-circle fs-3 me-3 mt-1 text-info"></i>
-                                            <div>
-                                                <h6 className="alert-heading mb-2">
-                                                    Lưu ý quan trọng
-                                                </h6>
-                                                <p className="mb-0">
-                                                    Yêu cầu hoàn tiền sẽ được xử lý trong vòng{' '}
-                                                    <strong>3-5 ngày làm việc</strong>. Số tiền sẽ
-                                                    được chuyển vào tài khoản ngân hàng mà bạn đã
+                                    {/* Provider Info - Doctor/Service/Hospital */}
+                                    <div className="card-header d-flex align-items-center flex-wrap gap-2 py-3">
+                                        <span className="avatar avatar-lg avatar-rounded me-2 flex-shrink-0">
+                                            <img
+                                                src={
+                                                    displayInfo?.avatar ||
+                                                    '/src/assets/img/clients/client-16.jpg'
+                                                }
+                                                alt={displayInfo?.name}
+                                            />
+                                        </span>
+                                        <p className="mb-0">
+                                            Bạn đang yêu cầu hoàn tiền cho lịch hẹn với{' '}
+                                            <span className="text-dark fw-semibold">
+                                                {displayInfo?.type === 'doctor' &&
+                                                    `${displayInfo.label} `}
+                                                {displayInfo?.name}
+                                            </span>
+                                        </p>
+                                    </div>
+
+                                    {/* Appointment Details */}
+                                    <div className="card-body pb-3">
+                                        <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between mb-3">
+                                            <h6>Thông tin lịch hẹn</h6>
+                                        </div>
+
+                                        <div className="row">
+                                            {/* Provider Name - Doctor/Service/Hospital */}
+                                            <div className="col-md-6">
+                                                <div className="mb-3">
+                                                    <div className="form-label">
+                                                        {displayInfo?.label}
+                                                    </div>
+                                                    <div className="form-plain-text">
+                                                        {displayInfo?.type === 'doctor' &&
+                                                            `${displayInfo.label} `}
+                                                        {displayInfo?.name}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Specialty - Only for Doctor */}
+                                            {displayInfo?.type === 'doctor' &&
+                                                displayInfo.specialty && (
+                                                    <div className="col-md-6">
+                                                        <div className="mb-3">
+                                                            <div className="form-label">
+                                                                Chuyên khoa
+                                                            </div>
+                                                            <div className="form-plain-text">
+                                                                {displayInfo.specialty}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                            {/* Date */}
+                                            <div className="col-md-6">
+                                                <div className="mb-3">
+                                                    <div className="form-label">Ngày hẹn</div>
+                                                    <div className="form-plain-text">
+                                                        {new Date(
+                                                            appointmentData?.appointmentDate || ''
+                                                        ).toLocaleDateString('vi-VN', {
+                                                            weekday: 'long',
+                                                            year: 'numeric',
+                                                            month: 'long',
+                                                            day: 'numeric',
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Time */}
+                                            <div className="col-md-6">
+                                                <div className="mb-3">
+                                                    <div className="form-label">Giờ hẹn</div>
+                                                    <div className="form-plain-text">
+                                                        {formatAppointmentTime(
+                                                            appointmentData?.appointmentTimeId || ''
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Hospital - Show for Doctor and Service appointments */}
+                                            {displayInfo?.type !== 'hospital' &&
+                                                appointmentData?.hospitalInfo?.name && (
+                                                    <div className="col-md-6">
+                                                        <div className="mb-3">
+                                                            <div className="form-label">
+                                                                Địa điểm
+                                                            </div>
+                                                            <div className="form-plain-text">
+                                                                {appointmentData.hospitalInfo.name}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                            {/* Address - Show for Hospital appointments */}
+                                            {displayInfo?.type === 'hospital' &&
+                                                appointmentData?.hospitalInfo?.address && (
+                                                    <div className="col-md-6">
+                                                        <div className="mb-3">
+                                                            <div className="form-label">
+                                                                Địa chỉ
+                                                            </div>
+                                                            <div className="form-plain-text">
+                                                                {
+                                                                    appointmentData.hospitalInfo
+                                                                        .address
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                            {/* Fee */}
+                                            <div className="col-md-6">
+                                                <div className="mb-3">
+                                                    <div className="form-label">
+                                                        {displayInfo?.type === 'service'
+                                                            ? 'Phí dịch vụ'
+                                                            : 'Phí khám'}
+                                                    </div>
+                                                    <div className="form-plain-text text-success fw-semibold">
+                                                        {(displayInfo?.fee || 0).toLocaleString(
+                                                            'vi-VN'
+                                                        )}{' '}
+                                                        VNĐ
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Info Note */}
+                                        <div className="alert alert-light border mb-4">
+                                            <div className="d-flex">
+                                                <i className="isax isax-info-circle text-primary me-2 mt-1"></i>
+                                                <div>
+                                                    <strong>Lưu ý:</strong> Yêu cầu hoàn tiền sẽ
+                                                    được xử lý trong vòng 3-5 ngày làm việc. Số tiền
+                                                    sẽ được chuyển vào tài khoản ngân hàng mà bạn đã
                                                     đăng ký.
-                                                </p>
+                                                </div>
                                             </div>
                                         </div>
 
                                         {/* Action Buttons */}
-                                        <div className="d-flex justify-content-between gap-3 mt-4">
-                                            <button
-                                                type="button"
-                                                className="btn btn-light btn-lg rounded-pill px-4 d-inline-flex align-items-center"
-                                                onClick={() => navigate(PATHS.HOME)}
-                                                disabled={isSubmitting}
-                                            >
-                                                <i
-                                                    className="isax isax-arrow-left-2 me-2"
-                                                    aria-hidden="true"
-                                                ></i>{' '}
-                                                Hủy
-                                            </button>
-                                            <button
-                                                type="submit"
-                                                className="btn btn-primary btn-lg rounded-pill px-4 d-inline-flex align-items-center"
-                                                disabled={isSubmitting}
-                                            >
-                                                {isSubmitting ? (
-                                                    <>
-                                                        <output
-                                                            className="spinner-border spinner-border-sm me-2"
-                                                            aria-label="Đang xử lý"
-                                                        >
-                                                            <span className="visually-hidden">
-                                                                Đang xử lý...
-                                                            </span>
-                                                        </output>
-                                                        Đang xử lý...
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <i
-                                                            className="isax isax-send-2 me-2"
-                                                            aria-hidden="true"
-                                                        ></i>{' '}
-                                                        Gửi yêu cầu
-                                                    </>
-                                                )}
-                                            </button>
-                                        </div>
-                                    </form>
+                                        <form onSubmit={handleSubmit}>
+                                            <div className="d-flex justify-content-end gap-3">
+                                                <button
+                                                    type="submit"
+                                                    className="btn btn-primary rounded-pill px-4"
+                                                    disabled={isSubmitting}
+                                                >
+                                                    {isSubmitting ? (
+                                                        <>
+                                                            <span
+                                                                className="spinner-border spinner-border-sm me-2"
+                                                                role="status"
+                                                                aria-hidden="true"
+                                                            ></span>
+                                                            Đang xử lý...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <i className="isax isax-tick-circle me-2"></i>
+                                                            Xác nhận hoàn tiền
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
