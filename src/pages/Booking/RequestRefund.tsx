@@ -124,7 +124,7 @@ const RequestRefund: React.FC = () => {
                                     {/* Header */}
                                     <div className="card-header pt-3">
                                         <h5 className="d-flex align-items-center flex-wrap gap-2">
-                                            <i className="isax isax-receipt-2 text-primary me-2"></i>
+                                            <i className="isax isax-receipt-2 text-primary me-2"></i>{' '}
                                             Yêu cầu hoàn tiền
                                         </h5>
                                     </div>
@@ -289,16 +289,15 @@ const RequestRefund: React.FC = () => {
                                                 >
                                                     {isSubmitting ? (
                                                         <>
-                                                            <span
+                                                            <output
                                                                 className="spinner-border spinner-border-sm me-2"
-                                                                role="status"
                                                                 aria-hidden="true"
-                                                            ></span>
+                                                            ></output>{' '}
                                                             Đang xử lý...
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <i className="isax isax-tick-circle me-2"></i>
+                                                            <i className="isax isax-tick-circle me-2"></i>{' '}
                                                             Xác nhận hoàn tiền
                                                         </>
                                                     )}

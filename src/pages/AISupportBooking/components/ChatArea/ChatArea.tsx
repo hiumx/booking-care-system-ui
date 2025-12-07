@@ -220,7 +220,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                 messageId,
                 appointmentType: options?.appointmentType ?? AppointmentType.IN_PERSON,
             });
-            return;
         }
     };
 

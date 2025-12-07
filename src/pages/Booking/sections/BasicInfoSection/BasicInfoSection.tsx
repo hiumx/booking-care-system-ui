@@ -2,10 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import BookingSectionWrapper from '../../components/BookingSectionWrapper';
 import { mockAppointmentInfo } from '../../constants/mockData';
-import { useDoctorInfo } from '../../hooks/useDoctorInfo';
-import { useServiceMedicalInfo } from '../../hooks/useServiceMedicalInfo';
-import { useHospitalBookingInfo } from '../../hooks/useHospitalBookingInfo';
-import { useParams, Link } from 'react-router-dom';
+import { useBookingEntityInfo } from '../../hooks';
+import { Link } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import {
     selectUserFirstName,
@@ -36,30 +34,9 @@ interface BasicInfoSectionProps {
 
 const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep }) => {
     const { t } = useTranslation(['booking', 'common']);
-    const { serviceMedicalId, hospitalId } = useParams<{
-        serviceMedicalId?: string;
-        hospitalId?: string;
-    }>();
 
-    // Get booking flow type from Redux (supports both URL params and programmatic booking)
-    const bookingFlowType = useAppSelector((state) => state.booking.bookingFlowType);
-
-    // Determine booking type - check Redux first, then fall back to URL params
-    const isServiceMedicalBooking = bookingFlowType === 'service' || !!serviceMedicalId;
-    const isHospitalBooking = bookingFlowType === 'hospital' || !!hospitalId;
-
-    // Get entity info based on booking type (already fetched in DateTimeSection)
-    const doctorInfo = useDoctorInfo();
-    const serviceMedicalInfo = useServiceMedicalInfo();
-    const hospitalBookingInfo = useHospitalBookingInfo();
-
-    const getEntityInfo = () => {
-        if (isHospitalBooking) return hospitalBookingInfo;
-        if (isServiceMedicalBooking) return serviceMedicalInfo;
-        return doctorInfo;
-    };
-
-    const entityInfo = getEntityInfo();
+    // Use shared hook for booking type detection and entity info
+    const { entityInfo } = useBookingEntityInfo();
     const dispatch = useAppDispatch();
 
     // Get user profile from Redux

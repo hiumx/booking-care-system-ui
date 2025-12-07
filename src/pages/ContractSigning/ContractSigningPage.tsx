@@ -207,8 +207,8 @@ const ContractSigningPage: React.FC = () => {
                     <div className="card mb-4">
                         <div className="card-header">
                             <h6 className="mb-0">
-                                <i className="isax isax-document-text5 me-2 text-primary"></i>
-                                Thông tin hợp đồng
+                                <i className="isax isax-document-text5 me-2 text-primary"></i> Thông
+                                tin hợp đồng
                             </h6>
                         </div>
                         <div className="card-body">
@@ -269,8 +269,7 @@ const ContractSigningPage: React.FC = () => {
                     <div className="card mb-4">
                         <div className="card-header d-flex align-items-center justify-content-between">
                             <h6 className="mb-0">
-                                <i className="isax isax-eye5 me-2 text-primary"></i>
-                                Xem hợp đồng
+                                <i className="isax isax-eye5 me-2 text-primary"></i> Xem hợp đồng
                             </h6>
                             <span className="badge bg-info">Bản nháp</span>
                         </div>
@@ -294,8 +293,7 @@ const ContractSigningPage: React.FC = () => {
                                 rel="noopener noreferrer"
                                 className="btn btn-outline-primary btn-sm"
                             >
-                                <i className="isax isax-export-35 me-1"></i>
-                                Mở trong tab mới
+                                <i className="isax isax-export-35 me-1"></i> Mở trong tab mới
                             </a>
                         </div>
                     </div>
@@ -304,16 +302,15 @@ const ContractSigningPage: React.FC = () => {
                     <div className="card mb-4">
                         <div className="card-header">
                             <h6 className="mb-0">
-                                <span className="badge bg-primary me-2">1</span>
-                                <i className="isax isax-edit-25 me-2"></i>
-                                Vẽ chữ ký của bạn
+                                <span className="badge bg-primary me-2">1</span>{' '}
+                                <i className="isax isax-edit-25 me-2"></i> Vẽ chữ ký của bạn
                             </h6>
                         </div>
                         <div className="card-body">
                             <p className="text-muted small mb-3">
-                                <i className="isax isax-info-circle5 me-1"></i>
-                                Vẽ chữ ký của bạn trong khung bên dưới. Chữ ký này sẽ được sử dụng
-                                để xác thực hợp đồng.
+                                <i className="isax isax-info-circle5 me-1"></i> Vẽ chữ ký của bạn
+                                trong khung bên dưới. Chữ ký này sẽ được sử dụng để xác thực hợp
+                                đồng.
                             </p>
                             <div
                                 className="border rounded p-2 mb-3 position-relative bg-white"
@@ -347,13 +344,11 @@ const ContractSigningPage: React.FC = () => {
                                     onClick={handleClearSignature}
                                     disabled={!hasSignature}
                                 >
-                                    <i className="isax isax-trash5 me-1"></i>
-                                    Xóa và vẽ lại
+                                    <i className="isax isax-trash5 me-1"></i> Xóa và vẽ lại
                                 </button>
                                 {hasSignature && (
                                     <span className="badge bg-success">
-                                        <i className="isax isax-tick-circle5 me-1"></i>
-                                        Đã có chữ ký
+                                        <i className="isax isax-tick-circle5 me-1"></i> Đã có chữ ký
                                     </span>
                                 )}
                             </div>
@@ -364,9 +359,8 @@ const ContractSigningPage: React.FC = () => {
                     <div className="card mb-4">
                         <div className="card-header">
                             <h6 className="mb-0">
-                                <span className="badge bg-primary me-2">2</span>
-                                <i className="isax isax-shield-tick5 me-2"></i>
-                                Xác thực OTP
+                                <span className="badge bg-primary me-2">2</span>{' '}
+                                <i className="isax isax-shield-tick5 me-2"></i> Xác thực OTP
                             </h6>
                         </div>
                         <div className="card-body">
@@ -404,8 +398,8 @@ const ContractSigningPage: React.FC = () => {
                                     <div className="d-flex align-items-center justify-content-between">
                                         {countdown > 0 ? (
                                             <p className="text-muted small mb-0">
-                                                <i className="isax isax-clock5 me-1"></i>
-                                                Gửi lại mã sau <strong>{countdown}</strong> giây
+                                                <i className="isax isax-clock5 me-1"></i> Gửi lại mã
+                                                sau <strong>{countdown}</strong> giây
                                             </p>
                                         ) : (
                                             <button
@@ -413,14 +407,14 @@ const ContractSigningPage: React.FC = () => {
                                                 className="btn btn-link p-0 text-decoration-none"
                                                 onClick={handleSendOtp}
                                             >
-                                                <i className="isax isax-refresh5 me-1"></i>
-                                                Gửi lại mã OTP
+                                                <i className="isax isax-refresh5 me-1"></i> Gửi lại
+                                                mã OTP
                                             </button>
                                         )}
                                         {otpCode.length === 6 && (
                                             <span className="badge bg-success">
-                                                <i className="isax isax-tick-circle5 me-1"></i>
-                                                Đã nhập đủ
+                                                <i className="isax isax-tick-circle5 me-1"></i> Đã
+                                                nhập đủ
                                             </span>
                                         )}
                                     </div>
@@ -444,13 +438,12 @@ const ContractSigningPage: React.FC = () => {
                                     >
                                         {isSendingOtp ? (
                                             <>
-                                                <span className="spinner-border spinner-border-sm me-2"></span>
+                                                <span className="spinner-border spinner-border-sm me-2"></span>{' '}
                                                 Đang gửi...
                                             </>
                                         ) : (
                                             <>
-                                                <i className="isax isax-sms5 me-2"></i>
-                                                Gửi mã OTP
+                                                <i className="isax isax-sms5 me-2"></i> Gửi mã OTP
                                             </>
                                         )}
                                     </button>
@@ -472,8 +465,8 @@ const ContractSigningPage: React.FC = () => {
                     <div className="card">
                         <div className="card-body text-center py-4">
                             <h6 className="mb-3">
-                                <span className="badge bg-primary me-2">3</span>
-                                Xác nhận ký hợp đồng
+                                <span className="badge bg-primary me-2">3</span> Xác nhận ký hợp
+                                đồng
                             </h6>
                             <button
                                 type="button"
@@ -485,13 +478,13 @@ const ContractSigningPage: React.FC = () => {
                             >
                                 {isSigning ? (
                                     <>
-                                        <span className="spinner-border spinner-border-sm me-2"></span>
+                                        <span className="spinner-border spinner-border-sm me-2"></span>{' '}
                                         Đang xử lý...
                                     </>
                                 ) : (
                                     <>
-                                        <i className="isax isax-tick-circle5 me-2"></i>
-                                        Xác nhận ký hợp đồng
+                                        <i className="isax isax-tick-circle5 me-2"></i> Xác nhận ký
+                                        hợp đồng
                                     </>
                                 )}
                             </button>

@@ -25,7 +25,7 @@ const ContractSigningSuccessPage: React.FC = () => {
                                 {/* Success Header */}
                                 <div className="card-header pt-3 pb-3 border-bottom">
                                     <h5 className="d-flex align-items-center flex-wrap gap-2 mb-0">
-                                        <i className="isax isax-tick-circle5 text-success me-2"></i>
+                                        <i className="isax isax-tick-circle5 text-success me-2"></i>{' '}
                                         Ký hợp đồng thành công
                                     </h5>
                                 </div>
@@ -43,28 +43,28 @@ const ContractSigningSuccessPage: React.FC = () => {
                                 {/* Next Steps Info */}
                                 <div className="card-body pb-3">
                                     <h6 className="mb-3">
-                                        <i className="isax isax-info-circle me-2 text-primary"></i>
+                                        <i className="isax isax-info-circle me-2 text-primary"></i>{' '}
                                         Bước tiếp theo
                                     </h6>
                                     <div className="alert alert-light border mb-4">
                                         <ul className="mb-0 ps-3">
                                             <li className="mb-2">
-                                                <i className="isax isax-tick-circle text-success me-2"></i>
+                                                <i className="isax isax-tick-circle text-success me-2"></i>{' '}
                                                 Hợp đồng đã được ký thành công và gửi đến hệ thống
                                                 BookingCare
                                             </li>
                                             <li className="mb-2">
-                                                <i className="isax isax-clock text-warning me-2"></i>
+                                                <i className="isax isax-clock text-warning me-2"></i>{' '}
                                                 Đội ngũ quản trị sẽ xem xét và phê duyệt hợp đồng
                                                 trong thời gian sớm nhất
                                             </li>
                                             <li className="mb-2">
-                                                <i className="isax isax-sms text-info me-2"></i>
-                                                Bạn sẽ nhận được email thông báo khi hợp đồng được
-                                                phê duyệt
+                                                <i className="isax isax-sms text-info me-2"></i> Bạn
+                                                sẽ nhận được email thông báo khi hợp đồng được phê
+                                                duyệt
                                             </li>
                                             <li className="mb-0">
-                                                <i className="isax isax-user-tick text-success me-2"></i>
+                                                <i className="isax isax-user-tick text-success me-2"></i>{' '}
                                                 Sau khi phê duyệt, tài khoản bệnh viện sẽ được kích
                                                 hoạt và bạn có thể đăng nhập vào hệ thống
                                             </li>
@@ -73,8 +73,8 @@ const ContractSigningSuccessPage: React.FC = () => {
 
                                     {/* Timeline - Horizontal Steps */}
                                     <h6 className="mb-3">
-                                        <i className="isax isax-timer-1 me-2 text-primary"></i>
-                                        Quy trình xử lý
+                                        <i className="isax isax-timer-1 me-2 text-primary"></i> Quy
+                                        trình xử lý
                                     </h6>
                                     <div className="card border mb-4">
                                         <div className="card-body p-4">
@@ -175,7 +175,7 @@ const ContractSigningSuccessPage: React.FC = () => {
 
                                     {/* Contact Support */}
                                     <h6 className="mb-3">
-                                        <i className="isax isax-message-question me-2 text-primary"></i>
+                                        <i className="isax isax-message-question me-2 text-primary"></i>{' '}
                                         Cần hỗ trợ?
                                     </h6>
                                     <div className="card border bg-light mb-4">
@@ -218,8 +218,7 @@ const ContractSigningSuccessPage: React.FC = () => {
                                             className="btn btn-primary btn-lg px-5"
                                             onClick={() => navigate(PATHS.HOME)}
                                         >
-                                            <i className="isax isax-home me-2"></i>
-                                            Về trang chủ
+                                            <i className="isax isax-home me-2"></i> Về trang chủ
                                         </button>
                                     </div>
                                 </div>

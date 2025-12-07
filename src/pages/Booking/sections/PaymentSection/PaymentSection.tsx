@@ -1,11 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import BookingSectionWrapper from '../../components/BookingSectionWrapper';
 import { mockAppointmentInfo } from '../../constants/mockData';
-import { useDoctorInfo } from '../../hooks';
-import { useServiceMedicalInfo } from '../../hooks/useServiceMedicalInfo';
-import { useHospitalBookingInfo } from '../../hooks/useHospitalBookingInfo';
+import { useBookingEntityInfo } from '../../hooks';
 import { useAppSelector } from '@/store/hooks';
-import { useParams } from 'react-router-dom';
 import { selectSelectedDate, selectSelectedSlots } from '@/store/selectors/schedule.selectors';
 import TimeSlotBadge from '../../components/TimeSlotBadge';
 import PaymentService, { PaymentMethod } from '@/services/payment.service';
@@ -39,30 +36,8 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     rescheduleAppointmentDate,
     rescheduleAppointmentTimeId,
 }) => {
-    const { serviceMedicalId, hospitalId } = useParams<{
-        serviceMedicalId?: string;
-        hospitalId?: string;
-    }>();
-
-    // Get booking flow type from Redux (supports both URL params and programmatic booking)
-    const bookingFlowType = useAppSelector((state) => state.booking.bookingFlowType);
-
-    // Determine booking type - check Redux first, then fall back to URL params
-    const isServiceMedicalBooking = bookingFlowType === 'service' || !!serviceMedicalId;
-    const isHospitalBooking = bookingFlowType === 'hospital' || !!hospitalId;
-
-    // Get entity info based on booking type (already fetched in DateTimeSection)
-    const doctorInfo = useDoctorInfo();
-    const serviceMedicalInfo = useServiceMedicalInfo();
-    const hospitalBookingInfo = useHospitalBookingInfo();
-
-    // Helper function to get entity info - extracted to avoid nested ternary
-    const getEntityInfo = () => {
-        if (isHospitalBooking) return hospitalBookingInfo;
-        if (isServiceMedicalBooking) return serviceMedicalInfo;
-        return doctorInfo;
-    };
-    const entityInfo = getEntityInfo();
+    // Use shared hook for booking type detection and entity info
+    const { entityInfo, isServiceMedicalBooking, isHospitalBooking } = useBookingEntityInfo();
 
     // Get selected date and time slots (or use reschedule values if provided)
     const selectedDateFromRedux = useAppSelector(selectSelectedDate);

@@ -166,6 +166,24 @@
             }
         }
     }
+
+    // Fix appointment card contact info section
+    :global(.mail-info-patient) {
+        max-width: 250px;
+
+        ul {
+            li {
+                max-width: 100%;
+
+                a {
+                    display: inline-block;
+                    max-width: 200px;
+                    word-break: break-all;
+                    line-height: 1.4;
+                }
+            }
+        }
+    }
 }
 
 // Fix email/phone text overflow - wrap to new line when too long
@@ -221,26 +239,6 @@
         h6 {
             word-break: break-word;
             overflow-wrap: break-word;
-        }
-    }
-}
-
-// Fix appointment card contact info section
-:global(.appointment-wrap) {
-    :global(.mail-info-patient) {
-        max-width: 250px;
-
-        ul {
-            li {
-                max-width: 100%;
-
-                a {
-                    display: inline-block;
-                    max-width: 200px;
-                    word-break: break-all;
-                    line-height: 1.4;
-                }
-            }
         }
     }
 }

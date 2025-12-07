@@ -263,6 +263,7 @@ a {
 }
 
 /* Fix patient info email in appointment detail card */
+/* Fix patient info email in appointment detail card */
 .appointment-detail-card {
     .mail-info-patient {
         ul {
@@ -306,6 +307,23 @@ a {
             max-width: 320px;
         }
     }
+
+    /* Fix appointment detail card layout - prevent name overflow */
+    > ul {
+        > li:first-child {
+            flex: 0 0 auto !important;
+            max-width: 350px !important;
+
+            .patinet-information {
+                max-width: 350px !important;
+
+                .patient-info {
+                    max-width: 220px !important;
+                    flex-shrink: 1;
+                }
+            }
+        }
+    }
 }
 
 /* Fix long hospital/doctor name wrapping */
@@ -324,25 +342,6 @@ a {
                 overflow-wrap: break-word !important;
                 display: inline;
                 white-space: normal !important;
-            }
-        }
-    }
-}
-
-/* Fix appointment detail card layout - prevent name overflow */
-.appointment-detail-card {
-    > ul {
-        > li:first-child {
-            flex: 0 0 auto !important;
-            max-width: 350px !important;
-
-            .patinet-information {
-                max-width: 350px !important;
-
-                .patient-info {
-                    max-width: 220px !important;
-                    flex-shrink: 1;
-                }
             }
         }
     }

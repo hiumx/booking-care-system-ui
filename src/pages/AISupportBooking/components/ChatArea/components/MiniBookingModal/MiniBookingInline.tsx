@@ -276,9 +276,10 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
             else if (currentStep === 'basic') setCurrentStep('datetime');
             else if (currentStep === 'datetime') setCurrentStep('appointmentType');
             else if (currentStep === 'appointmentType') setCurrentStep('specialty');
-        } else {
-            if (currentStep === 'payment') setCurrentStep('basic');
-            else if (currentStep === 'basic') setCurrentStep('datetime');
+        } else if (currentStep === 'payment') {
+            setCurrentStep('basic');
+        } else if (currentStep === 'basic') {
+            setCurrentStep('datetime');
         }
     };
 

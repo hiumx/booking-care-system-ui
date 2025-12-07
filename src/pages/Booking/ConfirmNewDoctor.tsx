@@ -199,7 +199,7 @@ const ConfirmNewDoctor: React.FC = () => {
                                     <div className="card h-100">
                                         <div className="card-body">
                                             <h6 className="card-title mb-3">
-                                                <i className="isax isax-calendar-1 me-2 text-muted"></i>
+                                                <i className="isax isax-calendar-1 me-2 text-muted"></i>{' '}
                                                 Lịch hẹn hiện tại
                                             </h6>
 
@@ -288,7 +288,7 @@ const ConfirmNewDoctor: React.FC = () => {
                                     <div className="card h-100 border-primary">
                                         <div className="card-body">
                                             <h6 className="card-title mb-3">
-                                                <i className="isax isax-user-tick me-2 text-primary"></i>
+                                                <i className="isax isax-user-tick me-2 text-primary"></i>{' '}
                                                 Bác sĩ được gán mới
                                             </h6>
 
@@ -375,8 +375,8 @@ const ConfirmNewDoctor: React.FC = () => {
                                                                 {formatPrice(
                                                                     priceDifference.amount
                                                                 )}
-                                                            </strong>
-                                                            . Bạn cần thanh toán thêm.
+                                                            </strong>{' '}
+                                                            Bạn cần thanh toán thêm.
                                                         </span>
                                                     </>
                                                 )}
@@ -389,8 +389,8 @@ const ConfirmNewDoctor: React.FC = () => {
                                                                 {formatPrice(
                                                                     priceDifference.amount
                                                                 )}
-                                                            </strong>
-                                                            . Bạn sẽ được hoàn tiền.
+                                                            </strong>{' '}
+                                                            Bạn sẽ được hoàn tiền.
                                                         </span>
                                                     </>
                                                 )}
@@ -419,11 +419,10 @@ const ConfirmNewDoctor: React.FC = () => {
                                 >
                                     {isConfirming ? (
                                         <>
-                                            <span
+                                            <output
                                                 className="spinner-border spinner-border-sm me-2"
-                                                role="status"
                                                 aria-hidden="true"
-                                            ></span>
+                                            ></output>{' '}
                                             Đang xử lý...
                                         </>
                                     ) : (

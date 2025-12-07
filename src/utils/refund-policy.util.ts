@@ -35,10 +35,10 @@ const parseAppointmentStartTime = (
         const parts = timeString.split('_');
 
         if (parts.length >= 3 && parts[0] === 'AT') {
-            const hour = parseInt(parts[1], 10);
-            const minute = parseInt(parts[2], 10);
+            const hour = Number.parseInt(parts[1], 10);
+            const minute = Number.parseInt(parts[2], 10);
 
-            if (!isNaN(hour) && !isNaN(minute)) {
+            if (!Number.isNaN(hour) && !Number.isNaN(minute)) {
                 return { hour, minute };
             }
         }
