@@ -44,9 +44,12 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         hospitalId?: string;
     }>();
 
-    // Determine booking type
-    const isServiceMedicalBooking = !!serviceMedicalId;
-    const isHospitalBooking = !!hospitalId;
+    // Get booking flow type from Redux (supports both URL params and programmatic booking)
+    const bookingFlowType = useAppSelector((state) => state.booking.bookingFlowType);
+
+    // Determine booking type - check Redux first, then fall back to URL params
+    const isServiceMedicalBooking = bookingFlowType === 'service' || !!serviceMedicalId;
+    const isHospitalBooking = bookingFlowType === 'hospital' || !!hospitalId;
 
     // Get entity info based on booking type (already fetched in DateTimeSection)
     const doctorInfo = useDoctorInfo();

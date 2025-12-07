@@ -133,7 +133,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     const [activeTabs, setActiveTabs] = useState<Record<string, 'doctor' | 'hospital'>>({});
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [miniBooking, setMiniBooking] = useState<{
-        doctorId: string;
+        doctorId?: string;
+        hospitalId?: string;
         messageId: string;
         appointmentType: AppointmentType;
     } | null>(null);
@@ -196,13 +197,14 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         type: 'doctor' | 'hospital',
         options?: { appointmentType?: AppointmentType }
     ) => {
+        // Find the latest AI message with suggestions to attach mini booking
+        const lastMsgWithSuggestions = [...messages]
+            .reverse()
+            .find((m) => m.sender === 'ai' && m.suggestions && m.suggestions.length > 0);
+        const messageId = lastMsgWithSuggestions?.id || (messages[messages.length - 1]?.id ?? '');
+
         if (type === 'doctor' && suggestionId) {
-            // Show inline booking below the latest AI message that has suggestions
-            const lastMsgWithSuggestions = [...messages]
-                .reverse()
-                .find((m) => m.sender === 'ai' && m.suggestions && m.suggestions.length > 0);
-            const messageId =
-                lastMsgWithSuggestions?.id || (messages[messages.length - 1]?.id ?? '');
+            // Show inline booking for doctor
             setMiniBooking({
                 doctorId: suggestionId,
                 messageId,
@@ -210,9 +212,16 @@ const ChatArea: React.FC<ChatAreaProps> = ({
             });
             return;
         }
-        // For hospital suggestions, fall back to message prompt
-        const supportMessage = `Tôi cần hỗ trợ đặt lịch khám tại bệnh viện này`;
-        setInputValue(supportMessage);
+
+        if (type === 'hospital' && suggestionId) {
+            // Show inline booking for hospital
+            setMiniBooking({
+                hospitalId: suggestionId,
+                messageId,
+                appointmentType: options?.appointmentType ?? AppointmentType.IN_PERSON,
+            });
+            return;
+        }
     };
 
     const handleConsultMore = () => {
@@ -377,6 +386,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                 {miniBooking && miniBooking.messageId === message.id && (
                                     <MiniBookingInline
                                         doctorId={miniBooking.doctorId}
+                                        hospitalId={miniBooking.hospitalId}
                                         appointmentType={miniBooking.appointmentType}
                                         onClose={() => {
                                             setMiniBooking(null);

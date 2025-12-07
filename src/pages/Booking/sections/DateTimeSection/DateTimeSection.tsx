@@ -258,25 +258,57 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     // Minimum hours buffer before appointment (patient needs time to prepare and travel)
     const MIN_HOURS_BUFFER = 2;
 
+    // State to trigger re-calculation of time-based filtering
+    // This ensures slots are filtered based on current time when component mounts
+    const [currentTimeKey, setCurrentTimeKey] = useState(() => Date.now());
+
+    // Update currentTimeKey when date changes to force re-filter
+    useEffect(() => {
+        setCurrentTimeKey(Date.now());
+    }, [selectedDate]);
+
     // Filter out past time slots when selected date is today
     // This ensures users can only book slots that are at least MIN_HOURS_BUFFER hours from now
     const effectiveScheduleCategories = useMemo(() => {
         if (!selectedDate) return rawScheduleCategories;
 
-        const today = new Date();
-        const selectedDateObj = new Date(selectedDate);
+        const now = new Date();
 
-        // Check if selected date is today
-        const isToday =
-            today.getFullYear() === selectedDateObj.getFullYear() &&
-            today.getMonth() === selectedDateObj.getMonth() &&
-            today.getDate() === selectedDateObj.getDate();
+        // Get today's date string in YYYY-MM-DD format (local timezone)
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+        // Handle different selectedDate formats: "YYYY-MM-DD" or "DD/MM/YYYY" or ISO string
+        let normalizedSelectedDate = selectedDate;
+
+        // If selectedDate contains 'T' (ISO format), extract date part
+        if (selectedDate.includes('T')) {
+            normalizedSelectedDate = selectedDate.split('T')[0];
+        }
+        // If selectedDate is in DD/MM/YYYY format, convert to YYYY-MM-DD
+        else if (selectedDate.includes('/')) {
+            const parts = selectedDate.split('/');
+            if (parts.length === 3) {
+                normalizedSelectedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            }
+        }
+
+        const isToday = normalizedSelectedDate === todayStr;
 
         // If not today, return all slots
         if (!isToday) return rawScheduleCategories;
 
         // Calculate minimum allowed time (current time + buffer)
-        const minAllowedTime = new Date(today.getTime() + MIN_HOURS_BUFFER * 60 * 60 * 1000);
+        const minAllowedTime = new Date(now.getTime() + MIN_HOURS_BUFFER * 60 * 60 * 1000);
+
+        // Check if minAllowedTime is tomorrow (crossed midnight)
+        // If so, no slots today are valid
+        const minAllowedDateStr = `${minAllowedTime.getFullYear()}-${String(minAllowedTime.getMonth() + 1).padStart(2, '0')}-${String(minAllowedTime.getDate()).padStart(2, '0')}`;
+
+        if (minAllowedDateStr !== todayStr) {
+            // minAllowedTime is tomorrow, so no slots today are valid
+            return [];
+        }
+
         const minHours = minAllowedTime.getHours();
         const minMinutes = minAllowedTime.getMinutes();
 
@@ -289,13 +321,14 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                     const [slotHours, slotMinutes] = slot.startTime.split(':').map(Number);
 
                     // Compare with minimum allowed time
-                    if (slotHours > minHours) return true;
-                    if (slotHours === minHours && slotMinutes >= minMinutes) return true;
-                    return false;
+                    return (
+                        slotHours > minHours ||
+                        (slotHours === minHours && slotMinutes >= minMinutes)
+                    );
                 }),
             }))
-            .filter((category) => category.timeSlots.length > 0); // Remove empty categories
-    }, [rawScheduleCategories, selectedDate]);
+            .filter((category) => category.timeSlots.length > 0);
+    }, [rawScheduleCategories, selectedDate, currentTimeKey]);
 
     // Get info using custom hooks based on booking type
     const doctorInfo = useDoctorInfo();

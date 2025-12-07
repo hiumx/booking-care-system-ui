@@ -13,18 +13,31 @@ import typingStyles from '../TypingIndicator/TypingIndicator.module.scss';
 import DateTimeSection from '@/pages/Booking/sections/DateTimeSection';
 import BasicInfoSection from '@/pages/Booking/sections/BasicInfoSection';
 import PaymentSection from '@/pages/Booking/sections/PaymentSection';
+import SpecialtyServiceSection from '@/pages/Booking/sections/SpecialtyServiceSection';
+import AppointmentTypeSection from '@/pages/Booking/sections/AppointmentTypeSection';
 import PaymentService, { CreatePaymentRequest } from '@/services/payment.service';
-import { setAppointmentType, setCreatedAppointmentId } from '@/store/slices/bookingSlice';
+import {
+    setAppointmentType,
+    setCreatedAppointmentId,
+    setBookingFlowType,
+    setHospitalId,
+} from '@/store/slices/bookingSlice';
+import { getHospitalByIdAsync } from '@/store/slices/hospitalSlice';
 import styles from '../../ChatArea.module.scss';
 
+// Booking flow type for mini booking
+type MiniBookingFlowType = 'doctor' | 'hospital';
+
 interface MiniBookingInlineProps {
-    doctorId: string;
+    doctorId?: string;
+    hospitalId?: string;
     onClose: () => void;
     appointmentType?: AppointmentType;
 }
 
 const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
     doctorId,
+    hospitalId,
     onClose,
     appointmentType = AppointmentType.IN_PERSON,
 }) => {
@@ -34,26 +47,108 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
     const userState = useSelector((state: RootState) => state.user);
     const doctorState = useSelector((state: RootState) => state.doctor);
     const scheduleState = useSelector((state: RootState) => state.schedule);
+    const bookingState = useSelector((state: RootState) => state.booking);
+    const hospitalState = useSelector((state: RootState) => state.hospital);
+    const hospitalData = hospitalState.selectedHospital;
+    const isLoadingHospital = hospitalState.isLoading;
 
-    type Step = 'datetime' | 'basic' | 'payment';
+    // Determine booking flow type
+    const flowType: MiniBookingFlowType = hospitalId ? 'hospital' : 'doctor';
+    const isHospitalBooking = flowType === 'hospital';
 
-    const [currentStep, setCurrentStep] = useState<Step>('datetime');
+    // Steps for different flows
+    type DoctorStep = 'datetime' | 'basic' | 'payment';
+    type HospitalStep = 'specialty' | 'appointmentType' | 'datetime' | 'basic' | 'payment';
+    type Step = DoctorStep | HospitalStep;
+
+    const [currentStep, setCurrentStep] = useState<Step>(
+        isHospitalBooking ? 'specialty' : 'datetime'
+    );
     const [isGuideTyping, setIsGuideTyping] = useState(true);
-    const [guideText, setGuideText] = useState<string>('Mời bạn chọn ngày và khung giờ phù hợp');
+    const [guideText, setGuideText] = useState<string>(
+        isHospitalBooking
+            ? 'Mời bạn chọn chuyên khoa hoặc dịch vụ'
+            : 'Mời bạn chọn ngày và khung giờ phù hợp'
+    );
     const [showStep, setShowStep] = useState(false);
 
+    // Initialize booking flow
     useEffect(() => {
         dispatch(setAppointmentType(appointmentType));
+
+        if (isHospitalBooking && hospitalId) {
+            dispatch(setBookingFlowType('hospital'));
+            dispatch(setHospitalId(hospitalId));
+            // Fetch hospital data
+            dispatch(getHospitalByIdAsync(hospitalId) as any)
+                .unwrap()
+                .catch((error: any) => {
+                    console.error('Error fetching hospital:', error);
+                    toast.error('Không thể tải thông tin bệnh viện');
+                });
+        } else if (doctorId) {
+            dispatch(setBookingFlowType('doctor'));
+        }
+
         return () => {
             dispatch(setAppointmentType(AppointmentType.IN_PERSON));
         };
-    }, [appointmentType, dispatch]);
+    }, [appointmentType, dispatch, isHospitalBooking, hospitalId, doctorId]);
 
     // Build AI guide text per step
     const getGuideText = (step: Step): string => {
+        if (step === 'specialty') return 'Mời bạn chọn chuyên khoa hoặc dịch vụ';
+        if (step === 'appointmentType') return 'Chọn hình thức khám và bác sĩ (nếu có)';
         if (step === 'datetime') return 'Mời bạn chọn ngày và khung giờ phù hợp';
         if (step === 'basic') return 'Vui lòng xác nhận thông tin người khám';
         return 'Chọn phương thức thanh toán để hoàn tất đặt lịch';
+    };
+
+    // Helper function to get consultation fee based on appointment type
+    const getConsultationFee = (): number | undefined => {
+        // Hospital booking flow
+        if (isHospitalBooking) {
+            const currentAppointmentType =
+                bookingState.appointmentType || AppointmentType.IN_PERSON;
+            const serviceTypeName =
+                currentAppointmentType === AppointmentType.IN_PERSON
+                    ? 'Khám trực tiếp'
+                    : 'Tư vấn trực tuyến';
+
+            // If doctor is selected, get price from doctor
+            if (bookingState.selectedDoctorId && doctorState.selectedDoctor?.prices) {
+                const price = doctorState.selectedDoctor.prices.find(
+                    (p) => p.serviceTypeName === serviceTypeName
+                );
+                return price?.amount;
+            }
+
+            // If service is selected (no doctor), get price from hospital's service
+            if (bookingState.selectedServiceMedicalId && hospitalData) {
+                const service = hospitalData.serviceMedicals?.find(
+                    (s) => s.id === bookingState.selectedServiceMedicalId
+                );
+                return service?.price;
+            }
+
+            return undefined;
+        }
+
+        // Direct doctor booking
+        if (doctorId && doctorState.selectedDoctor?.prices) {
+            const currentAppointmentType =
+                bookingState.appointmentType || AppointmentType.IN_PERSON;
+            const serviceTypeName =
+                currentAppointmentType === AppointmentType.IN_PERSON
+                    ? 'Khám trực tiếp'
+                    : 'Tư vấn trực tuyến';
+            const price = doctorState.selectedDoctor.prices.find(
+                (p) => p.serviceTypeName === serviceTypeName
+            );
+            return price?.amount;
+        }
+
+        return undefined;
     };
 
     useEffect(() => {
@@ -67,6 +162,19 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
         }, 2000);
         return () => clearTimeout(t);
     }, [currentStep]);
+
+    // Hospital flow step handlers
+    const handleContinueFromSpecialty = () => {
+        if (!bookingState.selectedSpecialtyId && !bookingState.selectedServiceMedicalId) {
+            toast.warn('Vui lòng chọn chuyên khoa hoặc dịch vụ');
+            return;
+        }
+        setCurrentStep('appointmentType');
+    };
+
+    const handleContinueFromAppointmentType = () => {
+        setCurrentStep('datetime');
+    };
 
     const handleContinueFromDateTime = () => {
         if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0) {
@@ -82,7 +190,8 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
 
     const ensureAppointmentCreated = async (skipPayment: boolean) => {
         if (!profile?.id) throw new Error('Vui lòng đăng nhập');
-        if (!doctorId) throw new Error('Thiếu thông tin bác sĩ');
+        if (!isHospitalBooking && !doctorId) throw new Error('Thiếu thông tin bác sĩ');
+        if (isHospitalBooking && !hospitalId) throw new Error('Thiếu thông tin bệnh viện');
         if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0)
             throw new Error('Vui lòng chọn ngày và khung giờ');
 
@@ -91,17 +200,48 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
             startTime: firstSlot.startTime,
             endTime: firstSlot.endTime,
         });
-        const request = createAppointmentRequest({
+
+        // Get consultation fee
+        const amount = getConsultationFee();
+
+        // Base request params
+        const baseParams = {
             patientId: profile.id,
-            doctorId: doctorId,
-            specialtyId: doctorState.selectedDoctor?.specialtyId,
+            patientAccountId: profile.accountId,
             appointmentDate: scheduleState.selectedDate,
             appointmentTimeId,
-            hospitalId: doctorState.selectedDoctor?.hospital?.id,
-            appointmentType,
-            symptoms: '',
-            attachmentUrls: [],
-        });
+            appointmentType: bookingState.appointmentType || appointmentType,
+            symptoms: bookingState.symptoms || '',
+            attachmentUrls: bookingState.attachmentUrls || [],
+            amount,
+            // Include relativeId if booking for a relative
+            ...(bookingState.isBookingForRelative &&
+                bookingState.relativeId && {
+                    relativeId: bookingState.relativeId,
+                }),
+        };
+
+        let request;
+
+        if (isHospitalBooking) {
+            // Hospital booking flow
+            request = createAppointmentRequest({
+                ...baseParams,
+                hospitalId: hospitalId,
+                specialtyId: bookingState.selectedSpecialtyId || undefined,
+                serviceId: bookingState.selectedServiceMedicalId || undefined,
+                doctorId: bookingState.selectedDoctorId || undefined,
+            });
+        } else {
+            // Doctor booking flow
+            request = createAppointmentRequest({
+                ...baseParams,
+                doctorId: doctorId,
+                specialtyId: doctorState.selectedDoctor?.specialty?.id,
+                hospitalId: doctorState.selectedDoctor?.hospital?.id,
+            });
+        }
+
         const response = await AppointmentService.createAppointment({
             ...request,
             skipPayment,
@@ -116,34 +256,83 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
 
     // Helpers to reuse Booking sections
     const getStepTitle = (step: Step): string => {
+        if (step === 'specialty') return 'Chọn chuyên khoa / dịch vụ';
+        if (step === 'appointmentType') return 'Chọn hình thức khám';
         if (step === 'datetime') return 'Chọn ngày và giờ';
         if (step === 'basic') return 'Xác nhận thông tin người khám';
         return 'Thanh toán';
     };
 
     const nextStep = () => {
-        if (currentStep === 'datetime') handleContinueFromDateTime();
+        if (currentStep === 'specialty') handleContinueFromSpecialty();
+        else if (currentStep === 'appointmentType') handleContinueFromAppointmentType();
+        else if (currentStep === 'datetime') handleContinueFromDateTime();
         else if (currentStep === 'basic') handleContinueFromBasic();
     };
+
     const prevStep = () => {
-        if (currentStep === 'payment') setCurrentStep('basic');
-        else if (currentStep === 'basic') setCurrentStep('datetime');
+        if (isHospitalBooking) {
+            if (currentStep === 'payment') setCurrentStep('basic');
+            else if (currentStep === 'basic') setCurrentStep('datetime');
+            else if (currentStep === 'datetime') setCurrentStep('appointmentType');
+            else if (currentStep === 'appointmentType') setCurrentStep('specialty');
+        } else {
+            if (currentStep === 'payment') setCurrentStep('basic');
+            else if (currentStep === 'basic') setCurrentStep('datetime');
+        }
+    };
+
+    // Get hospitalId for payment based on flow type
+    const getPaymentHospitalId = (): string | undefined => {
+        if (isHospitalBooking) {
+            return hospitalId;
+        }
+        return doctorState.selectedDoctor?.hospital?.id;
     };
 
     const renderStepContent = () => {
+        // Hospital booking: specialty selection step
+        if (currentStep === 'specialty' && isHospitalBooking) {
+            return (
+                <SpecialtyServiceSection
+                    nextStep={nextStep}
+                    prevStep={prevStep}
+                    hospitalData={hospitalData}
+                    isLoading={isLoadingHospital}
+                />
+            );
+        }
+
+        // Hospital booking: appointment type selection step
+        if (currentStep === 'appointmentType' && isHospitalBooking) {
+            return (
+                <AppointmentTypeSection
+                    nextStep={nextStep}
+                    prevStep={prevStep}
+                    hospitalData={hospitalData}
+                />
+            );
+        }
+
+        // DateTime step (both flows)
         if (currentStep === 'datetime') {
             return (
                 <DateTimeSection
                     nextStep={nextStep}
                     prevStep={prevStep}
-                    doctorId={doctorId}
-                    hidePrev={true}
+                    doctorId={isHospitalBooking ? undefined : doctorId}
+                    hospitalId={isHospitalBooking ? hospitalId : undefined}
+                    hidePrev={!isHospitalBooking}
                 />
             );
         }
+
+        // Basic info step (both flows)
         if (currentStep === 'basic') {
             return <BasicInfoSection nextStep={nextStep} prevStep={prevStep} />;
         }
+
+        // Payment step (both flows)
         return (
             <PaymentSection
                 nextStep={nextStep}
@@ -158,7 +347,7 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
                         const paymentRequest: CreatePaymentRequest = {
                             appointmentId,
                             patientId: userState.profile!.id,
-                            hospitalId: doctorState.selectedDoctor?.hospital?.id,
+                            hospitalId: getPaymentHospitalId(),
                             amount: depositAmount,
                             paymentMethodId,
                         };
