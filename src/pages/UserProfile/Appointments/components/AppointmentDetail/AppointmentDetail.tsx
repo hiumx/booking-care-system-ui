@@ -12,6 +12,7 @@ import {
     getDisplayLabel,
     getDisplayFeeText,
     isServiceAppointment,
+    getRebookingUrl,
 } from '@/types/appointment.types';
 import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
 
@@ -20,7 +21,6 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     onStartSession,
     onCancel,
     onReschedule,
-    onDownloadPrescription,
 }) => {
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -55,7 +55,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     showDownloadPrescription: false,
                     showCancelButton: true,
                     showReasonLink: false,
-                    bottomSection: 'start_session',
+                    bottomSection: 'none',
                 };
             case AppointmentStatus.CANCELLED:
                 return {
@@ -148,33 +148,24 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     <li>
                         <div className="detail-badge-info">
                             <span className="badge bg-soft-red me-2">Trạng thái: Đặt lại lịch</span>
-                            <button
-                                type="button"
+                            <Link
+                                to={getRebookingUrl(appointment)}
                                 className="reschedule-btn btn btn-primary-gradient rounded-pill"
-                                onClick={() => onReschedule?.()}
                             >
                                 Đặt Lại Lịch Hẹn
-                            </button>
+                            </Link>
                         </div>
                     </li>
                 );
             case 'prescription_reschedule':
                 return (
                     <li className="detail-badge-info">
-                        <button
-                            type="button"
-                            className="btn btn-light rounded-pill me-3"
-                            onClick={onDownloadPrescription}
-                        >
-                            Tải Đơn Thuốc
-                        </button>
-                        <button
-                            type="button"
+                        <Link
+                            to={getRebookingUrl(appointment)}
                             className="btn reschedule-btn btn-primary-gradient rounded-pill"
-                            onClick={() => onReschedule?.()}
                         >
                             Đặt Lại Lịch Hẹn
-                        </button>
+                        </Link>
                     </li>
                 );
             default:
@@ -195,10 +186,32 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                                     alt={getDisplayLabel(appointment)}
                                 />
                             </Link>
-                            <div className="patient-info">
+                            <div
+                                className="patient-info"
+                                style={{
+                                    maxWidth: '280px',
+                                    flex: '0 0 280px',
+                                }}
+                            >
                                 <p>{getDisplayLabel(appointment)}</p>
-                                <h6>
-                                    <Link to="#">{getDisplayName(appointment)}</Link>
+                                <h6
+                                    style={{
+                                        whiteSpace: 'normal',
+                                        wordBreak: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        lineHeight: 1.4,
+                                    }}
+                                >
+                                    <Link
+                                        to="#"
+                                        style={{
+                                            whiteSpace: 'normal',
+                                            wordBreak: 'break-word',
+                                            display: 'inline',
+                                        }}
+                                    >
+                                        {getDisplayName(appointment)}
+                                    </Link>
                                 </h6>
                                 {config.showContactInfo && (
                                     <div className="mail-info-patient">
