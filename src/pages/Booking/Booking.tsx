@@ -312,7 +312,8 @@ const Booking: React.FC = () => {
     // Handle appointment creation and payment (Option 1: Deposit)
     const handleCreateAppointmentAndPayment = async (
         paymentMethodId: string,
-        depositAmount: number
+        depositAmount: number,
+        discountCode?: string
     ) => {
         if (!userState.profile?.id) {
             toast.error('Không tìm thấy thông tin người dùng');
@@ -347,6 +348,7 @@ const Booking: React.FC = () => {
                 hospitalId: paymentHospitalId,
                 amount: depositAmount,
                 paymentMethodId,
+                discountCode, // Add discount code to payment request
             };
 
             const paymentResponse = await PaymentService.createAppointmentPayment(paymentRequest);

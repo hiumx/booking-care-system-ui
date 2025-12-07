@@ -23,6 +23,7 @@ export interface CreatePaymentRequest {
     hospitalId?: string;
     amount: number;
     paymentMethodId: string;
+    discountCode?: string;
 }
 
 export interface Payment {

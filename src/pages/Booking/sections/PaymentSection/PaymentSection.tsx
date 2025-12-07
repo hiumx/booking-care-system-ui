@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom';
 import { selectSelectedDate, selectSelectedSlots } from '@/store/selectors/schedule.selectors';
 import TimeSlotBadge from '../../components/TimeSlotBadge';
 import PaymentService, { PaymentMethod } from '@/services/payment.service';
+import DiscountService from '@/services/discount.service';
 import { toast } from 'react-toastify';
 import { AppointmentType } from '@/enums/appointment.enums';
 
@@ -18,7 +19,8 @@ interface PaymentSectionProps {
     isCreatingAppointment?: boolean;
     onCreateAppointmentAndPayment: (
         paymentMethodId: string,
-        depositAmount: number
+        depositAmount: number,
+        discountCode?: string
     ) => Promise<void>;
     onCreateAppointmentOnly?: () => Promise<void>; // New: Create appointment without payment
     isProcessingPayment?: boolean;
@@ -91,6 +93,15 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const [selectedPayment, setSelectedPayment] = useState<string>('');
     const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(true);
+
+    // Discount state
+    const [discountCode, setDiscountCode] = useState<string>('');
+    const [appliedDiscount, setAppliedDiscount] = useState<{
+        code: string;
+        discountAmount: number;
+        finalAmount: number;
+    } | null>(null);
+    const [isValidatingDiscount, setIsValidatingDiscount] = useState(false);
 
     // Payment option state (new business requirement)
     // For specialty booking, default to 'no-payment' since there's no price yet
@@ -248,6 +259,52 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         ? supplementaryAmount
         : Math.round(TOTAL_AMOUNT * DEPOSIT_PERCENTAGE);
 
+    // Final amount after discount
+    const FINAL_AMOUNT = appliedDiscount ? appliedDiscount.finalAmount : DEPOSIT_AMOUNT;
+
+    // Handle discount code validation
+    const handleValidateDiscount = async () => {
+        if (!discountCode.trim()) {
+            toast.warning('Vui lòng nhập mã giảm giá');
+            return;
+        }
+
+        if (!hospitalId) {
+            toast.error('Không tìm thấy thông tin bệnh viện');
+            return;
+        }
+
+        setIsValidatingDiscount(true);
+        try {
+            const result = await DiscountService.validateDiscount(discountCode.trim(), {
+                hospitalId,
+                totalAmount: DEPOSIT_AMOUNT,
+            });
+
+            if (result.isValid) {
+                setAppliedDiscount({
+                    code: discountCode.trim(),
+                    discountAmount: result.appliedAmount,
+                    finalAmount: result.finalAmount,
+                });
+                toast.success('Áp dụng mã giảm giá thành công!');
+            } else {
+                toast.error(result.message || 'Mã giảm giá không hợp lệ');
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Không thể xác thực mã giảm giá');
+        } finally {
+            setIsValidatingDiscount(false);
+        }
+    };
+
+    // Handle remove discount
+    const handleRemoveDiscount = () => {
+        setAppliedDiscount(null);
+        setDiscountCode('');
+        toast.info('Đã hủy mã giảm giá');
+    };
+
     // Handle next step based on selected payment option
     const handleNextStep = async () => {
         if (isCreatingAppointment || isProcessingPayment) {
@@ -274,8 +331,12 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                 return;
             }
 
-            // Call parent handler with payment method and deposit amount
-            await onCreateAppointmentAndPayment(selectedPayment, DEPOSIT_AMOUNT);
+            // Call parent handler with payment method, deposit amount, and discount code (if applied)
+            await onCreateAppointmentAndPayment(
+                selectedPayment,
+                FINAL_AMOUNT,
+                appliedDiscount?.code
+            );
         }
         // Option 2: No payment (create appointment only)
         else if (paymentOption === 'no-payment') {
@@ -840,6 +901,77 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                     <div className="pt-3 border-top booking-more-info">
                                         <h6 className="mb-3">Thông tin thanh toán</h6>
                                         {renderPaymentAmountDetails()}
+
+                                        {/* Discount Code Section */}
+                                        {paymentOption === 'deposit' && !isSupplementaryPayment && (
+                                            <div className="mt-3">
+                                                <div className="discount-section">
+                                                    <label className="form-label fw-medium">
+                                                        <i className="bi bi-tag me-2"></i>
+                                                        Mã giảm giá
+                                                    </label>
+                                                    {!appliedDiscount ? (
+                                                        <div className="input-group">
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                placeholder="Nhập mã giảm giá"
+                                                                value={discountCode}
+                                                                onChange={(e) =>
+                                                                    setDiscountCode(
+                                                                        e.target.value.toUpperCase()
+                                                                    )
+                                                                }
+                                                                disabled={isValidatingDiscount}
+                                                            />
+                                                            <button
+                                                                className="btn btn-outline-primary"
+                                                                type="button"
+                                                                onClick={handleValidateDiscount}
+                                                                disabled={
+                                                                    isValidatingDiscount ||
+                                                                    !discountCode.trim()
+                                                                }
+                                                            >
+                                                                {isValidatingDiscount ? (
+                                                                    <>
+                                                                        <span
+                                                                            className="spinner-border spinner-border-sm me-2"
+                                                                            role="status"
+                                                                            aria-hidden="true"
+                                                                        ></span>
+                                                                        Đang kiểm tra...
+                                                                    </>
+                                                                ) : (
+                                                                    'Áp dụng'
+                                                                )}
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="alert alert-success d-flex justify-content-between align-items-center mb-0">
+                                                            <div>
+                                                                <i className="bi bi-check-circle me-2"></i>
+                                                                <strong>
+                                                                    {appliedDiscount.code}
+                                                                </strong>{' '}
+                                                                - Giảm{' '}
+                                                                {appliedDiscount.discountAmount.toLocaleString(
+                                                                    'vi-VN'
+                                                                )}{' '}
+                                                                đ
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-sm btn-outline-danger"
+                                                                onClick={handleRemoveDiscount}
+                                                            >
+                                                                <i className="bi bi-x-lg"></i>
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                     {TOTAL_AMOUNT > 0 && (
                                         <div className="bg-primary d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between p-3 rounded">
@@ -849,7 +981,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                     : 'Số tiền thanh toán'}
                                             </h6>
                                             <h6 className="text-white">
-                                                {DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ
+                                                {FINAL_AMOUNT.toLocaleString('vi-VN')} đ
                                             </h6>
                                         </div>
                                     )}
