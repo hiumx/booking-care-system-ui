@@ -1,0 +1,92 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 150px;
+}
+
+.bannerAds {
+    position: relative;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.adBadge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 10;
+    text-transform: uppercase;
+}
+
+.bannerImage {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+}
+
+.mapContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-height: 400px;
+}
+
+.mapHeader {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+
+    h5 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+}
+
+.mapBody {
+    flex: 1;
+    position: relative;
+    min-height: 400px;
+}
+
+.mapIframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    min-height: 400px;
+}
+
+@media (max-width: 992px) {
+    .sidebar {
+        position: static;
+        margin-top: 30px;
+    }
+
+    .mapContainer {
+        min-height: 300px;
+    }
+
+    .mapBody {
+        min-height: 300px;
+    }
+
+    .mapIframe {
+        min-height: 300px;
+    }
+}

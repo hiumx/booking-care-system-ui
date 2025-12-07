@@ -138,6 +138,7 @@ export interface DoctorSearchParams {
     hospitalFilters?: string[]; // Support multiple hospital filters
     languageFilter?: string;
     languageFilters?: string[]; // Support multiple language filters
+    languageIds?: string[]; // Explicit language IDs (preferred)
     serviceTypeFilter?: string;
     serviceTypeFilters?: string[]; // Support multiple service type filters
     priceRange?: {

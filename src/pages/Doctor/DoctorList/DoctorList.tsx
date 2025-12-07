@@ -65,6 +65,7 @@ const DoctorList: React.FC = () => {
     const experienceMinFromUrl = searchParams.get('experienceMin');
     const experienceMaxFromUrl = searchParams.get('experienceMax');
     const languageIdsFromUrl = searchParams.getAll('languageId');
+    const genderIdsFromUrl = searchParams.getAll('gender');
     const provinceIdFromUrl = searchParams.get('provinceId');
     const districtIdFromUrl = searchParams.get('districtId');
     const provinceNameFromUrl = searchParams.get('provinceName');
@@ -222,17 +223,14 @@ const DoctorList: React.FC = () => {
     };
 
     const initializeLanguageFilter = () => {
-        if (languageIdsFromUrl && languageIdsFromUrl.length > 0 && languages.length > 0) {
-            const languageNames = languageIdsFromUrl
-                .map((id) => {
-                    const language = languages.find((lang) => lang.id === id);
-                    return language ? language.name : null;
-                })
-                .filter((name): name is string => name !== null);
+        if (languageIdsFromUrl && languageIdsFromUrl.length > 0) {
+            setLanguageFilters(languageIdsFromUrl);
+        }
+    };
 
-            if (languageNames.length > 0) {
-                setLanguageFilters(languageNames);
-            }
+    const initializeGenderFilter = () => {
+        if (genderIdsFromUrl && genderIdsFromUrl.length > 0) {
+            setGenderFilters(genderIdsFromUrl);
         }
     };
 
@@ -249,15 +247,27 @@ const DoctorList: React.FC = () => {
 
     // Initialize all filters from URL params - ONLY ONCE
     useEffect(() => {
-        if (!hasInitializedUrlFilters.current) {
-            initializeBasicFilters();
-            initializeServiceTypeFilter();
-            initializeRatingFilter();
-            initializeRangeFilter();
-            initializeLanguageFilter();
-            initializeAreaFilter();
-            hasInitializedUrlFilters.current = true;
+        if (hasInitializedUrlFilters.current) {
+            return;
         }
+
+        // Đợi dữ liệu cần thiết trước khi khởi tạo các bộ lọc phụ thuộc vào API
+        const needsServiceTypes = Boolean(serviceTypeFromUrl) && serviceTypes.length === 0;
+        const needsLanguages =
+            languageIdsFromUrl && languageIdsFromUrl.length > 0 && languages.length === 0;
+
+        if (needsServiceTypes || needsLanguages) {
+            return;
+        }
+
+        initializeBasicFilters();
+        initializeServiceTypeFilter();
+        initializeRatingFilter();
+        initializeRangeFilter();
+        initializeLanguageFilter();
+        initializeGenderFilter();
+        initializeAreaFilter();
+        hasInitializedUrlFilters.current = true;
     }, [
         specialtyIdFromUrl,
         hospitalIdFromUrl,
@@ -272,6 +282,7 @@ const DoctorList: React.FC = () => {
         experienceMaxFromUrl,
         languageIdsFromUrl,
         languages,
+        genderIdsFromUrl,
         provinceIdFromUrl,
         districtIdFromUrl,
         provinceNameFromUrl,
@@ -404,6 +415,9 @@ const DoctorList: React.FC = () => {
 
     // Helper function to check if we should wait for languages
     const shouldWaitForLanguages = () => {
+        // Only wait if we're still initializing from URL (not when user is changing filters)
+        if (hasInitializedUrlFilters.current) return false;
+
         if (!languageIdsFromUrl || languageIdsFromUrl.length === 0) return false;
         const isLanguagesLoaded = languages.length > 0;
         const isLanguageFilterSet = languageFilters.length > 0;
@@ -784,6 +798,7 @@ const DoctorList: React.FC = () => {
         } else {
             setGenderFilter(undefined);
         }
+        updateURLParams({ gender, pageNumber: 1 });
         setCurrentPage(1);
     };
 
@@ -821,16 +836,14 @@ const DoctorList: React.FC = () => {
         newParams.set('pageSize', String(pageSize));
         setSearchParams(newParams, { replace: true });
 
+        // Reset lastSearchParamsRef to ensure API is called when filter changes
+        lastSearchParamsRef.current = '';
+
         setCurrentPage(1);
     };
 
     const handleLanguageFilters = (languageIds: string[]) => {
-        // Convert language IDs to names using Redux store
-        const languageNames = languageIds.map((id) => {
-            const language = languages.find((lang) => lang.id === id);
-            return language ? language.name : id;
-        });
-        setLanguageFilters(languageNames);
+        setLanguageFilters(languageIds);
 
         // Update URL with multiple languageId params
         const newParams = new URLSearchParams(searchParams);
@@ -841,6 +854,9 @@ const DoctorList: React.FC = () => {
         newParams.set('pageNumber', '1');
         newParams.set('pageSize', String(pageSize));
         setSearchParams(newParams, { replace: true });
+
+        // Reset lastSearchParamsRef to ensure API is called when filter changes
+        lastSearchParamsRef.current = '';
 
         setCurrentPage(1);
     };
@@ -856,6 +872,10 @@ const DoctorList: React.FC = () => {
             serviceTypeId: serviceTypeIds.length > 0 ? serviceTypeIds[0] : null,
             pageNumber: 1,
         });
+
+        // Reset lastSearchParamsRef to ensure API is called when filter changes
+        lastSearchParamsRef.current = '';
+
         setCurrentPage(1);
     };
 
@@ -880,6 +900,10 @@ const DoctorList: React.FC = () => {
                 pageNumber: 1,
             });
         }
+
+        // Reset lastSearchParamsRef to ensure API is called when filter changes
+        lastSearchParamsRef.current = '';
+
         setCurrentPage(1);
     };
 
@@ -916,6 +940,18 @@ const DoctorList: React.FC = () => {
         } else {
             setGenderFilters([]);
         }
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('gender');
+        for (const gender of genders) {
+            newParams.append('gender', gender);
+        }
+        newParams.set('pageNumber', '1');
+        newParams.set('pageSize', String(pageSize));
+        setSearchParams(newParams, { replace: true });
+
+        // Reset lastSearchParamsRef to ensure API is called when filter changes
+        lastSearchParamsRef.current = '';
+
         setCurrentPage(1);
     };
 
@@ -1055,14 +1091,12 @@ const DoctorList: React.FC = () => {
                                 {error ? (
                                     <div className="col-md-12 mb-4">
                                         <div
-                                            className="alert alert-danger border-0 shadow-sm rounded-3"
+                                            className="alert alert-danger border-0 shadow-sm rounded-3 text-center"
                                             role="alert"
                                         >
-                                            <div className="d-flex align-items-center mb-3">
-                                                <div className="flex-shrink-0 me-3">
-                                                    <i className="fas fa-exclamation-triangle fs-2 text-danger"></i>
-                                                </div>
-                                                <div className="flex-grow-1">
+                                            <div className="d-flex align-items-center justify-content-center mb-3">
+                                                <i className="fas fa-exclamation-triangle fs-2 text-danger me-3"></i>
+                                                <div>
                                                     <h4 className="alert-heading mb-1 fw-bold">
                                                         Không thể tải dữ liệu
                                                     </h4>
@@ -1070,7 +1104,7 @@ const DoctorList: React.FC = () => {
                                                 </div>
                                             </div>
                                             <hr className="my-3" />
-                                            <div className="d-flex gap-2 flex-wrap">
+                                            <div className="d-flex gap-2 flex-wrap justify-content-center">
                                                 <button
                                                     className="btn btn-primary btn-sm px-3 py-2 rounded-pill fw-semibold"
                                                     onClick={() => globalThis.location.reload()}
