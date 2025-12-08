@@ -22,11 +22,6 @@ export const selectDiscountValidationResult = createSelector(
     (discount) => discount.validationResult
 );
 
-export const selectDiscountUsageStats = createSelector(
-    [selectDiscountState],
-    (discount) => discount.usageStats
-);
-
 export const selectDiscountPagination = createSelector(
     [selectDiscountState],
     (discount) => discount.pagination
