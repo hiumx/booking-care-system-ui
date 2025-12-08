@@ -10,6 +10,19 @@ import DiscountService from '@/services/discount.service';
 import { toast } from 'react-toastify';
 import { AppointmentType } from '@/enums/appointment.enums';
 
+// Helper function to parse AppointmentTimeId (format: AT_08_00_09_00 -> { startTime: "08:00", endTime: "09:00" })
+const parseAppointmentTimeId = (timeId: string) => {
+    // Format: AT_08_00_09_00
+    const parts = timeId.split('_');
+    if (parts.length === 5 && parts[0] === 'AT') {
+        return {
+            startTime: `${parts[1]}:${parts[2]}`,
+            endTime: `${parts[3]}:${parts[4]}`,
+        };
+    }
+    return null;
+};
+
 interface PaymentSectionProps {
     nextStep: () => void;
     prevStep: () => void;
@@ -46,19 +59,6 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     // Get selected date and time slots (or use reschedule values if provided)
     const selectedDateFromRedux = useAppSelector(selectSelectedDate);
     const selectedSlotsFromRedux = useAppSelector(selectSelectedSlots);
-
-    // Helper function to parse AppointmentTimeId (format: AT_08_00_09_00 -> { startTime: "08:00", endTime: "09:00" })
-    const parseAppointmentTimeId = (timeId: string) => {
-        // Format: AT_08_00_09_00
-        const parts = timeId.split('_');
-        if (parts.length === 5 && parts[0] === 'AT') {
-            return {
-                startTime: `${parts[1]}:${parts[2]}`,
-                endTime: `${parts[3]}:${parts[4]}`,
-            };
-        }
-        return null;
-    };
 
     // Use reschedule date/time if provided (for staff-assigned flow with skipDateTime=true)
     const selectedDate = rescheduleAppointmentDate || selectedDateFromRedux;
