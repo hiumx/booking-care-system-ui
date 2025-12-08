@@ -248,17 +248,14 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
 
     // Get hospitalId from multiple sources based on booking flow
     const getHospitalId = (): string | undefined => {
-        // Priority 1: From URL params (hospital booking flow)
-        if (hospitalId) return hospitalId;
-
-        // Priority 2: From service medical state (service booking flow)
+        // Priority 1: From service medical state (service booking flow)
         if (serviceMedicalState?.hospitalId) return serviceMedicalState.hospitalId;
 
-        // Priority 3: From doctor state (doctor booking flow)
+        // Priority 2: From doctor state (doctor booking flow)
         if (doctorState.selectedDoctor?.hospital?.id)
             return doctorState.selectedDoctor?.hospital?.id;
 
-        // Priority 4: From hospital state (hospital booking flow with selected hospital)
+        // Priority 3: From hospital state (hospital booking flow with selected hospital)
         if (hospitalState.selectedHospital?.id) return hospitalState.selectedHospital.id;
 
         return undefined;
@@ -960,7 +957,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                                 disabled={isValidatingDiscount}
                                                             />
                                                             <button
-                                                                className="btn btn-outline-primary"
+                                                                className="btn btn-apply-discount"
                                                                 type="button"
                                                                 onClick={handleValidateDiscount}
                                                                 disabled={
@@ -978,7 +975,10 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                                         Đang kiểm tra...
                                                                     </>
                                                                 ) : (
-                                                                    'Áp dụng'
+                                                                    <>
+                                                                        <i className="bi bi-check-circle-fill me-1"></i>
+                                                                        Áp dụng
+                                                                    </>
                                                                 )}
                                                             </button>
                                                         </div>
@@ -997,10 +997,12 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                             </div>
                                                             <button
                                                                 type="button"
-                                                                className="btn btn-sm btn-outline-danger"
+                                                                className="btn-remove-discount"
                                                                 onClick={handleRemoveDiscount}
+                                                                title="Hủy mã giảm giá"
+                                                                aria-label="Hủy mã giảm giá"
                                                             >
-                                                                <i className="bi bi-x-lg"></i>
+                                                                ×
                                                             </button>
                                                         </div>
                                                     )}
@@ -1121,6 +1123,85 @@ const styles = `
     background-color: #007bff;
     border-color: #007bff;
 }
+
+/* Apply Discount Button Styles */
+.btn-apply-discount {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+    white-space: nowrap;
+}
+
+.btn-apply-discount:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+   
+}
+
+.btn-apply-discount:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 123, 255, 0.3);
+    
+}
+
+.btn-apply-discount:disabled {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    cursor: not-allowed;
+    opacity: 0.65;
+    box-shadow: none;
+    color: white !important;
+}
+
+.btn-apply-discount i {
+    font-size: 14px;
+}
+
+/* Remove Discount Button Styles */
+.btn-remove-discount {
+    background: transparent;
+    border: 2px solid #dc3545;
+    color: #dc3545;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.btn-remove-discount:hover {
+    background: #dc3545;
+    color: white;
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.btn-remove-discount:active {
+    transform: scale(0.95) rotate(90deg);
+    box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+}
+
+.btn-remove-discount i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+
+
+
 
 @media (max-width: 768px) {
     .payment-option-card {
