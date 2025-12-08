@@ -233,3 +233,136 @@ a {
         }
     }
 }
+
+/* Fix email/phone text overflow in appointment cards - wrap to new line when too long */
+.mail-info-patient {
+    ul {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            word-break: break-all;
+            max-width: 100%;
+
+            i {
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
+
+            a {
+                word-break: break-all;
+                overflow-wrap: break-word;
+                line-height: 1.4;
+            }
+        }
+    }
+}
+
+/* Fix patient info email in appointment detail card */
+/* Fix patient info email in appointment detail card */
+.appointment-detail-card {
+    .mail-info-patient {
+        ul {
+            flex-direction: column;
+            align-items: flex-start;
+
+            li {
+                display: flex;
+                align-items: flex-start;
+                gap: 0.5rem;
+                word-break: break-all;
+                max-width: 280px;
+
+                i {
+                    flex-shrink: 0;
+                    margin-top: 3px;
+                }
+            }
+        }
+    }
+
+    .patient-info {
+        max-width: 350px;
+
+        h6 {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            line-height: 1.4;
+
+            a {
+                word-break: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+            }
+        }
+    }
+
+    .patinet-information {
+        .patient-info {
+            max-width: 320px;
+        }
+    }
+
+    /* Fix appointment detail card layout - prevent name overflow */
+    > ul {
+        > li:first-child {
+            flex: 0 0 auto !important;
+            max-width: 350px !important;
+
+            .patinet-information {
+                max-width: 350px !important;
+
+                .patient-info {
+                    max-width: 220px !important;
+                    flex-shrink: 1;
+                }
+            }
+        }
+    }
+}
+
+/* Fix long hospital/doctor name wrapping */
+.patinet-information {
+    .patient-info {
+        max-width: 300px !important;
+
+        h6 {
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+            white-space: normal !important;
+            line-height: 1.4;
+
+            a {
+                word-break: break-word !important;
+                overflow-wrap: break-word !important;
+                display: inline;
+                white-space: normal !important;
+            }
+        }
+    }
+}
+
+/* Fix appointment card contact info section */
+.appointment-wrap {
+    .mail-info-patient {
+        max-width: 250px;
+
+        ul {
+            li {
+                max-width: 100%;
+
+                a {
+                    display: inline-block;
+                    max-width: 200px;
+                    word-break: break-all;
+                    line-height: 1.4;
+                }
+            }
+        }
+    }
+}

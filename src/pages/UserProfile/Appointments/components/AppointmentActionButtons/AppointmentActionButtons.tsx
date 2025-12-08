@@ -85,32 +85,35 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                 </li>
                 {/* Reschedule with same doctor - only show if has doctor */}
                 {appointment.doctorInfo?.id && (
-                    <li>
-                        <Link
-                            to="#"
-                            title="Đổi lịch với cùng bác sĩ"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                onReschedule?.(appointment, 'SAME_DOCTOR');
-                            }}
-                        >
-                            <i className="isax isax-calendar-edit"></i>
-                        </Link>
-                    </li>
+                    <>
+                        <li>
+                            <Link
+                                to="#"
+                                title="Đổi lịch với cùng bác sĩ"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    onReschedule?.(appointment, 'SAME_DOCTOR');
+                                }}
+                            >
+                                <i className="isax isax-calendar-edit"></i>
+                            </Link>
+                        </li>
+                        {/* Choose new doctor */}
+                        <li>
+                            <Link
+                                to="#"
+                                title="Chọn bác sĩ mới"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    onReschedule?.(appointment, 'NEW_DOCTOR');
+                                }}
+                            >
+                                <i className="isax isax-user-search"></i>
+                            </Link>
+                        </li>
+                    </>
                 )}
-                {/* Choose new doctor */}
-                <li>
-                    <Link
-                        to="#"
-                        title="Chọn bác sĩ mới"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            onReschedule?.(appointment, 'NEW_DOCTOR');
-                        }}
-                    >
-                        <i className="isax isax-user-search"></i>
-                    </Link>
-                </li>
+
                 {/* Cancel appointment */}
                 <li>
                     <Link
@@ -130,12 +133,6 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
 
     const renderStatusBadge = () => {
         switch (status) {
-            case 'waiting':
-                return (
-                    <span className="badge badge-warning">
-                        <i className="isax isax-clock5 me-1"></i> Chờ Xác Nhận
-                    </span>
-                );
             case 'cancelled':
                 return (
                     <span className="badge badge-danger">

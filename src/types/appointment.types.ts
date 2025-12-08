@@ -305,7 +305,8 @@ export interface StatusConfig {
         | 'waiting_status'
         | 'start_session'
         | 'reschedule_status'
-        | 'prescription_reschedule';
+        | 'prescription_reschedule'
+        | 'none';
 }
 
 // Filter Options for UI
@@ -649,4 +650,26 @@ export const getDisplayFeeText = (appointment: AppointmentCardData): string => {
  */
 export const isServiceAppointment = (appointment: AppointmentCardData): boolean => {
     return !appointment.doctorInfo?.id && !!appointment.serviceInfo?.id;
+};
+
+/**
+ * Get rebooking URL based on appointment type
+ * Priority: Doctor > Service > Hospital
+ * @returns URL path for rebooking
+ */
+export const getRebookingUrl = (appointment: AppointmentCardData): string => {
+    // Doctor appointment - book with same doctor
+    if (appointment.doctorInfo?.id) {
+        return `/booking/${appointment.doctorInfo.id}`;
+    }
+    // Service appointment - book same service
+    if (appointment.serviceInfo?.id) {
+        return `/booking/service/${appointment.serviceInfo.id}`;
+    }
+    // Hospital appointment - book with same hospital
+    if (appointment.hospitalInfo?.id) {
+        return `/booking/hospital/${appointment.hospitalInfo.id}`;
+    }
+    // Fallback to home
+    return '/';
 };
