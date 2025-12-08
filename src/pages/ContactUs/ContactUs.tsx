@@ -305,7 +305,7 @@ const ContactUs: React.FC = () => {
             {/* Identity Card File - Only show if not eKYC verified */}
 
             <div className="mb-4">
-                <label className="form-label">
+                <label className="form-label" htmlFor="identity-card-file-input">
                     CMND/CCCD người đại diện <span className="text-danger">*</span>
                 </label>
                 <CustomFileInput
@@ -414,7 +414,7 @@ const ContactUs: React.FC = () => {
                     </div>
                     <div className="col-md-12">
                         <div className="mb-3">
-                            <label className="form-label">
+                            <label className="form-label" htmlFor="license-file-input">
                                 Giấy phép hoạt động <span className="text-danger">*</span>
                             </label>
                             <CustomFileInput
@@ -434,7 +434,7 @@ const ContactUs: React.FC = () => {
                     </div>
                     <div className="col-md-12">
                         <div className="mb-3">
-                            <label className="form-label">
+                            <label className="form-label" htmlFor="business-certificate-file-input">
                                 Giấy chứng nhận đăng ký doanh nghiệp{' '}
                                 <span className="text-danger">*</span>
                             </label>

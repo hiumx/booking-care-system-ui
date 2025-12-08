@@ -309,8 +309,8 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
     const renderOcrResult = (ocrResult: EkycOcrResult) => (
         <div className={styles.ocrResult}>
             <h6 className="mb-3">
-                <i className="isax isax-document-text me-2"></i>
-                Thông tin từ CMND/CCCD
+                <i className="isax isax-document-text me-2" aria-hidden="true" />
+                <span>Thông tin từ CMND/CCCD</span>
             </h6>
             <div className="row">
                 <div className="col-md-6 mb-2">
@@ -419,9 +419,9 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                         />
                         {!isCameraReady && (
                             <div className="d-flex align-items-center justify-content-center h-100">
-                                <div className="spinner-border text-light" role="status">
+                                <output className="spinner-border text-light">
                                     <span className="visually-hidden">Loading...</span>
-                                </div>
+                                </output>
                             </div>
                         )}
                         {(activeCamera === 'selfie' || activeCamera === 'video') &&
@@ -441,37 +441,37 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                         >
                             Hủy
                         </button>
-                        {isVideoMode ? (
-                            isRecording ? (
-                                <button
-                                    type="button"
-                                    className="btn btn-danger"
-                                    onClick={stopRecording}
-                                    disabled={recordingTime < 2}
-                                >
-                                    <i className="isax isax-stop me-2"></i>
-                                    Dừng ({5 - recordingTime}s)
-                                </button>
-                            ) : (
-                                <button
-                                    type="button"
-                                    className="btn btn-danger"
-                                    onClick={startRecording}
-                                    disabled={!isCameraReady}
-                                >
-                                    <i className="isax isax-video me-2"></i>
-                                    Bắt đầu quay
-                                </button>
-                            )
-                        ) : (
+                        {isVideoMode && isRecording && (
+                            <button
+                                type="button"
+                                className="btn btn-danger"
+                                onClick={stopRecording}
+                                disabled={recordingTime < 2}
+                            >
+                                <i className="isax isax-stop me-2" aria-hidden="true" />
+                                <span>Dừng ({5 - recordingTime}s)</span>
+                            </button>
+                        )}
+                        {isVideoMode && !isRecording && (
+                            <button
+                                type="button"
+                                className="btn btn-danger"
+                                onClick={startRecording}
+                                disabled={!isCameraReady}
+                            >
+                                <i className="isax isax-video me-2" aria-hidden="true" />
+                                <span>Bắt đầu quay</span>
+                            </button>
+                        )}
+                        {!isVideoMode && (
                             <button
                                 type="button"
                                 className="btn btn-sm btn-outline-primary"
                                 onClick={capturePhoto}
                                 disabled={!isCameraReady}
                             >
-                                <i className="isax isax-camera me-2"></i>
-                                Chụp ảnh
+                                <i className="isax isax-camera me-2" aria-hidden="true" />
+                                <span>Chụp ảnh</span>
                             </button>
                         )}
                     </div>
@@ -480,139 +480,153 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
         );
     };
 
-    const renderUploadBox = (
-        label: string,
-        preview: string,
-        inputRef: React.RefObject<HTMLInputElement | null>,
-        onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
-        cameraTarget: CameraTarget,
-        placeholder: string,
-        icon: string,
-        isRequired = true
-    ) => (
-        <div className="mb-3">
-            <label className="form-label">
-                {label} {isRequired && <span className="text-danger">*</span>}
-            </label>
-            <div className={styles.uploadBox}>
-                {preview ? (
-                    <div className={styles.previewContainer}>
-                        <img src={preview} alt={label} className={styles.previewImage} />
-                        <button
-                            type="button"
-                            className={styles.removeBtn}
-                            onClick={() => {
-                                if (cameraTarget === 'front') {
-                                    setIdCardFront(null);
-                                    setIdCardFrontPreview('');
-                                } else if (cameraTarget === 'back') {
-                                    setIdCardBack(null);
-                                    setIdCardBackPreview('');
-                                } else {
-                                    setSelfie(null);
-                                    setSelfiePreview('');
-                                }
-                            }}
-                        >
-                            <i className="isax isax-close-circle"></i>
-                        </button>
-                    </div>
-                ) : (
-                    <div className={styles.uploadActions}>
-                        <div className={styles.uploadPlaceholder}>
-                            <i className={`isax ${icon}`}></i>
-                            <span>{placeholder}</span>
-                        </div>
-                        <div className={styles.actionButtons}>
-                            <button
-                                type="button"
-                                className="btn btn-sm btn-outline-primary"
-                                onClick={() => inputRef.current?.click()}
-                            >
-                                <i className="isax isax-gallery-add me-1"></i>
-                                Tải lên
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-sm btn-outline-primary"
-                                onClick={() => startCamera(cameraTarget)}
-                            >
-                                <i className="isax isax-camera me-1"></i>
-                                Chụp ảnh
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
-            <input
-                ref={inputRef}
-                type="file"
-                accept="image/*"
-                onChange={onChange}
-                className="d-none"
-            />
-        </div>
-    );
+    interface UploadBoxConfig {
+        label: string;
+        preview: string;
+        inputRef: React.RefObject<HTMLInputElement | null>;
+        onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+        cameraTarget: CameraTarget;
+        placeholder: string;
+        icon: string;
+    }
 
-    const renderVideoUploadBox = () => (
-        <div className="mb-3">
-            <label className="form-label">
-                Video xác thực người thật <span className="text-danger">*</span>
-            </label>
-            <div className={styles.uploadBox}>
-                {videoPreview ? (
-                    <div className={styles.previewContainer}>
-                        <video src={videoPreview} className={styles.previewImage} controls />
-                        <button
-                            type="button"
-                            className={styles.removeBtn}
-                            onClick={() => {
-                                setLivenessVideo(null);
-                                setVideoPreview('');
-                            }}
-                        >
-                            <i className="isax isax-close-circle"></i>
-                        </button>
-                    </div>
-                ) : (
-                    <div className={styles.uploadActions}>
-                        <div className={styles.uploadPlaceholder}>
-                            <i className="isax isax-video"></i>
-                            <span>Quay video 3-5 giây</span>
-                        </div>
-                        <div className={styles.actionButtons}>
+    const renderUploadBox = (config: UploadBoxConfig) => {
+        const { label, preview, inputRef, onChange, cameraTarget, placeholder, icon } = config;
+        const inputId = `upload-${cameraTarget}`;
+        return (
+            <div className="mb-3">
+                <label className="form-label" htmlFor={inputId}>
+                    {label} <span className="text-danger">*</span>
+                </label>
+                <div className={styles.uploadBox}>
+                    {preview ? (
+                        <div className={styles.previewContainer}>
+                            <img src={preview} alt={label} className={styles.previewImage} />
                             <button
                                 type="button"
-                                className="btn btn-sm btn-outline-primary"
-                                onClick={() => videoInputRef.current?.click()}
+                                className={styles.removeBtn}
+                                onClick={() => {
+                                    if (cameraTarget === 'front') {
+                                        setIdCardFront(null);
+                                        setIdCardFrontPreview('');
+                                    } else if (cameraTarget === 'back') {
+                                        setIdCardBack(null);
+                                        setIdCardBackPreview('');
+                                    } else {
+                                        setSelfie(null);
+                                        setSelfiePreview('');
+                                    }
+                                }}
+                                aria-label="Xóa ảnh"
                             >
-                                <i className="isax isax-gallery-add me-1"></i>
-                                Tải lên
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-sm btn-outline-danger"
-                                onClick={() => startCamera('video')}
-                            >
-                                <i className="isax isax-video me-1"></i>
-                                Quay video
+                                <i className="isax isax-close-circle" aria-hidden="true" />
                             </button>
                         </div>
-                    </div>
-                )}
+                    ) : (
+                        <div className={styles.uploadActions}>
+                            <div className={styles.uploadPlaceholder}>
+                                <i className={`isax ${icon}`} aria-hidden="true" />
+                                <span>{placeholder}</span>
+                            </div>
+                            <div className={styles.actionButtons}>
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-primary"
+                                    onClick={() => inputRef.current?.click()}
+                                >
+                                    <i className="isax isax-gallery-add me-1" aria-hidden="true" />
+                                    <span>Tải lên</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-primary"
+                                    onClick={() => startCamera(cameraTarget)}
+                                >
+                                    <i className="isax isax-camera me-1" aria-hidden="true" />
+                                    <span>Chụp ảnh</span>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <input
+                    ref={inputRef}
+                    id={inputId}
+                    type="file"
+                    accept="image/*"
+                    onChange={onChange}
+                    className="d-none"
+                />
             </div>
-            <input
-                ref={videoInputRef}
-                type="file"
-                accept="video/*"
-                onChange={handleVideoChange}
-                className="d-none"
-            />
-            <small className="text-muted">
-                Video giúp xác thực bạn là người thật. Xoay đầu nhẹ sang trái và phải khi quay.
-            </small>
-        </div>
-    );
+        );
+    };
+
+    const renderVideoUploadBox = () => {
+        const videoInputId = 'liveness-video-input';
+        return (
+            <div className="mb-3">
+                <label className="form-label" htmlFor={videoInputId}>
+                    Video xác thực người thật <span className="text-danger">*</span>
+                </label>
+                <div className={styles.uploadBox}>
+                    {videoPreview ? (
+                        <div className={styles.previewContainer}>
+                            <video src={videoPreview} className={styles.previewImage} controls>
+                                <track kind="captions" />
+                            </video>
+                            <button
+                                type="button"
+                                className={styles.removeBtn}
+                                onClick={() => {
+                                    setLivenessVideo(null);
+                                    setVideoPreview('');
+                                }}
+                                aria-label="Xóa video"
+                            >
+                                <i className="isax isax-close-circle" aria-hidden="true" />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className={styles.uploadActions}>
+                            <div className={styles.uploadPlaceholder}>
+                                <i className="isax isax-video" aria-hidden="true" />
+                                <span>Quay video 3-5 giây</span>
+                            </div>
+                            <div className={styles.actionButtons}>
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-primary"
+                                    onClick={() => videoInputRef.current?.click()}
+                                >
+                                    <i className="isax isax-gallery-add me-1" aria-hidden="true" />
+                                    <span>Tải lên</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-danger"
+                                    onClick={() => startCamera('video')}
+                                >
+                                    <i className="isax isax-video me-1" aria-hidden="true" />
+                                    <span>Quay video</span>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <input
+                    ref={videoInputRef}
+                    id={videoInputId}
+                    type="file"
+                    accept="video/*"
+                    onChange={handleVideoChange}
+                    className="d-none"
+                />
+                <small className="text-muted">
+                    Video giúp xác thực bạn là người thật. Xoay đầu nhẹ sang trái và phải khi quay.
+                </small>
+            </div>
+        );
+    };
 
     const isProcessing = state.step === 'uploading' || state.step === 'processing';
     const canVerify = idCardFront && idCardBack && selfie && livenessVideo && !isProcessing;
@@ -636,38 +650,38 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                 <>
                     <div className="row">
                         <div className="col-md-6">
-                            {renderUploadBox(
-                                'Ảnh mặt trước CMND/CCCD',
-                                idCardFrontPreview,
-                                idCardFrontRef,
-                                handleIdCardFrontChange,
-                                'front',
-                                'Mặt trước',
-                                'isax-card'
-                            )}
+                            {renderUploadBox({
+                                label: 'Ảnh mặt trước CMND/CCCD',
+                                preview: idCardFrontPreview,
+                                inputRef: idCardFrontRef,
+                                onChange: handleIdCardFrontChange,
+                                cameraTarget: 'front',
+                                placeholder: 'Mặt trước',
+                                icon: 'isax-card',
+                            })}
                         </div>
                         <div className="col-md-6">
-                            {renderUploadBox(
-                                'Ảnh mặt sau CMND/CCCD',
-                                idCardBackPreview,
-                                idCardBackRef,
-                                handleIdCardBackChange,
-                                'back',
-                                'Mặt sau',
-                                'isax-card'
-                            )}
+                            {renderUploadBox({
+                                label: 'Ảnh mặt sau CMND/CCCD',
+                                preview: idCardBackPreview,
+                                inputRef: idCardBackRef,
+                                onChange: handleIdCardBackChange,
+                                cameraTarget: 'back',
+                                placeholder: 'Mặt sau',
+                                icon: 'isax-card',
+                            })}
                         </div>
                     </div>
 
-                    {renderUploadBox(
-                        'Ảnh chân dung (Selfie)',
-                        selfiePreview,
-                        selfieRef,
-                        handleSelfieChange,
-                        'selfie',
-                        'Chụp ảnh selfie',
-                        'isax-user'
-                    )}
+                    {renderUploadBox({
+                        label: 'Ảnh chân dung (Selfie)',
+                        preview: selfiePreview,
+                        inputRef: selfieRef,
+                        onChange: handleSelfieChange,
+                        cameraTarget: 'selfie',
+                        placeholder: 'Chụp ảnh selfie',
+                        icon: 'isax-user',
+                    })}
 
                     {renderVideoUploadBox()}
 
@@ -682,9 +696,9 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
 
                     {isProcessing && (
                         <div className={styles.processingOverlay}>
-                            <div className="spinner-border text-primary" role="status">
+                            <output className="spinner-border text-primary">
                                 <span className="visually-hidden">Loading...</span>
-                            </div>
+                            </output>
                             <p className="mt-2 mb-0">
                                 {state.step === 'uploading'
                                     ? 'Đang tải ảnh lên...'
