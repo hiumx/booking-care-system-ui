@@ -211,7 +211,7 @@ const Booking: React.FC = () => {
     };
 
     // Helper function to create appointment request from schedule
-    const createAppointmentFromSchedule = () => {
+    const createAppointmentFromSchedule = (discountedTotalAmount?: number) => {
         if (!scheduleState.selectedSlots[0] || !userState.profile || !scheduleState.selectedDate) {
             return null;
         }
@@ -219,8 +219,9 @@ const Booking: React.FC = () => {
         const firstSlot = scheduleState.selectedSlots[0];
         const appointmentTimeId = createAppointmentTimeId(firstSlot);
 
-        // Get the original consultation/service fee at booking time
-        const amount = getConsultationFee();
+        // Use discounted amount if provided, otherwise use original price
+        // This ensures revenue statistics reflect actual amount after discount
+        const amount = discountedTotalAmount ?? getConsultationFee();
 
         // Base appointment request
         const baseRequest = {
@@ -231,7 +232,7 @@ const Booking: React.FC = () => {
             appointmentType: bookingState.appointmentType || AppointmentType.IN_PERSON,
             symptoms: bookingState.symptoms,
             attachmentUrls: bookingState.attachmentUrls,
-            amount, // Include original fee for statistics
+            amount, // Amount after discount (if applied) for revenue statistics
             // Include relativeId if booking for a relative
             ...(bookingState.isBookingForRelative &&
                 bookingState.relativeId && {
@@ -275,7 +276,10 @@ const Booking: React.FC = () => {
     };
 
     // Helper function to ensure appointment is created and return appointmentId
-    const ensureAppointmentCreated = async (skipPayment: boolean = false): Promise<string> => {
+    const ensureAppointmentCreated = async (
+        skipPayment: boolean = false,
+        discountedTotalAmount?: number
+    ): Promise<string> => {
         // Return existing appointment ID if available
         if (bookingState.createdAppointmentId) {
             return bookingState.createdAppointmentId;
@@ -284,7 +288,7 @@ const Booking: React.FC = () => {
         // Create new appointment
         setIsCreatingAppointment(true);
 
-        const request = createAppointmentFromSchedule();
+        const request = createAppointmentFromSchedule(discountedTotalAmount);
         if (!request) {
             throw new Error('Không thể tạo yêu cầu đặt lịch');
         }
@@ -313,7 +317,9 @@ const Booking: React.FC = () => {
     const handleCreateAppointmentAndPayment = async (
         paymentMethodId: string,
         depositAmount: number,
-        discountCode?: string
+        discountId?: string,
+        discountCode?: string,
+        discountedTotalAmount?: number
     ) => {
         if (!userState.profile?.id) {
             toast.error('Không tìm thấy thông tin người dùng');
@@ -328,8 +334,8 @@ const Booking: React.FC = () => {
         setIsProcessingPayment(true);
 
         try {
-            // Step 1: Ensure appointment is created
-            const appointmentId = await ensureAppointmentCreated();
+            // Step 1: Ensure appointment is created with discounted amount for revenue tracking
+            const appointmentId = await ensureAppointmentCreated(false, discountedTotalAmount);
 
             // Step 2: Create payment request
             // Get hospitalId based on booking type
@@ -348,7 +354,8 @@ const Booking: React.FC = () => {
                 hospitalId: paymentHospitalId,
                 amount: depositAmount,
                 paymentMethodId,
-                discountCode, // Add discount code to payment request
+                discountId, // Discount ID already validated by frontend
+                discountCode, // Discount code for gRPC UseDiscount call
             };
 
             const paymentResponse = await PaymentService.createAppointmentPayment(paymentRequest);

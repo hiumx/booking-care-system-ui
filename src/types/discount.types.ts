@@ -88,7 +88,7 @@ export interface DiscountListResponse {
 export interface DiscountValidationResult {
     isValid: boolean;
     discount?: Discount;
-    appliedAmount: number;
+    discountAmount: number; // Backend returns DiscountAmount which becomes discountAmount
     finalAmount: number;
     message?: string;
     errors?: string[];

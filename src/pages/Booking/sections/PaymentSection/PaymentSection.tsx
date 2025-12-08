@@ -20,7 +20,9 @@ interface PaymentSectionProps {
     onCreateAppointmentAndPayment: (
         paymentMethodId: string,
         depositAmount: number,
-        discountCode?: string
+        discountId?: string,
+        discountCode?: string,
+        discountedTotalAmount?: number
     ) => Promise<void>;
     onCreateAppointmentOnly?: () => Promise<void>; // New: Create appointment without payment
     isProcessingPayment?: boolean;
@@ -97,6 +99,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     // Discount state
     const [discountCode, setDiscountCode] = useState<string>('');
     const [appliedDiscount, setAppliedDiscount] = useState<{
+        id: string; // Discount ID from validation response
         code: string;
         discountAmount: number;
         finalAmount: number;
@@ -255,12 +258,35 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     // For regular payment: calculate 30% deposit from doctor's price or service price
     const TOTAL_AMOUNT = isSupplementaryPayment ? supplementaryAmount : getConsultationFee();
     const DEPOSIT_PERCENTAGE = 0.3; // 30% deposit
+
+    // Calculate deposit from total amount (or final amount if discount applied)
+    const TOTAL_AFTER_DISCOUNT = appliedDiscount ? appliedDiscount.finalAmount : TOTAL_AMOUNT;
     const DEPOSIT_AMOUNT = isSupplementaryPayment
         ? supplementaryAmount
-        : Math.round(TOTAL_AMOUNT * DEPOSIT_PERCENTAGE);
+        : Math.round(TOTAL_AFTER_DISCOUNT * DEPOSIT_PERCENTAGE);
 
-    // Final amount after discount
-    const FINAL_AMOUNT = appliedDiscount ? appliedDiscount.finalAmount : DEPOSIT_AMOUNT;
+    // Final amount to pay (deposit after discount)
+    const FINAL_AMOUNT = DEPOSIT_AMOUNT;
+
+    // Get hospitalId from multiple sources based on booking flow
+    const getHospitalId = (): string | undefined => {
+        // Priority 1: From URL params (hospital booking flow)
+        if (hospitalId) return hospitalId;
+
+        // Priority 2: From service medical state (service booking flow)
+        if (serviceMedicalState?.hospitalId) return serviceMedicalState.hospitalId;
+
+        // Priority 3: From doctor state (doctor booking flow)
+        if (doctorState.selectedDoctor?.hospital?.id)
+            return doctorState.selectedDoctor?.hospital?.id;
+
+        // Priority 4: From hospital state (hospital booking flow with selected hospital)
+        if (hospitalState.selectedHospital?.id) return hospitalState.selectedHospital.id;
+
+        return undefined;
+    };
+
+    const resolvedHospitalId = getHospitalId();
 
     // Handle discount code validation
     const handleValidateDiscount = async () => {
@@ -269,7 +295,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
             return;
         }
 
-        if (!hospitalId) {
+        if (!resolvedHospitalId) {
             toast.error('Không tìm thấy thông tin bệnh viện');
             return;
         }
@@ -277,15 +303,22 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         setIsValidatingDiscount(true);
         try {
             const result = await DiscountService.validateDiscount(discountCode.trim(), {
-                hospitalId,
-                totalAmount: DEPOSIT_AMOUNT,
+                hospitalId: resolvedHospitalId,
+                totalAmount: TOTAL_AMOUNT, // Validate against total amount, not deposit
             });
 
             if (result.isValid) {
+                // Discount object should exist when isValid=true
+                if (!result.discount?.id) {
+                    toast.error('Lỗi: Không nhận được thông tin discount từ server');
+                    return;
+                }
+
                 setAppliedDiscount({
+                    id: result.discount.id, // Store discount ID for payment
                     code: discountCode.trim(),
-                    discountAmount: result.appliedAmount,
-                    finalAmount: result.finalAmount,
+                    discountAmount: result.discountAmount,
+                    finalAmount: result.finalAmount, // This is total after discount
                 });
                 toast.success('Áp dụng mã giảm giá thành công!');
             } else {
@@ -331,11 +364,13 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                 return;
             }
 
-            // Call parent handler with payment method, deposit amount, and discount code (if applied)
+            // Call parent handler with payment method, deposit amount, discount ID, discount code, and total after discount
             await onCreateAppointmentAndPayment(
                 selectedPayment,
                 FINAL_AMOUNT,
-                appliedDiscount?.code
+                appliedDiscount?.id,
+                appliedDiscount?.code,
+                TOTAL_AFTER_DISCOUNT // Pass total after discount for appointment amount
             );
         }
         // Option 2: No payment (create appointment only)
@@ -408,6 +443,27 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                 <p className="mb-0">Tổng phí khám bệnh</p>
                 <span className="fw-medium d-block">{TOTAL_AMOUNT.toLocaleString('vi-VN')} đ</span>
             </div>
+
+            {/* Show discount if applied */}
+            {appliedDiscount && (
+                <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
+                    <p className="mb-0 text-success">Giảm giá ({appliedDiscount.code})</p>
+                    <span className="fw-medium text-success d-block">
+                        - {appliedDiscount.discountAmount.toLocaleString('vi-VN')} đ
+                    </span>
+                </div>
+            )}
+
+            {/* Show total after discount if discount applied */}
+            {appliedDiscount && (
+                <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2 pb-2 border-bottom">
+                    <p className="mb-0 fw-bold">Tổng sau giảm giá</p>
+                    <span className="fw-bold d-block">
+                        {TOTAL_AFTER_DISCOUNT.toLocaleString('vi-VN')} đ
+                    </span>
+                </div>
+            )}
+
             <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
                 <p className="mb-0">Phí đặt cọc (30%)</p>
                 <span className="fw-medium text-primary d-block">
@@ -418,8 +474,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                 <i className="bi bi-info-circle me-2"></i>
                 <small>
                     Bạn chỉ cần thanh toán đặt cọc 30% ({DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ)
-                    để xác nhận lịch hẹn. Số tiền còn lại sẽ được thanh toán trực tiếp tại phòng
-                    khám.
+                    để xác nhận lịch hẹn. Số tiền còn lại (
+                    {(TOTAL_AFTER_DISCOUNT - DEPOSIT_AMOUNT).toLocaleString('vi-VN')} đ) sẽ được
+                    thanh toán trực tiếp tại phòng khám.
                 </small>
             </div>
         </>

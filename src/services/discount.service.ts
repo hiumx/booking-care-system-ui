@@ -52,7 +52,7 @@ export class DiscountService {
         } catch (error: any) {
             throw {
                 isValid: false,
-                appliedAmount: 0,
+                discountAmount: 0,
                 finalAmount: context.totalAmount,
                 message:
                     error.response?.data?.message || error.message || 'Mã giảm giá không hợp lệ',
