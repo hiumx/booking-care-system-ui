@@ -1,55 +1,34 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Star, Building2, Stethoscope, HelpCircle } from 'lucide-react';
+import { MapPin, Star, Building2, HelpCircle } from 'lucide-react';
 import { Suggestion } from '@/types/ai.types';
 import { PATHS, replacePathParams } from '@/routes/paths';
 import clsx from 'clsx';
 import styles from './SuggestionCard.module.scss';
 import { AppointmentType } from '@/enums/appointment.enums';
 
-type SupportBookingOptions = {
-    appointmentType?: AppointmentType;
-};
-
 interface SuggestionCardProps {
     suggestion: Suggestion;
-    onSupportBooking?: (options?: SupportBookingOptions) => void;
+    onSupportBooking?: (options?: { appointmentType?: AppointmentType }) => void;
+    selectedServiceType?: string;
 }
 
 interface CardFooterProps {
-    showOnlineButton?: boolean;
-    onlineButtonLabel?: string;
-    onSupportBooking?: (options?: SupportBookingOptions) => void;
-    onlineAppointmentType?: AppointmentType;
+    onSupportBooking?: (options?: { appointmentType?: AppointmentType }) => void;
+    appointmentType?: AppointmentType;
 }
 
-const CardFooter: React.FC<CardFooterProps> = ({
-    showOnlineButton,
-    onlineButtonLabel = 'Tư vấn trực tuyến',
-    onSupportBooking,
-    onlineAppointmentType = AppointmentType.TELEHEALTH,
-}) => {
-    if (!showOnlineButton && !onSupportBooking) {
-        return null;
-    }
+const CardFooter: React.FC<CardFooterProps> = ({ onSupportBooking, appointmentType }) => {
+    if (!onSupportBooking) return null;
 
     return (
         <div className={styles.cardFooter}>
             <div className={styles.buttonGroup}>
-                {showOnlineButton && onSupportBooking && (
-                    <button
-                        className={clsx('btn', 'btn-outline-primary', styles.bookButton)}
-                        onClick={() => onSupportBooking({ appointmentType: onlineAppointmentType })}
-                    >
-                        <Stethoscope size={16} />
-                        <span>{onlineButtonLabel}</span>
-                    </button>
-                )}
                 {onSupportBooking && (
                     <button
                         className={clsx('btn', 'btn-primary', styles.supportButton)}
                         onClick={() =>
-                            onSupportBooking({ appointmentType: AppointmentType.IN_PERSON })
+                            onSupportBooking(appointmentType ? { appointmentType } : undefined)
                         }
                     >
                         <HelpCircle size={16} />
@@ -61,7 +40,11 @@ const CardFooter: React.FC<CardFooterProps> = ({
     );
 };
 
-const SuggestionCard: React.FC<SuggestionCardProps> = ({ suggestion, onSupportBooking }) => {
+const SuggestionCard: React.FC<SuggestionCardProps> = ({
+    suggestion,
+    onSupportBooking,
+    selectedServiceType,
+}) => {
     const navigate = useNavigate();
     const [doctorAvatarError, setDoctorAvatarError] = useState(false);
     const [hospitalImageError, setHospitalImageError] = useState(false);
@@ -84,6 +67,22 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({ suggestion, onSupportBo
 
     if (suggestion.type === 'doctor' && suggestion.doctor) {
         const doctor = suggestion.doctor;
+        const serviceOptions = doctor.serviceOptions || [];
+        const selectedOption =
+            (selectedServiceType &&
+                serviceOptions.find(
+                    (o) =>
+                        o.serviceTypeName?.toLowerCase() === selectedServiceType.toLowerCase() ||
+                        o.serviceTypeName?.toLowerCase().includes(selectedServiceType.toLowerCase())
+                )) ||
+            serviceOptions[0];
+        const displayServiceName = selectedOption?.serviceTypeName || doctor.serviceTypeName;
+        const displayPrice = selectedOption?.price || doctor.price;
+        const appointmentType =
+            (displayServiceName || '').toLowerCase().includes('telehealth') ||
+            (displayServiceName || '').toLowerCase().includes('tư vấn trực tuyến')
+                ? AppointmentType.TELEHEALTH
+                : AppointmentType.IN_PERSON;
         const getInitials = () => {
             const name = doctor.name || '';
             const names = name.trim().split(' ');
@@ -92,9 +91,6 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({ suggestion, onSupportBo
             }
             return names[0]?.[0]?.toUpperCase() || 'D';
         };
-
-        const hasOnlineConsultation =
-            doctor.serviceTypeName?.trim().toLowerCase() === 'tư vấn trực tuyến';
 
         return (
             <div className={styles.suggestionCard}>
@@ -137,16 +133,16 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({ suggestion, onSupportBo
                         <Building2 size={16} />
                         <span>{doctor.hospitalName || 'Chưa có thông tin'}</span>
                     </div>
-                    {doctor.serviceTypeName && (
+                    {displayServiceName && (
                         <div className={styles.cardDetail}>
                             <span className={styles.label}>Loại dịch vụ:</span>
-                            <span className={styles.value}>{doctor.serviceTypeName}</span>
+                            <span className={styles.value}>{displayServiceName}</span>
                         </div>
                     )}
-                    {doctor.price && (
+                    {displayPrice && (
                         <div className={styles.cardDetail}>
                             <span className={styles.label}>Giá:</span>
-                            <span className={styles.priceValue}>{doctor.price}</span>
+                            <span className={styles.priceValue}>{displayPrice}</span>
                         </div>
                     )}
                     <div className={styles.cardDetails}>
@@ -159,12 +155,7 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({ suggestion, onSupportBo
                         </div>
                     </div>
                 </div>
-                <CardFooter
-                    showOnlineButton={hasOnlineConsultation}
-                    onlineButtonLabel="Tư vấn trực tuyến"
-                    onlineAppointmentType={AppointmentType.TELEHEALTH}
-                    onSupportBooking={onSupportBooking}
-                />
+                <CardFooter onSupportBooking={onSupportBooking} appointmentType={appointmentType} />
             </div>
         );
     }

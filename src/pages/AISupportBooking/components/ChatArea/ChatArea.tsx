@@ -8,6 +8,7 @@ import SuggestionCard from './components/SuggestionCard';
 import TypingIndicator from './components/TypingIndicator';
 import SearchBox from '../SearchBox';
 import Carousel from '@/components/Carousel';
+import Select from '@/components/Select';
 import styles from './ChatArea.module.scss';
 import MiniBookingInline from './components/MiniBookingModal/MiniBookingInline';
 import { AppointmentType } from '@/enums/appointment.enums';
@@ -45,6 +46,49 @@ const CAROUSEL_SUGGESTIONS_BREAKPOINTS = {
     0: {
         slidesPerView: 1, // điện thoại nhỏ
     },
+};
+
+const normalizeServiceName = (name?: string) => (name || '').trim().toLowerCase();
+
+const resolveDoctorServiceInfo = (doctor: any, selectedServiceType?: string) => {
+    const options = doctor.serviceOptions || [];
+    const match =
+        (selectedServiceType &&
+            options.find(
+                (o: any) =>
+                    normalizeServiceName(o.serviceTypeName) ===
+                        normalizeServiceName(selectedServiceType) ||
+                    normalizeServiceName(o.serviceTypeName).includes(
+                        normalizeServiceName(selectedServiceType)
+                    )
+            )) ||
+        options.find(
+            (o: any) =>
+                normalizeServiceName(o.serviceTypeName) === 'in_person' ||
+                normalizeServiceName(o.serviceTypeName).includes('trực tiếp')
+        ) ||
+        options[0];
+
+    return {
+        ...doctor,
+        serviceTypeName: match?.serviceTypeName || doctor.serviceTypeName,
+        price: match?.price || doctor.price,
+    };
+};
+
+const getServiceTypesFromSuggestions = (suggestions: any[]): string[] => {
+    const types = suggestions
+        .filter((s) => s.type === 'doctor' && s.doctor)
+        .flatMap((s) => {
+            const doc = s.doctor;
+            const opts = doc.serviceOptions || [];
+            if (opts.length > 0) return opts.map((o: any) => o.serviceTypeName).filter(Boolean);
+            if (doc.serviceTypeName) return [doc.serviceTypeName];
+            return [];
+        })
+        .filter(Boolean) as string[];
+
+    return Array.from(new Set(types));
 };
 
 // Helper component for rendering tabs
@@ -88,9 +132,28 @@ const createCarouselItems = (
         id: string,
         type: 'doctor' | 'hospital',
         options?: { appointmentType?: AppointmentType }
-    ) => void
+    ) => void,
+    selectedServiceType?: string
 ) => {
-    const filteredSuggestions = suggestions.filter((suggestion) => suggestion.type === activeTab);
+    const filteredSuggestions = suggestions.filter((suggestion) => {
+        if (suggestion.type !== activeTab) return false;
+
+        if (activeTab === 'doctor' && selectedServiceType) {
+            const opts = suggestion.doctor?.serviceOptions || [];
+            const match = opts.some(
+                (o: any) =>
+                    normalizeServiceName(o.serviceTypeName) ===
+                        normalizeServiceName(selectedServiceType) ||
+                    normalizeServiceName(o.serviceTypeName).includes(
+                        normalizeServiceName(selectedServiceType)
+                    )
+            );
+            // If doctor không có dịch vụ đang chọn, ẩn khỏi carousel
+            return match;
+        }
+
+        return true;
+    });
 
     return filteredSuggestions.map((suggestion, index) => {
         const suggestionId =
@@ -103,12 +166,21 @@ const createCarouselItems = (
                 ? suggestion.doctor?.id || ''
                 : suggestion.hospital?.id || '';
 
+        const resolvedSuggestion =
+            suggestion.type === 'doctor' && suggestion.doctor
+                ? {
+                      ...suggestion,
+                      doctor: resolveDoctorServiceInfo(suggestion.doctor, selectedServiceType),
+                  }
+                : suggestion;
+
         return {
             id: suggestionId,
             node: (
                 <SuggestionCard
                     key={suggestionId}
-                    suggestion={suggestion}
+                    suggestion={resolvedSuggestion}
+                    selectedServiceType={selectedServiceType}
                     onSupportBooking={(options) =>
                         handleSupportBooking(entityId, suggestion.type, options)
                     }
@@ -131,6 +203,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 }) => {
     const [inputValue, setInputValue] = useState('');
     const [activeTabs, setActiveTabs] = useState<Record<string, 'doctor' | 'hospital'>>({});
+    const [serviceSelections, setServiceSelections] = useState<Record<string, string>>({});
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [miniBooking, setMiniBooking] = useState<{
         doctorId: string;
@@ -160,6 +233,30 @@ const ChatArea: React.FC<ChatAreaProps> = ({
             [messageId]: tab,
         }));
     };
+
+    const handleServiceTypeChange = (messageId: string, serviceType: string) => {
+        setServiceSelections((prev) => ({
+            ...prev,
+            [messageId]: serviceType,
+        }));
+    };
+
+    // Initialize default service type per message (prefer khám trực tiếp/IN_PERSON)
+    useEffect(() => {
+        messages.forEach((m) => {
+            if (!m.suggestions || m.suggestions.length === 0) return;
+            const types = getServiceTypesFromSuggestions(m.suggestions);
+            if (types.length === 0) return;
+            const preferred =
+                types.find(
+                    (t) =>
+                        normalizeServiceName(t) === 'in_person' ||
+                        normalizeServiceName(t).includes('trực tiếp')
+                ) || types[0];
+
+            setServiceSelections((prev) => (prev[m.id] ? prev : { ...prev, [m.id]: preferred }));
+        });
+    }, [messages]);
 
     const handleSend = () => {
         if (inputValue.trim()) {
@@ -328,27 +425,74 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                 <MessageBubble message={message} />
                                 {message.suggestions && message.suggestions.length > 0 && (
                                     <div className={styles.suggestionsContainer}>
-                                        <div className={styles.tabsContainer}>
-                                            <SuggestionTabs
-                                                suggestions={message.suggestions}
-                                                activeTab={getActiveTabForMessage(message.id)}
-                                                onTabChange={(tab) =>
-                                                    handleTabChange(message.id, tab)
-                                                }
-                                            />
-                                        </div>
-                                        <div className={styles.suggestionsCarousel}>
-                                            <Carousel
-                                                slides={createCarouselItems(
-                                                    message.suggestions,
-                                                    getActiveTabForMessage(message.id),
-                                                    handleSupportBooking
-                                                )}
-                                                breakpoints={CAROUSEL_SUGGESTIONS_BREAKPOINTS}
-                                                loop={false}
-                                                isAutoPlay={false}
-                                            />
-                                        </div>
+                                        {(() => {
+                                            const serviceTypes = getServiceTypesFromSuggestions(
+                                                message.suggestions
+                                            );
+                                            const selectedServiceType =
+                                                serviceSelections[message.id] ||
+                                                serviceTypes[0] ||
+                                                undefined;
+
+                                            return (
+                                                <>
+                                                    <div className={styles.tabsContainer}>
+                                                        <SuggestionTabs
+                                                            suggestions={message.suggestions}
+                                                            activeTab={getActiveTabForMessage(
+                                                                message.id
+                                                            )}
+                                                            onTabChange={(tab) =>
+                                                                handleTabChange(message.id, tab)
+                                                            }
+                                                        />
+                                                    </div>
+                                                    {serviceTypes.length > 0 &&
+                                                        getActiveTabForMessage(message.id) ===
+                                                            'doctor' && (
+                                                            <div className={styles.serviceTypeRow}>
+                                                                <Select
+                                                                    title="Chọn loại dịch vụ"
+                                                                    items={serviceTypes.map(
+                                                                        (t) => ({
+                                                                            label: t,
+                                                                            value: t,
+                                                                        })
+                                                                    )}
+                                                                    value={
+                                                                        selectedServiceType ||
+                                                                        serviceTypes[0]
+                                                                    }
+                                                                    onChange={(value) =>
+                                                                        handleServiceTypeChange(
+                                                                            message.id,
+                                                                            value
+                                                                        )
+                                                                    }
+                                                                    className={
+                                                                        styles.serviceTypeSelect
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    <div className={styles.suggestionsCarousel}>
+                                                        <Carousel
+                                                            slides={createCarouselItems(
+                                                                message.suggestions,
+                                                                getActiveTabForMessage(message.id),
+                                                                handleSupportBooking,
+                                                                selectedServiceType
+                                                            )}
+                                                            breakpoints={
+                                                                CAROUSEL_SUGGESTIONS_BREAKPOINTS
+                                                            }
+                                                            loop={false}
+                                                            isAutoPlay={false}
+                                                        />
+                                                    </div>
+                                                </>
+                                            );
+                                        })()}
                                         {/* Consultation button - inside suggestions, below carousel */}
                                         {(() => {
                                             const shouldShow = message.canRequestMoreQuestions;

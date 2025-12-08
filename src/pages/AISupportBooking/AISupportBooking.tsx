@@ -507,6 +507,21 @@ const AISupportBooking: React.FC = () => {
                 serviceTypeName: d.serviceTypeName || undefined,
                 price: d.price || undefined,
                 avatarUrl: d.avatarUrl || undefined,
+                serviceOptions:
+                    d.serviceOptions?.map((o: any) => ({
+                        serviceTypeId: o.serviceTypeId,
+                        serviceTypeName: o.serviceTypeName,
+                        price: o.price,
+                    })) ||
+                    (d.serviceTypeName || d.price
+                        ? [
+                              {
+                                  serviceTypeId: undefined,
+                                  serviceTypeName: d.serviceTypeName || 'Khám trực tiếp',
+                                  price: d.price,
+                              },
+                          ]
+                        : []),
             },
         }));
 
