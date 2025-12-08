@@ -242,7 +242,7 @@ export const selectHasAppliedDiscount = createSelector(
 
 export const selectAppliedDiscountAmount = createSelector(
     [selectAppliedDiscount],
-    (appliedDiscount) => appliedDiscount?.validationResult.appliedAmount || 0
+    (appliedDiscount) => appliedDiscount?.validationResult.discountAmount || 0
 );
 
 export const selectAppliedDiscountCode = createSelector(
@@ -255,6 +255,6 @@ export const selectAppliedDiscountSavings = createSelector(
     (appliedDiscount) => {
         if (!appliedDiscount) return 0;
         const { validationResult } = appliedDiscount;
-        return validationResult.appliedAmount;
+        return validationResult.discountAmount;
     }
 );
