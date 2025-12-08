@@ -50,7 +50,7 @@ export class DiscountService {
 
             return response.data || response;
         } catch (error: any) {
-            throw {
+            const validationResult: DiscountValidationResult = {
                 isValid: false,
                 discountAmount: 0,
                 finalAmount: context.totalAmount,
@@ -58,6 +58,10 @@ export class DiscountService {
                     error.response?.data?.message || error.message || 'Mã giảm giá không hợp lệ',
                 errors: [error.message || 'Validation failed'],
             };
+            const errorInstance = new Error(validationResult.message);
+            // Attach validation result to error for caller to use
+            (errorInstance as any).validationResult = validationResult;
+            throw errorInstance;
         }
     }
 

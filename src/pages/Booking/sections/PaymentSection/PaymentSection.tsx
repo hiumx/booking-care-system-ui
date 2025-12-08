@@ -602,28 +602,28 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         };
     }, [selectedDate, selectedSlots]);
 
+    // Helper function to get next step button title - extracted to reduce cognitive complexity
+    const getNextStepButtonTitle = (): string => {
+        if (isCreatingAppointment || isProcessingPayment) {
+            return 'Đang xử lý...';
+        }
+        if (isSupplementaryPayment) {
+            return 'Thanh toán';
+        }
+        if (paymentOption === 'deposit') {
+            return 'Đặt cọc & Thanh toán';
+        }
+        if (paymentOption === 'no-payment') {
+            return 'Đặt lịch ngay';
+        }
+        return 'Tiếp tục';
+    };
+
     return (
         <BookingSectionWrapper
             doctor={entityInfo}
             appointment={mockAppointmentInfo}
-            nextStepTitle={(() => {
-                if (isCreatingAppointment) {
-                    return 'Đang xử lý...';
-                }
-                if (isProcessingPayment) {
-                    return 'Đang xử lý...';
-                }
-                if (isSupplementaryPayment) {
-                    return 'Thanh toán';
-                }
-                // New business logic for button text
-                if (paymentOption === 'deposit') {
-                    return 'Đặt cọc & Thanh toán';
-                } else if (paymentOption === 'no-payment') {
-                    return 'Đặt lịch ngay';
-                }
-                return 'Tiếp tục';
-            })()}
+            nextStepTitle={getNextStepButtonTitle()}
             nextStep={handleNextStep}
             prevStep={prevStep}
             isShowInfoHeader={false}
@@ -938,13 +938,43 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                         {paymentOption === 'deposit' && !isSupplementaryPayment && (
                                             <div className="mt-3">
                                                 <div className="discount-section">
-                                                    <label className="form-label fw-medium">
-                                                        <i className="bi bi-tag me-2"></i>
+                                                    <label
+                                                        htmlFor="discountCodeInput"
+                                                        className="form-label fw-medium"
+                                                    >
+                                                        <i
+                                                            className="bi bi-tag me-2"
+                                                            aria-hidden="true"
+                                                        ></i>{' '}
                                                         Mã giảm giá
                                                     </label>
-                                                    {!appliedDiscount ? (
+                                                    {appliedDiscount ? (
+                                                        <div className="alert alert-success d-flex justify-content-between align-items-center mb-0">
+                                                            <div>
+                                                                <i className="bi bi-check-circle me-2"></i>
+                                                                <strong>
+                                                                    {appliedDiscount.code}
+                                                                </strong>{' '}
+                                                                - Giảm{' '}
+                                                                {appliedDiscount.discountAmount.toLocaleString(
+                                                                    'vi-VN'
+                                                                )}{' '}
+                                                                đ
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                className="btn-remove-discount"
+                                                                onClick={handleRemoveDiscount}
+                                                                title="Hủy mã giảm giá"
+                                                                aria-label="Hủy mã giảm giá"
+                                                            >
+                                                                ×
+                                                            </button>
+                                                        </div>
+                                                    ) : (
                                                         <div className="input-group">
                                                             <input
+                                                                id="discountCodeInput"
                                                                 type="text"
                                                                 className="form-control"
                                                                 placeholder="Nhập mã giảm giá"
@@ -967,42 +997,26 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                             >
                                                                 {isValidatingDiscount ? (
                                                                     <>
-                                                                        <span
+                                                                        <output
                                                                             className="spinner-border spinner-border-sm me-2"
-                                                                            role="status"
-                                                                            aria-hidden="true"
-                                                                        ></span>
+                                                                            aria-live="polite"
+                                                                            aria-atomic="true"
+                                                                        >
+                                                                            <span className="visually-hidden">
+                                                                                Đang kiểm tra...
+                                                                            </span>
+                                                                        </output>{' '}
                                                                         Đang kiểm tra...
                                                                     </>
                                                                 ) : (
                                                                     <>
-                                                                        <i className="bi bi-check-circle-fill me-1"></i>
+                                                                        <i
+                                                                            className="bi bi-check-circle-fill me-1"
+                                                                            aria-hidden="true"
+                                                                        ></i>{' '}
                                                                         Áp dụng
                                                                     </>
                                                                 )}
-                                                            </button>
-                                                        </div>
-                                                    ) : (
-                                                        <div className="alert alert-success d-flex justify-content-between align-items-center mb-0">
-                                                            <div>
-                                                                <i className="bi bi-check-circle me-2"></i>
-                                                                <strong>
-                                                                    {appliedDiscount.code}
-                                                                </strong>{' '}
-                                                                - Giảm{' '}
-                                                                {appliedDiscount.discountAmount.toLocaleString(
-                                                                    'vi-VN'
-                                                                )}{' '}
-                                                                đ
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                className="btn-remove-discount"
-                                                                onClick={handleRemoveDiscount}
-                                                                title="Hủy mã giảm giá"
-                                                                aria-label="Hủy mã giảm giá"
-                                                            >
-                                                                ×
                                                             </button>
                                                         </div>
                                                     )}
