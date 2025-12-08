@@ -162,7 +162,12 @@ const AppointmentDetailPage: React.FC = () => {
             );
 
             // Calculate refund percentage for success message (patient cancellation)
-            const refundInfo = getRefundInfo(appointmentData.appointmentDate, undefined, false);
+            const refundInfo = getRefundInfo(
+                appointmentData.appointmentDate,
+                appointmentData.appointmentTimeId,
+                undefined,
+                false
+            );
 
             // Show success message with refund info
             if (refundInfo.refundPercentage === 100) {
@@ -334,7 +339,12 @@ const AppointmentDetailPage: React.FC = () => {
                     minReasonLength={10}
                     refundInfo={
                         appointmentData.consultationFees > 0
-                            ? getRefundInfo(appointmentData.appointmentDate, undefined, false) // Patient cancellation - only show refund info if has payment
+                            ? getRefundInfo(
+                                  appointmentData.appointmentDate,
+                                  appointmentData.appointmentTimeId,
+                                  undefined,
+                                  false
+                              ) // Patient cancellation - only show refund info if has payment
                             : undefined
                     }
                 />

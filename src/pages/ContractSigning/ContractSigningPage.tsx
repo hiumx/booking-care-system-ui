@@ -84,7 +84,7 @@ const ContractSigningPage: React.FC = () => {
             const response = await sendSigningOtp(token);
             if (response.success) {
                 setOtpSent(true);
-                setCountdown(60); // 60 seconds countdown
+                setCountdown(60);
                 toast.success(response.message || 'Mã OTP đã được gửi đến email của bạn');
             } else {
                 toast.error(response.message || 'Không thể gửi OTP');
@@ -114,7 +114,6 @@ const ContractSigningPage: React.FC = () => {
 
         setIsSigning(true);
         try {
-            // Get signature as base64
             const signatureBase64 = signatureRef.current.toDataURL();
 
             const response = await signContract({
@@ -125,7 +124,6 @@ const ContractSigningPage: React.FC = () => {
 
             if (response.success) {
                 toast.success(response.message || 'Ký hợp đồng thành công!');
-                // Redirect to success page after 2 seconds
                 setTimeout(() => {
                     navigate(PATHS.CONTRACT_SIGNING.SUCCESS);
                 }, 2000);
@@ -144,10 +142,7 @@ const ContractSigningPage: React.FC = () => {
         return (
             <div
                 className="d-flex justify-content-center align-items-center"
-                style={{
-                    minHeight: 'calc(100vh - 300px)',
-                    width: '100%',
-                }}
+                style={{ minHeight: 'calc(100vh - 300px)', width: '100%' }}
             >
                 <div className="text-center">
                     <Spinner size="large" variant="primary" />
@@ -163,16 +158,18 @@ const ContractSigningPage: React.FC = () => {
             <div className="container py-5">
                 <div className="row justify-content-center">
                     <div className="col-md-8">
-                        <div className="alert alert-danger">
-                            <h4 className="alert-heading">
-                                <i className="ti ti-alert-circle me-2" aria-hidden="true" /> Token
-                                không hợp lệ
-                            </h4>
-                            <p className="mb-0">{errorMessage}</p>
-                            <hr />
-                            <p className="mb-0">
-                                Vui lòng liên hệ admin để nhận link ký hợp đồng mới.
-                            </p>
+                        <div className="card">
+                            <div className="card-body text-center py-5">
+                                <i
+                                    className="isax isax-close-circle5 text-danger mb-3"
+                                    style={{ fontSize: '48px' }}
+                                ></i>
+                                <h4 className="text-danger mb-3">Token không hợp lệ</h4>
+                                <p className="text-muted mb-0">{errorMessage}</p>
+                                <p className="text-muted">
+                                    Vui lòng liên hệ admin để nhận link ký hợp đồng mới.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -181,29 +178,16 @@ const ContractSigningPage: React.FC = () => {
     }
 
     return (
-        <div className="container py-5">
+        <div className="container py-4">
             <div className="row justify-content-center">
                 <div className="col-lg-10">
                     {/* Header */}
-                    <div className="text-center mb-5">
-                        <div className="mb-3">
-                            <div
-                                className="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center"
-                                style={{ width: '80px', height: '80px' }}
-                            >
-                                <i
-                                    className="ti ti-writing-sign text-primary"
-                                    style={{ fontSize: '40px' }}
-                                ></i>
-                            </div>
-                        </div>
-                        <h2 className="fw-bold mb-2">Ký hợp đồng điện tử</h2>
+                    <div className="text-center mb-4">
+                        <h3 className="mb-2">Ký hợp đồng điện tử</h3>
                         <p className="text-muted">
                             Vui lòng đọc kỹ hợp đồng và hoàn thành các bước ký bên dưới
                         </p>
-
-                        {/* Progress Indicator */}
-                        <div className="mt-4">
+                        <div className="mt-3">
                             <StepWizard
                                 steps={[
                                     { id: 1, title: 'Chữ ký' },
@@ -220,110 +204,60 @@ const ContractSigningPage: React.FC = () => {
                     </div>
 
                     {/* Contract Info */}
-                    <div className="card mb-4 border-0 shadow-sm">
-                        <div
-                            className="card-header"
-                            style={{
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                border: 'none',
-                            }}
-                        >
-                            <h5 className="mb-0 text-white">
-                                <i className="ti ti-file-text me-2" aria-hidden="true" /> Thông tin
-                                hợp đồng
-                            </h5>
+                    <div className="card mb-4">
+                        <div className="card-header">
+                            <h6 className="mb-0">
+                                <i className="isax isax-document-text5 me-2 text-primary"></i> Thông
+                                tin hợp đồng
+                            </h6>
                         </div>
-                        <div className="card-body p-4">
-                            <div className="row g-4">
+                        <div className="card-body">
+                            <div className="row g-3">
                                 <div className="col-md-6">
-                                    <div className="d-flex align-items-start">
-                                        <div className="flex-shrink-0">
-                                            <div
-                                                className="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
-                                                style={{ width: '40px', height: '40px' }}
-                                            >
-                                                <i
-                                                    className="ti ti-file-invoice text-primary"
-                                                    style={{ fontSize: '20px' }}
-                                                ></i>
-                                            </div>
-                                        </div>
-                                        <div className="flex-grow-1 ms-3">
-                                            <span className="text-muted small mb-1 d-block">
+                                    <div className="d-flex align-items-center">
+                                        <i className="isax isax-receipt-15 text-primary me-2"></i>
+                                        <div>
+                                            <small className="text-muted d-block">
                                                 Số hợp đồng
-                                            </span>
-                                            <div className="fw-semibold">
+                                            </small>
+                                            <span className="fw-medium">
                                                 {contractInfo?.contractNumber}
-                                            </div>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="col-md-6">
-                                    <div className="d-flex align-items-start">
-                                        <div className="flex-shrink-0">
-                                            <div
-                                                className="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center"
-                                                style={{ width: '40px', height: '40px' }}
-                                            >
-                                                <i
-                                                    className="ti ti-building-hospital text-success"
-                                                    style={{ fontSize: '20px' }}
-                                                ></i>
-                                            </div>
-                                        </div>
-                                        <div className="flex-grow-1 ms-3">
-                                            <span className="text-muted small mb-1 d-block">
-                                                Bệnh viện
-                                            </span>
-                                            <div className="fw-semibold">
+                                    <div className="d-flex align-items-center">
+                                        <i className="isax isax-hospital5 text-success me-2"></i>
+                                        <div>
+                                            <small className="text-muted d-block">Bệnh viện</small>
+                                            <span className="fw-medium">
                                                 {contractInfo?.hospitalName}
-                                            </div>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="col-md-6">
-                                    <div className="d-flex align-items-start">
-                                        <div className="flex-shrink-0">
-                                            <div
-                                                className="rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center"
-                                                style={{ width: '40px', height: '40px' }}
-                                            >
-                                                <i
-                                                    className="ti ti-user text-info"
-                                                    style={{ fontSize: '20px' }}
-                                                ></i>
-                                            </div>
-                                        </div>
-                                        <div className="flex-grow-1 ms-3">
-                                            <span className="text-muted small mb-1 d-block">
+                                    <div className="d-flex align-items-center">
+                                        <i className="isax isax-user text-info me-2"></i>
+                                        <div>
+                                            <small className="text-muted d-block">
                                                 Người đại diện
-                                            </span>
-                                            <div className="fw-semibold">
+                                            </small>
+                                            <span className="fw-medium">
                                                 {contractInfo?.representativeName}
-                                            </div>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="col-md-6">
-                                    <div className="d-flex align-items-start">
-                                        <div className="flex-shrink-0">
-                                            <div
-                                                className="rounded-circle bg-warning bg-opacity-10 d-flex align-items-center justify-content-center"
-                                                style={{ width: '40px', height: '40px' }}
-                                            >
-                                                <i
-                                                    className="ti ti-mail text-warning"
-                                                    style={{ fontSize: '20px' }}
-                                                ></i>
-                                            </div>
-                                        </div>
-                                        <div className="flex-grow-1 ms-3">
-                                            <span className="text-muted small mb-1 d-block">
-                                                Email
-                                            </span>
-                                            <div className="fw-semibold">
+                                    <div className="d-flex align-items-center">
+                                        <i className="isax isax-sms5 text-warning me-2"></i>
+                                        <div>
+                                            <small className="text-muted d-block">Email</small>
+                                            <span className="fw-medium">
                                                 {contractInfo?.representativeEmail}
-                                            </div>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -332,24 +266,21 @@ const ContractSigningPage: React.FC = () => {
                     </div>
 
                     {/* Contract Preview */}
-                    <div className="card mb-4 border-0 shadow-sm">
-                        <div className="card-header bg-light border-0">
-                            <div className="d-flex align-items-center justify-content-between">
-                                <h5 className="mb-0">
-                                    <i className="ti ti-eye me-2 text-primary" aria-hidden="true" />{' '}
-                                    Xem hợp đồng
-                                </h5>
-                                <span className="badge bg-info">Bản nháp</span>
-                            </div>
+                    <div className="card mb-4">
+                        <div className="card-header d-flex align-items-center justify-content-between">
+                            <h6 className="mb-0">
+                                <i className="isax isax-eye5 me-2 text-primary"></i> Xem hợp đồng
+                            </h6>
+                            <span className="badge bg-info">Bản nháp</span>
                         </div>
-                        <div className="card-body p-4">
-                            <div className="alert alert-warning border-0 mb-3">
-                                <i className="ti ti-alert-triangle me-2"></i>
+                        <div className="card-body">
+                            <div className="alert alert-warning mb-3">
+                                <i className="isax isax-warning-25 me-2"></i>
                                 <small>
                                     Vui lòng đọc kỹ toàn bộ nội dung hợp đồng trước khi ký
                                 </small>
                             </div>
-                            <div className="ratio ratio-16x9 mb-3 rounded overflow-hidden shadow-sm">
+                            <div className="ratio ratio-16x9 mb-3 rounded overflow-hidden border">
                                 <iframe
                                     src={contractInfo?.contractDraftUrl}
                                     title="Contract Preview"
@@ -362,34 +293,28 @@ const ContractSigningPage: React.FC = () => {
                                 rel="noopener noreferrer"
                                 className="btn btn-outline-primary btn-sm"
                             >
-                                <i className="ti ti-external-link me-1" aria-hidden="true" /> Mở
-                                trong tab mới để xem rõ hơn
+                                <i className="isax isax-export-35 me-1"></i> Mở trong tab mới
                             </a>
                         </div>
                     </div>
 
                     {/* Signature Section */}
-                    <div className="card mb-4 border-0 shadow-sm">
-                        <div className="card-header bg-light border-0">
-                            <h5 className="mb-0">
-                                <span className="badge bg-primary me-2">1</span>
-                                <i className="ti ti-writing me-2" aria-hidden="true" /> Vẽ chữ ký
-                                của bạn
-                            </h5>
+                    <div className="card mb-4">
+                        <div className="card-header">
+                            <h6 className="mb-0">
+                                <span className="badge bg-primary me-2">1</span>{' '}
+                                <i className="isax isax-edit-25 me-2"></i> Vẽ chữ ký của bạn
+                            </h6>
                         </div>
-                        <div className="card-body p-4">
+                        <div className="card-body">
                             <p className="text-muted small mb-3">
-                                <i className="ti ti-info-circle me-1" aria-hidden="true" /> Vẽ chữ
-                                ký của bạn trong khung bên dưới. Chữ ký này sẽ được sử dụng để xác
-                                thực hợp đồng.
+                                <i className="isax isax-info-circle5 me-1"></i> Vẽ chữ ký của bạn
+                                trong khung bên dưới. Chữ ký này sẽ được sử dụng để xác thực hợp
+                                đồng.
                             </p>
                             <div
-                                className="border rounded p-2 mb-3 position-relative"
-                                style={{
-                                    background:
-                                        'repeating-linear-gradient(0deg, transparent, transparent 19px, #e9ecef 19px, #e9ecef 20px), repeating-linear-gradient(90deg, transparent, transparent 19px, #e9ecef 19px, #e9ecef 20px)',
-                                    backgroundColor: '#fff',
-                                }}
+                                className="border rounded p-2 mb-3 position-relative bg-white"
+                                style={{ minHeight: '200px' }}
                             >
                                 <SignatureCanvas
                                     ref={signatureRef}
@@ -405,27 +330,25 @@ const ContractSigningPage: React.FC = () => {
                                         style={{ pointerEvents: 'none', opacity: 0.5 }}
                                     >
                                         <i
-                                            className="ti ti-pencil me-2"
-                                            style={{ fontSize: '24px' }}
+                                            className="isax isax-edit5 me-2"
+                                            style={{ fontSize: '20px' }}
                                         ></i>
                                         <span>Vẽ chữ ký tại đây</span>
                                     </div>
                                 )}
                             </div>
-                            <div className="d-flex gap-2">
+                            <div className="d-flex align-items-center gap-2">
                                 <button
                                     type="button"
                                     className="btn btn-outline-danger btn-sm"
                                     onClick={handleClearSignature}
                                     disabled={!hasSignature}
                                 >
-                                    <i className="ti ti-eraser me-1" aria-hidden="true" /> Xóa và vẽ
-                                    lại
+                                    <i className="isax isax-trash5 me-1"></i> Xóa và vẽ lại
                                 </button>
                                 {hasSignature && (
-                                    <span className="badge bg-success align-self-center">
-                                        <i className="ti ti-check me-1" aria-hidden="true" /> Đã có
-                                        chữ ký
+                                    <span className="badge bg-success">
+                                        <i className="isax isax-tick-circle5 me-1"></i> Đã có chữ ký
                                     </span>
                                 )}
                             </div>
@@ -433,37 +356,25 @@ const ContractSigningPage: React.FC = () => {
                     </div>
 
                     {/* OTP Section */}
-                    <div className="card mb-4 border-0 shadow-sm">
-                        <div className="card-header bg-light border-0">
-                            <h5 className="mb-0">
-                                <span className="badge bg-primary me-2">2</span>
-                                <i className="ti ti-shield-check me-2" aria-hidden="true" /> Xác
-                                thực OTP
-                            </h5>
+                    <div className="card mb-4">
+                        <div className="card-header">
+                            <h6 className="mb-0">
+                                <span className="badge bg-primary me-2">2</span>{' '}
+                                <i className="isax isax-shield-tick5 me-2"></i> Xác thực OTP
+                            </h6>
                         </div>
-                        <div className="card-body p-4">
+                        <div className="card-body">
                             {otpSent ? (
                                 <div>
-                                    <div className="alert alert-success border-0 mb-4">
-                                        <div className="d-flex align-items-center">
-                                            <i
-                                                className="ti ti-circle-check me-2"
-                                                style={{ fontSize: '24px' }}
-                                                aria-hidden="true"
-                                            />
-                                            <div>
-                                                <strong>Mã OTP đã được gửi!</strong>
-                                                <div className="small mt-1">
-                                                    Vui lòng kiểm tra email của bạn
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div className="alert alert-success mb-3">
+                                        <i className="isax isax-tick-circle5 me-2"></i>
+                                        <strong>Mã OTP đã được gửi!</strong>
+                                        <span className="ms-1">
+                                            Vui lòng kiểm tra email của bạn
+                                        </span>
                                     </div>
                                     <div className="mb-3">
-                                        <label
-                                            htmlFor="otp-input"
-                                            className="form-label fw-semibold"
-                                        >
+                                        <label htmlFor="otp-input" className="form-label fw-medium">
                                             Nhập mã OTP (6 chữ số)
                                         </label>
                                         <input
@@ -481,17 +392,14 @@ const ContractSigningPage: React.FC = () => {
                                                         .join('')
                                                 )
                                             }
-                                            style={{ letterSpacing: '0.5em', fontSize: '1.5rem' }}
+                                            style={{ letterSpacing: '0.5em', fontSize: '1.25rem' }}
                                         />
                                     </div>
                                     <div className="d-flex align-items-center justify-content-between">
                                         {countdown > 0 ? (
                                             <p className="text-muted small mb-0">
-                                                <i
-                                                    className="ti ti-clock me-1"
-                                                    aria-hidden="true"
-                                                />{' '}
-                                                Gửi lại mã sau <strong>{countdown}</strong> giây
+                                                <i className="isax isax-clock5 me-1"></i> Gửi lại mã
+                                                sau <strong>{countdown}</strong> giây
                                             </p>
                                         ) : (
                                             <button
@@ -499,30 +407,23 @@ const ContractSigningPage: React.FC = () => {
                                                 className="btn btn-link p-0 text-decoration-none"
                                                 onClick={handleSendOtp}
                                             >
-                                                <i
-                                                    className="ti ti-refresh me-1"
-                                                    aria-hidden="true"
-                                                />{' '}
-                                                Gửi lại mã OTP
+                                                <i className="isax isax-refresh5 me-1"></i> Gửi lại
+                                                mã OTP
                                             </button>
                                         )}
                                         {otpCode.length === 6 && (
                                             <span className="badge bg-success">
-                                                <i
-                                                    className="ti ti-check me-1"
-                                                    aria-hidden="true"
-                                                />{' '}
-                                                Đã nhập đủ
+                                                <i className="isax isax-tick-circle5 me-1"></i> Đã
+                                                nhập đủ
                                             </span>
                                         )}
                                     </div>
                                 </div>
                             ) : (
                                 <div>
-                                    <div className="alert alert-info border-0 mb-3">
-                                        <i className="ti ti-info-circle me-2" aria-hidden="true" />
+                                    <div className="alert alert-info mb-3">
+                                        <i className="isax isax-info-circle5 me-2"></i>
                                         <small>
-                                            {' '}
                                             Mã OTP sẽ được gửi đến email{' '}
                                             <strong className="text-primary">
                                                 {contractInfo?.representativeEmail}
@@ -537,24 +438,19 @@ const ContractSigningPage: React.FC = () => {
                                     >
                                         {isSendingOtp ? (
                                             <>
-                                                <output className="spinner-border spinner-border-sm me-2" />{' '}
+                                                <span className="spinner-border spinner-border-sm me-2"></span>{' '}
                                                 Đang gửi...
                                             </>
                                         ) : (
                                             <>
-                                                <i className="ti ti-mail me-2" aria-hidden="true" />{' '}
-                                                Gửi mã OTP
+                                                <i className="isax isax-sms5 me-2"></i> Gửi mã OTP
                                             </>
                                         )}
                                     </button>
                                     {!hasSignature && (
-                                        <div className="alert alert-warning border-0 mt-3 mb-0">
-                                            <i
-                                                className="ti ti-alert-triangle me-2"
-                                                aria-hidden="true"
-                                            />
+                                        <div className="alert alert-warning mt-3 mb-0">
+                                            <i className="isax isax-warning-25 me-2"></i>
                                             <small>
-                                                {' '}
                                                 Vui lòng hoàn thành bước 1 (vẽ chữ ký) trước khi gửi
                                                 OTP
                                             </small>
@@ -566,15 +462,15 @@ const ContractSigningPage: React.FC = () => {
                     </div>
 
                     {/* Submit Button */}
-                    <div className="card border-0 shadow-sm">
-                        <div className="card-body text-center p-4">
-                            <h5 className="mb-3">
+                    <div className="card">
+                        <div className="card-body text-center py-4">
+                            <h6 className="mb-3">
                                 <span className="badge bg-primary me-2">3</span> Xác nhận ký hợp
                                 đồng
-                            </h5>
+                            </h6>
                             <button
                                 type="button"
-                                className="btn btn-success px-4 py-2"
+                                className="btn btn-success btn-lg px-4"
                                 onClick={handleSignContract}
                                 disabled={
                                     !hasSignature || !otpSent || otpCode.length !== 6 || isSigning
@@ -582,21 +478,18 @@ const ContractSigningPage: React.FC = () => {
                             >
                                 {isSigning ? (
                                     <>
-                                        <output className="spinner-border spinner-border-sm me-2" />{' '}
+                                        <span className="spinner-border spinner-border-sm me-2"></span>{' '}
                                         Đang xử lý...
                                     </>
                                 ) : (
                                     <>
-                                        <i className="ti ti-check me-2" aria-hidden="true" /> Xác
-                                        nhận ký hợp đồng
+                                        <i className="isax isax-tick-circle5 me-2"></i> Xác nhận ký
+                                        hợp đồng
                                     </>
                                 )}
                             </button>
                             <div className="alert alert-light border mt-3 mb-0">
-                                <i
-                                    className="ti ti-shield-check me-2 text-success"
-                                    aria-hidden="true"
-                                />{' '}
+                                <i className="isax isax-shield-tick5 me-2 text-success"></i>
                                 <small className="text-muted">
                                     Bằng việc ký hợp đồng, bạn xác nhận đã đọc và đồng ý với tất cả
                                     các điều khoản trong hợp đồng. Chữ ký điện tử của bạn có giá trị
