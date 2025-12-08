@@ -10,6 +10,7 @@ import {
     getDisplayPhone,
     getDisplaySpecialty,
     getDisplayLabel,
+    getRebookingUrl,
 } from '@/types/appointment.types';
 import AppointmentActionButtons from '../AppointmentActionButtons/AppointmentActionButtons';
 
@@ -66,9 +67,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
             case 'cancelled':
                 return (
                     <li className="appointment-detail-btn">
-                        <Link
-                            to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                        >
+                        <Link to={getRebookingUrl(appointment)}>
                             <i className="isax isax-calendar-tick5 me-1"></i> Đặt Lại
                         </Link>
                     </li>
@@ -103,7 +102,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                             )}
                         </li>
                         <li className="appointment-detail-btn d-flex align-items-center gap-3 flex-wrap">
-                            <Link to="#" className="btn btn-md btn-dark">
+                            <Link to={getRebookingUrl(appointment)} className="btn btn-md btn-dark">
                                 Đặt Lại <i className="isax isax-arrow-right-3 ms-1"></i>
                             </Link>
                             <Link

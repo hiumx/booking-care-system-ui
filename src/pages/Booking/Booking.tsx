@@ -244,7 +244,7 @@ const Booking: React.FC = () => {
             return createAppointmentRequest({
                 ...baseRequest,
                 doctorId: doctorId,
-                specialtyId: doctorState.selectedDoctor?.specialtyId,
+                specialtyId: doctorState.selectedDoctor?.specialty?.id,
                 hospitalId: doctorState.selectedDoctor?.hospital?.id,
             });
         }
