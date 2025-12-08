@@ -36,19 +36,14 @@ const ConfirmNewDoctor: React.FC = () => {
     const rescheduleToken = searchParams.get('token');
     const newDoctorId = searchParams.get('newDoctorId');
 
-    // Use formatAppointmentTime from utils
-
     // Calculate price difference between original and new doctor
     const calculatePriceDifference = () => {
         if (!appointmentData || !newDoctor) return;
 
         const originalPrice = appointmentData.consultationFees || 0;
         const newDoctorFullPrice = newDoctor.prices?.[0]?.amount || 0;
-
-        // Business rule: newPrice is 30% deposit of the full price
         const newPrice = newDoctorFullPrice * 0.3;
 
-        // If original appointment has no payment (originalPrice = 0), treat as equal
         if (originalPrice === 0) {
             setPriceDifference({ type: 'none', amount: 0 });
         } else if (newPrice === originalPrice) {
@@ -70,7 +65,6 @@ const ConfirmNewDoctor: React.FC = () => {
         loadData();
     }, [appointmentId, newDoctorId]);
 
-    // Calculate price difference when both appointment and doctor data are loaded
     useEffect(() => {
         if (appointmentData && newDoctor) {
             calculatePriceDifference();
@@ -81,14 +75,12 @@ const ConfirmNewDoctor: React.FC = () => {
         try {
             setIsLoading(true);
 
-            // Load appointment data
             const appointmentResponse = await AppointmentService.getAppointmentById(appointmentId!);
             if (!appointmentResponse.success || !appointmentResponse.data) {
                 throw new Error('Không thể tải thông tin lịch hẹn');
             }
             setAppointmentData(appointmentResponse.data);
 
-            // Load new doctor info
             const doctorResponse = await DoctorService.getDoctorById(newDoctorId!);
             if (!doctorResponse.success || !doctorResponse.data) {
                 throw new Error('Không thể tải thông tin bác sĩ mới');
@@ -117,7 +109,6 @@ const ConfirmNewDoctor: React.FC = () => {
         setIsConfirming(true);
 
         try {
-            // Use original appointment date/time for staff-assigned flow
             const newAppointmentDate = appointmentData.appointmentDate;
             const newAppointmentTimeId = appointmentData.appointmentTimeId;
             const doctorPriceId = newDoctor.prices?.[0]?.id || '';
@@ -129,24 +120,21 @@ const ConfirmNewDoctor: React.FC = () => {
                 newAppointmentDate,
                 newAppointmentTimeId,
                 doctorPriceId,
-                isStaffAssigned: true, // Staff-assigned flow
+                isStaffAssigned: true,
             });
 
             if (response.success && response.data) {
                 const { action } = response.data;
 
                 if (action === 'direct_update') {
-                    // Same price or no payment - direct update
                     toast.success('Đã cập nhật bác sĩ thành công!');
                     navigate(PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', appointmentId));
                 } else if (action === 'payment_required') {
-                    // Higher price - redirect to ChooseNewDoctor for payment
                     toast.info('Bác sĩ mới có cọc cao hơn. Vui lòng thanh toán thêm để xác nhận.');
                     navigate(
                         `${PATHS.BOOKING.CHOOSE_NEW_DOCTOR.replace(':doctorId', newDoctorId)}?rescheduleFor=${appointmentId}&token=${rescheduleToken}&skipDateTime=true&isStaffAssigned=true&newDoctorId=${newDoctorId}`
                     );
                 } else if (action === 'refund_created') {
-                    // Lower price - refund created
                     toast.success('Đã cập nhật bác sĩ và tạo yêu cầu hoàn tiền!');
                     navigate(PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', appointmentId));
                 }
@@ -183,300 +171,269 @@ const ConfirmNewDoctor: React.FC = () => {
         );
     }
 
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 0,
+        }).format(price);
+    };
+
     return (
         <BookingLayout>
             <div className={clsx(styles.bookingContainer, 'doctor-content')}>
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-10 mx-auto">
-                            <div className="card shadow-sm">
-                                <div className="card-header bg-success text-white">
-                                    <h4 className="mb-0 d-flex align-items-center">
-                                        <i className="isax isax-user-tick me-2"></i> Xác nhận bác sĩ
-                                        được bệnh viện gán
-                                    </h4>
-                                </div>
-                                <div className="card-body p-4">
-                                    {/* Info Alert */}
-                                    <div className="alert alert-success d-flex align-items-start border-0 shadow-sm mb-4">
-                                        <i className="isax isax-info-circle fs-3 me-3 mt-1 text-success"></i>
-                                        <div>
-                                            <h6 className="alert-heading mb-2">
-                                                Thông báo từ bệnh viện
+                            {/* Page Title */}
+                            <div className="text-center mb-4">
+                                <h4 className="fw-bold mb-2">Xác nhận thay đổi bác sĩ</h4>
+                                <p className="text-muted mb-0">
+                                    Bệnh viện đã gán cho bạn một bác sĩ mới thay thế
+                                </p>
+                            </div>
+
+                            <div className="row g-4">
+                                {/* Left Column - Original Appointment */}
+                                <div className="col-lg-6">
+                                    <div className="card h-100">
+                                        <div className="card-body">
+                                            <h6 className="card-title mb-3">
+                                                <i className="isax isax-calendar-1 me-2 text-muted"></i>{' '}
+                                                Lịch hẹn hiện tại
                                             </h6>
-                                            <p className="mb-0">
-                                                Bệnh viện đã gán cho bạn một bác sĩ mới thay thế.
-                                                Vui lòng xem thông tin chi tiết và xác nhận để tiếp
-                                                tục.
-                                            </p>
-                                        </div>
-                                    </div>
 
-                                    {/* Original Appointment Info */}
-                                    <div className="bg-light rounded-3 p-4 mb-4">
-                                        <h5 className="mb-3 d-flex align-items-center text-dark">
-                                            <i className="isax isax-calendar-1 me-2"></i> Thông tin
-                                            lịch hẹn gốc
-                                        </h5>
-
-                                        {/* Original Doctor Info */}
-                                        <div className="d-flex align-items-center mb-3 pb-3 border-bottom">
-                                            <div className="me-3 flex-shrink-0">
+                                            {/* Original Doctor */}
+                                            <div className="d-flex align-items-center mb-3">
                                                 <img
                                                     src={
                                                         appointmentData?.doctorInfo?.avatarUrl ||
                                                         '/src/assets/img/clients/client-16.jpg'
                                                     }
                                                     alt="doctor"
-                                                    className="rounded-circle"
+                                                    className="rounded-circle me-3"
                                                     style={{
-                                                        width: '60px',
-                                                        height: '60px',
+                                                        width: '50px',
+                                                        height: '50px',
                                                         objectFit: 'cover',
-                                                        aspectRatio: '1/1',
                                                     }}
                                                 />
-                                            </div>
-                                            <div className="flex-grow-1">
-                                                <p className="text-muted mb-1 small">
-                                                    Bác sĩ ban đầu
-                                                </p>
-                                                <h6 className="mb-1 text-dark">
-                                                    {appointmentData?.doctorInfo?.positionName}{' '}
-                                                    {appointmentData?.doctorInfo?.fullName ||
-                                                        'Bác sĩ'}
-                                                </h6>
-                                                <p className="text-muted mb-0">
-                                                    <i className="isax isax-health me-1"></i>
-                                                    {appointmentData?.doctorInfo?.specialtyName ||
-                                                        'Chưa cập nhật'}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Appointment Details */}
-                                        <div className="row g-3">
-                                            <div className="col-md-6">
-                                                <div className="d-flex align-items-start">
-                                                    <i className="isax isax-calendar-2 text-primary me-2 mt-1"></i>
-                                                    <div>
-                                                        <small className="text-muted d-block">
-                                                            Ngày khám
-                                                        </small>
-                                                        <span className="fw-medium text-dark">
-                                                            {new Date(
-                                                                appointmentData?.appointmentDate ||
-                                                                    ''
-                                                            ).toLocaleDateString('vi-VN', {
-                                                                weekday: 'long',
-                                                                year: 'numeric',
-                                                                month: 'long',
-                                                                day: 'numeric',
-                                                            })}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-md-6">
-                                                <div className="d-flex align-items-start">
-                                                    <i className="isax isax-clock text-primary me-2 mt-1"></i>
-                                                    <div>
-                                                        <small className="text-muted d-block">
-                                                            Giờ khám
-                                                        </small>
-                                                        <span className="fw-medium text-dark">
-                                                            {formatAppointmentTime(
-                                                                appointmentData?.appointmentTimeId ||
-                                                                    ''
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-md-12">
-                                                <div className="d-flex align-items-start">
-                                                    <i className="isax isax-hospital text-primary me-2 mt-1"></i>
-                                                    <div>
-                                                        <small className="text-muted d-block">
-                                                            Địa điểm
-                                                        </small>
-                                                        <span className="fw-medium text-dark">
-                                                            {appointmentData?.hospitalInfo?.name ||
-                                                                'Chưa cập nhật'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* New Doctor Info */}
-                                    {newDoctor && (
-                                        <div className="bg-success bg-opacity-10 rounded-3 p-4 mb-4 border border-success">
-                                            <h5 className="mb-3 d-flex align-items-center text-success">
-                                                <i className="isax isax-user-tick me-2"></i> Bác sĩ
-                                                được gán mới
-                                            </h5>
-
-                                            <div className="d-flex align-items-start">
-                                                <div className="me-3 flex-shrink-0">
-                                                    <img
-                                                        src={
-                                                            newDoctor.avatarUrl ||
-                                                            '/src/assets/img/clients/client-16.jpg'
-                                                        }
-                                                        alt="new doctor"
-                                                        className="rounded-circle"
-                                                        style={{
-                                                            width: '80px',
-                                                            height: '80px',
-                                                            objectFit: 'cover',
-                                                            aspectRatio: '1/1',
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="flex-grow-1">
-                                                    <h5 className="mb-2 text-dark">
-                                                        {newDoctor.position?.name}{' '}
-                                                        {newDoctor.lastName} {newDoctor.firstName}
-                                                    </h5>
-                                                    <p className="text-muted mb-2">
-                                                        <i className="isax isax-health me-2"></i>
-                                                        {newDoctor.specialty?.name}
+                                                <div>
+                                                    <p className="mb-0 fw-medium">
+                                                        {appointmentData?.doctorInfo?.positionName}{' '}
+                                                        {appointmentData?.doctorInfo?.fullName ||
+                                                            'Bác sĩ'}
                                                     </p>
-                                                    <p className="text-muted mb-2">
-                                                        <i className="isax isax-hospital me-2"></i>
-                                                        {newDoctor.hospital?.name}
-                                                    </p>
-                                                    <p className="mb-2">
-                                                        <i className="isax isax-briefcase me-2"></i>
-                                                        <strong>Kinh nghiệm:</strong>{' '}
-                                                        {newDoctor.yearsOfExperience} năm
-                                                    </p>
+                                                    <small className="text-muted">
+                                                        {appointmentData?.doctorInfo
+                                                            ?.specialtyName || 'Chưa cập nhật'}
+                                                    </small>
+                                                </div>
+                                            </div>
 
-                                                    {/* Price Comparison Info */}
-                                                    {priceDifference &&
-                                                        priceDifference.type !== 'none' && (
-                                                            <div className="mt-3 p-3 bg-light rounded-3 border">
-                                                                <h6 className="mb-2 text-dark">
-                                                                    <i className="isax isax-money-2 me-2"></i>{' '}
-                                                                    So sánh giá khám
-                                                                </h6>
-                                                                <div className="row g-2">
-                                                                    <div className="col-6">
-                                                                        <small className="text-muted d-block">
-                                                                            Bác sĩ cũ
-                                                                        </small>
-                                                                        <span className="fw-medium">
-                                                                            {(
-                                                                                appointmentData?.consultationFees ||
-                                                                                0
-                                                                            ).toLocaleString(
-                                                                                'vi-VN'
-                                                                            )}{' '}
-                                                                            đ
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="col-6">
-                                                                        <small className="text-muted d-block">
-                                                                            Bác sĩ mới (cọc 30%)
-                                                                        </small>
-                                                                        <span className="fw-medium">
-                                                                            {(
-                                                                                (newDoctor
-                                                                                    .prices?.[0]
-                                                                                    ?.amount || 0) *
-                                                                                0.3
-                                                                            ).toLocaleString(
-                                                                                'vi-VN'
-                                                                            )}{' '}
-                                                                            đ
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
+                                            <hr />
 
-                                                                {/* Price difference alert */}
-                                                                {priceDifference.type ===
-                                                                    'higher' && (
-                                                                    <div className="alert alert-warning mt-2 mb-0 py-2">
-                                                                        <i className="isax isax-warning-2 me-2"></i>
-                                                                        <small>
-                                                                            Bác sĩ mới có cọc cao
-                                                                            hơn{' '}
-                                                                            {priceDifference.amount.toLocaleString(
-                                                                                'vi-VN'
-                                                                            )}{' '}
-                                                                            đ. Bạn cần thanh toán
-                                                                            thêm để xác nhận.
-                                                                        </small>
-                                                                    </div>
-                                                                )}
-                                                                {priceDifference.type ===
-                                                                    'lower' && (
-                                                                    <div className="alert alert-success mt-2 mb-0 py-2">
-                                                                        <i className="isax isax-tick-circle me-2"></i>
-                                                                        <small>
-                                                                            Bác sĩ mới có cọc thấp
-                                                                            hơn{' '}
-                                                                            {priceDifference.amount.toLocaleString(
-                                                                                'vi-VN'
-                                                                            )}{' '}
-                                                                            đ. Bạn sẽ được hoàn
-                                                                            tiền.
-                                                                        </small>
-                                                                    </div>
-                                                                )}
-                                                                {priceDifference.type ===
-                                                                    'equal' && (
-                                                                    <div className="alert alert-info mt-2 mb-0 py-2">
-                                                                        <i className="isax isax-info-circle me-2"></i>
-                                                                        <small>
-                                                                            Bác sĩ mới có cọc bằng
-                                                                            với bác sĩ cũ. Không cần
-                                                                            thanh toán thêm.
-                                                                        </small>
-                                                                    </div>
-                                                                )}
-                                                            </div>
+                                            {/* Appointment Details */}
+                                            <div className="row g-3">
+                                                <div className="col-6">
+                                                    <small className="text-muted d-block mb-1">
+                                                        Ngày khám
+                                                    </small>
+                                                    <p className="mb-0 fw-medium">
+                                                        {new Date(
+                                                            appointmentData?.appointmentDate || ''
+                                                        ).toLocaleDateString('vi-VN', {
+                                                            day: '2-digit',
+                                                            month: '2-digit',
+                                                            year: 'numeric',
+                                                        })}
+                                                    </p>
+                                                </div>
+                                                <div className="col-6">
+                                                    <small className="text-muted d-block mb-1">
+                                                        Giờ khám
+                                                    </small>
+                                                    <p className="mb-0 fw-medium">
+                                                        {formatAppointmentTime(
+                                                            appointmentData?.appointmentTimeId || ''
                                                         )}
+                                                    </p>
+                                                </div>
+                                                <div className="col-12">
+                                                    <small className="text-muted d-block mb-1">
+                                                        Địa điểm
+                                                    </small>
+                                                    <p className="mb-0 fw-medium">
+                                                        {appointmentData?.hospitalInfo?.name ||
+                                                            'Chưa cập nhật'}
+                                                    </p>
+                                                </div>
+                                                <div className="col-12">
+                                                    <small className="text-muted d-block mb-1">
+                                                        Phí đã cọc
+                                                    </small>
+                                                    <p className="mb-0 fw-medium text-primary">
+                                                        {formatPrice(
+                                                            appointmentData?.consultationFees || 0
+                                                        )}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
-                                    )}
-
-                                    {/* Action Button */}
-                                    <div className="d-flex justify-content-end gap-3 mt-4">
-                                        <button
-                                            type="button"
-                                            className="btn btn-success  d-inline-flex align-items-center"
-                                            onClick={handleConfirm}
-                                            disabled={isConfirming}
-                                        >
-                                            {isConfirming ? (
-                                                <>
-                                                    <output
-                                                        className="spinner-border spinner-border-sm me-2"
-                                                        aria-label="Đang xử lý"
-                                                    >
-                                                        <span className="visually-hidden">
-                                                            Đang xử lý...
-                                                        </span>
-                                                    </output>
-                                                    Đang xử lý...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <i className="isax isax-tick-circle me-2"></i>
-                                                    {priceDifference?.type === 'higher'
-                                                        ? 'Xác nhận & Thanh toán'
-                                                        : 'Xác nhận bác sĩ mới'}
-                                                </>
-                                            )}
-                                        </button>
                                     </div>
                                 </div>
+
+                                {/* Right Column - New Doctor */}
+                                <div className="col-lg-6">
+                                    <div className="card h-100 border-primary">
+                                        <div className="card-body">
+                                            <h6 className="card-title mb-3">
+                                                <i className="isax isax-user-tick me-2 text-primary"></i>{' '}
+                                                Bác sĩ được gán mới
+                                            </h6>
+
+                                            {newDoctor && (
+                                                <>
+                                                    {/* New Doctor Info */}
+                                                    <div className="d-flex align-items-center mb-3">
+                                                        <img
+                                                            src={
+                                                                newDoctor.avatarUrl ||
+                                                                '/src/assets/img/clients/client-16.jpg'
+                                                            }
+                                                            alt="new doctor"
+                                                            className="rounded-circle me-3"
+                                                            style={{
+                                                                width: '50px',
+                                                                height: '50px',
+                                                                objectFit: 'cover',
+                                                            }}
+                                                        />
+                                                        <div>
+                                                            <p className="mb-0 fw-medium">
+                                                                {newDoctor.position?.name}{' '}
+                                                                {newDoctor.lastName}{' '}
+                                                                {newDoctor.firstName}
+                                                            </p>
+                                                            <small className="text-muted">
+                                                                {newDoctor.specialty?.name}
+                                                            </small>
+                                                        </div>
+                                                    </div>
+
+                                                    <hr />
+
+                                                    {/* New Doctor Details */}
+                                                    <div className="row g-3">
+                                                        <div className="col-6">
+                                                            <small className="text-muted d-block mb-1">
+                                                                Bệnh viện
+                                                            </small>
+                                                            <p className="mb-0 fw-medium">
+                                                                {newDoctor.hospital?.name}
+                                                            </p>
+                                                        </div>
+                                                        <div className="col-6">
+                                                            <small className="text-muted d-block mb-1">
+                                                                Kinh nghiệm
+                                                            </small>
+                                                            <p className="mb-0 fw-medium">
+                                                                {newDoctor.yearsOfExperience} năm
+                                                            </p>
+                                                        </div>
+                                                        <div className="col-12">
+                                                            <small className="text-muted d-block mb-1">
+                                                                Phí cọc mới (30%)
+                                                            </small>
+                                                            <p className="mb-0 fw-medium text-primary">
+                                                                {formatPrice(
+                                                                    (newDoctor.prices?.[0]
+                                                                        ?.amount || 0) * 0.3
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Price Difference Notice */}
+                            {priceDifference && priceDifference.type !== 'none' && (
+                                <div className="card mt-4">
+                                    <div className="card-body py-3">
+                                        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                            <div className="d-flex align-items-center">
+                                                {priceDifference.type === 'higher' && (
+                                                    <>
+                                                        <i className="isax isax-arrow-up-3 text-warning me-2"></i>
+                                                        <span>
+                                                            Cọc cao hơn{' '}
+                                                            <strong className="text-warning">
+                                                                {formatPrice(
+                                                                    priceDifference.amount
+                                                                )}
+                                                            </strong>{' '}
+                                                            Bạn cần thanh toán thêm.
+                                                        </span>
+                                                    </>
+                                                )}
+                                                {priceDifference.type === 'lower' && (
+                                                    <>
+                                                        <i className="isax isax-arrow-down-2 text-success me-2"></i>
+                                                        <span>
+                                                            Cọc thấp hơn{' '}
+                                                            <strong className="text-success">
+                                                                {formatPrice(
+                                                                    priceDifference.amount
+                                                                )}
+                                                            </strong>{' '}
+                                                            Bạn sẽ được hoàn tiền.
+                                                        </span>
+                                                    </>
+                                                )}
+                                                {priceDifference.type === 'equal' && (
+                                                    <>
+                                                        <i className="isax isax-tick-circle text-primary me-2"></i>
+                                                        <span>
+                                                            Cọc bằng nhau. Không cần thanh toán
+                                                            thêm.
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            <div className="d-flex justify-content-end gap-3 mt-4">
+                                <button
+                                    type="button"
+                                    className="btn btn-primary-gradient d-inline-flex align-items-center rounded-pill px-4"
+                                    onClick={handleConfirm}
+                                    disabled={isConfirming}
+                                >
+                                    {isConfirming ? (
+                                        <>
+                                            <output
+                                                className="spinner-border spinner-border-sm me-2"
+                                                aria-hidden="true"
+                                            ></output>{' '}
+                                            Đang xử lý...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="isax isax-tick-circle me-2"></i>
+                                            {priceDifference?.type === 'higher'
+                                                ? 'Xác nhận & Thanh toán'
+                                                : 'Xác nhận bác sĩ mới'}
+                                        </>
+                                    )}
+                                </button>
                             </div>
                         </div>
                     </div>
