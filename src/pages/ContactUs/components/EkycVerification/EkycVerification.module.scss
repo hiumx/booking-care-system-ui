@@ -1,0 +1,249 @@
+.ekycContainer {
+    padding: 1.5rem;
+    background-color: #f6faff;
+    border-radius: 12px;
+    border: 1px solid #cfe2ff;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.uploadBox {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        border-color: #0d6efd;
+        background-color: #f0f7ff;
+    }
+
+    &:focus {
+        outline: 2px solid #0d6efd;
+        outline-offset: 2px;
+    }
+}
+
+.selfieBox {
+    max-width: 300px;
+    margin: 0 auto;
+    min-height: 200px;
+}
+
+.uploadPlaceholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #6b7280;
+
+    i {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        color: #9ca3af;
+    }
+
+    span {
+        font-weight: 500;
+    }
+}
+
+.previewImage {
+    max-width: 100%;
+    max-height: 180px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.ocrResult {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 1rem;
+
+    h6 {
+        color: #166534;
+    }
+}
+
+.verificationSuccess {
+    padding: 1rem;
+}
+
+.verificationFailed {
+    padding: 1rem;
+}
+
+.processingOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    z-index: 10;
+
+    p {
+        color: #0d6efd;
+        font-weight: 500;
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .ekycContainer {
+        padding: 1rem;
+    }
+
+    .uploadBox {
+        min-height: 120px;
+        padding: 1rem;
+    }
+
+    .selfieBox {
+        max-width: 100%;
+    }
+}
+
+.previewContainer {
+    position: relative;
+    width: 100%;
+}
+
+.removeBtn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #dc3545;
+    line-height: 1;
+
+    &:hover {
+        color: #a71d2a;
+    }
+}
+
+.uploadActions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.cameraModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cameraContainer {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+}
+
+.videoWrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.faceGuide {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 240px;
+    height: 300px;
+    border: 3px dashed rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+
+    &::after {
+        content: 'Đưa mặt vào khung';
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #fff;
+        font-size: 12px;
+        white-space: nowrap;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+}
+
+// Recording indicator for video
+.recordingIndicator {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(220, 53, 69, 0.9);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.recordingDot {
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%,
+    50% {
+        opacity: 1;
+    }
+    51%,
+    100% {
+        opacity: 0.3;
+    }
+}
