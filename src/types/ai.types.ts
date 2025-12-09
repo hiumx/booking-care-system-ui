@@ -60,6 +60,13 @@ export interface Doctor {
     serviceTypeName?: string;
     price?: string;
     avatarUrl?: string;
+    serviceOptions?: DoctorServiceOption[];
+}
+
+export interface DoctorServiceOption {
+    serviceTypeId?: string;
+    serviceTypeName: string;
+    price?: string;
 }
 
 export interface Hospital {

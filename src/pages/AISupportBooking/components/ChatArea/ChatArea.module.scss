@@ -336,6 +336,16 @@
             }
         }
     }
+
+    .serviceTypeRow {
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .serviceTypeSelect {
+        min-width: 240px;
+    }
 }
 
 .inputContainer {
