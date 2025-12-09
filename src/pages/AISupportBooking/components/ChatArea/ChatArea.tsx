@@ -140,16 +140,25 @@ const createCarouselItems = (
 
         if (activeTab === 'doctor' && selectedServiceType) {
             const opts = suggestion.doctor?.serviceOptions || [];
-            const match = opts.some(
-                (o: any) =>
-                    normalizeServiceName(o.serviceTypeName) ===
-                        normalizeServiceName(selectedServiceType) ||
-                    normalizeServiceName(o.serviceTypeName).includes(
-                        normalizeServiceName(selectedServiceType)
-                    )
-            );
-            // If doctor không có dịch vụ đang chọn, ẩn khỏi carousel
-            return match;
+            const normalizedSelected = normalizeServiceName(selectedServiceType);
+
+            const matchFromOptions = opts.some((o: any) => {
+                const normalizedName = normalizeServiceName(o.serviceTypeName);
+                return (
+                    normalizedName === normalizedSelected ||
+                    normalizedName.includes(normalizedSelected)
+                );
+            });
+
+            // Fallback: allow match by serviceTypeName when serviceOptions không có
+            const matchFromServiceName =
+                opts.length === 0 &&
+                !!suggestion.doctor?.serviceTypeName &&
+                normalizeServiceName(suggestion.doctor.serviceTypeName).includes(
+                    normalizedSelected
+                );
+
+            return matchFromOptions || matchFromServiceName || opts.length === 0;
         }
 
         return true;

@@ -14,23 +14,46 @@ import { Message, ChatHistory, Suggestion } from '@/types/ai.types';
 import { PATHS, replacePathParams } from '@/routes/paths';
 import { AIService, SymptomAnalysisRequest } from '@/services/ai.service';
 
-// Helper function to parse doctor data
-const parseDoctorData = (d: any) => ({
-    type: 'doctor' as const,
-    doctor: {
-        id: d.id || d.Id || d.doctor?.id,
-        name: d.name || d.Name || d.doctor?.name,
-        specialtyName: d.specialtyName || d.SpecialtyName || d.doctor?.specialtyName,
-        hospitalName: d.hospitalName || d.HospitalName || d.doctor?.hospitalName,
-        rating: d.rating || d.Rating || d.doctor?.rating || 0,
-        yearOfExperience:
-            d.yearOfExperience || d.YearOfExperience || d.doctor?.yearOfExperience || 0,
-        serviceTypeName:
-            d.serviceTypeName || d.ServiceTypeName || d.doctor?.serviceTypeName || undefined,
-        price: d.price || d.Price || d.doctor?.price || undefined,
-        avatarUrl: d.avatarUrl || d.AvatarUrl || d.doctor?.avatarUrl || undefined,
-    },
-});
+// Helper function to parse doctor data (preserve service options for filtering)
+const parseDoctorData = (d: any) => {
+    const rawOptions =
+        d.serviceOptions ||
+        d.ServiceOptions ||
+        d.doctor?.serviceOptions ||
+        d.doctor?.ServiceOptions;
+
+    const serviceOptions = Array.isArray(rawOptions)
+        ? rawOptions.map((o: any) => ({
+              serviceTypeId: o.serviceTypeId || o.ServiceTypeId,
+              serviceTypeName: o.serviceTypeName || o.ServiceTypeName,
+              price: o.price || o.Price,
+          }))
+        : [];
+
+    const fallbackOption = serviceOptions[0];
+
+    return {
+        type: 'doctor' as const,
+        doctor: {
+            id: d.id || d.Id || d.doctor?.id,
+            name: d.name || d.Name || d.doctor?.name,
+            specialtyName: d.specialtyName || d.SpecialtyName || d.doctor?.specialtyName,
+            hospitalName: d.hospitalName || d.HospitalName || d.doctor?.hospitalName,
+            rating: d.rating || d.Rating || d.doctor?.rating || 0,
+            yearOfExperience:
+                d.yearOfExperience || d.YearOfExperience || d.doctor?.yearOfExperience || 0,
+            serviceTypeName:
+                d.serviceTypeName ||
+                d.ServiceTypeName ||
+                d.doctor?.serviceTypeName ||
+                fallbackOption?.serviceTypeName ||
+                undefined,
+            price: d.price || d.Price || d.doctor?.price || fallbackOption?.price || undefined,
+            avatarUrl: d.avatarUrl || d.AvatarUrl || d.doctor?.avatarUrl || undefined,
+            serviceOptions,
+        },
+    };
+};
 
 // Helper function to parse hospital data
 const parseHospitalData = (h: any) => ({
