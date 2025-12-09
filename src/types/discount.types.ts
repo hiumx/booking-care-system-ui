@@ -1,16 +1,13 @@
 // Import discount enums
-import { DiscountApplicableTo, DiscountStatus, DiscountType } from '../enums/discount.enums';
+import { DiscountStatus, DiscountType } from '../enums/discount.enums';
 
-// Discount types based on the DDL schema
+// Discount types based on the backend schema
 export interface Discount {
     id: string; // GUID
     code: string;
     name: string;
     description?: string;
-    clinicId: string;
-    specialtyId?: string;
-    doctorId?: string;
-    applicableTo: DiscountApplicableTo;
+    hospitalId: string; // Changed from clinicId to match backend
     amount: number;
     discountType: DiscountType;
     startDate: string; // ISO date string
@@ -27,10 +24,7 @@ export interface CreateDiscountRequest {
     code: string;
     name: string;
     description?: string;
-    clinicId: string;
-    specialtyId?: string;
-    doctorId?: string;
-    applicableTo: DiscountApplicableTo;
+    hospitalId: string; // Changed from clinicId to match backend
     amount: number;
     discountType: DiscountType;
     startDate: string;
@@ -45,10 +39,7 @@ export interface UpdateDiscountRequest extends Partial<CreateDiscountRequest> {
 
 // Query parameters for filtering discounts
 export interface DiscountFilters {
-    clinicId?: string;
-    specialtyId?: string;
-    doctorId?: string;
-    applicableTo?: DiscountApplicableTo;
+    hospitalId?: string; // Changed from clinicId to match backend
     discountType?: DiscountType;
     status?: DiscountStatus;
     code?: string;
@@ -88,7 +79,7 @@ export interface DiscountListResponse {
 export interface DiscountValidationResult {
     isValid: boolean;
     discount?: Discount;
-    appliedAmount: number;
+    discountAmount: number; // Backend returns DiscountAmount which becomes discountAmount
     finalAmount: number;
     message?: string;
     errors?: string[];
@@ -98,9 +89,7 @@ export interface DiscountValidationResult {
 export interface ApplyDiscountRequest {
     code: string;
     originalAmount: number;
-    clinicId: string;
-    specialtyId?: string;
-    doctorId?: string;
+    hospitalId: string; // Changed from clinicId to match backend
 }
 
 // Discount usage statistics

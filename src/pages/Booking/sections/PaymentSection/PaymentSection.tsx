@@ -6,8 +6,22 @@ import { useAppSelector } from '@/store/hooks';
 import { selectSelectedDate, selectSelectedSlots } from '@/store/selectors/schedule.selectors';
 import TimeSlotBadge from '../../components/TimeSlotBadge';
 import PaymentService, { PaymentMethod } from '@/services/payment.service';
+import DiscountService from '@/services/discount.service';
 import { toast } from 'react-toastify';
 import { AppointmentType } from '@/enums/appointment.enums';
+
+// Helper function to parse AppointmentTimeId (format: AT_08_00_09_00 -> { startTime: "08:00", endTime: "09:00" })
+const parseAppointmentTimeId = (timeId: string) => {
+    // Format: AT_08_00_09_00
+    const parts = timeId.split('_');
+    if (parts.length === 5 && parts[0] === 'AT') {
+        return {
+            startTime: `${parts[1]}:${parts[2]}`,
+            endTime: `${parts[3]}:${parts[4]}`,
+        };
+    }
+    return null;
+};
 
 interface PaymentSectionProps {
     nextStep: () => void;
@@ -15,7 +29,10 @@ interface PaymentSectionProps {
     isCreatingAppointment?: boolean;
     onCreateAppointmentAndPayment: (
         paymentMethodId: string,
-        depositAmount: number
+        depositAmount: number,
+        discountId?: string,
+        discountCode?: string,
+        discountedTotalAmount?: number
     ) => Promise<void>;
     onCreateAppointmentOnly?: () => Promise<void>; // New: Create appointment without payment
     isProcessingPayment?: boolean;
@@ -43,19 +60,6 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     const selectedDateFromRedux = useAppSelector(selectSelectedDate);
     const selectedSlotsFromRedux = useAppSelector(selectSelectedSlots);
 
-    // Helper function to parse AppointmentTimeId (format: AT_08_00_09_00 -> { startTime: "08:00", endTime: "09:00" })
-    const parseAppointmentTimeId = (timeId: string) => {
-        // Format: AT_08_00_09_00
-        const parts = timeId.split('_');
-        if (parts.length === 5 && parts[0] === 'AT') {
-            return {
-                startTime: `${parts[1]}:${parts[2]}`,
-                endTime: `${parts[3]}:${parts[4]}`,
-            };
-        }
-        return null;
-    };
-
     // Use reschedule date/time if provided (for staff-assigned flow with skipDateTime=true)
     const selectedDate = rescheduleAppointmentDate || selectedDateFromRedux;
     const selectedSlots = rescheduleAppointmentTimeId
@@ -69,6 +73,16 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const [selectedPayment, setSelectedPayment] = useState<string>('');
     const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(true);
+
+    // Discount state
+    const [discountCode, setDiscountCode] = useState<string>('');
+    const [appliedDiscount, setAppliedDiscount] = useState<{
+        id: string; // Discount ID from validation response
+        code: string;
+        discountAmount: number;
+        finalAmount: number;
+    } | null>(null);
+    const [isValidatingDiscount, setIsValidatingDiscount] = useState(false);
 
     // Payment option state (new business requirement)
     // For specialty booking, default to 'no-payment' since there's no price yet
@@ -222,9 +236,82 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     // For regular payment: calculate 30% deposit from doctor's price or service price
     const TOTAL_AMOUNT = isSupplementaryPayment ? supplementaryAmount : getConsultationFee();
     const DEPOSIT_PERCENTAGE = 0.3; // 30% deposit
+
+    // Calculate deposit from total amount (or final amount if discount applied)
+    const TOTAL_AFTER_DISCOUNT = appliedDiscount ? appliedDiscount.finalAmount : TOTAL_AMOUNT;
     const DEPOSIT_AMOUNT = isSupplementaryPayment
         ? supplementaryAmount
-        : Math.round(TOTAL_AMOUNT * DEPOSIT_PERCENTAGE);
+        : Math.round(TOTAL_AFTER_DISCOUNT * DEPOSIT_PERCENTAGE);
+
+    // Final amount to pay (deposit after discount)
+    const FINAL_AMOUNT = DEPOSIT_AMOUNT;
+
+    // Get hospitalId from multiple sources based on booking flow
+    const getHospitalId = (): string | undefined => {
+        // Priority 1: From service medical state (service booking flow)
+        if (serviceMedicalState?.hospitalId) return serviceMedicalState.hospitalId;
+
+        // Priority 2: From doctor state (doctor booking flow)
+        if (doctorState.selectedDoctor?.hospital?.id)
+            return doctorState.selectedDoctor?.hospital?.id;
+
+        // Priority 3: From hospital state (hospital booking flow with selected hospital)
+        if (hospitalState.selectedHospital?.id) return hospitalState.selectedHospital.id;
+
+        return undefined;
+    };
+
+    const resolvedHospitalId = getHospitalId();
+
+    // Handle discount code validation
+    const handleValidateDiscount = async () => {
+        if (!discountCode.trim()) {
+            toast.warning('Vui lòng nhập mã giảm giá');
+            return;
+        }
+
+        if (!resolvedHospitalId) {
+            toast.error('Không tìm thấy thông tin bệnh viện');
+            return;
+        }
+
+        setIsValidatingDiscount(true);
+        try {
+            const result = await DiscountService.validateDiscount(discountCode.trim(), {
+                hospitalId: resolvedHospitalId,
+                totalAmount: TOTAL_AMOUNT, // Validate against total amount, not deposit
+            });
+
+            if (result.isValid) {
+                // Discount object should exist when isValid=true
+                if (!result.discount?.id) {
+                    toast.error('Lỗi: Không nhận được thông tin discount từ server');
+                    return;
+                }
+
+                setAppliedDiscount({
+                    id: result.discount.id, // Store discount ID for payment
+                    code: discountCode.trim(),
+                    discountAmount: result.discountAmount,
+                    finalAmount: result.finalAmount, // This is total after discount
+                });
+                toast.success('Áp dụng mã giảm giá thành công!');
+            } else {
+                toast.error(result.message || 'Mã giảm giá không hợp lệ');
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Không thể xác thực mã giảm giá');
+        } finally {
+            setIsValidatingDiscount(false);
+        }
+    };
+
+    // Handle remove discount
+    const handleRemoveDiscount = () => {
+        setAppliedDiscount(null);
+        setDiscountCode('');
+        toast.info('Đã hủy mã giảm giá');
+    };
 
     // Handle next step based on selected payment option
     const handleNextStep = async () => {
@@ -252,8 +339,14 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                 return;
             }
 
-            // Call parent handler with payment method and deposit amount
-            await onCreateAppointmentAndPayment(selectedPayment, DEPOSIT_AMOUNT);
+            // Call parent handler with payment method, deposit amount, discount ID, discount code, and total after discount
+            await onCreateAppointmentAndPayment(
+                selectedPayment,
+                FINAL_AMOUNT,
+                appliedDiscount?.id,
+                appliedDiscount?.code,
+                TOTAL_AFTER_DISCOUNT // Pass total after discount for appointment amount
+            );
         }
         // Option 2: No payment (create appointment only)
         else if (paymentOption === 'no-payment') {
@@ -325,6 +418,27 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                 <p className="mb-0">Tổng phí khám bệnh</p>
                 <span className="fw-medium d-block">{TOTAL_AMOUNT.toLocaleString('vi-VN')} đ</span>
             </div>
+
+            {/* Show discount if applied */}
+            {appliedDiscount && (
+                <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
+                    <p className="mb-0 text-success">Giảm giá ({appliedDiscount.code})</p>
+                    <span className="fw-medium text-success d-block">
+                        - {appliedDiscount.discountAmount.toLocaleString('vi-VN')} đ
+                    </span>
+                </div>
+            )}
+
+            {/* Show total after discount if discount applied */}
+            {appliedDiscount && (
+                <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2 pb-2 border-bottom">
+                    <p className="mb-0 fw-bold">Tổng sau giảm giá</p>
+                    <span className="fw-bold d-block">
+                        {TOTAL_AFTER_DISCOUNT.toLocaleString('vi-VN')} đ
+                    </span>
+                </div>
+            )}
+
             <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
                 <p className="mb-0">Phí đặt cọc (30%)</p>
                 <span className="fw-medium text-primary d-block">
@@ -335,8 +449,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                 <i className="bi bi-info-circle me-2"></i>
                 <small>
                     Bạn chỉ cần thanh toán đặt cọc 30% ({DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ)
-                    để xác nhận lịch hẹn. Số tiền còn lại sẽ được thanh toán trực tiếp tại phòng
-                    khám.
+                    để xác nhận lịch hẹn. Số tiền còn lại (
+                    {(TOTAL_AFTER_DISCOUNT - DEPOSIT_AMOUNT).toLocaleString('vi-VN')} đ) sẽ được
+                    thanh toán trực tiếp tại phòng khám.
                 </small>
             </div>
         </>
@@ -487,28 +602,28 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         };
     }, [selectedDate, selectedSlots]);
 
+    // Helper function to get next step button title - extracted to reduce cognitive complexity
+    const getNextStepButtonTitle = (): string => {
+        if (isCreatingAppointment || isProcessingPayment) {
+            return 'Đang xử lý...';
+        }
+        if (isSupplementaryPayment) {
+            return 'Thanh toán';
+        }
+        if (paymentOption === 'deposit') {
+            return 'Đặt cọc & Thanh toán';
+        }
+        if (paymentOption === 'no-payment') {
+            return 'Đặt lịch ngay';
+        }
+        return 'Tiếp tục';
+    };
+
     return (
         <BookingSectionWrapper
             doctor={entityInfo}
             appointment={mockAppointmentInfo}
-            nextStepTitle={(() => {
-                if (isCreatingAppointment) {
-                    return 'Đang xử lý...';
-                }
-                if (isProcessingPayment) {
-                    return 'Đang xử lý...';
-                }
-                if (isSupplementaryPayment) {
-                    return 'Thanh toán';
-                }
-                // New business logic for button text
-                if (paymentOption === 'deposit') {
-                    return 'Đặt cọc & Thanh toán';
-                } else if (paymentOption === 'no-payment') {
-                    return 'Đặt lịch ngay';
-                }
-                return 'Tiếp tục';
-            })()}
+            nextStepTitle={getNextStepButtonTitle()}
             nextStep={handleNextStep}
             prevStep={prevStep}
             isShowInfoHeader={false}
@@ -818,6 +933,96 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                     <div className="pt-3 border-top booking-more-info">
                                         <h6 className="mb-3">Thông tin thanh toán</h6>
                                         {renderPaymentAmountDetails()}
+
+                                        {/* Discount Code Section */}
+                                        {paymentOption === 'deposit' && !isSupplementaryPayment && (
+                                            <div className="mt-3">
+                                                <div className="discount-section">
+                                                    <label
+                                                        htmlFor="discountCodeInput"
+                                                        className="form-label fw-medium"
+                                                    >
+                                                        <i
+                                                            className="bi bi-tag me-2"
+                                                            aria-hidden="true"
+                                                        ></i>{' '}
+                                                        Mã giảm giá
+                                                    </label>
+                                                    {appliedDiscount ? (
+                                                        <div className="alert alert-success d-flex justify-content-between align-items-center mb-0">
+                                                            <div>
+                                                                <i className="bi bi-check-circle me-2"></i>
+                                                                <strong>
+                                                                    {appliedDiscount.code}
+                                                                </strong>{' '}
+                                                                - Giảm{' '}
+                                                                {appliedDiscount.discountAmount.toLocaleString(
+                                                                    'vi-VN'
+                                                                )}{' '}
+                                                                đ
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                className="btn-remove-discount"
+                                                                onClick={handleRemoveDiscount}
+                                                                title="Hủy mã giảm giá"
+                                                                aria-label="Hủy mã giảm giá"
+                                                            >
+                                                                ×
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="input-group">
+                                                            <input
+                                                                id="discountCodeInput"
+                                                                type="text"
+                                                                className="form-control"
+                                                                placeholder="Nhập mã giảm giá"
+                                                                value={discountCode}
+                                                                onChange={(e) =>
+                                                                    setDiscountCode(
+                                                                        e.target.value.toUpperCase()
+                                                                    )
+                                                                }
+                                                                disabled={isValidatingDiscount}
+                                                            />
+                                                            <button
+                                                                className="btn btn-apply-discount"
+                                                                type="button"
+                                                                onClick={handleValidateDiscount}
+                                                                disabled={
+                                                                    isValidatingDiscount ||
+                                                                    !discountCode.trim()
+                                                                }
+                                                            >
+                                                                {isValidatingDiscount ? (
+                                                                    <>
+                                                                        <output
+                                                                            className="spinner-border spinner-border-sm me-2"
+                                                                            aria-live="polite"
+                                                                            aria-atomic="true"
+                                                                        >
+                                                                            <span className="visually-hidden">
+                                                                                Đang kiểm tra...
+                                                                            </span>
+                                                                        </output>{' '}
+                                                                        Đang kiểm tra...
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <i
+                                                                            className="bi bi-check-circle-fill me-1"
+                                                                            aria-hidden="true"
+                                                                        ></i>{' '}
+                                                                        Áp dụng
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                     {TOTAL_AMOUNT > 0 && (
                                         <div className="bg-primary d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between p-3 rounded">
@@ -827,7 +1032,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                     : 'Số tiền thanh toán'}
                                             </h6>
                                             <h6 className="text-white">
-                                                {DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ
+                                                {FINAL_AMOUNT.toLocaleString('vi-VN')} đ
                                             </h6>
                                         </div>
                                     )}
@@ -932,6 +1137,85 @@ const styles = `
     background-color: #007bff;
     border-color: #007bff;
 }
+
+/* Apply Discount Button Styles */
+.btn-apply-discount {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+    white-space: nowrap;
+}
+
+.btn-apply-discount:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+   
+}
+
+.btn-apply-discount:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 123, 255, 0.3);
+    
+}
+
+.btn-apply-discount:disabled {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    cursor: not-allowed;
+    opacity: 0.65;
+    box-shadow: none;
+    color: white !important;
+}
+
+.btn-apply-discount i {
+    font-size: 14px;
+}
+
+/* Remove Discount Button Styles */
+.btn-remove-discount {
+    background: transparent;
+    border: 2px solid #dc3545;
+    color: #dc3545;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.btn-remove-discount:hover {
+    background: #dc3545;
+    color: white;
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.btn-remove-discount:active {
+    transform: scale(0.95) rotate(90deg);
+    box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+}
+
+.btn-remove-discount i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+
+
+
 
 @media (max-width: 768px) {
     .payment-option-card {
