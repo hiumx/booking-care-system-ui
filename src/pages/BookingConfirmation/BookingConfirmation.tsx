@@ -12,8 +12,8 @@ import { AppointmentResponse } from '@/types/appointment.types';
 import { toast } from 'react-toastify';
 import Spinner from '@/components/Spinner';
 import { QRCodeSVG } from 'qrcode.react';
-import medicalServiceIcon from '@/assets/img/icons/medical-service.svg';
-import specialtyIcon from '@/assets/img/icons/specialty.svg';
+import medicalServiceIcon from '@/assets/img/icons/medal-icon.svg';
+import specialtyIcon from '@/assets/img/specialities/speciality-icon-01.svg';
 import client16 from '@/assets/img/clients/client-16.jpg';
 
 const BookingConfirmation: React.FC = () => {
