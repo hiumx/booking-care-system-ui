@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import { CallLogResponse, CallStatus, CallType } from '@/types/communication.types';
+import userDefault from '@/assets/img/patients/patient.jpg';
 
 interface CallLogItemProps {
     callLog: CallLogResponse;
@@ -62,11 +63,7 @@ const CallLogItem: React.FC<CallLogItemProps> = ({ callLog, isOwn, callerName, c
         <div className={clsx('chats', { 'chats-right': isOwn })}>
             {!isOwn && (
                 <div className="chat-avatar">
-                    <img
-                        src={callerAvatar || '/default-avatar.png'}
-                        className="dreams_chat"
-                        alt="avatar"
-                    />
+                    <img src={callerAvatar || userDefault} className="dreams_chat" alt="avatar" />
                 </div>
             )}
             <div className="chat-content">
@@ -107,11 +104,7 @@ const CallLogItem: React.FC<CallLogItemProps> = ({ callLog, isOwn, callerName, c
             </div>
             {isOwn && (
                 <div className="chat-avatar">
-                    <img
-                        src={callerAvatar || '/default-avatar.png'}
-                        className="dreams_chat"
-                        alt="avatar"
-                    />
+                    <img src={callerAvatar || userDefault} className="dreams_chat" alt="avatar" />
                 </div>
             )}
         </div>

@@ -6,6 +6,7 @@ import { RootState } from '@/store';
 import VideoCallWindow from '../../../VideoCallWindow';
 import TagManager from '../../../TagManager';
 import styles from './ChatHeader.module.scss';
+import userDefault from '@/assets/img/patients/patient.jpg';
 
 const ChatHeader = () => {
     const { activeConversation, onlineUsers } = useChat();
@@ -97,7 +98,7 @@ const ChatHeader = () => {
                             <>
                                 <figure className={`avatar ${isOnline ? 'avatar-online' : ''}`}>
                                     <img
-                                        src={otherParticipant.avatarUrl || '/default-avatar.png'}
+                                        src={otherParticipant.avatarUrl || userDefault}
                                         alt="avatar"
                                     />
                                 </figure>
