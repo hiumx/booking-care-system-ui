@@ -11,6 +11,7 @@ import {
     getDisplayLabel,
 } from '@/types/appointment.types';
 import AppointmentActionButtons from '../AppointmentActionButtons/AppointmentActionButtons';
+import doctorThumb01 from '@/assets/img/doctors/doctor-thumb-01.jpg';
 
 interface AppointmentGridCardProps {
     appointment: AppointmentCardData;
@@ -100,8 +101,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
                                             src={displayAvatar}
                                             alt={displayName}
                                             onError={(e) => {
-                                                e.currentTarget.src =
-                                                    '/src/assets/img/doctors/doctor-thumb-01.jpg';
+                                                e.currentTarget.src = doctorThumb01;
                                             }}
                                         />
                                     ) : (

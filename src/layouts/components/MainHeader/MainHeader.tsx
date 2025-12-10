@@ -25,6 +25,8 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { formatDistanceToNow } from 'date-fns';
 import { vi, enUS } from 'date-fns/locale';
 import useTheme from '@/hooks/useTheme';
+import logo from '@/assets/img/logo.svg';
+import profile06 from '@/assets/img/doctors-dashboard/profile-06.jpg';
 interface HeaderProps {
     isHeaderMenu?: boolean;
 }
@@ -174,7 +176,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                 <nav className="navbar navbar-expand-lg header-nav">
                     <div className="navbar-header">
                         <Link to={PATHS.HOME} className="navbar-brand logo">
-                            <img src="/src/assets/img/logo.svg" className="img-fluid" alt="Logo" />
+                            <img src={logo} className="img-fluid" alt="Logo" />
                         </Link>
                     </div>
                     {isHeaderMenu && (
@@ -592,10 +594,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                             >
                                                 <img
                                                     className="rounded-circle"
-                                                    src={
-                                                        profile?.avatarUrl ||
-                                                        '/src/assets/img/doctors-dashboard/profile-06.jpg'
-                                                    }
+                                                    src={profile?.avatarUrl || profile06}
                                                     width="31"
                                                     height="31"
                                                     style={{
@@ -618,10 +617,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                                     }}
                                                 >
                                                     <img
-                                                        src={
-                                                            profile?.avatarUrl ||
-                                                            '/src/assets/img/doctors-dashboard/profile-06.jpg'
-                                                        }
+                                                        src={profile?.avatarUrl || profile06}
                                                         alt={`${profile?.fullName || 'User'} avatar`}
                                                         className="avatar-img rounded-circle"
                                                         style={{

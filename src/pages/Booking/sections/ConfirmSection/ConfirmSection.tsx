@@ -6,6 +6,8 @@ import { useDoctorInfo } from '../../hooks';
 import { useAppSelector } from '@/store/hooks';
 import { selectSelectedDate, selectSelectedSlots } from '@/store/selectors/schedule.selectors';
 import TimeSlotBadge from '../../components/TimeSlotBadge';
+import client16 from '@/assets/img/clients/client-16.jpg';
+import paymentQrIcon from '@/assets/img/icons/payment-qr.svg';
 
 interface ConfirmSectionProps {
     handleGoBack: () => void;
@@ -76,10 +78,7 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                     </div>
                                     <div className="card-header d-flex align-items-center flex-wrap rpw-gap-2">
                                         <span className="avatar avatar-lg avatar-rounded me-2 flex-shrink-0">
-                                            <img
-                                                src="/src/assets/img/clients/client-16.jpg"
-                                                alt="patient-avatar"
-                                            />
+                                            <img src={client16} alt="patient-avatar" />
                                         </span>
                                         <p className="mb-0">
                                             Lịch khám của bạn đã được xác nhận với{' '}
@@ -233,10 +232,7 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                         <h6 className="fs-14 mb-2">Mã đặt lịch</h6>
                                         <span className="booking-id-badge mb-3">DCRA12565</span>
                                         <span className="d-block mb-3">
-                                            <img
-                                                src="/src/assets/img/icons/payment-qr.svg"
-                                                alt=""
-                                            />
+                                            <img src={paymentQrIcon} alt="" />
                                         </span>
                                         <p>Quét mã QR này để tải thông tin chi tiết về lịch hẹn</p>
                                     </div>

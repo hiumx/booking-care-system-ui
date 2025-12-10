@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import book01 from '@/assets/img/book-01.jpg';
+import book02 from '@/assets/img/book-02.jpg';
+import book03 from '@/assets/img/book-03.jpg';
+import wayIcon from '@/assets/img/icons/way-icon.svg';
 
 interface VisionMissionItem {
     id: string | number;
@@ -32,9 +36,9 @@ const BookusSection: React.FC<BookusSectionProps> = ({ images, visionMission, bo
 
     // Mock data - có thể thay thế bằng data từ API
     const defaultImages = {
-        large: '/src/assets/img/book-01.jpg',
-        small1: '/src/assets/img/book-02.jpg',
-        small2: '/src/assets/img/book-03.jpg',
+        large: book01,
+        small1: book02,
+        small2: book03,
     };
 
     // Get vision/mission from translation
@@ -178,10 +182,7 @@ const BookusSection: React.FC<BookusSectionProps> = ({ images, visionMission, bo
                                     </div>
                                     {item.showWayIcon && (
                                         <div className="way-icon">
-                                            <img
-                                                src="/src/assets/img/icons/way-icon.svg"
-                                                alt="way"
-                                            />
+                                            <img src={wayIcon} alt="way" />
                                         </div>
                                     )}
                                 </div>

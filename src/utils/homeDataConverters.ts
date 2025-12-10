@@ -1,13 +1,22 @@
+import speciality01 from '@/assets/img/specialities/speciality-01.jpg';
+import speciality02 from '@/assets/img/specialities/speciality-02.jpg';
+import speciality03 from '@/assets/img/specialities/speciality-03.jpg';
+import speciality04 from '@/assets/img/specialities/speciality-04.jpg';
+import speciality05 from '@/assets/img/specialities/speciality-05.jpg';
+import speciality06 from '@/assets/img/specialities/speciality-06.jpg';
+import speciality07 from '@/assets/img/specialities/speciality-07.jpg';
+import speciality08 from '@/assets/img/specialities/speciality-08.jpg';
+
 // Fallback images for specialties
 export const specialtyImages = [
-    '/src/assets/img/specialities/speciality-01.jpg',
-    '/src/assets/img/specialities/speciality-02.jpg',
-    '/src/assets/img/specialities/speciality-03.jpg',
-    '/src/assets/img/specialities/speciality-04.jpg',
-    '/src/assets/img/specialities/speciality-05.jpg',
-    '/src/assets/img/specialities/speciality-06.jpg',
-    '/src/assets/img/specialities/speciality-07.jpg',
-    '/src/assets/img/specialities/speciality-08.jpg',
+    speciality01,
+    speciality02,
+    speciality03,
+    speciality04,
+    speciality05,
+    speciality06,
+    speciality07,
+    speciality08,
 ];
 
 // Convert API data to Service format

@@ -8,6 +8,7 @@ import { PATHS } from '@/routes/paths';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
 import BookingLoadingSpinner from '@/components/BookingLoadingSpinner';
+import client16 from '@/assets/img/clients/client-16.jpg';
 import {
     loadAppointmentData,
     validateAppointmentParams,
@@ -133,10 +134,7 @@ const RequestRefund: React.FC = () => {
                                     <div className="card-header d-flex align-items-center flex-wrap gap-2 py-3">
                                         <span className="avatar avatar-lg avatar-rounded me-2 flex-shrink-0">
                                             <img
-                                                src={
-                                                    displayInfo?.avatar ||
-                                                    '/src/assets/img/clients/client-16.jpg'
-                                                }
+                                                src={displayInfo?.avatar || client16}
                                                 alt={displayInfo?.name}
                                             />
                                         </span>

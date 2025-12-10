@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Service } from '@/types/booking';
 import { Clock, DollarSign, Calendar, Tag, Star, Shield, Zap, CheckCircle } from 'lucide-react';
 import styles from './ServiceCard.module.scss';
+import serviceImg02 from '@/assets/img/service/service-img-02.jpg';
 
 export interface ServiceCardProps {
     service: Service;
@@ -31,11 +32,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onBookService, class
     return (
         <div className={`${styles.card} ${className || ''}`}>
             <div className="position-relative">
-                <img
-                    src={'/src/assets/img/service/service-img-02.jpg'}
-                    alt={service.name}
-                    className={styles.cardImg}
-                />
+                <img src={serviceImg02} alt={service.name} className={styles.cardImg} />
                 <div className={styles.categoryBadge}>
                     <Tag size={12} className="me-1" />
                     {service.category}

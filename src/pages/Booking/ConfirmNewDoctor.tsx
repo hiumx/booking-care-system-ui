@@ -11,6 +11,7 @@ import styles from './Booking.module.scss';
 import clsx from 'clsx';
 import FullScreenSpinner from '@/components/FullScreenSpinner';
 import { formatAppointmentTime } from '@/utils/appointment-utils';
+import client16 from '@/assets/img/clients/client-16.jpg';
 
 /**
  * ConfirmNewDoctor Page - Option 2
@@ -208,7 +209,7 @@ const ConfirmNewDoctor: React.FC = () => {
                                                 <img
                                                     src={
                                                         appointmentData?.doctorInfo?.avatarUrl ||
-                                                        '/src/assets/img/clients/client-16.jpg'
+                                                        client16
                                                     }
                                                     alt="doctor"
                                                     className="rounded-circle me-3"
@@ -297,10 +298,7 @@ const ConfirmNewDoctor: React.FC = () => {
                                                     {/* New Doctor Info */}
                                                     <div className="d-flex align-items-center mb-3">
                                                         <img
-                                                            src={
-                                                                newDoctor.avatarUrl ||
-                                                                '/src/assets/img/clients/client-16.jpg'
-                                                            }
+                                                            src={newDoctor.avatarUrl || client16}
                                                             alt="new doctor"
                                                             className="rounded-circle me-3"
                                                             style={{
