@@ -12,6 +12,9 @@ import { AppointmentResponse } from '@/types/appointment.types';
 import { toast } from 'react-toastify';
 import Spinner from '@/components/Spinner';
 import { QRCodeSVG } from 'qrcode.react';
+import medicalServiceIcon from '@/assets/img/icons/medal-icon.svg';
+import specialtyIcon from '@/assets/img/specialities/speciality-icon-01.svg';
+import client16 from '@/assets/img/clients/client-16.jpg';
 
 const BookingConfirmation: React.FC = () => {
     const { appointmentId } = useParams<{ appointmentId: string }>();
@@ -114,21 +117,16 @@ const BookingConfirmation: React.FC = () => {
     // Helper functions to extract nested ternaries
     const getAvatarSrc = () => {
         if (isServiceMedicalBooking) {
-            return (
-                formattedAppointmentInfo.service?.imageUrl ||
-                '/src/assets/img/icons/medical-service.svg'
-            );
+            return formattedAppointmentInfo.service?.imageUrl || medicalServiceIcon;
         }
         if (isSpecialtyBooking) {
             return (
                 formattedAppointmentInfo.specialty?.imageUrl ||
                 formattedAppointmentInfo.hospital?.avatarUrl ||
-                '/src/assets/img/icons/specialty.svg'
+                specialtyIcon
             );
         }
-        return (
-            formattedAppointmentInfo.doctor?.avatarUrl || '/src/assets/img/clients/client-16.jpg'
-        );
+        return formattedAppointmentInfo.doctor?.avatarUrl || client16;
     };
 
     const getAvatarAlt = () => {

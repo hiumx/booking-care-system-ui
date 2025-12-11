@@ -2,6 +2,17 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PATHS } from '@/routes/paths';
+import footerBg01 from '@/assets/img/bg/footer-bg-01.png';
+import footerBg02 from '@/assets/img/bg/footer-bg-02.png';
+import footerBg03 from '@/assets/img/bg/footer-bg-03.png';
+import footerBg04 from '@/assets/img/bg/footer-bg-04.png';
+import footerBg05 from '@/assets/img/bg/footer-bg-05.png';
+import card01 from '@/assets/img/icons/card-01.svg';
+import card02 from '@/assets/img/icons/card-02.svg';
+import card03 from '@/assets/img/icons/card-03.svg';
+import card04 from '@/assets/img/icons/card-04.svg';
+import card05 from '@/assets/img/icons/card-05.svg';
+import card06 from '@/assets/img/icons/card-06.svg';
 
 interface FooterLink {
     text: string;
@@ -136,31 +147,11 @@ const MainFooter: React.FC = () => {
                     </div>
                 </div>
                 <div className="footer-bg">
-                    <img
-                        src="/src/assets/img/bg/footer-bg-01.png"
-                        alt="img"
-                        className="footer-bg-01"
-                    />
-                    <img
-                        src="/src/assets/img/bg/footer-bg-02.png"
-                        alt="img"
-                        className="footer-bg-02"
-                    />
-                    <img
-                        src="/src/assets/img/bg/footer-bg-03.png"
-                        alt="img"
-                        className="footer-bg-03"
-                    />
-                    <img
-                        src="/src/assets/img/bg/footer-bg-04.png"
-                        alt="img"
-                        className="footer-bg-04"
-                    />
-                    <img
-                        src="/src/assets/img/bg/footer-bg-05.png"
-                        alt="img"
-                        className="footer-bg-05"
-                    />
+                    <img src={footerBg01} alt="img" className="footer-bg-01" />
+                    <img src={footerBg02} alt="img" className="footer-bg-02" />
+                    <img src={footerBg03} alt="img" className="footer-bg-03" />
+                    <img src={footerBg04} alt="img" className="footer-bg-04" />
+                    <img src={footerBg05} alt="img" className="footer-bg-05" />
                 </div>
             </div>
             <div className="footer-bottom">
@@ -187,32 +178,32 @@ const MainFooter: React.FC = () => {
                         <ul className="payment-method">
                             <li>
                                 <Link to="#">
-                                    <img src="/src/assets/img/icons/card-01.svg" alt="Img" />
+                                    <img src={card01} alt="Img" />
                                 </Link>
                             </li>
                             <li>
                                 <Link to="#">
-                                    <img src="/src/assets/img/icons/card-02.svg" alt="Img" />
+                                    <img src={card02} alt="Img" />
                                 </Link>
                             </li>
                             <li>
                                 <Link to="#">
-                                    <img src="/src/assets/img/icons/card-03.svg" alt="Img" />
+                                    <img src={card03} alt="Img" />
                                 </Link>
                             </li>
                             <li>
                                 <Link to="#">
-                                    <img src="/src/assets/img/icons/card-04.svg" alt="Img" />
+                                    <img src={card04} alt="Img" />
                                 </Link>
                             </li>
                             <li>
                                 <Link to="#">
-                                    <img src="/src/assets/img/icons/card-05.svg" alt="Img" />
+                                    <img src={card05} alt="Img" />
                                 </Link>
                             </li>
                             <li>
                                 <Link to="#">
-                                    <img src="/src/assets/img/icons/card-06.svg" alt="Img" />
+                                    <img src={card06} alt="Img" />
                                 </Link>
                             </li>
                         </ul>

@@ -1,4 +1,7 @@
 import { Link } from 'react-router-dom';
+import breadcrumbBg01 from '@/assets/img/bg/breadcrumb-bg-01.png';
+import breadcrumbBg02 from '@/assets/img/bg/breadcrumb-bg-02.png';
+import breadcrumbIcon from '@/assets/img/bg/breadcrumb-icon.png';
 
 export interface BreadcrumbItem {
     label: string;
@@ -49,26 +52,10 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, title }) => {
                 </div>
             </div>
             <div className="breadcrumb-bg">
-                <img
-                    src="/src/assets/img/bg/breadcrumb-bg-01.png"
-                    alt="img"
-                    className="breadcrumb-bg-01"
-                />
-                <img
-                    src="/src/assets/img/bg/breadcrumb-bg-02.png"
-                    alt="img"
-                    className="breadcrumb-bg-02"
-                />
-                <img
-                    src="/src/assets/img/bg/breadcrumb-icon.png"
-                    alt="img"
-                    className="breadcrumb-bg-03"
-                />
-                <img
-                    src="/src/assets/img/bg/breadcrumb-icon.png"
-                    alt="img"
-                    className="breadcrumb-bg-04"
-                />
+                <img src={breadcrumbBg01} alt="img" className="breadcrumb-bg-01" />
+                <img src={breadcrumbBg02} alt="img" className="breadcrumb-bg-02" />
+                <img src={breadcrumbIcon} alt="img" className="breadcrumb-bg-03" />
+                <img src={breadcrumbIcon} alt="img" className="breadcrumb-bg-04" />
             </div>
         </div>
     );

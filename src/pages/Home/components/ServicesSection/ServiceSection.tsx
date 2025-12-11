@@ -2,6 +2,10 @@ import React from 'react';
 import SectionHeader from 'src/pages/Home/components/ServicesSection/components/SectionHeader';
 import ServiceColumn from 'src/pages/Home/components/ServicesSection/components/ServiceColumn';
 import ServiceImageCenter from 'src/pages/Home/components/ServicesSection/components/ServiceImageCenter';
+import serviceSecBg from '@/assets/img/bg/sercice-sec-bg.png';
+import serviceImg from '@/assets/img/service/service-img.jpg';
+import serviceImg01 from '@/assets/img/service/service-img-01.jpg';
+import serviceImg02 from '@/assets/img/service/service-img-02.jpg';
 
 interface Service {
     id: string;
@@ -18,7 +22,7 @@ const ServiceSection: React.FC<ServiceSectionProps> = ({ leftServices, rightServ
     return (
         <section className="service-sec-fourteen">
             <div className="section-bg">
-                <img src="/src/assets/img/bg/sercice-sec-bg.png" alt="Background" />
+                <img src={serviceSecBg} alt="Background" />
             </div>
             <div className="container">
                 <SectionHeader
@@ -35,9 +39,9 @@ const ServiceSection: React.FC<ServiceSectionProps> = ({ leftServices, rightServ
                     {/* Center images */}
                     <div className="col-lg-4 col-md-6 d-flex" data-aos="zoom-in">
                         <ServiceImageCenter
-                            mainImage="/src/assets/img/service/service-img.jpg"
-                            imageOne="/src/assets/img/service/service-img-01.jpg"
-                            imageTwo="/src/assets/img/service/service-img-02.jpg"
+                            mainImage={serviceImg}
+                            imageOne={serviceImg01}
+                            imageTwo={serviceImg02}
                         />
                     </div>
 

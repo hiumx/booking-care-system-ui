@@ -2,6 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PATHS } from '@/routes/paths';
+import article01 from '@/assets/img/blog/article-01.jpg';
+import article02 from '@/assets/img/blog/article-02.jpg';
+import article03 from '@/assets/img/blog/article-03.jpg';
+import article04 from '@/assets/img/blog/article-04.jpg';
 
 interface Article {
     id: string | number;
@@ -27,12 +31,7 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ articles }) => {
         returnObjects: true,
     }) as Array<{ category: string; title: string; description: string }>;
 
-    const imagePaths = [
-        '/src/assets/img/blog/article-01.jpg',
-        '/src/assets/img/blog/article-02.jpg',
-        '/src/assets/img/blog/article-03.jpg',
-        '/src/assets/img/blog/article-04.jpg',
-    ];
+    const imagePaths = [article01, article02, article03, article04];
 
     // Month names based on language
     const monthNames = {
@@ -52,7 +51,7 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ articles }) => {
 
     const defaultArticles: Article[] = translatedArticles.map((item, index) => ({
         id: index + 1,
-        image: imagePaths[index] || '/src/assets/img/blog/article-01.jpg',
+        image: imagePaths[index] || article01,
         ...item,
         date: dates[index].date,
         day: dates[index].day,

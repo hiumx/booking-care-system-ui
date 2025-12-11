@@ -28,6 +28,8 @@ import styles from './Appointments.module.scss';
 import { Link } from 'react-router-dom';
 import AppointmentGridCard from './components/AppointmentGridCard/AppointmentGridCard';
 import { AppointmentType, AppointmentStatus } from '@/enums/appointment.enums';
+import doctorThumb01 from '@/assets/img/doctors/doctor-thumb-01.jpg';
+import profile06 from '@/assets/img/doctors-dashboard/profile-06.jpg';
 
 // View mode type
 type ViewMode = 'list' | 'grid';
@@ -1141,10 +1143,7 @@ const Appointments: React.FC = () => {
                                                 id="review-for"
                                             >
                                                 <span className="user-avatar me-2">
-                                                    <img
-                                                        src="/src/assets/img/doctors/doctor-thumb-01.jpg"
-                                                        alt="Dr Edalin"
-                                                    />
+                                                    <img src={doctorThumb01} alt="Dr Edalin" />
                                                 </span>
                                                 <h6 className="fs-16 fw-medium">Dr Edalin</h6>
                                             </div>
@@ -1161,10 +1160,7 @@ const Appointments: React.FC = () => {
                                                 id="review-by"
                                             >
                                                 <span className="user-avatar me-2">
-                                                    <img
-                                                        src="/src/assets/img/doctors-dashboard/profile-06.jpg"
-                                                        alt="Hendrita"
-                                                    />
+                                                    <img src={profile06} alt="Hendrita" />
                                                 </span>
                                                 <h6 className="fs-16 fw-medium">Hendrita</h6>
                                             </div>

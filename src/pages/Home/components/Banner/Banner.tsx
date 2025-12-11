@@ -4,6 +4,16 @@ import { useEffect, useRef, useState } from 'react';
 import SearchInput from '@/components/SearchInput';
 import { PATHS } from '@/routes/paths';
 import styles from './Banner.module.scss';
+import videoIcon from '@/assets/img/icons/video.svg';
+import bannerDoctor from '@/assets/img/banner/banner-doctor.svg';
+import patient19 from '@/assets/img/patients/patient19.jpg';
+import patient16 from '@/assets/img/patients/patient16.jpg';
+import patient18 from '@/assets/img/patients/patient18.jpg';
+import bannerBg02 from '@/assets/img/bg/banner-bg-02.png';
+import bannerBg03 from '@/assets/img/bg/banner-bg-03.png';
+import bannerBg04 from '@/assets/img/bg/banner-bg-04.png';
+import bannerBg05 from '@/assets/img/bg/banner-bg-05.png';
+import bannerIcon01 from '@/assets/img/bg/banner-icon-01.svg';
 
 const Banner: React.FC = () => {
     const navigate = useNavigate();
@@ -131,7 +141,7 @@ const Banner: React.FC = () => {
                             <h1 className="display-5">
                                 <span className={styles.bannerText}>Khám sức khỏe: Tìm bác sĩ</span>
                                 <span className={`banner-icon ${styles.bannerIcon}`}>
-                                    <img src="/src/assets/img/icons/video.svg" alt="img" />
+                                    <img src={videoIcon} alt="img" />
                                 </span>
                                 <span className={`text-gradient ${styles.textGradient}`}>
                                     của bạn
@@ -143,11 +153,7 @@ const Banner: React.FC = () => {
                     </div>
                     <div className="col-lg-5">
                         <div className="banner-img aos" data-aos="fade-up">
-                            <img
-                                src="/src/assets/img/banner/banner-doctor.svg"
-                                className="img-fluid"
-                                alt="patient-image"
-                            />
+                            <img src={bannerDoctor} className="img-fluid" alt="patient-image" />
                             <div className="banner-appointment">
                                 <h6 style={{ fontSize: '20px', fontWeight: 'bold' }}>100</h6>
                                 <p style={{ fontSize: '16px' }}>
@@ -157,22 +163,13 @@ const Banner: React.FC = () => {
                             <div className="banner-patient">
                                 <div className="avatar-list-stacked avatar-group-sm">
                                     <span className="avatar avatar-rounded">
-                                        <img
-                                            src="/src/assets/img/patients/patient19.jpg"
-                                            alt="img"
-                                        />
+                                        <img src={patient19} alt="img" />
                                     </span>
                                     <span className="avatar avatar-rounded">
-                                        <img
-                                            src="/src/assets/img/patients/patient16.jpg"
-                                            alt="img"
-                                        />
+                                        <img src={patient16} alt="img" />
                                     </span>
                                     <span className="avatar avatar-rounded">
-                                        <img
-                                            src="/src/assets/img/patients/patient18.jpg"
-                                            alt="img"
-                                        />
+                                        <img src={patient18} alt="img" />
                                     </span>
                                 </div>
                                 <p style={{ fontSize: '20px', fontWeight: 'bold' }}>1000</p>
@@ -183,20 +180,12 @@ const Banner: React.FC = () => {
                 </div>
             </div>
             <div className="banner-bg">
-                <img src="/src/assets/img/bg/banner-bg-02.png" alt="img" className="banner-bg-01" />
-                <img src="/src/assets/img/bg/banner-bg-03.png" alt="img" className="banner-bg-02" />
-                <img src="/src/assets/img/bg/banner-bg-04.png" alt="img" className="banner-bg-03" />
-                <img src="/src/assets/img/bg/banner-bg-05.png" alt="img" className="banner-bg-04" />
-                <img
-                    src="/src/assets/img/bg/banner-icon-01.svg"
-                    alt="img"
-                    className="banner-bg-05"
-                />
-                <img
-                    src="/src/assets/img/bg/banner-icon-01.svg"
-                    alt="img"
-                    className="banner-bg-06"
-                />
+                <img src={bannerBg02} alt="img" className="banner-bg-01" />
+                <img src={bannerBg03} alt="img" className="banner-bg-02" />
+                <img src={bannerBg04} alt="img" className="banner-bg-03" />
+                <img src={bannerBg05} alt="img" className="banner-bg-04" />
+                <img src={bannerIcon01} alt="img" className="banner-bg-05" />
+                <img src={bannerIcon01} alt="img" className="banner-bg-06" />
             </div>
         </section>
     );

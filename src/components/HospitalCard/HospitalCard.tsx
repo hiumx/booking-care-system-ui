@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
 import styles from './HospitalCard.module.scss';
+import clinic1 from '@/assets/img/clinic/clinic-1.jpg';
 
 export interface HospitalCardProps {
     clinic: {
@@ -22,7 +23,7 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
     clinic = {
         id: '1',
         name: 'City Medical Center',
-        image: '/src/assets/img/clinic-1.jpg',
+        image: clinic1,
         specialties: [
             'Cardiology',
             'Neurology',
