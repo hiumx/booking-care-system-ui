@@ -727,6 +727,119 @@ const AISupportBooking: React.FC = () => {
         return lines.join('\n');
     };
 
+    // Helper function to build nutrition completion message
+    const buildNutritionCompletionMessage = (
+        profile: any,
+        mealPlan: any,
+        workoutPlan: any
+    ): string => {
+        const lines: string[] = [];
+        lines.push('✅ Đã tạo hồ sơ dinh dưỡng thành công!');
+        lines.push('');
+        lines.push('📊 THÔNG TIN CỦA BẠN:');
+        lines.push(
+            `• BMI: ${profile.bmi.toFixed(1)} (${profile.bmi < 18.5 ? 'Gầy' : profile.bmi < 25 ? 'Bình thường' : profile.bmi < 30 ? 'Thừa cân' : 'Béo phì'})`
+        );
+        lines.push(`• Chiều cao: ${profile.heightCm} cm`);
+        lines.push(`• Cân nặng: ${profile.weightKg} kg`);
+        lines.push(
+            `• Mục tiêu: ${profile.healthGoal === 'WeightLoss' ? 'Giảm cân' : profile.healthGoal === 'MuscleGain' ? 'Tăng cơ' : 'Duy trì'}`
+        );
+        lines.push(`• Calories mục tiêu: ${profile.targetCalories} kcal/ngày`);
+        lines.push(
+            `• Protein: ${profile.targetProteinG}g | Carbs: ${profile.targetCarbsG}g | Fat: ${profile.targetFatG}g`
+        );
+        lines.push('');
+        lines.push(`🍽️ THỰC ĐƠN HÔM NAY (${new Date(mealPlan.date).toLocaleDateString('vi-VN')}):`);
+        lines.push('');
+
+        const mealTypeMap: Record<string, string> = {
+            Breakfast: 'Bữa sáng',
+            Lunch: 'Bữa trưa',
+            Dinner: 'Bữa tối',
+            Snack: 'Bữa phụ',
+        };
+
+        if (mealPlan.meals && Array.isArray(mealPlan.meals)) {
+            mealPlan.meals.forEach((meal: any) => {
+                const mealTypeVi = mealTypeMap[meal.mealType] || meal.mealType;
+                lines.push(`=== ${mealTypeVi.toUpperCase()} ===`);
+                if (meal.recipe) {
+                    const r = meal.recipe;
+                    lines.push(`🍲 ${r.nameVi || r.nameEn}`);
+                    lines.push(`   ⏱️ Thời gian: ${r.prepTimeMinutes + r.cookTimeMinutes} phút`);
+                    lines.push(
+                        `   📊 Dinh dưỡng: ${r.nutrition?.calories} kcal | Protein: ${r.nutrition?.proteinG}g | Carbs: ${r.nutrition?.carbsG}g | Fat: ${r.nutrition?.fatG}g`
+                    );
+                }
+                lines.push('');
+            });
+        }
+
+        lines.push(`⚡ Tổng năng lượng: ${mealPlan.totalCalories} kcal`);
+        lines.push('');
+        lines.push('💪 KẾ HOẠCH TẬP LUYỆN HÔM NAY:');
+        lines.push('');
+        lines.push(`Loại: ${workoutPlan.workoutType}`);
+        lines.push(`Thời gian: ${workoutPlan.durationMinutes} phút`);
+        lines.push(`Calories đốt cháy: ~${workoutPlan.estimatedCaloriesBurned} kcal`);
+        lines.push('');
+
+        if (workoutPlan.exercises && Array.isArray(workoutPlan.exercises)) {
+            workoutPlan.exercises.forEach((exercise: any, index: number) => {
+                const duration = exercise.durationMinutes
+                    ? ` (${exercise.durationMinutes} phút)`
+                    : '';
+                const sets = exercise.sets ? ` - ${exercise.sets} sets` : '';
+                const reps = exercise.reps ? ` x ${exercise.reps} reps` : '';
+                const intensity = exercise.intensity ? ` [${exercise.intensity}]` : '';
+                lines.push(
+                    `${index + 1}. ${exercise.nameVi || exercise.nameEn}${duration}${sets}${reps}${intensity}`
+                );
+                lines.push('');
+            });
+        }
+
+        lines.push('🔔 Bạn sẽ nhận được thông báo mỗi sáng với thực đơn và kế hoạch tập mới!');
+        return lines.join('\n');
+    };
+
+    // Handler for starting nutrition conversation
+    const handleStartNutrition = async () => {
+        if (!isAuthenticated) {
+            navigate(
+                `${PATHS.LOGIN}?returnUrl=${encodeURIComponent(globalThis.location.pathname)}`
+            );
+            return;
+        }
+
+        // Create new chat for nutrition conversation
+        const newChatId = startLocalChat('Tôi muốn tạo kế hoạch dinh dưỡng');
+
+        // Call nutrition conversation API
+        setIsAITyping(true);
+        try {
+            const response = await AIService.startNutritionConversation(newChatId);
+
+            // Add AI's first question to chat
+            const aiMessage: Message = {
+                id: Date.now().toString(),
+                content: response.data.question,
+                sender: 'ai',
+                timestamp: new Date(),
+                nutritionStep: response.data.currentStep,
+                nutritionTotalSteps: response.data.totalSteps,
+            };
+
+            setMessages((prev) => [...prev, aiMessage]);
+        } catch (error) {
+            console.error('Error starting nutrition conversation:', error);
+            toast.error('Không thể bắt đầu tạo kế hoạch dinh dưỡng');
+        } finally {
+            setIsAITyping(false);
+        }
+    };
+
     const handleSendMessage = async (content: string) => {
         if (!content.trim()) return;
 
@@ -758,7 +871,68 @@ const AISupportBooking: React.FC = () => {
         // Create new chat if no active chat
         let currentChatId = ensureChatSession(trimmedContent);
 
-        // Call real AI API
+        // Check if in nutrition conversation
+        const lastAiMessage = messages.filter((m) => m.sender === 'ai').pop();
+        if (lastAiMessage?.nutritionStep !== undefined) {
+            // This is a nutrition conversation
+            setIsAITyping(true);
+            try {
+                const response = await AIService.answerNutritionQuestion(
+                    currentChatId,
+                    trimmedContent
+                );
+
+                if (response.data.isComplete) {
+                    // Show completion message with profile, meal plan, workout plan
+                    const completionMessage = buildNutritionCompletionMessage(
+                        response.data.profile,
+                        response.data.mealPlan,
+                        response.data.workoutPlan
+                    );
+
+                    const aiMessage: Message = {
+                        id: Date.now().toString(),
+                        content: completionMessage,
+                        sender: 'ai',
+                        timestamp: new Date(),
+                        nutritionComplete: true,
+                        nutritionData: {
+                            profile: response.data.profile!,
+                            mealPlan: response.data.mealPlan!,
+                            workoutPlan: response.data.workoutPlan!,
+                        },
+                    };
+
+                    setMessages((prev) => [...prev, aiMessage]);
+                } else {
+                    // Show next question
+                    const aiMessage: Message = {
+                        id: Date.now().toString(),
+                        content: response.data.question,
+                        sender: 'ai',
+                        timestamp: new Date(),
+                        nutritionStep: response.data.currentStep,
+                        nutritionTotalSteps: response.data.totalSteps,
+                    };
+
+                    setMessages((prev) => [...prev, aiMessage]);
+                }
+            } catch (error: any) {
+                console.error('Error answering nutrition question:', error);
+                const errorMessage: Message = {
+                    id: Date.now().toString(),
+                    content: getErrorMessage(error),
+                    sender: 'ai',
+                    timestamp: new Date(),
+                };
+                setMessages((prev) => [...prev, errorMessage]);
+            } finally {
+                setIsAITyping(false);
+            }
+            return;
+        }
+
+        // Call real AI API for symptom analysis
         setIsAITyping(true);
 
         try {
@@ -1135,6 +1309,7 @@ const AISupportBooking: React.FC = () => {
                             }}
                             onLabResultFileSelect={handleLabResultFileSelect}
                             onDermatologyFileSelect={handleDermatologyFileSelect}
+                            onNutritionClick={handleStartNutrition}
                         />
                     )}
                 </div>

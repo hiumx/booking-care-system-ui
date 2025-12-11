@@ -237,6 +237,12 @@ const Notifications = () => {
         )
         .reduce((sum, [, count]) => sum + count, 0);
 
+    const nutritionCount = Object.entries(countsByType)
+        .filter(([type]) =>
+            getTypesByCategory(NotificationCategory.Nutrition).includes(type as NotificationType)
+        )
+        .reduce((sum, [, count]) => sum + count, 0);
+
     const systemCount = Object.entries(countsByType)
         .filter(([type]) =>
             getTypesByCategory(NotificationCategory.System).includes(type as NotificationType)
@@ -486,6 +492,27 @@ const Notifications = () => {
                                     }
                                 >
                                     {newsCount}
+                                </span>
+                            </button>
+                        </li>
+                        <li className="nav-item">
+                            <button
+                                className={`nav-link ${activeCategory === NotificationCategory.Nutrition ? 'active' : ''}`}
+                                type="button"
+                                onClick={() => setActiveCategory(NotificationCategory.Nutrition)}
+                            >
+                                {NotificationCategoryLabels[NotificationCategory.Nutrition]}
+                                <span
+                                    style={
+                                        nutritionCount > 0
+                                            ? {
+                                                  backgroundColor: '#dc3545',
+                                                  color: '#ffffff',
+                                              }
+                                            : undefined
+                                    }
+                                >
+                                    {nutritionCount}
                                 </span>
                             </button>
                         </li>

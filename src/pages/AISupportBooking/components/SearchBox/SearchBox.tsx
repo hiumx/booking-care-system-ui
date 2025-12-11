@@ -37,6 +37,7 @@ interface SearchBoxProps {
     forceShowLocationModal?: boolean;
     onLabResultFileSelect?: (file: File) => void;
     onDermatologyFileSelect?: (file: File) => void;
+    onNutritionClick?: () => void;
 }
 
 interface ComingSoonFeature {
@@ -46,11 +47,6 @@ interface ComingSoonFeature {
 }
 
 const comingSoonFeatures: ComingSoonFeature[] = [
-    {
-        id: 'medicine-lookup',
-        icon: Pill,
-        title: 'Tra cứu thuốc',
-    },
     {
         id: 'medical-history',
         icon: ClipboardList,
@@ -68,6 +64,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     forceShowLocationModal = false,
     onLabResultFileSelect,
     onDermatologyFileSelect,
+    onNutritionClick,
 }) => {
     const [isMultiLine, setIsMultiLine] = useState(false);
     const [showAttachmentModal, setShowAttachmentModal] = useState(false);
@@ -410,6 +407,28 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                     </div>
                     <div className={styles.quickActionContent}>
                         <p className={styles.quickActionTitle}>Phân tích hình ảnh y tế</p>
+                    </div>
+                </div>
+
+                <div
+                    className={clsx(styles.quickActionCard, styles.nutritionActionCard)}
+                    onClick={onNutritionClick}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onNutritionClick?.();
+                        }
+                    }}
+                >
+                    <div className={styles.quickActionIcon}>
+                        <Pill size={20} />
+                    </div>
+                    <div className={styles.quickActionContent}>
+                        <p className={styles.quickActionTitle}>
+                            Khuyến nghị dinh dưỡng và tập luyện cá nhân hóa
+                        </p>
                     </div>
                 </div>
 

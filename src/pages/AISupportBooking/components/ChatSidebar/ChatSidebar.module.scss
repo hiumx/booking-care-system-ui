@@ -475,6 +475,67 @@
             }
         }
     }
+
+    .nutritionCard {
+        margin: 0 15px 15px 15px;
+        padding: 16px;
+        background: linear-gradient(135deg, #fff5e6 0%, #ffe0b2 100%);
+        border: 2px solid #ffb74d;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(255, 152, 0, 0.25);
+            border-color: #ff9800;
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+
+        .cardIcon {
+            font-size: 32px;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .cardContent {
+            flex: 1;
+            min-width: 0;
+
+            h3 {
+                font-size: 14px;
+                font-weight: 600;
+                color: #e65100;
+                margin: 0 0 4px 0;
+                line-height: 1.3;
+            }
+
+            p {
+                font-size: 12px;
+                color: #f57c00;
+                margin: 0;
+                line-height: 1.4;
+            }
+        }
+
+        .cardArrow {
+            font-size: 20px;
+            color: #ff9800;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        &:hover .cardArrow {
+            transform: translateX(4px);
+        }
+    }
 }
 
 // Responsive - Tablet
@@ -484,6 +545,193 @@
 
         &.closed {
             width: 60px;
+        }
+
+        .nutritionCard {
+            margin: 0 12px 12px 12px;
+            padding: 14px;
+
+            .cardIcon {
+                font-size: 28px;
+            }
+
+            .cardContent {
+                h3 {
+                    font-size: 13px;
+                }
+
+                p {
+                    font-size: 11px;
+                }
+            }
+        }
+    }
+}
+
+// Responsive - Mobile
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 280px;
+        height: 100vh;
+        z-index: 200;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+        transform: translateX(0);
+        transition:
+            transform 0.3s ease,
+            width 0.3s ease;
+
+        &.closed {
+            width: 0;
+            transform: translateX(-100%);
+            border-right: none;
+            box-shadow: none;
+        }
+
+        .sidebarHeader {
+            padding: 16px;
+            min-height: 72px;
+
+            .title {
+                font-size: 16px;
+
+                span {
+                    font-size: 16px;
+                }
+            }
+
+            .toggleButton {
+                width: 28px;
+                height: 28px;
+            }
+        }
+
+        .newChatButton {
+            margin: 12px;
+            padding: 10px 16px;
+            font-size: 14px;
+        }
+
+        .nutritionCard {
+            margin: 0 12px 12px 12px;
+            padding: 12px;
+
+            .cardIcon {
+                font-size: 24px;
+            }
+
+            .cardContent {
+                h3 {
+                    font-size: 12px;
+                }
+
+                p {
+                    font-size: 11px;
+                }
+            }
+
+            .cardArrow {
+                font-size: 18px;
+            }
+        }
+
+        .chatList {
+            padding: 8px;
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            .chatItem {
+                padding: 10px;
+                margin-bottom: 6px;
+
+                .chatAvatar {
+                    width: 40px;
+                    height: 40px;
+                }
+
+                .chatContent {
+                    .chatTitle {
+                        font-size: 13px;
+                    }
+
+                    .chatPreview {
+                        font-size: 11px;
+                    }
+
+                    .chatTime {
+                        font-size: 10px;
+                    }
+                }
+
+                .deleteButton {
+                    width: 24px;
+                    height: 24px;
+                }
+            }
+        }
+
+        .userInfo {
+            padding: 12px;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+
+            .userAvatar {
+                width: 40px;
+                height: 40px;
+
+                .avatarFallback {
+                    font-size: 16px;
+                }
+            }
+
+            .userDetails {
+                .userName {
+                    font-size: 14px;
+                }
+
+                .userStatus {
+                    font-size: 12px;
+                }
+            }
+
+            .upgradeButton {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+        }
+    }
+}
+
+// Responsive - Small Mobile
+@media (max-width: 480px) {
+    .sidebar {
+        width: 100%;
+        max-width: 320px;
+
+        &.closed {
+            width: 0;
+            transform: translateX(-100%);
+        }
+
+        .sidebarHeader {
+            padding: 12px;
+
+            .title {
+                font-size: 15px;
+            }
+        }
+
+        .newChatButton {
+            margin: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+        }
+
+        .nutritionCard {
+            margin: 0 10px 10px 10px;
+            padding: 10px;
         }
     }
 }

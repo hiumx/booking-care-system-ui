@@ -12,6 +12,8 @@ export enum NotificationType {
     PaymentFailed = 'PaymentFailed',
     RefundProcessed = 'RefundProcessed',
     SystemAnnouncement = 'SystemAnnouncement',
+    NutritionMealPlan = 'NutritionMealPlan',
+    NutritionWorkoutPlan = 'NutritionWorkoutPlan',
 }
 
 /**
@@ -28,6 +30,8 @@ export const NotificationTypeLabels: Record<NotificationType, string> = {
     [NotificationType.PaymentFailed]: 'Thanh toán',
     [NotificationType.RefundProcessed]: 'Hoàn tiền',
     [NotificationType.SystemAnnouncement]: 'Tin tức',
+    [NotificationType.NutritionMealPlan]: 'Dinh dưỡng',
+    [NotificationType.NutritionWorkoutPlan]: 'Tập luyện',
 };
 
 /**
@@ -37,6 +41,7 @@ export enum NotificationCategory {
     Appointment = 'appointment', // Phiếu khám
     News = 'news', // Tin tức
     System = 'system', // Thông báo
+    Nutrition = 'nutrition', // Dinh dưỡng & Tập luyện
 }
 
 /**
@@ -46,6 +51,7 @@ export const NotificationCategoryLabels: Record<NotificationCategory, string> = 
     [NotificationCategory.Appointment]: 'Phiếu khám',
     [NotificationCategory.News]: 'Tin tức',
     [NotificationCategory.System]: 'Thông báo',
+    [NotificationCategory.Nutrition]: 'Dinh dưỡng',
 };
 
 /**
@@ -59,6 +65,9 @@ export const getNotificationCategory = (type: NotificationType): NotificationCat
         case NotificationType.SystemAlert:
         case NotificationType.SystemAnnouncement:
             return NotificationCategory.News;
+        case NotificationType.NutritionMealPlan:
+        case NotificationType.NutritionWorkoutPlan:
+            return NotificationCategory.Nutrition;
         case NotificationType.PaymentReminder:
         case NotificationType.Refund:
         case NotificationType.AccountUpdate:
@@ -84,6 +93,8 @@ export const getTypesByCategory = (category: NotificationCategory): Notification
                 NotificationType.SystemAlert,
                 NotificationType.SystemAnnouncement,
             ];
+        case NotificationCategory.Nutrition:
+            return [NotificationType.NutritionMealPlan, NotificationType.NutritionWorkoutPlan];
         case NotificationCategory.System:
             return [
                 NotificationType.PaymentReminder,
