@@ -8,6 +8,7 @@ import EditReviewForm from './components/EditReviewForm';
 import EditReplyForm from './components/EditReplyForm';
 import Button from '@/components/Button';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import userDefault from '@/assets/img/patients/patient.jpg';
 
 interface Reply {
     id: number;
@@ -210,10 +211,10 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                         aria-label={`View profile of ${review.name}`}
                     >
                         <img
-                            src={review.avatar || '/default-avatar.png'}
+                            src={review.avatar || userDefault}
                             alt={`${review.name}'s avatar`}
                             onError={(e) => {
-                                e.currentTarget.src = '/default-avatar.png';
+                                e.currentTarget.src = userDefault;
                             }}
                         />
                     </Link>
@@ -348,10 +349,10 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                                         aria-label={`View profile of ${reply.name}`}
                                     >
                                         <img
-                                            src={reply.avatar || '/default-avatar.png'}
+                                            src={reply.avatar || userDefault}
                                             alt={`${reply.name}'s avatar`}
                                             onError={(e) => {
-                                                e.currentTarget.src = '/default-avatar.png';
+                                                e.currentTarget.src = userDefault;
                                             }}
                                         />
                                     </Link>

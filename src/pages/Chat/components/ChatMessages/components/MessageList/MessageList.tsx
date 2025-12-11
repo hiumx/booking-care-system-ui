@@ -4,6 +4,7 @@ import { useChat } from '@/providers/ChatProvider';
 import { RootState } from '@/store';
 import MessageItem from './MessageItem';
 import CallLogItem from './CallLogItem';
+import userDefault from '@/assets/img/patients/patient.jpg';
 
 const MessageList = () => {
     const {
@@ -262,7 +263,7 @@ const MessageList = () => {
                 isOwn: isOwnCall,
                 // Add caller info for display
                 callerName: callerInfo?.fullName || 'Unknown',
-                callerAvatar: callerInfo?.avatarUrl || '/default-avatar.png',
+                callerAvatar: callerInfo?.avatarUrl || userDefault,
             };
         }
 
@@ -273,7 +274,7 @@ const MessageList = () => {
             itemType: 'Message' as const,
             senderId: msg.senderId,
             senderName: msg.senderInfo?.fullName || 'Unknown',
-            senderAvatar: msg.senderInfo?.avatarUrl || '/default-avatar.png',
+            senderAvatar: msg.senderInfo?.avatarUrl || userDefault,
             content: msg.content,
             timestamp: formatMessageTimestamp(msg.createdAt || item.createdAt), // ✅ Smart formatting
             createdAt: msg.createdAt || item.createdAt,
@@ -398,7 +399,7 @@ const MessageList = () => {
                 <div className="chats">
                     <div className="chat-avatar">
                         <img
-                            src={typingUser.avatarUrl || '/default-avatar.png'}
+                            src={typingUser.avatarUrl || userDefault}
                             className="dreams_chat"
                             alt="avatar"
                         />

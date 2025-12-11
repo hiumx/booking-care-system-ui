@@ -7,6 +7,7 @@ import { ConversationResponse, MessageType } from '@/types/communication.types';
 import { Tag } from '@/types/tag.types';
 import TagService from '@/services/tag.service';
 import styles from './ChatList.module.scss';
+import userDefault from '@/assets/img/patients/patient.jpg';
 
 interface ChatListProps {
     searchTerm: string;
@@ -200,7 +201,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) 
                                 <div className={clsx(styles.conversation, 'd-flex w-100')}>
                                     <div className={`avatar ${isOnline ? 'avatar-online' : ''}`}>
                                         <img
-                                            src={otherUser?.avatarUrl || '/default-avatar.png'}
+                                            src={otherUser?.avatarUrl || userDefault}
                                             alt={otherUser?.fullName || 'User'}
                                         />
                                     </div>
