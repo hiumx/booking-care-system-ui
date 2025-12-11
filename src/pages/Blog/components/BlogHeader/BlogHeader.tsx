@@ -4,6 +4,7 @@ import styles from './BlogHeader.module.scss';
 import { Link } from 'react-router-dom';
 import { PATHS } from '@/routes/paths';
 import clsx from 'clsx';
+import logo from '@/assets/img/logo.svg';
 
 const BlogHeader: React.FC = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -109,11 +110,7 @@ const BlogHeader: React.FC = () => {
 
                 <div className="navbar-header">
                     <Link to={PATHS.HOME} className="navbar-brand logo">
-                        <img
-                            src="/src/assets/img/logo.svg"
-                            className={clsx(styles.logoImg, 'img-fluid')}
-                            alt="Logo"
-                        />
+                        <img src={logo} className={clsx(styles.logoImg, 'img-fluid')} alt="Logo" />
                     </Link>
                 </div>
 

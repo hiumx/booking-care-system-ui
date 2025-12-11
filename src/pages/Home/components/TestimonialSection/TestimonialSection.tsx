@@ -4,6 +4,11 @@ import { Autoplay } from 'swiper/modules';
 import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import { Link } from 'react-router-dom';
+import patient22 from '@/assets/img/patients/patient22.jpg';
+import patient21 from '@/assets/img/patients/patient21.jpg';
+import patient from '@/assets/img/patients/patient.jpg';
+import patient23 from '@/assets/img/patients/patient23.jpg';
+import quoteIcon from '@/assets/img/icons/quote-icon.svg';
 
 interface Testimonial {
     id: string | number;
@@ -42,17 +47,12 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
         authorLocation: string;
     }>;
 
-    const avatarPaths = [
-        '/src/assets/img/patients/patient22.jpg',
-        '/src/assets/img/patients/patient21.jpg',
-        '/src/assets/img/patients/patient.jpg',
-        '/src/assets/img/patients/patient23.jpg',
-    ];
+    const avatarPaths = [patient22, patient21, patient, patient23];
 
     const defaultTestimonials: Testimonial[] = translatedTestimonials.map((item, index) => ({
         id: index + 1,
         ...item,
-        authorAvatar: avatarPaths[index] || '/src/assets/img/patients/patient.jpg',
+        authorAvatar: avatarPaths[index] || patient,
     }));
 
     // Get counters from translation
@@ -210,7 +210,7 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
                                             </div>
                                             <span>
                                                 <img
-                                                    src="/src/assets/img/icons/quote-icon.svg"
+                                                    src={quoteIcon}
                                                     alt="quote"
                                                     className="ms-auto"
                                                 />

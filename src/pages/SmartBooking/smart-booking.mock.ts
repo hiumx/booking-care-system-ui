@@ -1,10 +1,18 @@
 import { Doctor, Hospital, Service } from '@/types/booking';
+import doctor01 from '@/assets/img/doctors/doctor-01.jpg';
+import doctor02 from '@/assets/img/doctors/doctor-02.jpg';
+import doctor03 from '@/assets/img/doctors/doctor-03.jpg';
+import doctor04 from '@/assets/img/doctors/doctor-04.jpg';
+import doctor05 from '@/assets/img/doctors/doctor-05.jpg';
+import clinic10 from '@/assets/img/clinic/clinic-10.jpg';
+import clinic11 from '@/assets/img/clinic/clinic-11.jpg';
+import clinic12 from '@/assets/img/clinic/clinic-12.jpg';
 
 export const mockDoctors: Doctor[] = [
     {
         id: '1',
         name: 'Dr. Nguyễn Văn Minh',
-        avatar: '/src/assets/img/doctors/doctor-01.jpg',
+        avatar: doctor01,
         specialty: 'Bác sĩ Tim mạch',
         experience: 15,
         rating: 4.8,
@@ -16,7 +24,7 @@ export const mockDoctors: Doctor[] = [
     {
         id: '2',
         name: 'Dr. Trần Thị Lan',
-        avatar: '/src/assets/img/doctors/doctor-02.jpg',
+        avatar: doctor02,
         specialty: 'Bác sĩ Nhi khoa',
         experience: 12,
         rating: 4.9,
@@ -28,7 +36,7 @@ export const mockDoctors: Doctor[] = [
     {
         id: '3',
         name: 'Dr. Lê Quang Hải',
-        avatar: '/src/assets/img/doctors/doctor-03.jpg',
+        avatar: doctor03,
         specialty: 'Bác sĩ Thần kinh',
         experience: 18,
         rating: 4.7,
@@ -40,7 +48,7 @@ export const mockDoctors: Doctor[] = [
     {
         id: '4',
         name: 'Dr. Phạm Thị Hương',
-        avatar: '/src/assets/img/doctors/doctor-04.jpg',
+        avatar: doctor04,
         specialty: 'Bác sĩ Sản phụ khoa',
         experience: 20,
         rating: 4.8,
@@ -52,7 +60,7 @@ export const mockDoctors: Doctor[] = [
     {
         id: '5',
         name: 'Dr. Hoàng Văn Thành',
-        avatar: '/src/assets/img/doctors/doctor-05.jpg',
+        avatar: doctor05,
         specialty: 'Bác sĩ Chấn thương chỉnh hình',
         experience: 10,
         rating: 4.6,
@@ -67,7 +75,7 @@ export const mockHospitals: Hospital[] = [
     {
         id: '1',
         name: 'Bệnh viện Bạch Mai',
-        logo: '/src/assets/img/clinic/clinic-10.jpg',
+        logo: clinic10,
         address: '78 Giải Phóng, Đống Đa, Hà Nội',
         rating: 4.5,
         reviewCount: 1234,
@@ -78,7 +86,7 @@ export const mockHospitals: Hospital[] = [
     {
         id: '2',
         name: 'Bệnh viện Việt Đức',
-        logo: '/src/assets/img/clinic/clinic-10.jpg',
+        logo: clinic10,
         address: '40 Tràng Thi, Hoàn Kiếm, Hà Nội',
         rating: 4.6,
         reviewCount: 987,
@@ -89,7 +97,7 @@ export const mockHospitals: Hospital[] = [
     {
         id: '3',
         name: 'Bệnh viện Nhi Trung ương',
-        logo: '/src/assets/img/clinic/clinic-10.jpg',
+        logo: clinic10,
         address: '18/879 La Thành, Đống Đa, Hà Nội',
         rating: 4.7,
         reviewCount: 523,
@@ -100,7 +108,7 @@ export const mockHospitals: Hospital[] = [
     {
         id: '4',
         name: 'Bệnh viện Da liễu Trung ương',
-        logo: '/src/assets/img/clinic/clinic-10.jpg',
+        logo: clinic10,
         address: '15A Phương Mai, Đống Đa, Hà Nội',
         rating: 4.4,
         reviewCount: 387,
@@ -111,7 +119,7 @@ export const mockHospitals: Hospital[] = [
     {
         id: '5',
         name: 'Bệnh viện Mắt Trung ương',
-        logo: '/src/assets/img/clinic/clinic-11.jpg',
+        logo: clinic11,
         address: '85 Bà Triệu, Hai Bà Trưng, Hà Nội',
         rating: 4.6,
         reviewCount: 298,
@@ -122,7 +130,7 @@ export const mockHospitals: Hospital[] = [
     {
         id: '6',
         name: 'Bệnh viện Tai mũi họng Trung ương',
-        logo: '/src/assets/img/clinic/clinic-12.jpg',
+        logo: clinic12,
         address: '78 Giải Phóng, Đống Đa, Hà Nội',
         rating: 4.5,
         reviewCount: 412,
@@ -133,7 +141,7 @@ export const mockHospitals: Hospital[] = [
     {
         id: '7',
         name: 'Bệnh viện Tâm thần Trung ương',
-        logo: '/src/assets/img/clinic/clinic-10.jpg',
+        logo: clinic10,
         address: '78 Giải Phóng, Đống Đa, Hà Nội',
         rating: 4.3,
         reviewCount: 156,

@@ -4,6 +4,7 @@ import Button from '../../../../components/Button';
 
 import { generateInvoicePDF, printInvoice } from '../pdfGenerator';
 import styles from './InvoiceModal.module.scss';
+import logo from '@/assets/img/logo.svg';
 
 interface InvoiceModalProps {
     profile?: any;
@@ -157,7 +158,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                             <div
                                                 className={clsx(styles.invoiceLogo, 'invoice-logo')}
                                             >
-                                                <img src="/src/assets/img/logo.svg" alt="logo" />
+                                                <img src={logo} alt="logo" />
                                             </div>
                                         </div>
                                         <div className="col-md-6">

@@ -6,6 +6,7 @@ import { PaymentService, InvoiceItem } from '../../../services/payment.service';
 import clsx from 'clsx';
 
 import styles from './Invoices.module.scss';
+import doctorThumb01 from '@/assets/img/doctors/doctor-thumb-01.jpg';
 
 // Adapter interface to convert InvoiceItem to expected modal format
 interface InvoiceModalData {
@@ -42,7 +43,7 @@ const Invoices: React.FC<InvoicesProps> = ({ patientId, profile }) => {
             id: invoice.id,
             doctor: {
                 name: invoice.paymentMethodName, // Using payment method as "doctor" since we don't have doctor info
-                img: '/src/assets/img/doctors/doctor-thumb-01.jpg', // Default image
+                img: doctorThumb01, // Default image
             },
             appointmentDate: formatDate(invoice.appointmentDate),
             bookedOn: formatDate(invoice.createdAt),
