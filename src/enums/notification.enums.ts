@@ -41,7 +41,8 @@ export enum NotificationCategory {
     Appointment = 'appointment', // Phiếu khám
     News = 'news', // Tin tức
     System = 'system', // Thông báo
-    Nutrition = 'nutrition', // Dinh dưỡng & Tập luyện
+    Nutrition = 'nutrition', // Dinh dưỡng
+    Workout = 'workout', // Tập luyện
 }
 
 /**
@@ -52,6 +53,7 @@ export const NotificationCategoryLabels: Record<NotificationCategory, string> = 
     [NotificationCategory.News]: 'Tin tức',
     [NotificationCategory.System]: 'Thông báo',
     [NotificationCategory.Nutrition]: 'Dinh dưỡng',
+    [NotificationCategory.Workout]: 'Tập luyện',
 };
 
 /**
@@ -66,8 +68,9 @@ export const getNotificationCategory = (type: NotificationType): NotificationCat
         case NotificationType.SystemAnnouncement:
             return NotificationCategory.News;
         case NotificationType.NutritionMealPlan:
-        case NotificationType.NutritionWorkoutPlan:
             return NotificationCategory.Nutrition;
+        case NotificationType.NutritionWorkoutPlan:
+            return NotificationCategory.Workout;
         case NotificationType.PaymentReminder:
         case NotificationType.Refund:
         case NotificationType.AccountUpdate:
@@ -94,7 +97,9 @@ export const getTypesByCategory = (category: NotificationCategory): Notification
                 NotificationType.SystemAnnouncement,
             ];
         case NotificationCategory.Nutrition:
-            return [NotificationType.NutritionMealPlan, NotificationType.NutritionWorkoutPlan];
+            return [NotificationType.NutritionMealPlan];
+        case NotificationCategory.Workout:
+            return [NotificationType.NutritionWorkoutPlan];
         case NotificationCategory.System:
             return [
                 NotificationType.PaymentReminder,

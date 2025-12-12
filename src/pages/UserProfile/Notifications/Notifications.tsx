@@ -249,6 +249,12 @@ const Notifications = () => {
         )
         .reduce((sum, [, count]) => sum + count, 0);
 
+    const workoutCount = Object.entries(countsByType)
+        .filter(([type]) =>
+            getTypesByCategory(NotificationCategory.Workout).includes(type as NotificationType)
+        )
+        .reduce((sum, [, count]) => sum + count, 0);
+
     // Pagination
     const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -513,6 +519,27 @@ const Notifications = () => {
                                     }
                                 >
                                     {nutritionCount}
+                                </span>
+                            </button>
+                        </li>
+                        <li className="nav-item">
+                            <button
+                                className={`nav-link ${activeCategory === NotificationCategory.Workout ? 'active' : ''}`}
+                                type="button"
+                                onClick={() => setActiveCategory(NotificationCategory.Workout)}
+                            >
+                                {NotificationCategoryLabels[NotificationCategory.Workout]}
+                                <span
+                                    style={
+                                        workoutCount > 0
+                                            ? {
+                                                  backgroundColor: '#dc3545',
+                                                  color: '#ffffff',
+                                              }
+                                            : undefined
+                                    }
+                                >
+                                    {workoutCount}
                                 </span>
                             </button>
                         </li>

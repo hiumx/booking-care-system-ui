@@ -734,23 +734,39 @@ const AISupportBooking: React.FC = () => {
         workoutPlan: any
     ): string => {
         const lines: string[] = [];
-        lines.push('✅ Đã tạo hồ sơ dinh dưỡng thành công!');
+
+        // Header
+        lines.push('Tuyệt vời! Hồ sơ dinh dưỡng của bạn đã được tạo thành công.');
         lines.push('');
-        lines.push('📊 THÔNG TIN CỦA BẠN:');
+
+        // Profile info
+        lines.push('THÔNG TIN CỦA BẠN');
+        const bmiStatus =
+            profile.bmi < 18.5
+                ? 'Gầy'
+                : profile.bmi < 25
+                  ? 'Bình thường'
+                  : profile.bmi < 30
+                    ? 'Thừa cân'
+                    : 'Béo phì';
+        lines.push(`BMI: ${profile.bmi.toFixed(1)} (${bmiStatus})`);
+        lines.push(`Chiều cao: ${profile.heightCm} cm`);
+        lines.push(`Cân nặng: ${profile.weightKg} kg`);
+        const goalText =
+            profile.healthGoal === 'WeightLoss'
+                ? 'Giảm cân'
+                : profile.healthGoal === 'MuscleGain'
+                  ? 'Tăng cơ'
+                  : 'Duy trì';
+        lines.push(`Mục tiêu: ${goalText}`);
+        lines.push(`Calories mục tiêu: ${profile.targetCalories} kcal/ngày`);
         lines.push(
-            `• BMI: ${profile.bmi.toFixed(1)} (${profile.bmi < 18.5 ? 'Gầy' : profile.bmi < 25 ? 'Bình thường' : profile.bmi < 30 ? 'Thừa cân' : 'Béo phì'})`
-        );
-        lines.push(`• Chiều cao: ${profile.heightCm} cm`);
-        lines.push(`• Cân nặng: ${profile.weightKg} kg`);
-        lines.push(
-            `• Mục tiêu: ${profile.healthGoal === 'WeightLoss' ? 'Giảm cân' : profile.healthGoal === 'MuscleGain' ? 'Tăng cơ' : 'Duy trì'}`
-        );
-        lines.push(`• Calories mục tiêu: ${profile.targetCalories} kcal/ngày`);
-        lines.push(
-            `• Protein: ${profile.targetProteinG}g | Carbs: ${profile.targetCarbsG}g | Fat: ${profile.targetFatG}g`
+            `Protein: ${profile.targetProteinG}g | Carbs: ${profile.targetCarbsG}g | Fat: ${profile.targetFatG}g`
         );
         lines.push('');
-        lines.push(`🍽️ THỰC ĐƠN HÔM NAY (${new Date(mealPlan.date).toLocaleDateString('vi-VN')}):`);
+
+        // Meal plan
+        lines.push(`THỰC ĐƠN HÔM NAY (${new Date(mealPlan.date).toLocaleDateString('vi-VN')})`);
         lines.push('');
 
         const mealTypeMap: Record<string, string> = {
@@ -761,25 +777,29 @@ const AISupportBooking: React.FC = () => {
         };
 
         if (mealPlan.meals && Array.isArray(mealPlan.meals)) {
-            mealPlan.meals.forEach((meal: any) => {
+            mealPlan.meals.forEach((meal: any, index: number) => {
                 const mealTypeVi = mealTypeMap[meal.mealType] || meal.mealType;
-                lines.push(`=== ${mealTypeVi.toUpperCase()} ===`);
+                lines.push(`${mealTypeVi}`);
                 if (meal.recipe) {
                     const r = meal.recipe;
-                    lines.push(`🍲 ${r.nameVi || r.nameEn}`);
-                    lines.push(`   ⏱️ Thời gian: ${r.prepTimeMinutes + r.cookTimeMinutes} phút`);
+                    lines.push(`Món: ${r.nameVi || r.nameEn}`);
+                    lines.push(`Thời gian: ${r.prepTimeMinutes + r.cookTimeMinutes} phút`);
                     lines.push(
-                        `   📊 Dinh dưỡng: ${r.nutrition?.calories} kcal | Protein: ${r.nutrition?.proteinG}g | Carbs: ${r.nutrition?.carbsG}g | Fat: ${r.nutrition?.fatG}g`
+                        `Dinh dưỡng: ${r.nutrition?.calories} kcal | Protein: ${r.nutrition?.proteinG}g | Carbs: ${r.nutrition?.carbsG}g | Fat: ${r.nutrition?.fatG}g`
                     );
                 }
-                lines.push('');
+                if (index < mealPlan.meals.length - 1) {
+                    lines.push('');
+                }
             });
         }
 
-        lines.push(`⚡ Tổng năng lượng: ${mealPlan.totalCalories} kcal`);
         lines.push('');
-        lines.push('💪 KẾ HOẠCH TẬP LUYỆN HÔM NAY:');
+        lines.push(`Tổng năng lượng: ${mealPlan.totalCalories} kcal`);
         lines.push('');
+
+        // Workout plan
+        lines.push('KẾ HOẠCH TẬP LUYỆN HÔM NAY');
         lines.push(`Loại: ${workoutPlan.workoutType}`);
         lines.push(`Thời gian: ${workoutPlan.durationMinutes} phút`);
         lines.push(`Calories đốt cháy: ~${workoutPlan.estimatedCaloriesBurned} kcal`);
@@ -796,11 +816,13 @@ const AISupportBooking: React.FC = () => {
                 lines.push(
                     `${index + 1}. ${exercise.nameVi || exercise.nameEn}${duration}${sets}${reps}${intensity}`
                 );
-                lines.push('');
             });
         }
 
-        lines.push('🔔 Bạn sẽ nhận được thông báo mỗi sáng với thực đơn và kế hoạch tập mới!');
+        lines.push('');
+        lines.push(
+            'Bạn sẽ nhận được thông báo mỗi sáng với thực đơn và kế hoạch tập mới. Chúc bạn thành công!'
+        );
         return lines.join('\n');
     };
 
