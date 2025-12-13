@@ -43,8 +43,11 @@ import ServiceDetail from '@/pages/MedicalService/ServiceDetail/ServiceDetailPag
 import AISupportBooking from '@/pages/AISupportBooking';
 import ContractSigningPage from '@/pages/ContractSigning/ContractSigningPage';
 import ContractSigningSuccessPage from '@/pages/ContractSigning/ContractSigningSuccessPage';
+import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute';
+import NotFound from '@/pages/Errors/NotFound';
 
 const routes: RouteObject[] = [
+    // Public routes
     {
         path: PATHS.HOME,
         element: <Home />,
@@ -102,46 +105,12 @@ const routes: RouteObject[] = [
         element: <SmartBooking />,
     },
     {
-        path: PATHS.AI_SUPPORT_BOOKING,
-        element: <AISupportBooking />,
-    },
-    {
-        path: PATHS.AI_SUPPORT_BOOKING_CHAT,
-        element: <AISupportBooking />,
-    },
-
-    // Authentication paths
-    {
         path: PATHS.DEMO,
         element: <Demo />,
     },
     {
         path: PATHS.DEMO_DATE_RANGE_PICKER,
         element: <DateRangePickerDemo />,
-    },
-    {
-        path: PATHS.LOGIN,
-        element: <Login />,
-    },
-    {
-        path: PATHS.REGISTER,
-        element: <Register />,
-    },
-    {
-        path: PATHS.FORGOT_PASSWORD,
-        element: <ForgotPassword />,
-    },
-    {
-        path: PATHS.RESET_PASSWORD,
-        element: <ResetPassword />,
-    },
-    {
-        path: PATHS.SCREEN_MANAGEMENT,
-        element: <ScreenManagement />,
-    },
-    {
-        path: PATHS.USER.ROOT,
-        children: [{ path: PATHS.USER.PROFILE, element: <UserProfile /> }],
     },
     {
         path: PATHS.HOSPITAL.ROOT,
@@ -153,13 +122,11 @@ const routes: RouteObject[] = [
     {
         path: PATHS.SPECIALTIES.ROOT,
         element: <SpecialtiesList />,
-        // children: [{ path: PATHS.SPECIALTIES.PROFILE, element: <SpecialtiesProfile /> }],
     },
     {
         path: PATHS.SPECIALTIES.DETAIL,
         element: <SpecialtyDetail />,
     },
-
     {
         path: PATHS.Service.ROOT,
         element: <ServiceList />,
@@ -177,71 +144,183 @@ const routes: RouteObject[] = [
         element: <ServiceDetail />,
     },
     {
-        path: PATHS.HOSPITAL.ROOT,
-        element: <Hospital />,
-        // children: [{ path: PATHS.HOSPITAL.DETAIL, element: <HospitalProfile /> }],
-    },
-    {
-        path: PATHS.CHAT,
-        element: <Chat />,
-    },
-    {
         path: PATHS.DOCTOR.ROOT,
         children: [
             { path: PATHS.DOCTOR.ROOT, element: <DoctorList />, index: true },
             { path: PATHS.DOCTOR.PROFILE, element: <DoctorProfile /> },
         ],
     },
+
+    // Authentication routes (public - redirect if authenticated)
+    {
+        path: PATHS.LOGIN,
+        element: <Login />,
+    },
+    {
+        path: PATHS.REGISTER,
+        element: <Register />,
+    },
+    {
+        path: PATHS.FORGOT_PASSWORD,
+        element: <ForgotPassword />,
+    },
+    {
+        path: PATHS.RESET_PASSWORD,
+        element: <ResetPassword />,
+    },
+
+    // Protected routes (require authentication)
+    {
+        path: PATHS.USER.ROOT,
+        children: [
+            {
+                path: PATHS.USER.PROFILE,
+                element: (
+                    <ProtectedRoute>
+                        <UserProfile />
+                    </ProtectedRoute>
+                ),
+            },
+        ],
+    },
+    {
+        path: PATHS.CHAT,
+        element: (
+            <ProtectedRoute>
+                <Chat />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: PATHS.AI_SUPPORT_BOOKING,
+        element: (
+            <ProtectedRoute>
+                <AISupportBooking />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: PATHS.AI_SUPPORT_BOOKING_CHAT,
+        element: (
+            <ProtectedRoute>
+                <AISupportBooking />
+            </ProtectedRoute>
+        ),
+    },
     {
         path: PATHS.BOOKING.ROOT,
-        element: <Booking />,
+        element: (
+            <ProtectedRoute>
+                <Booking />
+            </ProtectedRoute>
+        ),
     },
     {
         path: PATHS.BOOKING.SERVICE,
-        element: <Booking />,
+        element: (
+            <ProtectedRoute>
+                <Booking />
+            </ProtectedRoute>
+        ),
     },
     {
         path: PATHS.BOOKING.HOSPITAL,
-        element: <Booking />,
+        element: (
+            <ProtectedRoute>
+                <Booking />
+            </ProtectedRoute>
+        ),
     },
     {
         path: PATHS.BOOKING.CONFIRMATION,
-        element: <BookingConfirmation />,
+        element: (
+            <ProtectedRoute>
+                <BookingConfirmation />
+            </ProtectedRoute>
+        ),
     },
     {
         path: PATHS.BOOKING.RESCHEDULE,
-        element: <RescheduleAppointment />,
+        element: (
+            <ProtectedRoute>
+                <RescheduleAppointment />
+            </ProtectedRoute>
+        ),
     },
     {
         path: PATHS.BOOKING.CONFIRM_NEW_DOCTOR,
-        element: <ConfirmNewDoctor />,
+        element: (
+            <ProtectedRoute>
+                <ConfirmNewDoctor />
+            </ProtectedRoute>
+        ),
     },
     {
         path: PATHS.BOOKING.REQUEST_REFUND,
-        element: <RequestRefund />,
+        element: (
+            <ProtectedRoute>
+                <RequestRefund />
+            </ProtectedRoute>
+        ),
     },
     {
         path: PATHS.BOOKING.CHOOSE_NEW_DOCTOR,
-        element: <ChooseNewDoctor />,
+        element: (
+            <ProtectedRoute>
+                <ChooseNewDoctor />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: PATHS.CONTRACT_SIGNING.ROOT,
+        element: (
+            <ProtectedRoute>
+                <ContractSigningPage />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: PATHS.CONTRACT_SIGNING.SUCCESS,
+        element: (
+            <ProtectedRoute>
+                <ContractSigningSuccessPage />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: PATHS.SCREEN_MANAGEMENT,
+        element: (
+            <ProtectedRoute>
+                <ScreenManagement />
+            </ProtectedRoute>
+        ),
     },
     {
         path: PATHS.DASHBOARD.ROOT,
         children: [
-            { path: PATHS.DASHBOARD.ROOT, element: <h1>Dashboard</h1> },
-            { path: PATHS.DASHBOARD.SETTINGS, element: <h1>Setting</h1> },
+            {
+                path: PATHS.DASHBOARD.ROOT,
+                element: (
+                    <ProtectedRoute>
+                        <h1>Dashboard</h1>
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: PATHS.DASHBOARD.SETTINGS,
+                element: (
+                    <ProtectedRoute>
+                        <h1>Setting</h1>
+                    </ProtectedRoute>
+                ),
+            },
         ],
     },
-    {
-        path: PATHS.CONTRACT_SIGNING.ROOT,
-        element: <ContractSigningPage />,
-    },
-    {
-        path: PATHS.CONTRACT_SIGNING.SUCCESS,
-        element: <ContractSigningSuccessPage />,
-    },
+
+    // 404 Not Found
     {
         path: PATHS.NOT_FOUND,
-        element: <h1>404 - Page Not Found</h1>,
+        element: <NotFound />,
     },
 ];
 
