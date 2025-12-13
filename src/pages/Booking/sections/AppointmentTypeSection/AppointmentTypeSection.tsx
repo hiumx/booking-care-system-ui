@@ -937,7 +937,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                             ...availableLanguages.map(
                                                                                 (lang) => ({
                                                                                     label: lang.name,
-                                                                                    value: lang.name,
+                                                                                    value: lang.id,
                                                                                 })
                                                                             ),
                                                                         ]}
