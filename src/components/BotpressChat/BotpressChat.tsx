@@ -39,13 +39,13 @@ const VI_TRANSLATIONS: Record<string, string> = {
     Retry: 'Thử lại',
 };
 
+interface BotpressInstance {
+    on: (event: string, callback: (data: BotpressEventData) => void) => void;
+    sendPayload: (payload: BotpressPayload) => void;
+}
+
 declare global {
-    interface Window {
-        botpress?: {
-            on: (event: string, callback: (data: BotpressEventData) => void) => void;
-            sendPayload: (payload: BotpressPayload) => void;
-        };
-    }
+    var botpress: BotpressInstance | undefined;
 }
 
 interface BotpressEventData {
@@ -80,8 +80,7 @@ const BotpressChat: React.FC<BotpressChatProps> = ({ configUrl = BOTPRESS_CONFIG
         const elements = root.querySelectorAll('*');
         elements.forEach((el) => {
             if (el.shadowRoot) {
-                shadowRoots.push(el.shadowRoot);
-                shadowRoots.push(...getAllShadowRoots(el.shadowRoot));
+                shadowRoots.push(el.shadowRoot, ...getAllShadowRoots(el.shadowRoot));
             }
         });
         return shadowRoots;
@@ -148,116 +147,111 @@ const BotpressChat: React.FC<BotpressChatProps> = ({ configUrl = BOTPRESS_CONFIG
         setTimeout(() => clearInterval(interval), 30000);
     }, [translateBotpressUI]);
 
+    // Inject branding CSS into shadow root
+    const injectBrandingCss = useCallback((shadowRoot: ShadowRoot) => {
+        if (shadowRoot.getElementById('mc-branding-css')) return;
+
+        const style = document.createElement('style');
+        style.id = 'mc-branding-css';
+        style.textContent = `
+            /* Đẩy FAB icon lên trên để có chỗ cho label */
+            .bpFab,
+            [class*="bpFab"] {
+                margin-bottom: 10px !important;
+            }
+            .bpComposerFooter a,
+            [class*="bpComposerFooter"] a,
+            [class*="ComposerFooter"] a {
+                display: none !important;
+            }
+            .mc-brand {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 4px !important;
+                color: #0d9488 !important;
+                font-size: 11px !important;
+                font-weight: 500 !important;
+                width: 100% !important;
+            }
+            /* Override Delivered status text via CSS ::after */
+            [class*="bpMessageDeliveryStatus"]::after,
+            [class*="DeliveryStatus"]::after,
+            .bpMessageDeliveryStatus::after {
+                content: "Đã gửi" !important;
+            }
+            /* Override other status texts */
+            [class*="Sending"]::after {
+                content: "Đang gửi" !important;
+            }
+            [class*="Failed"]::after {
+                content: "Thất bại" !important;
+            }
+        `;
+        shadowRoot.appendChild(style);
+    }, []);
+
+    // Replace footer branding in shadow root
+    const replaceFooterBranding = useCallback((shadowRoot: ShadowRoot): boolean => {
+        let found = false;
+        const footers = shadowRoot.querySelectorAll(
+            '.bpComposerFooter, [class*="bpComposerFooter"], [class*="ComposerFooter"]'
+        );
+
+        footers.forEach((footer) => {
+            found = true;
+            const link = footer.querySelector('a');
+            if (link) link.style.display = 'none';
+            const p = footer.querySelector('p');
+            if (p) p.style.display = 'none';
+
+            if (!footer.querySelector('.mc-brand')) {
+                const brand = document.createElement('div');
+                brand.className = 'mc-brand';
+                brand.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#0d9488">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <span>Powered by MedCure</span>
+                `;
+                footer.appendChild(brand);
+            }
+        });
+
+        // Hide "by Botpress" text
+        const walker = document.createTreeWalker(shadowRoot, NodeFilter.SHOW_TEXT, null);
+        let node;
+        while ((node = walker.nextNode())) {
+            if (node.textContent?.includes('by Botpress')) {
+                const parent = node.parentElement;
+                if (parent) {
+                    parent.style.display = 'none';
+                    found = true;
+                }
+            }
+        }
+
+        return found;
+    }, []);
+
+    // Replace branding in all shadow roots
+    const replaceBranding = useCallback(() => {
+        const allShadowRoots = getAllShadowRoots(document);
+        allShadowRoots.forEach((shadowRoot) => {
+            injectBrandingCss(shadowRoot);
+            replaceFooterBranding(shadowRoot);
+        });
+    }, [getAllShadowRoots, injectBrandingCss, replaceFooterBranding]);
+
     // Hide Botpress branding and replace with MedCure branding
     const customizeBotpressBranding = useCallback(() => {
-        const replaceBranding = () => {
-            const allShadowRoots = getAllShadowRoots(document);
-            let found = false;
+        const interval = setInterval(replaceBranding, 1000);
 
-            allShadowRoots.forEach((shadowRoot) => {
-                // Inject CSS
-                if (!shadowRoot.getElementById('mc-branding-css')) {
-                    const style = document.createElement('style');
-                    style.id = 'mc-branding-css';
-                    style.textContent = `
-                        /* Đẩy FAB icon lên trên để có chỗ cho label */
-                        .bpFab,
-                        [class*="bpFab"] {
-                            margin-bottom: 10px !important;
-                        }
-                        .bpComposerFooter a,
-                        [class*="bpComposerFooter"] a,
-                        [class*="ComposerFooter"] a {
-                            display: none !important;
-                        }
-                        .mc-brand {
-                            display: flex !important;
-                            align-items: center !important;
-                            justify-content: center !important;
-                            gap: 4px !important;
-                            color: #0d9488 !important;
-                            font-size: 11px !important;
-                            font-weight: 500 !important;
-                            width: 100% !important;
-                        }
-                        /* Override Delivered status text via CSS ::after */
-                        [class*="bpMessageDeliveryStatus"]::after,
-                        [class*="DeliveryStatus"]::after,
-                        .bpMessageDeliveryStatus::after {
-                            content: "Đã gửi" !important;
-                        }
-                        /* Override other status texts */
-                        [class*="Sending"]::after {
-                            content: "Đang gửi" !important;
-                        }
-                        [class*="Failed"]::after {
-                            content: "Thất bại" !important;
-                        }
-                    `;
-                    shadowRoot.appendChild(style);
-                }
-
-                // Find footer and replace content
-                const footers = shadowRoot.querySelectorAll(
-                    '.bpComposerFooter, [class*="bpComposerFooter"], [class*="ComposerFooter"]'
-                );
-
-                footers.forEach((footer) => {
-                    found = true;
-                    // Hide original link
-                    const link = footer.querySelector('a');
-                    if (link) {
-                        link.style.display = 'none';
-                    }
-                    const p = footer.querySelector('p');
-                    if (p) {
-                        p.style.display = 'none';
-                    }
-
-                    // Add MedCure branding if not exists
-                    if (!footer.querySelector('.mc-brand')) {
-                        const brand = document.createElement('div');
-                        brand.className = 'mc-brand';
-                        brand.innerHTML = `
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#0d9488">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                            </svg>
-                            <span>Powered by MedCure</span>
-                        `;
-                        footer.appendChild(brand);
-                    }
-                });
-
-                // Also find by text content "by Botpress"
-                const walker = document.createTreeWalker(shadowRoot, NodeFilter.SHOW_TEXT, null);
-                let node;
-                while ((node = walker.nextNode())) {
-                    if (node.textContent?.includes('by Botpress')) {
-                        const parent = node.parentElement;
-                        if (parent) {
-                            parent.style.display = 'none';
-                            found = true;
-                        }
-                    }
-                }
-            });
-
-            return found;
-        };
-
-        // Keep trying
-        const interval = setInterval(() => {
-            replaceBranding();
-        }, 1000);
-
-        // Also observe for changes
-        const observer = new MutationObserver(() => {
-            replaceBranding();
-        });
+        const observer = new MutationObserver(replaceBranding);
         observer.observe(document.body, { childList: true, subtree: true });
 
         setTimeout(() => clearInterval(interval), 30000);
-    }, [getAllShadowRoots]);
+    }, [replaceBranding]);
 
     const handleBotpressAction = useCallback(
         (data: BotpressEventData) => {
@@ -308,9 +302,9 @@ const BotpressChat: React.FC<BotpressChatProps> = ({ configUrl = BOTPRESS_CONFIG
 
         const setupBotpressListeners = () => {
             const checkBotpress = setInterval(() => {
-                if (window.botpress) {
+                if (globalThis.botpress) {
                     clearInterval(checkBotpress);
-                    window.botpress.on('customAction', handleBotpressAction);
+                    globalThis.botpress.on('customAction', handleBotpressAction);
 
                     // Setup translation and branding after botpress is ready
                     setupTranslationObserver();
