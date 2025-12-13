@@ -560,12 +560,12 @@ const HospitalProfile: React.FC = () => {
                                         <span className={styles.stepContent}>
                                             Truy cập website{' '}
                                             <a
-                                                href="https://medcure.vn/"
+                                                href="https://medcure.com.vn/"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className={styles.guideLink}
                                             >
-                                                https://medcure.vn/
+                                                https://medcure.com.vn/
                                             </a>{' '}
                                             hoặc tải ứng dụng MedCure – Đặt lịch khám bệnh trên điện
                                             thoại.

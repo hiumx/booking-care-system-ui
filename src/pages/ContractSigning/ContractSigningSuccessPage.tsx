@@ -204,7 +204,7 @@ const ContractSigningSuccessPage: React.FC = () => {
                                                         <i className="isax isax-call text-success"></i>
                                                     </span>
                                                     <span className="fw-semibold text-dark">
-                                                        1900-xxxx
+                                                        19001979
                                                     </span>
                                                 </a>
                                             </div>
