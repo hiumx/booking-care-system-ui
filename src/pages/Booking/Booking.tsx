@@ -71,11 +71,13 @@ const Booking: React.FC = () => {
     // Clear previous booking state when starting a new booking flow
     // This prevents reusing old appointment ID and clears highlighted slots
     useEffect(() => {
-        // Only clear if there's an existing createdAppointmentId from previous booking
+        // Always reset schedule state when entering booking page
+        // This ensures fresh state for new booking (date = today, no selected slots)
+        dispatch(resetScheduleState());
+
+        // Clear previous appointment ID if exists
         if (bookingState.createdAppointmentId) {
             dispatch(setCreatedAppointmentId(null));
-            // Also reset schedule state to clear highlighted slots from previous booking
-            dispatch(resetScheduleState());
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // Run only on mount

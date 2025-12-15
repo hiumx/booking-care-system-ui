@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
-import { PATHS } from '@/routes/paths';
+import { PATHS, replacePathParams } from '@/routes/paths';
 import styles from './SpecialtyCarouselItem.module.scss';
 
 interface SpecialtyCarouselItemProps {
@@ -18,19 +18,23 @@ const SpecialtyCarouselItem: React.FC<SpecialtyCarouselItemProps> = ({
     doctorCount,
     specialtyId,
 }) => {
+    const detailUrl = replacePathParams(PATHS.SPECIALTIES.DETAIL, { id: specialtyId });
+
     return (
-        <div className={clsx(styles.specialtyCarouselItemContainer, 'spaciality-item')}>
+        <Link
+            to={detailUrl}
+            className={clsx(styles.specialtyCarouselItemContainer, 'spaciality-item')}
+            aria-label={`Xem chi tiết chuyên khoa ${title}`}
+        >
             <div className="spaciality-img">
-                <img src={imageSrc} alt="img" />
+                <img src={imageSrc} alt={title} />
                 <span className="spaciality-icon">
-                    <img src={iconSrc} alt="img" />
+                    <img src={iconSrc} alt={`Icon ${title}`} />
                 </span>
             </div>
-            <h6>
-                <Link to={`${PATHS.HOSPITAL.ROOT}?specialtyId=${specialtyId}`}>{title}</Link>
-            </h6>
+            <h6>{title}</h6>
             <p className="mb-0">{doctorCount} bác sĩ</p>
-        </div>
+        </Link>
     );
 };
 

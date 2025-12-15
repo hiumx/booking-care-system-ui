@@ -458,6 +458,17 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         };
     }, []);
 
+    // Sync local date state with Redux selectedDate
+    // When selectedDate is reset to null (new booking flow), reset local date to today
+    useEffect(() => {
+        if (selectedDate === null) {
+            // Redux state was reset, set local date to today
+            setDate(new Date());
+            setSlotChecked([]);
+            hasRestoredRef.current = false;
+        }
+    }, [selectedDate]);
+
     // Fetch doctor details when doctorId changes (for doctor booking)
     useEffect(() => {
         if (isDoctorBooking && doctorId && doctorId !== selectedDoctorId) {

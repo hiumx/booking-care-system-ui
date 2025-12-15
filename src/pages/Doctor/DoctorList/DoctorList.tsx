@@ -123,8 +123,11 @@ const DoctorList: React.FC = () => {
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Track if initial data has been fetched
+    // Track if initial data has been fetched (serviceTypes, languages)
     const hasFetchedInitialData = useRef(false);
+
+    // Track if first doctor search has been completed (for URL filter sync)
+    const hasCompletedFirstFetch = useRef(false);
 
     // Track last search params to prevent duplicate API calls
     const lastSearchParamsRef = useRef<string>('');
@@ -426,13 +429,33 @@ const DoctorList: React.FC = () => {
 
     // Helper function to check if we should wait for URL filters initialization
     const shouldWaitForUrlFilters = () => {
+        // Check if URL has filter params
         const hasUrlParams =
             isRescheduleFlow ||
             serviceTypeFromUrl ||
             (languageIdsFromUrl && languageIdsFromUrl.length > 0) ||
             specialtyIdFromUrl ||
             hospitalIdFromUrl;
-        return hasUrlParams && !hasInitializedUrlFilters.current;
+
+        // If no URL params, no need to wait
+        if (!hasUrlParams) return false;
+
+        // Wait until initialization flag is set
+        if (!hasInitializedUrlFilters.current) return true;
+
+        // After initialization is complete, check if this is the first fetch
+        // Only verify state matches URL on initial load, not when user clears filters
+        if (hasCompletedFirstFetch.current) {
+            // Already fetched once, don't block subsequent fetches
+            return false;
+        }
+
+        // First fetch after initialization - verify state filters match URL params
+        // This ensures we don't fetch before React state update completes
+        const specialtyFilterMismatch = specialtyIdFromUrl && specialtyFilters.length === 0;
+        const hospitalFilterMismatch = hospitalIdFromUrl && hospitalFilters.length === 0;
+
+        return specialtyFilterMismatch || hospitalFilterMismatch;
     };
 
     // Helper function to render doctor list content
@@ -546,6 +569,9 @@ const DoctorList: React.FC = () => {
         } else {
             dispatch(searchDoctorsAsync(params));
         }
+
+        // Mark first fetch as completed to allow subsequent filter changes
+        hasCompletedFirstFetch.current = true;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         dispatch,

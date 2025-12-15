@@ -9,6 +9,7 @@ import { ChatHubProvider } from './contexts/ChatHubContext';
 import { GlobalChatProvider } from './providers/GlobalChatProvider';
 import { ToastContainer } from 'react-toastify';
 import CustomCursor from './components/CustomCursor';
+import BotpressChat from './components/BotpressChat';
 import 'react-toastify/dist/ReactToastify.css';
 
 const App: React.FC = () => {
@@ -62,6 +63,7 @@ const App: React.FC = () => {
                             </GlobalChatProvider>
                         </ChatHubProvider>
                         <CustomCursor />
+                        <BotpressChat />
                     </BrowserRouter>
                 </AccountNotificationProvider>
             </GoogleOAuthWrapper>
