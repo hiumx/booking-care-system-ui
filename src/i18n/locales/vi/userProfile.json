@@ -134,5 +134,171 @@
             "checkInfo": "Vui lòng kiểm tra lại thông tin!",
             "requireEmailOrPhone": "Vui lòng cung cấp ít nhất một trong email hoặc số điện thoại!"
         }
+    },
+    "favourite": {
+        "title": "Danh sách bác sĩ yêu thích",
+        "titleWithCount": "Danh sách bác sĩ yêu thích ({{count}})",
+        "searchPlaceholder": "Tìm kiếm",
+        "empty": {
+            "notLoggedIn": "Vui lòng đăng nhập để xem danh sách bác sĩ yêu thích.",
+            "noResults": "Không tìm thấy bác sĩ yêu thích nào."
+        },
+        "errors": {
+            "patientIdRequired": "Cần có Patient ID để tải danh sách bác sĩ yêu thích",
+            "loadFailed": "Có lỗi xảy ra khi tải danh sách bác sĩ yêu thích"
+        },
+        "card": {
+            "specialty": "Chuyên khoa:",
+            "level": "Trình độ :",
+            "location": "Địa điểm :",
+            "experience": "Kinh nghiệm {{years}} năm",
+            "viewDetails": "Xem chi tiết",
+            "bookNow": "Đặt ngay",
+            "addToFavourite": "Thêm vào yêu thích",
+            "removeFromFavourite": "Xóa khỏi yêu thích",
+            "unknown": "Không xác định"
+        }
+    },
+    "invoices": {
+        "title": "Hoá Đơn",
+        "searchPlaceholder": "Tìm kiếm hóa đơn...",
+        "sort": {
+            "newest": "Mới nhất",
+            "oldest": "Cũ nhất",
+            "amountDesc": "Số tiền giảm dần",
+            "amountAsc": "Số tiền tăng dần"
+        },
+        "table": {
+            "id": "ID",
+            "paymentMethod": "Phương thức thanh toán",
+            "appointmentDate": "Ngày Khám",
+            "paymentDate": "Ngày Thanh Toán",
+            "amount": "Tổng Tiền",
+            "status": "Trạng thái"
+        },
+        "status": {
+            "completed": "Đã thanh toán",
+            "pending": "Đang xử lý",
+            "failed": "Thất bại",
+            "cancelled": "Đã hủy"
+        },
+        "empty": {
+            "noInvoices": "Chưa có hóa đơn nào",
+            "noResults": "Không tìm thấy hóa đơn phù hợp với từ khóa tìm kiếm",
+            "loading": "Đang tải thông tin người dùng..."
+        },
+        "modal": {
+            "title": "Xem Hoá Đơn",
+            "downloadPdf": "Tải PDF",
+            "downloading": "Đang tải...",
+            "print": "In hóa đơn",
+            "printing": "Đang in...",
+            "invoiceNumber": "Hoá Đơn Số",
+            "issuedDate": "Ban Hành",
+            "paymentFrom": "Thanh Toán Từ",
+            "paymentTo": "Thanh Toán Cho",
+            "invoiceDetails": "Chi Tiết Hoá Đơn",
+            "content": "Nội dung",
+            "vat": "VAT",
+            "deposit": "Tiền Cọc",
+            "appointmentType": {
+                "inPerson": "Khám Trực Tiếp",
+                "remote": "Tư Vấn Từ Xa"
+            },
+            "subtotal": "Tổng Phụ:",
+            "discount": "Giảm Giá:",
+            "totalAmount": "Tổng Số Tiền:",
+            "otherInfo": "Thông tin khác",
+            "otherInfoDescription": "Một bản tường trình về căn bệnh hiện tại, bao gồm các tình huống xung quanh sự khởi phát của những thay đổi sức khỏe gần đây và trình tự thời gian của các sự kiện tiếp theo khiến bệnh nhân phải tìm đến thuốc",
+            "errors": {
+                "downloadFailed": "Không thể tải xuống PDF. Vui lòng thử lại.",
+                "printFailed": "Không thể in hóa đơn. Vui lòng thử lại."
+            }
+        }
+    },
+    "wallet": {
+        "title": "Wallet",
+        "loading": "Đang tải thông tin người dùng...",
+        "summary": {
+            "title": "Tài khoản của bạn",
+            "accountName": "Tên chủ tài khoản",
+            "accountNumber": "Số tài khoản",
+            "bankName": "Tên ngân hàng",
+            "bankCode": "Mã ngân hàng",
+            "notAdded": "Chưa được thêm",
+            "loading": "Đang tải...",
+            "editDetails": "Chỉnh sửa chi tiết",
+            "addBankAccount": "Thêm tài khoản ngân hàng",
+            "allBankAccounts": "Tất cả các tài khoản ngân hàng"
+        },
+        "transactions": {
+            "id": "ID",
+            "accountNumber": "Số tài khoản",
+            "refundReason": "Lý do hoàn tiền",
+            "updatedAt": "Cập nhật vào lúc",
+            "refundAmount": "Số tiền hoàn trả",
+            "status": "Trạng thái",
+            "completed": "Completed",
+            "pending": "Pending",
+            "empty": {
+                "title": "Chưa có giao dịch nào",
+                "description": "Lịch sử hoàn tiền của bạn sẽ được hiển thị tại đây."
+            }
+        },
+        "addCardModal": {
+            "addTitle": "Thêm số tài khoản",
+            "editTitle": "Cập nhật số tài khoản",
+            "accountName": "Tên chủ tài khoản",
+            "accountNumber": "Số tài khoản",
+            "bank": "Ngân hàng",
+            "bankPlaceholder": "Chọn ngân hàng của bạn",
+            "setDefault": "Đặt làm tài khoản mặc định",
+            "cancel": "Huỷ",
+            "processing": "Đang xử lý...",
+            "validation": {
+                "checkInfo": "Vui lòng kiểm tra lại thông tin",
+                "fillRequired": "Vui lòng điền đầy đủ thông tin bắt buộc"
+            },
+            "success": {
+                "added": "Thêm tài khoản ngân hàng thành công!",
+                "updated": "Cập nhật thông tin tài khoản thành công!"
+            },
+            "errors": {
+                "createFailed": "Không thể tạo tài khoản. Vui lòng thử lại.",
+                "updateFailed": "Không thể cập nhật tài khoản. Vui lòng thử lại."
+            }
+        },
+        "otherAccountsModal": {
+            "title": "Tất cả các tài khoản ngân hàng",
+            "bankName": "Tên ngân hàng",
+            "accountNumber": "Số tài khoản",
+            "accountName": "Tên tài khoản",
+            "default": "Mặc định",
+            "setDefault": "Đặt làm mặc định",
+            "processing": "Đang xử lý...",
+            "deleteTooltip": "Xóa tài khoản",
+            "cannotDeleteDefault": "Không thể xóa tài khoản mặc định",
+            "empty": "Không tìm thấy tài khoản ngân hàng",
+            "close": "Đóng",
+            "deleteConfirm": {
+                "title": "Xóa tài khoản",
+                "message": "Bạn có chắc chắn muốn xóa tài khoản này không? Hành động này không thể hoàn tác.",
+                "confirm": "Xóa",
+                "cancel": "Hủy"
+            },
+            "cannotDelete": {
+                "title": "Không thể xóa",
+                "message": "Không thể xóa tài khoản đang được chọn làm mặc định. Vui lòng chọn tài khoản khác làm mặc định trước khi xóa.",
+                "confirm": "Đã hiểu"
+            }
+        },
+        "success": {
+            "setDefault": "Đã đặt tài khoản mặc định thành công!",
+            "deleted": "Xóa tài khoản thành công!"
+        },
+        "errors": {
+            "setDefaultFailed": "Không thể đặt tài khoản mặc định. Vui lòng thử lại.",
+            "deleteFailed": "Không thể xóa tài khoản. Vui lòng thử lại."
+        }
     }
 }

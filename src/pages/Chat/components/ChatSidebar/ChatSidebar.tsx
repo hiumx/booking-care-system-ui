@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 
 import ChatList from './components/ChatList';
@@ -8,6 +9,7 @@ import { RootState } from '@/store';
 import styles from './ChatSidebar.module.scss';
 
 const ChatSidebar = () => {
+    const { t } = useTranslation('chat');
     const userProfile = useSelector((state: RootState) => state.user.profile);
     const currentUserId = (userProfile?.accountId || userProfile?.id || '').toUpperCase();
 
@@ -31,7 +33,7 @@ const ChatSidebar = () => {
         >
             <div className={clsx(styles.leftChatTitle, 'left-chat-title all-chats')}>
                 <div className="setting-title-head d-flex justify-content-between align-items-start">
-                    <h4 style={{ marginBottom: '0.75rem' }}>Tất cả tin nhắn</h4>
+                    <h4 style={{ marginBottom: '0.75rem' }}>{t('sidebar.title')}</h4>
                     <button
                         className={clsx(
                             styles.tagPanelBtn,
@@ -39,11 +41,11 @@ const ChatSidebar = () => {
                             showTagPanel && styles.active
                         )}
                         onClick={() => setShowTagPanel(!showTagPanel)}
-                        title={showTagPanel ? 'Ẩn nhãn' : 'Hiện nhãn'}
+                        title={showTagPanel ? t('sidebar.hideTag') : t('sidebar.showTag')}
                         type="button"
                     >
                         <i className="fa-solid fa-tags"></i>
-                        <span className="d-none d-sm-inline">Nhãn</span>
+                        <span className="d-none d-sm-inline">{t('sidebar.tags')}</span>
                         {selectedTagIds.length > 0 && (
                             <span className={styles.tagBadge}>{selectedTagIds.length}</span>
                         )}
@@ -59,7 +61,7 @@ const ChatSidebar = () => {
                             <input
                                 type="text"
                                 name="chat-search"
-                                placeholder="Tìm kiếm"
+                                placeholder={t('sidebar.searchPlaceholder')}
                                 className="form-control"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -73,14 +75,14 @@ const ChatSidebar = () => {
                         <div className="d-flex align-items-center justify-content-between mt-2 px-2">
                             <span className="text-muted small">
                                 <i className="fa-solid fa-filter me-1"></i>
-                                Lọc theo {selectedTagIds.length} nhãn
+                                {t('sidebar.filterByTags', { count: selectedTagIds.length })}
                             </span>
                             <button
                                 className="btn btn-sm btn-ghost-danger"
                                 onClick={() => setSelectedTagIds([])}
                                 type="button"
                             >
-                                <i className="fa-solid fa-xmark"></i> Xóa lọc
+                                <i className="fa-solid fa-xmark"></i> {t('sidebar.clearFilter')}
                             </button>
                         </div>
                     )}

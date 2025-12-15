@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 
 import { BankAccount } from '../../types/wallet.types';
@@ -21,6 +22,7 @@ const WalletSummary: React.FC<WalletSummaryProps> = ({
     accountsCount = 0,
     loading = false,
 }) => {
+    const { t } = useTranslation('userProfile');
     const hasCardDetails = defaultAccount !== null;
 
     return (
@@ -28,49 +30,49 @@ const WalletSummary: React.FC<WalletSummaryProps> = ({
             <div className="row">
                 <div className="col-xxl-5 col-lg-5">
                     <div className={clsx(styles.bankDetailsInfo, 'bank-details-info')}>
-                        <h3>Tài khoản của bạn</h3>
+                        <h3>{t('wallet.summary.title')}</h3>
                         <ul>
                             <li>
-                                <h6>Tên chủ tài khoản</h6>
+                                <h6>{t('wallet.summary.accountName')}</h6>
                                 <h5>
                                     {(() => {
-                                        if (loading) return 'Đang tải...';
+                                        if (loading) return t('wallet.summary.loading');
                                         return hasCardDetails
                                             ? defaultAccount.accountName
-                                            : 'Chưa được thêm';
+                                            : t('wallet.summary.notAdded');
                                     })()}
                                 </h5>
                             </li>
                             <li>
-                                <h6>Số tài khoản</h6>
+                                <h6>{t('wallet.summary.accountNumber')}</h6>
                                 <h5>
                                     {(() => {
-                                        if (loading) return 'Đang tải...';
+                                        if (loading) return t('wallet.summary.loading');
                                         return hasCardDetails
                                             ? defaultAccount.accountNumber
-                                            : 'Chưa được thêm';
+                                            : t('wallet.summary.notAdded');
                                     })()}
                                 </h5>
                             </li>
                             <li>
-                                <h6>Tên ngân hàng</h6>
+                                <h6>{t('wallet.summary.bankName')}</h6>
                                 <h5>
                                     {(() => {
-                                        if (loading) return 'Đang tải...';
+                                        if (loading) return t('wallet.summary.loading');
                                         return hasCardDetails
                                             ? defaultAccount.bankName
-                                            : 'Chưa được thêm';
+                                            : t('wallet.summary.notAdded');
                                     })()}
                                 </h5>
                             </li>
                             <li>
-                                <h6>Mã ngân hàng</h6>
+                                <h6>{t('wallet.summary.bankCode')}</h6>
                                 <h5>
                                     {(() => {
-                                        if (loading) return 'Đang tải...';
+                                        if (loading) return t('wallet.summary.loading');
                                         if (hasCardDetails && defaultAccount.bankCode)
                                             return defaultAccount.bankCode;
-                                        return 'Chưa được thêm';
+                                        return t('wallet.summary.notAdded');
                                     })()}
                                 </h5>
                             </li>
@@ -80,12 +82,16 @@ const WalletSummary: React.FC<WalletSummaryProps> = ({
                         <div className="edit-detail-link d-flex align-items-center w-80">
                             <div className={styles.buttonGroup}>
                                 {hasCardDetails && (
-                                    <button onClick={onEditDetails}>Chỉnh sửa chi tiết</button>
+                                    <button onClick={onEditDetails}>
+                                        {t('wallet.summary.editDetails')}
+                                    </button>
                                 )}
-                                <button onClick={onAddCard}>Thêm tài khoản ngân hàng</button>
+                                <button onClick={onAddCard}>
+                                    {t('wallet.summary.addBankAccount')}
+                                </button>
                             </div>
                             <button onClick={onOtherAccounts}>
-                                Tất cả các tài khoản ngân hàng{' '}
+                                {t('wallet.summary.allBankAccounts')}{' '}
                                 {accountsCount > 0 && `(${accountsCount})`}
                             </button>
                         </div>

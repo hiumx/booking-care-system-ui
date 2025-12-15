@@ -134,5 +134,171 @@
             "checkInfo": "Please check your information!",
             "requireEmailOrPhone": "Please provide at least email or phone number!"
         }
+    },
+    "favourite": {
+        "title": "Favourite Doctors List",
+        "titleWithCount": "Favourite Doctors List ({{count}})",
+        "searchPlaceholder": "Search",
+        "empty": {
+            "notLoggedIn": "Please log in to view your favourite doctors list.",
+            "noResults": "No favourite doctors found."
+        },
+        "errors": {
+            "patientIdRequired": "Patient ID is required to load favorite doctors",
+            "loadFailed": "An error occurred while loading favourite doctors list"
+        },
+        "card": {
+            "specialty": "Specialty:",
+            "level": "Education :",
+            "location": "Location :",
+            "experience": "{{years}} years of experience",
+            "viewDetails": "View Details",
+            "bookNow": "Book Now",
+            "addToFavourite": "Add to favourites",
+            "removeFromFavourite": "Remove from favourites",
+            "unknown": "Unknown"
+        }
+    },
+    "invoices": {
+        "title": "Invoices",
+        "searchPlaceholder": "Search invoices...",
+        "sort": {
+            "newest": "Newest",
+            "oldest": "Oldest",
+            "amountDesc": "Amount descending",
+            "amountAsc": "Amount ascending"
+        },
+        "table": {
+            "id": "ID",
+            "paymentMethod": "Payment Method",
+            "appointmentDate": "Appointment Date",
+            "paymentDate": "Payment Date",
+            "amount": "Amount",
+            "status": "Status"
+        },
+        "status": {
+            "completed": "Completed",
+            "pending": "Pending",
+            "failed": "Failed",
+            "cancelled": "Cancelled"
+        },
+        "empty": {
+            "noInvoices": "No invoices yet",
+            "noResults": "No invoices found matching your search",
+            "loading": "Loading user information..."
+        },
+        "modal": {
+            "title": "View Invoice",
+            "downloadPdf": "Download PDF",
+            "downloading": "Downloading...",
+            "print": "Print Invoice",
+            "printing": "Printing...",
+            "invoiceNumber": "Invoice No",
+            "issuedDate": "Issued",
+            "paymentFrom": "Payment From",
+            "paymentTo": "Payment To",
+            "invoiceDetails": "Invoice Details",
+            "content": "Content",
+            "vat": "VAT",
+            "deposit": "Deposit",
+            "appointmentType": {
+                "inPerson": "In-Person Consultation",
+                "remote": "Remote Consultation"
+            },
+            "subtotal": "Subtotal:",
+            "discount": "Discount:",
+            "totalAmount": "Total Amount:",
+            "otherInfo": "Other Information",
+            "otherInfoDescription": "A statement of the current illness, including the circumstances surrounding the onset of recent health changes and the timeline of subsequent events that led the patient to seek medication",
+            "errors": {
+                "downloadFailed": "Unable to download PDF. Please try again.",
+                "printFailed": "Unable to print invoice. Please try again."
+            }
+        }
+    },
+    "wallet": {
+        "title": "Wallet",
+        "loading": "Loading user information...",
+        "summary": {
+            "title": "Your Account",
+            "accountName": "Account Holder Name",
+            "accountNumber": "Account Number",
+            "bankName": "Bank Name",
+            "bankCode": "Bank Code",
+            "notAdded": "Not added yet",
+            "loading": "Loading...",
+            "editDetails": "Edit Details",
+            "addBankAccount": "Add Bank Account",
+            "allBankAccounts": "All Bank Accounts"
+        },
+        "transactions": {
+            "id": "ID",
+            "accountNumber": "Account Number",
+            "refundReason": "Refund Reason",
+            "updatedAt": "Updated At",
+            "refundAmount": "Refund Amount",
+            "status": "Status",
+            "completed": "Completed",
+            "pending": "Pending",
+            "empty": {
+                "title": "No transactions yet",
+                "description": "Your refund history will be displayed here."
+            }
+        },
+        "addCardModal": {
+            "addTitle": "Add Account Number",
+            "editTitle": "Update Account Number",
+            "accountName": "Account Holder Name",
+            "accountNumber": "Account Number",
+            "bank": "Bank",
+            "bankPlaceholder": "Select your bank",
+            "setDefault": "Set as default account",
+            "cancel": "Cancel",
+            "processing": "Processing...",
+            "validation": {
+                "checkInfo": "Please check your information",
+                "fillRequired": "Please fill in all required fields"
+            },
+            "success": {
+                "added": "Bank account added successfully!",
+                "updated": "Account information updated successfully!"
+            },
+            "errors": {
+                "createFailed": "Unable to create account. Please try again.",
+                "updateFailed": "Unable to update account. Please try again."
+            }
+        },
+        "otherAccountsModal": {
+            "title": "All Bank Accounts",
+            "bankName": "Bank Name",
+            "accountNumber": "Account Number",
+            "accountName": "Account Name",
+            "default": "Default",
+            "setDefault": "Set as Default",
+            "processing": "Processing...",
+            "deleteTooltip": "Delete account",
+            "cannotDeleteDefault": "Cannot delete default account",
+            "empty": "No bank accounts found",
+            "close": "Close",
+            "deleteConfirm": {
+                "title": "Delete Account",
+                "message": "Are you sure you want to delete this account? This action cannot be undone.",
+                "confirm": "Delete",
+                "cancel": "Cancel"
+            },
+            "cannotDelete": {
+                "title": "Cannot Delete",
+                "message": "Cannot delete the default account. Please set another account as default before deleting.",
+                "confirm": "Got it"
+            }
+        },
+        "success": {
+            "setDefault": "Default account set successfully!",
+            "deleted": "Account deleted successfully!"
+        },
+        "errors": {
+            "setDefaultFailed": "Unable to set default account. Please try again.",
+            "deleteFailed": "Unable to delete account. Please try again."
+        }
     }
 }

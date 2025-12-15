@@ -1,0 +1,130 @@
+{
+    "sidebar": {
+        "title": "Tất cả tin nhắn",
+        "tags": "Nhãn",
+        "hideTag": "Ẩn nhãn",
+        "showTag": "Hiện nhãn",
+        "searchPlaceholder": "Tìm kiếm",
+        "filterByTags": "Lọc theo {{count}} nhãn",
+        "clearFilter": "Xóa lọc",
+        "recentMessages": "Tin nhắn gần đây",
+        "noConversations": "Không có hội thoại nào",
+        "loading": "Đang tải..."
+    },
+    "header": {
+        "selectConversation": "Chọn hội thoại",
+        "online": "Đang online",
+        "offline": "Offline",
+        "search": "Tìm kiếm",
+        "manageTags": "Quản lý nhãn",
+        "searchMessages": "Tìm kiếm tin nhắn",
+        "menu": {
+            "videoCall": "Gọi video",
+            "muteNotifications": "Tắt thông báo",
+            "disappearingMessages": "Tin nhắn biến mất",
+            "deleteMessages": "Xóa tin nhắn",
+            "deleteChat": "Xóa chat",
+            "report": "Báo cáo",
+            "block": "Chặn"
+        }
+    },
+    "messages": {
+        "selectToStart": "Chọn một hội thoại để bắt đầu nhắn tin",
+        "loading": "Đang tải tin nhắn...",
+        "loadingOld": "Đang tải tin nhắn cũ...",
+        "today": "Hôm nay",
+        "yesterday": "Hôm qua",
+        "typing": "{{name}} đang nhập...",
+        "noMessages": "Không có tin nhắn"
+    },
+    "footer": {
+        "placeholder": "Nhập tin nhắn của bạn...",
+        "placeholderWithFile": "Thêm chú thích cho file...",
+        "sending": "Đang gửi...",
+        "removeFile": "Xóa file",
+        "menu": {
+            "document": "Tài liệu",
+            "camera": "Camera",
+            "gallery": "Thư viện",
+            "audio": "Âm thanh"
+        },
+        "speech": {
+            "listening": "Đang nghe...",
+            "startRecording": "Click để bắt đầu ghi âm",
+            "stopRecording": "Click để dừng nghe",
+            "notSupported": "Speech Recognition không được hỗ trợ trên trình duyệt này",
+            "error": "Lỗi: {{error}}"
+        },
+        "toast": {
+            "fileSent": "Đã gửi file thành công",
+            "sendFailed": "Không thể gửi tin nhắn",
+            "invalidFileType": "Loại file không hợp lệ"
+        }
+    },
+    "time": {
+        "justNow": "Vừa xong",
+        "minutesAgo": "{{count}} phút trước",
+        "hoursAgo": "{{count}} giờ trước",
+        "daysAgo": "{{count}} ngày trước"
+    },
+    "attachments": {
+        "sentImage": "Đã gửi ảnh",
+        "sentVideo": "Đã gửi video",
+        "sentAudio": "Đã gửi audio",
+        "sentFile": "Đã gửi file",
+        "voiceMessage": "Tin nhắn thoại",
+        "systemMessage": "Tin nhắn hệ thống"
+    },
+    "tagManager": {
+        "title": "Quản lý nhãn",
+        "createNew": "Tạo nhãn mới",
+        "loading": "Đang tải...",
+        "noTags": "Chưa có nhãn nào",
+        "editTag": "Chỉnh sửa nhãn",
+        "deleteTag": "Xóa nhãn",
+        "deleting": "Đang xóa",
+        "tagTypes": {
+            "custom": "Tùy chỉnh",
+            "system": "Hệ thống",
+            "important": "Quan trọng",
+            "work": "Công việc",
+            "personal": "Cá nhân",
+            "shopping": "Mua sắm",
+            "travel": "Du lịch",
+            "family": "Gia đình",
+            "vip": "VIP",
+            "archived": "Lưu trữ"
+        },
+        "createModal": {
+            "title": "Tạo nhãn mới",
+            "tagName": "Tên nhãn",
+            "tagNamePlaceholder": "Nhập tên nhãn...",
+            "color": "Màu sắc",
+            "tagType": "Loại nhãn",
+            "cancel": "Hủy",
+            "create": "Tạo"
+        },
+        "editModal": {
+            "title": "Chỉnh sửa nhãn",
+            "tagName": "Tên nhãn",
+            "tagNamePlaceholder": "Nhập tên nhãn...",
+            "color": "Màu sắc",
+            "tagType": "Loại nhãn",
+            "cancel": "Hủy",
+            "update": "Cập nhật"
+        },
+        "deleteConfirm": {
+            "title": "Xóa nhãn",
+            "messageWithCount": "Bạn có chắc muốn xóa nhãn \"{{name}}\"? Nhãn này đang được sử dụng trong {{count}} hội thoại.",
+            "message": "Bạn có chắc muốn xóa nhãn \"{{name}}\"?",
+            "confirm": "Xóa",
+            "cancel": "Hủy"
+        },
+        "errors": {
+            "updateFailed": "Không thể cập nhật nhãn. Vui lòng thử lại.",
+            "deleteFailed": "Không thể xóa nhãn. Vui lòng thử lại.",
+            "addFailed": "Không thể thêm nhãn. Vui lòng thử lại.",
+            "removeFailed": "Không thể xóa nhãn. Vui lòng thử lại."
+        }
+    }
+}

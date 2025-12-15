@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@mui/material';
 import DoctorCard from './components/DoctorCard';
 import Pagination from '@/components/Pagination';
@@ -44,6 +45,7 @@ interface FavouriteProps {
 }
 
 const Favourite: React.FC<FavouriteProps> = ({ patientId }) => {
+    const { t } = useTranslation('userProfile');
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [doctors, setDoctors] = useState<DoctorResponse[]>([]);
@@ -57,7 +59,7 @@ const Favourite: React.FC<FavouriteProps> = ({ patientId }) => {
     // Fetch favorite doctors
     const fetchFavoriteDoctors = async (page: number = 1, search: string = '') => {
         if (!patientId) {
-            setError('Patient ID is required to load favorite doctors');
+            setError(t('favourite.errors.patientIdRequired'));
             return;
         }
 
@@ -76,7 +78,7 @@ const Favourite: React.FC<FavouriteProps> = ({ patientId }) => {
             setTotalPages(response.totalPages);
             setTotalCount(response.totalCount);
         } catch (err: any) {
-            setError(err.message || 'Có lỗi xảy ra khi tải danh sách bác sĩ yêu thích');
+            setError(err.message || t('favourite.errors.loadFailed'));
             console.error('Error fetching favorite doctors:', err);
         } finally {
             setLoading(false);
@@ -106,12 +108,12 @@ const Favourite: React.FC<FavouriteProps> = ({ patientId }) => {
         return {
             id: apiDoctor.id,
             name: `${apiDoctor.lastName} ${apiDoctor.firstName}`,
-            specialty: apiDoctor.specialty?.name || 'Không xác định',
+            specialty: apiDoctor.specialty?.name || t('favourite.card.unknown'),
             image: apiDoctor.avatarUrl,
             rating: apiDoctor.reviewStatistics?.averageRating || 0,
             numberOfReviews: apiDoctor.reviewStatistics?.totalReviews || 0,
-            level: apiDoctor.position?.name || 'Không xác định',
-            location: apiDoctor.hospital?.name || 'Không xác định',
+            level: apiDoctor.position?.name || t('favourite.card.unknown'),
+            location: apiDoctor.hospital?.name || t('favourite.card.unknown'),
             experience: apiDoctor.yearsOfExperience.toString(),
             isVerified: apiDoctor.status === Status.ACTIVE,
         };
@@ -130,7 +132,7 @@ const Favourite: React.FC<FavouriteProps> = ({ patientId }) => {
     if (!patientId) {
         return (
             <div className="text-center my-4">
-                <p>Vui lòng đăng nhập để xem danh sách bác sĩ yêu thích.</p>
+                <p>{t('favourite.empty.notLoggedIn')}</p>
             </div>
         );
     }
@@ -138,14 +140,14 @@ const Favourite: React.FC<FavouriteProps> = ({ patientId }) => {
     return (
         <>
             <div className="dashboard-header">
-                <h3>Danh sách bác sĩ yêu thích ({totalCount})</h3>
+                <h3>{t('favourite.titleWithCount', { count: totalCount })}</h3>
                 <ul className="header-list-btns">
                     <li>
                         <div className="input-block dash-search-input">
                             <input
                                 type="text"
                                 className="form-control"
-                                placeholder="Tìm kiếm"
+                                placeholder={t('favourite.searchPlaceholder')}
                                 value={searchTerm}
                                 onChange={handleSearchChange}
                             />
@@ -176,7 +178,7 @@ const Favourite: React.FC<FavouriteProps> = ({ patientId }) => {
             {/* No data state */}
             {!loading && !error && doctors.length === 0 && (
                 <div className="text-center my-4">
-                    <p>Không tìm thấy bác sĩ yêu thích nào.</p>
+                    <p>{t('favourite.empty.noResults')}</p>
                 </div>
             )}
 

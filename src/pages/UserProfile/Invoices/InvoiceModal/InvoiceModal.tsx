@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import Button from '../../../../components/Button';
 
@@ -30,6 +31,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
     isClosing,
     onAnimationEnd,
 }) => {
+    const { t } = useTranslation('userProfile');
     const invoiceContentRef = useRef<HTMLDivElement>(null);
     const [isDownloading, setIsDownloading] = useState(false);
     const [isPrinting, setIsPrinting] = useState(false);
@@ -47,7 +49,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
             );
         } catch (error) {
             console.error('Error downloading PDF:', error);
-            alert('Không thể tải xuống PDF. Vui lòng thử lại.');
+            alert(t('invoices.modal.errors.downloadFailed'));
         } finally {
             setIsDownloading(false);
         }
@@ -62,7 +64,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
             printInvoice(invoiceContentRef.current);
         } catch (error) {
             console.error('Error printing invoice:', error);
-            alert('Không thể in hóa đơn. Vui lòng thử lại.');
+            alert(t('invoices.modal.errors.printFailed'));
         } finally {
             // Reset printing state after a short delay
             setTimeout(() => setIsPrinting(false), 1000);
@@ -111,7 +113,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                 >
                     <div className={clsx('modal-content', styles.modalContent)}>
                         <div className={clsx('modal-header')}>
-                            <h3 className="modal-title">Xem Hoá Đơn</h3>
+                            <h3 className="modal-title">{t('invoices.modal.title')}</h3>
                             <button
                                 type="button"
                                 className="btn-close"
@@ -127,7 +129,11 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                 <ul>
                                     <li>
                                         <Button
-                                            text={isDownloading ? 'Đang tải...' : 'Tải PDF'}
+                                            text={
+                                                isDownloading
+                                                    ? t('invoices.modal.downloading')
+                                                    : t('invoices.modal.downloadPdf')
+                                            }
                                             type="button"
                                             className="btn-md rounded-pill me-2"
                                             onClick={handleDownloadPDF}
@@ -136,7 +142,11 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                     </li>
                                     <li>
                                         <Button
-                                            text={isPrinting ? 'Đang in...' : 'In hóa đơn'}
+                                            text={
+                                                isPrinting
+                                                    ? t('invoices.modal.printing')
+                                                    : t('invoices.modal.print')
+                                            }
                                             type="button"
                                             className="btn-md rounded-pill btn-outline-primary"
                                             onClick={handlePrint}
@@ -168,9 +178,11 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                                     'invoice-details'
                                                 )}
                                             >
-                                                Hoá Đơn Số : <span>{invoice.id}</span>
+                                                {t('invoices.modal.invoiceNumber')} :{' '}
+                                                <span>{invoice.id}</span>
                                                 <br />
-                                                Ban Hành: <span>{invoice.bookedOn}</span>
+                                                {t('invoices.modal.issuedDate')}:{' '}
+                                                <span>{invoice.bookedOn}</span>
                                             </p>
                                         </div>
                                     </div>
@@ -182,7 +194,9 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                             <div
                                                 className={clsx(styles.invoiceInfo, 'invoice-info')}
                                             >
-                                                <h6 className="customer-text">Thanh Toán Từ</h6>
+                                                <h6 className="customer-text">
+                                                    {t('invoices.modal.paymentFrom')}
+                                                </h6>
                                                 <p
                                                     className={clsx(
                                                         styles.invoiceDetails,
@@ -198,7 +212,9 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                             <div
                                                 className={clsx(styles.invoiceInfo, 'invoice-info')}
                                             >
-                                                <h6 className="customer-text">Thanh Toán Cho</h6>
+                                                <h6 className="customer-text">
+                                                    {t('invoices.modal.paymentTo')}
+                                                </h6>
                                                 <p
                                                     className={clsx(
                                                         styles.invoiceDetails,
@@ -225,7 +241,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                 >
                                     <div className="row">
                                         <div className="col-md-12">
-                                            <h6>Chi Tiết Hoá Đơn</h6>
+                                            <h6>{t('invoices.modal.invoiceDetails')}</h6>
                                             <div className="invoice-table">
                                                 <div
                                                     className={clsx(
@@ -236,10 +252,14 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                                     <table className="table table-bordered">
                                                         <thead>
                                                             <tr>
-                                                                <th>Nội dung</th>
+                                                                <th>
+                                                                    {t('invoices.modal.content')}
+                                                                </th>
 
-                                                                <th>VAT</th>
-                                                                <th>Tiền Cọc</th>
+                                                                <th>{t('invoices.modal.vat')}</th>
+                                                                <th>
+                                                                    {t('invoices.modal.deposit')}
+                                                                </th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -247,8 +267,12 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                                                 <td className="text-gray-9">
                                                                     {invoice.appointmentType ===
                                                                     'IN_PERSON'
-                                                                        ? 'Khám Trực Tiếp'
-                                                                        : 'Tư Vấn Từ Xa'}
+                                                                        ? t(
+                                                                              'invoices.modal.appointmentType.inPerson'
+                                                                          )
+                                                                        : t(
+                                                                              'invoices.modal.appointmentType.remote'
+                                                                          )}
                                                                 </td>
 
                                                                 <td>0 ₫</td>
@@ -264,19 +288,21 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                                 <table className="invoice-table-two table">
                                                     <tbody>
                                                         <tr>
-                                                            <th>Tổng Phụ:</th>
+                                                            <th>{t('invoices.modal.subtotal')}</th>
                                                             <td>
                                                                 <span>{invoice.amount}</span>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <th>Giảm Giá:</th>
+                                                            <th>{t('invoices.modal.discount')}</th>
                                                             <td>
                                                                 <span>0%</span>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <th>Tổng Số Tiền:</th>
+                                                            <th>
+                                                                {t('invoices.modal.totalAmount')}
+                                                            </th>
                                                             <td>
                                                                 <span>{invoice.amount}</span>
                                                             </td>
@@ -290,12 +316,9 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                                 {/* /Invoice Item */}
                                 {/* Invoice Information */}
                                 <div className="other-info mb-0">
-                                    <h6 className="mb-2">Thông tin khác</h6>
+                                    <h6 className="mb-2">{t('invoices.modal.otherInfo')}</h6>
                                     <p className="mb-0">
-                                        Một bản tường trình về căn bệnh hiện tại, bao gồm các tình
-                                        huống xung quanh sự khởi phát của những thay đổi sức khỏe
-                                        gần đây và trình tự thời gian của các sự kiện tiếp theo
-                                        khiến bệnh nhân phải tìm đến thuốc
+                                        {t('invoices.modal.otherInfoDescription')}
                                     </p>
                                 </div>
                                 {/* /Invoice Information */}
