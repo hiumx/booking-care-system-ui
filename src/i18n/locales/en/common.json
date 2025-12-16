@@ -119,5 +119,10 @@
         "termsLink": "Terms & Conditions",
         "submitButton": "Add review",
         "cancelButton": "Cancel"
+    },
+    "testimonialSection": {
+        "loading": "Loading reviews...",
+        "noReviews": "No reviews yet",
+        "beFirst": "Be the first to review this hospital!"
     }
 }

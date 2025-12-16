@@ -473,14 +473,14 @@ const SideBar: React.FC<SideBarProps> = ({
         let sections = dynamicFilterData;
 
         // Hide sections without data (except always-show sections)
-        const alwaysShowSections = [
+        const alwaysShowSections = new Set([
             t('sidebar.filters.price'),
             t('sidebar.filters.rating'),
             t('sidebar.filters.experience'),
             t('sidebar.filters.gender'),
-        ];
+        ]);
         sections = sections.filter((section) => {
-            if (alwaysShowSections.includes(section.title)) {
+            if (alwaysShowSections.has(section.title)) {
                 return true;
             }
             return section.options.length > 0;

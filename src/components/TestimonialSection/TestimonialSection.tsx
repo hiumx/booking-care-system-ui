@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from './TestimonialSection.module.scss';
 import shape04 from '@/assets/img/shape-04.png';
 import shape05 from '@/assets/img/shape-05.png';
@@ -28,6 +29,7 @@ interface Testimonial {
 }
 
 const TestimonialSection: React.FC<TestimonialSectionProps> = ({ hospitalId }) => {
+    const { t } = useTranslation('common');
     const swiperRef = useRef<any>(null);
     const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
     const [loading, setLoading] = useState(false);
@@ -118,7 +120,9 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ hospitalId }) =
             return (
                 <div className="text-center py-5">
                     <div className="spinner-border">
-                        <output className="visually-hidden">Đang tải đánh giá...</output>
+                        <output className="visually-hidden">
+                            {t('testimonialSection.loading')}
+                        </output>
                     </div>
                 </div>
             );
@@ -128,8 +132,8 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ hospitalId }) =
             return (
                 <div className="text-center py-5">
                     <div className={styles.emptyState}>
-                        <h4>Chưa có đánh giá</h4>
-                        <p>Hãy là người đầu tiên đánh giá bệnh viện này!</p>
+                        <h4>{t('testimonialSection.noReviews')}</h4>
+                        <p>{t('testimonialSection.beFirst')}</p>
                     </div>
                 </div>
             );

@@ -119,5 +119,10 @@
         "termsLink": "Điều khoản & Điều kiện",
         "submitButton": "Thêm đánh giá",
         "cancelButton": "Hủy"
+    },
+    "testimonialSection": {
+        "loading": "Đang tải đánh giá...",
+        "noReviews": "Chưa có đánh giá",
+        "beFirst": "Hãy là người đầu tiên đánh giá bệnh viện này!"
     }
 }

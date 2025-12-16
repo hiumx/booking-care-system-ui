@@ -643,8 +643,7 @@ const AISupportBooking: React.FC = () => {
     // Helper function to build lab result message
     const buildLabResultMessage = (data: any): string => {
         const lines: string[] = [];
-        lines.push(t('labResult.title'));
-        lines.push('');
+        lines.push(t('labResult.title'), '');
 
         // Normal indicators
         if (data.normalIndicators && data.normalIndicators.length > 0) {
@@ -662,10 +661,10 @@ const AISupportBooking: React.FC = () => {
             lines.push(t('labResult.abnormalIndicators'));
             data.abnormalIndicators.forEach((indicator: any) => {
                 lines.push(
-                    `- ${indicator.name}: ${indicator.value} ${indicator.unit} (${t('labResult.reference')}: ${indicator.referenceRange})`
+                    `- ${indicator.name}: ${indicator.value} ${indicator.unit} (${t('labResult.reference')}: ${indicator.referenceRange})`,
+                    `  - ${t('labResult.explanation')}: ${indicator.explanation}`,
+                    `  - ${t('labResult.advice')}: ${indicator.advice}`
                 );
-                lines.push(`  - ${t('labResult.explanation')}: ${indicator.explanation}`);
-                lines.push(`  - ${t('labResult.advice')}: ${indicator.advice}`);
                 if (indicator.possibleDiagnosis) {
                     lines.push(
                         `  - ${t('labResult.possibleDiagnosis')}: ${indicator.possibleDiagnosis}`
@@ -697,25 +696,28 @@ const AISupportBooking: React.FC = () => {
     // Helper function to build dermatology message
     const buildDermatologyMessage = (data: any): string => {
         const lines: string[] = [];
-        lines.push(t('dermatology.title'));
-        lines.push('');
+        lines.push(t('dermatology.title'), '');
 
         // Diagnosis
         if (data.diagnosis) {
-            lines.push(`${t('dermatology.diagnosis')}: ${data.diagnosis.conditionName}`);
             lines.push(
-                `${t('dermatology.confidence')}: ${(data.diagnosis.confidence * 100).toFixed(0)}%`
+                `${t('dermatology.diagnosis')}: ${data.diagnosis.conditionName}`,
+                `${t('dermatology.confidence')}: ${(data.diagnosis.confidence * 100).toFixed(0)}%`,
+                ''
             );
-            lines.push('');
         }
 
         // Biopsy recommendation
         if (data.biopsyRecommended) {
-            lines.push(t('dermatology.biopsyRecommended'));
             if (data.biopsyReason) {
-                lines.push(`${t('dermatology.biopsyReason')}: ${data.biopsyReason}`);
+                lines.push(
+                    t('dermatology.biopsyRecommended'),
+                    `${t('dermatology.biopsyReason')}: ${data.biopsyReason}`,
+                    ''
+                );
+            } else {
+                lines.push(t('dermatology.biopsyRecommended'), '');
             }
-            lines.push('');
         }
 
         // General advice
