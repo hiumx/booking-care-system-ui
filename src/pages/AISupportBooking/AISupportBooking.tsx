@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { Home } from 'lucide-react';
 import { toast } from 'react-toastify';
 import ChatSidebar from './components/ChatSidebar';
@@ -154,6 +155,7 @@ const convertHistoryMessage = (msg: any, index: number, chatId: string): Message
 };
 
 const AISupportBooking: React.FC = () => {
+    const { t } = useTranslation('aiSupport');
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { chatId } = useParams<{ chatId?: string }>();
@@ -273,7 +275,7 @@ const AISupportBooking: React.FC = () => {
                 const historiesFromBackend: ChatHistory[] = sortedSessions.map((session) => {
                     // Parse UTC time string and convert to local time
                     // session.updatedAt is in UTC format from backend (ISO string)
-                    let formattedTime = 'Vừa xong';
+                    let formattedTime = t('chat.justNow');
                     try {
                         // Parse the UTC date string
                         const utcDate = new Date(session.updatedAt);
@@ -292,12 +294,12 @@ const AISupportBooking: React.FC = () => {
                         }
                     } catch (error) {
                         console.error('Error formatting time:', error);
-                        formattedTime = 'Vừa xong';
+                        formattedTime = t('chat.justNow');
                     }
 
                     return {
                         id: session.sessionId,
-                        title: session.title || 'Cuộc trò chuyện mới',
+                        title: session.title || t('chat.newConversation'),
                         lastMessage: session.lastMessage || '',
                         lastMessageTime: formattedTime,
                         avatar: '',
@@ -472,7 +474,7 @@ const AISupportBooking: React.FC = () => {
 
     const buildChatHistory = (id: string, initialContent?: string): ChatHistory => {
         const trimmed = initialContent?.trim() ?? '';
-        let title = 'Cuộc trò chuyện mới';
+        let title = t('chat.newConversation');
         if (trimmed.length > 0) {
             title = trimmed.length > 30 ? `${trimmed.substring(0, 30)}...` : trimmed;
         }
@@ -481,7 +483,7 @@ const AISupportBooking: React.FC = () => {
             id,
             title,
             lastMessage: trimmed,
-            lastMessageTime: trimmed ? 'Vừa xong' : formatChatTimestamp(),
+            lastMessageTime: trimmed ? t('chat.justNow') : formatChatTimestamp(),
             avatar: '',
         };
     };
@@ -630,26 +632,26 @@ const AISupportBooking: React.FC = () => {
     // Helper function to get error message
     const getErrorMessage = (error: any): string => {
         if (error.message) {
-            return `Xin lỗi, ${error.message}`;
+            return t('errors.sorry', { message: error.message });
         }
         if (error.response?.data?.message) {
-            return `Xin lỗi, ${error.response.data.message}`;
+            return t('errors.sorry', { message: error.response.data.message });
         }
-        return 'Xin lỗi, đã có lỗi xảy ra khi phân tích triệu chứng của bạn. Vui lòng thử lại sau.';
+        return t('errors.generic');
     };
 
     // Helper function to build lab result message
     const buildLabResultMessage = (data: any): string => {
         const lines: string[] = [];
-        lines.push('KẾT QUẢ PHÂN TÍCH XÉT NGHIỆM:');
+        lines.push(t('labResult.title'));
         lines.push('');
 
         // Normal indicators
         if (data.normalIndicators && data.normalIndicators.length > 0) {
-            lines.push('Các chỉ số bình thường:');
+            lines.push(t('labResult.normalIndicators'));
             data.normalIndicators.forEach((indicator: any) => {
                 lines.push(
-                    `- ${indicator.name}: ${indicator.value} ${indicator.unit} (Tham chiếu: ${indicator.referenceRange})`
+                    `- ${indicator.name}: ${indicator.value} ${indicator.unit} (${t('labResult.reference')}: ${indicator.referenceRange})`
                 );
             });
             lines.push('');
@@ -657,15 +659,17 @@ const AISupportBooking: React.FC = () => {
 
         // Abnormal indicators
         if (data.abnormalIndicators && data.abnormalIndicators.length > 0) {
-            lines.push('Các chỉ số bất thường:');
+            lines.push(t('labResult.abnormalIndicators'));
             data.abnormalIndicators.forEach((indicator: any) => {
                 lines.push(
-                    `- ${indicator.name}: ${indicator.value} ${indicator.unit} (Tham chiếu: ${indicator.referenceRange})`
+                    `- ${indicator.name}: ${indicator.value} ${indicator.unit} (${t('labResult.reference')}: ${indicator.referenceRange})`
                 );
-                lines.push(`  - Giải thích: ${indicator.explanation}`);
-                lines.push(`  - Lời khuyên: ${indicator.advice}`);
+                lines.push(`  - ${t('labResult.explanation')}: ${indicator.explanation}`);
+                lines.push(`  - ${t('labResult.advice')}: ${indicator.advice}`);
                 if (indicator.possibleDiagnosis) {
-                    lines.push(`  - Chẩn đoán có thể: ${indicator.possibleDiagnosis}`);
+                    lines.push(
+                        `  - ${t('labResult.possibleDiagnosis')}: ${indicator.possibleDiagnosis}`
+                    );
                     if (
                         indicator.recommendedSpecialties &&
                         indicator.recommendedSpecialties.length > 0
@@ -673,7 +677,9 @@ const AISupportBooking: React.FC = () => {
                         const specialtyNames = indicator.recommendedSpecialties
                             .map((s: any) => s.specialtyName || s)
                             .join(', ');
-                        lines.push(`    - Chuyên khoa phù hợp: ${specialtyNames}`);
+                        lines.push(
+                            `    - ${t('labResult.recommendedSpecialties')}: ${specialtyNames}`
+                        );
                     }
                 }
                 lines.push('');
@@ -691,28 +697,30 @@ const AISupportBooking: React.FC = () => {
     // Helper function to build dermatology message
     const buildDermatologyMessage = (data: any): string => {
         const lines: string[] = [];
-        lines.push('KẾT QUẢ PHÂN TÍCH ẢNH DA:');
+        lines.push(t('dermatology.title'));
         lines.push('');
 
         // Diagnosis
         if (data.diagnosis) {
-            lines.push(`Chẩn đoán khả năng: ${data.diagnosis.conditionName}`);
-            lines.push(`Độ tin cậy: ${(data.diagnosis.confidence * 100).toFixed(0)}%`);
+            lines.push(`${t('dermatology.diagnosis')}: ${data.diagnosis.conditionName}`);
+            lines.push(
+                `${t('dermatology.confidence')}: ${(data.diagnosis.confidence * 100).toFixed(0)}%`
+            );
             lines.push('');
         }
 
         // Biopsy recommendation
         if (data.biopsyRecommended) {
-            lines.push('Khuyến nghị sinh thiết: Có');
+            lines.push(t('dermatology.biopsyRecommended'));
             if (data.biopsyReason) {
-                lines.push(`Lý do: ${data.biopsyReason}`);
+                lines.push(`${t('dermatology.biopsyReason')}: ${data.biopsyReason}`);
             }
             lines.push('');
         }
 
         // General advice
         if (data.generalAdvice && data.generalAdvice.length > 0) {
-            lines.push('Lời khuyên:');
+            lines.push(`${t('dermatology.advice')}:`);
             data.generalAdvice.forEach((advice: string) => {
                 lines.push(`- ${advice}`);
             });
@@ -897,7 +905,7 @@ const AISupportBooking: React.FC = () => {
         if (isLocalChat) {
             newlyCreatedChatsRef.current.delete(chatId);
             handleChatDeletionNavigation(chatId);
-            toast.success('Đã xóa cuộc trò chuyện thành công');
+            toast.success(t('chat.deleteSuccess'));
             return;
         }
 
@@ -905,10 +913,10 @@ const AISupportBooking: React.FC = () => {
             await AIService.deleteSession(chatId);
             handleChatDeletionNavigation(chatId);
             await loadSessions(true);
-            toast.success('Đã xóa cuộc trò chuyện thành công');
+            toast.success(t('chat.deleteSuccess'));
         } catch (error: any) {
             console.error('Error deleting chat:', error);
-            toast.error(error?.message || 'Không thể xóa cuộc trò chuyện. Vui lòng thử lại.');
+            toast.error(error?.message || t('chat.deleteError'));
         }
     };
 
@@ -923,7 +931,7 @@ const AISupportBooking: React.FC = () => {
 
         // Kiểm tra vị trí
         if (!userLocation) {
-            toast.error('Vui lòng chọn vị trí trước khi phân tích kết quả xét nghiệm');
+            toast.error(t('errors.selectLocationFirst'));
             return;
         }
 
@@ -931,7 +939,7 @@ const AISupportBooking: React.FC = () => {
         // Note: Content format must match backend marker text for upload limit check
         const userMessage: Message = {
             id: Date.now().toString(),
-            content: `Đã gửi file xét nghiệm: ${file.name}`,
+            content: t('messages.labResultFile', { fileName: file.name }),
             sender: 'user',
             timestamp: new Date(),
             fileAttachment: {
@@ -945,7 +953,7 @@ const AISupportBooking: React.FC = () => {
         setMessages(updatedMessages);
 
         // Create new chat if no active chat
-        let currentChatId = ensureChatSession('Phân tích kết quả xét nghiệm');
+        let currentChatId = ensureChatSession(t('messages.analyzeLabResult'));
 
         // Call AI API to analyze lab result
         setIsAITyping(true);
@@ -959,7 +967,7 @@ const AISupportBooking: React.FC = () => {
                         ? resp.data.message.replace(/\\n/g, '\n')
                         : buildLabResultMessage(resp.data),
             });
-            toast.success('Đã phân tích kết quả xét nghiệm thành công');
+            toast.success(t('success.labResultAnalyzed'));
         } catch (error: any) {
             console.error('Error analyzing lab result:', error);
 
@@ -973,9 +981,7 @@ const AISupportBooking: React.FC = () => {
                     .includes('mỗi cuộc trò chuyện chỉ hỗ trợ phân tích một file xét nghiệm')
             ) {
                 // Show clear message to user
-                toast.info(
-                    'Mỗi cuộc trò chuyện chỉ hỗ trợ phân tích một file xét nghiệm. Vui lòng tạo cuộc trò chuyện mới để tiếp tục với file khác nhé!'
-                );
+                toast.info(t('errors.labResultLimit'));
                 // Remove the user message since upload was rejected
                 setMessages((prev) => prev.filter((m) => m.id !== userMessage.id));
                 setIsAITyping(false);
@@ -993,7 +999,7 @@ const AISupportBooking: React.FC = () => {
             };
 
             setMessages((prev) => [...prev, errorMsg]);
-            toast.error('Không thể phân tích kết quả xét nghiệm. Vui lòng thử lại.');
+            toast.error(t('errors.labResultFailed'));
         } finally {
             setIsAITyping(false);
 
@@ -1017,14 +1023,14 @@ const AISupportBooking: React.FC = () => {
 
         // Kiểm tra vị trí
         if (!userLocation) {
-            toast.error('Vui lòng chọn vị trí trước khi phân tích ảnh da');
+            toast.error(t('errors.selectLocationDermatology'));
             return;
         }
 
         // Create user message with file attachment
         const userMessage: Message = {
             id: Date.now().toString(),
-            content: 'Đã gửi ảnh da để phân tích',
+            content: t('messages.dermatologyImage'),
             sender: 'user',
             timestamp: new Date(),
             fileAttachment: {
@@ -1038,7 +1044,7 @@ const AISupportBooking: React.FC = () => {
         setMessages(updatedMessages);
 
         // Create new chat if no active chat
-        let currentChatId = ensureChatSession('Phân tích ảnh da');
+        let currentChatId = ensureChatSession(t('messages.analyzeDermatology'));
 
         // Call AI API to analyze dermatology image
         setIsAITyping(true);
@@ -1052,7 +1058,7 @@ const AISupportBooking: React.FC = () => {
                         ? resp.data.message.replace(/\\n/g, '\n')
                         : buildDermatologyMessage(resp.data),
             });
-            toast.success('Đã phân tích ảnh da thành công');
+            toast.success(t('success.dermatologyAnalyzed'));
         } catch (error: any) {
             console.error('Error analyzing dermatology image:', error);
 
@@ -1067,7 +1073,7 @@ const AISupportBooking: React.FC = () => {
             };
 
             setMessages((prev) => [...prev, errorMessage]);
-            toast.error('Không thể phân tích ảnh da. Vui lòng thử lại.');
+            toast.error(t('errors.dermatologyFailed'));
         } finally {
             setIsAITyping(false);
 
@@ -1084,7 +1090,7 @@ const AISupportBooking: React.FC = () => {
         <div className={styles.aiSupportBooking}>
             <Link to={PATHS.HOME} className={styles.homeButton}>
                 <Home size={18} className={styles.homeIcon} />
-                <span className={styles.homeText}>Trở về trang chủ</span>
+                <span className={styles.homeText}>{t('home.backToHome')}</span>
             </Link>
             {/* Overlay khi sidebar mở trên mobile */}
             {isSidebarOpen && (
@@ -1098,7 +1104,7 @@ const AISupportBooking: React.FC = () => {
                             setIsSidebarOpen(false);
                         }
                     }}
-                    aria-label="Close sidebar"
+                    aria-label={t('home.closeSidebar')}
                 />
             )}
             <div className={styles.container}>

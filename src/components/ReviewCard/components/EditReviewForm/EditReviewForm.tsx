@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 import Button from '@/components/Button';
 import { useReviewForm } from '@/hooks/useReviewForm';
 import { useStarRating } from '@/hooks/useStarRating';
@@ -24,6 +25,7 @@ interface EditReviewFormProps {
 }
 
 const EditReviewForm: React.FC<EditReviewFormProps> = ({ review, onSubmitEdit, onCancel }) => {
+    const { t } = useTranslation('common');
     // Use custom hooks for form validation and star rating
     const {
         description,
@@ -102,27 +104,31 @@ const EditReviewForm: React.FC<EditReviewFormProps> = ({ review, onSubmitEdit, o
     return (
         <div className={styles.editReviewForm}>
             <div className={styles.header}>
-                <h4>Chỉnh sửa đánh giá</h4>
+                <h4>{t('reviewForm.editTitle')}</h4>
             </div>
 
             <form onSubmit={handleSubmit} className={styles.form}>
                 {/* Rating Section */}
                 <div className={styles.ratingSection}>
                     <label className={styles.label}>
-                        Đánh giá của bạn <span className={styles.required}>*</span>
+                        {t('reviewForm.yourRating')}{' '}
+                        <span className={styles.required}>{t('reviewForm.required')}</span>
                     </label>
                     <div className={styles.stars} role="radiogroup" aria-label="Rating">
                         {renderStars()}
                     </div>
                     <span className={styles.ratingText}>
-                        {rating > 0 ? `${rating}/5 sao` : 'Chọn rating'}
+                        {rating > 0
+                            ? t('reviewForm.ratingText', { rating })
+                            : t('reviewForm.selectRating')}
                     </span>
                 </div>
 
                 {/* Description Section */}
                 <div className={styles.descriptionSection}>
                     <label htmlFor="edit-description" className={styles.label}>
-                        Nội dung đánh giá <span className={styles.required}>*</span>
+                        {t('reviewForm.reviewContent')}{' '}
+                        <span className={styles.required}>{t('reviewForm.required')}</span>
                     </label>
                     <textarea
                         id="edit-description"
@@ -131,7 +137,7 @@ const EditReviewForm: React.FC<EditReviewFormProps> = ({ review, onSubmitEdit, o
                             setDescription(e.target.value);
                             setDescriptionError(''); // Clear error on change
                         }}
-                        placeholder="Chia sẻ trải nghiệm của bạn về bác sĩ... (tối thiểu 5 ký tự)"
+                        placeholder={t('reviewForm.reviewPlaceholder')}
                         className={clsx(styles.textarea, {
                             [styles.error]: descriptionError,
                         })}
@@ -152,10 +158,10 @@ const EditReviewForm: React.FC<EditReviewFormProps> = ({ review, onSubmitEdit, o
                                 [styles.success]: trimmedLength >= minChars,
                             })}
                         >
-                            {trimmedLength}/{minChars} ký tự tối thiểu
+                            {t('reviewForm.minChars', { current: trimmedLength, min: minChars })}
                         </span>
                         <span className={clsx({ [styles.warning]: remainingChars < 20 })}>
-                            {remainingChars} ký tự còn lại
+                            {t('reviewForm.remainingChars', { count: remainingChars })}
                         </span>
                     </div>
                 </div>
@@ -163,13 +169,13 @@ const EditReviewForm: React.FC<EditReviewFormProps> = ({ review, onSubmitEdit, o
                 {/* Action Buttons */}
                 <div className={styles.actions}>
                     <Button
-                        text="Hủy"
+                        text={t('reviewForm.cancel')}
                         type="button"
                         className={styles.cancelButton}
                         onClick={onCancel}
                     />
                     <Button
-                        text="Cập nhật đánh giá"
+                        text={t('reviewForm.updateReview')}
                         type="submit"
                         className={styles.submitButton}
                     />

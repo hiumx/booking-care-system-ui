@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import styles from './SideBar.module.scss';
 import { Slider, styled } from '@mui/material';
@@ -46,57 +47,6 @@ interface SideBarProps {
     initialSearchTerm?: string; // Initial search term from URL params
     onClearAllFilters?: () => void; // Callback to clear all filters from parent
 }
-
-const mockFilterData: FilterSection[] = [
-    {
-        title: 'Giá cả',
-        options: [],
-    },
-    {
-        title: 'Đánh giá',
-        options: [
-            { id: 'checkebox-sm46', label: '5 Sao' },
-            { id: 'checkebox-sm47', label: '4 Sao' },
-            { id: 'checkebox-sm48', label: '3 Sao' },
-            { id: 'checkebox-sm49', label: '2 Sao' },
-            { id: 'checkebox-sm50', label: '1 Sao' },
-        ],
-    },
-    {
-        title: 'Học vị',
-        options: [], // Will be populated with real data from Redux
-        hasViewMore: true,
-    },
-    {
-        title: 'Kinh nghiệm',
-        options: [
-            { id: 'checkebox-sm22', label: 'Dưới 2 năm' },
-            { id: 'checkebox-sm23', label: 'Từ 2 – 5 năm' },
-            { id: 'checkebox-sm24', label: 'Từ 5 – 10 năm' },
-            { id: 'checkebox-sm25', label: 'Từ 10 – 20 năm' },
-            { id: 'checkebox-sm26', label: 'Trên 20 năm' },
-        ],
-        hasViewMore: true,
-    },
-    {
-        title: 'Giới tính',
-        options: [
-            { id: 'checkebox-sm14', label: 'Nam' },
-            { id: 'checkebox-sm15', label: 'Nữ' },
-            { id: 'checkebox-sm16', label: 'Khác' },
-        ],
-    },
-    {
-        title: 'Ngôn ngữ',
-        options: [], // Will be populated with real data from Redux
-        hasViewMore: true,
-    },
-    {
-        title: 'Loại dịch vụ',
-        options: [], // Will be populated with real data from Redux
-        hasViewMore: true,
-    },
-];
 
 const PrettoSlider = styled(Slider)({
     color: '#0E82FD',
@@ -159,12 +109,7 @@ const formatVND = (value: number): string => {
     }).format(value);
 };
 
-const formatYears = (value: number): string => {
-    if (value === 0) return '0 năm';
-    if (value === 1) return '1 năm';
-    if (value >= 50) return '50+ năm';
-    return `${value} năm`;
-};
+// formatYears will be defined inside component to use translations
 
 const SideBar: React.FC<SideBarProps> = ({
     onSearchChange,
@@ -191,11 +136,78 @@ const SideBar: React.FC<SideBarProps> = ({
     initialSearchTerm: _initialSearchTerm,
     onClearAllFilters,
 }) => {
+    const { t } = useTranslation('doctor');
     const dispatch = useAppDispatch();
     const [searchParams] = useSearchParams();
     const { positions } = useAppSelector((state) => state.position);
     const { languages } = useAppSelector((state) => state.language);
     const { serviceTypes } = useAppSelector((state) => state.serviceType);
+
+    // Format years with translations
+    const formatYears = useCallback(
+        (value: number): string => {
+            if (value === 0) return `0 ${t('sidebar.years')}`;
+            if (value === 1) return `1 ${t('sidebar.years')}`;
+            if (value >= 50) return `50${t('sidebar.yearsPlus')}`;
+            return `${value} ${t('sidebar.years')}`;
+        },
+        [t]
+    );
+
+    // Generate filter data with translations
+    const mockFilterData: FilterSection[] = useMemo(
+        () => [
+            {
+                title: t('sidebar.filters.price'),
+                options: [],
+            },
+            {
+                title: t('sidebar.filters.rating'),
+                options: [
+                    { id: 'checkebox-sm46', label: `5 ${t('sidebar.rating.star')}` },
+                    { id: 'checkebox-sm47', label: `4 ${t('sidebar.rating.star')}` },
+                    { id: 'checkebox-sm48', label: `3 ${t('sidebar.rating.star')}` },
+                    { id: 'checkebox-sm49', label: `2 ${t('sidebar.rating.star')}` },
+                    { id: 'checkebox-sm50', label: `1 ${t('sidebar.rating.star')}` },
+                ],
+            },
+            {
+                title: t('sidebar.filters.position'),
+                options: [],
+                hasViewMore: true,
+            },
+            {
+                title: t('sidebar.filters.experience'),
+                options: [
+                    { id: 'checkebox-sm22', label: t('sidebar.experience.under2') },
+                    { id: 'checkebox-sm23', label: t('sidebar.experience.2to5') },
+                    { id: 'checkebox-sm24', label: t('sidebar.experience.5to10') },
+                    { id: 'checkebox-sm25', label: t('sidebar.experience.10to20') },
+                    { id: 'checkebox-sm26', label: t('sidebar.experience.over20') },
+                ],
+                hasViewMore: true,
+            },
+            {
+                title: t('sidebar.filters.gender'),
+                options: [
+                    { id: 'checkebox-sm14', label: t('sidebar.gender.male') },
+                    { id: 'checkebox-sm15', label: t('sidebar.gender.female') },
+                    { id: 'checkebox-sm16', label: t('sidebar.gender.other') },
+                ],
+            },
+            {
+                title: t('sidebar.filters.language'),
+                options: [],
+                hasViewMore: true,
+            },
+            {
+                title: t('sidebar.filters.serviceType'),
+                options: [],
+                hasViewMore: true,
+            },
+        ],
+        [t]
+    );
 
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>(() =>
@@ -410,8 +422,10 @@ const SideBar: React.FC<SideBarProps> = ({
     const dynamicFilterData = useMemo(() => {
         const baseData = [...mockFilterData];
 
-        // Update Học vị (Positions) section with real data
-        const positionSectionIndex = baseData.findIndex((section) => section.title === 'Học vị');
+        // Update Positions section with real data
+        const positionSectionIndex = baseData.findIndex(
+            (section) => section.title === t('sidebar.filters.position')
+        );
         if (positionSectionIndex !== -1) {
             baseData[positionSectionIndex] = {
                 ...baseData[positionSectionIndex],
@@ -423,8 +437,10 @@ const SideBar: React.FC<SideBarProps> = ({
             };
         }
 
-        // Update Ngôn ngữ (Languages) section with real data
-        const languageSectionIndex = baseData.findIndex((section) => section.title === 'Ngôn ngữ');
+        // Update Languages section with real data
+        const languageSectionIndex = baseData.findIndex(
+            (section) => section.title === t('sidebar.filters.language')
+        );
         if (languageSectionIndex !== -1) {
             baseData[languageSectionIndex] = {
                 ...baseData[languageSectionIndex],
@@ -435,9 +451,9 @@ const SideBar: React.FC<SideBarProps> = ({
             };
         }
 
-        // Update Loại hình dịch vụ (Service Types) section with real data
+        // Update Service Types section with real data
         const serviceTypeSectionIndex = baseData.findIndex(
-            (section) => section.title === 'Loại dịch vụ'
+            (section) => section.title === t('sidebar.filters.serviceType')
         );
         if (serviceTypeSectionIndex !== -1) {
             baseData[serviceTypeSectionIndex] = {
@@ -450,15 +466,20 @@ const SideBar: React.FC<SideBarProps> = ({
         }
 
         return baseData;
-    }, [positions, languages, serviceTypes]);
+    }, [positions, languages, serviceTypes, mockFilterData, t]);
 
-    // Lọc dữ liệu theo từ khóa tìm kiếm và ẩn section không có data
+    // Filter data by search term and hide sections without data
     const filteredSections = useMemo(() => {
         let sections = dynamicFilterData;
 
-        // Ẩn section không có data (trừ các section luôn hiển thị)
+        // Hide sections without data (except always-show sections)
+        const alwaysShowSections = [
+            t('sidebar.filters.price'),
+            t('sidebar.filters.rating'),
+            t('sidebar.filters.experience'),
+            t('sidebar.filters.gender'),
+        ];
         sections = sections.filter((section) => {
-            const alwaysShowSections = ['Giá cả', 'Đánh giá', 'Kinh nghiệm', 'Giới tính'];
             if (alwaysShowSections.includes(section.title)) {
                 return true;
             }
@@ -514,11 +535,18 @@ const SideBar: React.FC<SideBarProps> = ({
 
     // Helper function to map option IDs based on section type
     const mapOptionId = (optionId: string, sectionTitle: string): any => {
-        const mappingFunctions = {
-            'Học vị': (id: string) => id.replace('position-', ''),
-            'Ngôn ngữ': (id: string) => id.replace('language-', ''),
-            'Loại dịch vụ': (id: string) => id.replace('serviceType-', ''),
-            'Giới tính': (id: string) => {
+        const positionTitle = t('sidebar.filters.position');
+        const languageTitle = t('sidebar.filters.language');
+        const serviceTypeTitle = t('sidebar.filters.serviceType');
+        const genderTitle = t('sidebar.filters.gender');
+        const ratingTitle = t('sidebar.filters.rating');
+        const experienceTitle = t('sidebar.filters.experience');
+
+        const mappingFunctions: { [key: string]: (id: string) => any } = {
+            [positionTitle]: (id: string) => id.replace('position-', ''),
+            [languageTitle]: (id: string) => id.replace('language-', ''),
+            [serviceTypeTitle]: (id: string) => id.replace('serviceType-', ''),
+            [genderTitle]: (id: string) => {
                 const genderMap: { [key: string]: string } = {
                     'checkebox-sm14': 'MALE',
                     'checkebox-sm15': 'FEMALE',
@@ -526,7 +554,7 @@ const SideBar: React.FC<SideBarProps> = ({
                 };
                 return genderMap[id] || id;
             },
-            'Đánh giá': (id: string) => {
+            [ratingTitle]: (id: string) => {
                 const ratingMap: { [key: string]: number } = {
                     'checkebox-sm46': 5,
                     'checkebox-sm47': 4,
@@ -536,7 +564,7 @@ const SideBar: React.FC<SideBarProps> = ({
                 };
                 return ratingMap[id]?.toString() || id;
             },
-            'Kinh nghiệm': (id: string) => {
+            [experienceTitle]: (id: string) => {
                 const experienceMap: {
                     [key: string]: { MinYears: number; MaxYears: number };
                 } = {
@@ -550,7 +578,7 @@ const SideBar: React.FC<SideBarProps> = ({
             },
         };
 
-        const mapper = mappingFunctions[sectionTitle as keyof typeof mappingFunctions];
+        const mapper = mappingFunctions[sectionTitle];
         return mapper ? mapper(optionId) : optionId;
     };
 
@@ -574,8 +602,14 @@ const SideBar: React.FC<SideBarProps> = ({
         isChecked: boolean,
         id: string
     ) => {
-        const callbackMap = {
-            'Học vị': () => {
+        const positionTitle = t('sidebar.filters.position');
+        const languageTitle = t('sidebar.filters.language');
+        const serviceTypeTitle = t('sidebar.filters.serviceType');
+        const genderTitle = t('sidebar.filters.gender');
+        const ratingTitle = t('sidebar.filters.rating');
+
+        const callbackMap: { [key: string]: () => void } = {
+            [positionTitle]: () => {
                 if (onPositionFilters) {
                     onPositionFilters(checkedValues);
                 } else if (onPositionFilter) {
@@ -583,7 +617,7 @@ const SideBar: React.FC<SideBarProps> = ({
                     onPositionFilter(positionId);
                 }
             },
-            'Ngôn ngữ': () => {
+            [languageTitle]: () => {
                 if (onLanguageFilters) {
                     onLanguageFilters(checkedValues);
                 } else if (onLanguageFilter) {
@@ -591,7 +625,7 @@ const SideBar: React.FC<SideBarProps> = ({
                     onLanguageFilter(languageId);
                 }
             },
-            'Loại dịch vụ': () => {
+            [serviceTypeTitle]: () => {
                 if (onServiceTypeFilters) {
                     onServiceTypeFilters(checkedValues);
                 } else if (onServiceTypeFilter) {
@@ -599,7 +633,7 @@ const SideBar: React.FC<SideBarProps> = ({
                     onServiceTypeFilter(serviceTypeId);
                 }
             },
-            'Đánh giá': () => {
+            [ratingTitle]: () => {
                 if (onRatingFilters) {
                     onRatingFilters(checkedValues);
                 } else if (onRatingFilter) {
@@ -607,7 +641,7 @@ const SideBar: React.FC<SideBarProps> = ({
                     onRatingFilter(rating);
                 }
             },
-            'Giới tính': () => {
+            [genderTitle]: () => {
                 if (onGenderFilters) {
                     onGenderFilters(checkedValues);
                 } else if (onGenderFilter) {
@@ -617,7 +651,7 @@ const SideBar: React.FC<SideBarProps> = ({
             },
         };
 
-        const callback = callbackMap[sectionTitle as keyof typeof callbackMap];
+        const callback = callbackMap[sectionTitle];
         if (callback) {
             callback();
         }
@@ -628,7 +662,7 @@ const SideBar: React.FC<SideBarProps> = ({
         let isChecked: boolean;
 
         // Special handling for Service Type - radio button behavior (single selection)
-        if (sectionTitle === 'Loại dịch vụ') {
+        if (sectionTitle === t('sidebar.filters.serviceType')) {
             // For radio buttons, uncheck all options in this section first
             const section = dynamicFilterData.find((s) => s.title === sectionTitle);
             newCheckedOptions = { ...checkedOptions };
@@ -728,7 +762,8 @@ const SideBar: React.FC<SideBarProps> = ({
                 aria-label="pretto slider"
             />
             <p className={styles.labelCustom}>
-                Giá: {formatVND(priceRange[0])} - {formatVND(priceRange[1])}
+                {t('sidebar.filters.price')}: {formatVND(priceRange[0])} -{' '}
+                {formatVND(priceRange[1])}
             </p>
         </div>
     );
@@ -756,7 +791,8 @@ const SideBar: React.FC<SideBarProps> = ({
                 aria-label="experience slider"
             />
             <p className={styles.labelCustom}>
-                Kinh nghiệm: {formatYears(experienceRange[0])} - {formatYears(experienceRange[1])}
+                {t('sidebar.filters.experience')}: {formatYears(experienceRange[0])} -{' '}
+                {formatYears(experienceRange[1])}
             </p>
         </div>
     );
@@ -795,7 +831,7 @@ const SideBar: React.FC<SideBarProps> = ({
 
     // Helper function to get options to show based on section type and view more state
     const getOptionsToShow = (section: FilterSection) => {
-        if (section.title === 'Đánh giá') {
+        if (section.title === t('sidebar.filters.rating')) {
             return section.options;
         }
 
@@ -810,7 +846,7 @@ const SideBar: React.FC<SideBarProps> = ({
         const optionsToShow = getOptionsToShow(section);
 
         // Use radio buttons for Service Type (single selection)
-        const isServiceType = section.title === 'Loại dịch vụ';
+        const isServiceType = section.title === t('sidebar.filters.serviceType');
         const inputType = isServiceType ? 'radio' : 'checkbox';
         const inputName = isServiceType ? 'service-type-filter' : undefined;
 
@@ -827,7 +863,9 @@ const SideBar: React.FC<SideBarProps> = ({
                         onChange={() => handleCheckboxChange(option.id, section.title)}
                     />
                     <label className={styles.labelCustom} htmlFor={option.id}>
-                        {section.title === 'Đánh giá' ? renderRatingStars(option) : option.label}
+                        {section.title === t('sidebar.filters.rating')
+                            ? renderRatingStars(option)
+                            : option.label}
                     </label>
                 </div>
                 {option.count !== undefined && (
@@ -839,7 +877,11 @@ const SideBar: React.FC<SideBarProps> = ({
 
     // Helper function to render view more button
     const renderViewMoreButton = (section: FilterSection, index: number) => {
-        if (!section.hasViewMore || section.title === 'Đánh giá' || section.options.length <= 5) {
+        if (
+            !section.hasViewMore ||
+            section.title === t('sidebar.filters.rating') ||
+            section.options.length <= 5
+        ) {
             return null;
         }
 
@@ -855,7 +897,9 @@ const SideBar: React.FC<SideBarProps> = ({
                             toggleViewMore(section.title);
                         }}
                     >
-                        {viewMoreSections[section.title] ? 'Thu gọn' : 'Xem thêm'}
+                        {viewMoreSections[section.title]
+                            ? t('sidebar.viewLess')
+                            : t('sidebar.viewMore')}
                     </Link>
                 </div>
             </div>
@@ -864,11 +908,11 @@ const SideBar: React.FC<SideBarProps> = ({
 
     // Main function to render filter section
     const renderFilterSection = (section: FilterSection, index: number) => {
-        if (section.title === 'Giá cả') {
+        if (section.title === t('sidebar.filters.price')) {
             return renderPriceFilter();
         }
 
-        if (section.title === 'Kinh nghiệm') {
+        if (section.title === t('sidebar.filters.experience')) {
             return renderExperienceFilter();
         }
 
@@ -885,9 +929,9 @@ const SideBar: React.FC<SideBarProps> = ({
             <div className="card filter-lists">
                 <div className="card-header">
                     <div className="d-flex align-items-center filter-head justify-content-between">
-                        <h4>Bộ lọc</h4>
+                        <h4>{t('sidebar.title')}</h4>
                         <Link to="#" className="btn btn-light btn-sm" onClick={handleClearAll}>
-                            Xóa tất cả
+                            {t('sidebar.clearAll')}
                         </Link>
                     </div>
                     <div className="filter-input">
@@ -902,7 +946,7 @@ const SideBar: React.FC<SideBarProps> = ({
                                     // Call debounced search
                                     debouncedSearch(value);
                                 }}
-                                placeholder="Tìm kiếm..."
+                                placeholder={t('sidebar.searchPlaceholder')}
                             />
                             <span>
                                 <i className="isax isax-search-normal-1"></i>
@@ -910,7 +954,7 @@ const SideBar: React.FC<SideBarProps> = ({
                         </div>
                     </div>
                     {filteredSections.length === 0 && searchTerm && (
-                        <p className="text-center mt-3">Không tìm thấy kết quả phù hợp</p>
+                        <p className="text-center mt-3">{t('sidebar.noResults')}</p>
                     )}
                 </div>
                 <div className="card-body p-0">

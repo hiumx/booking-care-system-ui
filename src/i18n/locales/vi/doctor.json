@@ -1,0 +1,175 @@
+{
+    "profile": {
+        "breadcrumb": {
+            "title": "Hồ sơ bác sĩ"
+        },
+        "loading": "Đang tải thông tin bác sĩ...",
+        "error": {
+            "title": "Đã xảy ra lỗi!",
+            "message": "Đã có lỗi xảy ra khi tải dữ liệu.",
+            "backHome": "Quay về trang chủ"
+        },
+        "notFound": {
+            "title": "Không tìm thấy bác sĩ!",
+            "message": "Bác sĩ bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.",
+            "backHome": "Quay về trang chủ"
+        },
+        "card": {
+            "available": "Sẵn sàng phục vụ",
+            "degree": "Học vị",
+            "fullTime": "Toàn thời gian, Liệu pháp trực tuyến sẵn có",
+            "removeFromFavorite": "Xóa khỏi yêu thích",
+            "addToFavorite": "Thêm vào yêu thích",
+            "email": "Email",
+            "gender": "Giới tính",
+            "acceptingPatients": "Tiếp nhận bệnh nhân mới",
+            "reviews": "Đánh giá",
+            "appointmentsBooked": "Gần {{count}}+ cuộc hẹn đã được đặt",
+            "yearsExperience": "{{years}} năm kinh nghiệm",
+            "price": "Giá",
+            "perVisit": "mỗi lượt khám",
+            "bookAppointment": "Đặt lịch hẹn"
+        },
+        "gender": {
+            "male": "Nam",
+            "female": "Nữ",
+            "other": "Khác"
+        },
+        "nav": {
+            "bio": "Tiểu sử",
+            "experience": "Kinh nghiệm",
+            "specialty": "Chuyên khoa",
+            "services": "Dịch vụ",
+            "hospital": "Bệnh viện",
+            "schedule": "Lịch làm việc",
+            "reviews": "Đánh giá"
+        },
+        "sections": {
+            "bio": {
+                "title": "Tiểu sử bác sĩ"
+            },
+            "experience": {
+                "title": "Kinh nghiệm",
+                "specialty": "Chuyên khoa",
+                "degree": "Trình độ",
+                "years": "Kinh nghiệm",
+                "yearsValue": "{{years}} năm kinh nghiệm",
+                "description": "Mô tả",
+                "noDescription": "Không có thông tin tiểu sử"
+            },
+            "specialty": {
+                "title": "Chuyên khoa"
+            },
+            "services": {
+                "title": "Dịch vụ & Giá",
+                "noServices": "Chưa có dịch vụ"
+            },
+            "hospital": {
+                "title": "Bệnh viện & Vị trí",
+                "defaultName": "Bệnh viện",
+                "defaultAddress": "Địa chỉ bệnh viện"
+            },
+            "schedule": {
+                "title": "Lịch làm việc"
+            }
+        },
+        "availability": {
+            "monday": "Thứ 2",
+            "saturday": "Thứ 7"
+        }
+    },
+    "schedule": {
+        "title": "Chọn Khung Giờ Có Sẵn",
+        "selectDate": "Chọn ngày có sẵn",
+        "selectDateLabel": "Chọn ngày",
+        "noSlots": "Không có lịch trống!",
+        "days": {
+            "sunday": "Chủ Nhật",
+            "monday": "Thứ Hai",
+            "tuesday": "Thứ Ba",
+            "wednesday": "Thứ Tư",
+            "thursday": "Thứ Năm",
+            "friday": "Thứ Sáu",
+            "saturday": "Thứ Bảy"
+        }
+    },
+    "list": {
+        "breadcrumb": {
+            "title": "Danh sách bác sĩ",
+            "home": "Trang chủ"
+        },
+        "results": {
+            "showing": "Hiển thị",
+            "doctorsForYou": "Bác sĩ Dành Cho Bạn"
+        },
+        "sort": {
+            "title": "Sắp xếp theo",
+            "lowToHigh": "Giá từ thấp đến cao",
+            "highToLow": "Giá từ cao đến thấp"
+        },
+        "empty": {
+            "title": "Không tìm thấy bác sĩ nào",
+            "message": "Vui lòng thử lại với từ khóa khác hoặc bộ lọc khác.",
+            "clearFilters": "Xóa tất cả bộ lọc"
+        },
+        "error": {
+            "title": "Không thể tải dữ liệu",
+            "retry": "Thử lại",
+            "goBack": "Quay lại"
+        },
+        "notUpdated": "Chưa cập nhật"
+    },
+    "card": {
+        "specialty": "Chuyên khoa",
+        "unknown": "Không xác định",
+        "expert": "Chuyên gia",
+        "directions": "Chỉ đường",
+        "yearsExperience": "{{years}} năm kinh nghiệm",
+        "unknownExperience": "Không xác định",
+        "unknownLanguage": "Không xác định ngôn ngữ",
+        "consultationFee": "Phí khám",
+        "contactForPrice": "Liên hệ để biết giá",
+        "bookAppointment": "Đặt lịch khám",
+        "selectDoctor": "Chọn bác sĩ này",
+        "noRating": "Chưa có đánh giá",
+        "removeFavorite": "Bỏ yêu thích bác sĩ",
+        "addFavorite": "Yêu thích bác sĩ",
+        "doctorImage": "hình ảnh bác sĩ"
+    },
+    "sidebar": {
+        "title": "Bộ lọc",
+        "searchPlaceholder": "Tìm kiếm...",
+        "noResults": "Không tìm thấy kết quả phù hợp",
+        "filters": {
+            "price": "Giá cả",
+            "rating": "Đánh giá",
+            "position": "Học vị",
+            "experience": "Kinh nghiệm",
+            "gender": "Giới tính",
+            "language": "Ngôn ngữ",
+            "serviceType": "Loại dịch vụ"
+        },
+        "rating": {
+            "star": "Sao"
+        },
+        "experience": {
+            "under2": "Dưới 2 năm",
+            "2to5": "Từ 2 – 5 năm",
+            "5to10": "Từ 5 – 10 năm",
+            "10to20": "Từ 10 – 20 năm",
+            "over20": "Trên 20 năm"
+        },
+        "gender": {
+            "male": "Nam",
+            "female": "Nữ",
+            "other": "Khác"
+        },
+        "priceLabel": "Giá: {{min}} - {{max}}",
+        "experienceLabel": "Kinh nghiệm: {{min}} - {{max}}",
+        "viewMore": "Xem thêm",
+        "viewLess": "Thu gọn",
+        "clearAll": "Xóa tất cả",
+        "years": "năm",
+        "yearsPlus": "năm+"
+    }
+}
