@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 
@@ -40,6 +41,7 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
     userId,
     loading = false,
 }) => {
+    const { t } = useTranslation('userProfile');
     const [formData, setFormData] = useState<AddCardFormData>({
         cardHolderName: '',
         cardNumber: '',
@@ -76,7 +78,9 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
                 (rule) => !rule.isValid
             );
 
-            setValidationMessage(firstError?.message || 'Vui lòng kiểm tra lại thông tin');
+            setValidationMessage(
+                firstError?.message || t('wallet.addCardModal.validation.checkInfo')
+            );
             return false;
         }
 
@@ -194,8 +198,8 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
             // Notify parent about success and close modal immediately
             const successMessage =
                 mode === 'edit'
-                    ? 'Cập nhật thông tin tài khoản thành công!'
-                    : 'Thêm tài khoản ngân hàng thành công!';
+                    ? t('wallet.addCardModal.success.updated')
+                    : t('wallet.addCardModal.success.added');
 
             onSuccess?.(successMessage);
             onClose();
@@ -218,8 +222,12 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
     };
 
     const isEditing = mode === 'edit' || (existingData !== null && existingData !== undefined);
-    const modalTitle = isEditing ? 'Cập nhật số tài khoản' : 'Thêm số tài khoản';
-    const submitButtonText = isEditing ? 'Cập nhật số tài khoản' : 'Thêm số tài khoản';
+    const modalTitle = isEditing
+        ? t('wallet.addCardModal.editTitle')
+        : t('wallet.addCardModal.addTitle');
+    const submitButtonText = isEditing
+        ? t('wallet.addCardModal.editTitle')
+        : t('wallet.addCardModal.addTitle');
 
     return (
         <Modal isOpen={isOpen} onClose={handleClose} title={modalTitle} width="500px">
@@ -227,7 +235,8 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
                 <div className={clsx(styles.modalBody, 'modal-body pb-0')}>
                     <div className={styles.formGroup}>
                         <label className={styles.formLabel} htmlFor="cardHolderName">
-                            Tên chủ tài khoản <span className={styles.required}>*</span>
+                            {t('wallet.addCardModal.accountName')}{' '}
+                            <span className={styles.required}>*</span>
                         </label>
                         <motion.input
                             type="text"
@@ -249,7 +258,8 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
                     </div>
                     <div className={styles.formGroup}>
                         <label className={styles.formLabel} htmlFor="cardNumber">
-                            Số tài khoản <span className={styles.required}>*</span>
+                            {t('wallet.addCardModal.accountNumber')}{' '}
+                            <span className={styles.required}>*</span>
                         </label>
                         <motion.input
                             type="text"
@@ -275,13 +285,14 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
 
                     <div className={styles.formGroup}>
                         <label className={styles.formLabel} htmlFor="branch">
-                            Ngân hàng <span className={styles.required}>*</span>
+                            {t('wallet.addCardModal.bank')}{' '}
+                            <span className={styles.required}>*</span>
                         </label>
                         <BankSelect
                             id="branch"
                             value={formData.bankCode}
                             onChange={handleBankChange}
-                            placeholder="Chọn ngân hàng của bạn"
+                            placeholder={t('wallet.addCardModal.bankPlaceholder')}
                             className={styles.formSelect}
                             required={true}
                         />
@@ -298,7 +309,7 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
                                     className={styles.checkboxInput}
                                 />
                                 <label htmlFor="isDefault" className={styles.checkboxLabel}>
-                                    Đặt làm tài khoản mặc định
+                                    {t('wallet.addCardModal.setDefault')}
                                 </label>
                             </div>
                         </div>
@@ -312,11 +323,13 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
                                 className={styles.btnCancel}
                                 onClick={handleClose}
                             >
-                                Huỷ
+                                {t('wallet.addCardModal.cancel')}
                             </button>
 
                             <Button
-                                text={loading ? 'Đang xử lý...' : submitButtonText}
+                                text={
+                                    loading ? t('wallet.addCardModal.processing') : submitButtonText
+                                }
                                 type="submit"
                                 className={styles.btnPrimary}
                                 isDisabled={loading}
@@ -330,7 +343,7 @@ const AddCardModal: React.FC<AddCardModalProps> = ({
             <NotificationToast
                 isOpen={showValidationToast}
                 onClose={() => setShowValidationToast(false)}
-                message={validationMessage || 'Vui lòng điền đầy đủ thông tin bắt buộc'}
+                message={validationMessage || t('wallet.addCardModal.validation.fillRequired')}
                 type="warning"
                 icon="fa-solid fa-exclamation-triangle"
                 duration={4000}

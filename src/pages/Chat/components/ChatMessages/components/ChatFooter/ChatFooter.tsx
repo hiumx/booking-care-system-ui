@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { toast } from 'react-toastify';
 import { useChat } from '@/providers/ChatProvider';
@@ -10,6 +11,7 @@ interface ChatFooterProps {
 }
 
 const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
+    const { t } = useTranslation('chat');
     const { sendMessage, activeConversation, startTyping, stopTyping } = useChat();
     const [message, setMessage] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
@@ -80,7 +82,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
         };
 
         recognition.onerror = (event: any) => {
-            toast.error(`Lỗi: ${event.error}`);
+            toast.error(t('footer.speech.error', { error: event.error }));
             setIsListening(false);
         };
 
@@ -115,7 +117,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
         e.preventDefault();
 
         if (!recognitionRef.current) {
-            toast.error('Speech Recognition không được hỗ trợ trên trình duyệt này');
+            toast.error(t('footer.speech.notSupported'));
             return;
         }
 
@@ -149,7 +151,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
             if (hasFiles && fileMessageType) {
                 // Send message with file (and optional text caption)
                 await sendMessage(message.trim(), fileMessageType, selectedFiles);
-                toast.success('Đã gửi file thành công');
+                toast.success(t('footer.toast.fileSent'));
             } else {
                 // Send text-only message
                 await sendMessage(message.trim(), MessageType.TEXT);
@@ -163,7 +165,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
             stopTyping();
         } catch (error) {
             console.error('Error sending message:', error);
-            toast.error('Không thể gửi tin nhắn');
+            toast.error(t('footer.toast.sendFailed'));
         } finally {
             setIsSending(false);
         }
@@ -201,7 +203,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
         // Validate file types match message type
         const isValid = validateFileTypes(fileArray, messageType);
         if (!isValid) {
-            toast.error('Loại file không hợp lệ');
+            toast.error(t('footer.toast.invalidFileType'));
             return;
         }
 
@@ -327,7 +329,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                     type="button"
                                     className={styles.removeFileBtn}
                                     onClick={handleClearFiles}
-                                    title="Xóa file"
+                                    title={t('footer.removeFile')}
                                 >
                                     <i className="fa-solid fa-xmark"></i>
                                 </button>
@@ -370,7 +372,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                         <span>
                                             <i className="fa-solid fa-file-lines"></i>
                                         </span>
-                                        Tài liệu
+                                        {t('footer.menu.document')}
                                     </button>
                                     <button
                                         type="button"
@@ -391,7 +393,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                         <span>
                                             <i className="fa-solid fa-camera"></i>
                                         </span>
-                                        Camera
+                                        {t('footer.menu.camera')}
                                     </button>
                                     <button
                                         type="button"
@@ -412,7 +414,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                         <span>
                                             <i className="fa-solid fa-image"></i>
                                         </span>
-                                        Thư viện
+                                        {t('footer.menu.gallery')}
                                     </button>
                                     <button
                                         type="button"
@@ -432,7 +434,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                         <span>
                                             <i className="fa-solid fa-volume-high"></i>
                                         </span>
-                                        Âm thanh
+                                        {t('footer.menu.audio')}
                                     </button>
                                 </div>
                             )}
@@ -521,8 +523,16 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                         type="button"
                         className={clsx('action-circle', { [styles.listening]: isListening })}
                         onClick={handleMicrophoneClick}
-                        title={isListening ? 'Click để dừng nghe' : 'Click để bắt đầu ghi âm'}
-                        aria-label={isListening ? 'Dừng ghi âm' : 'Bắt đầu ghi âm'}
+                        title={
+                            isListening
+                                ? t('footer.speech.stopRecording')
+                                : t('footer.speech.startRecording')
+                        }
+                        aria-label={
+                            isListening
+                                ? t('footer.speech.stopRecording')
+                                : t('footer.speech.startRecording')
+                        }
                         style={{
                             background: 'none',
                             border: 'none',
@@ -545,7 +555,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                                 textAlign: 'center',
                             }}
                         >
-                            Đang nghe...
+                            {t('footer.speech.listening')}
                         </div>
                     )}
                 </div>
@@ -554,8 +564,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                     className="form-control chat_form"
                     placeholder={
                         selectedFiles.length > 0
-                            ? 'Thêm chú thích cho file...'
-                            : 'Nhập tin nhắn của bạn...'
+                            ? t('footer.placeholderWithFile')
+                            : t('footer.placeholder')
                     }
                     value={message}
                     onChange={handleInputChange}
@@ -572,7 +582,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ setIsTyping }) => {
                     >
                         {isSending ? (
                             <output className="spinner-border spinner-border-sm">
-                                <span className="visually-hidden">Đang gửi...</span>
+                                <span className="visually-hidden">{t('footer.sending')}</span>
                             </output>
                         ) : (
                             <i className="isax isax-send-25"></i>

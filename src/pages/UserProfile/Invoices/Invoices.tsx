@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@mui/material';
 import InvoiceModal from './InvoiceModal';
 import Pagination from '../../../components/Pagination/Pagination';
@@ -24,6 +25,7 @@ interface InvoicesProps {
 }
 
 const Invoices: React.FC<InvoicesProps> = ({ patientId, profile }) => {
+    const { t } = useTranslation('userProfile');
     const [showModal, setShowModal] = useState(false);
     const [selectedInvoice, setSelectedInvoice] = useState<InvoiceModalData | undefined>(undefined);
     const [isClosing, setIsClosing] = useState(false);
@@ -152,7 +154,7 @@ const Invoices: React.FC<InvoicesProps> = ({ patientId, profile }) => {
     if (!patientId) {
         return (
             <div className="text-center py-5">
-                <p>Đang tải thông tin người dùng...</p>
+                <p>{t('invoices.empty.loading')}</p>
             </div>
         );
     }
@@ -161,7 +163,7 @@ const Invoices: React.FC<InvoicesProps> = ({ patientId, profile }) => {
         <>
             <div className="dashboard-header">
                 <h3>
-                    Hoá Đơn
+                    {t('invoices.title')}
                     {loading && <output className="ms-2 spinner-border spinner-border-sm"></output>}
                 </h3>
                 <ul className={clsx(styles.headerListBtns, 'header-list-btns')}>
@@ -170,7 +172,7 @@ const Invoices: React.FC<InvoicesProps> = ({ patientId, profile }) => {
                             <input
                                 type="text"
                                 className="form-control"
-                                placeholder="Tìm kiếm hóa đơn..."
+                                placeholder={t('invoices.searchPlaceholder')}
                                 value={searchTerm}
                                 onChange={handleSearchChange}
                             />
@@ -190,10 +192,10 @@ const Invoices: React.FC<InvoicesProps> = ({ patientId, profile }) => {
                                 setCurrentPage(1); // Reset to first page when changing sort
                             }}
                         >
-                            <option value="CreatedAt-desc">Mới nhất</option>
-                            <option value="CreatedAt-asc">Cũ nhất</option>
-                            <option value="Amount-desc">Số tiền giảm dần</option>
-                            <option value="Amount-asc">Số tiền tăng dần</option>
+                            <option value="CreatedAt-desc">{t('invoices.sort.newest')}</option>
+                            <option value="CreatedAt-asc">{t('invoices.sort.oldest')}</option>
+                            <option value="Amount-desc">{t('invoices.sort.amountDesc')}</option>
+                            <option value="Amount-asc">{t('invoices.sort.amountAsc')}</option>
                         </select>
                     </li>
                 </ul>
@@ -266,12 +268,12 @@ const Invoices: React.FC<InvoicesProps> = ({ patientId, profile }) => {
                         <table className="text-center table table-center mb-0">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Phương thức thanh toán</th>
-                                    <th>Ngày Khám</th>
-                                    <th>Ngày Thanh Toán</th>
-                                    <th>Tổng Tiền</th>
-                                    <th>Trạng thái</th>
+                                    <th>{t('invoices.table.id')}</th>
+                                    <th>{t('invoices.table.paymentMethod')}</th>
+                                    <th>{t('invoices.table.appointmentDate')}</th>
+                                    <th>{t('invoices.table.paymentDate')}</th>
+                                    <th>{t('invoices.table.amount')}</th>
+                                    <th>{t('invoices.table.status')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -305,10 +307,14 @@ const Invoices: React.FC<InvoicesProps> = ({ patientId, profile }) => {
                                                         'bg-secondary': item.status === 'CANCELLED',
                                                     })}
                                                 >
-                                                    {item.status === 'COMPLETED' && 'Đã thanh toán'}
-                                                    {item.status === 'PENDING' && 'Đang xử lý'}
-                                                    {item.status === 'FAILED' && 'Thất bại'}
-                                                    {item.status === 'CANCELLED' && 'Đã hủy'}
+                                                    {item.status === 'COMPLETED' &&
+                                                        t('invoices.status.completed')}
+                                                    {item.status === 'PENDING' &&
+                                                        t('invoices.status.pending')}
+                                                    {item.status === 'FAILED' &&
+                                                        t('invoices.status.failed')}
+                                                    {item.status === 'CANCELLED' &&
+                                                        t('invoices.status.cancelled')}
                                                 </span>
                                             </td>
                                         </tr>
@@ -317,8 +323,8 @@ const Invoices: React.FC<InvoicesProps> = ({ patientId, profile }) => {
                                     <tr>
                                         <td colSpan={7} className="text-center py-4">
                                             {searchTerm
-                                                ? 'Không tìm thấy hóa đơn phù hợp với từ khóa tìm kiếm'
-                                                : 'Chưa có hóa đơn nào'}
+                                                ? t('invoices.empty.noResults')
+                                                : t('invoices.empty.noInvoices')}
                                         </td>
                                     </tr>
                                 )}

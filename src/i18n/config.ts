@@ -23,6 +23,8 @@ import privacyPolicyVi from './locales/vi/privacyPolicy.json';
 import privacyPolicyEn from './locales/en/privacyPolicy.json';
 import refundPolicyVi from './locales/vi/refundPolicy.json';
 import refundPolicyEn from './locales/en/refundPolicy.json';
+import chatVi from './locales/vi/chat.json';
+import chatEn from './locales/en/chat.json';
 
 // Define resources
 const resources = {
@@ -37,6 +39,7 @@ const resources = {
         legalNotice: legalNoticeVi,
         privacyPolicy: privacyPolicyVi,
         refundPolicy: refundPolicyVi,
+        chat: chatVi,
     },
     en: {
         common: commonEn,
@@ -49,6 +52,7 @@ const resources = {
         legalNotice: legalNoticeEn,
         privacyPolicy: privacyPolicyEn,
         refundPolicy: refundPolicyEn,
+        chat: chatEn,
     },
 };
 
@@ -74,6 +78,7 @@ configuredI18n.init({
         'legalNotice',
         'privacyPolicy',
         'refundPolicy',
+        'chat',
     ],
 
     // Language detection configuration
