@@ -1,0 +1,83 @@
+{
+    "profile": {
+        "breadcrumb": {
+            "home": "Home",
+            "hospitals": "Hospitals"
+        },
+        "loading": "Loading hospital information...",
+        "defaultName": "Hospital",
+        "sections": {
+            "specialties": "Specialties",
+            "doctorServices": {
+                "title": "Doctor Consultation Services",
+                "description": "Specialized consultation and examination services",
+                "count": "{{count}} services"
+            },
+            "hospitalServices": {
+                "title": "Hospital Medical Services",
+                "description": "Advanced medical and laboratory services",
+                "count": "{{count}} services"
+            },
+            "introduction": "Introduction",
+            "pricing": "Pricing",
+            "guide": "Visit Guide",
+            "faq": "FAQ"
+        },
+        "expand": "Expand",
+        "collapse": "Collapse",
+        "pricing": {
+            "empty": "No pricing information available"
+        },
+        "guide": {
+            "step1": "Visit website",
+            "step1Content": "or download MedCure app – Book medical appointments on your phone.",
+            "step2": "Search for",
+            "step3": "Select the service you want such as",
+            "step3Default": "general checkup, specialist consultation, laboratory tests, imaging diagnostics...",
+            "step4": "Choose time, doctor and consultation type (at hospital or online consultation).",
+            "step5": "Confirm information, receive electronic appointment slip via email or app.",
+            "note": "Note:",
+            "noteContent": "Please arrive 15 minutes before your appointment time for reception assistance, basic measurements and completing procedures before consultation."
+        },
+        "sidebar": {
+            "mapTitle": "Map of {{name}}",
+            "bookNow": "Book Now",
+            "locationInfo": "Location and advertisement information"
+        }
+    },
+    "list": {
+        "breadcrumb": {
+            "home": "Home",
+            "title": "Hospital List"
+        },
+        "title": "Hospitals",
+        "titleWithSpecialty": "Hospitals - {{specialty}}",
+        "results": {
+            "showing": "Showing",
+            "hospitals": "Hospitals",
+            "filtered": "(filtered)"
+        },
+        "filters": {
+            "selectArea": "Select area",
+            "province": "Province",
+            "district": "District",
+            "selectSpecialty": "Select specialty",
+            "specialtyCount": "{{count}} specialties",
+            "searchPlaceholder": "Search Hospital",
+            "clearSelection": "Clear selection",
+            "activeFilters": "Active filters:",
+            "clearAll": "Clear all filters",
+            "clearAreaFilter": "Clear area filter",
+            "clearSpecialtyFilter": "Clear specialty filter",
+            "clearSearch": "Clear search"
+        },
+        "empty": {
+            "title": "No hospitals found",
+            "messageFiltered": "No hospitals match your filters. Try adjusting your filters or search terms.",
+            "messageDefault": "There are currently no hospitals in the system."
+        },
+        "modal": {
+            "specialtyTitle": "Search by specialty"
+        }
+    }
+}

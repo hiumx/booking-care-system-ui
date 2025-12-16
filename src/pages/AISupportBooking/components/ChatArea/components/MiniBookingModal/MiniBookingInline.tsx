@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Stethoscope } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store';
 import { toast } from 'react-toastify';
 import AppointmentService from '@/services/appointment.service';
@@ -41,6 +42,7 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
     onClose,
     appointmentType = AppointmentType.IN_PERSON,
 }) => {
+    const { t } = useTranslation('aiSupport');
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { profile } = useSelector((state: RootState) => state.user);
@@ -66,9 +68,7 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
     );
     const [isGuideTyping, setIsGuideTyping] = useState(true);
     const [guideText, setGuideText] = useState<string>(
-        isHospitalBooking
-            ? 'Mời bạn chọn chuyên khoa hoặc dịch vụ'
-            : 'Mời bạn chọn ngày và khung giờ phù hợp'
+        isHospitalBooking ? t('miniBooking.selectSpecialty') : t('miniBooking.selectDateTime')
     );
     const [showStep, setShowStep] = useState(false);
 
@@ -84,7 +84,7 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
                 .unwrap()
                 .catch((error: any) => {
                     console.error('Error fetching hospital:', error);
-                    toast.error('Không thể tải thông tin bệnh viện');
+                    toast.error(t('miniBooking.cannotLoadHospital'));
                 });
         } else if (doctorId) {
             dispatch(setBookingFlowType('doctor'));
@@ -97,11 +97,11 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
 
     // Build AI guide text per step
     const getGuideText = (step: Step): string => {
-        if (step === 'specialty') return 'Mời bạn chọn chuyên khoa hoặc dịch vụ';
-        if (step === 'appointmentType') return 'Chọn hình thức khám và bác sĩ (nếu có)';
-        if (step === 'datetime') return 'Mời bạn chọn ngày và khung giờ phù hợp';
-        if (step === 'basic') return 'Vui lòng xác nhận thông tin người khám';
-        return 'Chọn phương thức thanh toán để hoàn tất đặt lịch';
+        if (step === 'specialty') return t('miniBooking.selectSpecialty');
+        if (step === 'appointmentType') return t('miniBooking.selectAppointmentType');
+        if (step === 'datetime') return t('miniBooking.selectDateTime');
+        if (step === 'basic') return t('miniBooking.confirmInfo');
+        return t('miniBooking.selectPayment');
     };
 
     // Helper function to get consultation fee based on appointment type
@@ -166,7 +166,7 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
     // Hospital flow step handlers
     const handleContinueFromSpecialty = () => {
         if (!bookingState.selectedSpecialtyId && !bookingState.selectedServiceMedicalId) {
-            toast.warn('Vui lòng chọn chuyên khoa hoặc dịch vụ');
+            toast.warn(t('miniBooking.selectSpecialtyRequired'));
             return;
         }
         setCurrentStep('appointmentType');
@@ -178,7 +178,7 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
 
     const handleContinueFromDateTime = () => {
         if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0) {
-            toast.warn('Vui lòng chọn khung giờ');
+            toast.warn(t('miniBooking.selectTimeSlot'));
             return;
         }
         setCurrentStep('basic');
@@ -189,11 +189,11 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
     };
 
     const ensureAppointmentCreated = async (skipPayment: boolean) => {
-        if (!profile?.id) throw new Error('Vui lòng đăng nhập');
-        if (!isHospitalBooking && !doctorId) throw new Error('Thiếu thông tin bác sĩ');
-        if (isHospitalBooking && !hospitalId) throw new Error('Thiếu thông tin bệnh viện');
+        if (!profile?.id) throw new Error(t('miniBooking.pleaseLogin'));
+        if (!isHospitalBooking && !doctorId) throw new Error(t('miniBooking.missingDoctorInfo'));
+        if (isHospitalBooking && !hospitalId) throw new Error(t('miniBooking.missingHospitalInfo'));
         if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0)
-            throw new Error('Vui lòng chọn ngày và khung giờ');
+            throw new Error(t('miniBooking.selectDateTimeRequired'));
 
         const firstSlot = scheduleState.selectedSlots[0];
         const appointmentTimeId = createAppointmentTimeId({
@@ -249,18 +249,18 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
         // API returns appointmentId in data, but type definition says void
         const appointmentId = (response.data as unknown as { appointmentId?: string })
             ?.appointmentId;
-        if (!appointmentId) throw new Error('Không nhận được ID lịch hẹn');
+        if (!appointmentId) throw new Error(t('miniBooking.noAppointmentId'));
         dispatch(setCreatedAppointmentId(appointmentId));
         return appointmentId;
     };
 
     // Helpers to reuse Booking sections
     const getStepTitle = (step: Step): string => {
-        if (step === 'specialty') return 'Chọn chuyên khoa / dịch vụ';
-        if (step === 'appointmentType') return 'Chọn hình thức khám';
-        if (step === 'datetime') return 'Chọn ngày và giờ';
-        if (step === 'basic') return 'Xác nhận thông tin người khám';
-        return 'Thanh toán';
+        if (step === 'specialty') return t('miniBooking.stepSpecialty');
+        if (step === 'appointmentType') return t('miniBooking.stepAppointmentType');
+        if (step === 'datetime') return t('miniBooking.stepDateTime');
+        if (step === 'basic') return t('miniBooking.stepBasicInfo');
+        return t('miniBooking.stepPayment');
     };
 
     const nextStep = () => {
@@ -355,28 +355,28 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
                         const paymentResponse =
                             await PaymentService.createAppointmentPayment(paymentRequest);
                         if (!paymentResponse.paymentUrl) {
-                            throw new Error('Không nhận được URL thanh toán');
+                            throw new Error(t('miniBooking.noPaymentUrl'));
                         }
-                        toast.success('Đang chuyển hướng đến cổng thanh toán...');
+                        toast.success(t('miniBooking.redirectingPayment'));
                         setTimeout(() => {
                             globalThis.location.href = paymentResponse.paymentUrl;
                         }, 1000);
                     } catch (error: any) {
                         console.error('Process failed:', error);
-                        toast.error(error.message || 'Không thể hoàn tất quy trình');
+                        toast.error(error.message || t('miniBooking.cannotCompleteProcess'));
                     }
                 }}
                 onCreateAppointmentOnly={async () => {
                     try {
                         const appointmentId = await ensureAppointmentCreated(true);
-                        toast.success('Đặt lịch thành công!');
+                        toast.success(t('miniBooking.bookingSuccess'));
                         onClose();
                         navigate(
                             PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', appointmentId)
                         );
                     } catch (error: any) {
                         console.error('Create appointment failed:', error);
-                        toast.error(error.message || 'Không thể tạo lịch hẹn');
+                        toast.error(error.message || t('miniBooking.cannotCreateAppointment'));
                     }
                 }}
                 isProcessingPayment={false}
@@ -411,7 +411,7 @@ const MiniBookingInline: React.FC<MiniBookingInlineProps> = ({
                                     className="btn btn-sm btn-outline-primary"
                                     onClick={onClose}
                                 >
-                                    Đóng
+                                    {t('miniBooking.close')}
                                 </button>
                             </div>
 

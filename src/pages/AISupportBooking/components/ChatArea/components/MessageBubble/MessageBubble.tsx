@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { Stethoscope, Copy, Check } from 'lucide-react';
 import { RootState } from '@/store';
 import { Message } from '@/types/ai.types';
@@ -11,6 +12,7 @@ interface MessageBubbleProps {
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
+    const { t } = useTranslation('aiSupport');
     const isUser = message.sender === 'user';
     const { profile } = useSelector((state: RootState) => state.user);
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -386,7 +388,10 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                                     />
                                 </div>
                                 <span className={styles.progressText}>
-                                    Câu hỏi {message.questionCount}/3
+                                    {t('messageBubble.questionProgress', {
+                                        current: message.questionCount,
+                                        total: 3,
+                                    })}
                                 </span>
                             </div>
                         )}
@@ -408,7 +413,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                             return (
                                 <div className={styles.diseaseConclusion}>
                                     <div className={styles.conclusionHeader}>
-                                        <h4>Kết luận</h4>
+                                        <h4>{t('messageBubble.conclusion')}</h4>
                                     </div>
                                     <div className={styles.conclusionBody}>
                                         <div className={styles.diseaseName}>
@@ -416,7 +421,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                                         </div>
                                         <div className={styles.confidence}>
                                             <span className={styles.confidenceLabel}>
-                                                Độ tin cậy:
+                                                {t('messageBubble.confidenceLabel')}
                                             </span>
                                             <div className={styles.confidenceBar}>
                                                 <div
@@ -434,7 +439,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                                         {message.disease.reasons &&
                                             message.disease.reasons.length > 0 && (
                                                 <div className={styles.reasons}>
-                                                    <strong>Lý do:</strong>
+                                                    <strong>{t('messageBubble.reasons')}</strong>
                                                     <ul>
                                                         {message.disease.reasons.map((reason) => (
                                                             <li key={reason}>{reason}</li>
@@ -453,7 +458,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                         <button
                             className={styles.actionButton}
                             onClick={handleCopy}
-                            data-tooltip={copied ? 'Đã sao chép' : 'Sao chép'}
+                            data-tooltip={
+                                copied ? t('messageBubble.copied') : t('messageBubble.copy')
+                            }
                         >
                             {copied ? <Check size={14} /> : <Copy size={14} />}
                         </button>

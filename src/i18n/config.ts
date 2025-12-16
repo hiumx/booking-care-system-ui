@@ -25,6 +25,12 @@ import refundPolicyVi from './locales/vi/refundPolicy.json';
 import refundPolicyEn from './locales/en/refundPolicy.json';
 import chatVi from './locales/vi/chat.json';
 import chatEn from './locales/en/chat.json';
+import doctorVi from './locales/vi/doctor.json';
+import doctorEn from './locales/en/doctor.json';
+import hospitalVi from './locales/vi/hospital.json';
+import hospitalEn from './locales/en/hospital.json';
+import aiSupportVi from './locales/vi/aiSupport.json';
+import aiSupportEn from './locales/en/aiSupport.json';
 
 // Define resources
 const resources = {
@@ -40,6 +46,9 @@ const resources = {
         privacyPolicy: privacyPolicyVi,
         refundPolicy: refundPolicyVi,
         chat: chatVi,
+        doctor: doctorVi,
+        hospital: hospitalVi,
+        aiSupport: aiSupportVi,
     },
     en: {
         common: commonEn,
@@ -53,6 +62,9 @@ const resources = {
         privacyPolicy: privacyPolicyEn,
         refundPolicy: refundPolicyEn,
         chat: chatEn,
+        doctor: doctorEn,
+        hospital: hospitalEn,
+        aiSupport: aiSupportEn,
     },
 };
 
@@ -79,6 +91,9 @@ configuredI18n.init({
         'privacyPolicy',
         'refundPolicy',
         'chat',
+        'doctor',
+        'hospital',
+        'aiSupport',
     ],
 
     // Language detection configuration

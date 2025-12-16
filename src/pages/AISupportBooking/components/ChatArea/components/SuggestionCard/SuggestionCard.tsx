@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { MapPin, Star, Building2, HelpCircle } from 'lucide-react';
 import { Suggestion } from '@/types/ai.types';
 import { PATHS, replacePathParams } from '@/routes/paths';
@@ -16,9 +17,10 @@ interface SuggestionCardProps {
 interface CardFooterProps {
     onSupportBooking?: (options?: { appointmentType?: AppointmentType }) => void;
     appointmentType?: AppointmentType;
+    t: (key: string, options?: any) => string;
 }
 
-const CardFooter: React.FC<CardFooterProps> = ({ onSupportBooking, appointmentType }) => {
+const CardFooter: React.FC<CardFooterProps> = ({ onSupportBooking, appointmentType, t }) => {
     if (!onSupportBooking) return null;
 
     return (
@@ -32,7 +34,7 @@ const CardFooter: React.FC<CardFooterProps> = ({ onSupportBooking, appointmentTy
                         }
                     >
                         <HelpCircle size={16} />
-                        <span>Hỗ trợ đặt lịch</span>
+                        <span>{t('suggestionCard.supportBooking')}</span>
                     </button>
                 )}
             </div>
@@ -45,6 +47,7 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
     onSupportBooking,
     selectedServiceType,
 }) => {
+    const { t } = useTranslation('aiSupport');
     const navigate = useNavigate();
     const [doctorAvatarError, setDoctorAvatarError] = useState(false);
     const [hospitalImageError, setHospitalImageError] = useState(false);
@@ -118,30 +121,31 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                             }}
                             role="button"
                             tabIndex={0}
-                            data-tooltip="Xem thông tin bác sĩ"
-                            aria-label={`Xem thông tin bác sĩ ${doctor.name}`}
+                            data-tooltip={t('suggestionCard.viewDoctorInfo')}
+                            aria-label={`${t('suggestionCard.viewDoctorInfo')} ${doctor.name}`}
                         >
-                            {doctor.name || 'Bác sĩ'}
+                            {doctor.name || t('suggestionCard.doctor')}
                         </h4>
                         <p className={styles.cardSubtitle}>
-                            Chuyên khoa: {doctor.specialtyName || 'Chưa xác định'}
+                            {t('suggestionCard.specialty')}{' '}
+                            {doctor.specialtyName || t('suggestionCard.notDetermined')}
                         </p>
                     </div>
                 </div>
                 <div className={styles.cardBody}>
                     <div className={styles.cardDetail}>
                         <Building2 size={16} />
-                        <span>{doctor.hospitalName || 'Chưa có thông tin'}</span>
+                        <span>{doctor.hospitalName || t('suggestionCard.noInfo')}</span>
                     </div>
                     {displayServiceName && (
                         <div className={styles.cardDetail}>
-                            <span className={styles.label}>Loại dịch vụ:</span>
+                            <span className={styles.label}>{t('suggestionCard.serviceType')}</span>
                             <span className={styles.value}>{displayServiceName}</span>
                         </div>
                     )}
                     {displayPrice && (
                         <div className={styles.cardDetail}>
-                            <span className={styles.label}>Giá:</span>
+                            <span className={styles.label}>{t('suggestionCard.price')}</span>
                             <span className={styles.priceValue}>{displayPrice}</span>
                         </div>
                     )}
@@ -151,11 +155,17 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                             <span>{doctor.rating}/5.0</span>
                         </div>
                         <div className={styles.cardDetail}>
-                            <span>Kinh nghiệm: {doctor.yearOfExperience} năm</span>
+                            <span>
+                                {t('suggestionCard.experience', { years: doctor.yearOfExperience })}
+                            </span>
                         </div>
                     </div>
                 </div>
-                <CardFooter onSupportBooking={onSupportBooking} appointmentType={appointmentType} />
+                <CardFooter
+                    onSupportBooking={onSupportBooking}
+                    appointmentType={appointmentType}
+                    t={t}
+                />
             </div>
         );
     }
@@ -202,21 +212,23 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                             }}
                             role="button"
                             tabIndex={0}
-                            data-tooltip="Xem thông tin bệnh viện"
-                            aria-label={`Xem thông tin bệnh viện ${hospital.name || ''}`}
+                            data-tooltip={t('suggestionCard.viewHospitalInfo')}
+                            aria-label={`${t('suggestionCard.viewHospitalInfo')} ${hospital.name || ''}`}
                         >
-                            {hospital.name || 'Bệnh viện'}
+                            {hospital.name || t('suggestionCard.hospital')}
                         </h4>
                     </div>
                 </div>
                 <div className={styles.cardBody}>
                     <div className={styles.cardDetail}>
                         <MapPin size={16} />
-                        <span>{hospital.address || 'Chưa có địa chỉ'}</span>
+                        <span>{hospital.address || t('suggestionCard.noAddress')}</span>
                     </div>
                     {specialties.length > 0 && (
                         <div className={styles.specialties}>
-                            <p className={styles.specialtiesLabel}>Chuyên khoa:</p>
+                            <p className={styles.specialtiesLabel}>
+                                {t('suggestionCard.specialties')}
+                            </p>
                             <div className={styles.specialtyTags}>
                                 {displaySpecialties.map((specialty: string, index: number) => (
                                     <span
@@ -228,14 +240,16 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                                 ))}
                                 {remainingCount > 0 && (
                                     <span className={styles.specialtyTag}>
-                                        +{remainingCount} chuyên khoa
+                                        {t('suggestionCard.moreSpecialties', {
+                                            count: remainingCount,
+                                        })}
                                     </span>
                                 )}
                             </div>
                         </div>
                     )}
                 </div>
-                <CardFooter onSupportBooking={onSupportBooking} />
+                <CardFooter onSupportBooking={onSupportBooking} t={t} />
             </div>
         );
     }

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import styles from './DoctorProfile.module.scss';
 import MainLayout from '@/layouts/MainLayout';
@@ -47,6 +48,7 @@ import { Gender } from '@/enums/common.enums';
 import { PATHS, replacePathParams } from '@/routes/paths';
 
 const DoctorProfile: React.FC = () => {
+    const { t } = useTranslation('doctor');
     const dispatch = useDispatch<AppDispatch>();
     const { id } = useParams<{ id: string }>();
 
@@ -111,9 +113,9 @@ const DoctorProfile: React.FC = () => {
     const breadcrumbData = {
         items: [
             { label: '', path: '/', isActive: false },
-            { label: 'Hồ sơ bác sĩ', isActive: true },
+            { label: t('profile.breadcrumb.title'), isActive: true },
         ],
-        title: 'Hồ sơ bác sĩ',
+        title: t('profile.breadcrumb.title'),
     };
 
     // Loading and error states
@@ -126,7 +128,7 @@ const DoctorProfile: React.FC = () => {
                             <div className="spinner-border">
                                 <output className="visually-hidden">Loading...</output>
                             </div>
-                            <p className="mt-3">Đang tải thông tin bác sĩ...</p>
+                            <p className="mt-3">{t('profile.loading')}</p>
                         </div>
                     </div>
                 </div>
@@ -141,10 +143,10 @@ const DoctorProfile: React.FC = () => {
                 <div className="content">
                     <div className="container">
                         <div className="text-center py-5">
-                            <h4 className="fw-semibold mb-2">Đã xảy ra lỗi!</h4>
-                            <p className="text-muted mb-4">Đã có lỗi xảy ra khi tải dữ liệu.</p>
+                            <h4 className="fw-semibold mb-2">{t('profile.error.title')}</h4>
+                            <p className="text-muted mb-4">{t('profile.error.message')}</p>
                             <Link to={PATHS.HOME} className="btn btn-outline-primary px-4">
-                                Quay về trang chủ
+                                {t('profile.error.backHome')}
                             </Link>
                         </div>
                     </div>
@@ -160,12 +162,10 @@ const DoctorProfile: React.FC = () => {
                 <div className="content">
                     <div className="container">
                         <div className="text-center py-5">
-                            <h4 className="fw-semibold mb-2">Không tìm thấy bác sĩ!</h4>
-                            <p className="text-muted mb-4">
-                                Bác sĩ bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
-                            </p>
+                            <h4 className="fw-semibold mb-2">{t('profile.notFound.title')}</h4>
+                            <p className="text-muted mb-4">{t('profile.notFound.message')}</p>
                             <Link to={PATHS.HOME} className="btn btn-outline-primary px-4">
-                                Quay về trang chủ
+                                {t('profile.notFound.backHome')}
                             </Link>
                         </div>
                     </div>
@@ -181,12 +181,12 @@ const DoctorProfile: React.FC = () => {
     // Function to get gender display text
     const getGenderDisplayText = (gender: Gender | undefined) => {
         if (gender === Gender.FEMALE) {
-            return 'Nữ';
+            return t('profile.gender.female');
         }
         if (gender === Gender.MALE) {
-            return 'Nam';
+            return t('profile.gender.male');
         }
-        return 'Khác';
+        return t('profile.gender.other');
     };
 
     // Count completed appointments (mock data for now)
@@ -217,7 +217,8 @@ const DoctorProfile: React.FC = () => {
                                     </div>
                                     <div className="doc-info-cont">
                                         <span className="badge doc-avail-badge">
-                                            <i className="fa-solid fa-circle"></i> Sẵn sàng phục vụ
+                                            <i className="fa-solid fa-circle"></i>{' '}
+                                            {t('profile.card.available')}
                                         </span>
                                         <h4 className="doc-name">
                                             {doctor.lastName} {doctor.firstName}{' '}
@@ -227,7 +228,9 @@ const DoctorProfile: React.FC = () => {
                                                 {doctor.specialty?.name}
                                             </span>
                                         </h4>
-                                        <p>Học vị: {doctor.position?.name}</p>
+                                        <p>
+                                            {t('profile.card.degree')}: {doctor.position?.name}
+                                        </p>
                                         <p>{doctor.hospital?.name}</p>
 
                                         <p className="address-detail">
@@ -245,7 +248,7 @@ const DoctorProfile: React.FC = () => {
                                                 <span className="list-icon">
                                                     <img src={watchIcon} alt="Icon" />
                                                 </span>
-                                                <p>Toàn thời gian, Liệu pháp trực tuyến sẵn có</p>
+                                                <p>{t('profile.card.fullTime')}</p>
                                             </div>
                                             <ul className="sub-links">
                                                 <li>
@@ -257,8 +260,10 @@ const DoctorProfile: React.FC = () => {
                                                         }}
                                                         title={
                                                             isFavorited
-                                                                ? 'Xóa khỏi yêu thích'
-                                                                : 'Thêm vào yêu thích'
+                                                                ? t(
+                                                                      'profile.card.removeFromFavorite'
+                                                                  )
+                                                                : t('profile.card.addToFavorite')
                                                         }
                                                         className={clsx({
                                                             'text-danger': isFavorited,
@@ -294,7 +299,9 @@ const DoctorProfile: React.FC = () => {
                                                 <span className="list-icon">
                                                     <img src={thumbIcon} alt="Icon" />
                                                 </span>
-                                                <p>Email: {doctor.email}</p>
+                                                <p>
+                                                    {t('profile.card.email')}: {doctor.email}
+                                                </p>
                                             </div>
                                         </li>
                                         <li>
@@ -303,14 +310,15 @@ const DoctorProfile: React.FC = () => {
                                                     <img src={genderIcon} alt="Icon" />
                                                 </span>
                                                 <p>
-                                                    Giới tính: {getGenderDisplayText(doctor.gender)}
+                                                    {t('profile.card.gender')}:{' '}
+                                                    {getGenderDisplayText(doctor.gender)}
                                                 </p>
                                             </div>
                                             <h5 className="accept-text">
                                                 <span>
                                                     <i className="feather-check"></i>
                                                 </span>{' '}
-                                                Tiếp nhận bệnh nhân mới
+                                                {t('profile.card.acceptingPatients')}
                                             </h5>
                                         </li>
                                         <li>
@@ -321,7 +329,7 @@ const DoctorProfile: React.FC = () => {
                                                     to="#reviews"
                                                     className="d-inline-block average-rating"
                                                 >
-                                                    {totalReviews} Đánh giá
+                                                    {totalReviews} {t('profile.card.reviews')}
                                                 </Link>
                                             </div>
                                         </li>
@@ -334,18 +342,25 @@ const DoctorProfile: React.FC = () => {
                                         <span className="bg-blue">
                                             <img src={calendarIcon} alt="Calendar" />
                                         </span>
-                                        Gần {appointmentCount}+ cuộc hẹn đã được đặt
+                                        {t('profile.card.appointmentsBooked', {
+                                            count: appointmentCount,
+                                        })}
                                     </li>
                                     <li>
                                         <span className="bg-dark-blue">
                                             <img src={bullseyeIcon} alt="Target" />
                                         </span>
-                                        {doctor.yearsOfExperience} năm kinh nghiệm
+                                        {t('profile.card.yearsExperience', {
+                                            years: doctor.yearsOfExperience,
+                                        })}
                                     </li>
                                 </ul>
                                 <div className="bottom-book-btn">
                                     <p>
-                                        <span>Giá: {priceRange}</span> mỗi lượt khám
+                                        <span>
+                                            {t('profile.card.price')}: {priceRange}
+                                        </span>{' '}
+                                        {t('profile.card.perVisit')}
                                     </p>
                                     <div className="clinic-booking">
                                         <Link
@@ -354,7 +369,7 @@ const DoctorProfile: React.FC = () => {
                                                 doctorId: id || '',
                                             })}
                                         >
-                                            Đặt lịch hẹn
+                                            {t('profile.card.bookAppointment')}
                                         </Link>
                                     </div>
                                 </div>
@@ -371,7 +386,7 @@ const DoctorProfile: React.FC = () => {
                                         scrollToSection(bioRef.current);
                                     }}
                                 >
-                                    Tiểu sử
+                                    {t('profile.nav.bio')}
                                 </Link>
                             </li>
                             <li>
@@ -382,7 +397,7 @@ const DoctorProfile: React.FC = () => {
                                         scrollToSection(expRef.current);
                                     }}
                                 >
-                                    Kinh nghiệm
+                                    {t('profile.nav.experience')}
                                 </Link>
                             </li>
                             <li>
@@ -393,7 +408,7 @@ const DoctorProfile: React.FC = () => {
                                         scrollToSection(specialityRef.current);
                                     }}
                                 >
-                                    Chuyên khoa
+                                    {t('profile.nav.specialty')}
                                 </Link>
                             </li>
                             <li>
@@ -404,7 +419,7 @@ const DoctorProfile: React.FC = () => {
                                         scrollToSection(servicesRef.current);
                                     }}
                                 >
-                                    Dịch vụ
+                                    {t('profile.nav.services')}
                                 </Link>
                             </li>
                             <li>
@@ -415,7 +430,7 @@ const DoctorProfile: React.FC = () => {
                                         scrollToSection(clinicRef.current);
                                     }}
                                 >
-                                    Bệnh viện
+                                    {t('profile.nav.hospital')}
                                 </Link>
                             </li>
                             <li>
@@ -426,7 +441,7 @@ const DoctorProfile: React.FC = () => {
                                         scrollToSection(hoursRef.current);
                                     }}
                                 >
-                                    Lịch làm việc
+                                    {t('profile.nav.schedule')}
                                 </Link>
                             </li>
                             <li>
@@ -437,7 +452,7 @@ const DoctorProfile: React.FC = () => {
                                         scrollToSection(reviewRef.current);
                                     }}
                                 >
-                                    Đánh giá
+                                    {t('profile.nav.reviews')}
                                 </Link>
                             </li>
                         </ul>
@@ -445,7 +460,7 @@ const DoctorProfile: React.FC = () => {
                             <div ref={bioRef}>
                                 <div className="doc-information-details bio-detail" id="doc_bio">
                                     <div className="detail-title">
-                                        <h4>Tiểu sử bác sĩ</h4>
+                                        <h4>{t('profile.sections.bio.title')}</h4>
                                     </div>
                                     <ExpandableText text={doctor?.bio} limit={300} />
                                 </div>
@@ -453,7 +468,7 @@ const DoctorProfile: React.FC = () => {
                             <div ref={expRef}>
                                 <div className="doc-information-details" id="experience">
                                     <div className="detail-title">
-                                        <h4>Kinh nghiệm</h4>
+                                        <h4>{t('profile.sections.experience.title')}</h4>
                                     </div>
                                     <div className="experience-info">
                                         <div className="experience-logo">
@@ -464,18 +479,29 @@ const DoctorProfile: React.FC = () => {
                                         <div className="experience-content">
                                             <h5>{doctor.hospital?.name}</h5>
                                             <p>
-                                                <strong>Chuyên khoa:</strong>{' '}
+                                                <strong>
+                                                    {t('profile.sections.experience.specialty')}:
+                                                </strong>{' '}
                                                 {doctor.specialty?.name}
                                             </p>
                                             <p>
-                                                <strong>Trình độ:</strong> {doctor.position?.name}
+                                                <strong>
+                                                    {t('profile.sections.experience.degree')}:
+                                                </strong>{' '}
+                                                {doctor.position?.name}
                                             </p>
                                             <p>
-                                                <strong>Kinh nghiệm:</strong>{' '}
-                                                {doctor.yearsOfExperience} năm kinh nghiệm
+                                                <strong>
+                                                    {t('profile.sections.experience.years')}:
+                                                </strong>{' '}
+                                                {t('profile.sections.experience.yearsValue', {
+                                                    years: doctor.yearsOfExperience,
+                                                })}
                                             </p>
                                             <div>
-                                                <strong>Mô tả:</strong>{' '}
+                                                <strong>
+                                                    {t('profile.sections.experience.description')}:
+                                                </strong>{' '}
                                                 {doctor.bio ? (
                                                     <span
                                                         className="bio-content"
@@ -486,7 +512,7 @@ const DoctorProfile: React.FC = () => {
                                                         }}
                                                     />
                                                 ) : (
-                                                    'Không có thông tin tiểu sử'
+                                                    t('profile.sections.experience.noDescription')
                                                 )}
                                             </div>
                                         </div>
@@ -496,7 +522,7 @@ const DoctorProfile: React.FC = () => {
                             <div ref={specialityRef}>
                                 <div className="doc-information-details" id="speciality">
                                     <div className="detail-title">
-                                        <h4>Chuyên khoa</h4>
+                                        <h4>{t('profile.sections.specialty.title')}</h4>
                                     </div>
                                     <ul className={clsx('special-links', styles.marginLeftZero)}>
                                         <li>
@@ -510,7 +536,7 @@ const DoctorProfile: React.FC = () => {
                             <div ref={servicesRef}>
                                 <div className="doc-information-details" id="services">
                                     <div className="detail-title">
-                                        <h4>Dịch vụ & Giá</h4>
+                                        <h4>{t('profile.sections.services.title')}</h4>
                                     </div>
                                     <ul className={clsx('special-links', styles.marginLeftZero)}>
                                         {doctor.prices && doctor.prices.length > 0 ? (
@@ -526,7 +552,9 @@ const DoctorProfile: React.FC = () => {
                                             ))
                                         ) : (
                                             <li>
-                                                <span className="text-muted">Chưa có dịch vụ</span>
+                                                <span className="text-muted">
+                                                    {t('profile.sections.services.noServices')}
+                                                </span>
                                             </li>
                                         )}
                                     </ul>
@@ -535,25 +563,27 @@ const DoctorProfile: React.FC = () => {
                             <div ref={clinicRef}>
                                 <div className="doc-information-details" id="clinic">
                                     <div className="detail-title">
-                                        <h4>Bệnh viện & Vị trí</h4>
+                                        <h4>{t('profile.sections.hospital.title')}</h4>
                                     </div>
                                     <HospitalInfo
                                         hospital={{
                                             id: Number(doctor.hospital?.id) || 1,
-                                            name: doctor.hospital?.name || 'Bệnh viện',
+                                            name:
+                                                doctor.hospital?.name ||
+                                                t('profile.sections.hospital.defaultName'),
                                             address:
                                                 doctor.hospital?.address ||
                                                 doctor.address ||
-                                                'Địa chỉ bệnh viện',
+                                                t('profile.sections.hospital.defaultAddress'),
                                             background_url: doctor.hospital?.avatarUrl || doctorImg,
                                         }}
                                         availabilitySlots={[
                                             {
-                                                day: 'Thứ 2',
+                                                day: t('profile.availability.monday'),
                                                 time: '07:00 AM - 17:00 PM',
                                             },
                                             {
-                                                day: 'Thứ 7',
+                                                day: t('profile.availability.saturday'),
                                                 time: '07:00 AM - 17:00 PM',
                                             },
                                         ]}
@@ -563,7 +593,7 @@ const DoctorProfile: React.FC = () => {
                             <div ref={hoursRef}>
                                 <div className="doc-information-details" id="bussiness_hour">
                                     <div className="detail-title">
-                                        <h4>Lịch làm việc</h4>
+                                        <h4>{t('profile.sections.schedule.title')}</h4>
                                     </div>
                                     <ScheduleAvailability />
                                 </div>

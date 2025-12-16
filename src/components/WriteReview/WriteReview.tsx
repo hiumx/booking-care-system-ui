@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import Button from '@/components/Button';
 import { useReviewForm } from '@/hooks/useReviewForm';
@@ -17,6 +18,7 @@ interface WriteReviewProps {
 }
 
 const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview, onCancel }) => {
+    const { t } = useTranslation('common');
     const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
 
     // Use custom hooks for form validation and star rating
@@ -64,14 +66,14 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview, o
     return (
         <div className={clsx('write-review', styles.writeReview)}>
             <h4>
-                Viết đánh giá cho <strong>{doctorName}</strong>
+                {t('writeReview.title')} <strong>{doctorName}</strong>
             </h4>
 
             {/* Write Review Form */}
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label className="mb-2" htmlFor="star-rating">
-                        Đánh giá
+                        {t('writeReview.ratingLabel')}
                     </label>
                     <div className={clsx('star-rating', styles.starRating)} id="star-rating">
                         {[5, 4, 3, 2, 1].map((starValue) => (
@@ -87,11 +89,11 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview, o
                                 />
                                 <label
                                     htmlFor={`star-${starValue}`}
-                                    title={`${starValue} sao`}
+                                    title={t('writeReview.starTitle', { count: starValue })}
                                     onMouseEnter={() => handleStarHover(starValue)}
                                     onMouseLeave={handleStarLeave}
                                     className={styles.starLabel}
-                                    aria-label={`${starValue} sao`}
+                                    aria-label={t('writeReview.starTitle', { count: starValue })}
                                 >
                                     <i
                                         className={clsx('fa fa-star', styles.faStar, {
@@ -106,7 +108,8 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview, o
 
                 <div className="mb-3">
                     <label className="mb-2" htmlFor="review_desc">
-                        Nội dung đánh giá <span className="text-danger">*</span>
+                        {t('writeReview.contentLabel')}{' '}
+                        <span className="text-danger">{t('writeReview.required')}</span>
                     </label>
                     <textarea
                         id="review_desc"
@@ -115,7 +118,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview, o
                             'is-invalid': descriptionError,
                         })}
                         rows={4}
-                        placeholder="Chia sẻ trải nghiệm của bạn với bác sĩ... (tối thiểu 5 ký tự)"
+                        placeholder={t('writeReview.placeholder')}
                         value={description}
                         onChange={(e) => {
                             setDescription(e.target.value);
@@ -136,10 +139,12 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview, o
                                 'text-muted': trimmedLength === 0,
                             })}
                         >
-                            {trimmedLength}/{minChars} ký tự tối thiểu
+                            {t('writeReview.minChars', { current: trimmedLength, min: minChars })}
                         </small>
                         <small className="text-muted">
-                            <span id="chars">{remainingChars}</span> ký tự còn lại
+                            <span id="chars">
+                                {t('writeReview.remainingChars', { count: remainingChars })}
+                            </span>
                         </small>
                     </div>
                 </div>
@@ -156,9 +161,9 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview, o
                                 onChange={(e) => setTermsAccepted(e.target.checked)}
                             />
                             <label htmlFor="terms_accept">
-                                Tôi đã đọc và đồng ý với{' '}
+                                {t('writeReview.termsText')}{' '}
                                 <Link to="/terms-conditions" target="_blank">
-                                    Điều khoản &amp; Điều kiện
+                                    {t('writeReview.termsLink')}
                                 </Link>
                             </label>
                         </div>
@@ -166,10 +171,14 @@ const WriteReview: React.FC<WriteReviewProps> = ({ doctorName, onSubmitReview, o
                 </div>
 
                 <div className={styles.submitSection}>
-                    <Button text="Thêm đánh giá" type="submit" className={styles.submitBtn} />
+                    <Button
+                        text={t('writeReview.submitButton')}
+                        type="submit"
+                        className={styles.submitBtn}
+                    />
                     {onCancel && (
                         <Button
-                            text="Hủy"
+                            text={t('writeReview.cancelButton')}
                             type="button"
                             className={clsx('ms-2', styles.cancelBtn)}
                             onClick={onCancel}

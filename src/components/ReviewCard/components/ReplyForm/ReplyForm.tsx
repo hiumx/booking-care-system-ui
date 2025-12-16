@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Button from '@/components/Button';
 import clsx from 'clsx';
 import styles from './ReplyForm.module.scss';
@@ -14,8 +15,10 @@ const ReplyForm: React.FC<ReplyFormProps> = ({
     reviewId,
     onSubmitReply,
     onCancel,
-    placeholder = 'Viết phản hồi của bạn...',
+    placeholder,
 }) => {
+    const { t } = useTranslation('common');
+    const defaultPlaceholder = placeholder || t('replyForm.placeholder');
     const [replyText, setReplyText] = useState<string>('');
     const [error, setError] = useState<string>('');
     const maxChars = 300;
@@ -30,18 +33,18 @@ const ReplyForm: React.FC<ReplyFormProps> = ({
         setError('');
 
         if (!replyText.trim()) {
-            setError('Vui lòng nhập nội dung phản hồi');
+            setError(t('replyForm.emptyError'));
             return;
         }
 
         // Validate minimum length (backend requirement)
         if (trimmedLength < minChars) {
-            setError(`Nội dung phản hồi phải có ít nhất ${minChars} ký tự`);
+            setError(t('replyForm.minLengthError', { min: minChars }));
             return;
         }
 
         if (replyText.length > maxChars) {
-            setError(`Nội dung phản hồi không được vượt quá ${maxChars} ký tự`);
+            setError(t('replyForm.maxLengthError', { max: maxChars }));
             return;
         }
 
@@ -64,7 +67,9 @@ const ReplyForm: React.FC<ReplyFormProps> = ({
                             'is-invalid': error,
                         })}
                         rows={3}
-                        placeholder={`${placeholder} (tối thiểu 3 ký tự)`}
+                        placeholder={t('replyForm.placeholderWithMin', {
+                            placeholder: defaultPlaceholder,
+                        })}
                         value={replyText}
                         onChange={(e) => {
                             setReplyText(e.target.value);
@@ -84,18 +89,22 @@ const ReplyForm: React.FC<ReplyFormProps> = ({
                                 'text-muted': trimmedLength === 0,
                             })}
                         >
-                            {trimmedLength}/{minChars} ký tự tối thiểu
+                            {t('replyForm.minChars', { current: trimmedLength, min: minChars })}
                         </small>
                         <small className="text-muted">
-                            <span>{remainingChars}</span> ký tự còn lại
+                            {t('replyForm.remainingChars', { count: remainingChars })}
                         </small>
                     </div>
                 </div>
 
                 <div className={clsx('d-flex', 'gap-2', styles.buttonGroup)}>
-                    <Button text="Gửi phản hồi" type="submit" className={styles.submitButton} />
                     <Button
-                        text="Hủy"
+                        text={t('replyForm.submit')}
+                        type="submit"
+                        className={styles.submitButton}
+                    />
+                    <Button
+                        text={t('replyForm.cancel')}
                         type="button"
                         className={styles.cancelButton}
                         onClick={onCancel}

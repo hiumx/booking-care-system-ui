@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import SideBar from './components/SideBar';
@@ -26,16 +26,17 @@ import docProfile01 from '@/assets/img/doctor-grid/doctor-grid-01.jpg';
 
 // Mock data removed - using Redux data from backend
 
-const breadcrumbData = {
-    title: 'Danh sách bác sĩ',
-    items: [
-        { label: 'Trang chủ', path: '/', isActive: false },
-        { label: 'Danh sách bác sĩ', isActive: true },
-    ],
-};
-
 const DoctorList: React.FC = () => {
+    const { t } = useTranslation('doctor');
     const dispatch = useAppDispatch();
+
+    const breadcrumbData = {
+        title: t('list.breadcrumb.title'),
+        items: [
+            { label: t('list.breadcrumb.home'), path: '/', isActive: false },
+            { label: t('list.breadcrumb.title'), isActive: true },
+        ],
+    };
     const { profile } = useSelector((state: RootState) => state.user);
     const { doctors, isLoading, pagination, error } = useAppSelector((state) => state.doctor);
     const { languages } = useAppSelector((state) => state.language);
@@ -293,8 +294,8 @@ const DoctorList: React.FC = () => {
     ]);
 
     const sortOptions = [
-        { label: 'Giá từ thấp đến cao', value: 'low-to-high' },
-        { label: 'Giá từ cao đến thấp', value: 'high-to-low' },
+        { label: t('list.sort.lowToHigh'), value: 'low-to-high' },
+        { label: t('list.sort.highToLow'), value: 'high-to-low' },
     ];
 
     // Helper function to update URL params
@@ -472,8 +473,8 @@ const DoctorList: React.FC = () => {
             return (
                 <div className="col-md-12 mb-4">
                     <div className="text-center py-5">
-                        <h4>Không tìm thấy bác sĩ nào</h4>
-                        <p>Vui lòng thử lại với từ khóa khác hoặc bộ lọc khác.</p>
+                        <h4>{t('list.empty.title')}</h4>
+                        <p>{t('list.empty.message')}</p>
                         {(searchTerm ||
                             specialtyFilters.length > 0 ||
                             hospitalFilters.length > 0 ||
@@ -490,7 +491,7 @@ const DoctorList: React.FC = () => {
                                     className="btn btn-outline-primary"
                                     onClick={handleClearAllFilters}
                                 >
-                                    Xóa tất cả bộ lọc
+                                    {t('list.empty.clearFilters')}
                                 </button>
                             </div>
                         )}
@@ -505,8 +506,8 @@ const DoctorList: React.FC = () => {
                 doctorId={doctor.id}
                 patientId={patientId}
                 name={`${doctor.lastName} ${doctor.firstName}`}
-                specialty={doctor.specialty?.name || 'Chưa cập nhật'}
-                position={doctor.position?.name || 'Chưa cập nhật'}
+                specialty={doctor.specialty?.name || t('list.notUpdated')}
+                position={doctor.position?.name || t('list.notUpdated')}
                 prices={
                     doctor.prices?.map((price) => ({
                         id: price.id,
@@ -516,7 +517,7 @@ const DoctorList: React.FC = () => {
                     })) || []
                 }
                 rating={doctor.reviewStatistics?.averageRating || 0}
-                location={doctor.hospital?.name || doctor.address || 'Chưa cập nhật'}
+                location={doctor.hospital?.name || doctor.address || t('list.notUpdated')}
                 yearsOfExperience={doctor.yearsOfExperience}
                 isFavorite={doctor.isFavorited}
                 languages={doctor.languages || []}
@@ -1083,15 +1084,15 @@ const DoctorList: React.FC = () => {
                                         className={`${styles.filterContainer} d-flex align-items-center justify-content-between result-wrap`}
                                     >
                                         <h5 className={styles.h5Custom}>
-                                            Hiển thị{' '}
+                                            {t('list.results.showing')}{' '}
                                             <span className={styles.spanCustom}>
                                                 {pagination.totalCount}
                                             </span>{' '}
-                                            Bác sĩ Dành Cho Bạn
+                                            {t('list.results.doctorsForYou')}
                                         </h5>
                                         <div className="d-flex align-items-center gap-3">
                                             <Select
-                                                title="Sắp xếp theo"
+                                                title={t('list.sort.title')}
                                                 value={sortOption}
                                                 onChange={handleSortChange}
                                                 items={sortOptions}
@@ -1124,7 +1125,7 @@ const DoctorList: React.FC = () => {
                                                 <i className="fas fa-exclamation-triangle fs-2 text-danger me-3"></i>
                                                 <div>
                                                     <h4 className="alert-heading mb-1 fw-bold">
-                                                        Không thể tải dữ liệu
+                                                        {t('list.error.title')}
                                                     </h4>
                                                     <p className="mb-0 text-muted">{error}</p>
                                                 </div>
@@ -1136,14 +1137,14 @@ const DoctorList: React.FC = () => {
                                                     onClick={() => globalThis.location.reload()}
                                                 >
                                                     <i className="fas fa-redo-alt me-2"></i>
-                                                    {'Thử lại'}
+                                                    {t('list.error.retry')}
                                                 </button>
                                                 <button
                                                     className="btn btn-outline-secondary btn-sm px-3 py-2 rounded-pill fw-semibold"
                                                     onClick={() => globalThis.history.back()}
                                                 >
                                                     <i className="fas fa-arrow-left me-2"></i>
-                                                    {'Quay lại'}
+                                                    {t('list.error.goBack')}
                                                 </button>
                                             </div>
                                         </div>
