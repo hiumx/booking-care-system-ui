@@ -66,7 +66,11 @@
     },
     "testimonial": {
         "badge": "Testimonials",
-        "title": "15k Users Trust Doccure Worldwide",
+        "title": "15k Users Trust Medcure Worldwide",
+        "titleSuffix": "Users Trust Medcure Worldwide",
+        "starReview": "Star Review",
+        "anonymousUser": "Anonymous User",
+        "verifiedPatient": "Verified Patient",
         "testimonials": [
             {
                 "rating": 5,
