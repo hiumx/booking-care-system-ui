@@ -1,0 +1,70 @@
+.weekly-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 200px;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    gap: 0.5rem;
+
+    .chart-bar {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+
+        .bar-container {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+
+            .bar-fill {
+                width: 100%;
+                max-width: 40px;
+                background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+                border-radius: 8px 8px 0 0;
+                transition: height 0.5s ease;
+                position: relative;
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                padding-top: 0.5rem;
+
+                &.completed {
+                    background: linear-gradient(180deg, #4ecdc4 0%, #44a08d 100%);
+                }
+
+                .bar-value {
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    color: white;
+                }
+            }
+        }
+
+        .bar-label {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #666;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .weekly-chart {
+        height: 150px;
+
+        .chart-bar .bar-container .bar-fill {
+            max-width: 30px;
+
+            .bar-value {
+                font-size: 0.65rem;
+            }
+        }
+    }
+}

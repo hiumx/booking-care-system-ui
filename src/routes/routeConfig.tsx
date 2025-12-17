@@ -43,6 +43,8 @@ import ServiceDetail from '@/pages/MedicalService/ServiceDetail/ServiceDetailPag
 import AISupportBooking from '@/pages/AISupportBooking';
 import ContractSigningPage from '@/pages/ContractSigning/ContractSigningPage';
 import ContractSigningSuccessPage from '@/pages/ContractSigning/ContractSigningSuccessPage';
+import OnboardingWizard from '@/pages/Nutrition/OnboardingWizard';
+import RoadmapDashboard from '@/pages/Nutrition/RoadmapDashboard';
 
 const routes: RouteObject[] = [
     {
@@ -238,6 +240,14 @@ const routes: RouteObject[] = [
     {
         path: PATHS.CONTRACT_SIGNING.SUCCESS,
         element: <ContractSigningSuccessPage />,
+    },
+    {
+        path: PATHS.NUTRITION.ONBOARDING,
+        element: <OnboardingWizard />,
+    },
+    {
+        path: PATHS.NUTRITION.DASHBOARD,
+        element: <RoadmapDashboard />,
     },
     {
         path: PATHS.NOT_FOUND,

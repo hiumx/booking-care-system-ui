@@ -89,6 +89,13 @@ export const PATHS = {
         SUCCESS: '/contract-signing-success',
     },
 
+    // Nutrition paths
+    NUTRITION: {
+        ROOT: '/nutrition',
+        ONBOARDING: '/nutrition/onboarding',
+        DASHBOARD: '/nutrition/dashboard',
+    },
+
     // Not Found path
     NOT_FOUND: '*',
 } as const;

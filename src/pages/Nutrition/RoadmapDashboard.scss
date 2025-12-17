@@ -1,0 +1,385 @@
+@import '../../styles/variables';
+
+.roadmap-dashboard {
+    background-color: $background-color;
+    padding: 3rem 0;
+    min-height: calc(100vh - 68px - 200px);
+
+    &.loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+
+        .spinner {
+            font-size: 1.25rem;
+            color: $primary-color;
+            font-weight: 500;
+        }
+    }
+
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .dashboard-header {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+        .greeting {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+
+            h1 {
+                font-size: 1.75rem;
+                color: $text-primary-color;
+                margin: 0;
+                font-weight: 600;
+            }
+        }
+
+        .date-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+
+            button {
+                background: $primary-color;
+                color: white;
+                border: none;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                cursor: pointer;
+                font-size: 1.25rem;
+                transition: all 0.3s;
+
+                &:hover:not(:disabled) {
+                    background: darken($primary-color, 10%);
+                    transform: scale(1.1);
+                }
+
+                &:disabled {
+                    opacity: 0.4;
+                    cursor: not-allowed;
+                }
+            }
+
+            .selected-date {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: $text-primary-color;
+                min-width: 300px;
+                text-align: center;
+            }
+        }
+    }
+
+    .no-plan {
+        background: white;
+        border-radius: 16px;
+        padding: 4rem 2rem;
+        text-align: center;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+        .no-plan-content {
+            max-width: 500px;
+            margin: 0 auto;
+
+            h2 {
+                font-size: 1.5rem;
+                color: $text-primary-color;
+                margin-bottom: 1rem;
+                font-weight: 600;
+            }
+
+            p {
+                color: $text-secondary-color;
+                margin-bottom: 2rem;
+                line-height: 1.6;
+            }
+
+            .btn {
+                padding: 1rem 2.5rem;
+                border: none;
+                border-radius: 8px;
+                font-size: 1.1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+
+                &.btn-primary {
+                    background: $primary-color;
+                    color: white;
+
+                    &:hover:not(:disabled) {
+                        background: darken($primary-color, 10%);
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+                    }
+
+                    &:disabled {
+                        opacity: 0.6;
+                        cursor: not-allowed;
+                    }
+                }
+
+                &.btn-secondary {
+                    background: white;
+                    color: $text-primary-color;
+                    border: 2px solid $border-primary-color;
+
+                    &:hover {
+                        background: $background-color;
+                        border-color: $primary-color;
+                    }
+                }
+            }
+        }
+    }
+
+    .daily-overview {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+        h2 {
+            font-size: 1.5rem;
+            color: $text-primary-color;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+
+            .overview-card {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                padding: 1.5rem;
+                background: $background-color;
+                border-radius: 12px;
+                border: 1px solid $border-primary-color;
+
+                .card-icon {
+                    font-size: 2.5rem;
+                }
+
+                .card-content {
+                    flex: 1;
+
+                    .card-label {
+                        font-size: 0.9rem;
+                        color: $text-secondary-color;
+                        margin-bottom: 0.25rem;
+                    }
+
+                    .card-value {
+                        font-size: 1.25rem;
+                        font-weight: 600;
+                        color: $text-primary-color;
+                    }
+                }
+            }
+        }
+
+        .macros-section {
+            h3 {
+                font-size: 1.1rem;
+                color: $text-primary-color;
+                margin-bottom: 1rem;
+                font-weight: 600;
+            }
+        }
+    }
+
+    .meal-plan-section,
+    .workout-plan-section {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+        h2 {
+            font-size: 1.5rem;
+            color: $text-primary-color;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .meal-timeline,
+        .exercise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+
+    .workout-plan-section {
+        .workout-info {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+
+            .workout-type,
+            .workout-duration {
+                padding: 0.5rem 1rem;
+                background: $background-color;
+                border-radius: 8px;
+                font-weight: 600;
+                color: $text-primary-color;
+                border: 1px solid $border-primary-color;
+            }
+        }
+    }
+
+    .weekly-progress-section {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+        h2 {
+            font-size: 1.5rem;
+            color: $text-primary-color;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .progress-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+
+            .summary-item {
+                padding: 1.5rem;
+                background: $background-color;
+                border-radius: 12px;
+                border: 1px solid $border-primary-color;
+
+                .summary-label {
+                    display: block;
+                    font-size: 0.9rem;
+                    color: $text-secondary-color;
+                    margin-bottom: 0.5rem;
+                }
+
+                .summary-value {
+                    display: block;
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    color: $primary-color;
+                }
+            }
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .roadmap-dashboard {
+        padding: 2rem 0;
+
+        .dashboard-container {
+            padding: 0 0.75rem;
+        }
+
+        .dashboard-header {
+            padding: 1.5rem;
+
+            .greeting {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+
+                h1 {
+                    font-size: 1.5rem;
+                }
+            }
+
+            .date-selector {
+                .selected-date {
+                    min-width: auto;
+                    font-size: 1rem;
+                }
+            }
+        }
+
+        .daily-overview,
+        .meal-plan-section,
+        .workout-plan-section,
+        .weekly-progress-section {
+            padding: 1.5rem;
+
+            h2 {
+                font-size: 1.25rem;
+            }
+        }
+
+        .daily-overview {
+            .overview-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .weekly-progress-section {
+            .progress-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .roadmap-dashboard {
+        padding: 1rem 0;
+
+        .dashboard-header {
+            padding: 1rem;
+            border-radius: 12px;
+
+            .greeting h1 {
+                font-size: 1.25rem;
+            }
+
+            .date-selector {
+                flex-direction: column;
+                gap: 0.75rem;
+
+                .selected-date {
+                    font-size: 0.9rem;
+                }
+            }
+        }
+
+        .no-plan {
+            padding: 2rem 1rem;
+            border-radius: 12px;
+        }
+
+        .daily-overview,
+        .meal-plan-section,
+        .workout-plan-section,
+        .weekly-progress-section {
+            padding: 1rem;
+            border-radius: 12px;
+        }
+    }
+}
