@@ -252,7 +252,10 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                             </li>
                                         </ul>
                                     </li>
-                                    <li className="has-submenu">
+                                    <li>
+                                        <Link to={PATHS.BLOG}>{t('menu.blog')}</Link>
+                                    </li>
+                                    <li>
                                         <Link to={PATHS.CONTACT_US}>{t('menu.contact')}</Link>
                                     </li>
                                     <li className="has-submenu">

@@ -74,12 +74,27 @@
                     }
 
                     .mainArticleMeta {
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 8px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 4px;
                         font-size: 12px;
                         color: #666;
                         margin-top: 10px;
+
+                        .articleAuthor {
+                            font-weight: 600;
+                            color: #333;
+                            text-decoration: none;
+                            transition: color 0.2s ease;
+
+                            &:hover {
+                                color: #0d6efd;
+                            }
+                        }
+
+                        .articleDate {
+                            color: #666;
+                        }
                     }
                 }
 
@@ -167,42 +182,24 @@
                     }
 
                     .smallArticleMeta {
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 8px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 4px;
                         font-size: 12px;
                         color: #666;
                         margin-top: auto;
                         min-height: 18px;
                         flex-shrink: 0; // Prevent meta from shrinking
 
-                        .articleMetaText {
-                            display: inline;
-                            white-space: normal;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            max-width: 100%;
-                            word-wrap: break-word;
-                            max-height: 2.4em; // Limit to 2 lines
-                            line-height: 1.2;
-                        }
-
-                        .articleSource {
+                        .articleAuthor {
                             font-weight: 600;
                             color: #333;
                             text-decoration: none;
                             transition: color 0.2s ease;
-                            margin-right: 8px;
 
                             &:hover {
                                 color: #0d6efd;
                             }
-                        }
-
-                        .metaSeparator {
-                            color: black;
-                            user-select: none;
-                            margin-right: 8px;
                         }
 
                         .articleDate {
@@ -237,23 +234,19 @@
             }
         }
 
-        .articleSource {
+        .articleAuthor {
             font-weight: 600;
             color: #333;
             text-decoration: none;
             transition: color 0.2s ease;
-        }
-        .articleSource:hover {
-            color: #0d6efd;
+
+            &:hover {
+                color: #0d6efd;
+            }
         }
 
         .articleDate {
             color: #999;
-        }
-
-        .metaSeparator {
-            color: black;
-            user-select: none;
         }
     }
 }

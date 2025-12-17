@@ -31,6 +31,24 @@
         grid-area: experts;
     }
 
+    .loadingContainer {
+        grid-area: experts;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+    }
+
+    .emptyState {
+        grid-area: experts;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+        color: #666;
+        font-size: 14px;
+    }
+
     .expertItem {
         display: grid;
         grid-template-columns: 96px 1fr;
@@ -42,11 +60,6 @@
         transition:
             background-color 0.2s ease,
             box-shadow 0.2s ease;
-
-        // &:hover {
-        //     background: #f8fafc;
-        //     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        // }
 
         &:hover .info .name {
             color: #0d6efd;

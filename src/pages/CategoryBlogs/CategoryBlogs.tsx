@@ -4,294 +4,239 @@ import BlogHeader from '@/pages/Blog/components/BlogHeader';
 import Breadcrumb from '@/pages/BlogDetail/components/Breadcrumb';
 import BlogCard from '@/components/BLogCard';
 import styles from './CategoryBlogs.module.scss';
-
-interface Article {
-    id: string;
-    title: string;
-    image: string;
-    tag: string;
-    source: string;
-    date: string;
-    link: string;
-    category: string;
-}
+import { BlogService } from '@/services/blog.service';
+import { BlogSummaryDto, BlogCategoryDto, BlogStatus } from '@/types/blog.types';
+import { useApiCall } from '@/hooks/useApiCall';
+import Spinner from '@/components/Spinner';
+import { PATHS, replacePathParams } from '@/routes/paths';
 
 const CategoryBlogs: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const { categorySlug } = useParams<{ categorySlug: string }>();
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('co-xuong-khop');
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+    const [selectedCategorySlug, setSelectedCategorySlug] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [modalSearchTerm, setModalSearchTerm] = useState('');
-    const [tempSelectedCategory, setTempSelectedCategory] = useState('co-xuong-khop');
+    const [tempSelectedCategoryId, setTempSelectedCategoryId] = useState<number | null>(null);
     const [isAllMode, setIsAllMode] = useState(false);
+    const [categories, setCategories] = useState<BlogCategoryDto[]>([]);
+    const [blogs, setBlogs] = useState<BlogSummaryDto[]>([]);
+    const [totalPages, setTotalPages] = useState(1);
 
     const itemsPerPage = 12; // 4 items per row * 3 rows
 
-    // Sample categories
-    const categories = [
-        { id: 'co-xuong-khop', name: 'Cơ xương khớp' },
-        { id: 'than-kinh', name: 'Thần kinh' },
-        { id: 'tim-mach', name: 'Tim mạch' },
-        { id: 'tieu-hoa', name: 'Tiêu hóa' },
-        { id: 'cot-song', name: 'Cột sống' },
-        { id: 'tai-mui-hong', name: 'Tai Mũi Họng' },
-        { id: 'benh-da-day', name: 'Bệnh dạ dày' },
-        { id: 'di-kham-thong-minh', name: 'Đi khám thông minh' },
-    ];
+    // Fetch categories
+    const { data: categoriesData, execute: fetchCategories } = useApiCall(async () => {
+        const response = await BlogService.getCategories(true);
+        return response.data || [];
+    });
 
-    // Sample articles data
-    const articlesData: Article[] = [
-        {
-            id: '1',
-            title: 'Viêm khớp dạng thấp: Nguyên nhân, triệu chứng và cách điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2025/08/ke-toa-dien-tu-6-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Nguyễn Văn A',
-            date: 'Ngày đăng: 25 Th12, 2024',
-            link: '/article/1',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '2',
-            title: 'Thoái hóa khớp gối: Dấu hiệu nhận biết và phương pháp điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2025/08/bo-cong-cu-lam-viec-cho-bac-si-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Trần Thị B',
-            date: 'Ngày đăng: 24 Th12, 2024',
-            link: '/article/2',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '3',
-            title: 'Đau lưng cấp tính: Nguyên nhân và cách xử lý tại nhà',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2022/10/bien-suc-9-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Lê Văn C',
-            date: 'Ngày đăng: 23 Th12, 2024',
-            link: '/article/3',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '4',
-            title: 'Bệnh gout: Chế độ ăn uống và lối sống cho người bệnh',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2024/12/lomexin-1000-mg-1-1-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Phạm Thị D',
-            date: 'Ngày đăng: 22 Th12, 2024',
-            link: '/article/4',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '5',
-            title: 'Loãng xương ở người cao tuổi: Phòng ngừa và điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2025/08/ke-toa-dien-tu-6-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Hoàng Văn E',
-            date: 'Ngày đăng: 21 Th12, 2024',
-            link: '/article/5',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '6',
-            title: 'Viêm gân Achilles: Triệu chứng và phương pháp điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2025/08/bo-cong-cu-lam-viec-cho-bac-si-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Vũ Thị F',
-            date: 'Ngày đăng: 20 Th12, 2024',
-            link: '/article/6',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '7',
-            title: 'Đau vai gáy: Nguyên nhân và bài tập giảm đau hiệu quả',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2022/10/bien-suc-9-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Đặng Văn G',
-            date: 'Ngày đăng: 19 Th12, 2024',
-            link: '/article/7',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '8',
-            title: 'Bệnh viêm khớp vảy nến: Dấu hiệu và điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2024/12/lomexin-1000-mg-1-1-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Ngô Thị H',
-            date: 'Ngày đăng: 18 Th12, 2024',
-            link: '/article/8',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '9',
-            title: 'Đau khớp háng: Nguyên nhân và cách điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2025/08/ke-toa-dien-tu-6-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Lý Văn I',
-            date: 'Ngày đăng: 17 Th12, 2024',
-            link: '/article/9',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '10',
-            title: 'Bệnh lupus ban đỏ: Triệu chứng và điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2025/08/bo-cong-cu-lam-viec-cho-bac-si-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Trịnh Thị K',
-            date: 'Ngày đăng: 16 Th12, 2024',
-            link: '/article/10',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '11',
-            title: 'Viêm khớp thiếu niên: Dấu hiệu và điều trị sớm',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2022/10/bien-suc-9-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Mai Văn L',
-            date: 'Ngày đăng: 15 Th12, 2024',
-            link: '/article/11',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '12',
-            title: 'Đau cơ xơ hóa: Triệu chứng và phương pháp điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2024/12/lomexin-1000-mg-1-1-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Đỗ Thị M',
-            date: 'Ngày đăng: 14 Th12, 2024',
-            link: '/article/12',
-            category: 'co-xuong-khop',
-        },
-        // Add more articles for pagination demo
-        {
-            id: '13',
-            title: 'Bệnh viêm khớp phản ứng: Nguyên nhân và điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2025/08/ke-toa-dien-tu-6-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Võ Văn N',
-            date: 'Ngày đăng: 13 Th12, 2024',
-            link: '/article/13',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '14',
-            title: 'Đau khớp cổ tay: Nguyên nhân và cách điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2025/08/bo-cong-cu-lam-viec-cho-bac-si-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Hồ Thị O',
-            date: 'Ngày đăng: 12 Th12, 2024',
-            link: '/article/14',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '15',
-            title: 'Bệnh viêm khớp nhiễm khuẩn: Dấu hiệu và điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2022/10/bien-suc-9-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Dương Văn P',
-            date: 'Ngày đăng: 11 Th12, 2024',
-            link: '/article/15',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '16',
-            title: 'Đau khớp gối khi leo cầu thang: Nguyên nhân và cách khắc phục',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2024/12/lomexin-1000-mg-1-1-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Bùi Thị Q',
-            date: 'Ngày đăng: 10 Th12, 2024',
-            link: '/article/16',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '17',
-            title: 'Bệnh viêm khớp vảy nến: Dấu hiệu và điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2025/08/ke-toa-dien-tu-6-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Lê Văn R',
-            date: 'Ngày đăng: 09 Th12, 2024',
-            link: '/article/17',
-            category: 'co-xuong-khop',
-        },
-        {
-            id: '18',
-            title: 'Đau khớp háng: Nguyên nhân và cách điều trị',
-            image: 'https://cdn.youmed.vn/tin-tuc/wp-content/uploads/2025/08/bo-cong-cu-lam-viec-cho-bac-si-768x401.jpg',
-            tag: 'Cơ xương khớp',
-            source: 'Bác sĩ Phan Thị S',
-            date: 'Ngày đăng: 08 Th12, 2024',
-            link: '/article/18',
-            category: 'co-xuong-khop',
-        },
-    ];
+    // Fetch blogs
+    const {
+        data: blogsData,
+        isLoading: isLoadingBlogs,
+        execute: fetchBlogs,
+    } = useApiCall(async () => {
+        const params: any = {
+            status: BlogStatus.Active,
+            page: currentPage,
+            pageSize: itemsPerPage,
+        };
 
-    // Filter articles based on search term and selected category
-    const getFilteredArticles = () => {
-        let filtered = isAllMode
-            ? articlesData
-            : articlesData.filter((article) => article.category === selectedCategory);
-
-        if (searchTerm.trim()) {
-            filtered = filtered.filter(
-                (article) =>
-                    article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    article.tag.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    article.source.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+        if (isAllMode) {
+            // Fetch all blogs
+            if (searchTerm.trim()) {
+                params.keyword = searchTerm.trim();
+            }
+        } else {
+            // Fetch by category
+            if (selectedCategoryId) {
+                params.categoryId = selectedCategoryId;
+            }
+            if (searchTerm.trim()) {
+                params.keyword = searchTerm.trim();
+            }
         }
 
-        return filtered;
+        const response = await BlogService.getBlogs(params);
+        return response.data;
+    });
+
+    // Format date helper
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return `Ngày đăng: ${date.getDate()} Th${date.getMonth() + 1}, ${date.getFullYear()}`;
     };
 
-    const filteredArticles = getFilteredArticles();
-    const totalPages = Math.ceil(filteredArticles.length / itemsPerPage);
-
-    // Get current page articles
-    const getCurrentPageArticles = () => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        return filteredArticles.slice(startIndex, endIndex);
+    // Convert category name to slug (simple version)
+    const categoryNameToSlug = (name: string): string => {
+        return name
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/đ/g, 'd')
+            .replace(/Đ/g, 'D')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
     };
 
-    const currentArticles = getCurrentPageArticles();
+    // Find category by slug
+    const findCategoryBySlug = (slug: string): BlogCategoryDto | undefined => {
+        const findInCategories = (cats: BlogCategoryDto[]): BlogCategoryDto | undefined => {
+            for (const cat of cats) {
+                if (categoryNameToSlug(cat.categoryName) === slug) {
+                    return cat;
+                }
+                if (cat.children) {
+                    const found = findInCategories(cat.children);
+                    if (found) return found;
+                }
+            }
+            return undefined;
+        };
+        return findInCategories(categories);
+    };
+
+    // Initialize categories
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    useEffect(() => {
+        if (categoriesData) {
+            setCategories(categoriesData);
+        }
+    }, [categoriesData]);
+
+    // Initialize from URL params
+    useEffect(() => {
+        const categoryFromUrl = searchParams.get('category');
+        const searchFromUrl = searchParams.get('search') || '';
+        const pageFromUrl = Number.parseInt(searchParams.get('page') || '1', 10);
+
+        setSearchTerm(searchFromUrl);
+        setCurrentPage(pageFromUrl);
+
+        if (categoryFromUrl === 'all') {
+            setIsAllMode(true);
+            setSelectedCategoryId(null);
+            setSelectedCategorySlug('');
+        } else if (categorySlug) {
+            // Find category by slug from URL
+            const category = findCategoryBySlug(categorySlug);
+            if (category) {
+                setIsAllMode(false);
+                setSelectedCategoryId(category.id);
+                setSelectedCategorySlug(categorySlug);
+                setTempSelectedCategoryId(category.id);
+            }
+        } else if (categoryFromUrl) {
+            // Try to find by slug from query param
+            const category = findCategoryBySlug(categoryFromUrl);
+            if (category) {
+                setIsAllMode(false);
+                setSelectedCategoryId(category.id);
+                setSelectedCategorySlug(categoryFromUrl);
+                setTempSelectedCategoryId(category.id);
+            }
+        } else if (categories.length > 0) {
+            // Default to first category
+            const firstCategory = categories[0];
+            setIsAllMode(false);
+            setSelectedCategoryId(firstCategory.id);
+            setSelectedCategorySlug(categoryNameToSlug(firstCategory.categoryName));
+            setTempSelectedCategoryId(firstCategory.id);
+        }
+    }, [searchParams, categorySlug, categories]);
+
+    // Fetch blogs when filters change
+    useEffect(() => {
+        if (categories.length > 0 && (isAllMode || selectedCategoryId !== null)) {
+            fetchBlogs();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentPage, selectedCategoryId, searchTerm, isAllMode, categories.length]);
+
+    // Update blogs state when data changes
+    useEffect(() => {
+        if (blogsData) {
+            setBlogs(blogsData.items || []);
+            setTotalPages(Math.ceil((blogsData.totalItems || 0) / itemsPerPage));
+        }
+    }, [blogsData, itemsPerPage]);
 
     // Handle search
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        if (searchTerm.trim()) {
-            setSearchParams({
-                category: isAllMode ? 'all' : selectedCategory,
-                search: searchTerm.trim(),
-                page: '1',
-            });
-            setCurrentPage(1);
+        setCurrentPage(1);
+        const params: Record<string, string> = {
+            page: '1',
+        };
+        if (isAllMode) {
+            params.category = 'all';
+        } else if (selectedCategorySlug) {
+            params.category = selectedCategorySlug;
         }
+        if (searchTerm.trim()) {
+            params.search = searchTerm.trim();
+        }
+        setSearchParams(params);
     };
 
     // Handle category selection in modal
-    const handleCategorySelect = (categoryId: string) => {
-        setTempSelectedCategory(categoryId);
+    const handleCategorySelect = (categoryId: number) => {
+        setTempSelectedCategoryId(categoryId);
     };
 
     // Handle apply category selection
     const handleApplyCategory = () => {
-        setSelectedCategory(tempSelectedCategory);
-        setSearchTerm('');
-        setCurrentPage(1);
-        setSearchParams({ category: tempSelectedCategory, page: '1' });
+        if (tempSelectedCategoryId !== null) {
+            const category =
+                categories.find((cat) => cat.id === tempSelectedCategoryId) ||
+                categories.find((cat) =>
+                    cat.children?.some((child) => child.id === tempSelectedCategoryId)
+                );
+            if (category) {
+                const foundCategory =
+                    category.id === tempSelectedCategoryId
+                        ? category
+                        : category.children?.find((child) => child.id === tempSelectedCategoryId);
+                if (foundCategory) {
+                    setSelectedCategoryId(foundCategory.id);
+                    setSelectedCategorySlug(categoryNameToSlug(foundCategory.categoryName));
+                    setSearchTerm('');
+                    setCurrentPage(1);
+                    setIsAllMode(false);
+                    setSearchParams({
+                        category: categoryNameToSlug(foundCategory.categoryName),
+                        page: '1',
+                    });
+                }
+            }
+        }
         setShowCategoryModal(false);
         setModalSearchTerm('');
     };
 
     // Handle reset category selection
     const handleResetCategory = () => {
-        setSelectedCategory('co-xuong-khop');
-        setTempSelectedCategory('co-xuong-khop');
-        setSearchTerm('');
-        setCurrentPage(1);
-        setSearchParams({ category: 'co-xuong-khop', page: '1' });
+        if (categories.length > 0) {
+            const firstCategory = categories[0];
+            setSelectedCategoryId(firstCategory.id);
+            setSelectedCategorySlug(categoryNameToSlug(firstCategory.categoryName));
+            setTempSelectedCategoryId(firstCategory.id);
+            setSearchTerm('');
+            setCurrentPage(1);
+            setIsAllMode(false);
+            setSearchParams({
+                category: categoryNameToSlug(firstCategory.categoryName),
+                page: '1',
+            });
+        }
         setShowCategoryModal(false);
         setModalSearchTerm('');
     };
@@ -299,46 +244,72 @@ const CategoryBlogs: React.FC = () => {
     // Handle page change
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
-        setSearchParams({
-            category: isAllMode ? 'all' : selectedCategory,
-            search: searchTerm,
+        const params: Record<string, string> = {
             page: page.toString(),
-        });
+        };
+        if (isAllMode) {
+            params.category = 'all';
+        } else if (selectedCategorySlug) {
+            params.category = selectedCategorySlug;
+        }
+        if (searchTerm.trim()) {
+            params.search = searchTerm.trim();
+        }
+        setSearchParams(params);
+        // Scroll to top when page changes
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-
-    // Initialize from URL params
-    useEffect(() => {
-        const categoryFromUrl = searchParams.get('category') || categorySlug || 'co-xuong-khop';
-        const searchFromUrl = searchParams.get('search') || '';
-        const pageFromUrl = parseInt(searchParams.get('page') || '1');
-
-        setSelectedCategory(categoryFromUrl);
-        setTempSelectedCategory(categoryFromUrl);
-        setSearchTerm(searchFromUrl);
-        setCurrentPage(pageFromUrl);
-        setIsAllMode(categoryFromUrl === 'all');
-    }, [searchParams, categorySlug]);
 
     // Get current category name
     const getCurrentCategoryName = () => {
-        const category = categories.find((cat) => cat.id === selectedCategory);
-        return category ? category.name : 'Cơ xương khớp';
+        if (isAllMode) return 'Tất cả bài viết';
+        if (!selectedCategoryId) return 'Chuyên mục';
+
+        const findCategory = (cats: BlogCategoryDto[]): BlogCategoryDto | undefined => {
+            for (const cat of cats) {
+                if (cat.id === selectedCategoryId) return cat;
+                if (cat.children) {
+                    const found = findCategory(cat.children);
+                    if (found) return found;
+                }
+            }
+            return undefined;
+        };
+
+        const category = findCategory(categories);
+        return category ? category.categoryName : 'Chuyên mục';
+    };
+
+    // Get all categories (flattened for modal)
+    const getAllCategories = (): BlogCategoryDto[] => {
+        const result: BlogCategoryDto[] = [];
+        const flatten = (cats: BlogCategoryDto[]) => {
+            for (const cat of cats) {
+                result.push(cat);
+                if (cat.children) {
+                    flatten(cat.children);
+                }
+            }
+        };
+        flatten(categories);
+        return result;
     };
 
     // Filter categories based on modal search term
     const getFilteredCategories = () => {
-        if (!modalSearchTerm.trim()) return categories;
+        const allCats = getAllCategories();
+        if (!modalSearchTerm.trim()) return allCats;
 
-        return categories.filter((category) =>
-            category.name.toLowerCase().includes(modalSearchTerm.toLowerCase())
+        return allCats.filter((category) =>
+            category.categoryName.toLowerCase().includes(modalSearchTerm.toLowerCase())
         );
     };
 
     const breadcrumbItems = isAllMode
-        ? [{ label: 'Trang chủ', path: '/' }, { label: 'Tất cả bài viết' }]
+        ? [{ label: 'Trang chủ', path: PATHS.HOME }, { label: 'Tất cả bài viết' }]
         : [
-              { label: 'Trang chủ', path: '/' },
-              { label: 'Chuyên mục', path: '/categories' },
+              { label: 'Trang chủ', path: PATHS.HOME },
+              { label: 'Bản tin sức khỏe', path: PATHS.BLOG },
               { label: getCurrentCategoryName() },
           ];
 
@@ -423,7 +394,7 @@ const CategoryBlogs: React.FC = () => {
                                     className={styles.categoryBtn}
                                     onClick={() => {
                                         setShowCategoryModal(true);
-                                        setTempSelectedCategory(selectedCategory);
+                                        setTempSelectedCategoryId(selectedCategoryId);
                                         setModalSearchTerm('');
                                     }}
                                 >
@@ -441,7 +412,7 @@ const CategoryBlogs: React.FC = () => {
                         className={styles.modalOverlay}
                         onClick={() => {
                             setShowCategoryModal(false);
-                            setTempSelectedCategory(selectedCategory);
+                            setTempSelectedCategoryId(selectedCategoryId);
                             setModalSearchTerm('');
                         }}
                     >
@@ -452,7 +423,7 @@ const CategoryBlogs: React.FC = () => {
                                     className={styles.closeBtn}
                                     onClick={() => {
                                         setShowCategoryModal(false);
-                                        setTempSelectedCategory(selectedCategory);
+                                        setTempSelectedCategoryId(selectedCategoryId);
                                         setModalSearchTerm('');
                                     }}
                                 >
@@ -476,13 +447,13 @@ const CategoryBlogs: React.FC = () => {
                                     <button
                                         key={category.id}
                                         className={`${styles.categoryOption} ${
-                                            tempSelectedCategory === category.id
+                                            tempSelectedCategoryId === category.id
                                                 ? styles.selected
                                                 : ''
                                         }`}
                                         onClick={() => handleCategorySelect(category.id)}
                                     >
-                                        {category.name}
+                                        {category.categoryName}
                                     </button>
                                 ))}
                             </div>
@@ -490,6 +461,7 @@ const CategoryBlogs: React.FC = () => {
                             <div className={styles.modalActions}>
                                 <button className={styles.resetBtn} onClick={handleResetCategory}>
                                     <i className="fas fa-undo"></i>
+                                    {''}
                                     Đặt lại
                                 </button>
                                 <button className={styles.applyBtn} onClick={handleApplyCategory}>
@@ -502,30 +474,39 @@ const CategoryBlogs: React.FC = () => {
 
                 {/* Articles Grid */}
                 <div className={styles.content}>
-                    {currentArticles.length > 0 ? (
+                    {isLoadingBlogs ? (
+                        <div style={{ textAlign: 'center', padding: '4rem' }}>
+                            <Spinner />
+                        </div>
+                    ) : blogs.length > 0 ? (
                         <>
                             <div className={styles.articlesGrid}>
-                                {currentArticles.map((article) => (
-                                    <BlogCard
-                                        key={article.id}
-                                        image={article.image}
-                                        title={article.title}
-                                        link={article.link}
-                                        tag={article.tag}
-                                        source={article.source}
-                                        date={article.date}
-                                        containerClassName={styles.articleCard}
-                                        imageLinkClassName={styles.imageLink}
-                                        contentClassName={styles.cardContent}
-                                        tagClassName={styles.articleTag}
-                                        titleLinkClassName={styles.cardTitle}
-                                        metaClassName={styles.articleMeta}
-                                        metaTextClassName={styles.articleMetaText}
-                                        sourceClassName={styles.articleSource}
-                                        metaSeparatorClassName={styles.metaSeparator}
-                                        dateClassName={styles.articleDate}
-                                    />
-                                ))}
+                                {blogs.map((blog) => {
+                                    const blogTag = blog.tag || blog.category?.categoryName || '';
+                                    return (
+                                        <BlogCard
+                                            key={blog.id}
+                                            image={blog.thumbnailUrl || '/placeholder-blog.jpg'}
+                                            title={blog.titleVi}
+                                            link={replacePathParams(PATHS.BLOG_DETAIL, {
+                                                id: blog.id,
+                                            })}
+                                            tag={blogTag}
+                                            source={blog.source || 'Medcure'}
+                                            date={formatDate(blog.publishedAt || blog.createdAt)}
+                                            containerClassName={styles.articleCard}
+                                            imageLinkClassName={styles.imageLink}
+                                            contentClassName={styles.cardContent}
+                                            tagClassName={styles.articleTag}
+                                            titleLinkClassName={styles.cardTitle}
+                                            metaClassName={styles.articleMeta}
+                                            metaTextClassName={styles.articleMetaText}
+                                            sourceClassName={styles.articleSource}
+                                            metaSeparatorClassName={styles.metaSeparator}
+                                            dateClassName={styles.articleDate}
+                                        />
+                                    );
+                                })}
                             </div>
 
                             {/* Pagination */}
@@ -539,9 +520,13 @@ const CategoryBlogs: React.FC = () => {
                                         ←
                                     </button>
 
-                                    {getPaginationNumbers().map((page, index) => (
+                                    {getPaginationNumbers().map((page) => (
                                         <button
-                                            key={index}
+                                            key={
+                                                typeof page === 'number'
+                                                    ? `page-${page}`
+                                                    : 'ellipsis'
+                                            }
                                             className={`${styles.pageBtn} ${
                                                 page === currentPage ? styles.active : ''
                                             } ${page === '...' ? styles.ellipsis : ''}`}
@@ -566,7 +551,11 @@ const CategoryBlogs: React.FC = () => {
                         </>
                     ) : (
                         <div className={styles.noResults}>
-                            <p>Không tìm thấy bài viết nào cho "{searchTerm}"</p>
+                            <p>
+                                {searchTerm.trim()
+                                    ? `Không tìm thấy bài viết nào cho "${searchTerm}"`
+                                    : 'Không có bài viết nào trong danh mục này'}
+                            </p>
                         </div>
                     )}
                 </div>

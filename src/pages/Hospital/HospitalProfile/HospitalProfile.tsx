@@ -18,11 +18,12 @@ import ServiceCard from './components/ServiceCard';
 import ExpandableText from '@/components/ExpandableText';
 import { SpecialtyItem } from './components/SpecialtyItem';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from '@/store';
+import { AppDispatch, RootState } from '@/store';
 import { getHospitalByIdAsync } from '@/store/slices/hospitalSlice';
 import { HospitalProfileResponse } from '@/types/hospital.types';
-import { RootState } from '@/store';
 import { PATHS } from '@/routes/paths';
+import { HospitalFaqService } from '@/services/hospitalFaq.service';
+import { HospitalFaqResponse } from '@/types/hospitalFaq.types';
 
 interface BreadcrumbItem {
     label: string;
@@ -88,6 +89,9 @@ const HospitalProfile: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'gioi-thieu' | 'bang-gia' | 'huong-dan' | 'faq'>();
     const [expandedDoctorServices, setExpandedDoctorServices] = useState(true);
     const [expandedHospitalServices, setExpandedHospitalServices] = useState(true);
+    const [faqs, setFaqs] = useState<HospitalFaqResponse[]>([]);
+    const [isLoadingFaqs, setIsLoadingFaqs] = useState(false);
+    const [faqError, setFaqError] = useState<string | null>(null);
 
     // Separate useEffect for API call - only runs when id changes
     useEffect(() => {
@@ -95,6 +99,32 @@ const HospitalProfile: React.FC = () => {
             dispatch(getHospitalByIdAsync(id));
         }
     }, [dispatch, id]);
+
+    // Fetch FAQs when hospital ID is available
+    useEffect(() => {
+        const fetchFaqs = async () => {
+            if (!id) return;
+
+            setIsLoadingFaqs(true);
+            setFaqError(null);
+            try {
+                const response = await HospitalFaqService.getFaqsByHospitalId(id);
+                // Sort FAQs by displayOrder
+                const sortedFaqs = (response.data || []).sort(
+                    (a, b) => a.displayOrder - b.displayOrder
+                );
+                setFaqs(sortedFaqs);
+            } catch (error: any) {
+                console.error('Error fetching FAQs:', error);
+                setFaqError(error.message || 'Không thể tải câu hỏi thường gặp');
+                setFaqs([]);
+            } finally {
+                setIsLoadingFaqs(false);
+            }
+        };
+
+        fetchFaqs();
+    }, [id]);
 
     // Separate useEffect for scroll handling - no API calls
     useEffect(() => {
@@ -185,45 +215,6 @@ const HospitalProfile: React.FC = () => {
         },
     ];
 
-    // Mock FAQs
-    const faqs: Array<{ q: string; a: string }> = [
-        {
-            q: 'Bệnh viện có những chuyên khoa và dịch vụ khám, điều trị nào?',
-            a: 'Bệnh viện cung cấp đa dạng các chuyên khoa: Tim mạch, Nội tiết, Da liễu, Tiêu hóa, Thần kinh, Nhi khoa, Sản phụ khoa, Mắt. Dịch vụ đa dạng gồm khám tổng quát, tư vấn dinh dưỡng, điều trị da liễu, xét nghiệm máu, siêu âm, chụp X-quang và nhiều dịch vụ y tế chuyên nghiệp khác.',
-        },
-        {
-            q: 'Có cần đặt lịch hẹn trước khi đến khám không?',
-            a: 'Bạn nên đặt lịch trước qua tổng đài 19002115 hoặc nút "Đặt khám ngay" để chủ động thời gian và giảm thời gian chờ.',
-        },
-        {
-            q: 'Bệnh viện có hỗ trợ khám ngoài giờ hoặc cuối tuần không?',
-            a: 'Bệnh viện hoạt động Thứ 2 – Chủ nhật: 08:00 – 19:00. Vui lòng đặt lịch trước để được phục vụ tốt nhất.',
-        },
-        {
-            q: 'Khi đi khám cần mang theo giấy tờ gì?',
-            a: 'Vui lòng mang giấy tờ tùy thân và các kết quả khám/chẩn đoán trước đó (nếu có) để bác sĩ tham khảo.',
-        },
-        {
-            q: 'Bệnh viện có chỗ giữ xe hơi và xe máy không?',
-            a: 'Có. Khu vực gửi xe được bố trí ngay trong khuôn viên bệnh viện, có nhân sự hỗ trợ.',
-        },
-        {
-            q: 'Bệnh viện có áp dụng bảo hiểm y tế hoặc bảo hiểm tư nhân không?',
-            a: 'Bệnh viện hỗ trợ xuất hóa đơn để bạn tự quyết toán với bảo hiểm y tế hoặc bảo hiểm tư nhân theo chính sách của bạn.',
-        },
-        {
-            q: 'Chi phí khám và điều trị tại bệnh viện là bao nhiêu?',
-            a: 'Chi phí phụ thuộc vào gói dịch vụ và phác đồ điều trị. Vui lòng liên hệ bệnh viện để được tư vấn chi tiết.',
-        },
-        {
-            q: 'Thời gian nhận kết quả khám, xét nghiệm mất bao lâu?',
-            a: 'Tùy dịch vụ, hầu hết kết quả cơ bản có trong ngày; các xét nghiệm chuyên sâu có thể cần thêm thời gian xử lý.',
-        },
-        {
-            q: 'Các phương pháp điều trị tại bệnh viện có cần nghỉ dưỡng không?',
-            a: 'Phần lớn liệu trình là xâm lấn tối thiểu hoặc không xâm lấn, bạn có thể sinh hoạt bình thường ngay sau điều trị.',
-        },
-    ];
     const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
     // Loading state
@@ -651,35 +642,57 @@ const HospitalProfile: React.FC = () => {
                             </div>
 
                             <div id="faq" className={styles.sectionBlock}>
-                                <h3 className={styles.sectionTitle}>{t('profile.sections.faq')}</h3>
-                                <div className={styles.faqList}>
-                                    {faqs.map((item, idx) => (
-                                        <div key={`faq-${item.q}`} className={styles.faqItem}>
-                                            <button
-                                                className={clsx(
-                                                    styles.faqQuestion,
-                                                    openFaqIndex === idx && styles.faqOpen
+                                <h3 className={styles.sectionTitle}>Câu hỏi thường gặp</h3>
+                                {isLoadingFaqs ? (
+                                    <div className={styles.emptyState}>
+                                        <p className="text-muted">Đang tải câu hỏi thường gặp...</p>
+                                    </div>
+                                ) : faqError ? (
+                                    <div className={styles.emptyState}>
+                                        <p className="text-muted">{faqError}</p>
+                                    </div>
+                                ) : faqs.length === 0 ? (
+                                    <div className={styles.emptyState}>
+                                        <p className="text-muted">
+                                            Chưa có câu hỏi thường gặp cho bệnh viện này
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className={styles.faqList}>
+                                        {faqs.map((item, idx) => (
+                                            <div key={item.id} className={styles.faqItem}>
+                                                <button
+                                                    className={clsx(
+                                                        styles.faqQuestion,
+                                                        openFaqIndex === idx && styles.faqOpen
+                                                    )}
+                                                    aria-expanded={openFaqIndex === idx}
+                                                    onClick={() =>
+                                                        setOpenFaqIndex(
+                                                            openFaqIndex === idx ? null : idx
+                                                        )
+                                                    }
+                                                >
+                                                    <span className={styles.faqIndex}>
+                                                        {idx + 1}.
+                                                    </span>
+                                                    <span className={styles.faqText}>
+                                                        {item.question}
+                                                    </span>
+                                                    <i
+                                                        className="fa-solid fa-chevron-right"
+                                                        aria-hidden="true"
+                                                    />
+                                                </button>
+                                                {openFaqIndex === idx && (
+                                                    <div className={styles.faqAnswer}>
+                                                        {item.answer}
+                                                    </div>
                                                 )}
-                                                aria-expanded={openFaqIndex === idx}
-                                                onClick={() =>
-                                                    setOpenFaqIndex(
-                                                        openFaqIndex === idx ? null : idx
-                                                    )
-                                                }
-                                            >
-                                                <span className={styles.faqIndex}>{idx + 1}.</span>
-                                                <span className={styles.faqText}>{item.q}</span>
-                                                <i
-                                                    className="fa-solid fa-chevron-right"
-                                                    aria-hidden="true"
-                                                />
-                                            </button>
-                                            {openFaqIndex === idx && (
-                                                <div className={styles.faqAnswer}>{item.a}</div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
 

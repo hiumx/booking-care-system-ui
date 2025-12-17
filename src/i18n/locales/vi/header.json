@@ -18,7 +18,8 @@
             "healthNews": "Tin y tế"
         },
         "contact": "Liên hệ hợp tác",
-        "aboutUs": "Về chúng tôi"
+        "aboutUs": "Về chúng tôi",
+        "blog": "Bản tin sức khỏe"
     },
     "auth": {
         "login": "Đăng nhập",
