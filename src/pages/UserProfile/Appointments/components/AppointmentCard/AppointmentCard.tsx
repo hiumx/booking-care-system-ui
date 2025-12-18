@@ -12,8 +12,11 @@ import {
     getDisplayLabel,
     getRebookingUrl,
 } from '@/types/appointment.types';
-import { AppointmentType } from '@/enums/appointment.enums';
 import AppointmentActionButtons from '../AppointmentActionButtons/AppointmentActionButtons';
+import {
+    formatAppointmentDate,
+    getAppointmentTypeText,
+} from '../../utils/appointment-format.utils';
 
 interface AppointmentCardProps {
     appointment: AppointmentCardData;
@@ -33,23 +36,6 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     onReview,
 }) => {
     const { t, i18n } = useTranslation('userProfile');
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
-        return date.toLocaleDateString(locale, {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        });
-    };
-
-    const getAppointmentTypeText = (type: AppointmentType): string => {
-        if (type === AppointmentType.TELEHEALTH) {
-            return t('appointments.card.appointmentType.telehealth');
-        }
-        return t('appointments.card.appointmentType.inPerson');
-    };
 
     // Get display values using helper functions (priority: Doctor > Service > Hospital)
     const displayName = getDisplayName(appointment);
@@ -174,13 +160,13 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                 <li className="appointment-info">
                     <p>
                         <i className="isax isax-clock5"></i>
-                        {formatDate(appointment.appointmentDate)}
+                        {formatAppointmentDate(appointment.appointmentDate, i18n.language)}
                         {' | '}
                         {appointment.appointmentTime}
                     </p>
                     <ul className="d-flex apponitment-types">
                         <li>{displaySpecialty}</li>
-                        <li>{getAppointmentTypeText(appointment.appointmentType)}</li>
+                        <li>{getAppointmentTypeText(appointment.appointmentType, t)}</li>
                     </ul>
                 </li>
 

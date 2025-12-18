@@ -11,7 +11,7 @@ import { useAppSelector } from '@/store/hooks';
 import { PATHS } from '@/routes/paths';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
-import FullScreenSpinner from '@/components/FullScreenSpinner';
+import BookingLoadingState from './components/BookingLoadingState';
 import { loadAppointmentData, validateAppointmentParams } from '@/utils/appointment-utils';
 
 /**
@@ -77,25 +77,7 @@ const RescheduleAppointment: React.FC = () => {
     };
 
     if (isLoading) {
-        return (
-            <BookingLayout>
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-10 mx-auto">
-                            <div
-                                className="d-flex flex-column align-items-center justify-content-center"
-                                style={{ minHeight: '60vh' }}
-                            >
-                                <FullScreenSpinner
-                                    isVisible={true}
-                                    message={t('rescheduleAppointment.loading')}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </BookingLayout>
-        );
+        return <BookingLoadingState message={t('rescheduleAppointment.loading')} />;
     }
 
     return (

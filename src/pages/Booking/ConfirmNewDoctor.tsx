@@ -10,7 +10,7 @@ import { DoctorResponse } from '@/types/doctor.types';
 import { PATHS } from '@/routes/paths';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
-import FullScreenSpinner from '@/components/FullScreenSpinner';
+import BookingLoadingState from './components/BookingLoadingState';
 import { formatAppointmentTime } from '@/utils/appointment-utils';
 import client16 from '@/assets/img/clients/client-16.jpg';
 
@@ -174,25 +174,7 @@ const ConfirmNewDoctor: React.FC = () => {
     };
 
     if (isLoading) {
-        return (
-            <BookingLayout>
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-10 mx-auto">
-                            <div
-                                className="d-flex flex-column align-items-center justify-content-center"
-                                style={{ minHeight: '60vh' }}
-                            >
-                                <FullScreenSpinner
-                                    isVisible={true}
-                                    message={t('confirmNewDoctor.loading')}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </BookingLayout>
-        );
+        return <BookingLoadingState message={t('confirmNewDoctor.loading')} />;
     }
 
     return (

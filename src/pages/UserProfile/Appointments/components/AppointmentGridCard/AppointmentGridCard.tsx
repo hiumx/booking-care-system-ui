@@ -10,9 +10,13 @@ import {
     getDisplaySpecialty,
     getDisplayLabel,
 } from '@/types/appointment.types';
-import { AppointmentType } from '@/enums/appointment.enums';
 import AppointmentActionButtons from '../AppointmentActionButtons/AppointmentActionButtons';
 import doctorThumb01 from '@/assets/img/doctors/doctor-thumb-01.jpg';
+import {
+    formatAppointmentDate,
+    getAppointmentTypeText,
+    getAppointmentTypeIconColor,
+} from '../../utils/appointment-format.utils';
 
 interface AppointmentGridCardProps {
     appointment: AppointmentCardData;
@@ -31,35 +35,14 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
 }) => {
     const { t, i18n } = useTranslation('userProfile');
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
-        return date.toLocaleDateString(locale, {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        });
-    };
-
-    const getAppointmentTypeText = (type: AppointmentType): string => {
-        if (type === AppointmentType.TELEHEALTH) {
-            return t('appointments.card.appointmentType.telehealth');
-        }
-        return t('appointments.card.appointmentType.inPerson');
-    };
-
-    const getAppointmentTypeIconColor = (type: AppointmentType): string => {
-        if (type === AppointmentType.TELEHEALTH) {
-            return 'video-icon';
-        }
-        return 'hospital-icon';
-    };
-
     // Get display values using helper functions (priority: Doctor > Service > Hospital)
     const displayName = getDisplayName(appointment);
     const displayAvatar = getDisplayAvatar(appointment);
     const displaySpecialty = getDisplaySpecialty(appointment);
     const displayLabel = getDisplayLabel(appointment);
+
+    // Format date using shared utility
+    const formattedDate = formatAppointmentDate(appointment.appointmentDate, i18n.language);
 
     const renderActionButtons = () => {
         // Use AppointmentActionButtons component for waiting and upcoming status
@@ -142,7 +125,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
                                     className={getAppointmentTypeIconColor(
                                         appointment.appointmentType
                                     )}
-                                    title={getAppointmentTypeText(appointment.appointmentType)}
+                                    title={getAppointmentTypeText(appointment.appointmentType, t)}
                                 >
                                     <Link to="#">
                                         <i
@@ -157,8 +140,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
                     </li>
                     <li className="appointment-info">
                         <p>
-                            <i className="isax isax-calendar5"></i>{' '}
-                            {formatDate(appointment.appointmentDate)}
+                            <i className="isax isax-calendar5"></i> {formattedDate}
                         </p>
                         <p>
                             <i className="isax isax-clock5"></i> {appointment.appointmentTime}

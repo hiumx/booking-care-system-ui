@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import SpecialityCard from './components/SpecialityCard';
+import { LoadingState, ErrorState, SearchInput } from '@/components/PageStates';
 import styles from './SpecialtiesList.module.scss';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getSpecialtiesAsync } from '@/store/slices/specialtySlice';
@@ -67,44 +68,25 @@ const SpecialtiesList: React.FC = () => {
     // Loading state
     if (isLoading) {
         return (
-            <MainLayout>
-                <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
-                <div className={clsx('content', 'speciality-content')}>
-                    <div className={clsx('container')}>
-                        <div className={clsx('card')}>
-                            <div className={clsx('card-body', 'text-center')}>
-                                <div className="spinner-border">
-                                    <span className="visually-hidden">Loading...</span>
-                                </div>
-                                <output className="mt-3">{t('list.loading')}</output>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </MainLayout>
+            <LoadingState
+                message={t('list.loading')}
+                breadcrumbItems={breadcrumbData.items}
+                breadcrumbTitle={breadcrumbData.title}
+            />
         );
     }
 
     // Error state
     if (error) {
         return (
-            <MainLayout>
-                <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
-                <div className="content">
-                    <div className="container">
-                        <div className="text-center py-5">
-                            <h4 className="fw-semibold mb-2">{t('list.error.title')}</h4>
-                            <p className="text-muted mb-4">{t('list.error.message')}</p>
-                            <button
-                                className="btn btn-outline-primary px-4"
-                                onClick={() => dispatch(getSpecialtiesAsync())}
-                            >
-                                {t('list.error.retry')}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </MainLayout>
+            <ErrorState
+                title={t('list.error.title')}
+                message={t('list.error.message')}
+                actionText={t('list.error.retry')}
+                onAction={() => dispatch(getSpecialtiesAsync())}
+                breadcrumbItems={breadcrumbData.items}
+                breadcrumbTitle={breadcrumbData.title}
+            />
         );
     }
 
@@ -131,18 +113,11 @@ const SpecialtiesList: React.FC = () => {
                                     </span>{' '}
                                     {t('list.specialties')}
                                 </h5>
-                                <div className={clsx('input-block', 'dash-search-input')}>
-                                    <input
-                                        type="text"
-                                        className={clsx('form-control')}
-                                        placeholder={t('list.searchPlaceholder')}
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
-                                    />
-                                    <span className={clsx('search-icon')}>
-                                        <i className={clsx('isax', 'isax-search-normal')}></i>
-                                    </span>
-                                </div>
+                                <SearchInput
+                                    value={search}
+                                    onChange={setSearch}
+                                    placeholder={t('list.searchPlaceholder')}
+                                />
                             </div>
                         </div>
                     </div>

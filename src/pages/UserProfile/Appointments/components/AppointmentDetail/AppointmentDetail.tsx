@@ -15,6 +15,10 @@ import {
     getRebookingUrl,
 } from '@/types/appointment.types';
 import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
+import {
+    formatAppointmentDate,
+    getAppointmentTypeText,
+} from '../../utils/appointment-format.utils';
 
 const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     appointment,
@@ -23,23 +27,6 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     onReschedule,
 }) => {
     const { t, i18n } = useTranslation('userProfile');
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
-        return date.toLocaleDateString(locale, {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        });
-    };
-
-    const getAppointmentTypeText = (type: AppointmentType): string => {
-        if (type === AppointmentType.TELEHEALTH) {
-            return t('appointments.card.appointmentType.telehealth');
-        }
-        return t('appointments.card.appointmentType.inPerson');
-    };
 
     // Configuration cho từng trạng thái
     const getStatusConfig = (): StatusConfig => {
@@ -276,7 +263,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                             <ul className="d-flex apponitment-types">
                                 <li>
                                     {renderAppointmentTypeIcon()}
-                                    {getAppointmentTypeText(appointment.appointmentType)}
+                                    {getAppointmentTypeText(appointment.appointmentType, t)}
                                 </li>
                             </ul>
                         </div>
@@ -365,7 +352,8 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     <li>
                         <h6>{t('appointments.detailCard.dateTime')}</h6>
                         <span>
-                            {formatDate(appointment.appointmentDate)} {' | '}
+                            {formatAppointmentDate(appointment.appointmentDate, i18n.language)}{' '}
+                            {' | '}
                             {appointment.appointmentTime}
                         </span>
                     </li>

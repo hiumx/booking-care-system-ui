@@ -10,6 +10,7 @@ import PaymentService, { PaymentMethod } from '@/services/payment.service';
 import DiscountService from '@/services/discount.service';
 import { toast } from 'react-toastify';
 import { AppointmentType } from '@/enums/appointment.enums';
+import BenefitItem from '../../components/BenefitItem';
 
 // Helper function to parse AppointmentTimeId (format: AT_08_00_09_00 -> { startTime: "08:00", endTime: "09:00" })
 const parseAppointmentTimeId = (timeId: string) => {
@@ -744,30 +745,21 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
 
                                                 <div className="payment-option-content">
                                                     <div className="benefits-list">
-                                                        <div className="benefit-item">
-                                                            <i
-                                                                className="isax isax-tick-circle text-success me-2"
-                                                                aria-hidden="true"
-                                                            ></i>
-                                                            <span
-                                                                dangerouslySetInnerHTML={{
-                                                                    __html: t(
-                                                                        'paymentSection.bookingOptions.depositOption.benefit1'
-                                                                    ),
-                                                                }}
-                                                            />
-                                                        </div>
-                                                        <div className="benefit-item">
-                                                            <i
-                                                                className="isax isax-tick-circle text-success me-2"
-                                                                aria-hidden="true"
-                                                            ></i>
-                                                            <span>
-                                                                {t(
-                                                                    'paymentSection.bookingOptions.depositOption.benefit2'
-                                                                )}
-                                                            </span>
-                                                        </div>
+                                                        <BenefitItem
+                                                            icon="isax isax-tick-circle"
+                                                            iconColorClass="text-success"
+                                                            text={t(
+                                                                'paymentSection.bookingOptions.depositOption.benefit1'
+                                                            )}
+                                                            useHtml={true}
+                                                        />
+                                                        <BenefitItem
+                                                            icon="isax isax-tick-circle"
+                                                            iconColorClass="text-success"
+                                                            text={t(
+                                                                'paymentSection.bookingOptions.depositOption.benefit2'
+                                                            )}
+                                                        />
                                                     </div>
 
                                                     <div className="price-info mt-3">
@@ -834,39 +826,27 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
 
                                             <div className="payment-option-content">
                                                 <div className="benefits-list">
-                                                    <div className="benefit-item">
-                                                        <i
-                                                            className="isax isax-info-circle text-info me-2"
-                                                            aria-hidden="true"
-                                                        ></i>
-                                                        <span>
-                                                            {t(
-                                                                'paymentSection.bookingOptions.noPaymentOption.benefit1'
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                    <div className="benefit-item">
-                                                        <i
-                                                            className="isax isax-info-circle text-info me-2"
-                                                            aria-hidden="true"
-                                                        ></i>
-                                                        <span>
-                                                            {t(
-                                                                'paymentSection.bookingOptions.noPaymentOption.benefit2'
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                    <div className="benefit-item">
-                                                        <i
-                                                            className="isax isax-info-circle text-info me-2"
-                                                            aria-hidden="true"
-                                                        ></i>
-                                                        <span>
-                                                            {t(
-                                                                'paymentSection.bookingOptions.noPaymentOption.benefit3'
-                                                            )}
-                                                        </span>
-                                                    </div>
+                                                    <BenefitItem
+                                                        icon="isax isax-info-circle"
+                                                        iconColorClass="text-info"
+                                                        text={t(
+                                                            'paymentSection.bookingOptions.noPaymentOption.benefit1'
+                                                        )}
+                                                    />
+                                                    <BenefitItem
+                                                        icon="isax isax-info-circle"
+                                                        iconColorClass="text-info"
+                                                        text={t(
+                                                            'paymentSection.bookingOptions.noPaymentOption.benefit2'
+                                                        )}
+                                                    />
+                                                    <BenefitItem
+                                                        icon="isax isax-info-circle"
+                                                        iconColorClass="text-info"
+                                                        text={t(
+                                                            'paymentSection.bookingOptions.noPaymentOption.benefit3'
+                                                        )}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>

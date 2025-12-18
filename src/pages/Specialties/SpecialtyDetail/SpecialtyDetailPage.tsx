@@ -11,6 +11,7 @@ import { PATHS } from '@/routes/paths';
 import SpecialtySidebar from './components/SpecialtySidebar/SpecialtySidebar';
 import ModalArea from '@/components/ModalArea';
 import Pagination from '@/components/Pagination';
+import EmptyStateWithClearFilter from './components/EmptyStateWithClearFilter';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { getSpecialtiesAsync } from '@/store/slices/specialtySlice';
 import { DoctorService } from '@/services/doctor.service';
@@ -247,30 +248,21 @@ const SpecialtyDetailPage: React.FC = () => {
             return doctors.map(renderDoctorCard);
         }
 
+        const hasActiveFilters = !!(debouncedSearch || provinceId || districtId);
+        const handleClearFilters = () => {
+            handleClearArea();
+            setSearch('');
+        };
+
         return (
-            <div className={styles.emptyState}>
-                <div className={styles.emptyStateIcon}>
-                    <i className="fa-solid fa-user-doctor"></i>
-                </div>
-                <h4 className={styles.emptyStateTitle}>{t('detail.emptyDoctor.title')}</h4>
-                <p className={styles.emptyStateDescription}>{t('detail.emptyDoctor.message')}</p>
-                {(debouncedSearch || provinceId || districtId) && (
-                    <button
-                        className={clsx(
-                            'btn',
-                            'btn-outline-primary',
-                            'btn-sm',
-                            styles.clearFiltersButton
-                        )}
-                        onClick={() => {
-                            handleClearArea();
-                            setSearch('');
-                        }}
-                    >
-                        {t('detail.clearAllFilters')}
-                    </button>
-                )}
-            </div>
+            <EmptyStateWithClearFilter
+                icon="fa-solid fa-user-doctor"
+                title={t('detail.emptyDoctor.title')}
+                description={t('detail.emptyDoctor.message')}
+                showClearButton={hasActiveFilters}
+                clearButtonText={t('detail.clearAllFilters')}
+                onClear={handleClearFilters}
+            />
         );
     };
 
@@ -307,30 +299,21 @@ const SpecialtyDetailPage: React.FC = () => {
             );
         }
 
+        const hasActiveFilters = !!(debouncedSearch || provinceId || districtId);
+        const handleClearFilters = () => {
+            handleClearArea();
+            setSearch('');
+        };
+
         return (
-            <div className={styles.emptyState}>
-                <div className={styles.emptyStateIcon}>
-                    <i className="fa-solid fa-hospital"></i>
-                </div>
-                <h4 className={styles.emptyStateTitle}>{t('detail.emptyHospital.title')}</h4>
-                <p className={styles.emptyStateDescription}>{t('detail.emptyHospital.message')}</p>
-                {(debouncedSearch || provinceId || districtId) && (
-                    <button
-                        className={clsx(
-                            'btn',
-                            'btn-outline-primary',
-                            'btn-sm',
-                            styles.clearFiltersButton
-                        )}
-                        onClick={() => {
-                            handleClearArea();
-                            setSearch('');
-                        }}
-                    >
-                        {t('detail.clearAllFilters')}
-                    </button>
-                )}
-            </div>
+            <EmptyStateWithClearFilter
+                icon="fa-solid fa-hospital"
+                title={t('detail.emptyHospital.title')}
+                description={t('detail.emptyHospital.message')}
+                showClearButton={hasActiveFilters}
+                clearButtonText={t('detail.clearAllFilters')}
+                onClear={handleClearFilters}
+            />
         );
     };
 

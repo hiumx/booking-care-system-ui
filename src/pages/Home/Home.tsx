@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import AOS from 'aos';
-import { buildPath, PATHS, replacePathParams } from '@/routes/paths';
+import { PATHS } from '@/routes/paths';
 import MainLayout from '../../layouts/MainLayout';
 import Banner from './components/Banner';
 import HospitalCard from '@/components/HospitalCard';
 import SectionItem from './components/SectionItem';
 import SpecialtyCarouselItem from './components/SpecialtyCarouselItem';
-import DoctorCard from '@/components/DoctorCard';
 import ServiceSection from './components/ServicesSection/ServiceSection';
 import {
     CAROUSEL_SPECIALTIES_BREAKPOINTS,
@@ -36,6 +35,7 @@ import {
     DoctorsEmptyState,
     ServicesEmptyState,
 } from '@/components/LoadingEmptyState';
+import { createDoctorListItems } from '@/utils/doctor-list.utils';
 
 const Home: React.FC = () => {
     const { t } = useTranslation('home');
@@ -116,34 +116,8 @@ const Home: React.FC = () => {
         })
     );
 
-    const listDoctorItems: { id: string | number; node: React.ReactNode }[] = allDoctors.map(
-        (doctor) => ({
-            id: doctor.id,
-            node: (
-                <DoctorCard
-                    key={doctor.id}
-                    image={doctor.image}
-                    name={doctor.name}
-                    specialty={doctor.specialty}
-                    hospitalName={doctor.hospitalName}
-                    hospitalId={doctor.hospitalId}
-                    rating={doctor.rating}
-                    experience={doctor.experience}
-                    positionName={doctor.positionName}
-                    serviceTypeName={doctor.serviceTypeName}
-                    amount={doctor.amount}
-                    profileLink={replacePathParams(
-                        buildPath(PATHS.DOCTOR.ROOT, PATHS.DOCTOR.PROFILE),
-                        {
-                            id: doctor.id,
-                        }
-                    )}
-                    bookingLink={replacePathParams(PATHS.BOOKING.ROOT, { doctorId: doctor.id })}
-                    specialtiesLink={doctor.specialtiesLink}
-                />
-            ),
-        })
-    );
+    // Use shared utility to create doctor list items
+    const listDoctorItems = createDoctorListItems(allDoctors);
 
     return (
         <div>
