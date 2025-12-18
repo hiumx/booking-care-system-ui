@@ -10,6 +10,7 @@ const icons = [chooseImg1, chooseImg2, chooseImg3, chooseImg4];
 const WhyChooseSection: React.FC = () => {
     const { t } = useTranslation('about');
     const items = t('whyChoose.items', { returnObjects: true }) as Array<{
+        id: string;
         title: string;
         description: string;
     }>;
@@ -26,7 +27,7 @@ const WhyChooseSection: React.FC = () => {
                 </div>
                 <div className="row">
                     {items.map((item, index) => (
-                        <div key={index} className="col-lg-3 col-md-6 d-flex">
+                        <div key={item.id} className="col-lg-3 col-md-6 d-flex">
                             <div className="card why-choose-card w-100">
                                 <div className="card-body">
                                     <div className="why-choose-icon">

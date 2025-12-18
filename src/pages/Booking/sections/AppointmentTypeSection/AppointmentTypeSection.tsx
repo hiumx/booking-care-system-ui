@@ -1235,7 +1235,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                             {t(
                                                                 'appointmentTypeSection.filters.clearFilters'
                                                             )}
-                                                        </button>
+                                                        </button>{' '}
                                                         .
                                                     </div>
                                                 )}

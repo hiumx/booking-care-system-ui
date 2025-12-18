@@ -22,18 +22,22 @@
         "title": "Why Choose Us",
         "items": [
             {
+                "id": "quality-doctors",
                 "title": "Quality Doctor Team",
                 "description": "Our platform partners with experienced doctors dedicated to providing the best quality medical care for you."
             },
             {
+                "id": "24-7-service",
                 "title": "24/7 Service",
                 "description": "Access, find doctors and book appointments anytime, anywhere — including nights, weekends and holidays."
             },
             {
+                "id": "quality-testing",
                 "title": "Quality Lab Services",
                 "description": "Linked with certified laboratories; fast, accurate results support effective diagnosis."
             },
             {
+                "id": "free-consultation",
                 "title": "Free Initial Consultation",
                 "description": "Start your healthcare journey easily with a free first consultation."
             }

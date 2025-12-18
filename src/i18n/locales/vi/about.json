@@ -22,18 +22,22 @@
         "title": "Vì sao chọn chúng tôi",
         "items": [
             {
+                "id": "quality-doctors",
                 "title": "Đội ngũ bác sĩ chất lượng",
                 "description": "Nền tảng hợp tác với các bác sĩ giàu kinh nghiệm, tận tâm mang đến chất lượng khám chữa bệnh tốt nhất cho bạn."
             },
             {
+                "id": "24-7-service",
                 "title": "Phục vụ 24/7",
                 "description": "Truy cập, tìm bác sĩ và đặt lịch mọi lúc mọi nơi — kể cả ban đêm, cuối tuần và ngày lễ."
             },
             {
+                "id": "quality-testing",
                 "title": "Dịch vụ xét nghiệm chất lượng",
                 "description": "Liên kết phòng xét nghiệm đạt chuẩn; kết quả nhanh, chính xác hỗ trợ chẩn đoán hiệu quả."
             },
             {
+                "id": "free-consultation",
                 "title": "Tư vấn ban đầu miễn phí",
                 "description": "Bắt đầu hành trình chăm sóc sức khỏe dễ dàng với buổi tư vấn đầu tiên miễn phí."
             }
