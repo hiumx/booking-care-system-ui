@@ -1,10 +1,11 @@
 {
     "app": {
-        "name": "BookingCare",
+        "name": "MedCure",
         "description": "Online medical appointment booking platform"
     },
     "actions": {
         "save": "Save",
+        "add": "Add new",
         "cancel": "Cancel",
         "delete": "Delete",
         "edit": "Edit",
@@ -137,5 +138,23 @@
         "lastWeek": "Last Week",
         "thisMonth": "This Month",
         "lastMonth": "Last Month"
+    },
+    "aiAssistant": {
+        "label": "AI Assistant"
+    },
+    "units": {
+        "yearsOld": "years old",
+        "years": "years",
+        "months": "months",
+        "days": "days"
+    },
+    "fileInput": {
+        "dragDropOrSelect": "Drag and drop files here or",
+        "selectFile": "select files",
+        "supportedFormats": "Supported: Images, PDF, DOC, DOCX (Max {{maxSize}}MB)",
+        "filesSelected": "{{count}} file(s) selected",
+        "fileSizeExceeded": "File \"{{fileName}}\" exceeds maximum size of {{maxSize}}MB",
+        "selectFileAriaLabel": "Select files to upload",
+        "removeFile": "Remove file"
     }
 }

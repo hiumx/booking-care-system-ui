@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Calendar from '@/components/Calendar';
 import Modal from '@/components/Modal';
 import ModalArea from '@/components/ModalArea';
@@ -47,10 +48,11 @@ const SearchInput: React.FC<SearchInputProps> = ({
     onAreaFilter,
     rescheduleHospitalId,
     rescheduleSpecialtyId,
-    searchPlaceholder = 'Nhập tên bác sĩ',
+    searchPlaceholder,
     hideSpecialty = false,
     hideDate = false,
 }) => {
+    const { t } = useTranslation('home');
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -124,7 +126,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         setDoctorName(searchFromUrl || '');
         setTimeout(() => {
             const contentEditableDiv = document.querySelector(
-                `[contenteditable="true"][data-placeholder="${placeholder || 'Nhập tên bác sĩ'}"]`
+                `[contenteditable="true"][data-placeholder="${placeholder || t('searchInput.doctorPlaceholder')}"]`
             ) as HTMLElement;
             if (contentEditableDiv) {
                 contentEditableDiv.textContent = searchFromUrl || '';
@@ -190,7 +192,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
             const specialtyIdFromUrl = searchParams.get('specialtyId');
             const hospitalIdFromUrl = searchParams.get('hospitalId');
 
-            syncDoctorNameFromUrl(searchFromUrl, 'Nhập tên bác sĩ');
+            syncDoctorNameFromUrl(searchFromUrl, t('searchInput.doctorPlaceholder'));
             syncDateFromUrl(dateFromUrl);
             syncAreaFromUrl(
                 provinceIdFromUrl,
@@ -611,7 +613,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                     )}
                                     contentEditable
                                     suppressContentEditableWarning={true}
-                                    data-placeholder={searchPlaceholder}
+                                    data-placeholder={
+                                        searchPlaceholder || t('searchInput.doctorPlaceholder')
+                                    }
                                     onInput={(e) => {
                                         const text = e.currentTarget.textContent || '';
                                         setDoctorName(text);
@@ -635,9 +639,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                         styles.formControlCustom,
                                         styles.multiLineInput
                                     )}
-                                    data-placeholder="Chọn bệnh viện"
+                                    data-placeholder={t('searchInput.hospitalPlaceholder')}
                                     onClick={handleClinicClick}
-                                    aria-label="Chọn bệnh viện"
+                                    aria-label={t('searchInput.hospitalPlaceholder')}
                                     style={{ minHeight: '50px', textAlign: 'left' }}
                                 >
                                     {selectedClinics.length > 0
@@ -670,9 +674,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                             styles.formControlCustom,
                                             styles.multiLineInput
                                         )}
-                                        data-placeholder="Chọn chuyên khoa"
+                                        data-placeholder={t('searchInput.specialtyPlaceholder')}
                                         onClick={handleSpecialtyClick}
-                                        aria-label="Chọn chuyên khoa"
+                                        aria-label={t('searchInput.specialtyPlaceholder')}
                                         style={{ minHeight: '50px', textAlign: 'left' }}
                                     >
                                         {selectedSpecialties.length > 0
@@ -704,9 +708,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                         styles.formControlCustom,
                                         styles.multiLineInput
                                     )}
-                                    data-placeholder="Chọn địa điểm"
+                                    data-placeholder={t('searchInput.locationPlaceholder')}
                                     onClick={handleAreaClick}
-                                    aria-label="Chọn địa điểm"
+                                    aria-label={t('searchInput.locationPlaceholder')}
                                     style={{ minHeight: '50px', textAlign: 'left' }}
                                 >
                                     {selectedArea ? (
@@ -763,7 +767,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
                                 )}
                                 type="submit"
                             >
-                                <i className="isax isax-search-normal-15 me-2"></i>Tìm kiếm
+                                <i className="isax isax-search-normal-15 me-2"></i>
+                                {t('searchInput.searchButton')}
                             </button>
                         </div>
                     </div>
@@ -774,7 +779,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     onClose={handleSpecialtyModalClose}
                     onApply={handleSpecialtyApply}
                     items={specialtyItems}
-                    title="Tìm theo chuyên khoa"
+                    title={t('searchInput.specialtyModalTitle')}
                     itemType="specialty"
                     initialSelectedItems={selectedSpecialties}
                 />
@@ -783,7 +788,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     onClose={handleClinicModalClose}
                     onApply={handleClinicApply}
                     items={hospitalItems}
-                    title="Tìm theo Bệnh viện"
+                    title={t('searchInput.hospitalModalTitle')}
                     itemType="hospital"
                     initialSelectedItems={selectedClinics}
                 />

@@ -28,6 +28,7 @@ import DoctorList from '@/pages/Doctor/DoctorList';
 import ContactUs from '@/pages/ContactUs';
 import LegalNotice from '@/pages/LegalNotice/LegalNotice';
 import PrivacyPolicy from '@/pages/PrivacyPolicy/PrivacyPolicy';
+import TermsOfService from '@/pages/TermsOfService/TermsOfService';
 import RefundPolicy from '@/pages/RefundPolicy/RefundPolicy';
 import Booking from '@/pages/Booking/Booking';
 import BookingConfirmation from '@/pages/BookingConfirmation';
@@ -95,6 +96,10 @@ const routes: RouteObject[] = [
     {
         path: PATHS.PRIVACY_POLICY,
         element: <PrivacyPolicy />,
+    },
+    {
+        path: PATHS.TERMS_OF_SERVICE,
+        element: <TermsOfService />,
     },
     {
         path: PATHS.REFUND_POLICY,

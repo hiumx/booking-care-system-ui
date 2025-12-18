@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import BookingLayout from '@/layouts/BookingLayout';
 import DateTimeSection from './sections/DateTimeSection';
 import StepWizard from '@/components/StepWizard';
@@ -10,7 +11,7 @@ import { useAppSelector } from '@/store/hooks';
 import { PATHS } from '@/routes/paths';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
-import FullScreenSpinner from '@/components/FullScreenSpinner';
+import BookingLoadingState from './components/BookingLoadingState';
 import { loadAppointmentData, validateAppointmentParams } from '@/utils/appointment-utils';
 
 /**
@@ -18,6 +19,7 @@ import { loadAppointmentData, validateAppointmentParams } from '@/utils/appointm
  * Patient reschedules with same doctor, selecting new date/time
  */
 const RescheduleAppointment: React.FC = () => {
+    const { t } = useTranslation('booking');
     const [appointmentData, setAppointmentData] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -42,12 +44,12 @@ const RescheduleAppointment: React.FC = () => {
 
     const handleReschedule = async () => {
         if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0) {
-            toast.error('Vui lòng chọn ngày và giờ khám mới');
+            toast.error(t('rescheduleAppointment.toast.selectDateTime'));
             return;
         }
 
         if (!appointmentId || !rescheduleToken) {
-            toast.error('Thông tin không hợp lệ');
+            toast.error(t('rescheduleAppointment.toast.invalidInfo'));
             return;
         }
 
@@ -63,37 +65,19 @@ const RescheduleAppointment: React.FC = () => {
             });
 
             if (response.success) {
-                toast.success('Đổi lịch hẹn thành công!');
+                toast.success(t('rescheduleAppointment.toast.success'));
                 navigate(PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', appointmentId));
             } else {
-                throw new Error(response.message || 'Không thể đổi lịch hẹn');
+                throw new Error(response.message || t('rescheduleAppointment.toast.error'));
             }
         } catch (error: any) {
             console.error('Error rescheduling:', error);
-            toast.error(error.message || 'Không thể đổi lịch hẹn');
+            toast.error(error.message || t('rescheduleAppointment.toast.error'));
         }
     };
 
     if (isLoading) {
-        return (
-            <BookingLayout>
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-10 mx-auto">
-                            <div
-                                className="d-flex flex-column align-items-center justify-content-center"
-                                style={{ minHeight: '60vh' }}
-                            >
-                                <FullScreenSpinner
-                                    isVisible={true}
-                                    message="Đang tải thông tin lịch hẹn..."
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </BookingLayout>
-        );
+        return <BookingLoadingState message={t('rescheduleAppointment.loading')} />;
     }
 
     return (

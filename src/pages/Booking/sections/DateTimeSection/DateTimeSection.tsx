@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Calendar from '@/components/Calendar';
 import SlotCategory from './components/SlotCategory';
 import CountdownTimer from '@/components/CountdownTimer';
@@ -47,7 +48,8 @@ const restoreSlotHelper = (
     selectedSlot: any,
     setSlotChecked: (indices: number[]) => void,
     dispatch: any,
-    toggleSlotSelection: any
+    toggleSlotSelection: any,
+    t: (key: string) => string
 ) => {
     const allSlots = effectiveScheduleCategories.flatMap((category) => category.timeSlots);
     const slotIndex = allSlots.findIndex(
@@ -65,7 +67,7 @@ const restoreSlotHelper = (
             })
         );
         setSlotChecked([]);
-        toast.warning('Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.');
+        toast.warning(t('dateTimeSection.toast.holdExpired'));
         return;
     }
 
@@ -180,6 +182,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     isRescheduleMode = false,
     hidePrev = false,
 }) => {
+    const { t, i18n } = useTranslation('booking');
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
@@ -388,7 +391,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                 );
             }
 
-            toast.warning('Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.');
+            toast.warning(t('dateTimeSection.toast.holdExpired'));
         },
     });
 
@@ -425,7 +428,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                 );
             }
 
-            toast.warning('Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.');
+            toast.warning(t('dateTimeSection.toast.holdExpired'));
         },
     });
 
@@ -616,9 +619,13 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     // Handle slot click - single slot selection only (patient can book only 1 slot per booking)
     const handleClickSlot = useCallback(
         async (slotIndex: number) => {
+            console.log('[handleClickSlot] Called with slotIndex:', slotIndex);
+            console.log('[handleClickSlot] isHoldingSlot:', isHoldingSlot);
+            console.log('[handleClickSlot] slotChecked:', slotChecked);
+
             // Prevent clicking if already holding a slot
             if (isHoldingSlot) {
-                toast.info('Đang xử lý giữ chỗ...');
+                toast.info(t('dateTimeSection.toast.holdProcessing'));
                 return;
             }
 
@@ -644,7 +651,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             const hasValidBookingTarget = getValidBookingTarget();
 
             if (!selectedSlotData || !hasValidBookingTarget || !selectedDate) {
-                toast.error('Không thể chọn khung giờ này');
+                toast.error(t('dateTimeSection.toast.cannotSelectSlot'));
                 return;
             }
 
@@ -668,7 +675,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
 
             // Check authentication before holding slot
             if (!authState.isAuthenticated) {
-                toast.warn('Vui lòng đăng nhập để đặt lịch');
+                toast.warn(t('dateTimeSection.toast.loginRequired'));
                 navigate(PATHS.LOGIN);
                 return;
             }
@@ -701,7 +708,7 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                 // Doctor or service booking
                 const holdTargetId = effectiveDoctorId || effectiveServiceId;
                 if (!holdTargetId) {
-                    toast.error('Không thể giữ chỗ - thiếu thông tin bác sĩ hoặc dịch vụ');
+                    toast.error(t('dateTimeSection.toast.holdFailed'));
                     return;
                 }
                 const holdTargetType = effectiveDoctorId
@@ -715,8 +722,18 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                 );
             }
 
+            console.log('[handleClickSlot] Hold result:', result);
+
             // Only update UI state if hold was successful
             if (result) {
+                console.log(
+                    '[handleClickSlot] Hold successful, updating UI with slotIndex:',
+                    slotIndex
+                );
+
+                // Mark that user is interacting - prevents sync useEffect from overriding
+                isUserInteractingRef.current = true;
+
                 setSlotChecked([slotIndex]); // Replace with new slot (only 1 allowed)
 
                 // Update Redux state
@@ -726,8 +743,10 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                     isAvailable: true,
                     isBlocked: false,
                 };
+                console.log('[handleClickSlot] Dispatching toggleSlotSelection:', slotPayload);
                 dispatch(toggleSlotSelection(slotPayload));
             } else if (selectedDate) {
+                console.log('[handleClickSlot] Hold failed, refreshing slots');
                 // Hold failed (slot already held by another user)
                 // Refresh available slots to update UI
                 refreshAvailableSlots(selectedDate);
@@ -794,7 +813,8 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             selectedSlot,
             setSlotChecked,
             dispatch,
-            toggleSlotSelection
+            toggleSlotSelection,
+            t
         );
     };
 
@@ -832,7 +852,8 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
             selectedSlot,
             setSlotChecked,
             dispatch,
-            toggleSlotSelection
+            toggleSlotSelection,
+            t
         );
     };
 
@@ -976,7 +997,17 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
     ]);
 
     // Sync local slotChecked state with Redux selectedSlots for UI highlighting
+    // This is only needed for restoring state when navigating back
+    // handleClickSlot manages slotChecked directly during user interaction
+    const isUserInteractingRef = useRef(false);
+
     useEffect(() => {
+        // Skip sync if user just interacted (handleClickSlot already updated slotChecked)
+        if (isUserInteractingRef.current) {
+            isUserInteractingRef.current = false;
+            return;
+        }
+
         if (selectedSlots.length > 0 && effectiveScheduleCategories.length > 0) {
             const allSlots = effectiveScheduleCategories.flatMap((category) => category.timeSlots);
 
@@ -990,11 +1021,14 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                 )
                 .filter((index) => index !== -1);
 
-            setSlotChecked(checkedIndices);
-        } else {
+            // Only sync if indices are different (avoid unnecessary re-renders)
+            if (JSON.stringify(checkedIndices) !== JSON.stringify(slotChecked)) {
+                setSlotChecked(checkedIndices);
+            }
+        } else if (slotChecked.length > 0) {
             setSlotChecked([]);
         }
-    }, [selectedSlots, effectiveScheduleCategories]);
+    }, [selectedSlots, effectiveScheduleCategories, slotChecked]);
 
     // Note: We DON'T release held slots on unmount anymore
     // This allows users to navigate back and forth between steps
@@ -1045,7 +1079,11 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
         <BookingSectionWrapper
             doctor={bookingInfo}
             appointment={mockAppointmentInfo}
-            nextStepTitle={isRescheduleMode ? 'Xác nhận đổi lịch' : 'Thêm thông tin cơ bản'}
+            nextStepTitle={
+                isRescheduleMode
+                    ? t('dateTimeSection.nextStepTitle.reschedule')
+                    : t('dateTimeSection.nextStepTitle.default')
+            }
             nextStep={nextStep}
             prevStep={prevStep}
             showPrev={!hidePrev}
@@ -1066,8 +1104,10 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                 {selectedDate && (
                                     <div className="mt-2 text-center">
                                         <small className="text-muted">
-                                            Ngày đã chọn:{' '}
-                                            {new Date(selectedDate).toLocaleDateString('vi-VN')}
+                                            {t('dateTimeSection.selectedDate')}{' '}
+                                            {new Date(selectedDate).toLocaleDateString(
+                                                i18n.language === 'vi' ? 'vi-VN' : 'en-US'
+                                            )}
                                         </small>
                                         {isHeld && remainingSeconds > 0 && (
                                             <div className="mt-2">
@@ -1094,9 +1134,13 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                             )}
                                         >
                                             <div className="spinner-border">
-                                                <span className="visually-hidden">Đang tải...</span>
+                                                <span className="visually-hidden">
+                                                    {t('dateTimeSection.loading')}
+                                                </span>
                                             </div>
-                                            <p className="mt-2 text-muted">Đang tải lịch khám...</p>
+                                            <p className="mt-2 text-muted">
+                                                {t('dateTimeSection.loadingSchedule')}
+                                            </p>
                                         </div>
                                     )}
 
@@ -1119,10 +1163,10 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                             >
                                                 <i className="fas fa-calendar-times fs-1 text-muted mb-3"></i>
                                                 <p className="text-muted">
-                                                    Không có lịch khám cho ngày đã chọn
+                                                    {t('dateTimeSection.noSlotsForDate')}
                                                 </p>
                                                 <small className="text-muted">
-                                                    Vui lòng chọn ngày khác
+                                                    {t('dateTimeSection.selectAnotherDate')}
                                                 </small>
                                             </div>
                                         )}
@@ -1190,7 +1234,9 @@ const DateTimeSection: React.FC<DateTimeSectionProps> = ({
                                     {!selectedDate && (
                                         <div className="text-center py-4">
                                             <i className="fas fa-calendar-alt fs-1 text-muted mb-3"></i>
-                                            <p className="text-muted">Vui lòng chọn ngày khám</p>
+                                            <p className="text-muted">
+                                                {t('dateTimeSection.selectDate')}
+                                            </p>
                                         </div>
                                     )}
                                 </div>

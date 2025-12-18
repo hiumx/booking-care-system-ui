@@ -7,25 +7,25 @@
     "sections": {
         "companyInfo": {
             "title": "1. Thông tin Doanh nghiệp",
-            "description": "BookingCare là nền tảng đặt lịch khám bệnh trực tuyến, được vận hành bởi công ty BookingCare Technology JSC.",
+            "description": "MedCure là nền tảng đặt lịch khám bệnh trực tuyến, được vận hành bởi công ty MedCure Technology JSC.",
             "items": {
                 "companyName": "Tên công ty",
-                "companyNameValue": "BookingCare Technology Joint Stock Company",
+                "companyNameValue": "MedCure Technology Joint Stock Company",
                 "address": "Địa chỉ",
                 "addressValue": "Đà Nẵng, Việt Nam",
                 "email": "Email",
-                "emailValue": "support@bookingcare.vn",
+                "emailValue": "medcure.contact@gmail.com",
                 "hotline": "Hotline",
-                "hotlineValue": "+84 236 3 822 888"
+                "hotlineValue": "+84 763583081"
             }
         },
         "purpose": {
             "title": "2. Mục đích và Phạm vi hoạt động",
-            "description": "BookingCare cung cấp dịch vụ kết nối giữa bệnh nhân và các cơ sở y tế (bệnh viện, phòng khám, bác sĩ) để đặt lịch khám bệnh trực tuyến. Chúng tôi không trực tiếp cung cấp dịch vụ y tế mà chỉ đóng vai trò là nền tảng trung gian kết nối."
+            "description": "MedCure cung cấp dịch vụ kết nối giữa bệnh nhân và các cơ sở y tế (bệnh viện, phòng khám, bác sĩ) để đặt lịch khám bệnh trực tuyến. Chúng tôi không trực tiếp cung cấp dịch vụ y tế mà chỉ đóng vai trò là nền tảng trung gian kết nối."
         },
         "userResponsibilities": {
             "title": "3. Trách nhiệm của Người dùng",
-            "description": "Khi sử dụng dịch vụ của BookingCare, người dùng cam kết:",
+            "description": "Khi sử dụng dịch vụ của MedCure, người dùng cam kết:",
             "items": [
                 "Cung cấp thông tin chính xác, đầy đủ và cập nhật",
                 "Tuân thủ các quy định về đặt lịch và hủy lịch hẹn",
@@ -35,8 +35,8 @@
             ]
         },
         "bookingcareResponsibilities": {
-            "title": "4. Trách nhiệm của BookingCare",
-            "description": "BookingCare cam kết:",
+            "title": "4. Trách nhiệm của MedCure",
+            "description": "MedCure cam kết:",
             "items": [
                 "Bảo mật thông tin cá nhân của người dùng theo quy định pháp luật",
                 "Cung cấp dịch vụ ổn định, an toàn và tiện lợi",
@@ -46,16 +46,16 @@
         },
         "liabilityLimitation": {
             "title": "5. Giới hạn Trách nhiệm",
-            "description1": "BookingCare không chịu trách nhiệm về chất lượng dịch vụ y tế được cung cấp bởi các bác sĩ hoặc cơ sở y tế. Trách nhiệm về chẩn đoán, điều trị và chăm sóc sức khỏe thuộc về các bác sĩ và cơ sở y tế đã cung cấp dịch vụ.",
-            "description2": "BookingCare không chịu trách nhiệm về các thiệt hại gián tiếp, ngẫu nhiên hoặc hậu quả phát sinh từ việc sử dụng hoặc không thể sử dụng dịch vụ."
+            "description1": "MedCure không chịu trách nhiệm về chất lượng dịch vụ y tế được cung cấp bởi các bác sĩ hoặc cơ sở y tế. Trách nhiệm về chẩn đoán, điều trị và chăm sóc sức khỏe thuộc về các bác sĩ và cơ sở y tế đã cung cấp dịch vụ.",
+            "description2": "MedCure không chịu trách nhiệm về các thiệt hại gián tiếp, ngẫu nhiên hoặc hậu quả phát sinh từ việc sử dụng hoặc không thể sử dụng dịch vụ."
         },
         "intellectualProperty": {
             "title": "6. Quyền Sở hữu Trí tuệ",
-            "description": "Tất cả nội dung trên website BookingCare, bao gồm logo, hình ảnh, văn bản, phần mềm và các tài sản khác, đều thuộc quyền sở hữu của BookingCare hoặc được cấp phép sử dụng. Người dùng không được phép sao chép, sử dụng hoặc phân phối bất kỳ nội dung nào mà không có sự cho phép bằng văn bản từ BookingCare."
+            "description": "Tất cả nội dung trên website MedCure, bao gồm logo, hình ảnh, văn bản, phần mềm và các tài sản khác, đều thuộc quyền sở hữu của MedCure hoặc được cấp phép sử dụng. Người dùng không được phép sao chép, sử dụng hoặc phân phối bất kỳ nội dung nào mà không có sự cho phép bằng văn bản từ MedCure."
         },
         "changes": {
             "title": "7. Thay đổi và Cập nhật",
-            "description": "BookingCare có quyền thay đổi, cập nhật hoặc bổ sung các điều khoản trong thông báo pháp lý này mà không cần thông báo trước. Người dùng nên thường xuyên kiểm tra để cập nhật các thay đổi mới nhất."
+            "description": "MedCure có quyền thay đổi, cập nhật hoặc bổ sung các điều khoản trong thông báo pháp lý này mà không cần thông báo trước. Người dùng nên thường xuyên kiểm tra để cập nhật các thay đổi mới nhất."
         },
         "lawAndDisputes": {
             "title": "8. Luật Áp dụng và Giải quyết Tranh chấp",
@@ -65,9 +65,9 @@
             "title": "9. Liên hệ",
             "description": "Nếu bạn có bất kỳ câu hỏi nào về thông báo pháp lý này, vui lòng liên hệ với chúng tôi:",
             "email": "Email",
-            "emailValue": "legal@bookingcare.vn",
+            "emailValue": "medcure.contact@gmail.com",
             "hotline": "Hotline",
-            "hotlineValue": "+84 236 3 822 888",
+            "hotlineValue": "+84 763583081",
             "address": "Địa chỉ",
             "addressValue": "Đà Nẵng, Việt Nam"
         }

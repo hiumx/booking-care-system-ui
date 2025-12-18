@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import SectionHeader from 'src/pages/Home/components/ServicesSection/components/SectionHeader';
 import ServiceColumn from 'src/pages/Home/components/ServicesSection/components/ServiceColumn';
 import ServiceImageCenter from 'src/pages/Home/components/ServicesSection/components/ServiceImageCenter';
@@ -19,6 +20,8 @@ interface ServiceSectionProps {
 }
 
 const ServiceSection: React.FC<ServiceSectionProps> = ({ leftServices, rightServices }) => {
+    const { t } = useTranslation('home');
+
     return (
         <section className="service-sec-fourteen">
             <div className="section-bg">
@@ -26,8 +29,9 @@ const ServiceSection: React.FC<ServiceSectionProps> = ({ leftServices, rightServ
             </div>
             <div className="container">
                 <SectionHeader
-                    title="Dịch Vụ"
-                    subtitle="Ưu đãi đặc biệt khi đặt nhiều dịch vụ. Đặt ngay hôm nay!"
+                    title={t('sections.services.title')}
+                    titleSuffix={t('sections.services.titleSuffix')}
+                    subtitle={t('sections.services.subtitle')}
                     data-aos="fade-up"
                 />
                 <div className="row justify-content-center">

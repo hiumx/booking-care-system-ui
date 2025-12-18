@@ -8,6 +8,7 @@ import HospitalCard, { HospitalCardSkeleton } from '@/components/HospitalCard';
 import ModalArea from '@/components/ModalArea';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
+import { SearchInput } from '@/components/PageStates';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getSpecialtiesAsync } from '@/store/slices/specialtySlice';
 import { getOptimizedHospitalListAsync } from '@/store/slices/hospitalSlice';
@@ -376,18 +377,11 @@ const HospitalList: React.FC = () => {
                                             </button>
                                         </div>
                                     </div>
-                                    <div className={clsx('input-block', 'dash-search-input')}>
-                                        <input
-                                            type="text"
-                                            className={clsx('form-control')}
-                                            placeholder={t('list.filters.searchPlaceholder')}
-                                            value={search}
-                                            onChange={(e) => setSearch(e.target.value)}
-                                        />
-                                        <span className={clsx('search-icon')}>
-                                            <i className={clsx('isax', 'isax-search-normal')}></i>
-                                        </span>
-                                    </div>
+                                    <SearchInput
+                                        value={search}
+                                        onChange={setSearch}
+                                        placeholder={t('list.filters.searchPlaceholder')}
+                                    />
                                 </div>
                             </div>
                         </div>

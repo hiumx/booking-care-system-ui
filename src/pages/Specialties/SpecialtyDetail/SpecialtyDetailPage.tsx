@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import styles from './SpecialtyDetailPage.module.scss';
 import MainLayout from '@/layouts/MainLayout';
@@ -10,6 +11,7 @@ import { PATHS } from '@/routes/paths';
 import SpecialtySidebar from './components/SpecialtySidebar/SpecialtySidebar';
 import ModalArea from '@/components/ModalArea';
 import Pagination from '@/components/Pagination';
+import EmptyStateWithClearFilter from './components/EmptyStateWithClearFilter';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { getSpecialtiesAsync } from '@/store/slices/specialtySlice';
 import { DoctorService } from '@/services/doctor.service';
@@ -21,6 +23,7 @@ import { toast } from 'react-toastify';
 type TabType = 'doctor' | 'hospital';
 
 const SpecialtyDetailPage: React.FC = () => {
+    const { t } = useTranslation('specialty');
     const dispatch = useAppDispatch();
     const { id: specialtyId } = useParams<{ id: string }>();
 
@@ -54,7 +57,7 @@ const SpecialtyDetailPage: React.FC = () => {
 
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 10; // Items per page
+    const pageSize = 10;
 
     // Get specialties for modal and selected specialty
     const specialties = useAppSelector((state) => state.specialty.specialties);
@@ -113,7 +116,7 @@ const SpecialtyDetailPage: React.FC = () => {
                 }
             } catch (error: any) {
                 console.error('Error fetching doctors:', error);
-                toast.error('Không thể tải danh sách bác sĩ. Vui lòng thử lại.');
+                toast.error(t('toast.loadDoctorError'));
                 setDoctors([]);
             } finally {
                 setDoctorsLoading(false);
@@ -121,7 +124,7 @@ const SpecialtyDetailPage: React.FC = () => {
         };
 
         fetchDoctors();
-    }, [specialtyId, debouncedSearch, provinceId, districtId, currentPage, pageSize, activeTab]);
+    }, [specialtyId, debouncedSearch, provinceId, districtId, currentPage, pageSize, activeTab, t]);
 
     // Fetch hospitals when filters change (only when hospital tab is active)
     useEffect(() => {
@@ -150,7 +153,7 @@ const SpecialtyDetailPage: React.FC = () => {
                 }
             } catch (error: any) {
                 console.error('Error fetching hospitals:', error);
-                toast.error('Không thể tải danh sách bệnh viện. Vui lòng thử lại.');
+                toast.error(t('toast.loadHospitalError'));
                 setHospitals([]);
             } finally {
                 setHospitalsLoading(false);
@@ -158,19 +161,17 @@ const SpecialtyDetailPage: React.FC = () => {
         };
 
         fetchHospitals();
-    }, [specialtyId, debouncedSearch, provinceId, districtId, currentPage, pageSize, activeTab]);
+    }, [specialtyId, debouncedSearch, provinceId, districtId, currentPage, pageSize, activeTab, t]);
 
     // Area modal handlers
-    const handleAreaSelect = (areaDisplay: string, locationId: string, provinceId?: string) => {
+    const handleAreaSelect = (areaDisplay: string, locationId: string, areaProvinceId?: string) => {
         let newProvinceId: string;
         let newDistrictId: string;
 
         if (areaDisplay.includes(' - ')) {
-            // District selected
             newDistrictId = locationId;
-            newProvinceId = provinceId || '';
+            newProvinceId = areaProvinceId || '';
         } else {
-            // Province selected
             newProvinceId = locationId;
             newDistrictId = '';
         }
@@ -219,11 +220,11 @@ const SpecialtyDetailPage: React.FC = () => {
             doctorId={doctor.id}
             patientId={patientId}
             name={`${doctor.lastName} ${doctor.firstName}`}
-            specialty={doctor.specialty?.name || 'Chưa cập nhật'}
-            position={doctor.position?.name || 'Chưa cập nhật'}
+            specialty={doctor.specialty?.name || t('detail.notUpdated')}
+            position={doctor.position?.name || t('detail.notUpdated')}
             prices={formatDoctorPrices(doctor.prices)}
             rating={doctor.reviewStatistics?.averageRating || 0}
-            location={doctor.hospital?.name || doctor.address || 'Chưa cập nhật'}
+            location={doctor.hospital?.name || doctor.address || t('detail.notUpdated')}
             yearsOfExperience={doctor.yearsOfExperience}
             isFavorite={doctor.isFavorited || false}
             languages={doctor.languages || []}
@@ -247,32 +248,21 @@ const SpecialtyDetailPage: React.FC = () => {
             return doctors.map(renderDoctorCard);
         }
 
+        const hasActiveFilters = !!(debouncedSearch || provinceId || districtId);
+        const handleClearFilters = () => {
+            handleClearArea();
+            setSearch('');
+        };
+
         return (
-            <div className={styles.emptyState}>
-                <div className={styles.emptyStateIcon}>
-                    <i className="fa-solid fa-user-doctor"></i>
-                </div>
-                <h4 className={styles.emptyStateTitle}>Không tìm thấy bác sĩ nào</h4>
-                <p className={styles.emptyStateDescription}>
-                    Vui lòng thử lại với từ khóa khác hoặc bộ lọc khác.
-                </p>
-                {(debouncedSearch || provinceId || districtId) && (
-                    <button
-                        className={clsx(
-                            'btn',
-                            'btn-outline-primary',
-                            'btn-sm',
-                            styles.clearFiltersButton
-                        )}
-                        onClick={() => {
-                            handleClearArea();
-                            setSearch('');
-                        }}
-                    >
-                        Xóa tất cả bộ lọc
-                    </button>
-                )}
-            </div>
+            <EmptyStateWithClearFilter
+                icon="fa-solid fa-user-doctor"
+                title={t('detail.emptyDoctor.title')}
+                description={t('detail.emptyDoctor.message')}
+                showClearButton={hasActiveFilters}
+                clearButtonText={t('detail.clearAllFilters')}
+                onClear={handleClearFilters}
+            />
         );
     };
 
@@ -309,42 +299,31 @@ const SpecialtyDetailPage: React.FC = () => {
             );
         }
 
+        const hasActiveFilters = !!(debouncedSearch || provinceId || districtId);
+        const handleClearFilters = () => {
+            handleClearArea();
+            setSearch('');
+        };
+
         return (
-            <div className={styles.emptyState}>
-                <div className={styles.emptyStateIcon}>
-                    <i className="fa-solid fa-hospital"></i>
-                </div>
-                <h4 className={styles.emptyStateTitle}>Không tìm thấy bệnh viện nào</h4>
-                <p className={styles.emptyStateDescription}>
-                    Vui lòng thử lại với từ khóa khác hoặc bộ lọc khác.
-                </p>
-                {(debouncedSearch || provinceId || districtId) && (
-                    <button
-                        className={clsx(
-                            'btn',
-                            'btn-outline-primary',
-                            'btn-sm',
-                            styles.clearFiltersButton
-                        )}
-                        onClick={() => {
-                            handleClearArea();
-                            setSearch('');
-                        }}
-                    >
-                        Xóa tất cả bộ lọc
-                    </button>
-                )}
-            </div>
+            <EmptyStateWithClearFilter
+                icon="fa-solid fa-hospital"
+                title={t('detail.emptyHospital.title')}
+                description={t('detail.emptyHospital.message')}
+                showClearButton={hasActiveFilters}
+                clearButtonText={t('detail.clearAllFilters')}
+                onClear={handleClearFilters}
+            />
         );
     };
 
     const breadcrumbData = {
         items: [
-            { label: 'Trang chủ', path: '/', isActive: false },
-            { label: 'Chuyên khoa', path: PATHS.SPECIALTIES.ROOT, isActive: false },
-            { label: selectedSpecialty?.name || 'Chuyên khoa', isActive: true },
+            { label: t('breadcrumb.home'), path: '/', isActive: false },
+            { label: t('breadcrumb.specialties'), path: PATHS.SPECIALTIES.ROOT, isActive: false },
+            { label: selectedSpecialty?.name || t('breadcrumb.specialties'), isActive: true },
         ],
-        title: selectedSpecialty?.name || 'Chuyên khoa',
+        title: selectedSpecialty?.name || t('breadcrumb.specialties'),
     };
 
     return (
@@ -365,7 +344,7 @@ const SpecialtyDetailPage: React.FC = () => {
                                             })}
                                             onClick={() => setActiveTab('doctor')}
                                         >
-                                            Bác sĩ
+                                            {t('detail.tabs.doctor')}
                                         </button>
                                         <button
                                             className={clsx(styles.tab, {
@@ -373,7 +352,7 @@ const SpecialtyDetailPage: React.FC = () => {
                                             })}
                                             onClick={() => setActiveTab('hospital')}
                                         >
-                                            Bệnh viện
+                                            {t('detail.tabs.hospital')}
                                         </button>
                                     </div>
 
@@ -389,19 +368,19 @@ const SpecialtyDetailPage: React.FC = () => {
                                                 )}
                                             >
                                                 <h6 className={clsx(styles.customh5)}>
-                                                    Hiển thị{' '}
+                                                    {t('detail.showing')}{' '}
                                                     <span className={clsx(styles.resultCount)}>
                                                         {activeTab === 'doctor'
                                                             ? doctorsCount
                                                             : hospitalsCount}
                                                     </span>{' '}
                                                     {activeTab === 'doctor'
-                                                        ? 'bác sĩ'
-                                                        : 'bệnh viện'}
+                                                        ? t('detail.doctors')
+                                                        : t('detail.hospitals')}
                                                     {(selectedAreaDisplay || debouncedSearch) && (
                                                         <span className="text-muted">
                                                             {' '}
-                                                            (đã lọc)
+                                                            ({t('detail.filtered')})
                                                         </span>
                                                     )}
                                                 </h6>
@@ -434,14 +413,14 @@ const SpecialtyDetailPage: React.FC = () => {
                                                                     className={styles.locationText}
                                                                 >
                                                                     {selectedAreaDisplay ||
-                                                                        'Chọn khu vực'}
+                                                                        t('detail.selectArea')}
                                                                     {provinceId && !districtId && (
                                                                         <span
                                                                             className={
                                                                                 styles.filterBadge
                                                                             }
                                                                         >
-                                                                            Tỉnh
+                                                                            {t('detail.province')}
                                                                         </span>
                                                                     )}
                                                                     {districtId && (
@@ -450,7 +429,7 @@ const SpecialtyDetailPage: React.FC = () => {
                                                                                 styles.filterBadge
                                                                             }
                                                                         >
-                                                                            Quận/Huyện
+                                                                            {t('detail.district')}
                                                                         </span>
                                                                     )}
                                                                 </span>
@@ -463,7 +442,9 @@ const SpecialtyDetailPage: React.FC = () => {
                                                                             e.stopPropagation();
                                                                             handleClearArea();
                                                                         }}
-                                                                        aria-label="Xóa lựa chọn"
+                                                                        aria-label={t(
+                                                                            'detail.clearSelection'
+                                                                        )}
                                                                     >
                                                                         <i className="fa-solid fa-xmark"></i>
                                                                     </button>
@@ -482,8 +463,8 @@ const SpecialtyDetailPage: React.FC = () => {
                                                             className={clsx('form-control')}
                                                             placeholder={
                                                                 activeTab === 'doctor'
-                                                                    ? 'Tìm kiếm Bác sĩ'
-                                                                    : 'Tìm kiếm Bệnh viện'
+                                                                    ? t('detail.searchDoctor')
+                                                                    : t('detail.searchHospital')
                                                             }
                                                             value={search}
                                                             onChange={(e) =>
@@ -541,7 +522,9 @@ const SpecialtyDetailPage: React.FC = () => {
                                                                     className="btn-close btn-close-white"
                                                                     style={{ fontSize: '0.7em' }}
                                                                     onClick={handleClearArea}
-                                                                    aria-label="Xóa khu vực"
+                                                                    aria-label={t(
+                                                                        'detail.clearArea'
+                                                                    )}
                                                                 ></button>
                                                             </span>
                                                         )}
@@ -562,7 +545,9 @@ const SpecialtyDetailPage: React.FC = () => {
                                                                     className="btn-close btn-close-white"
                                                                     style={{ fontSize: '0.7em' }}
                                                                     onClick={() => setSearch('')}
-                                                                    aria-label="Xóa tìm kiếm"
+                                                                    aria-label={t(
+                                                                        'detail.clearSearch'
+                                                                    )}
                                                                 ></button>
                                                             </span>
                                                         )}
@@ -579,7 +564,7 @@ const SpecialtyDetailPage: React.FC = () => {
                                                             setSearch('');
                                                         }}
                                                     >
-                                                        Xóa tất cả bộ lọc
+                                                        {t('detail.clearAllFilters')}
                                                     </button>
                                                 </div>
                                             </div>

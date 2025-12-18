@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     AppointmentCardData,
     AppointmentUITab,
-    getAppointmentTypeText,
     getDisplayName,
     getDisplayAvatar,
     getDisplayEmail,
@@ -13,14 +13,19 @@ import {
     getRebookingUrl,
 } from '@/types/appointment.types';
 import AppointmentActionButtons from '../AppointmentActionButtons/AppointmentActionButtons';
+import PatientInfoDisplay from '../PatientInfoDisplay';
+import {
+    formatAppointmentDate,
+    getAppointmentTypeText,
+} from '../../utils/appointment-format.utils';
 
 interface AppointmentCardProps {
     appointment: AppointmentCardData;
     status: AppointmentUITab;
-    variant?: 'full' | 'minimal'; // 'full' shows all actions, 'minimal' only shows view icon
-    onCancel?: (appointment: AppointmentCardData) => void; // Callback for cancel action
-    onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void; // Callback for reschedule actions
-    onReview?: (appointment: AppointmentCardData) => void; // Callback for review action
+    variant?: 'full' | 'minimal';
+    onCancel?: (appointment: AppointmentCardData) => void;
+    onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void;
+    onReview?: (appointment: AppointmentCardData) => void;
 }
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({
@@ -31,14 +36,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     onReschedule,
     onReview,
 }) => {
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        });
-    };
+    const { t, i18n } = useTranslation('userProfile');
 
     // Get display values using helper functions (priority: Doctor > Service > Hospital)
     const displayName = getDisplayName(appointment);
@@ -68,7 +66,8 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                 return (
                     <li className="appointment-detail-btn">
                         <Link to={getRebookingUrl(appointment)}>
-                            <i className="isax isax-calendar-tick5 me-1"></i> Đặt Lại
+                            <i className="isax isax-calendar-tick5 me-1"></i>{' '}
+                            {t('appointments.card.rebook')}
                         </Link>
                     </li>
                 );
@@ -84,7 +83,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                                     data-bs-toggle="modal"
                                     data-bs-target="#view_review"
                                 >
-                                    Xem Đánh Giá
+                                    {t('appointments.card.viewReview')}
                                 </Link>
                             ) : (
                                 <Link
@@ -97,20 +96,22 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                                     data-bs-toggle="modal"
                                     data-bs-target="#add_review"
                                 >
-                                    Thêm Đánh Giá
+                                    {t('appointments.card.addReview')}
                                 </Link>
                             )}
                         </li>
                         <li className="appointment-detail-btn d-flex align-items-center gap-3 flex-wrap">
                             <Link to={getRebookingUrl(appointment)} className="btn btn-md btn-dark">
-                                Đặt Lại <i className="isax isax-arrow-right-3 ms-1"></i>
+                                {t('appointments.card.rebook')}{' '}
+                                <i className="isax isax-arrow-right-3 ms-1"></i>
                             </Link>
                             <Link
                                 to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                title="Xem chi tiết"
+                                title={t('appointments.card.viewDetail')}
                                 className="btn btn-md btn-primary-gradient"
                             >
-                                Xem Chi Tiết <i className="isax isax-arrow-right-3 ms-1"></i>
+                                {t('appointments.card.viewDetail')}{' '}
+                                <i className="isax isax-arrow-right-3 ms-1"></i>
                             </Link>
                         </li>
                     </>
@@ -126,43 +127,27 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
             <ul>
                 {/* Display Information - Priority: Doctor > Service > Hospital */}
                 <li>
-                    <div className="patinet-information">
-                        <Link
-                            to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                        >
-                            {displayAvatar ? (
-                                <img src={displayAvatar} alt={displayName} />
-                            ) : (
-                                <div className="avatar-placeholder">
-                                    <i className="isax isax-user"></i>
-                                </div>
-                            )}
-                        </Link>
-                        <div className="patient-info">
-                            <p>{displayLabel}</p>
-                            <h6>
-                                <Link
-                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                >
-                                    {displayName}
-                                </Link>
-                                {appointment.isNew && <span className="badge new-tag">Mới</span>}
-                            </h6>
-                        </div>
-                    </div>
+                    <PatientInfoDisplay
+                        appointmentId={appointment.appointmentId}
+                        status={status}
+                        displayAvatar={displayAvatar}
+                        displayName={displayName}
+                        displayLabel={displayLabel}
+                        isNew={appointment.isNew}
+                    />
                 </li>
 
                 {/* Appointment Information */}
                 <li className="appointment-info">
                     <p>
                         <i className="isax isax-clock5"></i>
-                        {formatDate(appointment.appointmentDate)}
+                        {formatAppointmentDate(appointment.appointmentDate, i18n.language)}
                         {' | '}
                         {appointment.appointmentTime}
                     </p>
                     <ul className="d-flex apponitment-types">
                         <li>{displaySpecialty}</li>
-                        <li>{getAppointmentTypeText(appointment.appointmentType)}</li>
+                        <li>{getAppointmentTypeText(appointment.appointmentType, t)}</li>
                     </ul>
                 </li>
 

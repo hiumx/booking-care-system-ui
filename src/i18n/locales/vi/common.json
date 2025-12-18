@@ -1,10 +1,11 @@
 {
     "app": {
-        "name": "BookingCare",
+        "name": "MedCure",
         "description": "Nền tảng đặt lịch khám bệnh trực tuyến"
     },
     "actions": {
         "save": "Lưu",
+        "add": "Thêm mới",
         "cancel": "Hủy",
         "delete": "Xóa",
         "edit": "Chỉnh sửa",
@@ -137,5 +138,23 @@
         "lastWeek": "Tuần trước",
         "thisMonth": "Tháng này",
         "lastMonth": "Tháng trước"
+    },
+    "aiAssistant": {
+        "label": "Trợ lý AI"
+    },
+    "units": {
+        "yearsOld": "tuổi",
+        "years": "năm",
+        "months": "tháng",
+        "days": "ngày"
+    },
+    "fileInput": {
+        "dragDropOrSelect": "Kéo thả tệp vào đây hoặc",
+        "selectFile": "chọn tệp",
+        "supportedFormats": "Hỗ trợ: Ảnh, PDF, DOC, DOCX (Tối đa {{maxSize}}MB)",
+        "filesSelected": "{{count}} tệp đã chọn",
+        "fileSizeExceeded": "Tệp \"{{fileName}}\" vượt quá kích thước tối đa {{maxSize}}MB",
+        "selectFileAriaLabel": "Chọn tệp để tải lên",
+        "removeFile": "Xóa tệp"
     }
 }

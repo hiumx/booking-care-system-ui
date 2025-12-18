@@ -1,4 +1,58 @@
 {
+    "searchInput": {
+        "doctorPlaceholder": "Nhập tên bác sĩ",
+        "hospitalPlaceholder": "Chọn bệnh viện",
+        "specialtyPlaceholder": "Chọn chuyên khoa",
+        "locationPlaceholder": "Chọn địa điểm",
+        "searchButton": "Tìm kiếm",
+        "hospitalModalTitle": "Tìm theo Bệnh viện",
+        "specialtyModalTitle": "Tìm theo chuyên khoa"
+    },
+    "sections": {
+        "specialties": {
+            "title": "Chuyên khoa hàng đầu",
+            "desc": "Chăm sóc và hỗ trợ",
+            "viewAll": "Xem tất cả chuyên khoa"
+        },
+        "hospitals": {
+            "title": "Bệnh viện hàng đầu",
+            "desc": "Khám phá các bệnh viện nổi bật",
+            "viewAll": "Xem tất cả bệnh viện"
+        },
+        "doctors": {
+            "title": "Bác sĩ hàng đầu",
+            "desc": "Gặp gỡ các bác sĩ giỏi nhất",
+            "viewAll": "Xem tất cả bác sĩ"
+        },
+        "services": {
+            "title": "Dịch Vụ",
+            "titleSuffix": "Của Chúng Tôi",
+            "subtitle": "Ưu đãi đặc biệt khi đặt nhiều dịch vụ. Đặt ngay hôm nay!"
+        }
+    },
+    "banner": {
+        "aiSupport": {
+            "title": "Hỗ trợ đặt lịch",
+            "rating": "5.0 sao",
+            "tooltip": "Click vào đặt lịch thông minh nha!"
+        },
+        "headline": {
+            "part1": "Khám sức khỏe: Tìm bác sĩ",
+            "highlight": "của bạn",
+            "part2": "ngay hôm nay"
+        },
+        "stats": {
+            "appointments": {
+                "count": "100",
+                "label": "Cuộc hẹn",
+                "sublabel": "đã hoàn thành"
+            },
+            "patients": {
+                "count": "1000",
+                "label": "Bệnh nhân hài lòng"
+            }
+        }
+    },
     "horizontalServices": {
         "services": [
             "Điều trị đa chuyên khoa & Bác sĩ",
@@ -186,11 +240,11 @@
         "heading": "Làm việc vì Sức khỏe Tốt hơn của Bạn.",
         "customerSupport": {
             "label": "Hỗ trợ Khách hàng",
-            "value": "+1 56589 54598"
+            "value": "+84 763583081"
         },
         "email": {
             "label": "Gửi Email cho chúng tôi",
-            "value": "support@bookingcare.vn"
+            "value": "medcure.contact@gmail.com"
         }
     },
     "footer": {
@@ -236,12 +290,12 @@
         },
         "newsletter": {
             "title": "Bản tin",
-            "description": "Đăng ký & Cập nhật từ Doccure",
+            "description": "Đăng ký & Cập nhật từ MedCure",
             "placeholder": "Nhập địa chỉ email",
             "button": "Gửi"
         },
         "connectWithUs": "Kết nối với chúng tôi",
-        "copyright": "Bản quyền © 2025 Doccure. Bảo lưu mọi quyền",
+        "copyright": "Bản quyền © 2025 MedCure. Bảo lưu mọi quyền",
         "legalNotice": "Thông báo Pháp lý",
         "privacyPolicy": "Chính sách Bảo mật",
         "refundPolicy": "Chính sách Hoàn tiền"

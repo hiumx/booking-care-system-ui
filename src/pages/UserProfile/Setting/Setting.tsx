@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SettingProps {
     title: string;
@@ -13,6 +14,8 @@ const Setting: React.FC<SettingProps> = ({
     activeTab = 'profile',
     onTabClick,
 }) => {
+    const { t } = useTranslation('userProfile');
+
     const handleTabClick = (tab: 'profile' | 'password') => {
         if (onTabClick) {
             onTabClick(tab);
@@ -29,7 +32,7 @@ const Setting: React.FC<SettingProps> = ({
                             onClick={() => handleTabClick('profile')}
                             type="button"
                         >
-                            Thông tin cá nhân
+                            {t('settings.tabs.profile')}
                         </button>
                     </li>
                     <li className="nav-item" role="presentation">
@@ -38,7 +41,7 @@ const Setting: React.FC<SettingProps> = ({
                             onClick={() => handleTabClick('password')}
                             type="button"
                         >
-                            Thay đổi mật khẩu
+                            {t('settings.tabs.password')}
                         </button>
                     </li>
                 </ul>

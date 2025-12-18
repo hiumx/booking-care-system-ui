@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Upload, X, FileText } from 'lucide-react';
 import styles from './CustomFileInput.module.scss';
 
@@ -29,6 +30,7 @@ const CustomFileInput: React.FC<CustomFileInputProps> = ({
     maxSize = 10, // 10MB default
     id = 'file-input',
 }) => {
+    const { t } = useTranslation('common');
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,7 +43,7 @@ const CustomFileInput: React.FC<CustomFileInputProps> = ({
         const validFiles = fileArray.filter((file) => {
             const fileSizeMB = file.size / (1024 * 1024);
             if (fileSizeMB > maxSize) {
-                alert(`Tệp "${file.name}" vượt quá kích thước tối đa ${maxSize}MB`);
+                alert(t('fileInput.fileSizeExceeded', { fileName: file.name, maxSize }));
                 return false;
             }
             return true;
@@ -81,7 +83,7 @@ const CustomFileInput: React.FC<CustomFileInputProps> = ({
         const validFiles = droppedFiles.filter((file) => {
             const fileSizeMB = file.size / (1024 * 1024);
             if (fileSizeMB > maxSize) {
-                alert(`Tệp "${file.name}" vượt quá kích thước tối đa ${maxSize}MB`);
+                alert(t('fileInput.fileSizeExceeded', { fileName: file.name, maxSize }));
                 return false;
             }
             return true;
@@ -130,16 +132,16 @@ const CustomFileInput: React.FC<CustomFileInputProps> = ({
                 onClick={handleClick}
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
-                aria-label="Chọn tệp để tải lên"
+                aria-label={t('fileInput.selectFileAriaLabel')}
             >
                 <Upload className={styles.icon} size={48} />
                 <div className={styles.text}>
                     <p className={styles.title}>
-                        Kéo thả tệp vào đây hoặc{' '}
-                        <span className={styles.textPrimary}>chọn tệp</span>
+                        {t('fileInput.dragDropOrSelect')}{' '}
+                        <span className={styles.textPrimary}>{t('fileInput.selectFile')}</span>
                     </p>
                     <p className={styles.subtitle}>
-                        Hỗ trợ: Ảnh, PDF, DOC, DOCX (Tối đa {maxSize}MB)
+                        {t('fileInput.supportedFormats', { maxSize })}
                     </p>
                 </div>
             </button>
@@ -148,7 +150,7 @@ const CustomFileInput: React.FC<CustomFileInputProps> = ({
                 <div className={styles.list}>
                     <div className={styles.listHeader}>
                         <FileText size={16} />
-                        <span>{files.length} tệp đã chọn</span>
+                        <span>{t('fileInput.filesSelected', { count: files.length })}</span>
                     </div>
                     <div className={styles.items}>
                         {files.map((file, index) => (
@@ -171,7 +173,7 @@ const CustomFileInput: React.FC<CustomFileInputProps> = ({
                                         e.stopPropagation();
                                         handleRemoveFile(index);
                                     }}
-                                    title="Xóa tệp"
+                                    title={t('fileInput.removeFile')}
                                 >
                                     <X size={18} />
                                 </button>

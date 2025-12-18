@@ -1,20 +1,21 @@
 // Steps for doctor/service booking flow
+// Note: titles are translation keys from booking.json
 export const BOOKING_STEPS = [
     {
         id: 1,
-        title: 'Ngày & Giờ',
+        titleKey: 'steps.dateTime',
     },
     {
         id: 2,
-        title: 'Thông Tin Cơ Bản',
+        titleKey: 'steps.basicInfo',
     },
     {
         id: 3,
-        title: 'Thanh Toán',
+        titleKey: 'steps.payment',
     },
     {
         id: 4,
-        title: 'Xác Nhận',
+        titleKey: 'steps.confirmation',
     },
 ];
 
@@ -22,22 +23,22 @@ export const BOOKING_STEPS = [
 export const HOSPITAL_BOOKING_STEPS = [
     {
         id: 1,
-        title: 'Chuyên khoa/Dịch vụ',
+        titleKey: 'steps.specialtyService',
     },
     {
         id: 2,
-        title: 'Loại khám',
+        titleKey: 'steps.appointmentType',
     },
     {
         id: 3,
-        title: 'Ngày & Giờ',
+        titleKey: 'steps.dateTime',
     },
     {
         id: 4,
-        title: 'Thông Tin Cơ Bản',
+        titleKey: 'steps.basicInfo',
     },
     {
         id: 5,
-        title: 'Thanh Toán',
+        titleKey: 'steps.payment',
     },
 ];

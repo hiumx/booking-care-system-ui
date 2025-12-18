@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import BookingLayout from '@/layouts/BookingLayout';
 import StepWizard from '@/components/StepWizard';
 import { BOOKING_STEPS, HOSPITAL_BOOKING_STEPS } from './data/data';
@@ -29,6 +30,7 @@ import PaymentService, { CreatePaymentRequest } from '@/services/payment.service
 import { createAppointmentTimeId, createAppointmentRequest } from '@/utils/appointment-utils';
 
 const Booking: React.FC = () => {
+    const { t } = useTranslation('booking');
     const [currentStep, setCurrentStep] = useState<number>(1);
     const [isCreatingAppointment, setIsCreatingAppointment] = useState(false);
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -71,13 +73,10 @@ const Booking: React.FC = () => {
     // Clear previous booking state when starting a new booking flow
     // This prevents reusing old appointment ID and clears highlighted slots
     useEffect(() => {
-        // Always reset schedule state when entering booking page
-        // This ensures fresh state for new booking (date = today, no selected slots)
-        dispatch(resetScheduleState());
-
         // Clear previous appointment ID if exists
         if (bookingState.createdAppointmentId) {
             dispatch(setCreatedAppointmentId(null));
+            dispatch(resetScheduleState());
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // Run only on mount
@@ -93,7 +92,7 @@ const Booking: React.FC = () => {
                 .unwrap()
                 .catch((error) => {
                     console.error('Error fetching hospital:', error);
-                    toast.error('Không thể tải thông tin bệnh viện');
+                    toast.error(t('bookingPage.toast.loadHospitalError'));
                 });
         } else if (isDoctorBooking) {
             dispatch(setBookingFlowType('doctor'));
@@ -144,14 +143,14 @@ const Booking: React.FC = () => {
         if (currentStep === authCheckStep) {
             // Check if user is authenticated
             if (!authState.isAuthenticated) {
-                toast.warn('Vui lòng đăng nhập');
+                toast.warn(t('bookingPage.toast.pleaseLogin'));
                 navigate(PATHS.LOGIN);
                 return;
             }
 
             // Check phone confirmation and phone value
             if (!authState.phoneConfirmed && !userState.profile?.phone) {
-                toast.warn('Vui lòng cập nhật số điện thoại');
+                toast.warn(t('bookingPage.toast.updatePhone'));
                 navigate(PATHS.USER.ROOT + '/' + PATHS.USER.PROFILE + '?tab=settings');
                 return;
             }
@@ -292,7 +291,7 @@ const Booking: React.FC = () => {
 
         const request = createAppointmentFromSchedule(discountedTotalAmount);
         if (!request) {
-            throw new Error('Không thể tạo yêu cầu đặt lịch');
+            throw new Error(t('bookingPage.toast.createRequestError'));
         }
 
         // Add skipPayment flag for no-payment option
@@ -301,12 +300,12 @@ const Booking: React.FC = () => {
         const response = await AppointmentService.createAppointment(finalRequest);
 
         if (!response.success) {
-            throw new Error(response.message || 'Không thể tạo lịch hẹn');
+            throw new Error(response.message || t('bookingPage.toast.createAppointmentError'));
         }
 
         const appointmentId = (response.data as any)?.appointmentId;
         if (!appointmentId) {
-            throw new Error('Không nhận được ID cuộc hẹn');
+            throw new Error(t('bookingPage.toast.appointmentIdError'));
         }
 
         dispatch(setCreatedAppointmentId(appointmentId));
@@ -324,12 +323,12 @@ const Booking: React.FC = () => {
         discountedTotalAmount?: number
     ) => {
         if (!userState.profile?.id) {
-            toast.error('Không tìm thấy thông tin người dùng');
+            toast.error(t('bookingPage.toast.userNotFound'));
             return;
         }
 
         if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0) {
-            toast.error('Vui lòng chọn ngày và giờ khám');
+            toast.error(t('bookingPage.toast.selectDateTime'));
             return;
         }
 
@@ -364,16 +363,16 @@ const Booking: React.FC = () => {
 
             // Step 3: Redirect to payment gateway
             if (!paymentResponse.paymentUrl) {
-                throw new Error('Không nhận được URL thanh toán');
+                throw new Error(t('bookingPage.toast.paymentUrlError'));
             }
 
-            toast.success('Đang chuyển hướng đến cổng thanh toán...');
+            toast.success(t('bookingPage.toast.redirectingPayment'));
             setTimeout(() => {
                 globalThis.location.href = paymentResponse.paymentUrl;
             }, 1000);
         } catch (error: any) {
             console.error('Process failed:', error);
-            toast.error(error.message || 'Không thể hoàn tất quy trình');
+            toast.error(error.message || t('bookingPage.toast.processError'));
             setIsCreatingAppointment(false);
             setIsProcessingPayment(false);
         }
@@ -382,23 +381,23 @@ const Booking: React.FC = () => {
     // Handle appointment creation without payment (Option 2: No Payment)
     const handleCreateAppointmentOnly = async () => {
         if (!userState.profile?.id) {
-            toast.error('Không tìm thấy thông tin người dùng');
+            toast.error(t('bookingPage.toast.userNotFound'));
             return;
         }
 
         if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0) {
-            toast.error('Vui lòng chọn ngày và giờ khám');
+            toast.error(t('bookingPage.toast.selectDateTime'));
             return;
         }
 
         try {
             // Pass skipPayment = true to send booking confirmation email immediately
             const appointmentId = await ensureAppointmentCreated(true);
-            toast.success('Đặt lịch thành công! Vui lòng thanh toán khi đến khám.');
+            toast.success(t('bookingPage.toast.bookingSuccessNoPayment'));
             navigate(PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', appointmentId));
         } catch (error: any) {
             console.error('Create appointment failed:', error);
-            toast.error(error.message || 'Không thể tạo lịch hẹn');
+            toast.error(error.message || t('bookingPage.toast.createAppointmentError'));
             setIsCreatingAppointment(false);
         }
     };

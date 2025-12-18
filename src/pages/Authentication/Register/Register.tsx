@@ -565,11 +565,11 @@ const Register: React.FC = () => {
                             />
                             <label htmlFor="agree" className="text-muted">
                                 {t('register.agreeTerms')}{' '}
-                                <Link to="/terms" className="text-primary">
+                                <Link to={PATHS.TERMS_OF_SERVICE} className="text-primary">
                                     {t('register.termsOfService')}
                                 </Link>{' '}
                                 {t('register.and')}{' '}
-                                <Link to="/privacy" className="text-primary">
+                                <Link to={PATHS.PRIVACY_POLICY} className="text-primary">
                                     {t('register.privacyPolicy')}
                                 </Link>
                             </label>

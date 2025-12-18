@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import BookingLayout from '@/layouts/BookingLayout';
 import { AppointmentService } from '@/services/appointment.service';
 import { DoctorService } from '@/services/doctor.service';
@@ -9,7 +10,7 @@ import { DoctorResponse } from '@/types/doctor.types';
 import { PATHS } from '@/routes/paths';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
-import FullScreenSpinner from '@/components/FullScreenSpinner';
+import BookingLoadingState from './components/BookingLoadingState';
 import { formatAppointmentTime } from '@/utils/appointment-utils';
 import client16 from '@/assets/img/clients/client-16.jpg';
 
@@ -31,6 +32,7 @@ const ConfirmNewDoctor: React.FC = () => {
     } | null>(null);
 
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation('booking');
     const { appointmentId } = useParams<{ appointmentId: string }>();
     const [searchParams] = useSearchParams();
 
@@ -58,7 +60,7 @@ const ConfirmNewDoctor: React.FC = () => {
 
     useEffect(() => {
         if (!appointmentId || !rescheduleToken || !newDoctorId) {
-            toast.error('Thông tin không hợp lệ');
+            toast.error(t('confirmNewDoctor.toast.invalidInfo'));
             navigate(PATHS.HOME);
             return;
         }
@@ -78,18 +80,20 @@ const ConfirmNewDoctor: React.FC = () => {
 
             const appointmentResponse = await AppointmentService.getAppointmentById(appointmentId!);
             if (!appointmentResponse.success || !appointmentResponse.data) {
-                throw new Error('Không thể tải thông tin lịch hẹn');
+                throw new Error(t('confirmNewDoctor.toast.loadAppointmentError'));
             }
             setAppointmentData(appointmentResponse.data);
 
             const doctorResponse = await DoctorService.getDoctorById(newDoctorId!);
             if (!doctorResponse.success || !doctorResponse.data) {
-                throw new Error('Không thể tải thông tin bác sĩ mới');
+                throw new Error(t('confirmNewDoctor.toast.loadDoctorError'));
             }
             setNewDoctor(doctorResponse.data);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error loading data:', error);
-            toast.error(error.message || 'Không thể tải thông tin');
+            const errorMessage =
+                error instanceof Error ? error.message : t('confirmNewDoctor.toast.loadError');
+            toast.error(errorMessage);
             navigate(PATHS.HOME);
         } finally {
             setIsLoading(false);
@@ -98,12 +102,12 @@ const ConfirmNewDoctor: React.FC = () => {
 
     const handleConfirm = async () => {
         if (!appointmentId || !rescheduleToken || !newDoctorId) {
-            toast.error('Thông tin không hợp lệ');
+            toast.error(t('confirmNewDoctor.toast.invalidInfo'));
             return;
         }
 
         if (!appointmentData || !newDoctor) {
-            toast.error('Chưa tải đủ thông tin');
+            toast.error(t('confirmNewDoctor.toast.notEnoughInfo'));
             return;
         }
 
@@ -128,49 +132,29 @@ const ConfirmNewDoctor: React.FC = () => {
                 const { action } = response.data;
 
                 if (action === 'direct_update') {
-                    toast.success('Đã cập nhật bác sĩ thành công!');
+                    toast.success(t('confirmNewDoctor.toast.updateSuccess'));
                     navigate(PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', appointmentId));
                 } else if (action === 'payment_required') {
-                    toast.info('Bác sĩ mới có cọc cao hơn. Vui lòng thanh toán thêm để xác nhận.');
+                    toast.info(t('confirmNewDoctor.toast.paymentRequired'));
                     navigate(
                         `${PATHS.BOOKING.CHOOSE_NEW_DOCTOR.replace(':doctorId', newDoctorId)}?rescheduleFor=${appointmentId}&token=${rescheduleToken}&skipDateTime=true&isStaffAssigned=true&newDoctorId=${newDoctorId}`
                     );
                 } else if (action === 'refund_created') {
-                    toast.success('Đã cập nhật bác sĩ và tạo yêu cầu hoàn tiền!');
+                    toast.success(t('confirmNewDoctor.toast.refundSuccess'));
                     navigate(PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', appointmentId));
                 }
             } else {
-                throw new Error(response.message || 'Không thể cập nhật bác sĩ');
+                throw new Error(response.message || t('confirmNewDoctor.toast.updateError'));
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error in handleConfirm:', error);
-            toast.error(error.message || 'Có lỗi xảy ra, vui lòng thử lại');
+            const errorMessage =
+                error instanceof Error ? error.message : t('confirmNewDoctor.toast.error');
+            toast.error(errorMessage);
         } finally {
             setIsConfirming(false);
         }
     };
-
-    if (isLoading) {
-        return (
-            <BookingLayout>
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-10 mx-auto">
-                            <div
-                                className="d-flex flex-column align-items-center justify-content-center"
-                                style={{ minHeight: '60vh' }}
-                            >
-                                <FullScreenSpinner
-                                    isVisible={true}
-                                    message="Đang tải thông tin bác sĩ..."
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </BookingLayout>
-        );
-    }
 
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('vi-VN', {
@@ -180,6 +164,19 @@ const ConfirmNewDoctor: React.FC = () => {
         }).format(price);
     };
 
+    const formatDate = (dateString: string) => {
+        const locale = i18n.language === 'en' ? 'en-US' : 'vi-VN';
+        return new Date(dateString).toLocaleDateString(locale, {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+    };
+
+    if (isLoading) {
+        return <BookingLoadingState message={t('confirmNewDoctor.loading')} />;
+    }
+
     return (
         <BookingLayout>
             <div className={clsx(styles.bookingContainer, 'doctor-content')}>
@@ -188,10 +185,8 @@ const ConfirmNewDoctor: React.FC = () => {
                         <div className="col-lg-10 mx-auto">
                             {/* Page Title */}
                             <div className="text-center mb-4">
-                                <h4 className="fw-bold mb-2">Xác nhận thay đổi bác sĩ</h4>
-                                <p className="text-muted mb-0">
-                                    Bệnh viện đã gán cho bạn một bác sĩ mới thay thế
-                                </p>
+                                <h4 className="fw-bold mb-2">{t('confirmNewDoctor.title')}</h4>
+                                <p className="text-muted mb-0">{t('confirmNewDoctor.subtitle')}</p>
                             </div>
 
                             <div className="row g-4">
@@ -201,7 +196,7 @@ const ConfirmNewDoctor: React.FC = () => {
                                         <div className="card-body">
                                             <h6 className="card-title mb-3">
                                                 <i className="isax isax-calendar-1 me-2 text-muted"></i>{' '}
-                                                Lịch hẹn hiện tại
+                                                {t('confirmNewDoctor.currentAppointment.title')}
                                             </h6>
 
                                             {/* Original Doctor */}
@@ -223,11 +218,16 @@ const ConfirmNewDoctor: React.FC = () => {
                                                     <p className="mb-0 fw-medium">
                                                         {appointmentData?.doctorInfo?.positionName}{' '}
                                                         {appointmentData?.doctorInfo?.fullName ||
-                                                            'Bác sĩ'}
+                                                            t(
+                                                                'confirmNewDoctor.currentAppointment.doctor'
+                                                            )}
                                                     </p>
                                                     <small className="text-muted">
                                                         {appointmentData?.doctorInfo
-                                                            ?.specialtyName || 'Chưa cập nhật'}
+                                                            ?.specialtyName ||
+                                                            t(
+                                                                'confirmNewDoctor.currentAppointment.notUpdated'
+                                                            )}
                                                     </small>
                                                 </div>
                                             </div>
@@ -238,21 +238,21 @@ const ConfirmNewDoctor: React.FC = () => {
                                             <div className="row g-3">
                                                 <div className="col-6">
                                                     <small className="text-muted d-block mb-1">
-                                                        Ngày khám
+                                                        {t(
+                                                            'confirmNewDoctor.currentAppointment.date'
+                                                        )}
                                                     </small>
                                                     <p className="mb-0 fw-medium">
-                                                        {new Date(
+                                                        {formatDate(
                                                             appointmentData?.appointmentDate || ''
-                                                        ).toLocaleDateString('vi-VN', {
-                                                            day: '2-digit',
-                                                            month: '2-digit',
-                                                            year: 'numeric',
-                                                        })}
+                                                        )}
                                                     </p>
                                                 </div>
                                                 <div className="col-6">
                                                     <small className="text-muted d-block mb-1">
-                                                        Giờ khám
+                                                        {t(
+                                                            'confirmNewDoctor.currentAppointment.time'
+                                                        )}
                                                     </small>
                                                     <p className="mb-0 fw-medium">
                                                         {formatAppointmentTime(
@@ -262,16 +262,22 @@ const ConfirmNewDoctor: React.FC = () => {
                                                 </div>
                                                 <div className="col-12">
                                                     <small className="text-muted d-block mb-1">
-                                                        Địa điểm
+                                                        {t(
+                                                            'confirmNewDoctor.currentAppointment.location'
+                                                        )}
                                                     </small>
                                                     <p className="mb-0 fw-medium">
                                                         {appointmentData?.hospitalInfo?.name ||
-                                                            'Chưa cập nhật'}
+                                                            t(
+                                                                'confirmNewDoctor.currentAppointment.notUpdated'
+                                                            )}
                                                     </p>
                                                 </div>
                                                 <div className="col-12">
                                                     <small className="text-muted d-block mb-1">
-                                                        Phí đã cọc
+                                                        {t(
+                                                            'confirmNewDoctor.currentAppointment.depositPaid'
+                                                        )}
                                                     </small>
                                                     <p className="mb-0 fw-medium text-primary">
                                                         {formatPrice(
@@ -290,7 +296,7 @@ const ConfirmNewDoctor: React.FC = () => {
                                         <div className="card-body">
                                             <h6 className="card-title mb-3">
                                                 <i className="isax isax-user-tick me-2 text-primary"></i>{' '}
-                                                Bác sĩ được gán mới
+                                                {t('confirmNewDoctor.newDoctor.title')}
                                             </h6>
 
                                             {newDoctor && (
@@ -325,7 +331,9 @@ const ConfirmNewDoctor: React.FC = () => {
                                                     <div className="row g-3">
                                                         <div className="col-6">
                                                             <small className="text-muted d-block mb-1">
-                                                                Bệnh viện
+                                                                {t(
+                                                                    'confirmNewDoctor.newDoctor.hospital'
+                                                                )}
                                                             </small>
                                                             <p className="mb-0 fw-medium">
                                                                 {newDoctor.hospital?.name}
@@ -333,15 +341,22 @@ const ConfirmNewDoctor: React.FC = () => {
                                                         </div>
                                                         <div className="col-6">
                                                             <small className="text-muted d-block mb-1">
-                                                                Kinh nghiệm
+                                                                {t(
+                                                                    'confirmNewDoctor.newDoctor.experience'
+                                                                )}
                                                             </small>
                                                             <p className="mb-0 fw-medium">
-                                                                {newDoctor.yearsOfExperience} năm
+                                                                {newDoctor.yearsOfExperience}{' '}
+                                                                {t(
+                                                                    'confirmNewDoctor.newDoctor.years'
+                                                                )}
                                                             </p>
                                                         </div>
                                                         <div className="col-12">
                                                             <small className="text-muted d-block mb-1">
-                                                                Phí cọc mới (30%)
+                                                                {t(
+                                                                    'confirmNewDoctor.newDoctor.newDeposit'
+                                                                )}
                                                             </small>
                                                             <p className="mb-0 fw-medium text-primary">
                                                                 {formatPrice(
@@ -368,13 +383,17 @@ const ConfirmNewDoctor: React.FC = () => {
                                                     <>
                                                         <i className="isax isax-arrow-up-3 text-warning me-2"></i>
                                                         <span>
-                                                            Cọc cao hơn{' '}
+                                                            {t(
+                                                                'confirmNewDoctor.priceDifference.higher'
+                                                            )}{' '}
                                                             <strong className="text-warning">
                                                                 {formatPrice(
                                                                     priceDifference.amount
                                                                 )}
                                                             </strong>{' '}
-                                                            Bạn cần thanh toán thêm.
+                                                            {t(
+                                                                'confirmNewDoctor.priceDifference.higherNote'
+                                                            )}
                                                         </span>
                                                     </>
                                                 )}
@@ -382,13 +401,17 @@ const ConfirmNewDoctor: React.FC = () => {
                                                     <>
                                                         <i className="isax isax-arrow-down-2 text-success me-2"></i>
                                                         <span>
-                                                            Cọc thấp hơn{' '}
+                                                            {t(
+                                                                'confirmNewDoctor.priceDifference.lower'
+                                                            )}{' '}
                                                             <strong className="text-success">
                                                                 {formatPrice(
                                                                     priceDifference.amount
                                                                 )}
                                                             </strong>{' '}
-                                                            Bạn sẽ được hoàn tiền.
+                                                            {t(
+                                                                'confirmNewDoctor.priceDifference.lowerNote'
+                                                            )}
                                                         </span>
                                                     </>
                                                 )}
@@ -396,8 +419,9 @@ const ConfirmNewDoctor: React.FC = () => {
                                                     <>
                                                         <i className="isax isax-tick-circle text-primary me-2"></i>
                                                         <span>
-                                                            Cọc bằng nhau. Không cần thanh toán
-                                                            thêm.
+                                                            {t(
+                                                                'confirmNewDoctor.priceDifference.equal'
+                                                            )}
                                                         </span>
                                                     </>
                                                 )}
@@ -421,14 +445,14 @@ const ConfirmNewDoctor: React.FC = () => {
                                                 className="spinner-border spinner-border-sm me-2"
                                                 aria-hidden="true"
                                             ></output>{' '}
-                                            Đang xử lý...
+                                            {t('confirmNewDoctor.actions.processing')}
                                         </>
                                     ) : (
                                         <>
                                             <i className="isax isax-tick-circle me-2"></i>
                                             {priceDifference?.type === 'higher'
-                                                ? 'Xác nhận & Thanh toán'
-                                                : 'Xác nhận bác sĩ mới'}
+                                                ? t('confirmNewDoctor.actions.confirmAndPay')
+                                                : t('confirmNewDoctor.actions.confirmNewDoctor')}
                                         </>
                                     )}
                                 </button>
