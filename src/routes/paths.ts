@@ -18,6 +18,7 @@ export const PATHS = {
     SMART_BOOKING: '/smart-booking',
     LEGAL_NOTICE: '/legal-notice',
     PRIVACY_POLICY: '/privacy-policy',
+    TERMS_OF_SERVICE: '/terms-of-service',
     REFUND_POLICY: '/refund-policy',
     AI_SUPPORT_BOOKING: '/ai-support-booking',
     AI_SUPPORT_BOOKING_CHAT: '/ai-support-booking/:chatId',

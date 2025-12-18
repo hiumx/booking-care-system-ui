@@ -15,6 +15,8 @@ import userProfileVi from './locales/vi/userProfile.json';
 import userProfileEn from './locales/en/userProfile.json';
 import homeVi from './locales/vi/home.json';
 import homeEn from './locales/en/home.json';
+import contactVi from './locales/vi/contact.json';
+import contactEn from './locales/en/contact.json';
 import headerVi from './locales/vi/header.json';
 import headerEn from './locales/en/header.json';
 import legalNoticeVi from './locales/vi/legalNotice.json';
@@ -31,6 +33,14 @@ import hospitalVi from './locales/vi/hospital.json';
 import hospitalEn from './locales/en/hospital.json';
 import aiSupportVi from './locales/vi/aiSupport.json';
 import aiSupportEn from './locales/en/aiSupport.json';
+import aboutVi from './locales/vi/about.json';
+import aboutEn from './locales/en/about.json';
+import contractSigningVi from './locales/vi/contractSigning.json';
+import contractSigningEn from './locales/en/contractSigning.json';
+import specialtyVi from './locales/vi/specialty.json';
+import specialtyEn from './locales/en/specialty.json';
+import termsOfServiceVi from './locales/vi/termsOfService.json';
+import termsOfServiceEn from './locales/en/termsOfService.json';
 
 // Define resources
 const resources = {
@@ -41,6 +51,7 @@ const resources = {
         errors: errorsVi,
         userProfile: userProfileVi,
         home: homeVi,
+        contact: contactVi,
         header: headerVi,
         legalNotice: legalNoticeVi,
         privacyPolicy: privacyPolicyVi,
@@ -49,6 +60,10 @@ const resources = {
         doctor: doctorVi,
         hospital: hospitalVi,
         aiSupport: aiSupportVi,
+        about: aboutVi,
+        contractSigning: contractSigningVi,
+        specialty: specialtyVi,
+        termsOfService: termsOfServiceVi,
     },
     en: {
         common: commonEn,
@@ -57,6 +72,7 @@ const resources = {
         errors: errorsEn,
         userProfile: userProfileEn,
         home: homeEn,
+        contact: contactEn,
         header: headerEn,
         legalNotice: legalNoticeEn,
         privacyPolicy: privacyPolicyEn,
@@ -65,6 +81,10 @@ const resources = {
         doctor: doctorEn,
         hospital: hospitalEn,
         aiSupport: aiSupportEn,
+        about: aboutEn,
+        contractSigning: contractSigningEn,
+        specialty: specialtyEn,
+        termsOfService: termsOfServiceEn,
     },
 };
 
@@ -86,6 +106,7 @@ configuredI18n.init({
         'errors',
         'userProfile',
         'home',
+        'contact',
         'header',
         'legalNotice',
         'privacyPolicy',
@@ -94,6 +115,10 @@ configuredI18n.init({
         'doctor',
         'hospital',
         'aiSupport',
+        'about',
+        'contractSigning',
+        'specialty',
+        'termsOfService',
     ],
 
     // Language detection configuration

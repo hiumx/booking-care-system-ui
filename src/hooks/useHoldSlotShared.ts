@@ -62,7 +62,7 @@ export const executeHoldSlot = async <TSlot>(
             }));
 
             startCountdown(response.remainingSeconds);
-            toast.success(response.message);
+
             return true;
         }
 

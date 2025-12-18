@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import './FAQSection.module.scss';
 import faqImg from '@/assets/img/faq-img.png';
 import smilingIcon from '@/assets/img/icons/smiling-icon.svg';
 
 interface CountUpOnViewProps {
     end: number;
-    duration?: number; // ms
+    duration?: number;
     className?: string;
 }
 
@@ -49,36 +50,17 @@ const CountUpOnView: React.FC<CountUpOnViewProps> = ({ end, duration = 1500, cla
     );
 };
 
-const items = [
-    {
-        id: 'one',
-        q: 'Làm thế nào để đặt lịch khám?',
-        a: 'Bạn có thể đăng nhập hoặc tạo tài khoản, tìm bác sĩ theo chuyên khoa, khu vực hoặc thời gian trống và xác nhận đặt lịch.',
-    },
-    {
-        id: 'two',
-        q: 'Tôi có thể đặt lịch khám trực tuyến không?',
-        a: 'Có. Chỉ cần truy cập hệ thống, chọn bác sĩ/phòng khám phù hợp và hoàn tất đặt lịch trong vài bước.',
-    },
-    {
-        id: 'three',
-        q: 'Thông tin cá nhân của tôi có được bảo mật không?',
-        a: 'Tất cả dữ liệu đều được mã hóa và chỉ chia sẻ với bác sĩ khi có sự đồng ý của bạn.',
-    },
-    {
-        id: 'four',
-        q: 'Tôi có thể hủy hoặc dời lịch hẹn không?',
-        a: 'Bạn có thể hủy hoặc đổi lịch trước giờ khám theo chính sách của phòng khám/bác sĩ.',
-    },
-    {
-        id: 'five',
-        q: 'Làm sao để tìm đúng bác sĩ/chuyên gia phù hợp?',
-        a: 'Bạn có thể lọc theo chuyên khoa, vị trí, thời gian rảnh, đánh giá và chi phí để chọn bác sĩ phù hợp.',
-    },
-];
+interface FAQItem {
+    id: string;
+    question: string;
+    answer: string;
+}
 
 const FAQSection: React.FC = () => {
-    const [openId, setOpenId] = useState<string>('one'); // first open by default
+    const { t } = useTranslation('about');
+    const [openId, setOpenId] = useState<string>('one');
+
+    const items = t('faq.items', { returnObjects: true }) as FAQItem[];
 
     const toggle = (id: string) => setOpenId((prev) => (prev === id ? '' : id));
 
@@ -88,8 +70,8 @@ const FAQSection: React.FC = () => {
                 <div className="row">
                     <div className="col-md-12">
                         <div className="section-inner-header text-center">
-                            <h6>Giải đáp thắc mắc</h6>
-                            <h2>Câu hỏi thường gặp</h2>
+                            <h6>{t('faq.badge')}</h6>
+                            <h2>{t('faq.title')}</h2>
                         </div>
                     </div>
                 </div>
@@ -106,7 +88,7 @@ const FAQSection: React.FC = () => {
                                         <CountUpOnView className="count-digit" end={95} />
                                         k+
                                     </h4>
-                                    <p>Khách hàng hài lòng</p>
+                                    <p>{t('faq.satisfiedCustomers')}</p>
                                 </div>
                             </div>
                         </div>
@@ -128,7 +110,7 @@ const FAQSection: React.FC = () => {
                                                     aria-controls={panelId}
                                                     onClick={() => toggle(it.id)}
                                                 >
-                                                    {it.q}
+                                                    {it.question}
                                                 </button>
                                             </h2>
                                             <div
@@ -138,7 +120,7 @@ const FAQSection: React.FC = () => {
                                             >
                                                 <div className="accordion-body">
                                                     <div className="accordion-content">
-                                                        <p>{it.a}</p>
+                                                        <p>{it.answer}</p>
                                                     </div>
                                                 </div>
                                             </div>

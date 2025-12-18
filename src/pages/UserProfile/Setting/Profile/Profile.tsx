@@ -607,18 +607,6 @@ const Profile = () => {
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
                             <Input
-                                label={t('profile.fields.lastName.label')}
-                                isRequired
-                                type="text"
-                                value={updateData.lastName || ''}
-                                onChange={(e) => handleInputChange('lastName', e.target.value)}
-                                error={lastNameError}
-                            />
-                        </div>
-                    </div>
-                    <div className="col-lg-4 col-md-6">
-                        <div className="mb-3">
-                            <Input
                                 label={t('profile.fields.firstName.label')}
                                 isRequired
                                 type="text"
@@ -628,7 +616,18 @@ const Profile = () => {
                             />
                         </div>
                     </div>
-
+                    <div className="col-lg-4 col-md-6">
+                        <div className="mb-3">
+                            <Input
+                                label={t('profile.fields.lastName.label')}
+                                isRequired
+                                type="text"
+                                value={updateData.lastName || ''}
+                                onChange={(e) => handleInputChange('lastName', e.target.value)}
+                                error={lastNameError}
+                            />
+                        </div>
+                    </div>
                     <div className="col-lg-4 col-md-6">
                         <div className="mb-3">
                             <label className="form-label">

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+import clsx from 'clsx';
 import { PATHS } from '@/routes/paths';
 import { AppDispatch, RootState } from '@/store';
 import { logoutAsync } from '@/store/slices/authSlice';
@@ -25,8 +26,9 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { formatDistanceToNow } from 'date-fns';
 import { vi, enUS } from 'date-fns/locale';
 import useTheme from '@/hooks/useTheme';
-import logo from '@/assets/img/logo.svg';
+import logo from '@/assets/img/logo_medcure.png';
 import profile06 from '@/assets/img/doctors-dashboard/profile-06.jpg';
+import styles from './MainHeader.module.scss';
 interface HeaderProps {
     isHeaderMenu?: boolean;
 }
@@ -53,7 +55,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                 .unwrap()
                 .catch((error) => {
                     console.error('Failed to fetch user profile:', error);
-                    toast.error('Không thể tải thông tin người dùng');
+                    toast.error(t('toast.loadProfileError'));
                 });
         }
     }, [isAuthenticated, profile, dispatch]);
@@ -119,11 +121,11 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
             await dispatch(logoutAsync()).unwrap();
             dispatch(clearUserProfile()); // Clear user profile from state
             dispatch(clearNotifications()); // Clear notifications
-            toast.success('Đăng xuất thành công');
+            toast.success(t('toast.logoutSuccess'));
             navigate(PATHS.HOME); // Redirect to home page
         } catch (error: unknown) {
             console.error('Logout failed:', error);
-            toast.error('Không thể đăng xuất. Vui lòng thử lại');
+            toast.error(t('toast.logoutError'));
         }
     };
 
@@ -151,10 +153,10 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
         try {
             await dispatch(markAllNotificationsAsRead()).unwrap();
             await dispatch(fetchNotificationCountsByType(false)).unwrap();
-            toast.success('Đã đánh dấu tất cả là đã đọc');
+            toast.success(t('notification.markedAllRead'));
         } catch (error) {
             console.error('Failed to mark all as read:', error);
-            toast.error('Không thể đánh dấu tất cả');
+            toast.error(t('notification.markAllError'));
         }
     };
 
@@ -181,7 +183,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                     </div>
                     {isHeaderMenu && (
                         <div className="header-menu">
-                            <div className="main-menu-wrapper">
+                            <div className={clsx('main-menu-wrapper', styles.mainMenuWrapper)}>
                                 <div className="menu-header">
                                     <Link to={PATHS.HOME} className="menu-logo">
                                         <img
@@ -253,6 +255,9 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                     <li className="has-submenu">
                                         <Link to={PATHS.CONTACT_US}>{t('menu.contact')}</Link>
                                     </li>
+                                    <li className="has-submenu">
+                                        <Link to={PATHS.ABOUT_US}>{t('menu.aboutUs')}</Link>
+                                    </li>
                                 </ul>
                             </div>
                             <ul className="nav header-navbar-rht">
@@ -318,7 +323,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                             <div className="dropdown-menu notifications dropdown-menu-end">
                                                 <div className="topnav-dropdown-header">
                                                     <span className="notification-title">
-                                                        Thông báo
+                                                        {t('notification.title')}
                                                     </span>
                                                     {unreadCount > 0 && (
                                                         <button
@@ -338,7 +343,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                                                 padding: 0,
                                                             }}
                                                         >
-                                                            Đọc tất cả
+                                                            {t('notification.markAllRead')}
                                                         </button>
                                                     )}
                                                 </div>
@@ -348,7 +353,9 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                                             <li className="notification-message">
                                                                 <div className="text-center py-3">
                                                                     <p className="text-muted">
-                                                                        Chưa có thông báo nào
+                                                                        {t(
+                                                                            'notification.noNotifications'
+                                                                        )}
                                                                     </p>
                                                                 </div>
                                                             </li>
@@ -439,7 +446,9 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                                                                                         '8px',
                                                                                                 }}
                                                                                             >
-                                                                                                Mới
+                                                                                                {t(
+                                                                                                    'notification.new'
+                                                                                                )}
                                                                                             </span>
                                                                                         )}
                                                                                     </div>
@@ -528,7 +537,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                                             e.currentTarget.style.color = '#0d6efd';
                                                         }}
                                                     >
-                                                        Xem tất cả
+                                                        {t('notification.viewAll')}
                                                     </button>
                                                 </div>
                                             </div>

@@ -17,7 +17,6 @@ import {
 import {
     NotificationType,
     NotificationCategory,
-    NotificationCategoryLabels,
     getTypesByCategory,
 } from '@/enums/notification.enums';
 import { NotificationService } from '@/services/notification.service';
@@ -28,7 +27,7 @@ import NotificationSkeleton from './NotificationSkeleton';
 const Notifications = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation('userProfile');
     const currentLanguage = (i18n.language || 'vi') as 'vi' | 'en';
     const { countsByType } = useSelector((state: RootState) => state.notification);
 
@@ -101,7 +100,7 @@ const Notifications = () => {
             setNotifications(uniqueNotifications);
         } catch (error) {
             console.error('[Notifications] Failed to load notifications:', error);
-            toast.error('Không thể tải thông báo');
+            toast.error(t('notifications.toast.loadError'));
             setNotifications([]);
         } finally {
             setIsLoading(false);
@@ -119,9 +118,9 @@ const Notifications = () => {
                 )
             );
 
-            toast.success('Đã đánh dấu đã đọc');
+            toast.success(t('notifications.toast.markedAsRead'));
         } catch {
-            toast.error('Không thể đánh dấu đã đọc');
+            toast.error(t('notifications.toast.markAsReadError'));
         }
     };
 
@@ -163,11 +162,11 @@ const Notifications = () => {
                 }))
             );
 
-            toast.success('Đã đánh dấu tất cả là đã đọc');
+            toast.success(t('notifications.toast.allMarkedAsRead'));
             setIsSettingsOpen(false);
             dispatch(fetchNotificationCountsByType(false));
         } catch {
-            toast.error('Không thể đánh dấu tất cả');
+            toast.error(t('notifications.toast.markAllError'));
         }
     };
 
@@ -178,19 +177,15 @@ const Notifications = () => {
             // Update local state
             setNotifications((prev) => prev.filter((n) => n.id !== id));
 
-            toast.success('Đã xóa thông báo');
+            toast.success(t('notifications.toast.deleted'));
             dispatch(fetchNotificationCountsByType(false));
         } catch {
-            toast.error('Không thể xóa thông báo');
+            toast.error(t('notifications.toast.deleteError'));
         }
     };
 
     const handleDeleteAll = async () => {
-        if (
-            !globalThis.confirm(
-                'Bạn có chắc chắn muốn xóa tất cả thông báo? Hành động này không thể hoàn tác.'
-            )
-        ) {
+        if (!globalThis.confirm(t('notifications.confirmDeleteAll'))) {
             return;
         }
 
@@ -200,11 +195,11 @@ const Notifications = () => {
             // Update local state
             setNotifications([]);
 
-            toast.success('Đã xóa tất cả thông báo');
+            toast.success(t('notifications.toast.allDeleted'));
             setIsSettingsOpen(false);
             dispatch(fetchNotificationCountsByType(false));
         } catch {
-            toast.error('Không thể xóa tất cả thông báo');
+            toast.error(t('notifications.toast.deleteAllError'));
         }
     };
 
@@ -270,7 +265,7 @@ const Notifications = () => {
             return (
                 <div className="text-center py-5">
                     <i className="isax isax-notification-bing fs-1 text-muted"></i>
-                    <p className="text-muted mt-3">Chưa có thông báo nào</p>
+                    <p className="text-muted mt-3">{t('notifications.empty')}</p>
                 </div>
             );
         }
@@ -387,7 +382,7 @@ const Notifications = () => {
                                                     }
                                                 >
                                                     <i className="isax isax-tick-circle me-1"></i>{' '}
-                                                    Đánh dấu đã đọc
+                                                    {t('notifications.markAsRead')}
                                                 </button>
                                             )}
                                             <button
@@ -395,14 +390,15 @@ const Notifications = () => {
                                                 className="btn btn-sm btn-outline-danger"
                                                 onClick={() => handleDelete(notification.id)}
                                             >
-                                                <i className="isax isax-trash me-1"></i> Xóa
+                                                <i className="isax isax-trash me-1"></i>{' '}
+                                                {t('notifications.delete')}
                                             </button>
                                             {!notification.isRead && (
                                                 <span
                                                     className="badge bg-primary"
                                                     style={{ marginLeft: 'auto' }}
                                                 >
-                                                    Mới
+                                                    {t('notifications.new')}
                                                 </span>
                                             )}
                                         </div>
@@ -439,7 +435,7 @@ const Notifications = () => {
                         alignItems: 'center',
                     }}
                 >
-                    <h3>Danh sách thông báo</h3>
+                    <h3>{t('notifications.title')}</h3>
                 </div>
             </div>
 
@@ -453,7 +449,7 @@ const Notifications = () => {
                                 type="button"
                                 onClick={() => setActiveCategory(NotificationCategory.Appointment)}
                             >
-                                {NotificationCategoryLabels[NotificationCategory.Appointment]}
+                                {t('notifications.tabs.appointment')}
                                 <span
                                     style={
                                         appointmentCount > 0
@@ -474,7 +470,7 @@ const Notifications = () => {
                                 type="button"
                                 onClick={() => setActiveCategory(NotificationCategory.News)}
                             >
-                                {NotificationCategoryLabels[NotificationCategory.News]}
+                                {t('notifications.tabs.news')}
                                 <span
                                     style={
                                         newsCount > 0
@@ -495,7 +491,7 @@ const Notifications = () => {
                                 type="button"
                                 onClick={() => setActiveCategory(NotificationCategory.System)}
                             >
-                                {NotificationCategoryLabels[NotificationCategory.System]}
+                                {t('notifications.tabs.system')}
                                 <span
                                     style={
                                         systemCount > 0
@@ -525,7 +521,7 @@ const Notifications = () => {
                             border: '1px solid #e0e0e0',
                         }}
                     >
-                        <i className="isax isax-setting-2"></i> Tùy chọn
+                        <i className="isax isax-setting-2"></i> {t('notifications.options')}
                     </button>
 
                     {isSettingsOpen && (
@@ -552,7 +548,8 @@ const Notifications = () => {
                                     padding: '8px 16px',
                                 }}
                             >
-                                <i className="isax isax-tick-circle"></i> Đánh dấu tất cả đã đọc
+                                <i className="isax isax-tick-circle"></i>{' '}
+                                {t('notifications.markAllAsRead')}
                             </button>
                             <div className="dropdown-divider"></div>
                             <button
@@ -566,7 +563,7 @@ const Notifications = () => {
                                     padding: '8px 16px',
                                 }}
                             >
-                                <i className="isax isax-trash"></i> Xóa tất cả
+                                <i className="isax isax-trash"></i> {t('notifications.deleteAll')}
                             </button>
                         </div>
                     )}

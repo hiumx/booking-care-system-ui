@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { RangeKeyDict } from 'react-date-range';
 import clsx from 'clsx';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import AppointmentCard from './components/AppointmentCard/AppointmentCard';
 import AppointmentCardSkeleton from './components/AppointmentCard/AppointmentCardSkeleton';
@@ -35,6 +36,7 @@ import profile06 from '@/assets/img/doctors-dashboard/profile-06.jpg';
 type ViewMode = 'list' | 'grid';
 
 const Appointments: React.FC = () => {
+    const { t } = useTranslation('userProfile');
     // Get user profile from Redux
     const userProfile = useSelector((state: RootState) => state.user.profile);
 
@@ -136,7 +138,7 @@ const Appointments: React.FC = () => {
         const fetchAppointments = async () => {
             if (!userProfile?.id) {
                 console.warn('User profile not available');
-                toast.warning('Vui lòng đăng nhập để xem lịch hẹn');
+                toast.warning(t('appointments.toast.loginRequired'));
                 return;
             }
 
@@ -194,11 +196,11 @@ const Appointments: React.FC = () => {
                         });
                     }
                 } else {
-                    throw new Error(response.message || 'Không thể tải danh sách lịch hẹn');
+                    throw new Error(response.message || t('appointments.toast.loadError'));
                 }
             } catch (error: any) {
                 console.error('Error fetching appointments:', error);
-                const errorMessage = error.message || 'Không thể tải danh sách lịch hẹn';
+                const errorMessage = error.message || t('appointments.toast.loadError');
                 setApiError(errorMessage);
                 setAppointments([]);
                 setTotalCount(0);
@@ -461,7 +463,7 @@ const Appointments: React.FC = () => {
             appointment.status !== AppointmentStatus.PENDING &&
             appointment.status !== AppointmentStatus.CONFIRMED
         ) {
-            toast.warning('Chỉ có thể hủy lịch hẹn ở trạng thái Chờ xử lý hoặc Sắp tới');
+            toast.warning(t('appointments.toast.cancelStatusWarning'));
             return;
         }
 
@@ -502,17 +504,15 @@ const Appointments: React.FC = () => {
                 );
 
                 if (refundInfo.refundPercentage === 100) {
-                    toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 100% chi phí.');
+                    toast.success(t('appointments.toast.cancelSuccessRefund100'));
                 } else if (refundInfo.refundPercentage === 50) {
-                    toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 50% chi phí.');
+                    toast.success(t('appointments.toast.cancelSuccessRefund50'));
                 } else {
-                    toast.success(
-                        'Hủy lịch hẹn thành công. Do hủy muộn, bạn sẽ không được hoàn lại chi phí.'
-                    );
+                    toast.success(t('appointments.toast.cancelSuccessNoRefund'));
                 }
             } else {
                 // No payment - simple success message
-                toast.success('Hủy lịch hẹn thành công.');
+                toast.success(t('appointments.toast.cancelSuccess'));
             }
 
             // Close modal and reset state
@@ -529,7 +529,7 @@ const Appointments: React.FC = () => {
             setRefreshTrigger((prev) => prev + 1);
         } catch (error: any) {
             console.error('Error cancelling appointment:', error);
-            toast.error(error.message || 'Không thể hủy lịch hẹn. Vui lòng thử lại.');
+            toast.error(error.message || t('appointments.toast.cancelError'));
         } finally {
             setIsCancelling(false);
         }
@@ -600,22 +600,22 @@ const Appointments: React.FC = () => {
 
         // Validation
         if (!selectedAppointmentForReview || !userProfile?.id) {
-            toast.error('Không tìm thấy thông tin lịch hẹn hoặc người dùng.');
+            toast.error(t('appointments.review.validation.noAppointment'));
             return;
         }
 
         if (!reviewRating || reviewRating < 1 || reviewRating > 5) {
-            toast.error('Vui lòng chọn đánh giá từ 1 đến 5 sao.');
+            toast.error(t('appointments.review.validation.invalidRating'));
             return;
         }
 
         if (!reviewComment.trim() || reviewComment.trim().length < 5) {
-            toast.error('Vui lòng nhập nhận xét (tối thiểu 5 ký tự).');
+            toast.error(t('appointments.review.validation.invalidComment'));
             return;
         }
 
         if (!selectedAppointmentForReview.doctorInfo?.id) {
-            toast.error('Không tìm thấy thông tin bác sĩ để đánh giá.');
+            toast.error(t('appointments.review.validation.noDoctor'));
             return;
         }
 
@@ -698,14 +698,14 @@ const Appointments: React.FC = () => {
                     <div className="mb-4" style={{ fontSize: '4rem', color: 'var(--bs-danger)' }}>
                         <i className="isax isax-close-circle"></i>
                     </div>
-                    <h4 className="text-danger">Đã xảy ra lỗi</h4>
+                    <h4 className="text-danger">{t('appointments.error.title')}</h4>
                     <p className="text-muted mb-4">{apiError}</p>
                     <button
                         type="button"
                         className="btn btn-primary-gradient rounded-pill"
                         onClick={() => globalThis.location.reload()}
                     >
-                        Thử lại
+                        {t('appointments.error.retry')}
                     </button>
                 </div>
             );
@@ -783,11 +783,11 @@ const Appointments: React.FC = () => {
                 <div className="mb-1" style={{ fontSize: '4rem', color: 'var(--bs-gray-400)' }}>
                     <i className="isax isax-calendar-search"></i>
                 </div>
-                <h4 className="text-muted">Không có lịch hẹn nào</h4>
+                <h4 className="text-muted">{t('appointments.empty.title')}</h4>
                 <p className="text-muted mb-3">
                     {hasActiveFilters
-                        ? 'Không tìm thấy lịch hẹn nào phù hợp với bộ lọc của bạn.'
-                        : 'Bạn chưa có lịch hẹn nào trong danh mục này.'}
+                        ? t('appointments.empty.withFilter')
+                        : t('appointments.empty.noFilter')}
                 </p>
                 {hasActiveFilters && (
                     <button
@@ -795,7 +795,7 @@ const Appointments: React.FC = () => {
                         className="btn btn-primary-gradient rounded-pill"
                         onClick={resetFilters}
                     >
-                        Xóa Bộ Lọc
+                        {t('appointments.empty.clearFilter')}
                     </button>
                 )}
             </div>
@@ -806,14 +806,14 @@ const Appointments: React.FC = () => {
         <>
             {/* Dashboard Header */}
             <div className="dashboard-header">
-                <h3>Lịch Hẹn</h3>
+                <h3>{t('appointments.title')}</h3>
                 <ul className={clsx(styles.headerListBtns, 'header-list-btns')}>
                     <li>
                         <div className="input-block dash-search-input">
                             <input
                                 type="text"
                                 className="form-control"
-                                placeholder="Tìm kiếm"
+                                placeholder={t('appointments.search')}
                                 value={searchTerm}
                                 onChange={(e) => handleSearchChange(e.target.value)}
                             />
@@ -863,7 +863,8 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('waiting')}
                             >
-                                Chờ Xác Nhận<span>{appointmentCounts.waiting}</span>
+                                {t('appointments.tabs.waiting')}
+                                <span>{appointmentCounts.waiting}</span>
                             </button>
                         </li>
                         <li className="nav-item">
@@ -872,7 +873,8 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('upcoming')}
                             >
-                                Sắp Khám<span>{appointmentCounts.upcoming}</span>
+                                {t('appointments.tabs.upcoming')}
+                                <span>{appointmentCounts.upcoming}</span>
                             </button>
                         </li>
                         <li className="nav-item">
@@ -881,7 +883,8 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('cancelled')}
                             >
-                                Đã Hủy <span>{appointmentCounts.cancelled}</span>
+                                {t('appointments.tabs.cancelled')}{' '}
+                                <span>{appointmentCounts.cancelled}</span>
                             </button>
                         </li>
                         <li className="nav-item">
@@ -890,7 +893,8 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 onClick={() => handleTabChange('completed')}
                             >
-                                Đã Khám <span>{appointmentCounts.completed}</span>
+                                {t('appointments.tabs.completed')}{' '}
+                                <span>{appointmentCounts.completed}</span>
                             </button>
                         </li>
                     </ul>
@@ -902,7 +906,7 @@ const Appointments: React.FC = () => {
                         <DateRangePicker
                             ranges={dateRanges}
                             onChange={handleDateRangeChange}
-                            placeholder="Chọn khoảng thời gian"
+                            placeholder={t('appointments.dateRangePlaceholder')}
                             className={styles.appointmentDatePicker}
                             months={calendarMonths}
                             direction="horizontal"
@@ -912,7 +916,7 @@ const Appointments: React.FC = () => {
                                 type="button"
                                 className={styles.clearDateBtn}
                                 onClick={handleClearDateRange}
-                                title="Xóa bộ lọc ngày"
+                                title={t('appointments.clearDateFilter')}
                             >
                                 <i className="fa fa-times"></i>
                             </button>
@@ -945,8 +949,9 @@ const Appointments: React.FC = () => {
                     <div className="modal-content">
                         <div className="modal-header">
                             <h3 className="modal-title">
-                                Đánh giá{' '}
-                                {selectedAppointmentForReview?.doctorInfo?.fullName || 'Bác sĩ'}
+                                {t('appointments.review.title')}{' '}
+                                {selectedAppointmentForReview?.doctorInfo?.fullName ||
+                                    t('appointments.review.doctor')}
                             </h3>
                             <button
                                 type="button"
@@ -967,7 +972,8 @@ const Appointments: React.FC = () => {
                                                     className="form-label"
                                                     htmlFor="rating-group"
                                                 >
-                                                    Đánh giá <span className="text-danger">*</span>
+                                                    {t('appointments.review.ratingLabel')}{' '}
+                                                    <span className="text-danger">*</span>
                                                 </label>
                                                 <div className="selection-wrap">
                                                     <div className="d-inline-block">
@@ -1066,7 +1072,8 @@ const Appointments: React.FC = () => {
                                                     className="form-label"
                                                     htmlFor="comment-textarea"
                                                 >
-                                                    Nhận xét <span className="text-danger">*</span>
+                                                    {t('appointments.review.commentLabel')}{' '}
+                                                    <span className="text-danger">*</span>
                                                 </label>
                                                 <textarea
                                                     id="comment-textarea"
@@ -1076,7 +1083,9 @@ const Appointments: React.FC = () => {
                                                     onChange={(e) =>
                                                         setReviewComment(e.target.value)
                                                     }
-                                                    placeholder="Chia sẻ trải nghiệm của bạn (tối thiểu 5 ký tự)..."
+                                                    placeholder={t(
+                                                        'appointments.review.commentPlaceholder'
+                                                    )}
                                                     minLength={5}
                                                     required
                                                 ></textarea>
@@ -1096,14 +1105,16 @@ const Appointments: React.FC = () => {
                                             setReviewComment('');
                                         }}
                                     >
-                                        Hủy
+                                        {t('appointments.review.cancel')}
                                     </Link>
                                     <button
                                         type="submit"
                                         className="btn btn-md btn-primary-gradient rounded-pill"
                                         disabled={isSubmittingReview}
                                     >
-                                        {isSubmittingReview ? 'Đang gửi...' : 'Thêm đánh giá'}
+                                        {isSubmittingReview
+                                            ? t('appointments.review.submitting')
+                                            : t('appointments.review.submit')}
                                     </button>
                                 </div>
                             </div>
@@ -1117,7 +1128,7 @@ const Appointments: React.FC = () => {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h3 className="modal-title">Chi tiết đánh giá</h3>
+                            <h3 className="modal-title">{t('appointments.viewReview.title')}</h3>
                             <button
                                 type="button"
                                 className="btn-close"
@@ -1136,7 +1147,7 @@ const Appointments: React.FC = () => {
                                                 className="form-label text-gray-6"
                                                 htmlFor="review-for"
                                             >
-                                                Đánh giá cho
+                                                {t('appointments.viewReview.reviewFor')}
                                             </label>
                                             <div
                                                 className="d-flex align-items-center"
@@ -1153,7 +1164,7 @@ const Appointments: React.FC = () => {
                                                 className="form-label text-gray-6"
                                                 htmlFor="review-by"
                                             >
-                                                Đánh giá bởi
+                                                {t('appointments.viewReview.reviewBy')}
                                             </label>
                                             <div
                                                 className="d-flex align-items-center"
@@ -1170,7 +1181,7 @@ const Appointments: React.FC = () => {
                                                 className="form-label text-gray-6"
                                                 htmlFor="review-rating"
                                             >
-                                                Đánh giá
+                                                {t('appointments.viewReview.rating')}
                                             </label>
                                             <div
                                                 className="d-flex align-items-center rating-list"
@@ -1192,7 +1203,7 @@ const Appointments: React.FC = () => {
                                             className="form-label text-gray-6"
                                             htmlFor="review-comment"
                                         >
-                                            Nhận xét
+                                            {t('appointments.viewReview.comment')}
                                         </label>
                                         <p className="mb-0" id="review-comment">
                                             Bác sĩ Edalin đã chăm sóc rất tốt và dành thời gian lắng
@@ -1217,13 +1228,13 @@ const Appointments: React.FC = () => {
                     }
                 }}
                 onConfirm={handleCancelConfirm}
-                title="Xác Nhận Hủy Lịch Hẹn"
-                message="Bạn có chắc chắn muốn hủy lịch hẹn"
-                confirmText="Xác nhận hủy"
-                cancelText="Đóng"
+                title={t('appointments.cancelModal.title')}
+                message={t('appointments.cancelModal.message')}
+                confirmText={t('appointments.cancelModal.confirm')}
+                cancelText={t('appointments.cancelModal.cancel')}
                 loading={isCancelling}
-                reasonLabel="Lý do hủy"
-                reasonPlaceholder="Vui lòng nhập lý do hủy lịch hẹn (tối thiểu 10 ký tự)..."
+                reasonLabel={t('appointments.cancelModal.reasonLabel')}
+                reasonPlaceholder={t('appointments.cancelModal.reasonPlaceholder')}
                 minReasonLength={10}
                 refundInfo={
                     selectedAppointmentToCancel && selectedAppointmentToCancel.consultationFees > 0

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import BookingLayout from '@/layouts/BookingLayout';
 import DateTimeSection from './sections/DateTimeSection';
 import PaymentSection from './sections/PaymentSection';
@@ -59,6 +60,7 @@ const ChooseNewDoctor: React.FC = () => {
 
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const { t } = useTranslation('booking');
     const { doctorId } = useParams<{ doctorId: string }>();
     const [searchParams] = useSearchParams();
 
@@ -76,7 +78,7 @@ const ChooseNewDoctor: React.FC = () => {
 
     useEffect(() => {
         if (!rescheduleAppointmentId || !rescheduleToken || !doctorId) {
-            toast.error('Thông tin không hợp lệ');
+            toast.error(t('chooseNewDoctor.toast.invalidInfo'));
             navigate(PATHS.HOME);
             return;
         }
@@ -99,11 +101,13 @@ const ChooseNewDoctor: React.FC = () => {
             if (response.success && response.data) {
                 setOriginalAppointment(response.data);
             } else {
-                throw new Error('Không thể tải thông tin lịch hẹn');
+                throw new Error(t('chooseNewDoctor.toast.loadError'));
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error loading appointment:', error);
-            toast.error(error.message || 'Không thể tải thông tin lịch hẹn');
+            const errorMessage =
+                error instanceof Error ? error.message : t('chooseNewDoctor.toast.loadError');
+            toast.error(errorMessage);
             navigate(PATHS.HOME);
         } finally {
             setIsLoading(false);
@@ -150,9 +154,13 @@ const ChooseNewDoctor: React.FC = () => {
         }
     };
 
+    const formatCurrency = (amount: number): string => {
+        return amount.toLocaleString('vi-VN') + ' đ';
+    };
+
     const handleNextStep = async () => {
         if (!scheduleState.selectedDate || scheduleState.selectedSlots.length === 0) {
-            toast.error('Vui lòng chọn ngày và giờ khám');
+            toast.error(t('chooseNewDoctor.toast.selectDateTime'));
             return;
         }
 
@@ -192,7 +200,7 @@ const ChooseNewDoctor: React.FC = () => {
 
     const handleDirectUpdate = async () => {
         if (!rescheduleAppointmentId || !rescheduleToken || !doctorId) {
-            toast.error('Thông tin không hợp lệ');
+            toast.error(t('chooseNewDoctor.toast.invalidInfo'));
             return;
         }
 
@@ -200,7 +208,7 @@ const ChooseNewDoctor: React.FC = () => {
         const dateTime = getAppointmentDateTime(skipDateTime, originalAppointment, scheduleState);
 
         if (!dateTime) {
-            toast.error('Vui lòng chọn ngày và giờ khám');
+            toast.error(t('chooseNewDoctor.toast.selectDateTime'));
             return;
         }
 
@@ -218,11 +226,13 @@ const ChooseNewDoctor: React.FC = () => {
                     PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', rescheduleAppointmentId)
                 );
             } else {
-                throw new Error(response.message || 'Không thể cập nhật lịch hẹn');
+                throw new Error(response.message || t('chooseNewDoctor.toast.updateError'));
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error updating appointment:', error);
-            toast.error(error.message || 'Không thể cập nhật lịch hẹn');
+            const errorMessage =
+                error instanceof Error ? error.message : t('chooseNewDoctor.toast.updateError');
+            toast.error(errorMessage);
         } finally {
             setIsProcessing(false);
         }
@@ -236,7 +246,7 @@ const ChooseNewDoctor: React.FC = () => {
             !userState.profile?.id ||
             !doctorId
         ) {
-            toast.error('Thông tin không hợp lệ');
+            toast.error(t('chooseNewDoctor.toast.invalidInfo'));
             return;
         }
 
@@ -244,7 +254,7 @@ const ChooseNewDoctor: React.FC = () => {
         const dateTime = getAppointmentDateTime(skipDateTime, originalAppointment, scheduleState);
 
         if (!dateTime) {
-            toast.error('Vui lòng chọn ngày và giờ khám');
+            toast.error(t('chooseNewDoctor.toast.selectDateTime'));
             return;
         }
 
@@ -285,19 +295,21 @@ const ChooseNewDoctor: React.FC = () => {
 
                 // Step 3: Redirect to payment gateway
                 if (paymentResponse.paymentUrl) {
-                    toast.success('Đang chuyển hướng đến cổng thanh toán...');
+                    toast.success(t('chooseNewDoctor.toast.redirectingPayment'));
                     setTimeout(() => {
                         globalThis.location.href = paymentResponse.paymentUrl;
                     }, 1000);
                 } else {
-                    throw new Error('Không nhận được URL thanh toán');
+                    throw new Error(t('chooseNewDoctor.toast.paymentUrlError'));
                 }
             } else {
-                throw new Error(chooseResponse.message || 'Không thể cập nhật lịch hẹn');
+                throw new Error(chooseResponse.message || t('chooseNewDoctor.toast.updateError'));
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error processing payment:', error);
-            toast.error(error.message || 'Không thể xử lý thanh toán');
+            const errorMessage =
+                error instanceof Error ? error.message : t('chooseNewDoctor.toast.paymentError');
+            toast.error(errorMessage);
         } finally {
             setIsProcessing(false);
         }
@@ -305,7 +317,7 @@ const ChooseNewDoctor: React.FC = () => {
 
     const handleRefundRequest = async () => {
         if (!rescheduleAppointmentId || !rescheduleToken || !priceDifference || !doctorId) {
-            toast.error('Thông tin không hợp lệ');
+            toast.error(t('chooseNewDoctor.toast.invalidInfo'));
             return;
         }
 
@@ -313,7 +325,7 @@ const ChooseNewDoctor: React.FC = () => {
         const dateTime = getAppointmentDateTime(skipDateTime, originalAppointment, scheduleState);
 
         if (!dateTime) {
-            toast.error('Vui lòng chọn ngày và giờ khám');
+            toast.error(t('chooseNewDoctor.toast.selectDateTime'));
             return;
         }
 
@@ -329,18 +341,22 @@ const ChooseNewDoctor: React.FC = () => {
                 toast.success(response.data.message);
                 if (response.data.action === 'refund_created') {
                     toast.info(
-                        `Số tiền hoàn lại: ${response.data.priceDifference.toLocaleString('vi-VN')} đ`
+                        t('chooseNewDoctor.toast.refundAmount', {
+                            amount: formatCurrency(response.data.priceDifference),
+                        })
                     );
                 }
                 navigate(
                     PATHS.BOOKING.CONFIRMATION.replace(':appointmentId', rescheduleAppointmentId)
                 );
             } else {
-                throw new Error(response.message || 'Không thể xử lý yêu cầu');
+                throw new Error(response.message || t('chooseNewDoctor.toast.refundError'));
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error requesting refund:', error);
-            toast.error(error.message || 'Không thể xử lý yêu cầu hoàn tiền');
+            const errorMessage =
+                error instanceof Error ? error.message : t('chooseNewDoctor.toast.refundError');
+            toast.error(errorMessage);
         } finally {
             setIsProcessing(false);
         }
@@ -383,6 +399,23 @@ const ChooseNewDoctor: React.FC = () => {
         }
     };
 
+    const getPriceDifferenceMessage = (type: string, amount: number): string => {
+        switch (type) {
+            case 'equal':
+                return t('chooseNewDoctor.priceDifference.equal');
+            case 'higher':
+                return t('chooseNewDoctor.priceDifference.higher', {
+                    amount: formatCurrency(amount),
+                });
+            case 'lower':
+                return t('chooseNewDoctor.priceDifference.lower', {
+                    amount: formatCurrency(amount),
+                });
+            default:
+                return '';
+        }
+    };
+
     if (isLoading) {
         return <BookingLoadingSpinner />;
     }
@@ -398,9 +431,13 @@ const ChooseNewDoctor: React.FC = () => {
                                 <>
                                     <div className="alert alert-light mb-3">
                                         <i className="ti ti-info-circle me-2"></i>
-                                        <strong>Lưu ý:</strong> Bạn chỉ cần thanh toán cọc 30% giá
-                                        khám. Số tiền còn lại sẽ được thanh toán khi hoàn thành
-                                        khám.
+                                        <strong>
+                                            {t('chooseNewDoctor.depositNote').split(':')[0]}:
+                                        </strong>
+                                        {t('chooseNewDoctor.depositNote')
+                                            .split(':')
+                                            .slice(1)
+                                            .join(':')}
                                     </div>
                                     <div
                                         className={`alert ${getPriceAlertClass(priceDifference.type)} mb-4`}
@@ -409,12 +446,10 @@ const ChooseNewDoctor: React.FC = () => {
                                             className={`ti ${getPriceIconClass(priceDifference.type)} me-2`}
                                             aria-hidden="true"
                                         ></i>
-                                        {priceDifference.type === 'equal' &&
-                                            'Cọc khám giống nhau, bạn không cần thanh toán thêm'}
-                                        {priceDifference.type === 'higher' &&
-                                            `Bác sĩ mới có cọc cao hơn ${priceDifference.amount.toLocaleString('vi-VN')} đ, bạn cần thanh toán thêm`}
-                                        {priceDifference.type === 'lower' &&
-                                            `Bác sĩ mới có cọc thấp hơn ${priceDifference.amount.toLocaleString('vi-VN')} đ, hệ thống sẽ hoàn tiền cho bạn`}
+                                        {getPriceDifferenceMessage(
+                                            priceDifference.type,
+                                            priceDifference.amount
+                                        )}
                                     </div>
                                 </>
                             )}
@@ -423,10 +458,10 @@ const ChooseNewDoctor: React.FC = () => {
                                 steps={
                                     priceDifference?.type === 'higher'
                                         ? [
-                                              { id: 1, title: 'Ngày & Giờ' },
-                                              { id: 2, title: 'Thanh Toán' },
+                                              { id: 1, title: t('chooseNewDoctor.steps.dateTime') },
+                                              { id: 2, title: t('chooseNewDoctor.steps.payment') },
                                           ]
-                                        : [{ id: 1, title: 'Ngày & Giờ' }]
+                                        : [{ id: 1, title: t('chooseNewDoctor.steps.dateTime') }]
                                 }
                                 currentStep={currentStep}
                             />

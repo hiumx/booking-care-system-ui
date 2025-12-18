@@ -1,0 +1,49 @@
+// MainHeader responsive styles
+
+// Fix menu items spacing on large screens
+.mainMenuWrapper {
+    :global(.main-nav) {
+        display: flex;
+        align-items: center;
+        gap: 0;
+
+        // Add more spacing between menu items on larger screens
+        @media (min-width: 992px) {
+            gap: 0.25rem;
+        }
+
+        @media (min-width: 1200px) {
+            gap: 0.5rem;
+        }
+
+        @media (min-width: 1400px) {
+            gap: 0.75rem;
+        }
+
+        > li {
+            > a {
+                white-space: nowrap;
+                padding: 0.5rem 0.5rem;
+
+                @media (min-width: 1200px) {
+                    padding: 0.5rem 0.75rem;
+                }
+            }
+        }
+    }
+}
+
+// Ensure header navbar right items have proper spacing
+.headerNavbarRight {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    @media (min-width: 1200px) {
+        gap: 0.75rem;
+    }
+
+    @media (min-width: 1400px) {
+        gap: 1rem;
+    }
+}

@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import styles from './DoctorProfile.module.scss';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
+import { LoadingState, ErrorState } from '@/components/PageStates';
 import ReviewSection from '@/components/ReviewSection';
 import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
 import {
@@ -120,57 +121,32 @@ const DoctorProfile: React.FC = () => {
 
     // Loading and error states
     if (isLoading) {
-        return (
-            <MainLayout>
-                <div className="content">
-                    <div className="container">
-                        <div className="text-center py-5">
-                            <div className="spinner-border">
-                                <output className="visually-hidden">Loading...</output>
-                            </div>
-                            <p className="mt-3">{t('profile.loading')}</p>
-                        </div>
-                    </div>
-                </div>
-            </MainLayout>
-        );
+        return <LoadingState message={t('profile.loading')} showBreadcrumb={false} />;
     }
 
     if (error) {
         return (
-            <MainLayout>
-                <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
-                <div className="content">
-                    <div className="container">
-                        <div className="text-center py-5">
-                            <h4 className="fw-semibold mb-2">{t('profile.error.title')}</h4>
-                            <p className="text-muted mb-4">{t('profile.error.message')}</p>
-                            <Link to={PATHS.HOME} className="btn btn-outline-primary px-4">
-                                {t('profile.error.backHome')}
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </MainLayout>
+            <ErrorState
+                title={t('profile.error.title')}
+                message={t('profile.error.message')}
+                actionText={t('profile.error.backHome')}
+                actionLink={PATHS.HOME}
+                breadcrumbItems={breadcrumbData.items}
+                breadcrumbTitle={breadcrumbData.title}
+            />
         );
     }
 
     if (!doctor) {
         return (
-            <MainLayout>
-                <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
-                <div className="content">
-                    <div className="container">
-                        <div className="text-center py-5">
-                            <h4 className="fw-semibold mb-2">{t('profile.notFound.title')}</h4>
-                            <p className="text-muted mb-4">{t('profile.notFound.message')}</p>
-                            <Link to={PATHS.HOME} className="btn btn-outline-primary px-4">
-                                {t('profile.notFound.backHome')}
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </MainLayout>
+            <ErrorState
+                title={t('profile.notFound.title')}
+                message={t('profile.notFound.message')}
+                actionText={t('profile.notFound.backHome')}
+                actionLink={PATHS.HOME}
+                breadcrumbItems={breadcrumbData.items}
+                breadcrumbTitle={breadcrumbData.title}
+            />
         );
     }
 

@@ -33,8 +33,9 @@ const mockTimeSlots = {
     ],
 };
 
+// Note: title uses translation keys that will be translated in SlotCategory component
 export const mockSlotCategories = [
-    { title: 'Buổi sáng', timeSlots: mockTimeSlots.morning },
-    { title: 'Buổi chiều', timeSlots: mockTimeSlots.afternoon },
-    { title: 'Buổi tối', timeSlots: mockTimeSlots.evening },
+    { title: 'morning', timeSlots: mockTimeSlots.morning },
+    { title: 'afternoon', timeSlots: mockTimeSlots.afternoon },
+    { title: 'evening', timeSlots: mockTimeSlots.evening },
 ];

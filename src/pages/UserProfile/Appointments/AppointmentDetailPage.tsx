@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import AppointmentDetail from './components/AppointmentDetail';
+import AppointmentDetail from './components/AppointmentDetail/AppointmentDetail';
 import AppointmentDetailSkeleton from './components/AppointmentDetail/AppointmentDetailSkeleton';
 import AppointmentCard from './components/AppointmentCard/AppointmentCard';
 import AppointmentCardSkeleton from './components/AppointmentCard/AppointmentCardSkeleton';
@@ -24,9 +25,12 @@ import {
 import { PATHS } from '@/routes/paths';
 
 const AppointmentDetailPage: React.FC = () => {
+    const { t, i18n } = useTranslation('userProfile');
+
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN', {
+        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
+        return date.toLocaleDateString(locale, {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
@@ -58,7 +62,7 @@ const AppointmentDetailPage: React.FC = () => {
     useEffect(() => {
         const fetchAppointmentDetail = async () => {
             if (!appointmentId) {
-                toast.error('Không tìm thấy ID cuộc hẹn');
+                toast.error(t('appointments.detail.toast.appointmentNotFound'));
                 navigate('/user/profile?tab=appointments');
                 return;
             }
@@ -72,11 +76,11 @@ const AppointmentDetailPage: React.FC = () => {
                     detailData.isNew = isNewAppointment(response.data.createdAt);
                     setAppointmentData(detailData);
                 } else {
-                    throw new Error(response.message || 'Không thể tải thông tin cuộc hẹn');
+                    throw new Error(response.message || t('appointments.detail.toast.loadError'));
                 }
             } catch (error: any) {
                 console.error('Error fetching appointment detail:', error);
-                toast.error(error.message || 'Không thể tải thông tin cuộc hẹn');
+                toast.error(error.message || t('appointments.detail.toast.loadError'));
                 navigate('/user/profile?tab=appointments');
             } finally {
                 setIsLoading(false);
@@ -129,7 +133,6 @@ const AppointmentDetailPage: React.FC = () => {
     }, [userProfile, appointmentId]);
 
     const handleStartSession = () => {
-        alert('Bắt đầu phiên tư vấn');
         // In real app: navigate to video call page or open video modal
     };
 
@@ -141,7 +144,7 @@ const AppointmentDetailPage: React.FC = () => {
             appointmentData.status !== AppointmentStatus.PENDING &&
             appointmentData.status !== AppointmentStatus.CONFIRMED
         ) {
-            toast.warning('Chỉ có thể hủy lịch hẹn ở trạng thái Chờ xử lý hoặc Sắp tới');
+            toast.warning(t('appointments.toast.cancelStatusWarning'));
             return;
         }
 
@@ -171,13 +174,11 @@ const AppointmentDetailPage: React.FC = () => {
 
             // Show success message with refund info
             if (refundInfo.refundPercentage === 100) {
-                toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 100% chi phí.');
+                toast.success(t('appointments.toast.cancelSuccessRefund100'));
             } else if (refundInfo.refundPercentage === 50) {
-                toast.success('Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 50% chi phí.');
+                toast.success(t('appointments.toast.cancelSuccessRefund50'));
             } else {
-                toast.success(
-                    'Hủy lịch hẹn thành công. Do hủy muộn, bạn sẽ không được hoàn lại chi phí.'
-                );
+                toast.success(t('appointments.toast.cancelSuccessNoRefund'));
             }
 
             // Close modal and navigate back to appointments list
@@ -187,7 +188,7 @@ const AppointmentDetailPage: React.FC = () => {
             navigate(PATHS.USER.ROOT + '/' + PATHS.USER.PROFILE + '?tab=appointments');
         } catch (error: any) {
             console.error('Error cancelling appointment:', error);
-            toast.error(error.message || 'Không thể hủy lịch hẹn. Vui lòng thử lại.');
+            toast.error(error.message || t('appointments.toast.cancelError'));
         } finally {
             setIsCancelling(false);
         }
@@ -200,7 +201,6 @@ const AppointmentDetailPage: React.FC = () => {
     ) => {
         // If called without parameters (from old reschedule buttons in CANCELLED/COMPLETED status)
         if (!action || !appointment) {
-            alert('Chuyển đến trang đặt lại lịch hẹn');
             return;
         }
 
@@ -209,7 +209,6 @@ const AppointmentDetailPage: React.FC = () => {
     };
 
     const handleDownloadPrescription = () => {
-        alert('Tải đơn thuốc');
         // In real app: trigger download or open prescription modal
     };
 
@@ -235,8 +234,8 @@ const AppointmentDetailPage: React.FC = () => {
                 <div className="mb-1" style={{ fontSize: '4rem', color: 'var(--bs-gray-400)' }}>
                     <i className="isax isax-calendar-search"></i>
                 </div>
-                <h4 className="text-muted">Không có lịch hẹn gần đây</h4>
-                <p className="text-muted mb-4">Bạn chưa có lịch hẹn nào trong danh mục này.</p>
+                <h4 className="text-muted">{t('appointments.detail.noRecentAppointments')}</h4>
+                <p className="text-muted mb-4">{t('appointments.detail.noRecentDescription')}</p>
             </div>
         );
     };
@@ -250,7 +249,7 @@ const AppointmentDetailPage: React.FC = () => {
                         <i className="fa-solid fa-arrow-left"></i>
                     </Link>
 
-                    <h3>Chi Tiết Cuộc Hẹn</h3>
+                    <h3>{t('appointments.detail.title')}</h3>
                 </div>
             </div>
 
@@ -273,7 +272,7 @@ const AppointmentDetailPage: React.FC = () => {
             {/* Recent Appointments Section */}
             {!isLoading && (
                 <div className="recent-appointments">
-                    <h5 className="head-text">Lịch Hẹn Gần Đây</h5>
+                    <h5 className="head-text">{t('appointments.detail.recentAppointments')}</h5>
 
                     {/* Loading State - Skeleton */}
                     {isLoadingRecent && (
@@ -293,7 +292,9 @@ const AppointmentDetailPage: React.FC = () => {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title">Lý Do Hủy</h5>
+                            <h5 className="modal-title">
+                                {t('appointments.detail.cancelReasonTitle')}
+                            </h5>
                             <button type="button" data-bs-dismiss="modal" aria-label="Close">
                                 <span>
                                     <i className="fa-solid fa-x"></i>
@@ -304,14 +305,15 @@ const AppointmentDetailPage: React.FC = () => {
                             <div className="reason-of-rejection">
                                 <p>
                                     {appointmentData?.reason ||
-                                        'Không có lý do cụ thể được cung cấp.'}
+                                        t('appointments.detail.noReasonProvided')}
                                 </p>
                                 <span className="text-danger">
-                                    Đã hủy bởi{' '}
+                                    {t('appointments.detail.cancelledBy')}{' '}
                                     {appointmentData?.cancelledBy === 'Patient'
-                                        ? 'bạn'
-                                        : 'bệnh viện'}{' '}
-                                    vào ngày {formatDate(appointmentData?.cancelledAt || '')}
+                                        ? t('appointments.detail.cancelledByYou')
+                                        : t('appointments.detail.cancelledByHospital')}{' '}
+                                    {t('appointments.detail.cancelledOn')}{' '}
+                                    {formatDate(appointmentData?.cancelledAt || '')}
                                 </span>
                             </div>
                         </div>
@@ -329,13 +331,13 @@ const AppointmentDetailPage: React.FC = () => {
                         }
                     }}
                     onConfirm={handleCancelConfirm}
-                    title="Xác Nhận Hủy Lịch Hẹn"
-                    message="Bạn có chắc chắn muốn hủy lịch hẹn"
-                    confirmText="Xác nhận hủy"
-                    cancelText="Đóng"
+                    title={t('appointments.cancelModal.title')}
+                    message={t('appointments.cancelModal.message')}
+                    confirmText={t('appointments.cancelModal.confirm')}
+                    cancelText={t('appointments.cancelModal.cancel')}
                     loading={isCancelling}
-                    reasonLabel="Lý do hủy"
-                    reasonPlaceholder="Vui lòng nhập lý do hủy lịch hẹn (tối thiểu 10 ký tự)..."
+                    reasonLabel={t('appointments.cancelModal.reasonLabel')}
+                    reasonPlaceholder={t('appointments.cancelModal.reasonPlaceholder')}
                     minReasonLength={10}
                     refundInfo={
                         appointmentData.consultationFees > 0

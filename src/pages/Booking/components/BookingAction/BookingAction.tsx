@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 export interface BookingActionProps {
     nextStepTitle: string;
     prevStep: () => void;
@@ -15,9 +17,12 @@ const BookingAction: React.FC<BookingActionProps> = ({
     loading = false,
     showPrev = true,
 }) => {
+    const { t } = useTranslation('booking');
+
     const containerClass = showPrev
         ? 'd-flex align-items-center flex-wrap rpw-gap-2 justify-content-between'
         : 'd-flex align-items-center flex-wrap rpw-gap-2 justify-content-end';
+
     return (
         <div className="card-footer">
             <div className={containerClass}>
@@ -28,7 +33,7 @@ const BookingAction: React.FC<BookingActionProps> = ({
                         disabled={loading}
                     >
                         <i className="isax isax-arrow-left-2 me-1"></i>
-                        Quay lại
+                        {t('common.back')}
                     </button>
                 )}
                 <button

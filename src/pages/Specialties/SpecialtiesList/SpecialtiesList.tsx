@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import SpecialityCard from './components/SpecialityCard';
+import { LoadingState, ErrorState, SearchInput } from '@/components/PageStates';
 import styles from './SpecialtiesList.module.scss';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getSpecialtiesAsync } from '@/store/slices/specialtySlice';
@@ -17,6 +19,8 @@ import speciality02 from '@/assets/img/specialities/speciality-02.svg';
 import speciality03 from '@/assets/img/specialities/speciality-03.svg';
 
 const SpecialtiesList: React.FC = () => {
+    const { t } = useTranslation('specialty');
+
     // Redux state management
     const dispatch = useAppDispatch();
     const specialties = useAppSelector(selectSpecialties);
@@ -33,14 +37,15 @@ const SpecialtiesList: React.FC = () => {
 
     // Transform API data to match component expectations
     const transformedSpecialties = specialties.map((specialty, index) => ({
-        id: specialty.id, // string from API
+        id: specialty.id,
         name: specialty.name,
         image_url: specialty.imageUrl || fallbackImages[index % fallbackImages.length],
-        status: 'ACTIVE', // All specialties from API are active
-        created_at: '2025-01-01T00:00:00', // Placeholder since API doesn't return this
-        updated_at: '2025-01-01T00:00:00', // Placeholder since API doesn't return this
-        doctorCount: specialty.doctorCount, // Use doctorCount from API
+        status: 'ACTIVE',
+        created_at: '2025-01-01T00:00:00',
+        updated_at: '2025-01-01T00:00:00',
+        doctorCount: specialty.doctorCount,
     }));
+
     // State for search
     const [search, setSearch] = useState('');
 
@@ -54,53 +59,34 @@ const SpecialtiesList: React.FC = () => {
     // Breadcrumb data
     const breadcrumbData = {
         items: [
-            { label: 'Trang chủ', path: '/', isActive: false },
-            { label: 'Chuyên khoa', isActive: true },
+            { label: t('breadcrumb.home'), path: '/', isActive: false },
+            { label: t('breadcrumb.specialties'), isActive: true },
         ],
-        title: 'Danh sách chuyên khoa',
+        title: t('list.title'),
     };
 
     // Loading state
     if (isLoading) {
         return (
-            <MainLayout>
-                <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
-                <div className={clsx('content', 'speciality-content')}>
-                    <div className={clsx('container')}>
-                        <div className={clsx('card')}>
-                            <div className={clsx('card-body', 'text-center')}>
-                                <div className="spinner-border">
-                                    <span className="visually-hidden">Loading...</span>
-                                </div>
-                                <output className="mt-3">Đang tải danh sách chuyên khoa...</output>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </MainLayout>
+            <LoadingState
+                message={t('list.loading')}
+                breadcrumbItems={breadcrumbData.items}
+                breadcrumbTitle={breadcrumbData.title}
+            />
         );
     }
 
     // Error state
     if (error) {
         return (
-            <MainLayout>
-                <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
-                <div className="content">
-                    <div className="container">
-                        <div className="text-center py-5">
-                            <h4 className="fw-semibold mb-2">Đã xảy ra lỗi!</h4>
-                            <p className="text-muted mb-4">Đã có lỗi xảy ra khi tải dữ liệu.</p>
-                            <button
-                                className="btn btn-outline-primary px-4"
-                                onClick={() => dispatch(getSpecialtiesAsync())}
-                            >
-                                Thử lại
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </MainLayout>
+            <ErrorState
+                title={t('list.error.title')}
+                message={t('list.error.message')}
+                actionText={t('list.error.retry')}
+                onAction={() => dispatch(getSpecialtiesAsync())}
+                breadcrumbItems={breadcrumbData.items}
+                breadcrumbTitle={breadcrumbData.title}
+            />
         );
     }
 
@@ -121,24 +107,17 @@ const SpecialtiesList: React.FC = () => {
                                 )}
                             >
                                 <h5 className={clsx(styles.customh5)}>
-                                    Hiển thị{' '}
+                                    {t('list.showing')}{' '}
                                     <span className={clsx(styles.resultCount)}>
                                         {filteredData.length}
                                     </span>{' '}
-                                    chuyên khoa
+                                    {t('list.specialties')}
                                 </h5>
-                                <div className={clsx('input-block', 'dash-search-input')}>
-                                    <input
-                                        type="text"
-                                        className={clsx('form-control')}
-                                        placeholder="Tìm kiếm chuyên khoa"
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
-                                    />
-                                    <span className={clsx('search-icon')}>
-                                        <i className={clsx('isax', 'isax-search-normal')}></i>
-                                    </span>
-                                </div>
+                                <SearchInput
+                                    value={search}
+                                    onChange={setSearch}
+                                    placeholder={t('list.searchPlaceholder')}
+                                />
                             </div>
                         </div>
                     </div>

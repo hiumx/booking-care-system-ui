@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AppointmentCardData, AppointmentUITab } from '@/types/appointment.types';
 
 interface AppointmentActionButtonsProps {
@@ -20,6 +21,8 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
     onCancel,
     variant = 'full',
 }) => {
+    const { t } = useTranslation('userProfile');
+
     // Minimal variant - only show view details button
     if (variant === 'minimal') {
         return (
@@ -28,7 +31,7 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                     <li>
                         <Link
                             to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                            title="Xem chi tiết"
+                            title={t('appointments.actions.viewDetail')}
                         >
                             <i className="isax isax-eye4"></i>
                         </Link>
@@ -50,7 +53,7 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                     <li>
                         <Link
                             to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                            title="Xem chi tiết"
+                            title={t('appointments.actions.viewDetail')}
                         >
                             <i className="isax isax-eye4"></i>
                         </Link>
@@ -59,7 +62,7 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                     <li>
                         <Link
                             to="#"
-                            title="Hủy lịch hẹn"
+                            title={t('appointments.actions.cancelAppointment')}
                             onClick={(e) => {
                                 e.preventDefault();
                                 onCancel?.(appointment);
@@ -78,7 +81,7 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                 <li>
                     <Link
                         to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                        title="Xem chi tiết"
+                        title={t('appointments.actions.viewDetail')}
                     >
                         <i className="isax isax-eye4"></i>
                     </Link>
@@ -89,7 +92,7 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                         <li>
                             <Link
                                 to="#"
-                                title="Đổi lịch với cùng bác sĩ"
+                                title={t('appointments.actions.rescheduleWithSameDoctor')}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     onReschedule?.(appointment, 'SAME_DOCTOR');
@@ -102,7 +105,7 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                         <li>
                             <Link
                                 to="#"
-                                title="Chọn bác sĩ mới"
+                                title={t('appointments.actions.chooseNewDoctor')}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     onReschedule?.(appointment, 'NEW_DOCTOR');
@@ -118,7 +121,7 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
                 <li>
                     <Link
                         to="#"
-                        title="Hủy lịch hẹn"
+                        title={t('appointments.actions.cancelAppointment')}
                         onClick={(e) => {
                             e.preventDefault();
                             onCancel?.(appointment);
@@ -136,13 +139,15 @@ const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> = ({
             case 'cancelled':
                 return (
                     <span className="badge badge-danger">
-                        <i className="isax isax-close-circle me-1"></i> Đã Hủy
+                        <i className="isax isax-close-circle me-1"></i>
+                        {t('appointments.actions.statusCancelled')}
                     </span>
                 );
             case 'completed':
                 return (
                     <span className="badge badge-success">
-                        <i className="isax isax-tick-circle me-1"></i> Đã Khám
+                        <i className="isax isax-tick-circle me-1"></i>
+                        {t('appointments.actions.statusCompleted')}
                     </span>
                 );
             default:
