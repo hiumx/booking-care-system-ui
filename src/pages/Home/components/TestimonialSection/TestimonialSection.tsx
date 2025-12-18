@@ -250,9 +250,9 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
                 <div className="section-header sec-header-one text-center aos" data-aos="fade-up">
                     <span className="badge badge-primary">{t('testimonial.badge')}</span>
                     <h2>
-                        {totalReviewsCount !== null
-                            ? `${totalReviewsCount.toLocaleString()}+ ${t('testimonial.titleSuffix', { defaultValue: 'Người dùng Tin tưởng Medcure Toàn cầu' })}`
-                            : t('testimonial.title')}
+                        {totalReviewsCount === null
+                            ? t('testimonial.title')
+                            : `${totalReviewsCount.toLocaleString()}+ ${t('testimonial.titleSuffix', { defaultValue: 'Người dùng Tin tưởng Medcure Toàn cầu' })}`}
                     </h2>
                 </div>
 
