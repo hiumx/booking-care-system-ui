@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { UserProfile, getGenderText } from '@/types/user.types';
 import { AppDispatch, RootState } from '@/store';
@@ -14,6 +15,7 @@ interface ProfileSidebarProps {
 }
 
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) => {
+    const { t, i18n } = useTranslation('userProfile');
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { unreadCount } = useSelector((state: RootState) => state.notification);
@@ -21,13 +23,25 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
 
     const isActive = (tab: string) => activeTab === tab;
 
-    // Helper function to format date of birth
+    // Helper function to format full name based on current language
+    // Vietnamese: lastName firstName (e.g., Nguyễn Văn A)
+    // English: firstName lastName (e.g., A Nguyen Van)
+    const formatFullName = (firstName?: string, lastName?: string) => {
+        if (!firstName && !lastName) return t('sidebar.notUpdated');
+        if (i18n.language === 'vi') {
+            return `${firstName || ''} ${lastName || ''}`.trim();
+        }
+        return `${lastName || ''} ${firstName || ''}`.trim();
+    };
+
+    // Helper function to format date of birth based on current language
     const formatDateOfBirth = (dateString: string | undefined) => {
-        if (!dateString) return 'Chưa cập nhật';
+        if (!dateString) return t('sidebar.notUpdated');
 
         try {
             const date = new Date(dateString);
-            return date.toLocaleDateString('vi-VN');
+            const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
+            return date.toLocaleDateString(locale);
         } catch {
             return dateString;
         }
@@ -39,11 +53,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
         try {
             await dispatch(logoutAsync()).unwrap();
             dispatch(clearUserProfile()); // Clear user profile from state
-            toast.success('Đăng xuất thành công');
+            toast.success(t('sidebar.toast.logoutSuccess'));
             navigate(PATHS.HOME); // Redirect to home page
         } catch (error: any) {
             console.error('Logout failed:', error);
-            toast.error('Không thể đăng xuất. Vui lòng thử lại');
+            toast.error(t('sidebar.toast.logoutError'));
         }
     };
 
@@ -53,7 +67,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
             <div className="profile-sidebar patient-sidebar profile-sidebar-new">
                 <div className="widget-profile pro-widget-content">
                     <div className="profile-info-widget text-center">
-                        <p>Đang tải thông tin...</p>
+                        <p>{t('sidebar.loading')}</p>
                     </div>
                 </div>
             </div>
@@ -70,7 +84,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                     >
                         <img
                             src={userData.avatarUrl || '/assets/img/default-avatar-male.png'}
-                            alt={`${userData.fullName} avatar`}
+                            alt={`${formatFullName(userData.firstName, userData.lastName)} avatar`}
                             className={styles.avatarImage}
                         />
                     </Link>
@@ -80,16 +94,18 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                                 to={PATHS.USER.ROOT + '/' + PATHS.USER.PROFILE + '?tab=settings'}
                                 className={styles.textFullName}
                             >
-                                {userData.fullName}
+                                {formatFullName(userData.firstName, userData.lastName)}
                             </Link>
                         </h3>
                         <div className="patient-details">
-                            <h5 className="mb-0">Vai trò : Bệnh nhân</h5>
+                            <h5 className="mb-0">
+                                {t('sidebar.role')} : {t('sidebar.patient')}
+                            </h5>
                         </div>
                         <span>
-                            Giới tính: {getGenderText(userData.gender)}{' '}
-                            <i className="fa-solid fa-circle"></i>Ngày sinh:{' '}
-                            {formatDateOfBirth(userData.dateOfBirth)}
+                            {t('sidebar.gender')}: {getGenderText(userData.gender)}{' '}
+                            <i className="fa-solid fa-circle"></i>
+                            {t('sidebar.dateOfBirth')}: {formatDateOfBirth(userData.dateOfBirth)}
                         </span>
                     </div>
                 </div>
@@ -97,53 +113,40 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
             <div className="dashboard-widget">
                 <nav className="dashboard-menu">
                     <ul>
-                        <li className={isActive('dashboard') ? 'active' : ''}>
-                            <Link to="/user/profile?tab=dashboard">
-                                <i className="isax isax-category-2"></i>
-                                <span>Thông Tin Cá Nhân</span>
-                            </Link>
-                        </li>
                         <li className={isActive('appointments') ? 'active' : ''}>
                             <Link to="/user/profile?tab=appointments">
                                 <i className="isax isax-calendar-1"></i>
-                                <span>Lịch Hẹn Của Tôi</span>
+                                <span>{t('sidebar.menu.appointments')}</span>
                             </Link>
                         </li>
                         <li className={isActive('favourites') ? 'active' : ''}>
                             <Link to="/user/profile?tab=favourites">
                                 <i className="isax isax-star-1"></i>
-                                <span>Yêu Thích</span>
+                                <span>{t('sidebar.menu.favourites')}</span>
                             </Link>
                         </li>
                         <li className={isActive('relatives') ? 'active' : ''}>
                             <Link to="/user/profile?tab=relatives">
                                 <i className="isax isax-people"></i>
-                                <span>Người Thân</span>
+                                <span>{t('sidebar.menu.relatives')}</span>
                             </Link>
                         </li>
-                        <li className={isActive('dependent') ? 'active' : ''}>
-                            <Link to="/user/profile?tab=dependent">
-                                <i className="isax isax-user-octagon"></i>
-                                <span>Lịch Sử Khám Bệnh</span>
-                            </Link>
-                        </li>
-
                         <li className={isActive('wallet') ? 'active' : ''}>
                             <Link to="/user/profile?tab=wallet">
                                 <i className="isax isax-wallet-2"></i>
-                                <span>Lịch sử hoàn tiền</span>
+                                <span>{t('sidebar.menu.wallet')}</span>
                             </Link>
                         </li>
                         <li className={isActive('invoices') ? 'active' : ''}>
                             <Link to="/user/profile?tab=invoices">
                                 <i className="isax isax-document-text"></i>
-                                <span>Hóa đơn</span>
+                                <span>{t('sidebar.menu.invoices')}</span>
                             </Link>
                         </li>
                         <li className={isActive('notifications') ? 'active' : ''}>
                             <Link to="/user/profile?tab=notifications">
                                 <i className="isax isax-notification-bing"></i>
-                                <span>Thông báo</span>
+                                <span>{t('sidebar.menu.notifications')}</span>
                                 {unreadCount > 0 && (
                                     <small className="unread-msg">{unreadCount}</small>
                                 )}
@@ -152,7 +155,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                         <li className={isActive('chat') ? 'active' : ''}>
                             <Link to="/chat">
                                 <i className="isax isax-messages-1"></i>
-                                <span>Tin nhắn</span>
+                                <span>{t('sidebar.menu.chat')}</span>
                                 {unreadMessageCount > 0 && (
                                     <small className="unread-msg">{unreadMessageCount}</small>
                                 )}
@@ -162,13 +165,13 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                         <li className={isActive('settings') ? 'active' : ''}>
                             <Link to="/user/profile?tab=settings">
                                 <i className="isax isax-setting-2"></i>
-                                <span>Cài đặt</span>
+                                <span>{t('sidebar.menu.settings')}</span>
                             </Link>
                         </li>
                         <li>
                             <Link to="#" onClick={handleLogout}>
                                 <i className="isax isax-logout"></i>
-                                <span>Đăng xuất</span>
+                                <span>{t('sidebar.menu.logout')}</span>
                             </Link>
                         </li>
                     </ul>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { Skeleton } from '@mui/material';
 import { setAppointmentType, setSelectedDoctorId } from '@/store/slices/bookingSlice';
@@ -67,6 +68,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
     prevStep,
     hospitalData,
 }) => {
+    const { t } = useTranslation('booking');
     const dispatch = useAppDispatch();
     const bookingState = useAppSelector((state) => state.booking);
     const scheduleState = useAppSelector((state) => state.schedule);
@@ -140,10 +142,20 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
         fetchLanguages();
     }, []);
 
-    // Get service type name based on appointment type
+    // Get service type name based on appointment type (for API calls - always Vietnamese)
     const getServiceTypeName = useCallback((type: AppointmentType): string => {
         return type === AppointmentType.IN_PERSON ? 'Khám trực tiếp' : 'Tư vấn trực tuyến';
     }, []);
+
+    // Get translated service type name for display
+    const getServiceTypeDisplayName = useCallback(
+        (type: AppointmentType): string => {
+            return type === AppointmentType.IN_PERSON
+                ? t('appointmentTypeSection.appointmentType.inPerson')
+                : t('appointmentTypeSection.appointmentType.telehealth');
+        },
+        [t]
+    );
 
     // Fetch doctors when specialty is selected or filters change
     const fetchDoctors = useCallback(
@@ -250,9 +262,13 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
 
     // Helper function to get doctor count text
     const getDoctorCountText = () => {
-        if (isLoadingDoctors) return 'Đang tải...';
-        if (totalDoctors > 0) return `${totalDoctors} bác sĩ có sẵn`;
-        return 'Không có bác sĩ';
+        if (isLoadingDoctors) return t('appointmentTypeSection.doctorSelection.loading');
+        if (totalDoctors > 0) {
+            return t('appointmentTypeSection.doctorSelection.doctorsAvailable', {
+                count: totalDoctors,
+            });
+        }
+        return t('appointmentTypeSection.doctorSelection.noDoctors');
     };
 
     // Reset filters
@@ -337,20 +353,20 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
             const specialty = hospitalData.specialties?.find(
                 (s) => s.id === bookingState.selectedSpecialtyId
             );
-            return specialty?.name || 'Chưa chọn';
+            return specialty?.name || t('appointmentTypeSection.notSelected');
         }
         if (isServiceSelected && hospitalData) {
             const service = hospitalData.serviceMedicals?.find(
                 (s) => s.id === bookingState.selectedServiceMedicalId
             );
-            return service?.name || 'Chưa chọn';
+            return service?.name || t('appointmentTypeSection.notSelected');
         }
-        return 'Chưa chọn';
+        return t('appointmentTypeSection.notSelected');
     };
 
     // Build header info
     const hospitalInfo: BookingEntityInfo = {
-        name: hospitalData?.name || 'Đang tải...',
+        name: hospitalData?.name || t('appointmentTypeSection.loading'),
         subtitle: hospitalData?.address || '',
         location: hospitalData?.address || '',
         avatar: hospitalData?.avatarUrl || '/assets/img/hospital-placeholder.png',
@@ -359,10 +375,11 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
 
     const appointmentInfo: AppointmentInfo = {
         service: getSelectedItemName(),
-        serviceType: isSpecialtySelected ? 'Chuyên khoa' : 'Dịch vụ',
-        dateTime: 'Chưa chọn',
-        appointmentType:
-            selectedType === AppointmentType.IN_PERSON ? 'Khám trực tiếp' : 'Tư vấn trực tuyến',
+        serviceType: isSpecialtySelected
+            ? t('appointmentTypeSection.specialty')
+            : t('appointmentTypeSection.service'),
+        dateTime: t('appointmentTypeSection.notSelected'),
+        appointmentType: getServiceTypeDisplayName(selectedType),
     };
 
     // Helper function to get price filter value - extracted to avoid nested ternary
@@ -396,8 +413,8 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
     // Helper function to render no doctors available message - extracted to avoid nested ternary
     const renderNoDoctorsMessage = () => (
         <div className="alert alert-info mb-0">
-            <i className="isax isax-info-circle me-2" aria-hidden="true"></i> Không tìm thấy bác sĩ
-            phù hợp. Vui lòng chọn "Để bệnh viện phân công".
+            <i className="isax isax-info-circle me-2" aria-hidden="true"></i>{' '}
+            {t('appointmentTypeSection.doctorSelection.noDoctorsMessage')}
         </div>
     );
 
@@ -433,7 +450,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
         <BookingSectionWrapper
             doctor={hospitalInfo}
             appointment={appointmentInfo}
-            nextStepTitle="Chọn ngày & giờ"
+            nextStepTitle={t('appointmentTypeSection.nextStepTitle')}
             nextStep={handleNext}
             prevStep={prevStep}
             fieldsetId="appointment-type"
@@ -442,7 +459,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
             <div className="card mb-0">
                 <div className="card-body pb-1">
                     {/* Appointment Type Selection */}
-                    <h6 className="mb-3">Chọn loại khám</h6>
+                    <h6 className="mb-3">{t('appointmentTypeSection.appointmentType.title')}</h6>
                     <div className="row mb-4">
                         <div className="col-xl col-md-6 col-sm-6">
                             <div
@@ -471,7 +488,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                 />
                                 <label className="form-check-label">
                                     <i className="isax isax-hospital5" aria-hidden="true"></i>
-                                    <span className="service-title d-block">Khám trực tiếp</span>
+                                    <span className="service-title d-block">
+                                        {t('appointmentTypeSection.appointmentType.inPerson')}
+                                    </span>
                                 </label>
                             </div>
                         </div>
@@ -508,7 +527,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                     htmlFor="appointmentTypeTelehealth"
                                 >
                                     <i className="isax isax-video5" aria-hidden="true"></i>
-                                    <span className="service-title d-block">Tư vấn trực tuyến</span>
+                                    <span className="service-title d-block">
+                                        {t('appointmentTypeSection.appointmentType.telehealth')}
+                                    </span>
                                 </label>
                             </div>
                         </div>
@@ -516,8 +537,8 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
 
                     {isServiceSelected && (
                         <div className="alert alert-warning mb-4">
-                            <i className="isax isax-info-circle me-2" aria-hidden="true"></i> Dịch
-                            vụ y tế chỉ hỗ trợ khám trực tiếp tại bệnh viện
+                            <i className="isax isax-info-circle me-2" aria-hidden="true"></i>{' '}
+                            {t('appointmentTypeSection.appointmentType.serviceOnlyInPerson')}
                         </div>
                     )}
 
@@ -526,10 +547,10 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                         <div className="mt-4 pt-4 border-top">
                             <h6 className="mb-3">
                                 <i className="isax isax-user-octagon me-2" aria-hidden="true"></i>{' '}
-                                Chọn bác sĩ (không bắt buộc)
+                                {t('appointmentTypeSection.doctorSelection.title')}
                             </h6>
                             <p className="text-muted fs-14 mb-3">
-                                Bạn có thể chọn bác sĩ hoặc để bệnh viện phân công bác sĩ phù hợp
+                                {t('appointmentTypeSection.doctorSelection.description')}
                             </p>
 
                             {/* Doctor Selection Mode */}
@@ -574,10 +595,14 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                 </span>
                                                 <span>
                                                     <span className="service-title d-block mb-1">
-                                                        Để bệnh viện phân công
+                                                        {t(
+                                                            'appointmentTypeSection.doctorSelection.hospitalAssign'
+                                                        )}
                                                     </span>
                                                     <span className="fs-14 text-muted">
-                                                        Bác sĩ phù hợp nhất
+                                                        {t(
+                                                            'appointmentTypeSection.doctorSelection.hospitalAssignDesc'
+                                                        )}
                                                     </span>
                                                 </span>
                                             </span>
@@ -630,7 +655,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                 </span>
                                                 <span>
                                                     <span className="service-title d-block mb-1">
-                                                        Tự chọn bác sĩ
+                                                        {t(
+                                                            'appointmentTypeSection.doctorSelection.selfSelect'
+                                                        )}
                                                     </span>
                                                     <span className="fs-14 text-muted">
                                                         {getDoctorCountText()}
@@ -668,8 +695,12 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                         <p className="text-muted fs-14 mb-0">
                                                             <i className="isax isax-info-circle me-1"></i>
                                                             {doctors.length > 0
-                                                                ? 'Chọn bác sĩ bạn muốn khám'
-                                                                : 'Không tìm thấy bác sĩ phù hợp'}
+                                                                ? t(
+                                                                      'appointmentTypeSection.doctorSelection.selectDoctorHint'
+                                                                  )
+                                                                : t(
+                                                                      'appointmentTypeSection.doctorSelection.noDoctorsFound'
+                                                                  )}
                                                         </p>
                                                         <button
                                                             className="btn btn-sm btn-outline-primary"
@@ -680,7 +711,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                             <i
                                                                 className={`isax isax-filter me-1`}
                                                             ></i>
-                                                            Bộ lọc
+                                                            {t(
+                                                                'appointmentTypeSection.filters.title'
+                                                            )}
                                                             {hasActiveFilters && (
                                                                 <span className="badge bg-primary ms-1">
                                                                     !
@@ -698,7 +731,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                     <input
                                                                         type="text"
                                                                         className="form-control form-control-sm"
-                                                                        placeholder="Tìm theo tên bác sĩ..."
+                                                                        placeholder={t(
+                                                                            'appointmentTypeSection.filters.searchPlaceholder'
+                                                                        )}
                                                                         value={filters.searchTerm}
                                                                         onChange={(e) =>
                                                                             handleFilterChange(
@@ -712,7 +747,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                 {/* Price Range */}
                                                                 <div className="col-md-6">
                                                                     <Select
-                                                                        title="Tất cả mức giá"
+                                                                        title={t(
+                                                                            'appointmentTypeSection.filters.allPrices'
+                                                                        )}
                                                                         value={getPriceFilterValue()}
                                                                         onChange={(value) => {
                                                                             if (value === '') {
@@ -761,19 +798,27 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                         }}
                                                                         items={[
                                                                             {
-                                                                                label: 'Tất cả mức giá',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.allPrices'
+                                                                                ),
                                                                                 value: '',
                                                                             },
                                                                             {
-                                                                                label: 'Dưới 300K',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.priceLow'
+                                                                                ),
                                                                                 value: 'low',
                                                                             },
                                                                             {
-                                                                                label: '300K - 500K',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.priceMedium'
+                                                                                ),
                                                                                 value: 'medium',
                                                                             },
                                                                             {
-                                                                                label: 'Trên 500K',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.priceHigh'
+                                                                                ),
                                                                                 value: 'high',
                                                                             },
                                                                         ]}
@@ -783,7 +828,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                 {/* Rating */}
                                                                 <div className="col-md-6">
                                                                     <Select
-                                                                        title="Tất cả đánh giá"
+                                                                        title={t(
+                                                                            'appointmentTypeSection.filters.allRatings'
+                                                                        )}
                                                                         value={
                                                                             filters.minRating?.toString() ||
                                                                             ''
@@ -798,19 +845,27 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                         }
                                                                         items={[
                                                                             {
-                                                                                label: 'Tất cả đánh giá',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.allRatings'
+                                                                                ),
                                                                                 value: '',
                                                                             },
                                                                             {
-                                                                                label: '4+ sao',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.rating4Plus'
+                                                                                ),
                                                                                 value: '4',
                                                                             },
                                                                             {
-                                                                                label: '3+ sao',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.rating3Plus'
+                                                                                ),
                                                                                 value: '3',
                                                                             },
                                                                             {
-                                                                                label: '2+ sao',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.rating2Plus'
+                                                                                ),
                                                                                 value: '2',
                                                                             },
                                                                         ]}
@@ -820,7 +875,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                 {/* Experience */}
                                                                 <div className="col-md-6">
                                                                     <Select
-                                                                        title="Tất cả kinh nghiệm"
+                                                                        title={t(
+                                                                            'appointmentTypeSection.filters.allExperience'
+                                                                        )}
                                                                         value={getExperienceFilterValue()}
                                                                         onChange={(value) => {
                                                                             if (value === '') {
@@ -869,19 +926,27 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                         }}
                                                                         items={[
                                                                             {
-                                                                                label: 'Tất cả kinh nghiệm',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.allExperience'
+                                                                                ),
                                                                                 value: '',
                                                                             },
                                                                             {
-                                                                                label: '1-3 năm',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.experience1to3'
+                                                                                ),
                                                                                 value: '1-3',
                                                                             },
                                                                             {
-                                                                                label: '4-7 năm',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.experience4to7'
+                                                                                ),
                                                                                 value: '4-7',
                                                                             },
                                                                             {
-                                                                                label: '8+ năm',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.experience8Plus'
+                                                                                ),
                                                                                 value: '8+',
                                                                             },
                                                                         ]}
@@ -891,7 +956,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                 {/* Gender */}
                                                                 <div className="col-md-6">
                                                                     <Select
-                                                                        title="Tất cả giới tính"
+                                                                        title={t(
+                                                                            'appointmentTypeSection.filters.allGenders'
+                                                                        )}
                                                                         value={filters.gender || ''}
                                                                         onChange={(value) =>
                                                                             handleFilterChange(
@@ -901,15 +968,21 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                         }
                                                                         items={[
                                                                             {
-                                                                                label: 'Tất cả giới tính',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.allGenders'
+                                                                                ),
                                                                                 value: '',
                                                                             },
                                                                             {
-                                                                                label: 'Nam',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.male'
+                                                                                ),
                                                                                 value: 'MALE',
                                                                             },
                                                                             {
-                                                                                label: 'Nữ',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.female'
+                                                                                ),
                                                                                 value: 'FEMALE',
                                                                             },
                                                                         ]}
@@ -919,7 +992,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                 {/* Language */}
                                                                 <div className="col-md-6">
                                                                     <Select
-                                                                        title="Tất cả ngôn ngữ"
+                                                                        title={t(
+                                                                            'appointmentTypeSection.filters.allLanguages'
+                                                                        )}
                                                                         value={
                                                                             filters.language || ''
                                                                         }
@@ -931,7 +1006,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                         }
                                                                         items={[
                                                                             {
-                                                                                label: 'Tất cả ngôn ngữ',
+                                                                                label: t(
+                                                                                    'appointmentTypeSection.filters.allLanguages'
+                                                                                ),
                                                                                 value: '',
                                                                             },
                                                                             ...availableLanguages.map(
@@ -956,7 +1033,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                             className="isax isax-refresh me-1"
                                                                             aria-hidden="true"
                                                                         ></i>{' '}
-                                                                        Xóa bộ lọc
+                                                                        {t(
+                                                                            'appointmentTypeSection.filters.reset'
+                                                                        )}
                                                                     </button>
                                                                 </div>
                                                             )}
@@ -966,7 +1045,10 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                     {/* Filter result count */}
                                                     {hasAppliedFilters && (
                                                         <p className="text-muted fs-13 mb-2">
-                                                            Tìm thấy {totalDoctors} bác sĩ phù hợp
+                                                            {t(
+                                                                'appointmentTypeSection.filters.foundDoctors',
+                                                                { count: totalDoctors }
+                                                            )}
                                                         </p>
                                                     )}
                                                 </div>
@@ -1082,7 +1164,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                                 ]
                                                                                     .filter(Boolean)
                                                                                     .join(' - ') ||
-                                                                                    'Chưa cập nhật'}
+                                                                                    t(
+                                                                                        'appointmentTypeSection.doctorCard.notUpdated'
+                                                                                    )}
                                                                             </div>
 
                                                                             {/* Line 3: Languages */}
@@ -1107,8 +1191,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                                                         {
                                                                                             doctor.yearsOfExperience
                                                                                         }{' '}
-                                                                                        năm kinh
-                                                                                        nghiệm
+                                                                                        {t(
+                                                                                            'appointmentTypeSection.doctorCard.yearsExperience'
+                                                                                        )}
                                                                                     </div>
                                                                                 )}
 
@@ -1140,14 +1225,17 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                             className="isax isax-info-circle me-2"
                                                             aria-hidden="true"
                                                         ></i>{' '}
-                                                        Không tìm thấy bác sĩ phù hợp với bộ lọc.
-                                                        Hãy thử điều chỉnh bộ lọc hoặc{' '}
+                                                        {t(
+                                                            'appointmentTypeSection.filters.noMatchingDoctors'
+                                                        )}{' '}
                                                         <button
                                                             className="btn btn-link p-0 text-primary"
                                                             onClick={handleResetFilters}
                                                         >
-                                                            xóa bộ lọc
-                                                        </button>{' '}
+                                                            {t(
+                                                                'appointmentTypeSection.filters.clearFilters'
+                                                            )}
+                                                        </button>
                                                         .
                                                     </div>
                                                 )}
@@ -1173,8 +1261,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                             className="isax isax-info-circle me-2"
                                                             aria-hidden="true"
                                                         ></i>{' '}
-                                                        Vui lòng chọn một bác sĩ hoặc quay lại chọn
-                                                        "Để bệnh viện phân công"
+                                                        {t(
+                                                            'appointmentTypeSection.doctorSelection.selectOrGoBack'
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>

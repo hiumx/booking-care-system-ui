@@ -1,9 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import wayImg from '@/assets/img/way-img.png';
 import shape06 from '@/assets/img/shape-06.png';
 import shape07 from '@/assets/img/shape-07.png';
+import { PATHS } from '@/routes/paths';
+
 const WaySection: React.FC = () => {
+    const { t } = useTranslation('about');
+
     return (
         <section className="way-section">
             <div className="container">
@@ -19,13 +24,10 @@ const WaySection: React.FC = () => {
                     <div className="row align-items-end">
                         <div className="col-lg-7 col-md-12">
                             <div className="section-inner-header way-inner-header mb-0">
-                                <h2>Đồng hành cùng bạn trên hành trình khỏe mạnh với Doccure</h2>
-                                <p>
-                                    Chúng tôi ưu tiên sức khỏe của bạn bằng các dịch vụ cá nhân hóa
-                                    và dễ tiếp cận — giúp việc chăm sóc y tế trở nên đơn giản hơn.
-                                </p>
-                                <Link to="/contact" className="btn btn-primary">
-                                    Liên hệ với chúng tôi
+                                <h2>{t('waySection.title')}</h2>
+                                <p>{t('waySection.description')}</p>
+                                <Link to={PATHS.CONTACT_US} className="btn btn-primary">
+                                    {t('waySection.contactButton')}
                                 </Link>
                             </div>
                         </div>

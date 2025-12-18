@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import BookingSectionWrapper from '../../components/BookingSectionWrapper';
 import { mockAppointmentInfo } from '../../constants/mockData';
 import { useBookingEntityInfo } from '../../hooks';
@@ -53,6 +54,8 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     rescheduleAppointmentDate,
     rescheduleAppointmentTimeId,
 }) => {
+    const { t, i18n } = useTranslation('booking');
+
     // Use shared hook for booking type detection and entity info
     const { entityInfo, isServiceMedicalBooking, isHospitalBooking } = useBookingEntityInfo();
 
@@ -197,13 +200,19 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
             return (
                 <>
                     <div className="mb-3">
-                        <div className="fw-medium">Dịch vụ</div>
+                        <div className="fw-medium">
+                            {t('paymentSection.appointmentInfo.service')}
+                        </div>
                         <div className="form-plain-text">{entityInfo.name}</div>
                     </div>
                     <div className="mb-3">
-                        <div className="fw-medium">Bệnh viện</div>
+                        <div className="fw-medium">
+                            {t('paymentSection.appointmentInfo.hospital')}
+                        </div>
                         <div className="form-plain-text">
-                            {'subtitle' in entityInfo ? entityInfo.subtitle : 'Chưa cập nhật'}
+                            {'subtitle' in entityInfo
+                                ? entityInfo.subtitle
+                                : t('paymentSection.appointmentInfo.notUpdated')}
                         </div>
                     </div>
                 </>
@@ -214,18 +223,22 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         return (
             <>
                 <div className="mb-3">
-                    <div className="fw-medium">Bác sĩ</div>
+                    <div className="fw-medium">{t('paymentSection.appointmentInfo.doctor')}</div>
                     <div className="form-plain-text">{entityInfo.name}</div>
                 </div>
                 <div className="mb-3">
-                    <div className="fw-medium">Chuyên khoa</div>
+                    <div className="fw-medium">{t('paymentSection.appointmentInfo.specialty')}</div>
                     <div className="form-plain-text">
-                        {'specialty' in entityInfo ? entityInfo.specialty : 'Chưa cập nhật'}
+                        {'specialty' in entityInfo
+                            ? entityInfo.specialty
+                            : t('paymentSection.appointmentInfo.notUpdated')}
                     </div>
                 </div>
                 <div className="mb-3">
-                    <div className="fw-medium">Bệnh viện</div>
-                    <div className="form-plain-text">{entityInfo.location || 'Chưa cập nhật'}</div>
+                    <div className="fw-medium">{t('paymentSection.appointmentInfo.hospital')}</div>
+                    <div className="form-plain-text">
+                        {entityInfo.location || t('paymentSection.appointmentInfo.notUpdated')}
+                    </div>
                 </div>
             </>
         );
@@ -266,12 +279,12 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     // Handle discount code validation
     const handleValidateDiscount = async () => {
         if (!discountCode.trim()) {
-            toast.warning('Vui lòng nhập mã giảm giá');
+            toast.warning(t('paymentSection.toast.enterDiscountCode'));
             return;
         }
 
         if (!resolvedHospitalId) {
-            toast.error('Không tìm thấy thông tin bệnh viện');
+            toast.error(t('paymentSection.toast.hospitalNotFound'));
             return;
         }
 
@@ -285,7 +298,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
             if (result.isValid) {
                 // Discount object should exist when isValid=true
                 if (!result.discount?.id) {
-                    toast.error('Lỗi: Không nhận được thông tin discount từ server');
+                    toast.error(t('paymentSection.toast.discountIdError'));
                     return;
                 }
 
@@ -295,12 +308,12 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                     discountAmount: result.discountAmount,
                     finalAmount: result.finalAmount, // This is total after discount
                 });
-                toast.success('Áp dụng mã giảm giá thành công!');
+                toast.success(t('paymentSection.toast.discountSuccess'));
             } else {
-                toast.error(result.message || 'Mã giảm giá không hợp lệ');
+                toast.error(result.message || t('paymentSection.toast.discountInvalid'));
             }
         } catch (error: any) {
-            toast.error(error.message || 'Không thể xác thực mã giảm giá');
+            toast.error(error.message || t('paymentSection.toast.discountValidateError'));
         } finally {
             setIsValidatingDiscount(false);
         }
@@ -310,7 +323,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     const handleRemoveDiscount = () => {
         setAppliedDiscount(null);
         setDiscountCode('');
-        toast.info('Đã hủy mã giảm giá');
+        toast.info(t('paymentSection.toast.discountRemoved'));
     };
 
     // Handle next step based on selected payment option
@@ -322,20 +335,20 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         // Option 1: Deposit payment (with 10% discount incentive)
         if (paymentOption === 'deposit') {
             if (!selectedPayment) {
-                toast.error('Vui lòng chọn phương thức thanh toán');
+                toast.error(t('paymentSection.toast.selectPaymentMethod'));
                 return;
             }
 
             // Validate that the selected payment method exists
             const selectedMethod = paymentMethods.find((method) => method.id === selectedPayment);
             if (!selectedMethod) {
-                toast.error('Phương thức thanh toán không hợp lệ');
+                toast.error(t('paymentSection.toast.invalidPaymentMethod'));
                 return;
             }
 
             // Validate that we have a valid price
             if (!TOTAL_AMOUNT || TOTAL_AMOUNT <= 0) {
-                toast.error('Không tìm thấy thông tin giá khám. Vui lòng thử lại.');
+                toast.error(t('paymentSection.toast.noPriceError'));
                 return;
             }
 
@@ -351,7 +364,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         // Option 2: No payment (create appointment only)
         else if (paymentOption === 'no-payment') {
             if (!onCreateAppointmentOnly) {
-                toast.error('Chức năng đặt lịch không thanh toán chưa được hỗ trợ');
+                toast.error(t('paymentSection.toast.noPaymentNotSupported'));
                 return;
             }
 
@@ -391,21 +404,27 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         );
     };
 
+    // Helper function to format currency based on locale
+    const formatCurrency = (amount: number): string => {
+        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
+        return amount.toLocaleString(locale);
+    };
+
     // Helper function to render supplementary payment info - extracted to reduce cognitive complexity
     const renderSupplementaryPaymentInfo = () => (
         <>
             <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
-                <p className="mb-0">Số tiền cần thanh toán thêm</p>
+                <p className="mb-0">{t('paymentSection.paymentInfo.supplementaryAmount')}</p>
                 <span className="fw-medium text-warning d-block">
-                    {DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ
+                    {formatCurrency(DEPOSIT_AMOUNT)} đ
                 </span>
             </div>
             <div className="alert alert-warning mt-3 mb-0">
                 <i className="bi bi-info-circle me-2"></i>
                 <small>
-                    Bác sĩ mới có cọc cao hơn. Bạn cần thanh toán thêm{' '}
-                    {DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ để xác nhận lịch hẹn. Số tiền còn lại
-                    sẽ được thanh toán khi hoàn thành khám.
+                    {t('paymentSection.supplementaryNote', {
+                        amount: formatCurrency(DEPOSIT_AMOUNT),
+                    })}
                 </small>
             </div>
         </>
@@ -415,16 +434,18 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     const renderRegularPaymentInfo = () => (
         <>
             <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
-                <p className="mb-0">Tổng phí khám bệnh</p>
-                <span className="fw-medium d-block">{TOTAL_AMOUNT.toLocaleString('vi-VN')} đ</span>
+                <p className="mb-0">{t('paymentSection.paymentInfo.totalFee')}</p>
+                <span className="fw-medium d-block">{formatCurrency(TOTAL_AMOUNT)} đ</span>
             </div>
 
             {/* Show discount if applied */}
             {appliedDiscount && (
                 <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
-                    <p className="mb-0 text-success">Giảm giá ({appliedDiscount.code})</p>
+                    <p className="mb-0 text-success">
+                        {t('paymentSection.paymentInfo.discount')} ({appliedDiscount.code})
+                    </p>
                     <span className="fw-medium text-success d-block">
-                        - {appliedDiscount.discountAmount.toLocaleString('vi-VN')} đ
+                        - {formatCurrency(appliedDiscount.discountAmount)} đ
                     </span>
                 </div>
             )}
@@ -432,26 +453,28 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
             {/* Show total after discount if discount applied */}
             {appliedDiscount && (
                 <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2 pb-2 border-bottom">
-                    <p className="mb-0 fw-bold">Tổng sau giảm giá</p>
+                    <p className="mb-0 fw-bold">
+                        {t('paymentSection.paymentInfo.totalAfterDiscount')}
+                    </p>
                     <span className="fw-bold d-block">
-                        {TOTAL_AFTER_DISCOUNT.toLocaleString('vi-VN')} đ
+                        {formatCurrency(TOTAL_AFTER_DISCOUNT)} đ
                     </span>
                 </div>
             )}
 
             <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-2">
-                <p className="mb-0">Phí đặt cọc (30%)</p>
+                <p className="mb-0">{t('paymentSection.paymentInfo.depositFee')}</p>
                 <span className="fw-medium text-primary d-block">
-                    {DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ
+                    {formatCurrency(DEPOSIT_AMOUNT)} đ
                 </span>
             </div>
             <div className="alert alert-info mt-3 mb-0">
                 <i className="bi bi-info-circle me-2"></i>
                 <small>
-                    Bạn chỉ cần thanh toán đặt cọc 30% ({DEPOSIT_AMOUNT.toLocaleString('vi-VN')} đ)
-                    để xác nhận lịch hẹn. Số tiền còn lại (
-                    {(TOTAL_AFTER_DISCOUNT - DEPOSIT_AMOUNT).toLocaleString('vi-VN')} đ) sẽ được
-                    thanh toán trực tiếp tại phòng khám.
+                    {t('paymentSection.depositNote', {
+                        depositAmount: formatCurrency(DEPOSIT_AMOUNT),
+                        remainingAmount: formatCurrency(TOTAL_AFTER_DISCOUNT - DEPOSIT_AMOUNT),
+                    })}
                 </small>
             </div>
         </>
@@ -462,9 +485,12 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         if (TOTAL_AMOUNT <= 0) {
             return (
                 <div className="alert alert-warning">
-                    <i className="bi bi-exclamation-triangle me-2" aria-hidden="true"></i> Không tìm
-                    thấy thông tin giá khám. Vui lòng quay lại và chọn lại{' '}
-                    {isServiceMedicalBooking ? 'dịch vụ' : 'bác sĩ'}.
+                    <i className="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>{' '}
+                    {t('paymentSection.noPriceWarning', {
+                        entity: isServiceMedicalBooking
+                            ? t('paymentSection.entityService')
+                            : t('paymentSection.entityDoctor'),
+                    })}
                 </div>
             );
         }
@@ -481,7 +507,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                     <div className="spinner-border spinner-border-sm">
                         <span className="visually-hidden">Loading...</span>
                     </div>
-                    <p className="mt-2 mb-0 text-muted">Đang tải phương thức thanh toán...</p>
+                    <p className="mt-2 mb-0 text-muted">
+                        {t('paymentSection.loadingPaymentMethods')}
+                    </p>
                 </div>
             );
         }
@@ -489,8 +517,8 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
         if (paymentMethods.length === 0) {
             return (
                 <div className="alert alert-warning">
-                    <i className="bi bi-exclamation-triangle me-2"></i> Hiện tại không có phương
-                    thức thanh toán nào khả dụng
+                    <i className="bi bi-exclamation-triangle me-2"></i>{' '}
+                    {t('paymentSection.noPaymentMethods')}
                 </div>
             );
         }
@@ -545,16 +573,25 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                             {method.description}
                                         </h6>
                                         <p className="mb-0">
-                                            Bạn sẽ được chuyển đến cổng thanh toán {method.name} để
-                                            hoàn tất giao dịch. {method.name} hỗ trợ thanh toán qua:
+                                            {t('paymentSection.paymentMethodInfo', {
+                                                methodName: method.name,
+                                            })}
                                         </p>
                                         <ul className="mb-0 mt-2">
-                                            <li>Thẻ ATM/Tài khoản ngân hàng</li>
                                             <li>
-                                                Thẻ thanh toán quốc tế (Visa, Mastercard, JCB, AMEX)
+                                                {t('paymentSection.paymentMethodOptions.atmBank')}
                                             </li>
-                                            <li>Ví điện tử VNPay</li>
-                                            <li>QR Code</li>
+                                            <li>
+                                                {t(
+                                                    'paymentSection.paymentMethodOptions.internationalCard'
+                                                )}
+                                            </li>
+                                            <li>
+                                                {t('paymentSection.paymentMethodOptions.eWallet')}
+                                            </li>
+                                            <li>
+                                                {t('paymentSection.paymentMethodOptions.qrCode')}
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>
@@ -570,15 +607,16 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     const formattedAppointmentInfo = useMemo(() => {
         if (!selectedDate) {
             return {
-                date: 'Chưa chọn',
-                time: 'Chưa chọn',
+                date: t('paymentSection.notSelected'),
+                time: t('paymentSection.notSelected'),
                 slots: [],
                 totalDuration: 0,
             };
         }
 
         const date = new Date(selectedDate);
-        const formattedDate = date.toLocaleDateString('vi-VN', {
+        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
+        const formattedDate = date.toLocaleDateString(locale, {
             day: '2-digit',
             month: 'long',
             year: 'numeric',
@@ -600,23 +638,23 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
             slots: sortedSlots,
             totalDuration,
         };
-    }, [selectedDate, selectedSlots]);
+    }, [selectedDate, selectedSlots, i18n.language, t]);
 
     // Helper function to get next step button title - extracted to reduce cognitive complexity
     const getNextStepButtonTitle = (): string => {
         if (isCreatingAppointment || isProcessingPayment) {
-            return 'Đang xử lý...';
+            return t('paymentSection.buttons.processing');
         }
         if (isSupplementaryPayment) {
-            return 'Thanh toán';
+            return t('paymentSection.buttons.pay');
         }
         if (paymentOption === 'deposit') {
-            return 'Đặt cọc & Thanh toán';
+            return t('paymentSection.buttons.depositAndPay');
         }
         if (paymentOption === 'no-payment') {
-            return 'Đặt lịch ngay';
+            return t('paymentSection.buttons.bookNow');
         }
-        return 'Tiếp tục';
+        return t('paymentSection.buttons.continue');
     };
 
     return (
@@ -640,7 +678,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                         className="isax isax-wallet-money me-2"
                                         aria-hidden="true"
                                     ></i>{' '}
-                                    Chọn phương thức đặt lịch
+                                    {t('paymentSection.bookingOptions.title')}
                                 </h5>
 
                                 {/* Specialty booking notice */}
@@ -650,10 +688,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                             className="isax isax-info-circle me-2"
                                             aria-hidden="true"
                                         ></i>
-                                        <strong>Lưu ý:</strong> Với hình thức đặt lịch theo chuyên
-                                        khoa, bệnh viện sẽ phân công bác sĩ phù hợp cho bạn. Chi phí
-                                        khám sẽ được thông báo sau khi bác sĩ được phân công và bạn
-                                        sẽ thanh toán trực tiếp tại bệnh viện.
+                                        {t('paymentSection.bookingOptions.specialtyNotice')}
                                     </div>
                                 )}
 
@@ -672,7 +707,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                 }}
                                                 role="button"
                                                 tabIndex={0}
-                                                aria-label="Đặt cọc và thanh toán ngay - Giảm ngay 10% tổng chi phí khi khám"
+                                                aria-label={t(
+                                                    'paymentSection.bookingOptions.depositOption.ariaLabel'
+                                                )}
                                                 aria-pressed={paymentOption === 'deposit'}
                                             >
                                                 <div className="payment-option-header">
@@ -691,12 +728,16 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                             className="form-check-label fw-bold"
                                                             htmlFor="depositOption"
                                                         >
-                                                            💳 Đặt cọc và thanh toán ngay
+                                                            {t(
+                                                                'paymentSection.bookingOptions.depositOption.label'
+                                                            )}
                                                         </label>
                                                     </div>
                                                     <div className="discount-badge">
                                                         <span className="badge bg-success">
-                                                            Tiết kiệm 10%
+                                                            {t(
+                                                                'paymentSection.bookingOptions.depositOption.saveBadge'
+                                                            )}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -708,30 +749,36 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                                 className="isax isax-tick-circle text-success me-2"
                                                                 aria-hidden="true"
                                                             ></i>
-                                                            <span>
-                                                                Giảm ngay <strong>10%</strong> tổng
-                                                                chi phí khi khám
-                                                            </span>
+                                                            <span
+                                                                dangerouslySetInnerHTML={{
+                                                                    __html: t(
+                                                                        'paymentSection.bookingOptions.depositOption.benefit1'
+                                                                    ),
+                                                                }}
+                                                            />
                                                         </div>
                                                         <div className="benefit-item">
                                                             <i
                                                                 className="isax isax-tick-circle text-success me-2"
                                                                 aria-hidden="true"
                                                             ></i>
-                                                            <span>Đảm bảo giữ chỗ khám bệnh</span>
+                                                            <span>
+                                                                {t(
+                                                                    'paymentSection.bookingOptions.depositOption.benefit2'
+                                                                )}
+                                                            </span>
                                                         </div>
                                                     </div>
 
                                                     <div className="price-info mt-3">
                                                         <div className="current-price">
                                                             <span className="text-muted">
-                                                                Cọc thanh toán:
+                                                                {t(
+                                                                    'paymentSection.bookingOptions.depositOption.depositPayment'
+                                                                )}
                                                             </span>
                                                             <span className="fw-bold text-primary ms-2">
-                                                                {DEPOSIT_AMOUNT.toLocaleString(
-                                                                    'vi-VN'
-                                                                )}{' '}
-                                                                đ
+                                                                {formatCurrency(DEPOSIT_AMOUNT)} đ
                                                             </span>
                                                         </div>
                                                     </div>
@@ -757,7 +804,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                             }}
                                             role="button"
                                             tabIndex={0}
-                                            aria-label="Đặt lịch không cọc - Thanh toán toàn bộ khi khám"
+                                            aria-label={t(
+                                                'paymentSection.bookingOptions.noPaymentOption.ariaLabel'
+                                            )}
                                             aria-pressed={paymentOption === 'no-payment'}
                                         >
                                             <div className="payment-option-header">
@@ -776,7 +825,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                         className="form-check-label fw-bold"
                                                         htmlFor="noPaymentOption"
                                                     >
-                                                        📅 Đặt lịch không cọc
+                                                        {t(
+                                                            'paymentSection.bookingOptions.noPaymentOption.label'
+                                                        )}
                                                     </label>
                                                 </div>
                                             </div>
@@ -788,21 +839,33 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                             className="isax isax-info-circle text-info me-2"
                                                             aria-hidden="true"
                                                         ></i>
-                                                        <span>Thanh toán toàn bộ khi khám</span>
+                                                        <span>
+                                                            {t(
+                                                                'paymentSection.bookingOptions.noPaymentOption.benefit1'
+                                                            )}
+                                                        </span>
                                                     </div>
                                                     <div className="benefit-item">
                                                         <i
                                                             className="isax isax-info-circle text-info me-2"
                                                             aria-hidden="true"
                                                         ></i>
-                                                        <span>Không cần thanh toán trước</span>
+                                                        <span>
+                                                            {t(
+                                                                'paymentSection.bookingOptions.noPaymentOption.benefit2'
+                                                            )}
+                                                        </span>
                                                     </div>
                                                     <div className="benefit-item">
                                                         <i
                                                             className="isax isax-info-circle text-info me-2"
                                                             aria-hidden="true"
                                                         ></i>
-                                                        <span>Linh hoạt thay đổi lịch hẹn</span>
+                                                        <span>
+                                                            {t(
+                                                                'paymentSection.bookingOptions.noPaymentOption.benefit3'
+                                                            )}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -821,7 +884,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                     <div className="col-lg-6 d-flex">
                         <div className="card flex-fill mb-3 mb-lg-0">
                             <div className="card-body">
-                                <h6 className="mb-3">Cổng thanh toán</h6>
+                                <h6 className="mb-3">{t('paymentSection.paymentGateway')}</h6>
                                 <div className="payment-tabs">{renderPaymentMethodContent()}</div>
                             </div>
                         </div>
@@ -832,9 +895,11 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                 >
                     <div className="card flex-fill mb-0">
                         <div className="card-body">
-                            <h6 className="mb-3">Thông tin lịch khám</h6>
+                            <h6 className="mb-3">{t('paymentSection.appointmentInfo.title')}</h6>
                             <div className="mb-3">
-                                <div className="fw-medium">Ngày khám</div>
+                                <div className="fw-medium">
+                                    {t('paymentSection.appointmentInfo.date')}
+                                </div>
                                 <div className="form-plain-text">
                                     {formattedAppointmentInfo.date}
                                 </div>
@@ -844,8 +909,10 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                             {formattedAppointmentInfo.slots.length > 0 ? (
                                 <div className="mb-3">
                                     <div className="fw-medium mb-2">
-                                        Khung giờ đã chọn ({formattedAppointmentInfo.slots.length}{' '}
-                                        khung - {formattedAppointmentInfo.totalDuration} phút)
+                                        {t('paymentSection.appointmentInfo.selectedSlots', {
+                                            count: formattedAppointmentInfo.slots.length,
+                                            duration: formattedAppointmentInfo.totalDuration,
+                                        })}
                                     </div>
                                     <div className="d-flex flex-wrap gap-2">
                                         {formattedAppointmentInfo.slots.map((slot) => (
@@ -860,10 +927,12 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                 </div>
                             ) : (
                                 <div className="mb-3">
-                                    <div className="fw-medium">Giờ khám</div>
+                                    <div className="fw-medium">
+                                        {t('paymentSection.appointmentInfo.time')}
+                                    </div>
                                     <div className="form-plain-text text-warning">
-                                        <i className="bi bi-exclamation-triangle me-1"></i> Chưa
-                                        chọn giờ khám
+                                        <i className="bi bi-exclamation-triangle me-1"></i>{' '}
+                                        {t('paymentSection.appointmentInfo.timeNotSelected')}
                                     </div>
                                 </div>
                             )}
@@ -874,7 +943,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                     {shouldRenderHospitalBookingFlow() ? (
                                         <>
                                             <div className="mb-3">
-                                                <div className="fw-medium">Bệnh viện</div>
+                                                <div className="fw-medium">
+                                                    {t('paymentSection.appointmentInfo.hospital')}
+                                                </div>
                                                 <div className="form-plain-text">
                                                     {entityInfo.name}
                                                 </div>
@@ -882,7 +953,11 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                             {'selectedSpecialty' in entityInfo &&
                                                 entityInfo.selectedSpecialty && (
                                                     <div className="mb-3">
-                                                        <div className="fw-medium">Chuyên khoa</div>
+                                                        <div className="fw-medium">
+                                                            {t(
+                                                                'paymentSection.appointmentInfo.specialty'
+                                                            )}
+                                                        </div>
                                                         <div className="form-plain-text">
                                                             {entityInfo.selectedSpecialty}
                                                         </div>
@@ -891,7 +966,11 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                             {'selectedService' in entityInfo &&
                                                 entityInfo.selectedService && (
                                                     <div className="mb-3">
-                                                        <div className="fw-medium">Dịch vụ</div>
+                                                        <div className="fw-medium">
+                                                            {t(
+                                                                'paymentSection.appointmentInfo.service'
+                                                            )}
+                                                        </div>
                                                         <div className="form-plain-text">
                                                             {entityInfo.selectedService}
                                                         </div>
@@ -900,7 +979,11 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                             {'selectedDoctor' in entityInfo &&
                                                 entityInfo.selectedDoctor && (
                                                     <div className="mb-3">
-                                                        <div className="fw-medium">Bác sĩ</div>
+                                                        <div className="fw-medium">
+                                                            {t(
+                                                                'paymentSection.appointmentInfo.doctor'
+                                                            )}
+                                                        </div>
                                                         <div className="form-plain-text">
                                                             {entityInfo.selectedDoctor}
                                                         </div>
@@ -920,9 +1003,8 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                             className="isax isax-tick-circle me-2"
                                             aria-hidden="true"
                                         ></i>
-                                        <strong>Thanh toán tại bệnh viện:</strong> Bạn sẽ thanh toán
-                                        chi phí khám trực tiếp tại bệnh viện sau khi được phân công
-                                        bác sĩ.
+                                        <strong>{t('paymentSection.specialtyPaymentTitle')}</strong>{' '}
+                                        {t('paymentSection.specialtyPaymentNote')}
                                     </div>
                                 </div>
                             )}
@@ -931,7 +1013,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                             {paymentOption !== 'no-payment' && (
                                 <>
                                     <div className="pt-3 border-top booking-more-info">
-                                        <h6 className="mb-3">Thông tin thanh toán</h6>
+                                        <h6 className="mb-3">
+                                            {t('paymentSection.paymentInfo.title')}
+                                        </h6>
                                         {renderPaymentAmountDetails()}
 
                                         {/* Discount Code Section */}
@@ -946,7 +1030,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                             className="bi bi-tag me-2"
                                                             aria-hidden="true"
                                                         ></i>{' '}
-                                                        Mã giảm giá
+                                                        {t('paymentSection.discount.label')}
                                                     </label>
                                                     {appliedDiscount ? (
                                                         <div className="alert alert-success d-flex justify-content-between align-items-center mb-0">
@@ -955,18 +1039,26 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                                 <strong>
                                                                     {appliedDiscount.code}
                                                                 </strong>{' '}
-                                                                - Giảm{' '}
-                                                                {appliedDiscount.discountAmount.toLocaleString(
-                                                                    'vi-VN'
-                                                                )}{' '}
-                                                                đ
+                                                                -{' '}
+                                                                {t(
+                                                                    'paymentSection.discount.discountAmount',
+                                                                    {
+                                                                        amount: formatCurrency(
+                                                                            appliedDiscount.discountAmount
+                                                                        ),
+                                                                    }
+                                                                )}
                                                             </div>
                                                             <button
                                                                 type="button"
                                                                 className="btn-remove-discount"
                                                                 onClick={handleRemoveDiscount}
-                                                                title="Hủy mã giảm giá"
-                                                                aria-label="Hủy mã giảm giá"
+                                                                title={t(
+                                                                    'paymentSection.discount.removeTitle'
+                                                                )}
+                                                                aria-label={t(
+                                                                    'paymentSection.discount.removeTitle'
+                                                                )}
                                                             >
                                                                 ×
                                                             </button>
@@ -977,7 +1069,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                                 id="discountCodeInput"
                                                                 type="text"
                                                                 className="form-control"
-                                                                placeholder="Nhập mã giảm giá"
+                                                                placeholder={t(
+                                                                    'paymentSection.discount.placeholder'
+                                                                )}
                                                                 value={discountCode}
                                                                 onChange={(e) =>
                                                                     setDiscountCode(
@@ -1003,10 +1097,14 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                                             aria-atomic="true"
                                                                         >
                                                                             <span className="visually-hidden">
-                                                                                Đang kiểm tra...
+                                                                                {t(
+                                                                                    'paymentSection.discount.validating'
+                                                                                )}
                                                                             </span>
                                                                         </output>{' '}
-                                                                        Đang kiểm tra...
+                                                                        {t(
+                                                                            'paymentSection.discount.validating'
+                                                                        )}
                                                                     </>
                                                                 ) : (
                                                                     <>
@@ -1014,7 +1112,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                                             className="bi bi-check-circle-fill me-1"
                                                                             aria-hidden="true"
                                                                         ></i>{' '}
-                                                                        Áp dụng
+                                                                        {t(
+                                                                            'paymentSection.discount.apply'
+                                                                        )}
                                                                     </>
                                                                 )}
                                                             </button>
@@ -1028,11 +1128,13 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                         <div className="bg-primary d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between p-3 rounded">
                                             <h6 className="text-white">
                                                 {isSupplementaryPayment
-                                                    ? 'Số tiền cần thanh toán thêm'
-                                                    : 'Số tiền thanh toán'}
+                                                    ? t(
+                                                          'paymentSection.paymentInfo.supplementaryFinalAmount'
+                                                      )
+                                                    : t('paymentSection.paymentInfo.finalAmount')}
                                             </h6>
                                             <h6 className="text-white">
-                                                {FINAL_AMOUNT.toLocaleString('vi-VN')} đ
+                                                {formatCurrency(FINAL_AMOUNT)} đ
                                             </h6>
                                         </div>
                                     )}

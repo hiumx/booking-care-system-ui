@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import Button from '@/components/Button';
 import EkycService from '@/services/ekyc.service';
@@ -12,6 +13,7 @@ interface EkycVerificationProps {
 type CameraTarget = 'front' | 'back' | 'selfie' | 'video';
 
 const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationComplete }) => {
+    const { t } = useTranslation('contact');
     const [state, setState] = useState<EkycVerificationState>({
         step: 'idle',
         isVerified: false,
@@ -120,7 +122,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             setCameraStream(stream);
         } catch (err) {
-            toast.error('Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.');
+            toast.error(t('ekyc.camera.error'));
             console.error('Camera error:', err);
             setActiveCamera(null);
         }
@@ -233,7 +235,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
 
     const handleVerify = async () => {
         if (!idCardFront || !idCardBack || !selfie) {
-            toast.error('Vui lòng cung cấp đầy đủ ảnh CMND/CCCD và ảnh selfie');
+            toast.error(t('ekyc.messages.missingFiles'));
             return;
         }
 
@@ -261,7 +263,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                     verifiedAt: data.verifiedAt,
                 });
 
-                toast.success('Xác thực danh tính thành công!');
+                toast.success(t('ekyc.messages.success'));
 
                 // Privacy-friendly: Only send verification status, not PII
                 onVerificationComplete({
@@ -280,17 +282,17 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                     step: 'failed',
                     isVerified: false,
                     errorMessage:
-                        response.data?.errorMessage || 'Xác thực thất bại. Vui lòng thử lại.',
+                        response.data?.errorMessage || t('ekyc.messages.verificationFailed'),
                 });
-                toast.error(response.data?.errorMessage || 'Xác thực thất bại. Vui lòng thử lại.');
+                toast.error(response.data?.errorMessage || t('ekyc.messages.verificationFailed'));
             }
         } catch (error: any) {
             setState({
                 step: 'failed',
                 isVerified: false,
-                errorMessage: error.message || 'Có lỗi xảy ra. Vui lòng thử lại.',
+                errorMessage: error.message || t('ekyc.messages.error'),
             });
-            toast.error(error.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+            toast.error(error.message || t('ekyc.messages.error'));
         }
     };
 
@@ -310,28 +312,36 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
         <div className={styles.ocrResult}>
             <h6 className="mb-3">
                 <i className="isax isax-document-text me-2" aria-hidden="true" />
-                <span>Thông tin từ CMND/CCCD</span>
+                <span>{t('ekyc.ocrResult.title')}</span>
             </h6>
             <div className="row">
                 <div className="col-md-6 mb-2">
-                    <small className="text-muted">Số CMND/CCCD:</small>
-                    <p className="mb-0 fw-semibold">{ocrResult.idNumber || 'N/A'}</p>
+                    <small className="text-muted">{t('ekyc.ocrResult.idNumber')}</small>
+                    <p className="mb-0 fw-semibold">
+                        {ocrResult.idNumber || t('ekyc.ocrResult.na')}
+                    </p>
                 </div>
                 <div className="col-md-6 mb-2">
-                    <small className="text-muted">Họ và tên:</small>
-                    <p className="mb-0 fw-semibold">{ocrResult.fullName || 'N/A'}</p>
+                    <small className="text-muted">{t('ekyc.ocrResult.fullName')}</small>
+                    <p className="mb-0 fw-semibold">
+                        {ocrResult.fullName || t('ekyc.ocrResult.na')}
+                    </p>
                 </div>
                 <div className="col-md-6 mb-2">
-                    <small className="text-muted">Ngày sinh:</small>
-                    <p className="mb-0 fw-semibold">{ocrResult.dateOfBirth || 'N/A'}</p>
+                    <small className="text-muted">{t('ekyc.ocrResult.dateOfBirth')}</small>
+                    <p className="mb-0 fw-semibold">
+                        {ocrResult.dateOfBirth || t('ekyc.ocrResult.na')}
+                    </p>
                 </div>
                 <div className="col-md-6 mb-2">
-                    <small className="text-muted">Giới tính:</small>
-                    <p className="mb-0 fw-semibold">{ocrResult.gender || 'N/A'}</p>
+                    <small className="text-muted">{t('ekyc.ocrResult.gender')}</small>
+                    <p className="mb-0 fw-semibold">{ocrResult.gender || t('ekyc.ocrResult.na')}</p>
                 </div>
                 <div className="col-12 mb-2">
-                    <small className="text-muted">Địa chỉ:</small>
-                    <p className="mb-0 fw-semibold">{ocrResult.placeOfResidence || 'N/A'}</p>
+                    <small className="text-muted">{t('ekyc.ocrResult.address')}</small>
+                    <p className="mb-0 fw-semibold">
+                        {ocrResult.placeOfResidence || t('ekyc.ocrResult.na')}
+                    </p>
                 </div>
             </div>
         </div>
@@ -346,12 +356,12 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                             className="isax isax-tick-circle text-success"
                             style={{ fontSize: '48px' }}
                         ></i>
-                        <h5 className="mt-2 text-success">Xác thực thành công!</h5>
+                        <h5 className="mt-2 text-success">{t('ekyc.status.success')}</h5>
                     </div>
                     {state.ocrResult && renderOcrResult(state.ocrResult)}
                     {state.faceMatchResult && (
                         <div className="mt-3 p-3 bg-light rounded">
-                            <small className="text-muted">Độ khớp khuôn mặt:</small>
+                            <small className="text-muted">{t('ekyc.faceMatch.label')}</small>
                             <p className="mb-0 fw-semibold text-success">
                                 {state.faceMatchResult.similarity.toFixed(1)}%
                             </p>
@@ -369,12 +379,12 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                             className="isax isax-close-circle text-danger"
                             style={{ fontSize: '48px' }}
                         ></i>
-                        <h5 className="mt-2 text-danger">Xác thực thất bại</h5>
+                        <h5 className="mt-2 text-danger">{t('ekyc.status.failed')}</h5>
                         <p className="text-muted">{state.errorMessage}</p>
                     </div>
                     <div className="text-center">
                         <Button
-                            text="Thử lại"
+                            text={t('ekyc.buttons.retry')}
                             type="button"
                             onClick={handleRetry}
                             className="btn-outline-primary"
@@ -391,10 +401,10 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
         if (!activeCamera) return null;
 
         const titles: Record<CameraTarget, string> = {
-            front: 'Chụp mặt trước CMND/CCCD',
-            back: 'Chụp mặt sau CMND/CCCD',
-            selfie: 'Chụp ảnh chân dung',
-            video: 'Quay video xác thực',
+            front: t('ekyc.camera.front'),
+            back: t('ekyc.camera.back'),
+            selfie: t('ekyc.camera.selfie'),
+            video: t('ekyc.camera.video'),
         };
 
         const isVideoMode = activeCamera === 'video';
@@ -405,7 +415,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                     <h5 className="text-center mb-3">{titles[activeCamera]}</h5>
                     {isVideoMode && (
                         <p className="text-center text-muted small mb-2">
-                            Quay video khuôn mặt trong 3-5 giây, xoay đầu nhẹ sang trái và phải
+                            {t('ekyc.camera.videoInstruction')}
                         </p>
                     )}
                     <div className={styles.videoWrapper}>
@@ -439,7 +449,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                             className="btn btn-outline-danger"
                             onClick={stopCamera}
                         >
-                            Hủy
+                            {t('ekyc.buttons.cancel')}
                         </button>
                         {isVideoMode && isRecording && (
                             <button
@@ -449,7 +459,9 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                                 disabled={recordingTime < 2}
                             >
                                 <i className="isax isax-stop me-2" aria-hidden="true" />
-                                <span>Dừng ({5 - recordingTime}s)</span>
+                                <span>
+                                    {t('ekyc.buttons.stopRecording')} ({5 - recordingTime}s)
+                                </span>
                             </button>
                         )}
                         {isVideoMode && !isRecording && (
@@ -460,7 +472,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                                 disabled={!isCameraReady}
                             >
                                 <i className="isax isax-video me-2" aria-hidden="true" />
-                                <span>Bắt đầu quay</span>
+                                <span>{t('ekyc.buttons.startRecording')}</span>
                             </button>
                         )}
                         {!isVideoMode && (
@@ -471,7 +483,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                                 disabled={!isCameraReady}
                             >
                                 <i className="isax isax-camera me-2" aria-hidden="true" />
-                                <span>Chụp ảnh</span>
+                                <span>{t('ekyc.buttons.capture')}</span>
                             </button>
                         )}
                     </div>
@@ -517,7 +529,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                                         setSelfiePreview('');
                                     }
                                 }}
-                                aria-label="Xóa ảnh"
+                                aria-label={t('ekyc.removeImage')}
                             >
                                 <i className="isax isax-close-circle" aria-hidden="true" />
                             </button>
@@ -535,7 +547,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                                     onClick={() => inputRef.current?.click()}
                                 >
                                     <i className="isax isax-gallery-add me-1" aria-hidden="true" />
-                                    <span>Tải lên</span>
+                                    <span>{t('ekyc.buttons.upload')}</span>
                                 </button>
                                 <button
                                     type="button"
@@ -543,7 +555,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                                     onClick={() => startCamera(cameraTarget)}
                                 >
                                     <i className="isax isax-camera me-1" aria-hidden="true" />
-                                    <span>Chụp ảnh</span>
+                                    <span>{t('ekyc.buttons.capture')}</span>
                                 </button>
                             </div>
                         </div>
@@ -566,7 +578,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
         return (
             <div className="mb-3">
                 <label className="form-label" htmlFor={videoInputId}>
-                    Video xác thực người thật <span className="text-danger">*</span>
+                    {t('ekyc.livenessVideo')} <span className="text-danger">*</span>
                 </label>
                 <div className={styles.uploadBox}>
                     {videoPreview ? (
@@ -581,7 +593,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                                     setLivenessVideo(null);
                                     setVideoPreview('');
                                 }}
-                                aria-label="Xóa video"
+                                aria-label={t('ekyc.removeVideo')}
                             >
                                 <i className="isax isax-close-circle" aria-hidden="true" />
                             </button>
@@ -590,7 +602,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                         <div className={styles.uploadActions}>
                             <div className={styles.uploadPlaceholder}>
                                 <i className="isax isax-video" aria-hidden="true" />
-                                <span>Quay video 3-5 giây</span>
+                                <span>{t('ekyc.placeholders.video')}</span>
                             </div>
                             <div className={styles.actionButtons}>
                                 <button
@@ -599,7 +611,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                                     onClick={() => videoInputRef.current?.click()}
                                 >
                                     <i className="isax isax-gallery-add me-1" aria-hidden="true" />
-                                    <span>Tải lên</span>
+                                    <span>{t('ekyc.buttons.upload')}</span>
                                 </button>
                                 <button
                                     type="button"
@@ -607,7 +619,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                                     onClick={() => startCamera('video')}
                                 >
                                     <i className="isax isax-video me-1" aria-hidden="true" />
-                                    <span>Quay video</span>
+                                    <span>{t('ekyc.buttons.record')}</span>
                                 </button>
                             </div>
                         </div>
@@ -621,9 +633,7 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                     onChange={handleVideoChange}
                     className="d-none"
                 />
-                <small className="text-muted">
-                    Video giúp xác thực bạn là người thật. Xoay đầu nhẹ sang trái và phải khi quay.
-                </small>
+                <small className="text-muted">{t('ekyc.videoHelp')}</small>
             </div>
         );
     };
@@ -640,46 +650,44 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                         style={{ fontSize: '24px', color: '#0d6efd' }}
                     ></i>
                 </div>
-                <h5 className="mb-0 fw-bold text-primary">Xác thực danh tính (eKYC)</h5>
+                <h5 className="mb-0 fw-bold text-primary">{t('ekyc.title')}</h5>
             </div>
-            <p className="text-muted small mb-4">
-                Vui lòng xác thực danh tính bằng CMND/CCCD để đảm bảo tính xác thực của đơn đăng ký
-            </p>
+            <p className="text-muted small mb-4">{t('ekyc.description')}</p>
 
             {state.step !== 'completed' && state.step !== 'failed' && (
                 <>
                     <div className="row">
                         <div className="col-md-6">
                             {renderUploadBox({
-                                label: 'Ảnh mặt trước CMND/CCCD',
+                                label: t('ekyc.idCardFront'),
                                 preview: idCardFrontPreview,
                                 inputRef: idCardFrontRef,
                                 onChange: handleIdCardFrontChange,
                                 cameraTarget: 'front',
-                                placeholder: 'Mặt trước',
+                                placeholder: t('ekyc.placeholders.front'),
                                 icon: 'isax-card',
                             })}
                         </div>
                         <div className="col-md-6">
                             {renderUploadBox({
-                                label: 'Ảnh mặt sau CMND/CCCD',
+                                label: t('ekyc.idCardBack'),
                                 preview: idCardBackPreview,
                                 inputRef: idCardBackRef,
                                 onChange: handleIdCardBackChange,
                                 cameraTarget: 'back',
-                                placeholder: 'Mặt sau',
+                                placeholder: t('ekyc.placeholders.back'),
                                 icon: 'isax-card',
                             })}
                         </div>
                     </div>
 
                     {renderUploadBox({
-                        label: 'Ảnh chân dung (Selfie)',
+                        label: t('ekyc.selfie'),
                         preview: selfiePreview,
                         inputRef: selfieRef,
                         onChange: handleSelfieChange,
                         cameraTarget: 'selfie',
-                        placeholder: 'Chụp ảnh selfie',
+                        placeholder: t('ekyc.placeholders.selfie'),
                         icon: 'isax-user',
                     })}
 
@@ -687,7 +695,11 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
 
                     <div className="d-flex justify-content-end mt-4">
                         <Button
-                            text={isProcessing ? 'Đang xác thực...' : 'Xác thực danh tính'}
+                            text={
+                                isProcessing
+                                    ? t('ekyc.buttons.verifying')
+                                    : t('ekyc.buttons.verify')
+                            }
                             type="button"
                             onClick={handleVerify}
                             isDisabled={!canVerify}
@@ -701,8 +713,8 @@ const EkycVerification: React.FC<EkycVerificationProps> = ({ onVerificationCompl
                             </output>
                             <p className="mt-2 mb-0">
                                 {state.step === 'uploading'
-                                    ? 'Đang tải ảnh lên...'
-                                    : 'Đang xác thực danh tính...'}
+                                    ? t('ekyc.status.uploading')
+                                    : t('ekyc.status.processing')}
                             </p>
                         </div>
                     )}

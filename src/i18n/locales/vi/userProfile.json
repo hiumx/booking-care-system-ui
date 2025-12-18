@@ -1,4 +1,45 @@
 {
+    "breadcrumb": {
+        "patient": "Bệnh nhân",
+        "tabs": {
+            "dashboard": "Tổng quan",
+            "appointments": "Lịch hẹn của tôi",
+            "appointmentDetail": "Chi tiết lịch hẹn",
+            "favourites": "Yêu thích",
+            "relatives": "Người thân",
+            "dependent": "Người phụ thuộc",
+            "medicalRecords": "Hồ sơ bệnh án",
+            "wallet": "Lịch sử hoàn tiền",
+            "invoices": "Hóa đơn",
+            "notifications": "Thông báo",
+            "chat": "Tin nhắn",
+            "vitals": "Chỉ số sức khỏe",
+            "settings": "Cài đặt"
+        }
+    },
+    "sidebar": {
+        "role": "Vai trò",
+        "patient": "Bệnh nhân",
+        "gender": "Giới tính",
+        "dateOfBirth": "Ngày sinh",
+        "notUpdated": "Chưa cập nhật",
+        "loading": "Đang tải thông tin...",
+        "menu": {
+            "appointments": "Lịch Hẹn Của Tôi",
+            "favourites": "Yêu Thích",
+            "relatives": "Người Thân",
+            "wallet": "Lịch sử hoàn tiền",
+            "invoices": "Hóa đơn",
+            "notifications": "Thông báo",
+            "chat": "Tin nhắn",
+            "settings": "Cài đặt",
+            "logout": "Đăng xuất"
+        },
+        "toast": {
+            "logoutSuccess": "Đăng xuất thành công",
+            "logoutError": "Không thể đăng xuất. Vui lòng thử lại"
+        }
+    },
     "patientRelatives": {
         "title": "Quản lý người thân",
         "addButton": "Thêm người thân",
@@ -70,6 +111,216 @@
             "validationFailed": "Vui lòng kiểm tra lại thông tin"
         }
     },
+    "appointments": {
+        "title": "Lịch Hẹn",
+        "search": "Tìm kiếm",
+        "dateRangePlaceholder": "Chọn khoảng thời gian",
+        "clearDateFilter": "Xóa bộ lọc ngày",
+        "tabs": {
+            "waiting": "Chờ Xác Nhận",
+            "upcoming": "Sắp Khám",
+            "cancelled": "Đã Hủy",
+            "completed": "Đã Khám"
+        },
+        "toast": {
+            "loginRequired": "Vui lòng đăng nhập để xem lịch hẹn",
+            "loadError": "Không thể tải danh sách lịch hẹn",
+            "cancelStatusWarning": "Chỉ có thể hủy lịch hẹn ở trạng thái Chờ xử lý hoặc Sắp tới",
+            "cancelSuccess": "Hủy lịch hẹn thành công.",
+            "cancelSuccessRefund100": "Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 100% chi phí.",
+            "cancelSuccessRefund50": "Hủy lịch hẹn thành công. Bạn sẽ được hoàn lại 50% chi phí.",
+            "cancelSuccessNoRefund": "Hủy lịch hẹn thành công. Do hủy muộn, bạn sẽ không được hoàn lại chi phí.",
+            "cancelError": "Không thể hủy lịch hẹn. Vui lòng thử lại."
+        },
+        "error": {
+            "title": "Đã xảy ra lỗi",
+            "retry": "Thử lại"
+        },
+        "empty": {
+            "title": "Không có lịch hẹn nào",
+            "withFilter": "Không tìm thấy lịch hẹn nào phù hợp với bộ lọc của bạn.",
+            "noFilter": "Bạn chưa có lịch hẹn nào trong danh mục này.",
+            "clearFilter": "Xóa Bộ Lọc"
+        },
+        "review": {
+            "title": "Đánh giá",
+            "doctor": "Bác sĩ",
+            "ratingLabel": "Đánh giá",
+            "commentLabel": "Nhận xét",
+            "commentPlaceholder": "Chia sẻ trải nghiệm của bạn (tối thiểu 5 ký tự)...",
+            "cancel": "Hủy",
+            "submit": "Thêm đánh giá",
+            "submitting": "Đang gửi...",
+            "stars": "sao",
+            "validation": {
+                "noAppointment": "Không tìm thấy thông tin lịch hẹn hoặc người dùng.",
+                "invalidRating": "Vui lòng chọn đánh giá từ 1 đến 5 sao.",
+                "invalidComment": "Vui lòng nhập nhận xét (tối thiểu 5 ký tự).",
+                "noDoctor": "Không tìm thấy thông tin bác sĩ để đánh giá."
+            }
+        },
+        "viewReview": {
+            "title": "Chi tiết đánh giá",
+            "reviewFor": "Đánh giá cho",
+            "reviewBy": "Đánh giá bởi",
+            "rating": "Đánh giá",
+            "comment": "Nhận xét"
+        },
+        "cancelModal": {
+            "title": "Xác Nhận Hủy Lịch Hẹn",
+            "message": "Bạn có chắc chắn muốn hủy lịch hẹn",
+            "confirm": "Xác nhận hủy",
+            "cancel": "Đóng",
+            "reasonLabel": "Lý do hủy",
+            "reasonPlaceholder": "Vui lòng nhập lý do hủy lịch hẹn (tối thiểu 10 ký tự)..."
+        },
+        "filters": {
+            "filterBy": "Lọc theo",
+            "name": "Tên",
+            "searchPlaceholder": "Tìm kiếm",
+            "appointmentType": "Loại cuộc hẹn",
+            "all": "Tất cả",
+            "telehealth": "Trực tuyến",
+            "directVisit": "Khám trực tiếp",
+            "bookingFor": "Đặt lịch cho",
+            "self": "Bản thân",
+            "relative": "Người thân",
+            "reset": "Đặt lại",
+            "apply": "Lọc ngay"
+        },
+        "detail": {
+            "title": "Chi Tiết Cuộc Hẹn",
+            "recentAppointments": "Lịch Hẹn Gần Đây",
+            "noRecentAppointments": "Không có lịch hẹn gần đây",
+            "noRecentDescription": "Bạn chưa có lịch hẹn nào trong danh mục này.",
+            "cancelReasonTitle": "Lý Do Hủy",
+            "noReasonProvided": "Không có lý do cụ thể được cung cấp.",
+            "cancelledBy": "Đã hủy bởi",
+            "cancelledByYou": "bạn",
+            "cancelledByHospital": "bệnh viện",
+            "cancelledOn": "vào ngày",
+            "toast": {
+                "appointmentNotFound": "Không tìm thấy ID cuộc hẹn",
+                "loadError": "Không thể tải thông tin cuộc hẹn"
+            }
+        },
+        "card": {
+            "new": "Mới",
+            "viewDetail": "Xem Chi Tiết",
+            "rebook": "Đặt Lại",
+            "viewReview": "Xem Đánh Giá",
+            "addReview": "Thêm Đánh Giá",
+            "appointmentType": {
+                "telehealth": "Trực tuyến",
+                "inPerson": "Trực tiếp"
+            }
+        },
+        "actions": {
+            "viewDetail": "Xem chi tiết",
+            "cancelAppointment": "Hủy lịch hẹn",
+            "rescheduleWithSameDoctor": "Đổi lịch với cùng bác sĩ",
+            "chooseNewDoctor": "Chọn bác sĩ mới",
+            "statusCancelled": "Đã Hủy",
+            "statusCompleted": "Đã Khám"
+        }
+    },
+    "notifications": {
+        "title": "Danh sách thông báo",
+        "tabs": {
+            "appointment": "Lịch hẹn",
+            "news": "Tin tức",
+            "system": "Hệ thống"
+        },
+        "options": "Tùy chọn",
+        "markAllAsRead": "Đánh dấu tất cả đã đọc",
+        "deleteAll": "Xóa tất cả",
+        "markAsRead": "Đánh dấu đã đọc",
+        "delete": "Xóa",
+        "new": "Mới",
+        "empty": "Chưa có thông báo nào",
+        "toast": {
+            "loadError": "Không thể tải thông báo",
+            "markedAsRead": "Đã đánh dấu đã đọc",
+            "markAsReadError": "Không thể đánh dấu đã đọc",
+            "allMarkedAsRead": "Đã đánh dấu tất cả là đã đọc",
+            "markAllError": "Không thể đánh dấu tất cả",
+            "deleted": "Đã xóa thông báo",
+            "deleteError": "Không thể xóa thông báo",
+            "allDeleted": "Đã xóa tất cả thông báo",
+            "deleteAllError": "Không thể xóa tất cả thông báo"
+        },
+        "confirmDeleteAll": "Bạn có chắc chắn muốn xóa tất cả thông báo? Hành động này không thể hoàn tác."
+    },
+    "detailCard": {
+        "status": {
+            "pending": "Chờ Xác Nhận",
+            "confirmed": "Sắp Tới",
+            "cancelled": "Đã Hủy",
+            "completed": "Hoàn Thành",
+            "unknown": "Không xác định"
+        },
+        "personWithPatient": "Người đi cùng bệnh nhân",
+        "appointmentType": "Loại Cuộc Hẹn",
+        "reason": "Lý do",
+        "consultationFee": "Phí Tư Vấn",
+        "dateTime": "Ngày & Giờ Hẹn",
+        "location": "Vị trí",
+        "visitType": "Loại Thăm Khám",
+        "waitingConfirmation": "Đang chờ xác nhận",
+        "startSession": "Bắt Đầu Phiên",
+        "rescheduleStatus": "Trạng thái: Đặt lại lịch",
+        "rescheduleAppointment": "Đặt Lại Lịch Hẹn",
+        "rescheduleWithSameDoctor": "Đổi lịch với cùng bác sĩ",
+        "chooseNewDoctor": "Chọn bác sĩ mới",
+        "cancelAppointment": "Hủy lịch hẹn"
+    },
+    "settings": {
+        "tabs": {
+            "profile": "Thông tin cá nhân",
+            "password": "Thay đổi mật khẩu"
+        }
+    },
+    "changePassword": {
+        "title": "Thay đổi mật khẩu",
+        "currentPassword": {
+            "label": "Mật khẩu hiện tại",
+            "placeholder": "Nhập mật khẩu hiện tại"
+        },
+        "newPassword": {
+            "label": "Mật khẩu mới",
+            "placeholder": "Nhập mật khẩu mới"
+        },
+        "confirmPassword": {
+            "label": "Xác nhận mật khẩu mới",
+            "placeholder": "Nhập lại mật khẩu mới"
+        },
+        "strength": {
+            "label": "Độ mạnh mật khẩu:",
+            "weak": "Yếu",
+            "fair": "Trung bình",
+            "good": "Tốt",
+            "strong": "Mạnh",
+            "veryStrong": "Rất mạnh"
+        },
+        "passwordMatch": "Mật khẩu trùng khớp",
+        "requirements": {
+            "title": "Yêu cầu mật khẩu:",
+            "minLength": "Ít nhất 8 ký tự",
+            "uppercase": "Một chữ hoa",
+            "lowercase": "Một chữ thường",
+            "number": "Một số",
+            "specialChar": "Một ký tự đặc biệt"
+        },
+        "actions": {
+            "cancel": "Hủy",
+            "submit": "Thay đổi mật khẩu",
+            "submitting": "Đang xử lý..."
+        },
+        "toast": {
+            "success": "Thay đổi mật khẩu thành công!",
+            "error": "Không thể thay đổi mật khẩu. Vui lòng thử lại!"
+        }
+    },
     "profile": {
         "title": "Thông tin cá nhân",
         "avatar": {
@@ -82,14 +333,14 @@
         },
         "fields": {
             "firstName": {
-                "label": "Tên",
-                "required": "Tên không được để trống",
-                "minLength": "Tên phải có ít nhất 2 ký tự"
-            },
-            "lastName": {
                 "label": "Họ",
                 "required": "Họ không được để trống",
                 "minLength": "Họ phải có ít nhất 2 ký tự"
+            },
+            "lastName": {
+                "label": "Tên",
+                "required": "Tên không được để trống",
+                "minLength": "Tên phải có ít nhất 2 ký tự"
             },
             "gender": {
                 "label": "Giới tính",

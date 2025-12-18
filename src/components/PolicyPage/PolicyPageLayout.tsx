@@ -5,7 +5,7 @@ import MainLayout from '@/layouts/MainLayout';
 import { PATHS } from '@/routes/paths';
 
 interface PolicyPageLayoutProps {
-    namespace: 'legalNotice' | 'privacyPolicy' | 'refundPolicy';
+    namespace: 'legalNotice' | 'privacyPolicy' | 'refundPolicy' | 'termsOfService';
     children: ReactNode;
 }
 

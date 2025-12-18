@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 import Button from '@/components/Button';
 import { FilterState } from './AppointmentTypes';
@@ -26,6 +27,7 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
     onReset,
     onApply,
 }) => {
+    const { t } = useTranslation('userProfile');
     const filterDropdownRef = useRef<HTMLDivElement>(null);
 
     // Close filter when clicking outside
@@ -68,7 +70,8 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                 aria-expanded={isOpen}
                 aria-haspopup="true"
             >
-                <i className="isax isax-filter me-2"></i>Lọc theo
+                <i className="isax isax-filter me-2"></i>
+                {t('appointments.filters.filterBy')}
             </button>
             <div className={clsx(styles.filterDropdownMenu, 'filter-dropdown-menu')}>
                 <div className="filter-set-view">
@@ -89,7 +92,7 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                     aria-expanded="false"
                                     aria-controls="collapseTwo"
                                 >
-                                    Tên
+                                    {t('appointments.filters.name')}
                                 </button>
                             </div>
                             <div
@@ -106,7 +109,9 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                             <input
                                                 type="text"
                                                 className="form-control"
-                                                placeholder="Tìm kiếm"
+                                                placeholder={t(
+                                                    'appointments.filters.searchPlaceholder'
+                                                )}
                                                 value={filterState.filterSearchTerm}
                                                 onChange={(e) =>
                                                     onFilterSearchChange(e.target.value)
@@ -137,7 +142,7 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                     aria-expanded="true"
                                     aria-controls="collapseOne"
                                 >
-                                    Loại cuộc hẹn{' '}
+                                    {t('appointments.filters.appointmentType')}
                                 </button>
                             </div>
                             <div
@@ -165,7 +170,9 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                                     }
                                                 />
                                                 <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Tất cả</span>
+                                                <span className="check-title">
+                                                    {t('appointments.filters.all')}
+                                                </span>
                                             </label>
                                         </div>
                                     </li>
@@ -186,7 +193,9 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                                     }
                                                 />
                                                 <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Trực tuyến</span>
+                                                <span className="check-title">
+                                                    {t('appointments.filters.telehealth')}
+                                                </span>
                                             </label>
                                         </div>
                                     </li>
@@ -207,7 +216,9 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                                     }
                                                 />
                                                 <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Khám trực tiếp</span>
+                                                <span className="check-title">
+                                                    {t('appointments.filters.directVisit')}
+                                                </span>
                                             </label>
                                         </div>
                                     </li>
@@ -231,7 +242,7 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                     aria-expanded="false"
                                     aria-controls="collapseThree"
                                 >
-                                    Đặt lịch cho
+                                    {t('appointments.filters.bookingFor')}
                                 </button>
                             </div>
                             <div
@@ -254,7 +265,9 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                                     }
                                                 />
                                                 <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Tất cả</span>
+                                                <span className="check-title">
+                                                    {t('appointments.filters.all')}
+                                                </span>
                                             </label>
                                         </div>
                                     </li>
@@ -269,7 +282,9 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                                     }
                                                 />
                                                 <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Bản thân</span>
+                                                <span className="check-title">
+                                                    {t('appointments.filters.self')}
+                                                </span>
                                             </label>
                                         </div>
                                     </li>
@@ -287,7 +302,9 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                                     }
                                                 />
                                                 <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Người thân</span>
+                                                <span className="check-title">
+                                                    {t('appointments.filters.relative')}
+                                                </span>
                                             </label>
                                         </div>
                                     </li>
@@ -297,13 +314,13 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                     </div>
                     <div className={clsx(styles.filterResetBtn, 'filter-reset-btns')}>
                         <Button
-                            text="Đặt lại"
+                            text={t('appointments.filters.reset')}
                             type="button"
                             className={clsx(styles.btnLight, 'btn-md btn-light rounded-pill')}
                             onClick={onReset}
                         />
                         <Button
-                            text="Lọc ngay"
+                            text={t('appointments.filters.apply')}
                             type="button"
                             className="btn-md btn-primary-gradient rounded-pill"
                             onClick={onApply}

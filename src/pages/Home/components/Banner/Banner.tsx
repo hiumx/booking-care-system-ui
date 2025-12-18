@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import SearchInput from '@/components/SearchInput';
 import { PATHS } from '@/routes/paths';
 import styles from './Banner.module.scss';
@@ -16,6 +17,7 @@ import bannerBg05 from '@/assets/img/bg/banner-bg-05.png';
 import bannerIcon01 from '@/assets/img/bg/banner-icon-01.svg';
 
 const Banner: React.FC = () => {
+    const { t } = useTranslation('home');
     const navigate = useNavigate();
     const [isTooltipVisible, setIsTooltipVisible] = useState(false);
     const [tooltipPos, setTooltipPos] = useState<{ top: number; left: number } | null>(null);
@@ -86,13 +88,13 @@ const Banner: React.FC = () => {
                                     <div className="avatar-list-stacked avatar-group-lg">
                                         <span className="avatar avatar-rounded">
                                             <img
-                                                src="https://img.freepik.com/premium-psd/happy-robot-3d-ai-character-chat-bot-mascot-gpt-chatbot-icon-artificial-intelligence_95505-496.jpg?semt=ais_incoming&w=740&q=80"
+                                                src="https://img.freepik.com/premium-vector/ai-robot-doctor_78370-9566.jpg?semt=ais_hybrid&w=740&q=80"
                                                 alt="img"
                                             />
                                         </span>
                                     </div>
                                     <div className="me-2">
-                                        <h6 className="mb-1">Hỗ trợ đặt lịch</h6>
+                                        <h6 className="mb-1">{t('banner.aiSupport.title')}</h6>
                                         <div className="d-flex align-items-center">
                                             <div className="d-flex align-items-center">
                                                 <i className="fa-solid fa-star text-orange me-1"></i>
@@ -101,7 +103,7 @@ const Banner: React.FC = () => {
                                                 <i className="fa-solid fa-star text-orange me-1"></i>
                                                 <i className="fa-solid fa-star text-orange me-1"></i>
                                             </div>
-                                            <p>5.0 sao</p>
+                                            <p>{t('banner.aiSupport.rating')}</p>
                                         </div>
                                     </div>
                                 </motion.button>
@@ -133,20 +135,24 @@ const Banner: React.FC = () => {
                                     transition={{ duration: 0.15 }}
                                 >
                                     <span className={styles.bannerText}>
-                                        Click vào đặt lịch thông minh nha!
+                                        {t('banner.aiSupport.tooltip')}
                                     </span>
                                     <span className={styles.tooltipArrow} />
                                 </motion.div>
                             </motion.div>
                             <h1 className="display-5">
-                                <span className={styles.bannerText}>Khám sức khỏe: Tìm bác sĩ</span>
+                                <span className={styles.bannerText}>
+                                    {t('banner.headline.part1')}
+                                </span>
                                 <span className={`banner-icon ${styles.bannerIcon}`}>
                                     <img src={videoIcon} alt="img" />
                                 </span>
                                 <span className={`text-gradient ${styles.textGradient}`}>
-                                    của bạn
+                                    {t('banner.headline.highlight')}
                                 </span>
-                                <span className={styles.bannerText}>ngay hôm nay</span>
+                                <span className={styles.bannerText}>
+                                    {t('banner.headline.part2')}
+                                </span>
                             </h1>
                             <SearchInput forceWrap />
                         </div>
@@ -155,9 +161,14 @@ const Banner: React.FC = () => {
                         <div className="banner-img aos" data-aos="fade-up">
                             <img src={bannerDoctor} className="img-fluid" alt="patient-image" />
                             <div className="banner-appointment">
-                                <h6 style={{ fontSize: '20px', fontWeight: 'bold' }}>100</h6>
+                                <h6 style={{ fontSize: '20px', fontWeight: 'bold' }}>
+                                    {t('banner.stats.appointments.count')}
+                                </h6>
                                 <p style={{ fontSize: '16px' }}>
-                                    Cuộc hẹn <span className="d-block">đã hoàn thành</span>
+                                    {t('banner.stats.appointments.label')}{' '}
+                                    <span className="d-block">
+                                        {t('banner.stats.appointments.sublabel')}
+                                    </span>
                                 </p>
                             </div>
                             <div className="banner-patient">
@@ -172,8 +183,12 @@ const Banner: React.FC = () => {
                                         <img src={patient18} alt="img" />
                                     </span>
                                 </div>
-                                <p style={{ fontSize: '20px', fontWeight: 'bold' }}>1000</p>
-                                <p style={{ fontSize: '16px' }}>Bệnh nhân hài lòng</p>
+                                <p style={{ fontSize: '20px', fontWeight: 'bold' }}>
+                                    {t('banner.stats.patients.count')}
+                                </p>
+                                <p style={{ fontSize: '16px' }}>
+                                    {t('banner.stats.patients.label')}
+                                </p>
                             </div>
                         </div>
                     </div>

@@ -7,25 +7,25 @@
     "sections": {
         "companyInfo": {
             "title": "1. Company Information",
-            "description": "BookingCare is an online medical appointment booking platform, operated by BookingCare Technology JSC.",
+            "description": "MedCure is an online medical appointment booking platform, operated by MedCure Technology JSC.",
             "items": {
                 "companyName": "Company Name",
-                "companyNameValue": "BookingCare Technology Joint Stock Company",
+                "companyNameValue": "MedCure Technology Joint Stock Company",
                 "address": "Address",
                 "addressValue": "Da Nang, Vietnam",
                 "email": "Email",
-                "emailValue": "support@bookingcare.vn",
+                "emailValue": "medcure.contact@gmail.com",
                 "hotline": "Hotline",
-                "hotlineValue": "+84 236 3 822 888"
+                "hotlineValue": "+84 763583081"
             }
         },
         "purpose": {
             "title": "2. Purpose and Scope of Operations",
-            "description": "BookingCare provides a service connecting patients and healthcare facilities (hospitals, clinics, doctors) for online medical appointments. We do not directly provide medical services but act as an intermediary platform."
+            "description": "MedCure provides a service connecting patients and healthcare facilities (hospitals, clinics, doctors) for online medical appointments. We do not directly provide medical services but act as an intermediary platform."
         },
         "userResponsibilities": {
             "title": "3. User Responsibilities",
-            "description": "When using BookingCare services, users commit to:",
+            "description": "When using MedCure services, users commit to:",
             "items": [
                 "Providing accurate, complete, and up-to-date information",
                 "Complying with booking and cancellation regulations",
@@ -35,8 +35,8 @@
             ]
         },
         "bookingcareResponsibilities": {
-            "title": "4. BookingCare Responsibilities",
-            "description": "BookingCare commits to:",
+            "title": "4. MedCure Responsibilities",
+            "description": "MedCure commits to:",
             "items": [
                 "Protecting user personal information in accordance with legal regulations",
                 "Providing stable, secure, and convenient services",
@@ -46,16 +46,16 @@
         },
         "liabilityLimitation": {
             "title": "5. Liability Limitation",
-            "description1": "BookingCare is not responsible for the quality of medical services provided by doctors or healthcare facilities. Responsibility for diagnosis, treatment, and healthcare belongs to the doctors and healthcare facilities that provided the services.",
-            "description2": "BookingCare is not responsible for indirect, incidental, or consequential damages arising from the use or inability to use the service."
+            "description1": "MedCure is not responsible for the quality of medical services provided by doctors or healthcare facilities. Responsibility for diagnosis, treatment, and healthcare belongs to the doctors and healthcare facilities that provided the services.",
+            "description2": "MedCure is not responsible for indirect, incidental, or consequential damages arising from the use or inability to use the service."
         },
         "intellectualProperty": {
             "title": "6. Intellectual Property Rights",
-            "description": "All content on the BookingCare website, including logos, images, text, software, and other assets, is owned by BookingCare or licensed for use. Users are not permitted to copy, use, or distribute any content without written permission from BookingCare."
+            "description": "All content on the MedCure website, including logos, images, text, software, and other assets, is owned by MedCure or licensed for use. Users are not permitted to copy, use, or distribute any content without written permission from MedCure."
         },
         "changes": {
             "title": "7. Changes and Updates",
-            "description": "BookingCare reserves the right to change, update, or supplement the terms in this legal notice without prior notice. Users should regularly check for the latest updates."
+            "description": "MedCure reserves the right to change, update, or supplement the terms in this legal notice without prior notice. Users should regularly check for the latest updates."
         },
         "lawAndDisputes": {
             "title": "8. Applicable Law and Dispute Resolution",
@@ -65,9 +65,9 @@
             "title": "9. Contact",
             "description": "If you have any questions about this legal notice, please contact us:",
             "email": "Email",
-            "emailValue": "legal@bookingcare.vn",
+            "emailValue": "medcure.contact@gmail.com",
             "hotline": "Hotline",
-            "hotlineValue": "+84 236 3 822 888",
+            "hotlineValue": "+84 763583081",
             "address": "Address",
             "addressValue": "Da Nang, Vietnam"
         }

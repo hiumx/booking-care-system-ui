@@ -1,24 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     AppointmentCardData,
     AppointmentUITab,
-    getAppointmentTypeText,
     getAppointmentTypeIcon,
     getDisplayName,
     getDisplayAvatar,
     getDisplaySpecialty,
     getDisplayLabel,
 } from '@/types/appointment.types';
+import { AppointmentType } from '@/enums/appointment.enums';
 import AppointmentActionButtons from '../AppointmentActionButtons/AppointmentActionButtons';
 import doctorThumb01 from '@/assets/img/doctors/doctor-thumb-01.jpg';
 
 interface AppointmentGridCardProps {
     appointment: AppointmentCardData;
     status: AppointmentUITab;
-    onCancel?: (appointment: AppointmentCardData) => void; // Callback for cancel action
-    onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void; // Callback for reschedule actions
-    onReview?: (appointment: AppointmentCardData) => void; // Callback for review action
+    onCancel?: (appointment: AppointmentCardData) => void;
+    onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void;
+    onReview?: (appointment: AppointmentCardData) => void;
 }
 
 const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
@@ -26,23 +27,32 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
     status,
     onCancel,
     onReschedule,
-    onReview: _onReview, // Available for future use if grid view needs review functionality
+    onReview: _onReview,
 }) => {
+    const { t, i18n } = useTranslation('userProfile');
+
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN', {
+        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
+        return date.toLocaleDateString(locale, {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
         });
     };
 
-    const getAppointmentTypeIconColor = (type: string): string => {
-        const iconClasses: Record<string, string> = {
-            'Trực tuyến': 'video-icon',
-            'Trực tiếp': 'hospital-icon',
-        };
-        return iconClasses[type] || 'video-icon';
+    const getAppointmentTypeText = (type: AppointmentType): string => {
+        if (type === AppointmentType.TELEHEALTH) {
+            return t('appointments.card.appointmentType.telehealth');
+        }
+        return t('appointments.card.appointmentType.inPerson');
+    };
+
+    const getAppointmentTypeIconColor = (type: AppointmentType): string => {
+        if (type === AppointmentType.TELEHEALTH) {
+            return 'video-icon';
+        }
+        return 'hospital-icon';
     };
 
     // Get display values using helper functions (priority: Doctor > Service > Hospital)
@@ -77,7 +87,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
                             to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                             className="start-link w-100"
                         >
-                            Xem Chi Tiết
+                            {t('appointments.card.viewDetail')}
                         </Link>
                     </li>
                 );
@@ -119,7 +129,9 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
                                             {displayName}
                                         </Link>
                                         {appointment.isNew && (
-                                            <span className="badge new-tag">Mới</span>
+                                            <span className="badge new-tag">
+                                                {t('appointments.card.new')}
+                                            </span>
                                         )}
                                     </h6>
                                     <p className="visit">{displaySpecialty}</p>
@@ -128,8 +140,9 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
                             <div className="grid-user-msg">
                                 <span
                                     className={getAppointmentTypeIconColor(
-                                        getAppointmentTypeText(appointment.appointmentType)
+                                        appointment.appointmentType
                                     )}
+                                    title={getAppointmentTypeText(appointment.appointmentType)}
                                 >
                                     <Link to="#">
                                         <i

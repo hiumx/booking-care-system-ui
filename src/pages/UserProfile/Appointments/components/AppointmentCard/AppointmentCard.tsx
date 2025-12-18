@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     AppointmentCardData,
     AppointmentUITab,
-    getAppointmentTypeText,
     getDisplayName,
     getDisplayAvatar,
     getDisplayEmail,
@@ -12,15 +12,16 @@ import {
     getDisplayLabel,
     getRebookingUrl,
 } from '@/types/appointment.types';
+import { AppointmentType } from '@/enums/appointment.enums';
 import AppointmentActionButtons from '../AppointmentActionButtons/AppointmentActionButtons';
 
 interface AppointmentCardProps {
     appointment: AppointmentCardData;
     status: AppointmentUITab;
-    variant?: 'full' | 'minimal'; // 'full' shows all actions, 'minimal' only shows view icon
-    onCancel?: (appointment: AppointmentCardData) => void; // Callback for cancel action
-    onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void; // Callback for reschedule actions
-    onReview?: (appointment: AppointmentCardData) => void; // Callback for review action
+    variant?: 'full' | 'minimal';
+    onCancel?: (appointment: AppointmentCardData) => void;
+    onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void;
+    onReview?: (appointment: AppointmentCardData) => void;
 }
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({
@@ -31,13 +32,23 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     onReschedule,
     onReview,
 }) => {
+    const { t, i18n } = useTranslation('userProfile');
+
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN', {
+        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
+        return date.toLocaleDateString(locale, {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
         });
+    };
+
+    const getAppointmentTypeText = (type: AppointmentType): string => {
+        if (type === AppointmentType.TELEHEALTH) {
+            return t('appointments.card.appointmentType.telehealth');
+        }
+        return t('appointments.card.appointmentType.inPerson');
     };
 
     // Get display values using helper functions (priority: Doctor > Service > Hospital)
@@ -68,7 +79,8 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                 return (
                     <li className="appointment-detail-btn">
                         <Link to={getRebookingUrl(appointment)}>
-                            <i className="isax isax-calendar-tick5 me-1"></i> Đặt Lại
+                            <i className="isax isax-calendar-tick5 me-1"></i>{' '}
+                            {t('appointments.card.rebook')}
                         </Link>
                     </li>
                 );
@@ -84,7 +96,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                                     data-bs-toggle="modal"
                                     data-bs-target="#view_review"
                                 >
-                                    Xem Đánh Giá
+                                    {t('appointments.card.viewReview')}
                                 </Link>
                             ) : (
                                 <Link
@@ -97,20 +109,22 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                                     data-bs-toggle="modal"
                                     data-bs-target="#add_review"
                                 >
-                                    Thêm Đánh Giá
+                                    {t('appointments.card.addReview')}
                                 </Link>
                             )}
                         </li>
                         <li className="appointment-detail-btn d-flex align-items-center gap-3 flex-wrap">
                             <Link to={getRebookingUrl(appointment)} className="btn btn-md btn-dark">
-                                Đặt Lại <i className="isax isax-arrow-right-3 ms-1"></i>
+                                {t('appointments.card.rebook')}{' '}
+                                <i className="isax isax-arrow-right-3 ms-1"></i>
                             </Link>
                             <Link
                                 to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                title="Xem chi tiết"
+                                title={t('appointments.card.viewDetail')}
                                 className="btn btn-md btn-primary-gradient"
                             >
-                                Xem Chi Tiết <i className="isax isax-arrow-right-3 ms-1"></i>
+                                {t('appointments.card.viewDetail')}{' '}
+                                <i className="isax isax-arrow-right-3 ms-1"></i>
                             </Link>
                         </li>
                     </>
@@ -146,7 +160,11 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
                                 >
                                     {displayName}
                                 </Link>
-                                {appointment.isNew && <span className="badge new-tag">Mới</span>}
+                                {appointment.isNew && (
+                                    <span className="badge new-tag">
+                                        {t('appointments.card.new')}
+                                    </span>
+                                )}
                             </h6>
                         </div>
                     </div>

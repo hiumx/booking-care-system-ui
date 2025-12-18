@@ -84,7 +84,6 @@ export const useHoldSlot = ({
             });
 
             stopCountdown();
-            toast.info('Đã hủy giữ chỗ');
         } catch (error: any) {
             console.error('Error releasing slot:', error);
             // Still stop countdown even if API call fails

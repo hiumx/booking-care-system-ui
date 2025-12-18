@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import AOS from 'aos';
 import { buildPath, PATHS, replacePathParams } from '@/routes/paths';
 import MainLayout from '../../layouts/MainLayout';
@@ -37,6 +38,8 @@ import {
 } from '@/components/LoadingEmptyState';
 
 const Home: React.FC = () => {
+    const { t } = useTranslation('home');
+
     useEffect(() => {
         // Refresh AOS when Home component mounts to ensure animations work
         // Use setTimeout to ensure DOM is fully rendered
@@ -151,12 +154,12 @@ const Home: React.FC = () => {
                 {/* List Specialties */}
                 {shouldShowSpecialties ? (
                     <SectionItem
-                        title="Chuyên khoa hàng đầu"
-                        desc="Chăm sóc và hỗ trợ"
+                        title={t('sections.specialties.title')}
+                        desc={t('sections.specialties.desc')}
                         items={listSpecialtyItems}
                         breakpoints={CAROUSEL_SPECIALTIES_BREAKPOINTS}
                         viewAllTarget={PATHS.SPECIALTIES.ROOT}
-                        viewAllText="Xem tất cả chuyên khoa"
+                        viewAllText={t('sections.specialties.viewAll')}
                     />
                 ) : (
                     <SpecialtiesEmptyState isLoading={isSpecialtiesLoading} />
@@ -164,11 +167,11 @@ const Home: React.FC = () => {
                 {/* List Hospitals */}
                 {shouldShowHospitals ? (
                     <SectionItem
-                        title="Bệnh viện hàng đầu"
-                        desc="Khám phá các bệnh viện nổi bật"
+                        title={t('sections.hospitals.title')}
+                        desc={t('sections.hospitals.desc')}
                         items={listHospitalItems}
                         breakpoints={CAROUSEL_HOSPITALS_BREAKPOINTS}
-                        viewAllText="Xem tất cả bệnh viện"
+                        viewAllText={t('sections.hospitals.viewAll')}
                         viewAllTarget={PATHS.HOSPITAL.ROOT}
                         isBackgroundColor
                     />
@@ -178,12 +181,12 @@ const Home: React.FC = () => {
                 {/* List Doctors */}
                 {shouldShowDoctors ? (
                     <SectionItem
-                        title="Bác sĩ hàng đầu"
-                        desc="Gặp gỡ các bác sĩ giỏi nhất"
+                        title={t('sections.doctors.title')}
+                        desc={t('sections.doctors.desc')}
                         items={listDoctorItems}
                         breakpoints={CAROUSEL_DOCTORS_BREAKPOINTS}
                         viewAllTarget={PATHS.DOCTOR.ROOT}
-                        viewAllText="Xem tất cả bác sĩ"
+                        viewAllText={t('sections.doctors.viewAll')}
                     />
                 ) : (
                     <DoctorsEmptyState isLoading={isDoctorsLoading} />

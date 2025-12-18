@@ -1,12 +1,12 @@
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import { PATHS } from '@/routes/paths';
 import TimeSlotBadge from '../Booking/components/TimeSlotBadge';
 import styles from './BookingConfirmation.module.scss';
 import clsx from 'clsx';
-import NotificationToast from '@/components/NotificationToast';
 import { AppointmentService } from '@/services/appointment.service';
 import { AppointmentResponse } from '@/types/appointment.types';
 import { toast } from 'react-toastify';
@@ -17,18 +17,19 @@ import specialtyIcon from '@/assets/img/specialities/speciality-icon-01.svg';
 import client16 from '@/assets/img/clients/client-16.jpg';
 
 const BookingConfirmation: React.FC = () => {
+    const { t } = useTranslation('booking');
     const { appointmentId } = useParams<{ appointmentId: string }>();
     const navigate = useNavigate();
 
-    const [showSuccessToast, setShowSuccessToast] = useState(false);
     const [appointment, setAppointment] = useState<AppointmentResponse | null>(null);
     const [loading, setLoading] = useState(true);
+    const hasShownToast = useRef(false);
 
     // Fetch appointment data
     useEffect(() => {
         const fetchAppointment = async () => {
             if (!appointmentId) {
-                toast.error('Không tìm thấy mã cuộc hẹn');
+                toast.error(t('confirmation.toast.appointmentNotFound'));
                 navigate(PATHS.HOME);
                 return;
             }
@@ -39,13 +40,12 @@ const BookingConfirmation: React.FC = () => {
 
                 if (response.success && response.data) {
                     setAppointment(response.data);
-                    setShowSuccessToast(true);
                 } else {
-                    throw new Error(response.message || 'Không thể tải thông tin cuộc hẹn');
+                    throw new Error(response.message || t('confirmation.toast.loadError'));
                 }
             } catch (error: any) {
                 console.error('Error fetching appointment:', error);
-                toast.error(error.message || 'Không thể tải thông tin cuộc hẹn');
+                toast.error(error.message || t('confirmation.toast.loadError'));
                 navigate(PATHS.HOME);
             } finally {
                 setLoading(false);
@@ -53,7 +53,7 @@ const BookingConfirmation: React.FC = () => {
         };
 
         fetchAppointment();
-    }, [appointmentId, navigate]);
+    }, [appointmentId, navigate, t]);
 
     // Determine booking type based on appointment data
     const isServiceMedicalBooking = useMemo(() => {
@@ -67,12 +67,23 @@ const BookingConfirmation: React.FC = () => {
         );
     }, [appointment]);
 
+    // Show success toast when appointment is loaded
+    useEffect(() => {
+        if (appointment && !hasShownToast.current) {
+            hasShownToast.current = true;
+            const message = isSpecialtyBooking
+                ? t('confirmation.toast.successSpecialty')
+                : t('confirmation.toast.successPayment');
+            toast.success(message);
+        }
+    }, [appointment, isSpecialtyBooking, t]);
+
     // Format appointment info from API data
     const formattedAppointmentInfo = useMemo(() => {
         if (!appointment) {
             return {
-                date: 'Đang tải...',
-                dateTime: 'Đang tải...',
+                date: t('confirmation.loading'),
+                dateTime: t('confirmation.loading'),
                 timeSlot: null,
                 doctor: null,
                 service: null,
@@ -137,9 +148,9 @@ const BookingConfirmation: React.FC = () => {
 
     // Get booking type label for breadcrumb
     const getBookingTypeLabel = () => {
-        if (isServiceMedicalBooking) return 'Dịch vụ y tế';
-        if (isSpecialtyBooking) return 'Đặt lịch theo chuyên khoa';
-        return 'Đặt lịch khám';
+        if (isServiceMedicalBooking) return t('confirmation.breadcrumb.medicalService');
+        if (isSpecialtyBooking) return t('confirmation.breadcrumb.specialtyBooking');
+        return t('confirmation.breadcrumb.doctorBooking');
     };
 
     const getBookingTypePath = () => {
@@ -151,54 +162,55 @@ const BookingConfirmation: React.FC = () => {
     // Helper function to render confirmation message - extracted from nested ternary
     const renderConfirmationMessage = () => {
         if (isServiceMedicalBooking) {
+            const serviceName =
+                formattedAppointmentInfo.service?.name ||
+                t('confirmation.breadcrumb.medicalService');
             return (
-                <>
-                    Lịch hẹn dịch vụ{' '}
-                    <span className="text-dark">
-                        {formattedAppointmentInfo.service?.name || 'Dịch vụ y tế'}
-                    </span>{' '}
-                    của bạn đã được xác nhận.
-                </>
+                <span
+                    dangerouslySetInnerHTML={{
+                        __html: t('confirmation.message.service', { serviceName }),
+                    }}
+                />
             );
         }
         if (isSpecialtyBooking) {
+            const specialtyName =
+                formattedAppointmentInfo.specialty?.name || t('confirmation.info.specialty');
             return (
-                <>
-                    Lịch khám chuyên khoa{' '}
-                    <span className="text-dark">
-                        {formattedAppointmentInfo.specialty?.name || 'Chuyên khoa'}
-                    </span>{' '}
-                    của bạn đã được tiếp nhận. Bệnh viện sẽ phân công bác sĩ phù hợp cho bạn.
-                </>
+                <span
+                    dangerouslySetInnerHTML={{
+                        __html: t('confirmation.message.specialty', { specialtyName }),
+                    }}
+                />
             );
         }
+        const position = formattedAppointmentInfo.doctor?.positionName || '';
+        const doctorName =
+            formattedAppointmentInfo.doctor?.fullName || t('confirmation.info.doctor');
         return (
-            <>
-                Lịch khám của bạn đã được xác nhận với{' '}
-                <span className="text-dark">
-                    {formattedAppointmentInfo.doctor?.positionName}{' '}
-                    {formattedAppointmentInfo.doctor?.fullName || 'Bác sĩ'}
-                </span>{' '}
-                .
-            </>
+            <span
+                dangerouslySetInnerHTML={{
+                    __html: t('confirmation.message.doctor', { position, doctorName }),
+                }}
+            />
         );
     };
 
     // Breadcrumb configuration - dynamic based on booking type
     const breadcrumbItems = [
-        { label: 'Trang chủ', path: PATHS.HOME },
+        { label: t('confirmation.breadcrumb.home'), path: PATHS.HOME },
         {
             label: getBookingTypeLabel(),
             path: getBookingTypePath(),
         },
-        { label: 'Xác nhận đặt lịch', isActive: true },
+        { label: t('confirmation.breadcrumb.title'), isActive: true },
     ];
 
     // Show loading spinner while fetching data
     if (loading) {
         return (
             <MainLayout>
-                <Breadcrumb items={breadcrumbItems} title="Xác nhận đặt lịch" />
+                <Breadcrumb items={breadcrumbItems} title={t('confirmation.breadcrumb.title')} />
                 <div
                     className="container d-flex justify-content-center align-items-center"
                     style={{ minHeight: '400px' }}
@@ -211,7 +223,7 @@ const BookingConfirmation: React.FC = () => {
 
     return (
         <MainLayout>
-            <Breadcrumb items={breadcrumbItems} title="Xác nhận đặt lịch" />
+            <Breadcrumb items={breadcrumbItems} title={t('confirmation.breadcrumb.title')} />
 
             <div className={clsx(styles.container, 'container')}>
                 <div className="row">
@@ -226,7 +238,7 @@ const BookingConfirmation: React.FC = () => {
                                                     <div className="card-header pt-3">
                                                         <h5 className="d-flex align-items-center flex-wrap rpw-gap-2">
                                                             <i className="isax isax-tick-circle5 text-success me-2"></i>{' '}
-                                                            Đặt lịch thành công
+                                                            {t('confirmation.success')}
                                                         </h5>
                                                     </div>
                                                     <div className="card-header d-flex align-items-center flex-wrap rpw-gap-2">
@@ -237,23 +249,25 @@ const BookingConfirmation: React.FC = () => {
                                                             />
                                                         </span>
                                                         <p className="mb-0">
-                                                            {renderConfirmationMessage()} Vui lòng
-                                                            đến trước{' '}
-                                                            <span className="text-dark">
-                                                                15 phút
-                                                            </span>{' '}
-                                                            so với giờ hẹn.
+                                                            {renderConfirmationMessage()}{' '}
+                                                            <span
+                                                                dangerouslySetInnerHTML={{
+                                                                    __html: t(
+                                                                        'confirmation.message.arriveEarly'
+                                                                    ),
+                                                                }}
+                                                            />
                                                         </p>
                                                     </div>
                                                     <div className="card-body pb-1">
                                                         <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-3">
-                                                            <h6>Thông tin lịch khám</h6>
+                                                            <h6>{t('confirmation.info.title')}</h6>
                                                             <Link
                                                                 to={PATHS.DOCTOR.ROOT}
                                                                 className="btn btn-light rounded-pill"
                                                             >
                                                                 <i className="isax isax-calendar me-1"></i>{' '}
-                                                                Đặt lại lịch
+                                                                {t('confirmation.info.reschedule')}
                                                             </Link>
                                                         </div>
                                                         <div className="row">
@@ -265,7 +279,9 @@ const BookingConfirmation: React.FC = () => {
                                                                         <div className="col-md-6">
                                                                             <div className="mb-3">
                                                                                 <div className="form-label">
-                                                                                    Bác sĩ
+                                                                                    {t(
+                                                                                        'confirmation.info.doctor'
+                                                                                    )}
                                                                                 </div>
                                                                                 <div className="form-plain-text">
                                                                                     {
@@ -284,13 +300,17 @@ const BookingConfirmation: React.FC = () => {
                                                                         <div className="col-md-6">
                                                                             <div className="mb-3">
                                                                                 <div className="form-label">
-                                                                                    Chuyên khoa
+                                                                                    {t(
+                                                                                        'confirmation.info.specialty'
+                                                                                    )}
                                                                                 </div>
                                                                                 <div className="form-plain-text">
                                                                                     {formattedAppointmentInfo
                                                                                         .doctor
                                                                                         .specialtyName ||
-                                                                                        'Chưa cập nhật'}
+                                                                                        t(
+                                                                                            'confirmation.info.notUpdated'
+                                                                                        )}
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -304,7 +324,9 @@ const BookingConfirmation: React.FC = () => {
                                                                         <div className="col-md-6">
                                                                             <div className="mb-3">
                                                                                 <div className="form-label">
-                                                                                    Chuyên khoa
+                                                                                    {t(
+                                                                                        'confirmation.info.specialty'
+                                                                                    )}
                                                                                 </div>
                                                                                 <div className="form-plain-text">
                                                                                     {
@@ -318,12 +340,15 @@ const BookingConfirmation: React.FC = () => {
                                                                         <div className="col-md-6">
                                                                             <div className="mb-3">
                                                                                 <div className="form-label">
-                                                                                    Bác sĩ
+                                                                                    {t(
+                                                                                        'confirmation.info.doctor'
+                                                                                    )}
                                                                                 </div>
                                                                                 <div className="form-plain-text text-warning">
                                                                                     <i className="isax isax-timer me-1"></i>{' '}
-                                                                                    Đang chờ phân
-                                                                                    công
+                                                                                    {t(
+                                                                                        'confirmation.info.waitingAssignment'
+                                                                                    )}
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -337,7 +362,9 @@ const BookingConfirmation: React.FC = () => {
                                                                         <div className="col-md-6">
                                                                             <div className="mb-3">
                                                                                 <div className="form-label">
-                                                                                    Dịch vụ
+                                                                                    {t(
+                                                                                        'confirmation.info.service'
+                                                                                    )}
                                                                                 </div>
                                                                                 <div className="form-plain-text">
                                                                                     {
@@ -351,7 +378,9 @@ const BookingConfirmation: React.FC = () => {
                                                                         <div className="col-md-6">
                                                                             <div className="mb-3">
                                                                                 <div className="form-label">
-                                                                                    Giá dịch vụ
+                                                                                    {t(
+                                                                                        'confirmation.info.servicePrice'
+                                                                                    )}
                                                                                 </div>
                                                                                 <div className="form-plain-text">
                                                                                     {formattedAppointmentInfo.service.price?.toLocaleString(
@@ -368,7 +397,9 @@ const BookingConfirmation: React.FC = () => {
                                                             <div className="col-md-6">
                                                                 <div className="mb-3">
                                                                     <div className="form-label">
-                                                                        Ngày khám
+                                                                        {t(
+                                                                            'confirmation.info.date'
+                                                                        )}
                                                                     </div>
                                                                     <div className="form-plain-text">
                                                                         {
@@ -382,12 +413,16 @@ const BookingConfirmation: React.FC = () => {
                                                             <div className="col-md-6">
                                                                 <div className="mb-3">
                                                                     <div className="form-label">
-                                                                        Thời gian khám
+                                                                        {t(
+                                                                            'confirmation.info.time'
+                                                                        )}
                                                                     </div>
                                                                     <div className="form-plain-text">
                                                                         {formattedAppointmentInfo.timeSlot
                                                                             ? `${formattedAppointmentInfo.timeSlot.startTime} - ${formattedAppointmentInfo.timeSlot.endTime}`
-                                                                            : 'Chưa có thông tin'}
+                                                                            : t(
+                                                                                  'confirmation.info.noTimeInfo'
+                                                                              )}
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -397,7 +432,9 @@ const BookingConfirmation: React.FC = () => {
                                                                 <div className="col-md-12">
                                                                     <div className="mb-3">
                                                                         <div className="form-label mb-2">
-                                                                            Khung giờ đã đặt
+                                                                            {t(
+                                                                                'confirmation.info.bookedSlot'
+                                                                            )}
                                                                         </div>
                                                                         <div className="d-flex flex-wrap gap-2">
                                                                             <TimeSlotBadge
@@ -424,13 +461,19 @@ const BookingConfirmation: React.FC = () => {
                                                                 <div className="col-md-6">
                                                                     <div className="mb-3">
                                                                         <div className="form-label">
-                                                                            Hình thức khám
+                                                                            {t(
+                                                                                'confirmation.info.appointmentType'
+                                                                            )}
                                                                         </div>
                                                                         <div className="form-plain-text">
                                                                             {appointment?.appointmentType ===
                                                                             'IN_PERSON'
-                                                                                ? 'Tại phòng khám'
-                                                                                : 'Trực tuyến'}
+                                                                                ? t(
+                                                                                      'confirmation.info.inPerson'
+                                                                                  )
+                                                                                : t(
+                                                                                      'confirmation.info.online'
+                                                                                  )}
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -440,12 +483,16 @@ const BookingConfirmation: React.FC = () => {
                                                             <div className="col-md-6">
                                                                 <div className="mb-3">
                                                                     <div className="form-label">
-                                                                        Địa điểm khám
+                                                                        {t(
+                                                                            'confirmation.info.location'
+                                                                        )}
                                                                     </div>
                                                                     <div className="form-plain-text">
                                                                         {formattedAppointmentInfo
                                                                             .hospital?.name ||
-                                                                            'Chưa cập nhật'}
+                                                                            t(
+                                                                                'confirmation.info.notUpdated'
+                                                                            )}
                                                                         <br />
                                                                         <small className="text-muted">
                                                                             {
@@ -464,7 +511,9 @@ const BookingConfirmation: React.FC = () => {
                                                                                         /* Show map */
                                                                                     }}
                                                                                 >
-                                                                                    Xem vị trí
+                                                                                    {t(
+                                                                                        'confirmation.info.viewLocation'
+                                                                                    )}
                                                                                 </button>
                                                                             </div>
                                                                         )}
@@ -482,22 +531,24 @@ const BookingConfirmation: React.FC = () => {
                                                                 <i className="isax isax-info-circle text-warning me-3 mt-1"></i>
                                                                 <div>
                                                                     <h6 className="mb-1 text-warning">
-                                                                        Đang chờ phân công bác sĩ
+                                                                        {t(
+                                                                            'confirmation.specialtyAlert.title'
+                                                                        )}
                                                                     </h6>
-                                                                    <p className="mb-0 text-muted">
-                                                                        Lịch hẹn của bạn đã được
-                                                                        tiếp nhận. Bệnh viện sẽ phân
-                                                                        công bác sĩ phù hợp với
-                                                                        chuyên khoa{' '}
-                                                                        <strong>
-                                                                            {
-                                                                                formattedAppointmentInfo
-                                                                                    .specialty?.name
-                                                                            }
-                                                                        </strong>{' '}
-                                                                        và thông báo cho bạn qua
-                                                                        email/điện thoại.
-                                                                    </p>
+                                                                    <p
+                                                                        className="mb-0 text-muted"
+                                                                        dangerouslySetInnerHTML={{
+                                                                            __html: t(
+                                                                                'confirmation.specialtyAlert.message',
+                                                                                {
+                                                                                    specialtyName:
+                                                                                        formattedAppointmentInfo
+                                                                                            .specialty
+                                                                                            ?.name,
+                                                                                }
+                                                                            ),
+                                                                        }}
+                                                                    />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -507,10 +558,13 @@ const BookingConfirmation: React.FC = () => {
                                                 <div className="card">
                                                     <div className="card-body d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between">
                                                         <div>
-                                                            <h6 className="mb-1">Cần hỗ trợ?</h6>
+                                                            <h6 className="mb-1">
+                                                                {t('confirmation.support.title')}
+                                                            </h6>
                                                             <p className="mb-0">
-                                                                Gọi cho chúng tôi nếu bạn gặp vấn đề
-                                                                khi đặt lịch hoặc hủy lịch.
+                                                                {t(
+                                                                    'confirmation.support.description'
+                                                                )}
                                                             </p>
                                                         </div>
                                                         <button
@@ -528,7 +582,7 @@ const BookingConfirmation: React.FC = () => {
                                                             }}
                                                         >
                                                             <i className="isax isax-call5 me-1"></i>{' '}
-                                                            Gọi cho chúng tôi
+                                                            {t('confirmation.support.callUs')}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -538,7 +592,9 @@ const BookingConfirmation: React.FC = () => {
                                             <div className="card flex-fill">
                                                 <div className="card-body d-flex flex-column justify-content-between">
                                                     <div className="text-center">
-                                                        <h6 className="fs-14 mb-2">Mã đặt lịch</h6>
+                                                        <h6 className="fs-14 mb-2">
+                                                            {t('confirmation.qrCode.bookingId')}
+                                                        </h6>
                                                         <span className="booking-id-badge mb-3">
                                                             {appointmentId
                                                                 ?.substring(0, 8)
@@ -555,8 +611,9 @@ const BookingConfirmation: React.FC = () => {
                                                             />
                                                         </span>
                                                         <p>
-                                                            Quét mã QR để xem chi tiết lịch hẹn trên
-                                                            thiết bị khác
+                                                            {t(
+                                                                'confirmation.qrCode.scanDescription'
+                                                            )}
                                                         </p>
                                                     </div>
                                                     <div>
@@ -567,13 +624,13 @@ const BookingConfirmation: React.FC = () => {
                                                                 /* Add to calendar */
                                                             }}
                                                         >
-                                                            Thêm vào lịch
+                                                            {t('confirmation.qrCode.addToCalendar')}
                                                         </button>
                                                         <Link
                                                             to={getBookingTypePath()}
                                                             className="btn w-100 btn-md btn-primary-gradient next_btns inline-flex align-items-center rounded-pill"
                                                         >
-                                                            Đặt lịch mới
+                                                            {t('confirmation.qrCode.newBooking')}
                                                         </Link>
                                                     </div>
                                                 </div>
@@ -586,20 +643,6 @@ const BookingConfirmation: React.FC = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Success Toast */}
-            <NotificationToast
-                isOpen={showSuccessToast}
-                onClose={() => setShowSuccessToast(false)}
-                message={
-                    isSpecialtyBooking
-                        ? 'Đặt lịch thành công! Bệnh viện sẽ phân công bác sĩ cho bạn.'
-                        : 'Thanh toán thành công! Lịch hẹn đã được xác nhận.'
-                }
-                type="success"
-                icon="fa-solid fa-check-circle"
-                duration={3000}
-            />
         </MainLayout>
     );
 };

@@ -1,9 +1,85 @@
 {
     "steps": {
-        "selectDateTime": "Chọn ngày giờ khám",
-        "basicInfo": "Thông tin cơ bản",
-        "selectPayment": "Chọn phương thức thanh toán",
-        "confirmation": "Xác nhận"
+        "dateTime": "Ngày & Giờ",
+        "basicInfo": "Thông Tin Cơ Bản",
+        "payment": "Thanh Toán",
+        "confirmation": "Xác Nhận",
+        "specialtyService": "Chuyên khoa/Dịch vụ",
+        "appointmentType": "Loại khám"
+    },
+    "common": {
+        "back": "Quay lại",
+        "notSelected": "Chưa chọn",
+        "copyright": "Bản quyền © {{year}}. Đã đăng ký mọi quyền, MedCure",
+        "holdSlot": "Giữ chỗ {{time}}"
+    },
+    "header": {
+        "appointmentInfo": "Thông tin lịch khám",
+        "timeSlots": "Giờ khám",
+        "slotsCount": "{{count}} khung",
+        "noTimeSlot": "Chưa chọn khung giờ",
+        "appointmentDate": "Ngày khám",
+        "appointmentType": "Loại lịch khám",
+        "specialty": "Chuyên khoa",
+        "service": "Dịch vụ",
+        "doctor": "Bác sĩ"
+    },
+    "confirmation": {
+        "breadcrumb": {
+            "home": "Trang chủ",
+            "medicalService": "Dịch vụ y tế",
+            "specialtyBooking": "Đặt lịch theo chuyên khoa",
+            "doctorBooking": "Đặt lịch khám",
+            "title": "Xác nhận đặt lịch"
+        },
+        "toast": {
+            "appointmentNotFound": "Không tìm thấy mã cuộc hẹn",
+            "loadError": "Không thể tải thông tin cuộc hẹn",
+            "successSpecialty": "Đặt lịch thành công! Bệnh viện sẽ phân công bác sĩ cho bạn.",
+            "successPayment": "Thanh toán thành công! Lịch hẹn đã được xác nhận."
+        },
+        "loading": "Đang tải...",
+        "success": "Đặt lịch thành công",
+        "message": {
+            "service": "Lịch hẹn dịch vụ <strong>{{serviceName}}</strong> của bạn đã được xác nhận.",
+            "specialty": "Lịch khám chuyên khoa <strong>{{specialtyName}}</strong> của bạn đã được tiếp nhận. Bệnh viện sẽ phân công bác sĩ phù hợp cho bạn.",
+            "doctor": "Lịch khám của bạn đã được xác nhận với <strong>{{position}} {{doctorName}}</strong>.",
+            "arriveEarly": "Vui lòng đến trước <strong>15 phút</strong> so với giờ hẹn."
+        },
+        "info": {
+            "title": "Thông tin lịch khám",
+            "reschedule": "Đặt lại lịch",
+            "doctor": "Bác sĩ",
+            "specialty": "Chuyên khoa",
+            "notUpdated": "Chưa cập nhật",
+            "waitingAssignment": "Đang chờ phân công",
+            "service": "Dịch vụ",
+            "servicePrice": "Giá dịch vụ",
+            "date": "Ngày khám",
+            "time": "Thời gian khám",
+            "noTimeInfo": "Chưa có thông tin",
+            "bookedSlot": "Khung giờ đã đặt",
+            "appointmentType": "Hình thức khám",
+            "inPerson": "Tại phòng khám",
+            "online": "Trực tuyến",
+            "location": "Địa điểm khám",
+            "viewLocation": "Xem vị trí"
+        },
+        "specialtyAlert": {
+            "title": "Đang chờ phân công bác sĩ",
+            "message": "Lịch hẹn của bạn đã được tiếp nhận. Bệnh viện sẽ phân công bác sĩ phù hợp với chuyên khoa <strong>{{specialtyName}}</strong> và thông báo cho bạn qua email/điện thoại."
+        },
+        "support": {
+            "title": "Cần hỗ trợ?",
+            "description": "Gọi cho chúng tôi nếu bạn gặp vấn đề khi đặt lịch hoặc hủy lịch.",
+            "callUs": "Gọi cho chúng tôi"
+        },
+        "qrCode": {
+            "bookingId": "Mã đặt lịch",
+            "scanDescription": "Quét mã QR để xem chi tiết lịch hẹn trên thiết bị khác",
+            "addToCalendar": "Thêm vào lịch",
+            "newBooking": "Đặt lịch mới"
+        }
     },
     "basicInfo": {
         "title": "Thông tin bệnh nhân",
@@ -57,5 +133,347 @@
         "specialty": "Chuyên khoa",
         "hospital": "Bệnh viện",
         "fee": "Phí khám"
+    },
+    "chooseNewDoctor": {
+        "steps": {
+            "dateTime": "Ngày & Giờ",
+            "payment": "Thanh Toán"
+        },
+        "depositNote": "Lưu ý: Bạn chỉ cần thanh toán cọc 30% giá khám. Số tiền còn lại sẽ được thanh toán khi hoàn thành khám.",
+        "priceDifference": {
+            "equal": "Cọc khám giống nhau, bạn không cần thanh toán thêm",
+            "higher": "Bác sĩ mới có cọc cao hơn {{amount}}, bạn cần thanh toán thêm",
+            "lower": "Bác sĩ mới có cọc thấp hơn {{amount}}, hệ thống sẽ hoàn tiền cho bạn"
+        },
+        "toast": {
+            "invalidInfo": "Thông tin không hợp lệ",
+            "loadError": "Không thể tải thông tin lịch hẹn",
+            "selectDateTime": "Vui lòng chọn ngày và giờ khám",
+            "updateError": "Không thể cập nhật lịch hẹn",
+            "paymentError": "Không thể xử lý thanh toán",
+            "paymentUrlError": "Không nhận được URL thanh toán",
+            "redirectingPayment": "Đang chuyển hướng đến cổng thanh toán...",
+            "refundError": "Không thể xử lý yêu cầu hoàn tiền",
+            "refundAmount": "Số tiền hoàn lại: {{amount}}"
+        }
+    },
+    "confirmNewDoctor": {
+        "title": "Xác nhận thay đổi bác sĩ",
+        "subtitle": "Bệnh viện đã gán cho bạn một bác sĩ mới thay thế",
+        "loading": "Đang tải thông tin bác sĩ...",
+        "currentAppointment": {
+            "title": "Lịch hẹn hiện tại",
+            "doctor": "Bác sĩ",
+            "date": "Ngày khám",
+            "time": "Giờ khám",
+            "location": "Địa điểm",
+            "depositPaid": "Phí đã cọc",
+            "notUpdated": "Chưa cập nhật"
+        },
+        "newDoctor": {
+            "title": "Bác sĩ được gán mới",
+            "hospital": "Bệnh viện",
+            "experience": "Kinh nghiệm",
+            "years": "năm",
+            "newDeposit": "Phí cọc mới (30%)"
+        },
+        "priceDifference": {
+            "higher": "Cọc cao hơn",
+            "higherNote": "Bạn cần thanh toán thêm.",
+            "lower": "Cọc thấp hơn",
+            "lowerNote": "Bạn sẽ được hoàn tiền.",
+            "equal": "Cọc bằng nhau. Không cần thanh toán thêm."
+        },
+        "actions": {
+            "processing": "Đang xử lý...",
+            "confirmAndPay": "Xác nhận & Thanh toán",
+            "confirmNewDoctor": "Xác nhận bác sĩ mới"
+        },
+        "toast": {
+            "invalidInfo": "Thông tin không hợp lệ",
+            "loadError": "Không thể tải thông tin",
+            "loadAppointmentError": "Không thể tải thông tin lịch hẹn",
+            "loadDoctorError": "Không thể tải thông tin bác sĩ mới",
+            "notEnoughInfo": "Chưa tải đủ thông tin",
+            "updateSuccess": "Đã cập nhật bác sĩ thành công!",
+            "paymentRequired": "Bác sĩ mới có cọc cao hơn. Vui lòng thanh toán thêm để xác nhận.",
+            "refundSuccess": "Đã cập nhật bác sĩ và tạo yêu cầu hoàn tiền!",
+            "updateError": "Không thể cập nhật bác sĩ",
+            "error": "Có lỗi xảy ra, vui lòng thử lại"
+        }
+    },
+    "requestRefund": {
+        "title": "Yêu cầu hoàn tiền",
+        "requestingRefundFor": "Bạn đang yêu cầu hoàn tiền cho lịch hẹn với",
+        "appointmentInfo": "Thông tin lịch hẹn",
+        "labels": {
+            "doctor": "Bác sĩ",
+            "service": "Dịch vụ",
+            "hospital": "Bệnh viện",
+            "specialty": "Chuyên khoa",
+            "date": "Ngày hẹn",
+            "time": "Giờ hẹn",
+            "location": "Địa điểm",
+            "address": "Địa chỉ",
+            "serviceFee": "Phí dịch vụ",
+            "consultationFee": "Phí khám"
+        },
+        "note": {
+            "title": "Lưu ý:",
+            "message": "Yêu cầu hoàn tiền sẽ được xử lý trong vòng 3-5 ngày làm việc. Số tiền sẽ được chuyển vào tài khoản ngân hàng mà bạn đã đăng ký."
+        },
+        "actions": {
+            "processing": "Đang xử lý...",
+            "confirmRefund": "Xác nhận hoàn tiền"
+        },
+        "toast": {
+            "invalidInfo": "Thông tin không hợp lệ",
+            "success": "Yêu cầu hoàn tiền đã được gửi thành công!",
+            "error": "Không thể gửi yêu cầu hoàn tiền"
+        }
+    },
+    "rescheduleAppointment": {
+        "loading": "Đang tải thông tin lịch hẹn...",
+        "toast": {
+            "selectDateTime": "Vui lòng chọn ngày và giờ khám mới",
+            "invalidInfo": "Thông tin không hợp lệ",
+            "success": "Đổi lịch hẹn thành công!",
+            "error": "Không thể đổi lịch hẹn"
+        }
+    },
+    "confirmSection": {
+        "notSelected": "Chưa chọn",
+        "success": "Đặt lịch thành công",
+        "message": "Lịch khám của bạn đã được xác nhận với {{doctorName}}. Vui lòng đến trước 15 phút so với giờ hẹn.",
+        "info": {
+            "title": "Thông tin lịch khám",
+            "reschedule": "Đặt lại lịch",
+            "doctor": "Bác sĩ",
+            "specialty": "Chuyên khoa",
+            "notUpdated": "Chưa cập nhật",
+            "date": "Ngày khám",
+            "totalDuration": "Tổng thời gian khám",
+            "durationFormat": "{{duration}} phút ({{count}} khung giờ)",
+            "bookedSlots": "Các khung giờ đã đặt",
+            "appointmentType": "Hình thức khám",
+            "inPerson": "Tại phòng khám",
+            "location": "Địa điểm khám",
+            "viewLocation": "Xem vị trí"
+        },
+        "support": {
+            "title": "Cần hỗ trợ?",
+            "description": "Gọi cho chúng tôi nếu bạn gặp vấn đề khi đặt lịch hoặc hủy lịch.",
+            "callUs": "Gọi cho chúng tôi"
+        },
+        "qrCode": {
+            "bookingId": "Mã đặt lịch",
+            "scanDescription": "Quét mã QR này để tải thông tin chi tiết về lịch hẹn",
+            "addToCalendar": "Thêm vào lịch",
+            "newBooking": "Đặt lịch mới"
+        },
+        "backToBookings": "Quay lại danh sách đặt lịch"
+    },
+    "appointmentTypeSection": {
+        "nextStepTitle": "Chọn ngày & giờ",
+        "loading": "Đang tải...",
+        "notSelected": "Chưa chọn",
+        "specialty": "Chuyên khoa",
+        "service": "Dịch vụ",
+        "appointmentType": {
+            "title": "Chọn loại khám",
+            "inPerson": "Khám trực tiếp",
+            "telehealth": "Tư vấn trực tuyến",
+            "serviceOnlyInPerson": "Dịch vụ y tế chỉ hỗ trợ khám trực tiếp tại bệnh viện"
+        },
+        "doctorSelection": {
+            "title": "Chọn bác sĩ (không bắt buộc)",
+            "description": "Bạn có thể chọn bác sĩ hoặc để bệnh viện phân công bác sĩ phù hợp",
+            "hospitalAssign": "Để bệnh viện phân công",
+            "hospitalAssignDesc": "Bác sĩ phù hợp nhất",
+            "selfSelect": "Tự chọn bác sĩ",
+            "loading": "Đang tải...",
+            "doctorsAvailable": "{{count}} bác sĩ có sẵn",
+            "noDoctors": "Không có bác sĩ",
+            "noDoctorsMessage": "Không tìm thấy bác sĩ phù hợp. Vui lòng chọn \"Để bệnh viện phân công\".",
+            "selectDoctorHint": "Chọn bác sĩ bạn muốn khám",
+            "noDoctorsFound": "Không tìm thấy bác sĩ phù hợp",
+            "selectOrGoBack": "Vui lòng chọn một bác sĩ hoặc quay lại chọn \"Để bệnh viện phân công\""
+        },
+        "filters": {
+            "title": "Bộ lọc",
+            "searchPlaceholder": "Tìm theo tên bác sĩ...",
+            "allPrices": "Tất cả mức giá",
+            "priceLow": "Dưới 300K",
+            "priceMedium": "300K - 500K",
+            "priceHigh": "Trên 500K",
+            "allRatings": "Tất cả đánh giá",
+            "rating4Plus": "4+ sao",
+            "rating3Plus": "3+ sao",
+            "rating2Plus": "2+ sao",
+            "allExperience": "Tất cả kinh nghiệm",
+            "experience1to3": "1-3 năm",
+            "experience4to7": "4-7 năm",
+            "experience8Plus": "8+ năm",
+            "allGenders": "Tất cả giới tính",
+            "male": "Nam",
+            "female": "Nữ",
+            "allLanguages": "Tất cả ngôn ngữ",
+            "reset": "Xóa bộ lọc",
+            "foundDoctors": "Tìm thấy {{count}} bác sĩ phù hợp",
+            "noMatchingDoctors": "Không tìm thấy bác sĩ phù hợp với bộ lọc. Hãy thử điều chỉnh bộ lọc hoặc",
+            "clearFilters": "xóa bộ lọc"
+        },
+        "doctorCard": {
+            "notUpdated": "Chưa cập nhật",
+            "yearsExperience": "năm kinh nghiệm"
+        }
+    },
+    "paymentSection": {
+        "notSelected": "Chưa chọn",
+        "bookingOptions": {
+            "title": "Chọn phương thức đặt lịch",
+            "specialtyNotice": "Với hình thức đặt lịch theo chuyên khoa, bệnh viện sẽ phân công bác sĩ phù hợp cho bạn. Chi phí khám sẽ được thông báo sau khi bác sĩ được phân công và bạn sẽ thanh toán trực tiếp tại bệnh viện.",
+            "depositOption": {
+                "label": "💳 Đặt cọc và thanh toán ngay",
+                "ariaLabel": "Đặt cọc và thanh toán ngay - Giảm ngay 10% tổng chi phí khi khám",
+                "saveBadge": "Tiết kiệm 10%",
+                "benefit1": "Giảm ngay <strong>10%</strong> tổng chi phí khi khám",
+                "benefit2": "Đảm bảo giữ chỗ khám bệnh",
+                "depositPayment": "Cọc thanh toán:"
+            },
+            "noPaymentOption": {
+                "label": "📅 Đặt lịch không cọc",
+                "ariaLabel": "Đặt lịch không cọc - Thanh toán toàn bộ khi khám",
+                "benefit1": "Thanh toán toàn bộ khi khám",
+                "benefit2": "Không cần thanh toán trước",
+                "benefit3": "Linh hoạt thay đổi lịch hẹn"
+            }
+        },
+        "paymentGateway": "Cổng thanh toán",
+        "loadingPaymentMethods": "Đang tải phương thức thanh toán...",
+        "noPaymentMethods": "Hiện tại không có phương thức thanh toán nào khả dụng",
+        "paymentMethodInfo": "Bạn sẽ được chuyển đến cổng thanh toán {{methodName}} để hoàn tất giao dịch. {{methodName}} hỗ trợ thanh toán qua:",
+        "paymentMethodOptions": {
+            "atmBank": "Thẻ ATM/Tài khoản ngân hàng",
+            "internationalCard": "Thẻ thanh toán quốc tế (Visa, Mastercard, JCB, AMEX)",
+            "eWallet": "Ví điện tử VNPay",
+            "qrCode": "QR Code"
+        },
+        "appointmentInfo": {
+            "title": "Thông tin lịch khám",
+            "date": "Ngày khám",
+            "time": "Giờ khám",
+            "timeNotSelected": "Chưa chọn giờ khám",
+            "selectedSlots": "Khung giờ đã chọn ({{count}} khung - {{duration}} phút)",
+            "hospital": "Bệnh viện",
+            "specialty": "Chuyên khoa",
+            "service": "Dịch vụ",
+            "doctor": "Bác sĩ",
+            "notUpdated": "Chưa cập nhật"
+        },
+        "paymentInfo": {
+            "title": "Thông tin thanh toán",
+            "totalFee": "Tổng phí khám bệnh",
+            "discount": "Giảm giá",
+            "totalAfterDiscount": "Tổng sau giảm giá",
+            "depositFee": "Phí đặt cọc (30%)",
+            "supplementaryAmount": "Số tiền cần thanh toán thêm",
+            "finalAmount": "Số tiền thanh toán",
+            "supplementaryFinalAmount": "Số tiền cần thanh toán thêm"
+        },
+        "depositNote": "Bạn chỉ cần thanh toán đặt cọc 30% ({{depositAmount}} đ) để xác nhận lịch hẹn. Số tiền còn lại ({{remainingAmount}} đ) sẽ được thanh toán trực tiếp tại phòng khám.",
+        "supplementaryNote": "Bác sĩ mới có cọc cao hơn. Bạn cần thanh toán thêm {{amount}} đ để xác nhận lịch hẹn. Số tiền còn lại sẽ được thanh toán khi hoàn thành khám.",
+        "noPriceWarning": "Không tìm thấy thông tin giá khám. Vui lòng quay lại và chọn lại {{entity}}.",
+        "entityService": "dịch vụ",
+        "entityDoctor": "bác sĩ",
+        "specialtyPaymentNote": "Bạn sẽ thanh toán chi phí khám trực tiếp tại bệnh viện sau khi được phân công bác sĩ.",
+        "specialtyPaymentTitle": "Thanh toán tại bệnh viện:",
+        "discount": {
+            "label": "Mã giảm giá",
+            "placeholder": "Nhập mã giảm giá",
+            "apply": "Áp dụng",
+            "validating": "Đang kiểm tra...",
+            "removeTitle": "Hủy mã giảm giá",
+            "discountAmount": "Giảm {{amount}} đ"
+        },
+        "buttons": {
+            "processing": "Đang xử lý...",
+            "pay": "Thanh toán",
+            "depositAndPay": "Đặt cọc & Thanh toán",
+            "bookNow": "Đặt lịch ngay",
+            "continue": "Tiếp tục"
+        },
+        "toast": {
+            "enterDiscountCode": "Vui lòng nhập mã giảm giá",
+            "hospitalNotFound": "Không tìm thấy thông tin bệnh viện",
+            "discountIdError": "Lỗi: Không nhận được thông tin discount từ server",
+            "discountSuccess": "Áp dụng mã giảm giá thành công!",
+            "discountInvalid": "Mã giảm giá không hợp lệ",
+            "discountValidateError": "Không thể xác thực mã giảm giá",
+            "discountRemoved": "Đã hủy mã giảm giá",
+            "selectPaymentMethod": "Vui lòng chọn phương thức thanh toán",
+            "invalidPaymentMethod": "Phương thức thanh toán không hợp lệ",
+            "noPriceError": "Không tìm thấy thông tin giá khám. Vui lòng thử lại.",
+            "noPaymentNotSupported": "Chức năng đặt lịch không thanh toán chưa được hỗ trợ"
+        }
+    },
+    "timeSlots": {
+        "morning": "Buổi sáng (8:00 - 12:00)",
+        "afternoon": "Buổi chiều (12:00 - 17:00)",
+        "evening": "Buổi tối (17:00 - 21:00)"
+    },
+    "dateTimeSection": {
+        "nextStepTitle": {
+            "reschedule": "Xác nhận đổi lịch",
+            "default": "Thêm thông tin cơ bản"
+        },
+        "selectedDate": "Ngày đã chọn:",
+        "loading": "Đang tải...",
+        "loadingSchedule": "Đang tải lịch khám...",
+        "noSlotsForDate": "Không có lịch khám cho ngày đã chọn",
+        "selectAnotherDate": "Vui lòng chọn ngày khác",
+        "selectDate": "Vui lòng chọn ngày khám",
+        "toast": {
+            "holdExpired": "Thời gian giữ chỗ đã hết. Vui lòng chọn lại khung giờ.",
+            "holdProcessing": "Đang xử lý giữ chỗ...",
+            "cannotSelectSlot": "Không thể chọn khung giờ này",
+            "loginRequired": "Vui lòng đăng nhập để đặt lịch",
+            "holdFailed": "Không thể giữ chỗ - thiếu thông tin bác sĩ hoặc dịch vụ"
+        }
+    },
+    "specialtyServiceSection": {
+        "notSelected": "Chưa chọn",
+        "loading": "Đang tải...",
+        "specialty": "Chuyên khoa",
+        "service": "Dịch vụ",
+        "nextStepTitle": "Chọn loại khám",
+        "selectSpecialty": "Chọn chuyên khoa",
+        "selectService": "Hoặc chọn dịch vụ y tế",
+        "searchSpecialty": "Tìm kiếm chuyên khoa...",
+        "searchService": "Tìm kiếm dịch vụ...",
+        "noSpecialtyFound": "Không tìm thấy chuyên khoa phù hợp",
+        "noServiceFound": "Không tìm thấy dịch vụ phù hợp",
+        "noSpecialties": "Bệnh viện chưa có chuyên khoa nào",
+        "noServices": "Bệnh viện chưa có dịch vụ y tế nào",
+        "doctors": "bác sĩ",
+        "collapse": "Thu gọn",
+        "showMore": "Xem thêm",
+        "selectionHint": "Vui lòng chọn một chuyên khoa hoặc một dịch vụ y tế để tiếp tục"
+    },
+    "bookingPage": {
+        "toast": {
+            "loadHospitalError": "Không thể tải thông tin bệnh viện",
+            "pleaseLogin": "Vui lòng đăng nhập",
+            "updatePhone": "Vui lòng cập nhật số điện thoại",
+            "userNotFound": "Không tìm thấy thông tin người dùng",
+            "selectDateTime": "Vui lòng chọn ngày và giờ khám",
+            "createRequestError": "Không thể tạo yêu cầu đặt lịch",
+            "createAppointmentError": "Không thể tạo lịch hẹn",
+            "appointmentIdError": "Không nhận được ID cuộc hẹn",
+            "paymentUrlError": "Không nhận được URL thanh toán",
+            "redirectingPayment": "Đang chuyển hướng đến cổng thanh toán...",
+            "processError": "Không thể hoàn tất quy trình",
+            "bookingSuccessNoPayment": "Đặt lịch thành công! Vui lòng thanh toán khi đến khám."
+        }
     }
 }

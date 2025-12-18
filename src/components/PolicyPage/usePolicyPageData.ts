@@ -10,7 +10,9 @@ interface KeyValueItem {
     value: string;
 }
 
-export const usePolicyPageData = (namespace: 'legalNotice' | 'privacyPolicy' | 'refundPolicy') => {
+export const usePolicyPageData = (
+    namespace: 'legalNotice' | 'privacyPolicy' | 'refundPolicy' | 'termsOfService'
+) => {
     const { t } = useTranslation(namespace);
 
     const getContactInfo = (contactKeys: {

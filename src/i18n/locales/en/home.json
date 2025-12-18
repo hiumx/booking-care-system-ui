@@ -1,4 +1,58 @@
 {
+    "searchInput": {
+        "doctorPlaceholder": "Enter doctor name",
+        "hospitalPlaceholder": "Select hospital",
+        "specialtyPlaceholder": "Select specialty",
+        "locationPlaceholder": "Select location",
+        "searchButton": "Search",
+        "hospitalModalTitle": "Search by Hospital",
+        "specialtyModalTitle": "Search by Specialty"
+    },
+    "sections": {
+        "specialties": {
+            "title": "Top Specialties",
+            "desc": "Care and Support",
+            "viewAll": "View all specialties"
+        },
+        "hospitals": {
+            "title": "Top Hospitals",
+            "desc": "Explore featured hospitals",
+            "viewAll": "View all hospitals"
+        },
+        "doctors": {
+            "title": "Top Doctors",
+            "desc": "Meet the best doctors",
+            "viewAll": "View all doctors"
+        },
+        "services": {
+            "title": "Our",
+            "titleSuffix": "Services",
+            "subtitle": "Special offers when booking multiple services. Book today!"
+        }
+    },
+    "banner": {
+        "aiSupport": {
+            "title": "Booking Support",
+            "rating": "5.0 stars",
+            "tooltip": "Click for smart booking!"
+        },
+        "headline": {
+            "part1": "Health Check: Find your doctor",
+            "highlight": "for you",
+            "part2": "today"
+        },
+        "stats": {
+            "appointments": {
+                "count": "100",
+                "label": "Appointments",
+                "sublabel": "completed"
+            },
+            "patients": {
+                "count": "1000",
+                "label": "Satisfied patients"
+            }
+        }
+    },
     "horizontalServices": {
         "services": [
             "Multi Speciality Treatments & Doctors",
@@ -66,7 +120,7 @@
     },
     "testimonial": {
         "badge": "Testimonials",
-        "title": "15k Users Trust Doccure Worldwide",
+        "title": "15k Users Trust MedCure Worldwide",
         "testimonials": [
             {
                 "rating": 5,
@@ -182,11 +236,11 @@
         "heading": "Working for Your Better Health.",
         "customerSupport": {
             "label": "Customer Support",
-            "value": "+1 56589 54598"
+            "value": "+84 763583081"
         },
         "email": {
             "label": "Drop Us an Email",
-            "value": "[email protected]"
+            "value": "medcure.contact@gmail.com"
         }
     },
     "footer": {
@@ -232,12 +286,12 @@
         },
         "newsletter": {
             "title": "Newsletter",
-            "description": "Subscribe & Stay Updated from the Doccure",
+            "description": "Subscribe & Stay Updated from the MedCure",
             "placeholder": "Enter Email Address",
             "button": "Send"
         },
         "connectWithUs": "Connect With Us",
-        "copyright": "Copyright © 2025 Doccure. All Rights Reserved",
+        "copyright": "Copyright © 2025 MedCure. All Rights Reserved",
         "legalNotice": "Legal Notice",
         "privacyPolicy": "Privacy Policy",
         "refundPolicy": "Refund Policy"
