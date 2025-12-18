@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { DateRangePicker as ReactDateRangePicker, Range, RangeKeyDict } from 'react-date-range';
-import { vi } from 'date-fns/locale';
+import { vi, enUS } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 
 import styles from './DateRangePicker.module.scss';
@@ -10,8 +11,8 @@ import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import Button from '@/components/Button';
 
-// Vietnamese predefined ranges
-const getVietnameseStaticRanges = () => {
+// Predefined ranges with i18n support
+const getStaticRanges = (t: (key: string) => string) => {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -30,7 +31,7 @@ const getVietnameseStaticRanges = () => {
 
     return [
         {
-            label: 'Hôm nay',
+            label: t('common:dateRangePicker.today'),
             range: () => ({
                 startDate: today,
                 endDate: today,
@@ -47,7 +48,7 @@ const getVietnameseStaticRanges = () => {
             },
         },
         {
-            label: 'Hôm qua',
+            label: t('common:dateRangePicker.yesterday'),
             range: () => ({
                 startDate: yesterday,
                 endDate: yesterday,
@@ -64,7 +65,7 @@ const getVietnameseStaticRanges = () => {
             },
         },
         {
-            label: 'Tuần này',
+            label: t('common:dateRangePicker.thisWeek'),
             range: () => ({
                 startDate: thisWeekStart,
                 endDate: today,
@@ -81,7 +82,7 @@ const getVietnameseStaticRanges = () => {
             },
         },
         {
-            label: 'Tuần trước',
+            label: t('common:dateRangePicker.lastWeek'),
             range: () => ({
                 startDate: lastWeekStart,
                 endDate: lastWeekEnd,
@@ -98,7 +99,7 @@ const getVietnameseStaticRanges = () => {
             },
         },
         {
-            label: 'Tháng này',
+            label: t('common:dateRangePicker.thisMonth'),
             range: () => ({
                 startDate: thisMonthStart,
                 endDate: today,
@@ -115,7 +116,7 @@ const getVietnameseStaticRanges = () => {
             },
         },
         {
-            label: 'Tháng trước',
+            label: t('common:dateRangePicker.lastMonth'),
             range: () => ({
                 startDate: lastMonthStart,
                 endDate: lastMonthEnd,
@@ -186,7 +187,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     onChange,
     isOpen = false,
     onToggle,
-    placeholder = 'Chọn khoảng thời gian',
+    placeholder,
     className,
     classNameForDropDown,
     disabled = false,
@@ -200,8 +201,15 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     showDefinedRanges = true,
     staticRanges,
     inputRanges,
-    locale = vi,
+    locale,
 }) => {
+    const { t, i18n } = useTranslation('common');
+
+    // Get locale based on current language
+    const dateLocale = locale || (i18n.language === 'vi' ? vi : enUS);
+
+    // Get placeholder with i18n
+    const placeholderText = placeholder || t('dateRangePicker.placeholder');
     const [internalOpen, setInternalOpen] = useState(isOpen);
     const pickerRef = useRef<HTMLDivElement>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
@@ -258,11 +266,13 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     const formatDateRange = () => {
         const selection = ranges[0];
         if (!selection?.startDate || !selection?.endDate) {
-            return placeholder;
+            return placeholderText;
         }
 
         const formatDate = (date: Date) => {
-            return date.toLocaleDateString('vi-VN', {
+            // Use locale based on current language
+            const localeCode = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
+            return date.toLocaleDateString(localeCode, {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
@@ -313,7 +323,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 disabled={disabled}
                 aria-expanded={open}
                 aria-haspopup="dialog"
-                aria-label="Mở bộ chọn khoảng thời gian"
+                aria-label={t('dateRangePicker.openPicker')}
             >
                 <div className={styles.triggerContent}>
                     <span className={styles.dateText}>{formatDateRange()}</span>
@@ -323,7 +333,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                                 type="button"
                                 className={styles.clearButton}
                                 onClick={handleClear}
-                                title="Xóa lựa chọn"
+                                title={t('dateRangePicker.clearSelection')}
                             >
                                 ×
                             </button>
@@ -358,12 +368,12 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                             rangeColors={rangeColors}
                             showDateDisplay={showDateDisplay}
                             staticRanges={
-                                showDefinedRanges ? staticRanges || getVietnameseStaticRanges() : []
+                                showDefinedRanges ? staticRanges || getStaticRanges(t) : []
                             }
                             inputRanges={showDefinedRanges ? inputRanges : []}
                             moveRangeOnFirstSelection={false}
                             retainEndDateOnFirstSelection={false}
-                            locale={locale}
+                            locale={dateLocale}
                         />
                     </div>
 
@@ -374,10 +384,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                             onClick={handleClear}
                             className={clsx(styles.actionButton, styles.clearBtn)}
                         >
-                            Xóa
+                            {t('actions.clear')}
                         </button>
                         <Button
-                            text="Áp dụng"
+                            text={t('actions.apply')}
                             type="button"
                             className={clsx(styles.actionButton, styles.applyBtn)}
                             onClick={handleApply}

@@ -19,7 +19,9 @@
         "next": "Tiếp theo",
         "close": "Đóng",
         "loading": "Đang tải...",
-        "processing": "Đang xử lý..."
+        "processing": "Đang xử lý...",
+        "clear": "Xóa",
+        "apply": "Áp dụng"
     },
     "validation": {
         "required": "Trường này là bắt buộc",
@@ -125,6 +127,17 @@
         "loading": "Đang tải đánh giá...",
         "noReviews": "Chưa có đánh giá",
         "beFirst": "Hãy là người đầu tiên đánh giá bệnh viện này!"
+    },
+    "dateRangePicker": {
+        "placeholder": "Chọn khoảng thời gian",
+        "clearSelection": "Xóa lựa chọn",
+        "openPicker": "Mở bộ chọn khoảng thời gian",
+        "today": "Hôm nay",
+        "yesterday": "Hôm qua",
+        "thisWeek": "Tuần này",
+        "lastWeek": "Tuần trước",
+        "thisMonth": "Tháng này",
+        "lastMonth": "Tháng trước"
     },
     "aiAssistant": {
         "label": "Trợ lý AI"

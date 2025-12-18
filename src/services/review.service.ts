@@ -208,4 +208,31 @@ export class ReviewService {
         );
         return response;
     }
+
+    /**
+     * Get high-quality reviews from across the platform for testimonial display
+     * GET /api/v1.0/Reviews/testimonials
+     * @param params - Query parameters (page, pageSize, minRating)
+     * @returns Promise with paginated high-quality reviews from all sources
+     * @example
+     * await ReviewService.getTestimonialReviews({
+     *     page: 1,
+     *     pageSize: 20,
+     *     minRating: 4
+     * });
+     */
+    static async getTestimonialReviews(params?: {
+        page?: number;
+        pageSize?: number;
+        minRating?: number;
+    }): Promise<ApiResponse<ReviewsResponse>> {
+        const { page = 1, pageSize = 20, minRating = 4 } = params || {};
+        const response = await axiosInstance.get<any, ApiResponse<ReviewsResponse>>(
+            `${this.BASE_PATH}/testimonials`,
+            {
+                params: { page, pageSize, minRating },
+            }
+        );
+        return response;
+    }
 }

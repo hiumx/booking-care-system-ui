@@ -19,7 +19,9 @@
         "next": "Next",
         "close": "Close",
         "loading": "Loading...",
-        "processing": "Processing..."
+        "processing": "Processing...",
+        "clear": "Clear",
+        "apply": "Apply"
     },
     "validation": {
         "required": "This field is required",
@@ -125,6 +127,17 @@
         "loading": "Loading reviews...",
         "noReviews": "No reviews yet",
         "beFirst": "Be the first to review this hospital!"
+    },
+    "dateRangePicker": {
+        "placeholder": "Select date range",
+        "clearSelection": "Clear selection",
+        "openPicker": "Open date range picker",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "thisWeek": "This Week",
+        "lastWeek": "Last Week",
+        "thisMonth": "This Month",
+        "lastMonth": "Last Month"
     },
     "aiAssistant": {
         "label": "AI Assistant"
