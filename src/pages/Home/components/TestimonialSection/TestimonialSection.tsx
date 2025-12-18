@@ -4,6 +4,10 @@ import { Autoplay } from 'swiper/modules';
 import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import { Link } from 'react-router-dom';
+
+import { ReviewService } from '@/services/review.service';
+import { Review } from '@/types/review.types';
+
 import patient22 from '@/assets/img/patients/patient22.jpg';
 import patient21 from '@/assets/img/patients/patient21.jpg';
 import patient from '@/assets/img/patients/patient.jpg';
@@ -36,7 +40,11 @@ interface TestimonialSectionProps {
 const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, counters }) => {
     const { t } = useTranslation('home');
 
-    // Get testimonials from translation
+    // State for API testimonials
+    const [apiTestimonials, setApiTestimonials] = useState<Testimonial[]>([]);
+    const [totalReviewsCount, setTotalReviewsCount] = useState<number | null>(null);
+
+    // Get testimonials from translation (fallback)
     const translatedTestimonials = t('testimonial.testimonials', {
         returnObjects: true,
     }) as Array<{
@@ -70,8 +78,65 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
         colorClass: colorClasses[index],
     }));
 
-    const displayTestimonials = testimonials || defaultTestimonials;
-    const displayCounters = counters || defaultCounters;
+    // Use testimonials in this order: props > API > translation fallback
+    const displayTestimonials =
+        testimonials || (apiTestimonials.length > 0 ? apiTestimonials : defaultTestimonials);
+
+    // Update counters with real total reviews count if available
+    const displayCounters =
+        counters ||
+        defaultCounters.map((counter, index) => {
+            // Assuming the first counter (index 0) is for reviews count
+            if (index === 0 && totalReviewsCount !== null) {
+                return {
+                    ...counter,
+                    value: totalReviewsCount,
+                };
+            }
+            return counter;
+        });
+
+    // Fetch testimonials from API
+    useEffect(() => {
+        if (testimonials) {
+            return; // Use provided testimonials
+        }
+
+        const fetchTestimonials = async () => {
+            try {
+                const response = await ReviewService.getTestimonialReviews({
+                    page: 1,
+                    pageSize: 20,
+                    minRating: 4,
+                });
+
+                if (response.success && response.data.reviews.length > 0) {
+                    const reviewTestimonials = response.data.reviews.map((review: Review) => ({
+                        id: review.id,
+                        rating: review.rating,
+                        title: `${review.rating} ${t('testimonial.starReview', { defaultValue: 'Star Review' })}`,
+                        comment: review.comment,
+                        authorName:
+                            review.patientInfo?.fullName ||
+                            t('testimonial.anonymousUser', { defaultValue: 'Anonymous User' }),
+                        authorLocation: t('testimonial.verifiedPatient', {
+                            defaultValue: 'Verified Patient',
+                        }),
+                        authorAvatar: review.patientInfo?.avatarUrl || patient,
+                    }));
+                    setApiTestimonials(reviewTestimonials);
+
+                    // Set total reviews count from API
+                    setTotalReviewsCount(response.data.totalCount);
+                }
+            } catch (error) {
+                console.error('Error fetching testimonial reviews:', error);
+                // Fall back to translation testimonials on error
+            }
+        };
+
+        fetchTestimonials();
+    }, [testimonials, t]);
 
     // Counter animation
     const [countersAnimated, setCountersAnimated] = useState(false);
@@ -184,7 +249,11 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
             <div className="container">
                 <div className="section-header sec-header-one text-center aos" data-aos="fade-up">
                     <span className="badge badge-primary">{t('testimonial.badge')}</span>
-                    <h2>{t('testimonial.title')}</h2>
+                    <h2>
+                        {totalReviewsCount === null
+                            ? t('testimonial.title')
+                            : `${totalReviewsCount.toLocaleString()}+ ${t('testimonial.titleSuffix', { defaultValue: 'Người dùng Tin tưởng Medcure Toàn cầu' })}`}
+                    </h2>
                 </div>
 
                 {/* Testimonial Slider */}

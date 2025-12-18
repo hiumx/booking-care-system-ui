@@ -120,7 +120,11 @@
     },
     "testimonial": {
         "badge": "Đánh giá",
-        "title": "15k Người dùng Tin tưởng MedCure Toàn cầu",
+        "title": "15k Người dùng Tin tưởng Medcure Toàn cầu",
+        "titleSuffix": "Người dùng Tin tưởng Medcure Toàn cầu",
+        "starReview": "Đánh giá sao",
+        "anonymousUser": "Người dùng ẩn danh",
+        "verifiedPatient": "Bệnh nhân đã xác thực",
         "testimonials": [
             {
                 "rating": 5,
