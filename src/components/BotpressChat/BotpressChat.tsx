@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PATHS } from '@/routes/paths';
 
 /**
@@ -72,7 +73,84 @@ interface BotpressChatProps {
 
 const BotpressChat: React.FC<BotpressChatProps> = ({ configUrl = BOTPRESS_CONFIG_URL }) => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { t, i18n } = useTranslation('common');
     const observerRef = useRef<MutationObserver | null>(null);
+    const labelRef = useRef<HTMLDivElement | null>(null);
+
+    // Hide chatbot on AI Support Booking page to avoid conflict
+    const isAISupportPage = location.pathname.startsWith(PATHS.AI_SUPPORT_BOOKING);
+
+    // Create/update AI Assistant label with i18n support
+    const createOrUpdateLabel = useCallback(() => {
+        const labelId = 'botpress-ai-label';
+        let label = document.getElementById(labelId) as HTMLDivElement | null;
+
+        if (!label) {
+            label = document.createElement('div');
+            label.id = labelId;
+            label.style.cssText = `
+                position: fixed;
+                bottom: 12px;
+                right: 18px;
+                background: linear-gradient(90.08deg, #0e82fd 0.09%, #06aed4 70.28%);
+                color: #fff;
+                padding: 4px 12px;
+                border-radius: 12px;
+                font-size: 11px;
+                font-weight: 500;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                z-index: 2147483644;
+                box-shadow: 0 2px 6px rgba(13, 110, 253, 0.3);
+                pointer-events: none;
+                letter-spacing: 0.3px;
+            `;
+            document.body.appendChild(label);
+            labelRef.current = label;
+        }
+
+        label.textContent = t('aiAssistant.label');
+        label.style.display = isAISupportPage ? 'none' : 'block';
+    }, [t, isAISupportPage]);
+
+    // Update label when language changes
+    useEffect(() => {
+        createOrUpdateLabel();
+    }, [createOrUpdateLabel, i18n.language]);
+
+    // Hide/show Botpress webchat based on current page using CSS class on body
+    useEffect(() => {
+        const HIDE_CLASS = 'hide-botpress-chat';
+
+        if (isAISupportPage) {
+            document.body.classList.add(HIDE_CLASS);
+        } else {
+            document.body.classList.remove(HIDE_CLASS);
+        }
+
+        // Inject global style if not exists
+        const styleId = 'botpress-visibility-style';
+        if (!document.getElementById(styleId)) {
+            const style = document.createElement('style');
+            style.id = styleId;
+            style.textContent = `
+                body.${HIDE_CLASS} > div:not(#root):not(.Toastify),
+                body.${HIDE_CLASS} [id^="bp-"],
+                body.${HIDE_CLASS} [class*="bpw"],
+                body.${HIDE_CLASS} [data-testid="webchat"] {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    pointer-events: none !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        return () => {
+            document.body.classList.remove(HIDE_CLASS);
+        };
+    }, [isAISupportPage]);
 
     // Recursively find all shadow roots
     const getAllShadowRoots = useCallback((root: Document | ShadowRoot): ShadowRoot[] => {
@@ -297,6 +375,11 @@ const BotpressChat: React.FC<BotpressChatProps> = ({ configUrl = BOTPRESS_CONFIG
     );
 
     useEffect(() => {
+        // Don't inject Botpress on AI Support page
+        if (isAISupportPage) {
+            return;
+        }
+
         const existingInject = document.querySelector(`script[src="${BOTPRESS_INJECT_URL}"]`);
         const existingConfig = document.querySelector(`script[src="${configUrl}"]`);
 
@@ -333,13 +416,24 @@ const BotpressChat: React.FC<BotpressChatProps> = ({ configUrl = BOTPRESS_CONFIG
             configScript.onload = () => setupBotpressListeners();
         };
 
-        // Cleanup - don't remove label to prevent flickering
+        // Cleanup
         return () => {
             if (observerRef.current) {
                 observerRef.current.disconnect();
             }
+            // Remove label on cleanup
+            if (labelRef.current) {
+                labelRef.current.remove();
+                labelRef.current = null;
+            }
         };
-    }, [configUrl, handleBotpressAction, setupTranslationObserver, customizeBotpressBranding]);
+    }, [
+        configUrl,
+        handleBotpressAction,
+        setupTranslationObserver,
+        customizeBotpressBranding,
+        isAISupportPage,
+    ]);
 
     return null;
 };
