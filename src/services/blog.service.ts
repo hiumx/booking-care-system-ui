@@ -35,6 +35,38 @@ const BLOG_ENDPOINTS = {
     DELETE_CATEGORY: (id: number) => `/blog/categories/${id}`,
 } as const;
 
+// Helper to build query params for getBlogs with reduced complexity
+const buildBlogQueryParams = (params?: BlogFilterParameters): Record<string, any> => {
+    if (!params) {
+        return {};
+    }
+
+    const queryParams: Record<string, any> = {};
+
+    const mappings: Array<[keyof BlogFilterParameters, string]> = [
+        ['page', 'page'],
+        ['pageSize', 'pageSize'],
+        ['tag', 'tag'],
+        ['source', 'source'],
+        ['status', 'status'],
+        ['keyword', 'keyword'],
+        ['categoryId', 'categoryId'],
+    ];
+
+    for (const [key, queryKey] of mappings) {
+        const value = params[key];
+        if (value !== undefined && value !== null) {
+            queryParams[queryKey] = value;
+        }
+    }
+
+    if (params.featured !== undefined) {
+        queryParams.featured = params.featured;
+    }
+
+    return queryParams;
+};
+
 export class BlogService {
     /**
      * Health check for blog service
@@ -59,18 +91,7 @@ export class BlogService {
         params?: BlogFilterParameters
     ): Promise<ApiResponse<PagedResponse<BlogSummaryDto>>> {
         try {
-            const queryParams: Record<string, any> = {};
-
-            if (params) {
-                if (params.page) queryParams.page = params.page;
-                if (params.pageSize) queryParams.pageSize = params.pageSize;
-                if (params.tag) queryParams.tag = params.tag;
-                if (params.source) queryParams.source = params.source;
-                if (params.status) queryParams.status = params.status;
-                if (params.featured !== undefined) queryParams.featured = params.featured;
-                if (params.keyword) queryParams.keyword = params.keyword;
-                if (params.categoryId) queryParams.categoryId = params.categoryId;
-            }
+            const queryParams = buildBlogQueryParams(params);
 
             const response: any = await axiosInstance.get(BLOG_ENDPOINTS.GET_BLOGS, {
                 params: queryParams,

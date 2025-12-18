@@ -74,14 +74,14 @@ const CategoryBlogs: React.FC = () => {
 
     // Convert category name to slug (simple version)
     const categoryNameToSlug = (name: string): string => {
-        return name
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/đ/g, 'd')
-            .replace(/Đ/g, 'D')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
+        const normalized = name.toLowerCase().normalize('NFD');
+        return (normalized as any)
+            .replaceAll(/[\u0300-\u036f]/g, '')
+            .replaceAll(/đ/g, 'd')
+            .replaceAll(/Đ/g, 'D')
+            .replaceAll(/[^a-z0-9]+/g, '-')
+            .replaceAll(/^-+/g, '')
+            .replaceAll(/-+$/g, '');
     };
 
     // Find category by slug

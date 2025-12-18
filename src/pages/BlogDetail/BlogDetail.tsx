@@ -93,14 +93,6 @@ const BlogDetail: React.FC = () => {
         }
     }, [blog?.category?.id, blog?.id]);
 
-    // Don't auto-redirect on error - let user see the error message
-    // useEffect(() => {
-    //     if (blogError) {
-    //         console.error('Error fetching blog:', blogError);
-    //         navigate(PATHS.BLOG);
-    //     }
-    // }, [blogError, navigate]);
-
     const handleTocClick = (e: MouseEvent<HTMLAnchorElement>, id: string) => {
         e.preventDefault();
         const el = document.getElementById(id);
@@ -117,6 +109,13 @@ const BlogDetail: React.FC = () => {
         return `Ngày đăng: ${date.getDate()} Th${date.getMonth() + 1}, ${date.getFullYear()}`;
     };
 
+    // Safely strip HTML tags from a string using the browser DOM API instead of regex
+    const stripHtmlTags = (html: string): string => {
+        const tempElement = document.createElement('div');
+        tempElement.innerHTML = html;
+        return (tempElement.textContent || tempElement.innerText || '').trim();
+    };
+
     // Parse HTML content to extract sections for table of contents
     const parseContentSections = (content: string) => {
         // Simple regex to find h2 tags - can be enhanced
@@ -126,10 +125,7 @@ const BlogDetail: React.FC = () => {
         let index = 0;
 
         while ((match = h2Regex.exec(content)) !== null) {
-            const title = match[1]
-                .split(/<[^>]*>/g)
-                .join('')
-                .trim();
+            const title = stripHtmlTags(match[1]);
             const id = `section-${index}`;
             sections.push({ id, title });
             index++;
