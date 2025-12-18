@@ -1,0 +1,87 @@
+{
+    "breadcrumb": {
+        "home": "Trang chủ",
+        "aboutUs": "Giới thiệu về chúng tôi"
+    },
+    "title": "Giới thiệu về chúng tôi",
+    "doctors": {
+        "title": "Bác sĩ tiêu biểu",
+        "desc": "Gặp gỡ các bác sĩ giỏi nhất của chúng tôi",
+        "viewAll": "Xem tất cả bác sĩ"
+    },
+    "aboutSection": {
+        "experience": "Hơn 25 năm kinh nghiệm",
+        "badge": "Về hệ thống của chúng tôi",
+        "title": "Chúng tôi luôn mang tới dịch vụ y tế tốt nhất cho sức khỏe của bạn",
+        "description1": "Tại MedCure, chúng tôi thấu hiểu tầm quan trọng của việc tiếp cận dịch vụ y tế thuận tiện. Sứ mệnh của chúng tôi là đơn giản hóa việc tìm kiếm và đặt lịch khám với đội ngũ bác sĩ uy tín, giúp bạn nhận được sự chăm sóc cần thiết đúng lúc.",
+        "description2": "Chúng tôi hướng tới một thế giới nơi ai cũng dễ dàng tiếp cận dịch vụ chăm sóc sức khỏe. Dù là khám định kỳ, tư vấn chuyên khoa hay cấp cứu, chúng tôi luôn nỗ lực kết nối bạn với bác sĩ phù hợp một cách nhanh chóng và hiệu quả.",
+        "emergencySupport": "Cần hỗ trợ khẩn cấp?",
+        "phone": "+84 763583081"
+    },
+    "whyChoose": {
+        "title": "Vì sao chọn chúng tôi",
+        "items": [
+            {
+                "title": "Đội ngũ bác sĩ chất lượng",
+                "description": "Nền tảng hợp tác với các bác sĩ giàu kinh nghiệm, tận tâm mang đến chất lượng khám chữa bệnh tốt nhất cho bạn."
+            },
+            {
+                "title": "Phục vụ 24/7",
+                "description": "Truy cập, tìm bác sĩ và đặt lịch mọi lúc mọi nơi — kể cả ban đêm, cuối tuần và ngày lễ."
+            },
+            {
+                "title": "Dịch vụ xét nghiệm chất lượng",
+                "description": "Liên kết phòng xét nghiệm đạt chuẩn; kết quả nhanh, chính xác hỗ trợ chẩn đoán hiệu quả."
+            },
+            {
+                "title": "Tư vấn ban đầu miễn phí",
+                "description": "Bắt đầu hành trình chăm sóc sức khỏe dễ dàng với buổi tư vấn đầu tiên miễn phí."
+            }
+        ]
+    },
+    "waySection": {
+        "title": "Đồng hành cùng bạn trên hành trình khỏe mạnh với MedCure",
+        "description": "Chúng tôi ưu tiên sức khỏe của bạn bằng các dịch vụ cá nhân hóa và dễ tiếp cận — giúp việc chăm sóc y tế trở nên đơn giản hơn.",
+        "contactButton": "Liên hệ với chúng tôi"
+    },
+    "faq": {
+        "badge": "Giải đáp thắc mắc",
+        "title": "Câu hỏi thường gặp",
+        "satisfiedCustomers": "Khách hàng hài lòng",
+        "items": [
+            {
+                "id": "one",
+                "question": "Làm thế nào để đặt lịch khám?",
+                "answer": "Bạn có thể đăng nhập hoặc tạo tài khoản, tìm bác sĩ theo chuyên khoa, khu vực hoặc thời gian trống và xác nhận đặt lịch."
+            },
+            {
+                "id": "two",
+                "question": "Tôi có thể đặt lịch khám trực tuyến không?",
+                "answer": "Có. Chỉ cần truy cập hệ thống, chọn bác sĩ/phòng khám phù hợp và hoàn tất đặt lịch trong vài bước."
+            },
+            {
+                "id": "three",
+                "question": "Thông tin cá nhân của tôi có được bảo mật không?",
+                "answer": "Tất cả dữ liệu đều được mã hóa và chỉ chia sẻ với bác sĩ khi có sự đồng ý của bạn."
+            },
+            {
+                "id": "four",
+                "question": "Tôi có thể hủy hoặc dời lịch hẹn không?",
+                "answer": "Bạn có thể hủy hoặc đổi lịch trước giờ khám theo chính sách của phòng khám/bác sĩ."
+            },
+            {
+                "id": "five",
+                "question": "Làm sao để tìm đúng bác sĩ/chuyên gia phù hợp?",
+                "answer": "Bạn có thể lọc theo chuyên khoa, vị trí, thời gian rảnh, đánh giá và chi phí để chọn bác sĩ phù hợp."
+            }
+        ]
+    },
+    "testimonial": {
+        "loading": "Đang tải đánh giá...",
+        "noReviews": "Chưa có đánh giá",
+        "beFirst": "Hãy là người đầu tiên đánh giá bệnh viện này!",
+        "badge": "Cảm nhận",
+        "title": "Khách hàng nói gì",
+        "defaultUser": "Người dùng"
+    }
+}

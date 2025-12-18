@@ -1,0 +1,50 @@
+{
+    "breadcrumb": {
+        "home": "Trang chủ",
+        "specialties": "Chuyên khoa"
+    },
+    "list": {
+        "title": "Danh sách chuyên khoa",
+        "loading": "Đang tải danh sách chuyên khoa...",
+        "error": {
+            "title": "Đã xảy ra lỗi!",
+            "message": "Đã có lỗi xảy ra khi tải dữ liệu.",
+            "retry": "Thử lại"
+        },
+        "showing": "Hiển thị",
+        "specialties": "chuyên khoa",
+        "searchPlaceholder": "Tìm kiếm chuyên khoa"
+    },
+    "detail": {
+        "tabs": {
+            "doctor": "Bác sĩ",
+            "hospital": "Bệnh viện"
+        },
+        "showing": "Hiển thị",
+        "doctors": "bác sĩ",
+        "hospitals": "bệnh viện",
+        "filtered": "đã lọc",
+        "selectArea": "Chọn khu vực",
+        "province": "Tỉnh",
+        "district": "Quận/Huyện",
+        "clearSelection": "Xóa lựa chọn",
+        "searchDoctor": "Tìm kiếm Bác sĩ",
+        "searchHospital": "Tìm kiếm Bệnh viện",
+        "clearAllFilters": "Xóa tất cả bộ lọc",
+        "clearArea": "Xóa khu vực",
+        "clearSearch": "Xóa tìm kiếm",
+        "notUpdated": "Chưa cập nhật",
+        "emptyDoctor": {
+            "title": "Không tìm thấy bác sĩ nào",
+            "message": "Vui lòng thử lại với từ khóa khác hoặc bộ lọc khác."
+        },
+        "emptyHospital": {
+            "title": "Không tìm thấy bệnh viện nào",
+            "message": "Vui lòng thử lại với từ khóa khác hoặc bộ lọc khác."
+        }
+    },
+    "toast": {
+        "loadDoctorError": "Không thể tải danh sách bác sĩ. Vui lòng thử lại.",
+        "loadHospitalError": "Không thể tải danh sách bệnh viện. Vui lòng thử lại."
+    }
+}

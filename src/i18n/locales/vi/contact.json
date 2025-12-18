@@ -1,0 +1,151 @@
+{
+    "breadcrumb": {
+        "home": "Trang chủ",
+        "contact": "Liên hệ hợp tác"
+    },
+    "title": "Liên hệ hợp tác",
+    "header": {
+        "subtitle": "Liên hệ hợp tác",
+        "title": "Đăng ký trở thành đối tác",
+        "description": "Chúng tôi đang tìm kiếm các bệnh viện, phòng khám uy tín để hợp tác cung cấp dịch vụ chăm sóc sức khỏe tốt nhất cho người dùng. Vui lòng điền thông tin bên dưới để đăng ký hợp tác."
+    },
+    "contactInfo": {
+        "address": {
+            "title": "Địa chỉ",
+            "value": "Đà Nẵng, Việt Nam"
+        },
+        "phone": {
+            "title": "Số điện thoại",
+            "value": "+84 763583081"
+        },
+        "email": {
+            "title": "Email",
+            "value": "medcure.contact@gmail.com"
+        }
+    },
+    "steps": {
+        "ekyc": "Xác thực danh tính",
+        "registration": "Thông tin đăng ký"
+    },
+    "form": {
+        "ekycVerified": "Đã xác thực danh tính thành công",
+        "representative": {
+            "title": "Thông tin người đại diện",
+            "autoFillNote": "Tên người đại diện đã được tự động điền từ CMND/CCCD",
+            "name": {
+                "label": "Tên người đại diện",
+                "placeholder": "Nhập họ và tên người đại diện"
+            },
+            "email": {
+                "label": "Email người đại diện",
+                "placeholder": "Nhập địa chỉ email người đại diện"
+            },
+            "phone": {
+                "label": "Số điện thoại người đại diện",
+                "placeholder": "Nhập số điện thoại người đại diện"
+            }
+        },
+        "identityCard": {
+            "label": "CMND/CCCD người đại diện"
+        },
+        "hospital": {
+            "title": "Thông tin bệnh viện",
+            "description": "Vui lòng cung cấp thông tin chi tiết về bệnh viện muốn hợp tác",
+            "name": {
+                "label": "Tên bệnh viện",
+                "placeholder": "Nhập tên bệnh viện đầy đủ"
+            },
+            "email": {
+                "label": "Email bệnh viện",
+                "placeholder": "Nhập địa chỉ email chính thức của bệnh viện"
+            },
+            "phone": {
+                "label": "Số điện thoại bệnh viện",
+                "placeholder": "Nhập số điện thoại chính của bệnh viện"
+            },
+            "address": {
+                "label": "Địa chỉ bệnh viện",
+                "placeholder": "Nhập địa chỉ đầy đủ của bệnh viện"
+            },
+            "taxCode": {
+                "label": "Mã số thuế doanh nghiệp",
+                "placeholder": "Nhập mã số thuế doanh nghiệp (10 chữ số hoặc 10 chữ số-XXX)"
+            },
+            "license": {
+                "label": "Giấy phép hoạt động"
+            },
+            "businessCertificate": {
+                "label": "Giấy chứng nhận đăng ký doanh nghiệp"
+            }
+        },
+        "submit": {
+            "button": "Gửi đơn đăng ký hợp tác",
+            "submitting": "Đang gửi..."
+        }
+    },
+    "messages": {
+        "validationError": "Vui lòng kiểm tra lại thông tin và điền đầy đủ các trường bắt buộc",
+        "success": "Đơn đăng ký hợp tác đã được gửi thành công! Chúng tôi sẽ xem xét và liên hệ lại trong thời gian sớm nhất.",
+        "error": "Có lỗi xảy ra khi gửi đơn đăng ký. Vui lòng thử lại sau."
+    },
+    "ekyc": {
+        "title": "Xác thực danh tính (eKYC)",
+        "description": "Vui lòng xác thực danh tính bằng CMND/CCCD để đảm bảo tính xác thực của đơn đăng ký",
+        "idCardFront": "Ảnh mặt trước CMND/CCCD",
+        "idCardBack": "Ảnh mặt sau CMND/CCCD",
+        "selfie": "Ảnh chân dung (Selfie)",
+        "livenessVideo": "Video xác thực người thật",
+        "placeholders": {
+            "front": "Mặt trước",
+            "back": "Mặt sau",
+            "selfie": "Chụp ảnh selfie",
+            "video": "Quay video 3-5 giây"
+        },
+        "buttons": {
+            "upload": "Tải lên",
+            "capture": "Chụp ảnh",
+            "record": "Quay video",
+            "verify": "Xác thực danh tính",
+            "verifying": "Đang xác thực...",
+            "retry": "Thử lại",
+            "cancel": "Hủy",
+            "startRecording": "Bắt đầu quay",
+            "stopRecording": "Dừng"
+        },
+        "camera": {
+            "front": "Chụp mặt trước CMND/CCCD",
+            "back": "Chụp mặt sau CMND/CCCD",
+            "selfie": "Chụp ảnh chân dung",
+            "video": "Quay video xác thực",
+            "videoInstruction": "Quay video khuôn mặt trong 3-5 giây, xoay đầu nhẹ sang trái và phải",
+            "error": "Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập."
+        },
+        "ocrResult": {
+            "title": "Thông tin từ CMND/CCCD",
+            "idNumber": "Số CMND/CCCD:",
+            "fullName": "Họ và tên:",
+            "dateOfBirth": "Ngày sinh:",
+            "gender": "Giới tính:",
+            "address": "Địa chỉ:",
+            "na": "N/A"
+        },
+        "faceMatch": {
+            "label": "Độ khớp khuôn mặt:"
+        },
+        "status": {
+            "success": "Xác thực thành công!",
+            "failed": "Xác thực thất bại",
+            "uploading": "Đang tải ảnh lên...",
+            "processing": "Đang xác thực danh tính..."
+        },
+        "messages": {
+            "success": "Xác thực danh tính thành công!",
+            "missingFiles": "Vui lòng cung cấp đầy đủ ảnh CMND/CCCD và ảnh selfie",
+            "error": "Có lỗi xảy ra. Vui lòng thử lại.",
+            "verificationFailed": "Xác thực thất bại. Vui lòng thử lại."
+        },
+        "videoHelp": "Video giúp xác thực bạn là người thật. Xoay đầu nhẹ sang trái và phải khi quay.",
+        "removeImage": "Xóa ảnh",
+        "removeVideo": "Xóa video"
+    }
+}

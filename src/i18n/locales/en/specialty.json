@@ -1,0 +1,50 @@
+{
+    "breadcrumb": {
+        "home": "Home",
+        "specialties": "Specialties"
+    },
+    "list": {
+        "title": "Specialties List",
+        "loading": "Loading specialties...",
+        "error": {
+            "title": "An error occurred!",
+            "message": "An error occurred while loading data.",
+            "retry": "Retry"
+        },
+        "showing": "Showing",
+        "specialties": "specialties",
+        "searchPlaceholder": "Search specialties"
+    },
+    "detail": {
+        "tabs": {
+            "doctor": "Doctors",
+            "hospital": "Hospitals"
+        },
+        "showing": "Showing",
+        "doctors": "doctors",
+        "hospitals": "hospitals",
+        "filtered": "filtered",
+        "selectArea": "Select area",
+        "province": "Province",
+        "district": "District",
+        "clearSelection": "Clear selection",
+        "searchDoctor": "Search Doctor",
+        "searchHospital": "Search Hospital",
+        "clearAllFilters": "Clear all filters",
+        "clearArea": "Clear area",
+        "clearSearch": "Clear search",
+        "notUpdated": "Not updated",
+        "emptyDoctor": {
+            "title": "No doctors found",
+            "message": "Please try again with different keywords or filters."
+        },
+        "emptyHospital": {
+            "title": "No hospitals found",
+            "message": "Please try again with different keywords or filters."
+        }
+    },
+    "toast": {
+        "loadDoctorError": "Unable to load doctors list. Please try again.",
+        "loadHospitalError": "Unable to load hospitals list. Please try again."
+    }
+}
