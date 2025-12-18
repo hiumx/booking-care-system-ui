@@ -222,6 +222,29 @@
             "chooseNewDoctor": "Chọn bác sĩ mới",
             "statusCancelled": "Đã Hủy",
             "statusCompleted": "Đã Khám"
+        },
+        "detailCard": {
+            "status": {
+                "pending": "Chờ Xác Nhận",
+                "confirmed": "Sắp Tới",
+                "cancelled": "Đã Hủy",
+                "completed": "Hoàn Thành",
+                "unknown": "Không xác định"
+            },
+            "personWithPatient": "Người đi cùng bệnh nhân",
+            "appointmentType": "Loại Cuộc Hẹn",
+            "reason": "Lý do",
+            "consultationFee": "Phí Tư Vấn",
+            "dateTime": "Ngày & Giờ Hẹn",
+            "location": "Vị trí",
+            "visitType": "Loại Thăm Khám",
+            "waitingConfirmation": "Đang chờ xác nhận",
+            "startSession": "Bắt Đầu Phiên",
+            "rescheduleStatus": "Trạng thái: Đặt lại lịch",
+            "rescheduleAppointment": "Đặt Lại Lịch Hẹn",
+            "rescheduleWithSameDoctor": "Đổi lịch với cùng bác sĩ",
+            "chooseNewDoctor": "Chọn bác sĩ mới",
+            "cancelAppointment": "Hủy lịch hẹn"
         }
     },
     "notifications": {
@@ -250,29 +273,6 @@
             "deleteAllError": "Không thể xóa tất cả thông báo"
         },
         "confirmDeleteAll": "Bạn có chắc chắn muốn xóa tất cả thông báo? Hành động này không thể hoàn tác."
-    },
-    "detailCard": {
-        "status": {
-            "pending": "Chờ Xác Nhận",
-            "confirmed": "Sắp Tới",
-            "cancelled": "Đã Hủy",
-            "completed": "Hoàn Thành",
-            "unknown": "Không xác định"
-        },
-        "personWithPatient": "Người đi cùng bệnh nhân",
-        "appointmentType": "Loại Cuộc Hẹn",
-        "reason": "Lý do",
-        "consultationFee": "Phí Tư Vấn",
-        "dateTime": "Ngày & Giờ Hẹn",
-        "location": "Vị trí",
-        "visitType": "Loại Thăm Khám",
-        "waitingConfirmation": "Đang chờ xác nhận",
-        "startSession": "Bắt Đầu Phiên",
-        "rescheduleStatus": "Trạng thái: Đặt lại lịch",
-        "rescheduleAppointment": "Đặt Lại Lịch Hẹn",
-        "rescheduleWithSameDoctor": "Đổi lịch với cùng bác sĩ",
-        "chooseNewDoctor": "Chọn bác sĩ mới",
-        "cancelAppointment": "Hủy lịch hẹn"
     },
     "settings": {
         "tabs": {

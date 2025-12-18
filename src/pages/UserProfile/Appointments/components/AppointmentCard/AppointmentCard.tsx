@@ -13,6 +13,7 @@ import {
     getRebookingUrl,
 } from '@/types/appointment.types';
 import AppointmentActionButtons from '../AppointmentActionButtons/AppointmentActionButtons';
+import PatientInfoDisplay from '../PatientInfoDisplay';
 import {
     formatAppointmentDate,
     getAppointmentTypeText,
@@ -126,34 +127,14 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
             <ul>
                 {/* Display Information - Priority: Doctor > Service > Hospital */}
                 <li>
-                    <div className="patinet-information">
-                        <Link
-                            to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                        >
-                            {displayAvatar ? (
-                                <img src={displayAvatar} alt={displayName} />
-                            ) : (
-                                <div className="avatar-placeholder">
-                                    <i className="isax isax-user"></i>
-                                </div>
-                            )}
-                        </Link>
-                        <div className="patient-info">
-                            <p>{displayLabel}</p>
-                            <h6>
-                                <Link
-                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                >
-                                    {displayName}
-                                </Link>
-                                {appointment.isNew && (
-                                    <span className="badge new-tag">
-                                        {t('appointments.card.new')}
-                                    </span>
-                                )}
-                            </h6>
-                        </div>
-                    </div>
+                    <PatientInfoDisplay
+                        appointmentId={appointment.appointmentId}
+                        status={status}
+                        displayAvatar={displayAvatar}
+                        displayName={displayName}
+                        displayLabel={displayLabel}
+                        isNew={appointment.isNew}
+                    />
                 </li>
 
                 {/* Appointment Information */}

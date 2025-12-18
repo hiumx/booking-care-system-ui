@@ -11,6 +11,7 @@ import DiscountService from '@/services/discount.service';
 import { toast } from 'react-toastify';
 import { AppointmentType } from '@/enums/appointment.enums';
 import BenefitItem from '../../components/BenefitItem';
+import PaymentOptionCard from '../../components/PaymentOptionCard';
 
 // Helper function to parse AppointmentTimeId (format: AT_08_00_09_00 -> { startTime: "08:00", endTime: "09:00" })
 const parseAppointmentTimeId = (timeId: string) => {
@@ -696,110 +697,14 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                 <div className="row">
                                     {/* Option 1: Deposit Payment with 10% Discount - Hidden for specialty booking */}
                                     {!isSpecialtyBooking && (
-                                        <div className="col-md-6 mb-3">
-                                            <div
-                                                className={`payment-option-card ${paymentOption === 'deposit' ? 'active' : ''}`}
-                                                onClick={() => setPaymentOption('deposit')}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter' || e.key === ' ') {
-                                                        e.preventDefault();
-                                                        setPaymentOption('deposit');
-                                                    }
-                                                }}
-                                                role="button"
-                                                tabIndex={0}
-                                                aria-label={t(
-                                                    'paymentSection.bookingOptions.depositOption.ariaLabel'
-                                                )}
-                                                aria-pressed={paymentOption === 'deposit'}
-                                            >
-                                                <div className="payment-option-header">
-                                                    <div className="form-check">
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="radio"
-                                                            name="paymentOption"
-                                                            id="depositOption"
-                                                            checked={paymentOption === 'deposit'}
-                                                            onChange={() =>
-                                                                setPaymentOption('deposit')
-                                                            }
-                                                        />
-                                                        <label
-                                                            className="form-check-label fw-bold"
-                                                            htmlFor="depositOption"
-                                                        >
-                                                            {t(
-                                                                'paymentSection.bookingOptions.depositOption.label'
-                                                            )}
-                                                        </label>
-                                                    </div>
-                                                    <div className="discount-badge">
-                                                        <span className="badge bg-success">
-                                                            {t(
-                                                                'paymentSection.bookingOptions.depositOption.saveBadge'
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="payment-option-content">
-                                                    <div className="benefits-list">
-                                                        <BenefitItem
-                                                            icon="isax isax-tick-circle"
-                                                            iconColorClass="text-success"
-                                                            text={t(
-                                                                'paymentSection.bookingOptions.depositOption.benefit1'
-                                                            )}
-                                                            useHtml={true}
-                                                        />
-                                                        <BenefitItem
-                                                            icon="isax isax-tick-circle"
-                                                            iconColorClass="text-success"
-                                                            text={t(
-                                                                'paymentSection.bookingOptions.depositOption.benefit2'
-                                                            )}
-                                                        />
-                                                    </div>
-
-                                                    <div className="price-info mt-3">
-                                                        <div className="current-price">
-                                                            <span className="text-muted">
-                                                                {t(
-                                                                    'paymentSection.bookingOptions.depositOption.depositPayment'
-                                                                )}
-                                                            </span>
-                                                            <span className="fw-bold text-primary ms-2">
-                                                                {formatCurrency(DEPOSIT_AMOUNT)} đ
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Option 2: No Payment - Full width for specialty booking */}
-                                    <div
-                                        className={
-                                            isSpecialtyBooking ? 'col-12 mb-3' : 'col-md-6 mb-3'
-                                        }
-                                    >
-                                        <div
-                                            className={`payment-option-card ${paymentOption === 'no-payment' ? 'active' : ''}`}
-                                            onClick={() => setPaymentOption('no-payment')}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' || e.key === ' ') {
-                                                    e.preventDefault();
-                                                    setPaymentOption('no-payment');
-                                                }
-                                            }}
-                                            role="button"
-                                            tabIndex={0}
-                                            aria-label={t(
-                                                'paymentSection.bookingOptions.noPaymentOption.ariaLabel'
+                                        <PaymentOptionCard
+                                            optionValue="deposit"
+                                            currentValue={paymentOption}
+                                            onSelect={setPaymentOption}
+                                            ariaLabel={t(
+                                                'paymentSection.bookingOptions.depositOption.ariaLabel'
                                             )}
-                                            aria-pressed={paymentOption === 'no-payment'}
+                                            className="col-md-6 mb-3"
                                         >
                                             <div className="payment-option-header">
                                                 <div className="form-check">
@@ -807,50 +712,122 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                                                         className="form-check-input"
                                                         type="radio"
                                                         name="paymentOption"
-                                                        id="noPaymentOption"
-                                                        checked={paymentOption === 'no-payment'}
-                                                        onChange={() =>
-                                                            setPaymentOption('no-payment')
-                                                        }
+                                                        id="depositOption"
+                                                        checked={paymentOption === 'deposit'}
+                                                        onChange={() => setPaymentOption('deposit')}
                                                     />
                                                     <label
                                                         className="form-check-label fw-bold"
-                                                        htmlFor="noPaymentOption"
+                                                        htmlFor="depositOption"
                                                     >
                                                         {t(
-                                                            'paymentSection.bookingOptions.noPaymentOption.label'
+                                                            'paymentSection.bookingOptions.depositOption.label'
                                                         )}
                                                     </label>
+                                                </div>
+                                                <div className="discount-badge">
+                                                    <span className="badge bg-success">
+                                                        {t(
+                                                            'paymentSection.bookingOptions.depositOption.saveBadge'
+                                                        )}
+                                                    </span>
                                                 </div>
                                             </div>
 
                                             <div className="payment-option-content">
                                                 <div className="benefits-list">
                                                     <BenefitItem
-                                                        icon="isax isax-info-circle"
-                                                        iconColorClass="text-info"
+                                                        icon="isax isax-tick-circle"
+                                                        iconColorClass="text-success"
                                                         text={t(
-                                                            'paymentSection.bookingOptions.noPaymentOption.benefit1'
+                                                            'paymentSection.bookingOptions.depositOption.benefit1'
                                                         )}
+                                                        useHtml={true}
                                                     />
                                                     <BenefitItem
-                                                        icon="isax isax-info-circle"
-                                                        iconColorClass="text-info"
+                                                        icon="isax isax-tick-circle"
+                                                        iconColorClass="text-success"
                                                         text={t(
-                                                            'paymentSection.bookingOptions.noPaymentOption.benefit2'
-                                                        )}
-                                                    />
-                                                    <BenefitItem
-                                                        icon="isax isax-info-circle"
-                                                        iconColorClass="text-info"
-                                                        text={t(
-                                                            'paymentSection.bookingOptions.noPaymentOption.benefit3'
+                                                            'paymentSection.bookingOptions.depositOption.benefit2'
                                                         )}
                                                     />
                                                 </div>
+
+                                                <div className="price-info mt-3">
+                                                    <div className="current-price">
+                                                        <span className="text-muted">
+                                                            {t(
+                                                                'paymentSection.bookingOptions.depositOption.depositPayment'
+                                                            )}
+                                                        </span>
+                                                        <span className="fw-bold text-primary ms-2">
+                                                            {formatCurrency(DEPOSIT_AMOUNT)} đ
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </PaymentOptionCard>
+                                    )}
+
+                                    {/* Option 2: No Payment - Full width for specialty booking */}
+                                    <PaymentOptionCard
+                                        optionValue="no-payment"
+                                        currentValue={paymentOption}
+                                        onSelect={setPaymentOption}
+                                        ariaLabel={t(
+                                            'paymentSection.bookingOptions.noPaymentOption.ariaLabel'
+                                        )}
+                                        className={
+                                            isSpecialtyBooking ? 'col-12 mb-3' : 'col-md-6 mb-3'
+                                        }
+                                    >
+                                        <div className="payment-option-header">
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="paymentOption"
+                                                    id="noPaymentOption"
+                                                    checked={paymentOption === 'no-payment'}
+                                                    onChange={() => setPaymentOption('no-payment')}
+                                                />
+                                                <label
+                                                    className="form-check-label fw-bold"
+                                                    htmlFor="noPaymentOption"
+                                                >
+                                                    {t(
+                                                        'paymentSection.bookingOptions.noPaymentOption.label'
+                                                    )}
+                                                </label>
                                             </div>
                                         </div>
-                                    </div>
+
+                                        <div className="payment-option-content">
+                                            <div className="benefits-list">
+                                                <BenefitItem
+                                                    icon="isax isax-info-circle"
+                                                    iconColorClass="text-info"
+                                                    text={t(
+                                                        'paymentSection.bookingOptions.noPaymentOption.benefit1'
+                                                    )}
+                                                />
+                                                <BenefitItem
+                                                    icon="isax isax-info-circle"
+                                                    iconColorClass="text-info"
+                                                    text={t(
+                                                        'paymentSection.bookingOptions.noPaymentOption.benefit2'
+                                                    )}
+                                                />
+                                                <BenefitItem
+                                                    icon="isax isax-info-circle"
+                                                    iconColorClass="text-info"
+                                                    text={t(
+                                                        'paymentSection.bookingOptions.noPaymentOption.benefit3'
+                                                    )}
+                                                />
+                                            </div>
+                                        </div>
+                                    </PaymentOptionCard>
                                 </div>
                             </div>
                         </div>

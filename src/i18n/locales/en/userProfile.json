@@ -151,6 +151,29 @@
             "chooseNewDoctor": "Choose new doctor",
             "statusCancelled": "Cancelled",
             "statusCompleted": "Completed"
+        },
+        "detailCard": {
+            "status": {
+                "pending": "Pending",
+                "confirmed": "Upcoming",
+                "cancelled": "Cancelled",
+                "completed": "Completed",
+                "unknown": "Unknown"
+            },
+            "personWithPatient": "Person accompanying patient",
+            "appointmentType": "Appointment Type",
+            "reason": "Reason",
+            "consultationFee": "Consultation Fee",
+            "dateTime": "Date & Time",
+            "location": "Location",
+            "visitType": "Visit Type",
+            "waitingConfirmation": "Waiting for confirmation",
+            "startSession": "Start Session",
+            "rescheduleStatus": "Status: Reschedule",
+            "rescheduleAppointment": "Reschedule Appointment",
+            "rescheduleWithSameDoctor": "Reschedule with same doctor",
+            "chooseNewDoctor": "Choose new doctor",
+            "cancelAppointment": "Cancel appointment"
         }
     },
     "notifications": {
@@ -179,29 +202,6 @@
             "deleteAllError": "Unable to delete all notifications"
         },
         "confirmDeleteAll": "Are you sure you want to delete all notifications? This action cannot be undone."
-    },
-    "detailCard": {
-        "status": {
-            "pending": "Pending",
-            "confirmed": "Upcoming",
-            "cancelled": "Cancelled",
-            "completed": "Completed",
-            "unknown": "Unknown"
-        },
-        "personWithPatient": "Person accompanying patient",
-        "appointmentType": "Appointment Type",
-        "reason": "Reason",
-        "consultationFee": "Consultation Fee",
-        "dateTime": "Date & Time",
-        "location": "Location",
-        "visitType": "Visit Type",
-        "waitingConfirmation": "Waiting for confirmation",
-        "startSession": "Start Session",
-        "rescheduleStatus": "Status: Reschedule",
-        "rescheduleAppointment": "Reschedule Appointment",
-        "rescheduleWithSameDoctor": "Reschedule with same doctor",
-        "chooseNewDoctor": "Choose new doctor",
-        "cancelAppointment": "Cancel appointment"
     },
     "settings": {
         "tabs": {
