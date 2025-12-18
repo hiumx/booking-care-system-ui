@@ -162,6 +162,7 @@ export const fetchSpecialtyAvailableSlots = createAsyncThunk(
 );
 
 // Helper function to group slots into categories
+// Note: title uses translation keys (morning, afternoon, evening) that will be translated in the component
 const groupSlotsIntoCategories = (slots: AvailableSlot[]): ScheduleCategory[] => {
     const grouped = ScheduleService.groupSlotsByPeriod(slots);
 
@@ -169,7 +170,7 @@ const groupSlotsIntoCategories = (slots: AvailableSlot[]): ScheduleCategory[] =>
 
     if (grouped.morning.length > 0) {
         categories.push({
-            title: 'Buổi sáng (8:00 - 12:00)',
+            title: 'morning',
             pattern: SchedulePatterns.MORNING,
             timeSlots: grouped.morning.map((slot) => ({
                 startTime: slot.startTime,
@@ -180,7 +181,7 @@ const groupSlotsIntoCategories = (slots: AvailableSlot[]): ScheduleCategory[] =>
 
     if (grouped.afternoon.length > 0) {
         categories.push({
-            title: 'Buổi chiều (12:00 - 17:00)',
+            title: 'afternoon',
             pattern: SchedulePatterns.AFTERNOON,
             timeSlots: grouped.afternoon.map((slot) => ({
                 startTime: slot.startTime,
@@ -191,7 +192,7 @@ const groupSlotsIntoCategories = (slots: AvailableSlot[]): ScheduleCategory[] =>
 
     if (grouped.evening.length > 0) {
         categories.push({
-            title: 'Buổi tối (17:00 - 21:00)',
+            title: 'evening',
             pattern: SchedulePatterns.EVENING,
             timeSlots: grouped.evening.map((slot) => ({
                 startTime: slot.startTime,
@@ -204,6 +205,7 @@ const groupSlotsIntoCategories = (slots: AvailableSlot[]): ScheduleCategory[] =>
 };
 
 // Helper function to group specialty slots into categories
+// Note: title uses translation keys (morning, afternoon, evening) that will be translated in the component
 const groupSpecialtySlotsIntoCategories = (slots: SpecialtyAvailableSlot[]): ScheduleCategory[] => {
     // Convert SpecialtyAvailableSlot to AvailableSlot format for grouping
     const convertedSlots: AvailableSlot[] = slots.map((slot) => ({
@@ -219,7 +221,7 @@ const groupSpecialtySlotsIntoCategories = (slots: SpecialtyAvailableSlot[]): Sch
 
     if (grouped.morning.length > 0) {
         const morningCategory = {
-            title: 'Buổi sáng (8:00 - 12:00)',
+            title: 'morning',
             pattern: SchedulePatterns.MORNING,
             timeSlots: grouped.morning.map((slot) => ({
                 startTime: slot.startTime,
@@ -231,7 +233,7 @@ const groupSpecialtySlotsIntoCategories = (slots: SpecialtyAvailableSlot[]): Sch
 
     if (grouped.afternoon.length > 0) {
         const afternoonCategory = {
-            title: 'Buổi chiều (12:00 - 17:00)',
+            title: 'afternoon',
             pattern: SchedulePatterns.AFTERNOON,
             timeSlots: grouped.afternoon.map((slot) => ({
                 startTime: slot.startTime,
@@ -243,7 +245,7 @@ const groupSpecialtySlotsIntoCategories = (slots: SpecialtyAvailableSlot[]): Sch
 
     if (grouped.evening.length > 0) {
         const eveningCategory = {
-            title: 'Buổi tối (17:00 - 21:00)',
+            title: 'evening',
             pattern: SchedulePatterns.EVENING,
             timeSlots: grouped.evening.map((slot) => ({
                 startTime: slot.startTime,
