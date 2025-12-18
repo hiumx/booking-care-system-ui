@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './CountdownTimer.module.scss';
 import clsx from 'clsx';
 
@@ -17,11 +18,13 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
     variant = 'default',
     showIcon = true,
 }) => {
+    const { t } = useTranslation('booking');
+
     // Format time as MM:SS
     const formatTime = (seconds: number): string => {
         const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        const remainingSecs = seconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${remainingSecs.toString().padStart(2, '0')}`;
     };
 
     // Determine variant based on remaining time
@@ -45,7 +48,9 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
             )}
         >
             {showIcon && <i className={clsx('fas fa-clock', styles.icon)} />}
-            <span className={styles.time}>Giữ chỗ {formatTime(remainingSeconds)}</span>
+            <span className={styles.time}>
+                {t('common.holdSlot', { time: formatTime(remainingSeconds) })}
+            </span>
         </div>
     );
 };
