@@ -1,4 +1,255 @@
 {
+    "breadcrumb": {
+        "patient": "Patient",
+        "tabs": {
+            "dashboard": "Dashboard",
+            "appointments": "My Appointments",
+            "appointmentDetail": "Appointment Details",
+            "favourites": "Favourites",
+            "relatives": "Family Members",
+            "dependent": "Dependants",
+            "medicalRecords": "Medical Records",
+            "wallet": "Refund History",
+            "invoices": "Invoices",
+            "notifications": "Notifications",
+            "chat": "Messages",
+            "vitals": "Vitals",
+            "settings": "Settings"
+        }
+    },
+    "sidebar": {
+        "role": "Role",
+        "patient": "Patient",
+        "gender": "Gender",
+        "dateOfBirth": "Date of Birth",
+        "notUpdated": "Not updated",
+        "loading": "Loading information...",
+        "menu": {
+            "appointments": "My Appointments",
+            "favourites": "Favourites",
+            "relatives": "Family Members",
+            "wallet": "Refund History",
+            "invoices": "Invoices",
+            "notifications": "Notifications",
+            "chat": "Messages",
+            "settings": "Settings",
+            "logout": "Logout"
+        },
+        "toast": {
+            "logoutSuccess": "Logged out successfully",
+            "logoutError": "Unable to logout. Please try again"
+        }
+    },
+    "appointments": {
+        "title": "Appointments",
+        "search": "Search",
+        "dateRangePlaceholder": "Select date range",
+        "clearDateFilter": "Clear date filter",
+        "tabs": {
+            "waiting": "Pending",
+            "upcoming": "Upcoming",
+            "cancelled": "Cancelled",
+            "completed": "Completed"
+        },
+        "toast": {
+            "loginRequired": "Please login to view appointments",
+            "loadError": "Unable to load appointments",
+            "cancelStatusWarning": "Can only cancel appointments with Pending or Upcoming status",
+            "cancelSuccess": "Appointment cancelled successfully.",
+            "cancelSuccessRefund100": "Appointment cancelled successfully. You will receive a 100% refund.",
+            "cancelSuccessRefund50": "Appointment cancelled successfully. You will receive a 50% refund.",
+            "cancelSuccessNoRefund": "Appointment cancelled successfully. Due to late cancellation, no refund will be provided.",
+            "cancelError": "Unable to cancel appointment. Please try again."
+        },
+        "error": {
+            "title": "An error occurred",
+            "retry": "Retry"
+        },
+        "empty": {
+            "title": "No appointments",
+            "withFilter": "No appointments found matching your filters.",
+            "noFilter": "You don't have any appointments in this category.",
+            "clearFilter": "Clear Filters"
+        },
+        "review": {
+            "title": "Review",
+            "doctor": "Doctor",
+            "ratingLabel": "Rating",
+            "commentLabel": "Comment",
+            "commentPlaceholder": "Share your experience (minimum 5 characters)...",
+            "cancel": "Cancel",
+            "submit": "Add Review",
+            "submitting": "Submitting...",
+            "stars": "stars",
+            "validation": {
+                "noAppointment": "Appointment or user information not found.",
+                "invalidRating": "Please select a rating from 1 to 5 stars.",
+                "invalidComment": "Please enter a comment (minimum 5 characters).",
+                "noDoctor": "Doctor information not found for review."
+            }
+        },
+        "viewReview": {
+            "title": "Review Details",
+            "reviewFor": "Review for",
+            "reviewBy": "Review by",
+            "rating": "Rating",
+            "comment": "Comment"
+        },
+        "cancelModal": {
+            "title": "Confirm Cancel Appointment",
+            "message": "Are you sure you want to cancel this appointment",
+            "confirm": "Confirm Cancel",
+            "cancel": "Close",
+            "reasonLabel": "Cancellation Reason",
+            "reasonPlaceholder": "Please enter the reason for cancellation (minimum 10 characters)..."
+        },
+        "filters": {
+            "filterBy": "Filter by",
+            "name": "Name",
+            "searchPlaceholder": "Search",
+            "appointmentType": "Appointment Type",
+            "all": "All",
+            "telehealth": "Telehealth",
+            "directVisit": "In-Person",
+            "bookingFor": "Booking For",
+            "self": "Myself",
+            "relative": "Family Member",
+            "reset": "Reset",
+            "apply": "Apply"
+        },
+        "detail": {
+            "title": "Appointment Details",
+            "recentAppointments": "Recent Appointments",
+            "noRecentAppointments": "No recent appointments",
+            "noRecentDescription": "You don't have any appointments in this category.",
+            "cancelReasonTitle": "Cancellation Reason",
+            "noReasonProvided": "No specific reason provided.",
+            "cancelledBy": "Cancelled by",
+            "cancelledByYou": "you",
+            "cancelledByHospital": "hospital",
+            "cancelledOn": "on",
+            "toast": {
+                "appointmentNotFound": "Appointment ID not found",
+                "loadError": "Unable to load appointment details"
+            }
+        },
+        "card": {
+            "new": "New",
+            "viewDetail": "View Details",
+            "rebook": "Rebook",
+            "viewReview": "View Review",
+            "addReview": "Add Review",
+            "appointmentType": {
+                "telehealth": "Telehealth",
+                "inPerson": "In-Person"
+            }
+        },
+        "actions": {
+            "viewDetail": "View details",
+            "cancelAppointment": "Cancel appointment",
+            "rescheduleWithSameDoctor": "Reschedule with same doctor",
+            "chooseNewDoctor": "Choose new doctor",
+            "statusCancelled": "Cancelled",
+            "statusCompleted": "Completed"
+        },
+        "detailCard": {
+            "status": {
+                "pending": "Pending",
+                "confirmed": "Upcoming",
+                "cancelled": "Cancelled",
+                "completed": "Completed",
+                "unknown": "Unknown"
+            },
+            "personWithPatient": "Person accompanying patient",
+            "appointmentType": "Appointment Type",
+            "reason": "Reason",
+            "consultationFee": "Consultation Fee",
+            "dateTime": "Date & Time",
+            "location": "Location",
+            "visitType": "Visit Type",
+            "waitingConfirmation": "Waiting for confirmation",
+            "startSession": "Start Session",
+            "rescheduleStatus": "Status: Reschedule",
+            "rescheduleAppointment": "Reschedule Appointment",
+            "rescheduleWithSameDoctor": "Reschedule with same doctor",
+            "chooseNewDoctor": "Choose new doctor",
+            "cancelAppointment": "Cancel appointment"
+        }
+    },
+    "notifications": {
+        "title": "Notifications",
+        "tabs": {
+            "appointment": "Appointments",
+            "news": "News",
+            "system": "System"
+        },
+        "options": "Options",
+        "markAllAsRead": "Mark all as read",
+        "deleteAll": "Delete all",
+        "markAsRead": "Mark as read",
+        "delete": "Delete",
+        "new": "New",
+        "empty": "No notifications yet",
+        "toast": {
+            "loadError": "Unable to load notifications",
+            "markedAsRead": "Marked as read",
+            "markAsReadError": "Unable to mark as read",
+            "allMarkedAsRead": "All marked as read",
+            "markAllError": "Unable to mark all",
+            "deleted": "Notification deleted",
+            "deleteError": "Unable to delete notification",
+            "allDeleted": "All notifications deleted",
+            "deleteAllError": "Unable to delete all notifications"
+        },
+        "confirmDeleteAll": "Are you sure you want to delete all notifications? This action cannot be undone."
+    },
+    "settings": {
+        "tabs": {
+            "profile": "Personal Information",
+            "password": "Change Password"
+        }
+    },
+    "changePassword": {
+        "title": "Change Password",
+        "currentPassword": {
+            "label": "Current Password",
+            "placeholder": "Enter current password"
+        },
+        "newPassword": {
+            "label": "New Password",
+            "placeholder": "Enter new password"
+        },
+        "confirmPassword": {
+            "label": "Confirm New Password",
+            "placeholder": "Re-enter new password"
+        },
+        "strength": {
+            "label": "Password strength:",
+            "weak": "Weak",
+            "fair": "Fair",
+            "good": "Good",
+            "strong": "Strong",
+            "veryStrong": "Very Strong"
+        },
+        "passwordMatch": "Passwords match",
+        "requirements": {
+            "title": "Password requirements:",
+            "minLength": "At least 8 characters",
+            "uppercase": "One uppercase letter",
+            "lowercase": "One lowercase letter",
+            "number": "One number",
+            "specialChar": "One special character"
+        },
+        "actions": {
+            "cancel": "Cancel",
+            "submit": "Change Password",
+            "submitting": "Processing..."
+        },
+        "toast": {
+            "success": "Password changed successfully!",
+            "error": "Unable to change password. Please try again!"
+        }
+    },
     "patientRelatives": {
         "title": "Manage Family Members",
         "addButton": "Add Family Member",
@@ -133,6 +384,172 @@
             "cancelChanges": "Changes canceled",
             "checkInfo": "Please check your information!",
             "requireEmailOrPhone": "Please provide at least email or phone number!"
+        }
+    },
+    "favourite": {
+        "title": "Favourite Doctors List",
+        "titleWithCount": "Favourite Doctors List ({{count}})",
+        "searchPlaceholder": "Search",
+        "empty": {
+            "notLoggedIn": "Please log in to view your favourite doctors list.",
+            "noResults": "No favourite doctors found."
+        },
+        "errors": {
+            "patientIdRequired": "Patient ID is required to load favorite doctors",
+            "loadFailed": "An error occurred while loading favourite doctors list"
+        },
+        "card": {
+            "specialty": "Specialty:",
+            "level": "Education :",
+            "location": "Location :",
+            "experience": "{{years}} years of experience",
+            "viewDetails": "View Details",
+            "bookNow": "Book Now",
+            "addToFavourite": "Add to favourites",
+            "removeFromFavourite": "Remove from favourites",
+            "unknown": "Unknown"
+        }
+    },
+    "invoices": {
+        "title": "Invoices",
+        "searchPlaceholder": "Search invoices...",
+        "sort": {
+            "newest": "Newest",
+            "oldest": "Oldest",
+            "amountDesc": "Amount descending",
+            "amountAsc": "Amount ascending"
+        },
+        "table": {
+            "id": "ID",
+            "paymentMethod": "Payment Method",
+            "appointmentDate": "Appointment Date",
+            "paymentDate": "Payment Date",
+            "amount": "Amount",
+            "status": "Status"
+        },
+        "status": {
+            "completed": "Completed",
+            "pending": "Pending",
+            "failed": "Failed",
+            "cancelled": "Cancelled"
+        },
+        "empty": {
+            "noInvoices": "No invoices yet",
+            "noResults": "No invoices found matching your search",
+            "loading": "Loading user information..."
+        },
+        "modal": {
+            "title": "View Invoice",
+            "downloadPdf": "Download PDF",
+            "downloading": "Downloading...",
+            "print": "Print Invoice",
+            "printing": "Printing...",
+            "invoiceNumber": "Invoice No",
+            "issuedDate": "Issued",
+            "paymentFrom": "Payment From",
+            "paymentTo": "Payment To",
+            "invoiceDetails": "Invoice Details",
+            "content": "Content",
+            "vat": "VAT",
+            "deposit": "Deposit",
+            "appointmentType": {
+                "inPerson": "In-Person Consultation",
+                "remote": "Remote Consultation"
+            },
+            "subtotal": "Subtotal:",
+            "discount": "Discount:",
+            "totalAmount": "Total Amount:",
+            "otherInfo": "Other Information",
+            "otherInfoDescription": "A statement of the current illness, including the circumstances surrounding the onset of recent health changes and the timeline of subsequent events that led the patient to seek medication",
+            "errors": {
+                "downloadFailed": "Unable to download PDF. Please try again.",
+                "printFailed": "Unable to print invoice. Please try again."
+            }
+        }
+    },
+    "wallet": {
+        "title": "Wallet",
+        "loading": "Loading user information...",
+        "summary": {
+            "title": "Your Account",
+            "accountName": "Account Holder Name",
+            "accountNumber": "Account Number",
+            "bankName": "Bank Name",
+            "bankCode": "Bank Code",
+            "notAdded": "Not added yet",
+            "loading": "Loading...",
+            "editDetails": "Edit Details",
+            "addBankAccount": "Add Bank Account",
+            "allBankAccounts": "All Bank Accounts"
+        },
+        "transactions": {
+            "id": "ID",
+            "accountNumber": "Account Number",
+            "refundReason": "Refund Reason",
+            "updatedAt": "Updated At",
+            "refundAmount": "Refund Amount",
+            "status": "Status",
+            "completed": "Completed",
+            "pending": "Pending",
+            "empty": {
+                "title": "No transactions yet",
+                "description": "Your refund history will be displayed here."
+            }
+        },
+        "addCardModal": {
+            "addTitle": "Add Account Number",
+            "editTitle": "Update Account Number",
+            "accountName": "Account Holder Name",
+            "accountNumber": "Account Number",
+            "bank": "Bank",
+            "bankPlaceholder": "Select your bank",
+            "setDefault": "Set as default account",
+            "cancel": "Cancel",
+            "processing": "Processing...",
+            "validation": {
+                "checkInfo": "Please check your information",
+                "fillRequired": "Please fill in all required fields"
+            },
+            "success": {
+                "added": "Bank account added successfully!",
+                "updated": "Account information updated successfully!"
+            },
+            "errors": {
+                "createFailed": "Unable to create account. Please try again.",
+                "updateFailed": "Unable to update account. Please try again."
+            }
+        },
+        "otherAccountsModal": {
+            "title": "All Bank Accounts",
+            "bankName": "Bank Name",
+            "accountNumber": "Account Number",
+            "accountName": "Account Name",
+            "default": "Default",
+            "setDefault": "Set as Default",
+            "processing": "Processing...",
+            "deleteTooltip": "Delete account",
+            "cannotDeleteDefault": "Cannot delete default account",
+            "empty": "No bank accounts found",
+            "close": "Close",
+            "deleteConfirm": {
+                "title": "Delete Account",
+                "message": "Are you sure you want to delete this account? This action cannot be undone.",
+                "confirm": "Delete",
+                "cancel": "Cancel"
+            },
+            "cannotDelete": {
+                "title": "Cannot Delete",
+                "message": "Cannot delete the default account. Please set another account as default before deleting.",
+                "confirm": "Got it"
+            }
+        },
+        "success": {
+            "setDefault": "Default account set successfully!",
+            "deleted": "Account deleted successfully!"
+        },
+        "errors": {
+            "setDefaultFailed": "Unable to set default account. Please try again.",
+            "deleteFailed": "Unable to delete account. Please try again."
         }
     }
 }

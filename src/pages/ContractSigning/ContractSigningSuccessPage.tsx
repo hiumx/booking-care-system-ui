@@ -1,20 +1,22 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PATHS } from '@/routes/paths';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 
 const ContractSigningSuccessPage: React.FC = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation('contractSigning');
 
     const breadcrumbItems = [
-        { label: 'Trang chủ', path: PATHS.HOME },
-        { label: 'Ký hợp đồng', path: PATHS.HOME },
-        { label: 'Hoàn tất', isActive: true },
+        { label: t('success.breadcrumb.home'), path: PATHS.HOME },
+        { label: t('success.breadcrumb.contractSigning'), path: PATHS.HOME },
+        { label: t('success.breadcrumb.complete'), isActive: true },
     ];
 
     return (
         <MainLayout>
-            <Breadcrumb items={breadcrumbItems} title="Ký hợp đồng thành công" />
+            <Breadcrumb items={breadcrumbItems} title={t('success.title')} />
 
             <div className="container py-4">
                 <div className="row justify-content-center">
@@ -26,17 +28,18 @@ const ContractSigningSuccessPage: React.FC = () => {
                                 <div className="card-header pt-3 pb-3 border-bottom">
                                     <h5 className="d-flex align-items-center flex-wrap gap-2 mb-0">
                                         <i className="isax isax-tick-circle5 text-success me-2"></i>{' '}
-                                        Ký hợp đồng thành công
+                                        {t('success.title')}
                                     </h5>
                                 </div>
 
                                 {/* Success Message */}
                                 <div className="card-header d-flex align-items-center flex-wrap gap-2 py-3">
                                     <p className="mb-0">
-                                        🎉 Cảm ơn bạn đã hoàn tất việc ký hợp đồng điện tử. Hợp đồng
-                                        đã được gửi đến hệ thống{' '}
-                                        <span className="text-dark fw-semibold">BookingCare</span>{' '}
-                                        để xem xét và phê duyệt.
+                                        🎉 {t('success.message')}{' '}
+                                        <span className="text-dark fw-semibold">
+                                            {t('success.systemName')}
+                                        </span>{' '}
+                                        {t('success.toReview')}
                                     </p>
                                 </div>
 
@@ -44,37 +47,33 @@ const ContractSigningSuccessPage: React.FC = () => {
                                 <div className="card-body pb-3">
                                     <h6 className="mb-3">
                                         <i className="isax isax-info-circle me-2 text-primary"></i>{' '}
-                                        Bước tiếp theo
+                                        {t('success.nextSteps.title')}
                                     </h6>
                                     <div className="alert alert-light border mb-4">
                                         <ul className="mb-0 ps-3">
                                             <li className="mb-2">
                                                 <i className="isax isax-tick-circle text-success me-2"></i>{' '}
-                                                Hợp đồng đã được ký thành công và gửi đến hệ thống
-                                                BookingCare
+                                                {t('success.nextSteps.step1')}
                                             </li>
                                             <li className="mb-2">
                                                 <i className="isax isax-clock text-warning me-2"></i>{' '}
-                                                Đội ngũ quản trị sẽ xem xét và phê duyệt hợp đồng
-                                                trong thời gian sớm nhất
+                                                {t('success.nextSteps.step2')}
                                             </li>
                                             <li className="mb-2">
-                                                <i className="isax isax-sms text-info me-2"></i> Bạn
-                                                sẽ nhận được email thông báo khi hợp đồng được phê
-                                                duyệt
+                                                <i className="isax isax-sms text-info me-2"></i>{' '}
+                                                {t('success.nextSteps.step3')}
                                             </li>
                                             <li className="mb-0">
                                                 <i className="isax isax-user-tick text-success me-2"></i>{' '}
-                                                Sau khi phê duyệt, tài khoản bệnh viện sẽ được kích
-                                                hoạt và bạn có thể đăng nhập vào hệ thống
+                                                {t('success.nextSteps.step4')}
                                             </li>
                                         </ul>
                                     </div>
 
                                     {/* Timeline - Horizontal Steps */}
                                     <h6 className="mb-3">
-                                        <i className="isax isax-timer-1 me-2 text-primary"></i> Quy
-                                        trình xử lý
+                                        <i className="isax isax-timer-1 me-2 text-primary"></i>{' '}
+                                        {t('success.timeline.title')}
                                     </h6>
                                     <div className="card border mb-4">
                                         <div className="card-body p-4">
@@ -119,10 +118,10 @@ const ContractSigningSuccessPage: React.FC = () => {
                                                         ></i>
                                                     </div>
                                                     <h6 className="mb-1 fw-semibold small">
-                                                        Ký hợp đồng
+                                                        {t('success.timeline.step1.title')}
                                                     </h6>
                                                     <span className="badge bg-success-subtle text-success">
-                                                        Hoàn thành
+                                                        {t('success.timeline.step1.status')}
                                                     </span>
                                                 </div>
 
@@ -141,10 +140,10 @@ const ContractSigningSuccessPage: React.FC = () => {
                                                         ></i>
                                                     </div>
                                                     <h6 className="mb-1 fw-semibold small">
-                                                        Xem xét hợp đồng
+                                                        {t('success.timeline.step2.title')}
                                                     </h6>
                                                     <span className="badge bg-warning-subtle text-warning">
-                                                        Đang chờ
+                                                        {t('success.timeline.step2.status')}
                                                     </span>
                                                 </div>
 
@@ -163,10 +162,10 @@ const ContractSigningSuccessPage: React.FC = () => {
                                                         ></i>
                                                     </div>
                                                     <h6 className="mb-1 fw-semibold small text-muted">
-                                                        Kích hoạt tài khoản
+                                                        {t('success.timeline.step3.title')}
                                                     </h6>
                                                     <span className="badge bg-light text-muted border">
-                                                        Chờ xử lý
+                                                        {t('success.timeline.step3.status')}
                                                     </span>
                                                 </div>
                                             </div>
@@ -176,13 +175,12 @@ const ContractSigningSuccessPage: React.FC = () => {
                                     {/* Contact Support */}
                                     <h6 className="mb-3">
                                         <i className="isax isax-message-question me-2 text-primary"></i>{' '}
-                                        Cần hỗ trợ?
+                                        {t('success.support.title')}
                                     </h6>
                                     <div className="card border bg-light mb-4">
                                         <div className="card-body p-3">
                                             <p className="mb-3 small">
-                                                Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với
-                                                chúng tôi:
+                                                {t('success.support.description')}
                                             </p>
                                             <div className="d-flex flex-wrap gap-4">
                                                 <a
@@ -204,7 +202,7 @@ const ContractSigningSuccessPage: React.FC = () => {
                                                         <i className="isax isax-call text-success"></i>
                                                     </span>
                                                     <span className="fw-semibold text-dark">
-                                                        1900-xxxx
+                                                        19001979
                                                     </span>
                                                 </a>
                                             </div>
@@ -218,7 +216,8 @@ const ContractSigningSuccessPage: React.FC = () => {
                                             className="btn btn-primary btn-lg px-5"
                                             onClick={() => navigate(PATHS.HOME)}
                                         >
-                                            <i className="isax isax-home me-2"></i> Về trang chủ
+                                            <i className="isax isax-home me-2"></i>{' '}
+                                            {t('success.backHome')}
                                         </button>
                                     </div>
                                 </div>

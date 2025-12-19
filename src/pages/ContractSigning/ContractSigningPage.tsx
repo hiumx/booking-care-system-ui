@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import SignatureCanvas from 'react-signature-canvas';
 import { toast } from 'react-toastify';
 import { validateToken, sendSigningOtp, signContract } from '@/services/contract-signing.service';
@@ -9,36 +10,28 @@ import StepWizard from '@/components/StepWizard/StepWizard';
 import Spinner from '@/components/Spinner';
 
 const ContractSigningPage: React.FC = () => {
+    const { t } = useTranslation('contractSigning');
     const { token } = useParams<{ token: string }>();
     const navigate = useNavigate();
     const signatureRef = useRef<SignatureCanvas>(null);
 
-    // State
     const [isLoading, setIsLoading] = useState(true);
     const [isValidToken, setIsValidToken] = useState(false);
     const [contractInfo, setContractInfo] = useState<ContractSigningInfo | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
-
-    // Signature state
     const [hasSignature, setHasSignature] = useState(false);
-
-    // OTP state
     const [otpSent, setOtpSent] = useState(false);
     const [otpCode, setOtpCode] = useState('');
     const [isSendingOtp, setIsSendingOtp] = useState(false);
     const [countdown, setCountdown] = useState(0);
-
-    // Signing state
     const [isSigning, setIsSigning] = useState(false);
 
-    // Validate token on mount
     useEffect(() => {
         if (token) {
             validateContractToken();
         }
     }, [token]);
 
-    // Countdown timer for OTP resend
     useEffect(() => {
         if (countdown > 0) {
             const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -57,15 +50,15 @@ const ContractSigningPage: React.FC = () => {
                     setContractInfo(tokenData.contractInfo);
                 } else {
                     setIsValidToken(false);
-                    setErrorMessage(tokenData.errorMessage || 'Token không hợp lệ hoặc đã hết hạn');
+                    setErrorMessage(tokenData.errorMessage || t('invalidToken.defaultError'));
                 }
             } else {
                 setIsValidToken(false);
-                setErrorMessage('Token không hợp lệ hoặc đã hết hạn');
+                setErrorMessage(t('invalidToken.defaultError'));
             }
         } catch (error: any) {
             setIsValidToken(false);
-            setErrorMessage(error.message || 'Không thể xác thực token. Vui lòng thử lại sau.');
+            setErrorMessage(error.message || t('invalidToken.validationError'));
         } finally {
             setIsLoading(false);
         }
@@ -85,12 +78,12 @@ const ContractSigningPage: React.FC = () => {
             if (response.success) {
                 setOtpSent(true);
                 setCountdown(60);
-                toast.success(response.message || 'Mã OTP đã được gửi đến email của bạn');
+                toast.success(response.message || t('toast.otpSent'));
             } else {
-                toast.error(response.message || 'Không thể gửi OTP');
+                toast.error(response.message || t('toast.otpSendFailed'));
             }
         } catch (error: any) {
-            toast.error(error.message || 'Có lỗi xảy ra khi gửi OTP');
+            toast.error(error.message || t('toast.otpSendError'));
         } finally {
             setIsSendingOtp(false);
         }
@@ -98,17 +91,17 @@ const ContractSigningPage: React.FC = () => {
 
     const handleSignContract = async () => {
         if (!token || !signatureRef.current || !otpCode) {
-            toast.error('Vui lòng hoàn thành tất cả các bước');
+            toast.error(t('toast.completeAllSteps'));
             return;
         }
 
         if (signatureRef.current.isEmpty()) {
-            toast.error('Vui lòng vẽ chữ ký của bạn');
+            toast.error(t('toast.drawSignature'));
             return;
         }
 
         if (otpCode.length !== 6) {
-            toast.error('Mã OTP phải có 6 chữ số');
+            toast.error(t('toast.otpLength'));
             return;
         }
 
@@ -123,21 +116,20 @@ const ContractSigningPage: React.FC = () => {
             });
 
             if (response.success) {
-                toast.success(response.message || 'Ký hợp đồng thành công!');
+                toast.success(response.message || t('toast.signSuccess'));
                 setTimeout(() => {
                     navigate(PATHS.CONTRACT_SIGNING.SUCCESS);
                 }, 2000);
             } else {
-                toast.error(response.message || 'Ký hợp đồng thất bại');
+                toast.error(response.message || t('toast.signFailed'));
             }
         } catch (error: any) {
-            toast.error(error.message || 'Có lỗi xảy ra khi ký hợp đồng');
+            toast.error(error.message || t('toast.signError'));
         } finally {
             setIsSigning(false);
         }
     };
 
-    // Loading state
     if (isLoading) {
         return (
             <div
@@ -146,13 +138,12 @@ const ContractSigningPage: React.FC = () => {
             >
                 <div className="text-center">
                     <Spinner size="large" variant="primary" />
-                    <p className="mt-3 text-muted">Đang xác thực...</p>
+                    <p className="mt-3 text-muted">{t('loading')}</p>
                 </div>
             </div>
         );
     }
 
-    // Invalid token
     if (!isValidToken) {
         return (
             <div className="container py-5">
@@ -164,11 +155,9 @@ const ContractSigningPage: React.FC = () => {
                                     className="isax isax-close-circle5 text-danger mb-3"
                                     style={{ fontSize: '48px' }}
                                 ></i>
-                                <h4 className="text-danger mb-3">Token không hợp lệ</h4>
+                                <h4 className="text-danger mb-3">{t('invalidToken.title')}</h4>
                                 <p className="text-muted mb-0">{errorMessage}</p>
-                                <p className="text-muted">
-                                    Vui lòng liên hệ admin để nhận link ký hợp đồng mới.
-                                </p>
+                                <p className="text-muted">{t('invalidToken.contactAdmin')}</p>
                             </div>
                         </div>
                     </div>
@@ -183,16 +172,14 @@ const ContractSigningPage: React.FC = () => {
                 <div className="col-lg-10">
                     {/* Header */}
                     <div className="text-center mb-4">
-                        <h3 className="mb-2">Ký hợp đồng điện tử</h3>
-                        <p className="text-muted">
-                            Vui lòng đọc kỹ hợp đồng và hoàn thành các bước ký bên dưới
-                        </p>
+                        <h3 className="mb-2">{t('header.title')}</h3>
+                        <p className="text-muted">{t('header.subtitle')}</p>
                         <div className="mt-3">
                             <StepWizard
                                 steps={[
-                                    { id: 1, title: 'Chữ ký' },
-                                    { id: 2, title: 'Xác thực OTP' },
-                                    { id: 3, title: 'Xác nhận' },
+                                    { id: 1, title: t('steps.signature') },
+                                    { id: 2, title: t('steps.otp') },
+                                    { id: 3, title: t('steps.confirm') },
                                 ]}
                                 currentStep={(() => {
                                     if (otpCode.length === 6) return 3;
@@ -207,8 +194,8 @@ const ContractSigningPage: React.FC = () => {
                     <div className="card mb-4">
                         <div className="card-header">
                             <h6 className="mb-0">
-                                <i className="isax isax-document-text5 me-2 text-primary"></i> Thông
-                                tin hợp đồng
+                                <i className="isax isax-document-text5 me-2 text-primary"></i>{' '}
+                                {t('contractInfo.title')}
                             </h6>
                         </div>
                         <div className="card-body">
@@ -218,7 +205,7 @@ const ContractSigningPage: React.FC = () => {
                                         <i className="isax isax-receipt-15 text-primary me-2"></i>
                                         <div>
                                             <small className="text-muted d-block">
-                                                Số hợp đồng
+                                                {t('contractInfo.contractNumber')}
                                             </small>
                                             <span className="fw-medium">
                                                 {contractInfo?.contractNumber}
@@ -230,7 +217,9 @@ const ContractSigningPage: React.FC = () => {
                                     <div className="d-flex align-items-center">
                                         <i className="isax isax-hospital5 text-success me-2"></i>
                                         <div>
-                                            <small className="text-muted d-block">Bệnh viện</small>
+                                            <small className="text-muted d-block">
+                                                {t('contractInfo.hospital')}
+                                            </small>
                                             <span className="fw-medium">
                                                 {contractInfo?.hospitalName}
                                             </span>
@@ -242,7 +231,7 @@ const ContractSigningPage: React.FC = () => {
                                         <i className="isax isax-user text-info me-2"></i>
                                         <div>
                                             <small className="text-muted d-block">
-                                                Người đại diện
+                                                {t('contractInfo.representative')}
                                             </small>
                                             <span className="fw-medium">
                                                 {contractInfo?.representativeName}
@@ -254,7 +243,9 @@ const ContractSigningPage: React.FC = () => {
                                     <div className="d-flex align-items-center">
                                         <i className="isax isax-sms5 text-warning me-2"></i>
                                         <div>
-                                            <small className="text-muted d-block">Email</small>
+                                            <small className="text-muted d-block">
+                                                {t('contractInfo.email')}
+                                            </small>
                                             <span className="fw-medium">
                                                 {contractInfo?.representativeEmail}
                                             </span>
@@ -269,16 +260,15 @@ const ContractSigningPage: React.FC = () => {
                     <div className="card mb-4">
                         <div className="card-header d-flex align-items-center justify-content-between">
                             <h6 className="mb-0">
-                                <i className="isax isax-eye5 me-2 text-primary"></i> Xem hợp đồng
+                                <i className="isax isax-eye5 me-2 text-primary"></i>{' '}
+                                {t('contractPreview.title')}
                             </h6>
-                            <span className="badge bg-info">Bản nháp</span>
+                            <span className="badge bg-info">{t('contractPreview.draft')}</span>
                         </div>
                         <div className="card-body">
                             <div className="alert alert-warning mb-3">
                                 <i className="isax isax-warning-25 me-2"></i>
-                                <small>
-                                    Vui lòng đọc kỹ toàn bộ nội dung hợp đồng trước khi ký
-                                </small>
+                                <small>{t('contractPreview.warning')}</small>
                             </div>
                             <div className="ratio ratio-16x9 mb-3 rounded overflow-hidden border">
                                 <iframe
@@ -293,7 +283,8 @@ const ContractSigningPage: React.FC = () => {
                                 rel="noopener noreferrer"
                                 className="btn btn-outline-primary btn-sm"
                             >
-                                <i className="isax isax-export-35 me-1"></i> Mở trong tab mới
+                                <i className="isax isax-export-35 me-1"></i>{' '}
+                                {t('contractPreview.openNewTab')}
                             </a>
                         </div>
                     </div>
@@ -303,14 +294,13 @@ const ContractSigningPage: React.FC = () => {
                         <div className="card-header">
                             <h6 className="mb-0">
                                 <span className="badge bg-primary me-2">1</span>{' '}
-                                <i className="isax isax-edit-25 me-2"></i> Vẽ chữ ký của bạn
+                                <i className="isax isax-edit-25 me-2"></i> {t('signature.title')}
                             </h6>
                         </div>
                         <div className="card-body">
                             <p className="text-muted small mb-3">
-                                <i className="isax isax-info-circle5 me-1"></i> Vẽ chữ ký của bạn
-                                trong khung bên dưới. Chữ ký này sẽ được sử dụng để xác thực hợp
-                                đồng.
+                                <i className="isax isax-info-circle5 me-1"></i>{' '}
+                                {t('signature.description')}
                             </p>
                             <div
                                 className="border rounded p-2 mb-3 position-relative bg-white"
@@ -333,7 +323,7 @@ const ContractSigningPage: React.FC = () => {
                                             className="isax isax-edit5 me-2"
                                             style={{ fontSize: '20px' }}
                                         ></i>
-                                        <span>Vẽ chữ ký tại đây</span>
+                                        <span>{t('signature.placeholder')}</span>
                                     </div>
                                 )}
                             </div>
@@ -344,11 +334,12 @@ const ContractSigningPage: React.FC = () => {
                                     onClick={handleClearSignature}
                                     disabled={!hasSignature}
                                 >
-                                    <i className="isax isax-trash5 me-1"></i> Xóa và vẽ lại
+                                    <i className="isax isax-trash5 me-1"></i> {t('signature.clear')}
                                 </button>
                                 {hasSignature && (
                                     <span className="badge bg-success">
-                                        <i className="isax isax-tick-circle5 me-1"></i> Đã có chữ ký
+                                        <i className="isax isax-tick-circle5 me-1"></i>{' '}
+                                        {t('signature.hasSignature')}
                                     </span>
                                 )}
                             </div>
@@ -360,7 +351,7 @@ const ContractSigningPage: React.FC = () => {
                         <div className="card-header">
                             <h6 className="mb-0">
                                 <span className="badge bg-primary me-2">2</span>{' '}
-                                <i className="isax isax-shield-tick5 me-2"></i> Xác thực OTP
+                                <i className="isax isax-shield-tick5 me-2"></i> {t('otp.title')}
                             </h6>
                         </div>
                         <div className="card-body">
@@ -368,14 +359,12 @@ const ContractSigningPage: React.FC = () => {
                                 <div>
                                     <div className="alert alert-success mb-3">
                                         <i className="isax isax-tick-circle5 me-2"></i>
-                                        <strong>Mã OTP đã được gửi!</strong>
-                                        <span className="ms-1">
-                                            Vui lòng kiểm tra email của bạn
-                                        </span>
+                                        <strong>{t('otp.sent')}</strong>
+                                        <span className="ms-1">{t('otp.checkEmail')}</span>
                                     </div>
                                     <div className="mb-3">
                                         <label htmlFor="otp-input" className="form-label fw-medium">
-                                            Nhập mã OTP (6 chữ số)
+                                            {t('otp.inputLabel')}
                                         </label>
                                         <input
                                             id="otp-input"
@@ -398,8 +387,9 @@ const ContractSigningPage: React.FC = () => {
                                     <div className="d-flex align-items-center justify-content-between">
                                         {countdown > 0 ? (
                                             <p className="text-muted small mb-0">
-                                                <i className="isax isax-clock5 me-1"></i> Gửi lại mã
-                                                sau <strong>{countdown}</strong> giây
+                                                <i className="isax isax-clock5 me-1"></i>{' '}
+                                                {t('otp.resendIn')} <strong>{countdown}</strong>{' '}
+                                                {t('otp.seconds')}
                                             </p>
                                         ) : (
                                             <button
@@ -407,14 +397,14 @@ const ContractSigningPage: React.FC = () => {
                                                 className="btn btn-link p-0 text-decoration-none"
                                                 onClick={handleSendOtp}
                                             >
-                                                <i className="isax isax-refresh5 me-1"></i> Gửi lại
-                                                mã OTP
+                                                <i className="isax isax-refresh5 me-1"></i>{' '}
+                                                {t('otp.resend')}
                                             </button>
                                         )}
                                         {otpCode.length === 6 && (
                                             <span className="badge bg-success">
-                                                <i className="isax isax-tick-circle5 me-1"></i> Đã
-                                                nhập đủ
+                                                <i className="isax isax-tick-circle5 me-1"></i>{' '}
+                                                {t('otp.inputComplete')}
                                             </span>
                                         )}
                                     </div>
@@ -424,7 +414,7 @@ const ContractSigningPage: React.FC = () => {
                                     <div className="alert alert-info mb-3">
                                         <i className="isax isax-info-circle5 me-2"></i>
                                         <small>
-                                            Mã OTP sẽ được gửi đến email{' '}
+                                            {t('otp.sendTo')}{' '}
                                             <strong className="text-primary">
                                                 {contractInfo?.representativeEmail}
                                             </strong>
@@ -439,21 +429,19 @@ const ContractSigningPage: React.FC = () => {
                                         {isSendingOtp ? (
                                             <>
                                                 <span className="spinner-border spinner-border-sm me-2"></span>{' '}
-                                                Đang gửi...
+                                                {t('otp.sending')}
                                             </>
                                         ) : (
                                             <>
-                                                <i className="isax isax-sms5 me-2"></i> Gửi mã OTP
+                                                <i className="isax isax-sms5 me-2"></i>{' '}
+                                                {t('otp.sendButton')}
                                             </>
                                         )}
                                     </button>
                                     {!hasSignature && (
                                         <div className="alert alert-warning mt-3 mb-0">
                                             <i className="isax isax-warning-25 me-2"></i>
-                                            <small>
-                                                Vui lòng hoàn thành bước 1 (vẽ chữ ký) trước khi gửi
-                                                OTP
-                                            </small>
+                                            <small>{t('otp.completeStep1')}</small>
                                         </div>
                                     )}
                                 </div>
@@ -465,8 +453,7 @@ const ContractSigningPage: React.FC = () => {
                     <div className="card">
                         <div className="card-body text-center py-4">
                             <h6 className="mb-3">
-                                <span className="badge bg-primary me-2">3</span> Xác nhận ký hợp
-                                đồng
+                                <span className="badge bg-primary me-2">3</span> {t('submit.title')}
                             </h6>
                             <button
                                 type="button"
@@ -479,22 +466,18 @@ const ContractSigningPage: React.FC = () => {
                                 {isSigning ? (
                                     <>
                                         <span className="spinner-border spinner-border-sm me-2"></span>{' '}
-                                        Đang xử lý...
+                                        {t('submit.processing')}
                                     </>
                                 ) : (
                                     <>
-                                        <i className="isax isax-tick-circle5 me-2"></i> Xác nhận ký
-                                        hợp đồng
+                                        <i className="isax isax-tick-circle5 me-2"></i>{' '}
+                                        {t('submit.button')}
                                     </>
                                 )}
                             </button>
                             <div className="alert alert-light border mt-3 mb-0">
                                 <i className="isax isax-shield-tick5 me-2 text-success"></i>
-                                <small className="text-muted">
-                                    Bằng việc ký hợp đồng, bạn xác nhận đã đọc và đồng ý với tất cả
-                                    các điều khoản trong hợp đồng. Chữ ký điện tử của bạn có giá trị
-                                    pháp lý.
-                                </small>
+                                <small className="text-muted">{t('submit.disclaimer')}</small>
                             </div>
                         </div>
                     </div>

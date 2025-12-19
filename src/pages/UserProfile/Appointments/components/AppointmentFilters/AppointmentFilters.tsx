@@ -1,9 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 import Button from '@/components/Button';
 import { FilterState } from './AppointmentTypes';
 import styles from './AppointmentFilters.module.scss';
+import FilterCheckboxItem from './FilterCheckboxItem';
 
 interface AppointmentFiltersProps {
     isOpen: boolean;
@@ -26,6 +28,7 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
     onReset,
     onApply,
 }) => {
+    const { t } = useTranslation('userProfile');
     const filterDropdownRef = useRef<HTMLDivElement>(null);
 
     // Close filter when clicking outside
@@ -68,7 +71,8 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                 aria-expanded={isOpen}
                 aria-haspopup="true"
             >
-                <i className="isax isax-filter me-2"></i>Lọc theo
+                <i className="isax isax-filter me-2"></i>
+                {t('appointments.filters.filterBy')}
             </button>
             <div className={clsx(styles.filterDropdownMenu, 'filter-dropdown-menu')}>
                 <div className="filter-set-view">
@@ -89,7 +93,7 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                     aria-expanded="false"
                                     aria-controls="collapseTwo"
                                 >
-                                    Tên
+                                    {t('appointments.filters.name')}
                                 </button>
                             </div>
                             <div
@@ -106,7 +110,9 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                             <input
                                                 type="text"
                                                 className="form-control"
-                                                placeholder="Tìm kiếm"
+                                                placeholder={t(
+                                                    'appointments.filters.searchPlaceholder'
+                                                )}
                                                 value={filterState.filterSearchTerm}
                                                 onChange={(e) =>
                                                     onFilterSearchChange(e.target.value)
@@ -137,7 +143,7 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                     aria-expanded="true"
                                     aria-controls="collapseOne"
                                 >
-                                    Loại cuộc hẹn{' '}
+                                    {t('appointments.filters.appointmentType')}
                                 </button>
                             </div>
                             <div
@@ -149,68 +155,27 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                 data-bs-parent="#accordionExample"
                             >
                                 <ul>
-                                    <li>
-                                        <div className={clsx(styles.filterChecks, 'filter-checks')}>
-                                            <label className={clsx(styles.checkBoxs, 'checkboxs')}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={
-                                                        filterState.appointmentTypeFilters.allType
-                                                    }
-                                                    onChange={(e) =>
-                                                        onAppointmentTypeChange(
-                                                            'allType',
-                                                            e.target.checked
-                                                        )
-                                                    }
-                                                />
-                                                <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Tất cả</span>
-                                            </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div className={clsx(styles.filterChecks, 'filter-checks')}>
-                                            <label className={clsx(styles.checkBoxs, 'checkboxs')}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={
-                                                        filterState.appointmentTypeFilters
-                                                            .telehealth
-                                                    }
-                                                    onChange={(e) =>
-                                                        onAppointmentTypeChange(
-                                                            'telehealth',
-                                                            e.target.checked
-                                                        )
-                                                    }
-                                                />
-                                                <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Trực tuyến</span>
-                                            </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div className={clsx(styles.filterChecks, 'filter-checks')}>
-                                            <label className={clsx(styles.checkBoxs, 'checkboxs')}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={
-                                                        filterState.appointmentTypeFilters
-                                                            .directVisit
-                                                    }
-                                                    onChange={(e) =>
-                                                        onAppointmentTypeChange(
-                                                            'directVisit',
-                                                            e.target.checked
-                                                        )
-                                                    }
-                                                />
-                                                <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Khám trực tiếp</span>
-                                            </label>
-                                        </div>
-                                    </li>
+                                    <FilterCheckboxItem
+                                        checked={filterState.appointmentTypeFilters.allType}
+                                        onChange={(checked) =>
+                                            onAppointmentTypeChange('allType', checked)
+                                        }
+                                        label={t('appointments.filters.all')}
+                                    />
+                                    <FilterCheckboxItem
+                                        checked={filterState.appointmentTypeFilters.telehealth}
+                                        onChange={(checked) =>
+                                            onAppointmentTypeChange('telehealth', checked)
+                                        }
+                                        label={t('appointments.filters.telehealth')}
+                                    />
+                                    <FilterCheckboxItem
+                                        checked={filterState.appointmentTypeFilters.directVisit}
+                                        onChange={(checked) =>
+                                            onAppointmentTypeChange('directVisit', checked)
+                                        }
+                                        label={t('appointments.filters.directVisit')}
+                                    />
                                 </ul>
                             </div>
                         </div>
@@ -231,7 +196,7 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                     aria-expanded="false"
                                     aria-controls="collapseThree"
                                 >
-                                    Đặt lịch cho
+                                    {t('appointments.filters.bookingFor')}
                                 </button>
                             </div>
                             <div
@@ -243,67 +208,36 @@ const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({
                                 data-bs-parent="#accordionExample"
                             >
                                 <ul>
-                                    <li>
-                                        <div className={clsx(styles.filterChecks, 'filter-checks')}>
-                                            <label className={clsx(styles.checkBoxs, 'checkboxs')}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={filterState.bookingForFilters.all}
-                                                    onChange={(e) =>
-                                                        onBookingForChange('all', e.target.checked)
-                                                    }
-                                                />
-                                                <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Tất cả</span>
-                                            </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div className={clsx(styles.filterChecks, 'filter-checks')}>
-                                            <label className={clsx(styles.checkBoxs, 'checkboxs')}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={filterState.bookingForFilters.self}
-                                                    onChange={(e) =>
-                                                        onBookingForChange('self', e.target.checked)
-                                                    }
-                                                />
-                                                <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Bản thân</span>
-                                            </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div className={clsx(styles.filterChecks, 'filter-checks')}>
-                                            <label className={clsx(styles.checkBoxs, 'checkboxs')}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={filterState.bookingForFilters.relative}
-                                                    onChange={(e) =>
-                                                        onBookingForChange(
-                                                            'relative',
-                                                            e.target.checked
-                                                        )
-                                                    }
-                                                />
-                                                <span className="checkmarks"></span>{' '}
-                                                <span className="check-title">Người thân</span>
-                                            </label>
-                                        </div>
-                                    </li>
+                                    <FilterCheckboxItem
+                                        checked={filterState.bookingForFilters.all}
+                                        onChange={(checked) => onBookingForChange('all', checked)}
+                                        label={t('appointments.filters.all')}
+                                    />
+                                    <FilterCheckboxItem
+                                        checked={filterState.bookingForFilters.self}
+                                        onChange={(checked) => onBookingForChange('self', checked)}
+                                        label={t('appointments.filters.self')}
+                                    />
+                                    <FilterCheckboxItem
+                                        checked={filterState.bookingForFilters.relative}
+                                        onChange={(checked) =>
+                                            onBookingForChange('relative', checked)
+                                        }
+                                        label={t('appointments.filters.relative')}
+                                    />
                                 </ul>
                             </div>
                         </div>
                     </div>
                     <div className={clsx(styles.filterResetBtn, 'filter-reset-btns')}>
                         <Button
-                            text="Đặt lại"
+                            text={t('appointments.filters.reset')}
                             type="button"
                             className={clsx(styles.btnLight, 'btn-md btn-light rounded-pill')}
                             onClick={onReset}
                         />
                         <Button
-                            text="Lọc ngay"
+                            text={t('appointments.filters.apply')}
                             type="button"
                             className="btn-md btn-primary-gradient rounded-pill"
                             onClick={onApply}

@@ -1,6 +1,7 @@
 export interface StepItem {
     id: number;
-    title: string;
+    title?: string;
+    titleKey?: string; // Translation key for i18n
 }
 
 export interface StepWizardProps {

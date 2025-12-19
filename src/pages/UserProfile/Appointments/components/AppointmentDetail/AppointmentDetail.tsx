@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     AppointmentDetailProps,
     StatusConfig,
-    getAppointmentTypeText as getTypeText,
     getAppointmentTypeIcon,
     getDisplayName,
     getDisplayAvatar,
@@ -15,6 +15,10 @@ import {
     getRebookingUrl,
 } from '@/types/appointment.types';
 import { AppointmentStatus, AppointmentType } from '@/enums/appointment.enums';
+import {
+    formatAppointmentDate,
+    getAppointmentTypeText,
+} from '../../utils/appointment-format.utils';
 
 const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     appointment,
@@ -22,20 +26,17 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     onCancel,
     onReschedule,
 }) => {
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        });
-    };
+    const { t, i18n } = useTranslation('userProfile');
+
     // Configuration cho từng trạng thái
     const getStatusConfig = (): StatusConfig => {
         switch (appointment.status) {
             case AppointmentStatus.PENDING:
                 return {
-                    badge: { className: 'badge bg-warning', text: 'Chờ Xác Nhận' },
+                    badge: {
+                        className: 'badge bg-warning',
+                        text: t('appointments.detailCard.status.pending'),
+                    },
                     showContactInfo: true,
                     showLocation: true,
                     showStartSession: false,
@@ -47,7 +48,10 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                 };
             case AppointmentStatus.CONFIRMED:
                 return {
-                    badge: { className: 'badge bg-secondary', text: 'Sắp Tới' },
+                    badge: {
+                        className: 'badge bg-secondary',
+                        text: t('appointments.detailCard.status.confirmed'),
+                    },
                     showContactInfo: true,
                     showLocation: true,
                     showStartSession: true,
@@ -59,7 +63,10 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                 };
             case AppointmentStatus.CANCELLED:
                 return {
-                    badge: { className: 'badge bg-red me-2', text: 'Đã Hủy' },
+                    badge: {
+                        className: 'badge bg-red me-2',
+                        text: t('appointments.detailCard.status.cancelled'),
+                    },
                     showContactInfo: true,
                     showStartSession: false,
                     showLocation: false,
@@ -71,7 +78,10 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                 };
             case AppointmentStatus.COMPLETED:
                 return {
-                    badge: { className: 'badge bg-green', text: 'Hoàn Thành' },
+                    badge: {
+                        className: 'badge bg-green',
+                        text: t('appointments.detailCard.status.completed'),
+                    },
                     showContactInfo: true,
                     showStartSession: false,
                     showLocation: false,
@@ -83,7 +93,10 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                 };
             default:
                 return {
-                    badge: { className: 'badge bg-secondary', text: 'Không xác định' },
+                    badge: {
+                        className: 'badge bg-secondary',
+                        text: t('appointments.detailCard.status.unknown'),
+                    },
                     showContactInfo: false,
                     showStartSession: false,
                     showLocation: false,
@@ -102,7 +115,6 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     const renderAppointmentTypeIcon = () => {
         const iconClass = getAppointmentTypeIcon(appointment.appointmentType);
 
-        // Add custom color classes based on type
         let colorClass = '';
         switch (appointment.appointmentType) {
             case AppointmentType.TELEHEALTH:
@@ -124,7 +136,8 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     <li>
                         <div className="detail-badge-info">
                             <span className="badge badge-warning">
-                                <i className="isax isax-clock5 me-2"></i> Đang chờ xác nhận
+                                <i className="isax isax-clock5 me-2"></i>
+                                {t('appointments.detailCard.waitingConfirmation')}
                             </span>
                         </div>
                     </li>
@@ -138,7 +151,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                                 className="btn btn-md btn-primary-gradient rounded-pill"
                                 onClick={onStartSession}
                             >
-                                Bắt Đầu Phiên
+                                {t('appointments.detailCard.startSession')}
                             </button>
                         </div>
                     </li>
@@ -147,12 +160,14 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                 return (
                     <li>
                         <div className="detail-badge-info">
-                            <span className="badge bg-soft-red me-2">Trạng thái: Đặt lại lịch</span>
+                            <span className="badge bg-soft-red me-2">
+                                {t('appointments.detailCard.rescheduleStatus')}
+                            </span>
                             <Link
                                 to={getRebookingUrl(appointment)}
                                 className="reschedule-btn btn btn-primary-gradient rounded-pill"
                             >
-                                Đặt Lại Lịch Hẹn
+                                {t('appointments.detailCard.rescheduleAppointment')}
                             </Link>
                         </div>
                     </li>
@@ -164,7 +179,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                             to={getRebookingUrl(appointment)}
                             className="btn reschedule-btn btn-primary-gradient rounded-pill"
                         >
-                            Đặt Lại Lịch Hẹn
+                            {t('appointments.detailCard.rescheduleAppointment')}
                         </Link>
                     </li>
                 );
@@ -237,18 +252,18 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                     <li className="appointment-info">
                         {appointment.personWithPatient && (
                             <div className="person-info">
-                                <p>Người đi cùng bệnh nhân</p>
+                                <p>{t('appointments.detailCard.personWithPatient')}</p>
                                 <ul className="d-flex apponitment-types">
                                     <li>{appointment.personWithPatient}</li>
                                 </ul>
                             </div>
                         )}
                         <div className="person-info">
-                            <p>Loại Cuộc Hẹn</p>
+                            <p>{t('appointments.detailCard.appointmentType')}</p>
                             <ul className="d-flex apponitment-types">
                                 <li>
                                     {renderAppointmentTypeIcon()}
-                                    {getTypeText(appointment.appointmentType)}
+                                    {getAppointmentTypeText(appointment.appointmentType, t)}
                                 </li>
                             </ul>
                         </div>
@@ -262,13 +277,16 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                                     className="reject-popup"
                                     data-bs-toggle="modal"
                                 >
-                                    Lý do
+                                    {t('appointments.detailCard.reason')}
                                 </Link>
                             )}
                         </div>
-                        {/* Hiển thị phí tư vấn cho tất cả trạng thái - flexible lấy theo bác sĩ hoặc service */}
+                        {/* Hiển thị phí tư vấn cho tất cả trạng thái */}
                         <div className="consult-fees">
-                            <h6>Phí Tư Vấn: {getDisplayFeeText(appointment)}</h6>
+                            <h6>
+                                {t('appointments.detailCard.consultationFee')}:{' '}
+                                {getDisplayFeeText(appointment)}
+                            </h6>
                         </div>
                         <ul>
                             <li>
@@ -276,7 +294,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                                     <i className="isax isax-messages-25"></i>
                                 </Link>
                             </li>
-                            {/* Option 1: Reschedule with same doctor - only for doctor appointments */}
+                            {/* Option 1: Reschedule with same doctor */}
                             {!isServiceAppointment(appointment) &&
                                 (appointment.status === AppointmentStatus.PENDING ||
                                     appointment.status === AppointmentStatus.CONFIRMED) && (
@@ -287,13 +305,15 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                                                 e.preventDefault();
                                                 onReschedule?.(appointment, 'SAME_DOCTOR');
                                             }}
-                                            title="Đổi lịch với cùng bác sĩ"
+                                            title={t(
+                                                'appointments.detailCard.rescheduleWithSameDoctor'
+                                            )}
                                         >
                                             <i className="isax isax-calendar-edit"></i>
                                         </Link>
                                     </li>
                                 )}
-                            {/* Option 3: Choose new doctor - only for doctor appointments */}
+                            {/* Option 3: Choose new doctor */}
                             {!isServiceAppointment(appointment) &&
                                 (appointment.status === AppointmentStatus.PENDING ||
                                     appointment.status === AppointmentStatus.CONFIRMED) && (
@@ -304,7 +324,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                                                 e.preventDefault();
                                                 onReschedule?.(appointment, 'NEW_DOCTOR');
                                             }}
-                                            title="Chọn bác sĩ mới"
+                                            title={t('appointments.detailCard.chooseNewDoctor')}
                                         >
                                             <i className="isax isax-user-search"></i>
                                         </Link>
@@ -319,7 +339,7 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                                             e.preventDefault();
                                             onCancel?.();
                                         }}
-                                        title="Hủy lịch hẹn"
+                                        title={t('appointments.detailCard.cancelAppointment')}
                                     >
                                         <i className="isax isax-close-circle5"></i>
                                     </Link>
@@ -330,21 +350,22 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                 </ul>
                 <ul className="detail-card-bottom-info">
                     <li>
-                        <h6>Ngày & Giờ Hẹn</h6>
+                        <h6>{t('appointments.detailCard.dateTime')}</h6>
                         <span>
-                            {formatDate(appointment.appointmentDate)} {' | '}
+                            {formatAppointmentDate(appointment.appointmentDate, i18n.language)}{' '}
+                            {' | '}
                             {appointment.appointmentTime}
                         </span>
                     </li>
                     {config.showLocation && (
                         <li>
-                            <h6>Vị trí</h6>
+                            <h6>{t('appointments.detailCard.location')}</h6>
                             <span>{appointment.location}</span>
                         </li>
                     )}
                     {appointment.visitType && (
                         <li>
-                            <h6>Loại Thăm Khám</h6>
+                            <h6>{t('appointments.detailCard.visitType')}</h6>
                             <span>{appointment.visitType}</span>
                         </li>
                     )}

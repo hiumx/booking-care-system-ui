@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import Breadcrumb from '@/components/Breadcrumb';
 import styles from './HospitalProfile.module.scss';
@@ -30,6 +31,7 @@ interface BreadcrumbItem {
 }
 
 const HospitalProfile: React.FC = () => {
+    const { t } = useTranslation('hospital');
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
@@ -70,11 +72,11 @@ const HospitalProfile: React.FC = () => {
     );
     const breadcrumbData: { items: BreadcrumbItem[]; title: string } = {
         items: [
-            { label: 'Trang Chủ', path: '/', isActive: false },
-            { label: 'Bệnh viện', path: '/hospitals', isActive: false },
-            { label: selectedHospital?.name || 'Bệnh viện', isActive: true },
+            { label: t('profile.breadcrumb.home'), path: '/', isActive: false },
+            { label: t('profile.breadcrumb.hospitals'), path: '/hospitals', isActive: false },
+            { label: selectedHospital?.name || t('profile.defaultName'), isActive: true },
         ],
-        title: selectedHospital?.name || 'Bệnh viện',
+        title: selectedHospital?.name || t('profile.defaultName'),
     };
 
     // Show map CTA and hide header when reaching tabs
@@ -234,7 +236,7 @@ const HospitalProfile: React.FC = () => {
                         <div className="spinner-border">
                             <output className="visually-hidden">Loading...</output>
                         </div>
-                        <p className="mt-3">Đang tải thông tin bệnh viện...</p>
+                        <p className="mt-3">{t('profile.loading')}</p>
                     </div>
                 </div>
             </MainLayout>
@@ -257,7 +259,9 @@ const HospitalProfile: React.FC = () => {
                         <div className={styles.mainContent}>
                             {/* Các chuyên khoa */}
                             <div className={styles.sectionBlock}>
-                                <h3 className={styles.sectionTitle}>Chuyên khoa</h3>
+                                <h3 className={styles.sectionTitle}>
+                                    {t('profile.sections.specialties')}
+                                </h3>
 
                                 {/* Desktop Slider */}
                                 <div className={styles.desktopSlider}>
@@ -315,7 +319,7 @@ const HospitalProfile: React.FC = () => {
                                             }
                                             role="button"
                                             tabIndex={0}
-                                            aria-label={`${expandedDoctorServices ? 'Thu gọn' : 'Mở rộng'} dịch vụ khám & tư vấn của bác sĩ`}
+                                            aria-label={`${expandedDoctorServices ? t('profile.collapse') : t('profile.expand')} ${t('profile.sections.doctorServices.title')}`}
                                             aria-expanded={expandedDoctorServices}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter' || e.key === ' ') {
@@ -329,16 +333,20 @@ const HospitalProfile: React.FC = () => {
                                             <div className={styles.categoryInfo}>
                                                 <div>
                                                     <h3 className={styles.categoryName}>
-                                                        Dịch vụ khám & tư vấn của bác sĩ
+                                                        {t('profile.sections.doctorServices.title')}
                                                     </h3>
                                                     <p className={styles.categoryDescription}>
-                                                        Các dịch vụ khám và tư vấn chuyên khoa
+                                                        {t(
+                                                            'profile.sections.doctorServices.description'
+                                                        )}
                                                     </p>
                                                 </div>
                                             </div>
                                             <div className={styles.categoryActions}>
                                                 <span className={styles.categoryServiceCount}>
-                                                    {doctorServices.length} dịch vụ
+                                                    {t('profile.sections.doctorServices.count', {
+                                                        count: doctorServices.length,
+                                                    })}
                                                 </span>
                                                 <span
                                                     className={styles.expandIcon}
@@ -401,7 +409,7 @@ const HospitalProfile: React.FC = () => {
                                             }
                                             role="button"
                                             tabIndex={0}
-                                            aria-label={`${expandedHospitalServices ? 'Thu gọn' : 'Mở rộng'} dịch vụ y tế tại bệnh viện`}
+                                            aria-label={`${expandedHospitalServices ? t('profile.collapse') : t('profile.expand')} ${t('profile.sections.hospitalServices.title')}`}
                                             aria-expanded={expandedHospitalServices}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter' || e.key === ' ') {
@@ -415,16 +423,22 @@ const HospitalProfile: React.FC = () => {
                                             <div className={styles.categoryInfo}>
                                                 <div>
                                                     <h3 className={styles.categoryName}>
-                                                        Dịch vụ y tế tại bệnh viện
+                                                        {t(
+                                                            'profile.sections.hospitalServices.title'
+                                                        )}
                                                     </h3>
                                                     <p className={styles.categoryDescription}>
-                                                        Các dịch vụ y tế và xét nghiệm chuyên sâu
+                                                        {t(
+                                                            'profile.sections.hospitalServices.description'
+                                                        )}
                                                     </p>
                                                 </div>
                                             </div>
                                             <div className={styles.categoryActions}>
                                                 <span className={styles.categoryServiceCount}>
-                                                    {hospitalServices.length} dịch vụ
+                                                    {t('profile.sections.hospitalServices.count', {
+                                                        count: hospitalServices.length,
+                                                    })}
                                                 </span>
                                                 <span
                                                     className={styles.expandIcon}
@@ -487,7 +501,7 @@ const HospitalProfile: React.FC = () => {
                                         activeTab === 'gioi-thieu' && styles.tabActive
                                     )}
                                 >
-                                    Giới thiệu
+                                    {t('profile.sections.introduction')}
                                 </a>
                                 <a
                                     href="#bang-gia"
@@ -497,7 +511,7 @@ const HospitalProfile: React.FC = () => {
                                         activeTab === 'bang-gia' && styles.tabActive
                                     )}
                                 >
-                                    Bảng giá
+                                    {t('profile.sections.pricing')}
                                 </a>
                                 <a
                                     href="#huong-dan"
@@ -507,7 +521,7 @@ const HospitalProfile: React.FC = () => {
                                         activeTab === 'huong-dan' && styles.tabActive
                                     )}
                                 >
-                                    Hướng dẫn đi khám
+                                    {t('profile.sections.guide')}
                                 </a>
                                 <a
                                     href="#faq"
@@ -517,17 +531,21 @@ const HospitalProfile: React.FC = () => {
                                         activeTab === 'faq' && styles.tabActive
                                     )}
                                 >
-                                    Câu hỏi thường gặp
+                                    {t('profile.sections.faq')}
                                 </a>
                             </div>
 
                             <div id="gioi-thieu" className={styles.sectionBlock}>
-                                <h3 className={styles.sectionTitle}>Giới thiệu</h3>
+                                <h3 className={styles.sectionTitle}>
+                                    {t('profile.sections.introduction')}
+                                </h3>
                                 <ExpandableText text={selectedHospital?.description} limit={300} />
                             </div>
 
                             <div id="bang-gia" className={styles.sectionBlock}>
-                                <h3 className={styles.sectionTitle}>Bảng giá</h3>
+                                <h3 className={styles.sectionTitle}>
+                                    {t('profile.sections.pricing')}
+                                </h3>
                                 {selectedHospital?.serviceMedicals &&
                                 selectedHospital.serviceMedicals.length > 0 ? (
                                     <div className={styles.priceTable}>
@@ -547,25 +565,27 @@ const HospitalProfile: React.FC = () => {
                                     </div>
                                 ) : (
                                     <div className={styles.emptyState}>
-                                        <p className="text-muted">Chưa có thông tin bảng giá</p>
+                                        <p className="text-muted">{t('profile.pricing.empty')}</p>
                                     </div>
                                 )}
                             </div>
 
                             <div id="huong-dan" className={styles.sectionBlock}>
-                                <h3 className={styles.sectionTitle}>Hướng dẫn đi khám</h3>
+                                <h3 className={styles.sectionTitle}>
+                                    {t('profile.sections.guide')}
+                                </h3>
                                 <div className={styles.guideContent}>
                                     <div className={styles.guideStep}>
                                         <span className={styles.stepLabel}>Bước 1:</span>
                                         <span className={styles.stepContent}>
                                             Truy cập website{' '}
                                             <a
-                                                href="https://medcure.vn/"
+                                                href="https://medcure.com.vn/"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className={styles.guideLink}
                                             >
-                                                https://medcure.vn/
+                                                https://medcure.com.vn/
                                             </a>{' '}
                                             hoặc tải ứng dụng MedCure – Đặt lịch khám bệnh trên điện
                                             thoại.
@@ -631,7 +651,7 @@ const HospitalProfile: React.FC = () => {
                             </div>
 
                             <div id="faq" className={styles.sectionBlock}>
-                                <h3 className={styles.sectionTitle}>Câu hỏi thường gặp</h3>
+                                <h3 className={styles.sectionTitle}>{t('profile.sections.faq')}</h3>
                                 <div className={styles.faqList}>
                                     {faqs.map((item, idx) => (
                                         <div key={`faq-${item.q}`} className={styles.faqItem}>
@@ -666,12 +686,12 @@ const HospitalProfile: React.FC = () => {
                         {/* RIGHT: sticky sidebar with map and ad banner */}
                         <aside
                             className={styles.sidebar}
-                            aria-label="Thông tin vị trí và quảng cáo"
+                            aria-label={t('profile.sidebar.locationInfo')}
                         >
                             <div className={clsx(styles.mapCtaBar, showMapCta && styles.visible)}>
                                 <Button
                                     className={clsx(styles.mapBookBtn)}
-                                    text="Đặt khám ngay"
+                                    text={t('profile.sidebar.bookNow')}
                                     type="button"
                                     onClick={handleBookingClick}
                                 />
@@ -679,7 +699,10 @@ const HospitalProfile: React.FC = () => {
                             <div className={styles.mapCard}>
                                 <div className={styles.mapBody}>
                                     <iframe
-                                        title={`Bản đồ ${selectedHospital?.name || 'Bệnh viện'}`}
+                                        title={t('profile.sidebar.mapTitle', {
+                                            name:
+                                                selectedHospital?.name || t('profile.defaultName'),
+                                        })}
                                         src={`https://www.google.com/maps?q=${encodeURIComponent(selectedHospital?.address || '462/9 Nguyen Tri Phuong, Ho Chi Minh')}&output=embed&markers=color:red|label:H|${encodeURIComponent(selectedHospital?.address || '462/9 Nguyen Tri Phuong, Ho Chi Minh')}`}
                                         loading="lazy"
                                         referrerPolicy="no-referrer-when-downgrade"

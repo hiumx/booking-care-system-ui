@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 
 interface StepItem {
     id: number;
-    title: string;
+    title?: string;
+    titleKey?: string;
 }
 
 interface StepWizardProps {
@@ -13,6 +15,15 @@ interface StepWizardProps {
 }
 
 const StepWizard: React.FC<StepWizardProps> = ({ steps, currentStep, className }) => {
+    const { t } = useTranslation('booking');
+
+    const getStepTitle = (step: StepItem): string => {
+        if (step.titleKey) {
+            return t(step.titleKey);
+        }
+        return step.title || '';
+    };
+
     return (
         <div className={clsx('booking-wizard', className)}>
             <ul
@@ -35,7 +46,7 @@ const StepWizard: React.FC<StepWizardProps> = ({ steps, currentStep, className }
                         <div className="profile-step">
                             <span className="multi-steps">{stepItem.id}</span>
                             <div className="step-section">
-                                <h6>{stepItem.title}</h6>
+                                <h6>{getStepTitle(stepItem)}</h6>
                             </div>
                         </div>
                     </li>

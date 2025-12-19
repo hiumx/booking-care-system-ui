@@ -7,7 +7,7 @@
     "sections": {
         "introduction": {
             "title": "1. Introduction",
-            "description": "BookingCare is committed to protecting the privacy and personal information of users. This privacy policy explains how we collect, use, store, and protect your information when you use our services."
+            "description": "MedCure is committed to protecting the privacy and personal information of users. This privacy policy explains how we collect, use, store, and protect your information when you use our services."
         },
         "informationCollection": {
             "title": "2. Information We Collect",
@@ -48,7 +48,7 @@
                 "legal": "Legal Requirements",
                 "legalValue": "When requested by competent state agencies",
                 "protection": "Protection of Rights",
-                "protectionValue": "To protect the rights, assets, or safety of BookingCare and users"
+                "protectionValue": "To protect the rights, assets, or safety of MedCure and users"
             }
         },
         "informationSecurity": {
@@ -101,9 +101,9 @@
             "title": "11. Contact",
             "description": "If you have questions or concerns about this privacy policy, please contact:",
             "email": "Email",
-            "emailValue": "privacy@bookingcare.vn",
+            "emailValue": "medcure.contact@gmail.com",
             "hotline": "Hotline",
-            "hotlineValue": "+84 236 3 822 888",
+            "hotlineValue": "+84 763583081",
             "address": "Address",
             "addressValue": "Da Nang, Vietnam"
         }

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     AppointmentCardData,
     AppointmentUITab,
-    getAppointmentTypeText,
     getAppointmentTypeIcon,
     getDisplayName,
     getDisplayAvatar,
@@ -11,14 +11,19 @@ import {
     getDisplayLabel,
 } from '@/types/appointment.types';
 import AppointmentActionButtons from '../AppointmentActionButtons/AppointmentActionButtons';
-import doctorThumb01 from '@/assets/img/doctors/doctor-thumb-01.jpg';
+import PatientInfoDisplay from '../PatientInfoDisplay';
+import {
+    formatAppointmentDate,
+    getAppointmentTypeText,
+    getAppointmentTypeIconColor,
+} from '../../utils/appointment-format.utils';
 
 interface AppointmentGridCardProps {
     appointment: AppointmentCardData;
     status: AppointmentUITab;
-    onCancel?: (appointment: AppointmentCardData) => void; // Callback for cancel action
-    onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void; // Callback for reschedule actions
-    onReview?: (appointment: AppointmentCardData) => void; // Callback for review action
+    onCancel?: (appointment: AppointmentCardData) => void;
+    onReschedule?: (appointment: AppointmentCardData, action: 'SAME_DOCTOR' | 'NEW_DOCTOR') => void;
+    onReview?: (appointment: AppointmentCardData) => void;
 }
 
 const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
@@ -26,30 +31,18 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
     status,
     onCancel,
     onReschedule,
-    onReview: _onReview, // Available for future use if grid view needs review functionality
+    onReview: _onReview,
 }) => {
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        });
-    };
-
-    const getAppointmentTypeIconColor = (type: string): string => {
-        const iconClasses: Record<string, string> = {
-            'Trực tuyến': 'video-icon',
-            'Trực tiếp': 'hospital-icon',
-        };
-        return iconClasses[type] || 'video-icon';
-    };
+    const { t, i18n } = useTranslation('userProfile');
 
     // Get display values using helper functions (priority: Doctor > Service > Hospital)
     const displayName = getDisplayName(appointment);
     const displayAvatar = getDisplayAvatar(appointment);
     const displaySpecialty = getDisplaySpecialty(appointment);
     const displayLabel = getDisplayLabel(appointment);
+
+    // Format date using shared utility
+    const formattedDate = formatAppointmentDate(appointment.appointmentDate, i18n.language);
 
     const renderActionButtons = () => {
         // Use AppointmentActionButtons component for waiting and upcoming status
@@ -77,7 +70,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
                             to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
                             className="start-link w-100"
                         >
-                            Xem Chi Tiết
+                            {t('appointments.card.viewDetail')}
                         </Link>
                     </li>
                 );
@@ -92,44 +85,23 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
                 <ul>
                     <li>
                         <div className="appointment-grid-head">
-                            <div className="patinet-information">
-                                <Link
-                                    to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                >
-                                    {displayAvatar ? (
-                                        <img
-                                            src={displayAvatar}
-                                            alt={displayName}
-                                            onError={(e) => {
-                                                e.currentTarget.src = doctorThumb01;
-                                            }}
-                                        />
-                                    ) : (
-                                        <div className="avatar-placeholder">
-                                            <i className="isax isax-user"></i>
-                                        </div>
-                                    )}
-                                </Link>
-                                <div className="patient-info">
-                                    <p>{displayLabel}</p>
-                                    <h6>
-                                        <Link
-                                            to={`/user/profile?tab=appointment-detail&id=${encodeURIComponent(appointment.appointmentId)}&status=${status}`}
-                                        >
-                                            {displayName}
-                                        </Link>
-                                        {appointment.isNew && (
-                                            <span className="badge new-tag">Mới</span>
-                                        )}
-                                    </h6>
-                                    <p className="visit">{displaySpecialty}</p>
-                                </div>
-                            </div>
+                            <PatientInfoDisplay
+                                appointmentId={appointment.appointmentId}
+                                status={status}
+                                displayAvatar={displayAvatar}
+                                displayName={displayName}
+                                displayLabel={displayLabel}
+                                isNew={appointment.isNew}
+                                displaySpecialty={displaySpecialty}
+                                showSpecialty={true}
+                                useFallbackImage={true}
+                            />
                             <div className="grid-user-msg">
                                 <span
                                     className={getAppointmentTypeIconColor(
-                                        getAppointmentTypeText(appointment.appointmentType)
+                                        appointment.appointmentType
                                     )}
+                                    title={getAppointmentTypeText(appointment.appointmentType, t)}
                                 >
                                     <Link to="#">
                                         <i
@@ -144,8 +116,7 @@ const AppointmentGridCard: React.FC<AppointmentGridCardProps> = ({
                     </li>
                     <li className="appointment-info">
                         <p>
-                            <i className="isax isax-calendar5"></i>{' '}
-                            {formatDate(appointment.appointmentDate)}
+                            <i className="isax isax-calendar5"></i> {formattedDate}
                         </p>
                         <p>
                             <i className="isax isax-clock5"></i> {appointment.appointmentTime}

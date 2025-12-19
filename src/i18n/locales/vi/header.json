@@ -18,7 +18,8 @@
             "serviceNews": "Tin dịch vụ",
             "healthNews": "Tin y tế"
         },
-        "contact": "Liên hệ hợp tác"
+        "contact": "Liên hệ hợp tác",
+        "aboutUs": "Về chúng tôi"
     },
     "auth": {
         "login": "Đăng nhập",
@@ -29,5 +30,19 @@
         "patient": "Bệnh nhân",
         "appointments": "Lịch hẹn",
         "profile": "Thông tin cá nhân"
+    },
+    "notification": {
+        "title": "Thông báo",
+        "markAllRead": "Đọc tất cả",
+        "noNotifications": "Chưa có thông báo nào",
+        "new": "Mới",
+        "viewAll": "Xem tất cả",
+        "markedAllRead": "Đã đánh dấu tất cả là đã đọc",
+        "markAllError": "Không thể đánh dấu tất cả"
+    },
+    "toast": {
+        "loadProfileError": "Không thể tải thông tin người dùng",
+        "logoutSuccess": "Đăng xuất thành công",
+        "logoutError": "Không thể đăng xuất. Vui lòng thử lại"
     }
 }

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle } from 'lucide-react';
 import clsx from 'clsx';
 import '@/styles/_auth.scss';
@@ -18,6 +19,7 @@ interface PasswordData {
 
 const ChangePassword = () => {
     const dispatch = useDispatch<AppDispatch>();
+    const { t } = useTranslation('userProfile');
     const { hasExternalProvider, isLoading } = useSelector((state: RootState) => state.auth);
 
     const [passwordData, setPasswordData] = useState<PasswordData>({
@@ -60,12 +62,26 @@ const ChangePassword = () => {
         if (passwordRequirements.hasNumber) score += 20;
         if (passwordRequirements.hasSpecialChar) score += 20;
 
-        if (score <= 20) return { score, label: 'Yếu', color: '#ef4444', width: 20 };
-        if (score <= 40) return { score, label: 'Trung bình', color: '#f59e0b', width: 40 };
-        if (score <= 60) return { score, label: 'Tốt', color: '#3b82f6', width: 60 };
-        if (score <= 80) return { score, label: 'Mạnh', color: '#10b981', width: 80 };
-        return { score, label: 'Rất mạnh', color: '#059669', width: 100 };
-    }, [passwordData.newPassword, passwordRequirements]);
+        if (score <= 20)
+            return { score, label: t('changePassword.strength.weak'), color: '#ef4444', width: 20 };
+        if (score <= 40)
+            return { score, label: t('changePassword.strength.fair'), color: '#f59e0b', width: 40 };
+        if (score <= 60)
+            return { score, label: t('changePassword.strength.good'), color: '#3b82f6', width: 60 };
+        if (score <= 80)
+            return {
+                score,
+                label: t('changePassword.strength.strong'),
+                color: '#10b981',
+                width: 80,
+            };
+        return {
+            score,
+            label: t('changePassword.strength.veryStrong'),
+            color: '#059669',
+            width: 100,
+        };
+    }, [passwordData.newPassword, passwordRequirements, t]);
 
     const canSubmit = useMemo(() => {
         const hasNewPassword = passwordData.newPassword.trim() !== '';
@@ -108,7 +124,7 @@ const ChangePassword = () => {
             };
 
             await dispatch(changePasswordAsync(request)).unwrap();
-            toast.success('Thay đổi mật khẩu thành công!');
+            toast.success(t('changePassword.toast.success'));
 
             // Reset form
             setPasswordData({
@@ -116,8 +132,10 @@ const ChangePassword = () => {
                 newPassword: '',
                 confirmPassword: '',
             });
-        } catch (error: any) {
-            toast.error(error || 'Không thể thay đổi mật khẩu. Vui lòng thử lại!');
+        } catch (error: unknown) {
+            const errorMessage =
+                error instanceof Error ? error.message : t('changePassword.toast.error');
+            toast.error(errorMessage);
         }
     };
 
@@ -143,10 +161,10 @@ const ChangePassword = () => {
                     {!hasExternalProvider && (
                         <div className="mb-3">
                             <Input
-                                label="Mật khẩu hiện tại"
+                                label={t('changePassword.currentPassword.label')}
                                 isRequired
                                 type="password"
-                                placeholder="Nhập mật khẩu hiện tại"
+                                placeholder={t('changePassword.currentPassword.placeholder')}
                                 leftIcon={<i className="feather-lock" />}
                                 value={passwordData.currentPassword}
                                 onChange={(e) =>
@@ -162,10 +180,10 @@ const ChangePassword = () => {
                     {/* New Password */}
                     <div className="mb-3">
                         <Input
-                            label="Mật khẩu mới"
+                            label={t('changePassword.newPassword.label')}
                             isRequired
                             type="password"
-                            placeholder="Nhập mật khẩu mới"
+                            placeholder={t('changePassword.newPassword.placeholder')}
                             leftIcon={<i className="feather-lock" />}
                             value={passwordData.newPassword}
                             onChange={(e) => handleInputChange('newPassword', e.target.value)}
@@ -178,7 +196,9 @@ const ChangePassword = () => {
                         {passwordData.newPassword && (
                             <div className="mt-2">
                                 <div className="d-flex justify-content-between align-items-center mb-1">
-                                    <small className="text-muted">Độ mạnh mật khẩu:</small>
+                                    <small className="text-muted">
+                                        {t('changePassword.strength.label')}
+                                    </small>
                                     <small
                                         className="fw-medium"
                                         style={{
@@ -204,10 +224,10 @@ const ChangePassword = () => {
                     {/* Confirm Password */}
                     <div className="mb-3">
                         <Input
-                            label="Xác nhận mật khẩu mới"
+                            label={t('changePassword.confirmPassword.label')}
                             isRequired
                             type="password"
-                            placeholder="Nhập lại mật khẩu mới"
+                            placeholder={t('changePassword.confirmPassword.placeholder')}
                             leftIcon={<i className="feather-lock" />}
                             value={passwordData.confirmPassword}
                             onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
@@ -225,7 +245,7 @@ const ChangePassword = () => {
                             passwordData.newPassword === passwordData.confirmPassword && (
                                 <div className="d-flex align-items-center mt-2 text-success">
                                     <CheckCircle size={16} className="me-2" />
-                                    <span>Mật khẩu trùng khớp</span>
+                                    <span>{t('changePassword.passwordMatch')}</span>
                                 </div>
                             )}
                     </div>
@@ -236,7 +256,7 @@ const ChangePassword = () => {
                     <div className="mb-3">
                         <div className={'requirements-list'}>
                             <span className="mb-1" style={{ fontWeight: 600 }}>
-                                Yêu cầu mật khẩu:
+                                {t('changePassword.requirements.title')}
                             </span>
                             <div className={'requirement-item'}>
                                 <span className={'requirement-icon'}>
@@ -254,7 +274,7 @@ const ChangePassword = () => {
                                             : 'text-muted'
                                     )}
                                 >
-                                    Ít nhất 8 ký tự
+                                    {t('changePassword.requirements.minLength')}
                                 </span>
                             </div>
                             <div className={'requirement-item'}>
@@ -273,7 +293,7 @@ const ChangePassword = () => {
                                             : 'text-muted'
                                     )}
                                 >
-                                    Một chữ hoa
+                                    {t('changePassword.requirements.uppercase')}
                                 </span>
                             </div>
                             <div className={'requirement-item'}>
@@ -292,7 +312,7 @@ const ChangePassword = () => {
                                             : 'text-muted'
                                     )}
                                 >
-                                    Một chữ thường
+                                    {t('changePassword.requirements.lowercase')}
                                 </span>
                             </div>
                             <div className={'requirement-item'}>
@@ -311,7 +331,7 @@ const ChangePassword = () => {
                                             : 'text-muted'
                                     )}
                                 >
-                                    Một số
+                                    {t('changePassword.requirements.number')}
                                 </span>
                             </div>
                             <div className={'requirement-item'}>
@@ -330,7 +350,7 @@ const ChangePassword = () => {
                                             : 'text-muted'
                                     )}
                                 >
-                                    Một ký tự đặc biệt
+                                    {t('changePassword.requirements.specialChar')}
                                 </span>
                             </div>
                         </div>
@@ -340,10 +360,14 @@ const ChangePassword = () => {
 
             <div className="modal-btn border-top pt-3 text-end">
                 <a href="#" className="btn btn-md btn-light rounded-pill">
-                    Hủy
+                    {t('changePassword.actions.cancel')}
                 </a>
                 <Button
-                    text={isLoading ? 'Đang xử lý...' : 'Thay đổi mật khẩu'}
+                    text={
+                        isLoading
+                            ? t('changePassword.actions.submitting')
+                            : t('changePassword.actions.submit')
+                    }
                     type="submit"
                     className={clsx('btn-md rounded-pill', !canSubmit && 'disabled')}
                     isDisabled={!canSubmit || isLoading}

@@ -1,0 +1,175 @@
+{
+    "profile": {
+        "breadcrumb": {
+            "title": "Doctor Profile"
+        },
+        "loading": "Loading doctor information...",
+        "error": {
+            "title": "An error occurred!",
+            "message": "An error occurred while loading data.",
+            "backHome": "Back to Home"
+        },
+        "notFound": {
+            "title": "Doctor not found!",
+            "message": "The doctor you are looking for does not exist or has been removed.",
+            "backHome": "Back to Home"
+        },
+        "card": {
+            "available": "Available",
+            "degree": "Degree",
+            "fullTime": "Full-time, Online Therapy Available",
+            "removeFromFavorite": "Remove from favorites",
+            "addToFavorite": "Add to favorites",
+            "email": "Email",
+            "gender": "Gender",
+            "acceptingPatients": "Accepting new patients",
+            "reviews": "Reviews",
+            "appointmentsBooked": "Nearly {{count}}+ appointments booked",
+            "yearsExperience": "{{years}} years of experience",
+            "price": "Price",
+            "perVisit": "per visit",
+            "bookAppointment": "Book Appointment"
+        },
+        "gender": {
+            "male": "Male",
+            "female": "Female",
+            "other": "Other"
+        },
+        "nav": {
+            "bio": "Biography",
+            "experience": "Experience",
+            "specialty": "Specialty",
+            "services": "Services",
+            "hospital": "Hospital",
+            "schedule": "Schedule",
+            "reviews": "Reviews"
+        },
+        "sections": {
+            "bio": {
+                "title": "Doctor Biography"
+            },
+            "experience": {
+                "title": "Experience",
+                "specialty": "Specialty",
+                "degree": "Degree",
+                "years": "Experience",
+                "yearsValue": "{{years}} years of experience",
+                "description": "Description",
+                "noDescription": "No biography information"
+            },
+            "specialty": {
+                "title": "Specialty"
+            },
+            "services": {
+                "title": "Services & Pricing",
+                "noServices": "No services available"
+            },
+            "hospital": {
+                "title": "Hospital & Location",
+                "defaultName": "Hospital",
+                "defaultAddress": "Hospital address"
+            },
+            "schedule": {
+                "title": "Working Hours"
+            }
+        },
+        "availability": {
+            "monday": "Monday",
+            "saturday": "Saturday"
+        }
+    },
+    "schedule": {
+        "title": "Select Available Time Slot",
+        "selectDate": "Select available date",
+        "selectDateLabel": "Select date",
+        "noSlots": "No available slots!",
+        "days": {
+            "sunday": "Sunday",
+            "monday": "Monday",
+            "tuesday": "Tuesday",
+            "wednesday": "Wednesday",
+            "thursday": "Thursday",
+            "friday": "Friday",
+            "saturday": "Saturday"
+        }
+    },
+    "list": {
+        "breadcrumb": {
+            "title": "Doctor List",
+            "home": "Home"
+        },
+        "results": {
+            "showing": "Showing",
+            "doctorsForYou": "Doctors For You"
+        },
+        "sort": {
+            "title": "Sort by",
+            "lowToHigh": "Price: Low to High",
+            "highToLow": "Price: High to Low"
+        },
+        "empty": {
+            "title": "No doctors found",
+            "message": "Please try again with different keywords or filters.",
+            "clearFilters": "Clear all filters"
+        },
+        "error": {
+            "title": "Unable to load data",
+            "retry": "Retry",
+            "goBack": "Go Back"
+        },
+        "notUpdated": "Not updated"
+    },
+    "card": {
+        "specialty": "Specialty",
+        "unknown": "Unknown",
+        "expert": "Expert",
+        "directions": "Directions",
+        "yearsExperience": "{{years}} years of experience",
+        "unknownExperience": "Unknown",
+        "unknownLanguage": "Unknown language",
+        "consultationFee": "Consultation Fee",
+        "contactForPrice": "Contact for price",
+        "bookAppointment": "Book Appointment",
+        "selectDoctor": "Select this doctor",
+        "noRating": "No reviews yet",
+        "removeFavorite": "Remove from favorites",
+        "addFavorite": "Add to favorites",
+        "doctorImage": "doctor image"
+    },
+    "sidebar": {
+        "title": "Filters",
+        "searchPlaceholder": "Search...",
+        "noResults": "No matching results found",
+        "filters": {
+            "price": "Price",
+            "rating": "Rating",
+            "position": "Position",
+            "experience": "Experience",
+            "gender": "Gender",
+            "language": "Language",
+            "serviceType": "Service Type"
+        },
+        "rating": {
+            "star": "Star"
+        },
+        "experience": {
+            "under2": "Under 2 years",
+            "2to5": "2 – 5 years",
+            "5to10": "5 – 10 years",
+            "10to20": "10 – 20 years",
+            "over20": "Over 20 years"
+        },
+        "gender": {
+            "male": "Male",
+            "female": "Female",
+            "other": "Other"
+        },
+        "priceLabel": "Price: {{min}} - {{max}}",
+        "experienceLabel": "Experience: {{min}} - {{max}}",
+        "viewMore": "View more",
+        "viewLess": "View less",
+        "clearAll": "Clear all",
+        "years": "years",
+        "yearsPlus": "years+"
+    }
+}

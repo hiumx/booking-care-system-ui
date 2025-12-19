@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { useChat } from '@/providers/ChatProvider';
 import { RootState } from '@/store';
@@ -7,6 +8,7 @@ import { ConversationResponse, MessageType } from '@/types/communication.types';
 import { Tag } from '@/types/tag.types';
 import TagService from '@/services/tag.service';
 import styles from './ChatList.module.scss';
+import userDefault from '@/assets/img/patients/patient.jpg';
 
 interface ChatListProps {
     searchTerm: string;
@@ -14,6 +16,7 @@ interface ChatListProps {
 }
 
 const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) => {
+    const { t } = useTranslation('chat');
     const { conversations, selectConversation, activeConversation, isLoading, onlineUsers } =
         useChat();
     const userProfile = useSelector((state: RootState) => state.user.profile);
@@ -119,28 +122,43 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) 
         const hours = Math.floor(diff / 3600000);
         const days = Math.floor(diff / 86400000);
 
-        if (minutes < 1) return 'Vừa xong';
-        if (minutes < 60) return `${minutes} phút trước`;
-        if (hours < 24) return `${hours} giờ trước`;
-        if (days < 7) return `${days} ngày trước`;
+        if (minutes < 1) return t('time.justNow');
+        if (minutes < 60) return t('time.minutesAgo', { count: minutes });
+        if (hours < 24) return t('time.hoursAgo', { count: hours });
+        if (days < 7) return t('time.daysAgo', { count: days });
         return date.toLocaleDateString('vi-VN');
     };
 
     // Helper: Get attachment preview message
     const getAttachmentPreview = (type: MessageType, fileName?: string) => {
         const attachmentMessages: Record<MessageType, { withFile: string; withoutFile: string }> = {
-            [MessageType.IMAGE]: { withFile: `📷 ${fileName}`, withoutFile: '📷 Đã gửi ảnh' },
-            [MessageType.VIDEO]: { withFile: `🎥 ${fileName}`, withoutFile: '🎥 Đã gửi video' },
-            [MessageType.AUDIO]: { withFile: `🎵 ${fileName}`, withoutFile: '🎵 Đã gửi audio' },
-            [MessageType.FILE]: { withFile: `📎 ${fileName}`, withoutFile: '📎 Đã gửi file' },
-            [MessageType.VOICE_NOTE]: {
-                withFile: '🎤 Tin nhắn thoại',
-                withoutFile: '🎤 Tin nhắn thoại',
+            [MessageType.IMAGE]: {
+                withFile: `📷 ${fileName}`,
+                withoutFile: `📷 ${t('attachments.sentImage')}`,
             },
-            [MessageType.TEXT]: { withFile: `📎 ${fileName}`, withoutFile: '📎 Đã gửi file' },
+            [MessageType.VIDEO]: {
+                withFile: `🎥 ${fileName}`,
+                withoutFile: `🎥 ${t('attachments.sentVideo')}`,
+            },
+            [MessageType.AUDIO]: {
+                withFile: `🎵 ${fileName}`,
+                withoutFile: `🎵 ${t('attachments.sentAudio')}`,
+            },
+            [MessageType.FILE]: {
+                withFile: `📎 ${fileName}`,
+                withoutFile: `📎 ${t('attachments.sentFile')}`,
+            },
+            [MessageType.VOICE_NOTE]: {
+                withFile: `🎤 ${t('attachments.voiceMessage')}`,
+                withoutFile: `🎤 ${t('attachments.voiceMessage')}`,
+            },
+            [MessageType.TEXT]: {
+                withFile: `📎 ${fileName}`,
+                withoutFile: `📎 ${t('attachments.sentFile')}`,
+            },
             [MessageType.SYSTEM]: {
-                withFile: '⚙️ Tin nhắn hệ thống',
-                withoutFile: '⚙️ Tin nhắn hệ thống',
+                withFile: `⚙️ ${t('attachments.systemMessage')}`,
+                withoutFile: `⚙️ ${t('attachments.systemMessage')}`,
             },
         };
 
@@ -150,7 +168,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) 
 
     // Format last message preview
     const formatLastMessagePreview = (conv: ConversationResponse) => {
-        if (!conv.lastMessage) return 'Không có tin nhắn';
+        if (!conv.lastMessage) return t('messages.noMessages');
 
         const { content, type, attachments } = conv.lastMessage;
 
@@ -167,7 +185,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) 
         }
 
         // Fallback
-        return 'Không có tin nhắn';
+        return t('messages.noMessages');
     };
 
     const handleSelectConversation = (conversationId: string) => {
@@ -200,7 +218,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) 
                                 <div className={clsx(styles.conversation, 'd-flex w-100')}>
                                     <div className={`avatar ${isOnline ? 'avatar-online' : ''}`}>
                                         <img
-                                            src={otherUser?.avatarUrl || '/default-avatar.png'}
+                                            src={otherUser?.avatarUrl || userDefault}
                                             alt={otherUser?.fullName || 'User'}
                                         />
                                     </div>
@@ -279,7 +297,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) 
         return (
             <div className="text-center p-4">
                 <output className="spinner-border">
-                    <span className="visually-hidden">Đang tải...</span>
+                    <span className="visually-hidden">{t('sidebar.loading')}</span>
                 </output>
             </div>
         );
@@ -288,13 +306,16 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm, selectedTagIds = [] }) 
     if (recentContacts.length === 0) {
         return (
             <div className="text-center p-4">
-                <p className="text-muted">Không có hội thoại nào</p>
+                <p className="text-muted">{t('sidebar.noConversations')}</p>
             </div>
         );
     }
 
     return (
-        <>{recentContacts.length > 0 && renderContactList(recentContacts, 'Tin nhắn gần đây')}</>
+        <>
+            {recentContacts.length > 0 &&
+                renderContactList(recentContacts, t('sidebar.recentMessages'))}
+        </>
     );
 };
 

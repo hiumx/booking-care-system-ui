@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import HospitalCard, { HospitalCardSkeleton } from '@/components/HospitalCard';
 import ModalArea from '@/components/ModalArea';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
+import { SearchInput } from '@/components/PageStates';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getSpecialtiesAsync } from '@/store/slices/specialtySlice';
 import { getOptimizedHospitalListAsync } from '@/store/slices/hospitalSlice';
@@ -30,6 +32,7 @@ const HOSPITAL_SKELETON_KEYS: string[] = [
 ];
 
 const HospitalList: React.FC = () => {
+    const { t } = useTranslation('hospital');
     const dispatch = useAppDispatch();
     const { specialties } = useAppSelector((state) => state.specialty);
     const { optimizedHospitals, isLoading, pagination } = useAppSelector((state) => state.hospital);
@@ -247,10 +250,12 @@ const HospitalList: React.FC = () => {
     // Breadcrumb data
     const breadcrumbData = {
         items: [
-            { label: 'Home', path: '/', isActive: false },
-            { label: 'Danh sách bệnh viện', isActive: true },
+            { label: t('list.breadcrumb.home'), path: '/', isActive: false },
+            { label: t('list.breadcrumb.title'), isActive: true },
         ],
-        title: selectedSpecialtyName ? `Bệnh viện - ${selectedSpecialtyName}` : 'Bệnh viện',
+        title: selectedSpecialtyName
+            ? t('list.titleWithSpecialty', { specialty: selectedSpecialtyName })
+            : t('list.title'),
     };
 
     return (
@@ -270,15 +275,18 @@ const HospitalList: React.FC = () => {
                                 )}
                             >
                                 <h6 className={clsx(styles.customh5)}>
-                                    Hiển thị{' '}
+                                    {t('list.results.showing')}{' '}
                                     <span className={clsx(styles.resultCount)}>
                                         {pagination.totalCount}
                                     </span>{' '}
-                                    Bệnh viện
+                                    {t('list.results.hospitals')}
                                     {(selectedAreaDisplay ||
                                         selectedSpecialties.length > 0 ||
                                         debouncedSearch) && (
-                                        <span className="text-muted"> (đã lọc)</span>
+                                        <span className="text-muted">
+                                            {' '}
+                                            {t('list.results.filtered')}
+                                        </span>
                                     )}
                                 </h6>
                                 <div
@@ -303,15 +311,16 @@ const HospitalList: React.FC = () => {
                                                     )}
                                                 ></i>
                                                 <span className={styles.locationText}>
-                                                    {selectedAreaDisplay || 'Chọn khu vực'}
+                                                    {selectedAreaDisplay ||
+                                                        t('list.filters.selectArea')}
                                                     {provinceId && !districtId && (
                                                         <span className={styles.filterBadge}>
-                                                            Tỉnh
+                                                            {t('list.filters.province')}
                                                         </span>
                                                     )}
                                                     {districtId && (
                                                         <span className={styles.filterBadge}>
-                                                            Quận/Huyện
+                                                            {t('list.filters.district')}
                                                         </span>
                                                     )}
                                                 </span>
@@ -322,7 +331,9 @@ const HospitalList: React.FC = () => {
                                                             e.stopPropagation();
                                                             handleClearArea();
                                                         }}
-                                                        aria-label="Xóa lựa chọn"
+                                                        aria-label={t(
+                                                            'list.filters.clearSelection'
+                                                        )}
                                                     >
                                                         <i className="fa-solid fa-xmark"></i>
                                                     </button>
@@ -344,8 +355,10 @@ const HospitalList: React.FC = () => {
                                                 <span className={styles.specialtyText}>
                                                     {selectedSpecialties.length > 0
                                                         ? selectedSpecialtyName ||
-                                                          `${selectedSpecialties.length} chuyên khoa`
-                                                        : 'Chọn chuyên khoa'}
+                                                          t('list.filters.specialtyCount', {
+                                                              count: selectedSpecialties.length,
+                                                          })
+                                                        : t('list.filters.selectSpecialty')}
                                                 </span>
                                                 {selectedSpecialties.length > 0 && (
                                                     <button
@@ -354,7 +367,9 @@ const HospitalList: React.FC = () => {
                                                             e.stopPropagation();
                                                             handleClearSpecialty();
                                                         }}
-                                                        aria-label="Xóa lựa chọn"
+                                                        aria-label={t(
+                                                            'list.filters.clearSelection'
+                                                        )}
                                                     >
                                                         <i className="fa-solid fa-xmark"></i>
                                                     </button>
@@ -362,18 +377,11 @@ const HospitalList: React.FC = () => {
                                             </button>
                                         </div>
                                     </div>
-                                    <div className={clsx('input-block', 'dash-search-input')}>
-                                        <input
-                                            type="text"
-                                            className={clsx('form-control')}
-                                            placeholder="Tìm kiếm Bệnh viện"
-                                            value={search}
-                                            onChange={(e) => setSearch(e.target.value)}
-                                        />
-                                        <span className={clsx('search-icon')}>
-                                            <i className={clsx('isax', 'isax-search-normal')}></i>
-                                        </span>
-                                    </div>
+                                    <SearchInput
+                                        value={search}
+                                        onChange={setSearch}
+                                        placeholder={t('list.filters.searchPlaceholder')}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -402,7 +410,7 @@ const HospitalList: React.FC = () => {
                                         )}
                                     >
                                         <span className={clsx('text-muted', 'fw-bold')}>
-                                            Bộ lọc đang áp dụng:
+                                            {t('list.filters.activeFilters')}
                                         </span>
 
                                         {selectedAreaDisplay && (
@@ -421,7 +429,7 @@ const HospitalList: React.FC = () => {
                                                     className="btn-close btn-close-white"
                                                     style={{ fontSize: '0.7em' }}
                                                     onClick={handleClearArea}
-                                                    aria-label="Xóa bộ lọc khu vực"
+                                                    aria-label={t('list.filters.clearAreaFilter')}
                                                 ></button>
                                             </span>
                                         )}
@@ -438,12 +446,16 @@ const HospitalList: React.FC = () => {
                                             >
                                                 <i className="fa-solid fa-briefcase-medical"></i>
                                                 {selectedSpecialtyName ||
-                                                    `${selectedSpecialties.length} chuyên khoa`}
+                                                    t('list.filters.specialtyCount', {
+                                                        count: selectedSpecialties.length,
+                                                    })}
                                                 <button
                                                     className="btn-close btn-close-white"
                                                     style={{ fontSize: '0.7em' }}
                                                     onClick={handleClearSpecialty}
-                                                    aria-label="Xóa bộ lọc chuyên khoa"
+                                                    aria-label={t(
+                                                        'list.filters.clearSpecialtyFilter'
+                                                    )}
                                                 ></button>
                                             </span>
                                         )}
@@ -464,7 +476,7 @@ const HospitalList: React.FC = () => {
                                                     className="btn-close btn-close-white"
                                                     style={{ fontSize: '0.7em' }}
                                                     onClick={() => setSearch('')}
-                                                    aria-label="Xóa tìm kiếm"
+                                                    aria-label={t('list.filters.clearSearch')}
                                                 ></button>
                                             </span>
                                         )}
@@ -478,7 +490,7 @@ const HospitalList: React.FC = () => {
                                             setSearch('');
                                         }}
                                     >
-                                        Xóa tất cả bộ lọc
+                                        {t('list.filters.clearAll')}
                                     </button>
                                 </div>
                             </div>
@@ -504,15 +516,13 @@ const HospitalList: React.FC = () => {
                                                 style={{ fontSize: '4rem' }}
                                             ></i>
                                         </div>
-                                        <h4 className="text-muted mb-3">
-                                            Không tìm thấy bệnh viện nào
-                                        </h4>
+                                        <h4 className="text-muted mb-3">{t('list.empty.title')}</h4>
                                         <p className="text-muted mb-4">
                                             {selectedAreaDisplay ||
                                             selectedSpecialties.length > 0 ||
                                             debouncedSearch
-                                                ? 'Không có bệnh viện nào phù hợp với bộ lọc của bạn. Hãy thử điều chỉnh bộ lọc hoặc tìm kiếm khác.'
-                                                : 'Hiện tại chưa có bệnh viện nào trong hệ thống.'}
+                                                ? t('list.empty.messageFiltered')
+                                                : t('list.empty.messageDefault')}
                                         </p>
                                         {(selectedAreaDisplay ||
                                             selectedSpecialties.length > 0 ||
@@ -525,8 +535,8 @@ const HospitalList: React.FC = () => {
                                                     setSearch('');
                                                 }}
                                             >
-                                                <i className="fa-solid fa-times me-2"></i> Xóa tất
-                                                cả bộ lọc
+                                                <i className="fa-solid fa-times me-2"></i>{' '}
+                                                {t('list.filters.clearAll')}
                                             </button>
                                         )}
                                     </div>
@@ -615,7 +625,7 @@ const HospitalList: React.FC = () => {
                 onClose={handleSpecialtyModalClose}
                 onApply={handleSpecialtyApply}
                 items={specialtyItems}
-                title="Tìm theo chuyên khoa"
+                title={t('list.modal.specialtyTitle')}
                 itemType="specialty"
                 initialSelectedItems={selectedSpecialties}
             />

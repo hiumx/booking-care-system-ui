@@ -18,7 +18,8 @@
             "serviceNews": "Service News",
             "healthNews": "Health News"
         },
-        "contact": "Contact Us"
+        "contact": "Contact Us",
+        "aboutUs": "About Us"
     },
     "auth": {
         "login": "Login",
@@ -29,5 +30,19 @@
         "patient": "Patient",
         "appointments": "Appointments",
         "profile": "Personal Information"
+    },
+    "notification": {
+        "title": "Notifications",
+        "markAllRead": "Mark all read",
+        "noNotifications": "No notifications yet",
+        "new": "New",
+        "viewAll": "View all",
+        "markedAllRead": "All notifications marked as read",
+        "markAllError": "Unable to mark all as read"
+    },
+    "toast": {
+        "loadProfileError": "Unable to load user profile",
+        "logoutSuccess": "Logged out successfully",
+        "logoutError": "Unable to logout. Please try again"
     }
 }

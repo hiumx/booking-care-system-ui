@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { PATHS, replacePathParams } from '@/routes/paths';
 import { useFavoriteDoctor } from '@/hooks/useFavoriteDoctor';
@@ -20,6 +21,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({
     onFavoriteChange,
     initialIsFavorited,
 }) => {
+    const { t } = useTranslation('userProfile');
     // Use custom hook for consistent favorite management
     // Pass initialIsFavorited to skip unnecessary API check
     const {
@@ -48,7 +50,11 @@ const DoctorCard: React.FC<DoctorCardProps> = ({
                     className={clsx(styles.favDoctorCard, 'fav-btn favourite-btn', {
                         [styles.disabled]: isToggling,
                     })}
-                    title={isFavorited ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'}
+                    title={
+                        isFavorited
+                            ? t('favourite.card.removeFromFavourite')
+                            : t('favourite.card.addToFavourite')
+                    }
                 >
                     <span className={`favourite-icon ${isFavorited ? 'favourite' : ''}`}>
                         {isToggling ? (
@@ -79,20 +85,22 @@ const DoctorCard: React.FC<DoctorCardProps> = ({
                         </Link>
                         {doctor.isVerified && <i className="isax isax-tick-circle5 verified"></i>}
                     </h3>
-                    <p className="speciality">Chuyên khoa: {doctor.specialty}</p>
+                    <p className="speciality">
+                        {t('favourite.card.specialty')} {doctor.specialty}
+                    </p>
                     <RatingStars rating={doctor.rating} numberOfReviews={doctor.numberOfReviews} />
                     <ul className="available-info">
                         <li>
                             <i className="isax isax-calendar5 me-1"></i>
-                            <span>Trình độ :</span> {doctor.level}
+                            <span>{t('favourite.card.level')}</span> {doctor.level}
                         </li>
                         <li>
                             <i className="isax isax-location5 me-1"></i>
-                            <span>Location :</span> {doctor.location}
+                            <span>{t('favourite.card.location')}</span> {doctor.location}
                         </li>
                     </ul>
                     <div className="last-book">
-                        <p>Kinh nghiệm {doctor.experience} năm</p>
+                        <p>{t('favourite.card.experience', { years: doctor.experience })}</p>
                     </div>
                 </div>
             </div>
@@ -105,7 +113,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({
                             })}
                             className="btn btn-md btn-light w-100"
                         >
-                            Xem chi tiết
+                            {t('favourite.card.viewDetails')}
                         </Link>
                     </div>
                     <div className="col-6">
@@ -113,7 +121,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({
                             to={replacePathParams(PATHS.BOOKING.ROOT, { doctorId: doctor.id })}
                             className="btn btn-md btn-outline-primary w-100"
                         >
-                            Đặt ngay
+                            {t('favourite.card.bookNow')}
                         </Link>
                     </div>
                 </div>

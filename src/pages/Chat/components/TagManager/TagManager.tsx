@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { Tag, ConversationTagType } from '@/types/tag.types';
 import TagService from '@/services/tag.service';
@@ -28,19 +29,6 @@ const TAG_COLORS = [
     '#52C41A',
 ];
 
-const TAG_TYPE_LABELS: Record<ConversationTagType, string> = {
-    [ConversationTagType.CUSTOM]: 'Tùy chỉnh',
-    [ConversationTagType.SYSTEM]: 'Hệ thống',
-    [ConversationTagType.IMPORTANT]: 'Quan trọng',
-    [ConversationTagType.WORK]: 'Công việc',
-    [ConversationTagType.PERSONAL]: 'Cá nhân',
-    [ConversationTagType.SHOPPING]: 'Mua sắm',
-    [ConversationTagType.TRAVEL]: 'Du lịch',
-    [ConversationTagType.FAMILY]: 'Gia đình',
-    [ConversationTagType.VIP]: 'VIP',
-    [ConversationTagType.ARCHIVED]: 'Lưu trữ',
-};
-
 const TagManager: React.FC<TagManagerProps> = ({
     userId,
     conversationId,
@@ -49,7 +37,22 @@ const TagManager: React.FC<TagManagerProps> = ({
     showConversationTags = false,
     onTagsUpdated,
 }) => {
+    const { t } = useTranslation('chat');
     const [tags, setTags] = useState<Tag[]>([]);
+
+    // Dynamic tag type labels using i18n
+    const TAG_TYPE_LABELS: Record<ConversationTagType, string> = {
+        [ConversationTagType.CUSTOM]: t('tagManager.tagTypes.custom'),
+        [ConversationTagType.SYSTEM]: t('tagManager.tagTypes.system'),
+        [ConversationTagType.IMPORTANT]: t('tagManager.tagTypes.important'),
+        [ConversationTagType.WORK]: t('tagManager.tagTypes.work'),
+        [ConversationTagType.PERSONAL]: t('tagManager.tagTypes.personal'),
+        [ConversationTagType.SHOPPING]: t('tagManager.tagTypes.shopping'),
+        [ConversationTagType.TRAVEL]: t('tagManager.tagTypes.travel'),
+        [ConversationTagType.FAMILY]: t('tagManager.tagTypes.family'),
+        [ConversationTagType.VIP]: t('tagManager.tagTypes.vip'),
+        [ConversationTagType.ARCHIVED]: t('tagManager.tagTypes.archived'),
+    };
     const [conversationTags, setConversationTags] = useState<Tag[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [deletingTagId, setDeletingTagId] = useState<string | null>(null);
@@ -181,7 +184,7 @@ const TagManager: React.FC<TagManagerProps> = ({
             }
         } catch (error) {
             console.error('Failed to update tag:', error);
-            alert('Không thể cập nhật nhãn. Vui lòng thử lại.');
+            alert(t('tagManager.errors.updateFailed'));
         }
     };
 
@@ -216,7 +219,7 @@ const TagManager: React.FC<TagManagerProps> = ({
             }
         } catch (error) {
             console.error('Failed to delete tag:', error);
-            alert('Không thể xóa nhãn. Vui lòng thử lại.');
+            alert(t('tagManager.errors.deleteFailed'));
         } finally {
             setDeletingTagId(null);
             setTagToDelete(null);
@@ -276,9 +279,10 @@ const TagManager: React.FC<TagManagerProps> = ({
             globalThis.dispatchEvent(new CustomEvent('conversationTagsUpdated'));
         } catch (error) {
             console.error('[TagManager] Failed to toggle tag:', error);
-            alert(
-                `Không thể ${conversationTags.some((t) => t.id === tagId) ? 'xóa' : 'thêm'} nhãn. Vui lòng thử lại.`
-            );
+            const errorKey = conversationTags.some((ct) => ct.id === tagId)
+                ? 'tagManager.errors.removeFailed'
+                : 'tagManager.errors.addFailed';
+            alert(t(errorKey));
         }
     };
 
@@ -292,9 +296,12 @@ const TagManager: React.FC<TagManagerProps> = ({
     const getDeleteMessage = (): string => {
         if (!tagToDelete) return '';
         if (tagToDelete.conversationCount > 0) {
-            return `Bạn có chắc muốn xóa nhãn "${tagToDelete.name}"? Nhãn này đang được sử dụng trong ${tagToDelete.conversationCount} hội thoại.`;
+            return t('tagManager.deleteConfirm.messageWithCount', {
+                name: tagToDelete.name,
+                count: tagToDelete.conversationCount,
+            });
         }
-        return `Bạn có chắc muốn xóa nhãn "${tagToDelete.name}"?`;
+        return t('tagManager.deleteConfirm.message', { name: tagToDelete.name });
     };
 
     return (
@@ -302,13 +309,13 @@ const TagManager: React.FC<TagManagerProps> = ({
             <div className={styles.header}>
                 <h6 className={styles.title}>
                     <i className="fa-solid fa-tags me-2"></i>
-                    {' Quản lý nhãn'}
+                    {` ${t('tagManager.title')}`}
                 </h6>
                 <button
                     className={clsx(styles.createBtn, 'btn btn-sm')}
                     onClick={() => setShowCreateModal(true)}
                     type="button"
-                    title="Tạo nhãn mới"
+                    title={t('tagManager.createNew')}
                 >
                     <i className="fa-solid fa-plus"></i>
                 </button>
@@ -316,14 +323,17 @@ const TagManager: React.FC<TagManagerProps> = ({
 
             {isLoading ? (
                 <div className="text-center py-3">
-                    <div className="spinner-border spinner-border-sm" aria-label="Đang tải">
-                        <output className="visually-hidden">Đang tải...</output>
+                    <div
+                        className="spinner-border spinner-border-sm"
+                        aria-label={t('tagManager.loading')}
+                    >
+                        <output className="visually-hidden">{t('tagManager.loading')}</output>
                     </div>
                 </div>
             ) : (
                 <div className={styles.tagList}>
                     {tags.length === 0 ? (
-                        <p className="text-muted text-center py-3">Chưa có nhãn nào</p>
+                        <p className="text-muted text-center py-3">{t('tagManager.noTags')}</p>
                     ) : (
                         tags.map((tag) => (
                             <button
@@ -364,8 +374,8 @@ const TagManager: React.FC<TagManagerProps> = ({
                                                 handleEditTag(tag);
                                             }}
                                             type="button"
-                                            title="Chỉnh sửa nhãn"
-                                            aria-label="Chỉnh sửa nhãn"
+                                            title={t('tagManager.editTag')}
+                                            aria-label={t('tagManager.editTag')}
                                         >
                                             <i className="fa-solid fa-pen"></i>
                                         </button>
@@ -378,15 +388,15 @@ const TagManager: React.FC<TagManagerProps> = ({
                                                 handleDeleteTag(tag.id);
                                             }}
                                             type="button"
-                                            title="Xóa nhãn"
+                                            title={t('tagManager.deleteTag')}
                                             disabled={deletingTagId === tag.id}
-                                            aria-label="Xóa nhãn"
+                                            aria-label={t('tagManager.deleteTag')}
                                         >
                                             {deletingTagId === tag.id ? (
                                                 <output
                                                     className="spinner-border spinner-border-sm"
                                                     style={{ width: '0.7rem', height: '0.7rem' }}
-                                                    aria-label="Đang xóa"
+                                                    aria-label={t('tagManager.deleting')}
                                                 />
                                             ) : (
                                                 <i className="fa-solid fa-trash-can"></i>
@@ -425,7 +435,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                             <div className="modal-content">
                                 <div className="modal-header">
                                     <h5 className="modal-title" id="create-tag-modal-title">
-                                        Tạo nhãn mới
+                                        {t('tagManager.createModal.title')}
                                     </h5>
                                     <button
                                         type="button"
@@ -436,7 +446,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                                 <div className="modal-body">
                                     <div className="mb-3">
                                         <label htmlFor="create-tag-name" className="form-label">
-                                            Tên nhãn
+                                            {t('tagManager.createModal.tagName')}
                                         </label>
                                         <input
                                             id="create-tag-name"
@@ -444,7 +454,9 @@ const TagManager: React.FC<TagManagerProps> = ({
                                             className="form-control"
                                             value={newTagName}
                                             onChange={(e) => setNewTagName(e.target.value)}
-                                            placeholder="Nhập tên nhãn..."
+                                            placeholder={t(
+                                                'tagManager.createModal.tagNamePlaceholder'
+                                            )}
                                             autoFocus
                                         />
                                     </div>
@@ -454,7 +466,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                                             className="form-label"
                                             id="create-tag-color-label"
                                         >
-                                            Màu sắc
+                                            {t('tagManager.createModal.color')}
                                         </label>
                                         <fieldset
                                             id="create-tag-color-group"
@@ -555,7 +567,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                                     </div>
                                     <div className="mb-3">
                                         <label htmlFor="create-tag-type" className="form-label">
-                                            Loại nhãn
+                                            {t('tagManager.createModal.tagType')}
                                         </label>
                                         <select
                                             id="create-tag-type"
@@ -579,7 +591,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                                         className="btn btn-secondary"
                                         onClick={() => setShowCreateModal(false)}
                                     >
-                                        Hủy
+                                        {t('tagManager.createModal.cancel')}
                                     </button>
                                     <button
                                         type="button"
@@ -587,7 +599,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                                         onClick={handleCreateTag}
                                         disabled={!newTagName.trim()}
                                     >
-                                        Tạo
+                                        {t('tagManager.createModal.create')}
                                     </button>
                                 </div>
                             </div>
@@ -621,7 +633,9 @@ const TagManager: React.FC<TagManagerProps> = ({
                         <div className="modal-dialog modal-dialog-centered">
                             <div className="modal-content">
                                 <div className="modal-header">
-                                    <h5 className="modal-title">Chỉnh sửa nhãn</h5>
+                                    <h5 className="modal-title">
+                                        {t('tagManager.editModal.title')}
+                                    </h5>
                                     <button
                                         type="button"
                                         className="btn-close"
@@ -631,7 +645,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                                 <div className="modal-body">
                                     <div className="mb-3">
                                         <label htmlFor="edit-tag-name" className="form-label">
-                                            Tên nhãn
+                                            {t('tagManager.editModal.tagName')}
                                         </label>
                                         <input
                                             id="edit-tag-name"
@@ -639,7 +653,9 @@ const TagManager: React.FC<TagManagerProps> = ({
                                             className="form-control"
                                             value={editTagName}
                                             onChange={(e) => setEditTagName(e.target.value)}
-                                            placeholder="Nhập tên nhãn..."
+                                            placeholder={t(
+                                                'tagManager.editModal.tagNamePlaceholder'
+                                            )}
                                             autoFocus
                                         />
                                     </div>
@@ -649,7 +665,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                                             className="form-label"
                                             id="edit-tag-color-label"
                                         >
-                                            Màu sắc
+                                            {t('tagManager.editModal.color')}
                                         </label>
                                         <fieldset
                                             id="edit-tag-color-group"
@@ -744,7 +760,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                                     </div>
                                     <div className="mb-3">
                                         <label htmlFor="edit-tag-type" className="form-label">
-                                            Loại nhãn
+                                            {t('tagManager.editModal.tagType')}
                                         </label>
                                         <select
                                             id="edit-tag-type"
@@ -768,7 +784,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                                         className="btn btn-secondary"
                                         onClick={cancelEditTag}
                                     >
-                                        Hủy
+                                        {t('tagManager.editModal.cancel')}
                                     </button>
                                     <button
                                         type="button"
@@ -776,7 +792,7 @@ const TagManager: React.FC<TagManagerProps> = ({
                                         onClick={handleUpdateTag}
                                         disabled={!editTagName.trim()}
                                     >
-                                        Cập nhật
+                                        {t('tagManager.editModal.update')}
                                     </button>
                                 </div>
                             </div>
@@ -790,10 +806,10 @@ const TagManager: React.FC<TagManagerProps> = ({
                 isOpen={showDeleteConfirm}
                 onClose={cancelDeleteTag}
                 onConfirm={confirmDeleteTag}
-                title="Xóa nhãn"
+                title={t('tagManager.deleteConfirm.title')}
                 message={getDeleteMessage()}
-                confirmText="Xóa"
-                cancelText="Hủy"
+                confirmText={t('tagManager.deleteConfirm.confirm')}
+                cancelText={t('tagManager.deleteConfirm.cancel')}
                 type="danger"
                 icon="fa-solid fa-trash-can"
             />

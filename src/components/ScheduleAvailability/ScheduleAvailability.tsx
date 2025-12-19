@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import Calendar from '@/components/Calendar';
 import styles from './ScheduleAvailability.module.scss';
@@ -20,6 +21,7 @@ interface DoctorScheduleTime {
 }
 
 const ScheduleAvailability: React.FC = () => {
+    const { t } = useTranslation('doctor');
     // Lấy ngày hiện tại
     const today = new Date();
     const [activeTab, setActiveTab] = useState('day1'); // Mặc định bắt đầu từ ngày mai
@@ -278,10 +280,18 @@ const ScheduleAvailability: React.FC = () => {
         },
     ];
 
-    // Chuyển đổi ngày sang định dạng tiếng Việt
-    const getVietnameseDay = (date: Date) => {
-        const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-        return days[date.getDay()];
+    // Get day name with i18n
+    const getDayName = (date: Date) => {
+        const dayKeys = [
+            'sunday',
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+        ];
+        return t(`schedule.days.${dayKeys[date.getDay()]}`);
     };
 
     // Lọc các khung giờ cho ngày được chọn
@@ -332,14 +342,14 @@ const ScheduleAvailability: React.FC = () => {
             <div className="custom-card">
                 <div className="card-body">
                     <div className="card-header d-flex justify-content-between align-items-center">
-                        <h3 className="header-title">Chọn Khung Giờ Có Sẵn</h3>
+                        <h3 className="header-title">{t('schedule.title')}</h3>
                         <div className="date-picker">
                             <button
                                 type="button"
                                 className="isax isax-calendar-tick calendar-icon"
                                 onClick={() => setShowDatePicker(!showDatePicker)}
                                 ref={anchorRef}
-                                aria-label="Chọn ngày"
+                                aria-label={t('schedule.selectDateLabel')}
                                 style={{ background: 'none', border: 'none', padding: 0 }}
                             />
                             <Calendar
@@ -369,7 +379,7 @@ const ScheduleAvailability: React.FC = () => {
 
                     <div className="available-tab">
                         <label className="form-label" htmlFor="date-selector">
-                            Chọn ngày có sẵn
+                            {t('schedule.selectDate')}
                         </label>
                         <ul className="nav" id="date-selector">
                             {next7Days.map((day) => (
@@ -386,7 +396,7 @@ const ScheduleAvailability: React.FC = () => {
                                         data-bs-toggle="tab"
                                         data-bs-target={`#${day.id}`}
                                     >
-                                        {getVietnameseDay(day.date)}
+                                        {getDayName(day.date)}
                                     </Link>
                                 </li>
                             ))}
@@ -406,7 +416,7 @@ const ScheduleAvailability: React.FC = () => {
                                 <div className="slot-box">
                                     <div className="slot-header">
                                         <h5>
-                                            {getVietnameseDay(day.date)}, {day.date.getDate()}/
+                                            {getDayName(day.date)}, {day.date.getDate()}/
                                             {day.date.getMonth() + 1}
                                         </h5>
                                     </div>
@@ -438,7 +448,7 @@ const ScheduleAvailability: React.FC = () => {
                                                     </li>
                                                 ))
                                             ) : (
-                                                <p>Không có lịch trống!</p>
+                                                <p>{t('schedule.noSlots')}</p>
                                             )}
                                         </ul>
                                     </div>

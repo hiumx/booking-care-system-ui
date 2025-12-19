@@ -238,7 +238,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
     const handleGetCurrentLocation = async () => {
         if (!navigator.geolocation) {
-            setLocationError('Trình duyệt của bạn không hỗ trợ lấy vị trí');
+            setLocationError(t('searchBox.browserNotSupported'));
             return;
         }
 
@@ -254,9 +254,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                 });
 
                 if (permissionStatus.state === 'denied') {
-                    setLocationError(
-                        'Bạn đã từ chối quyền truy cập vị trí. Vui lòng bật lại quyền trong cài đặt trình duyệt hoặc chọn "Nhập vị trí" để nhập thủ công.'
-                    );
+                    setLocationError(t('searchBox.locationDenied'));
                     setIsGettingLocation(false);
                     return;
                 }
@@ -291,14 +289,14 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                         setShowLocationModal(false);
                         setLocationError(null);
                     } else {
-                        setLocationError('Không thể xác định vị trí từ tọa độ');
+                        setLocationError(t('searchBox.cannotDetermineLocation'));
                     }
                 } catch (error: any) {
                     if (error?.name === 'AbortError') {
-                        setLocationError('Yêu cầu xác định vị trí đã bị hủy. Vui lòng thử lại.');
+                        setLocationError(t('searchBox.locationAborted'));
                     } else {
                         console.error('Error getting location:', error);
-                        setLocationError('Có lỗi xảy ra khi lấy vị trí');
+                        setLocationError(t('searchBox.locationError'));
                     }
                 } finally {
                     setIsGettingLocation(false);
@@ -307,17 +305,16 @@ const SearchBox: React.FC<SearchBoxProps> = ({
             },
             (error) => {
                 console.error('Geolocation error:', error);
-                let errorMessage = 'Không thể lấy vị trí hiện tại';
+                let errorMessage = t('searchBox.cannotGetLocation');
                 switch (error.code) {
                     case error.PERMISSION_DENIED:
-                        errorMessage =
-                            'Bạn đã từ chối quyền truy cập vị trí. Vui lòng bật lại quyền trong cài đặt trình duyệt hoặc chọn "Nhập vị trí" để nhập thủ công.';
+                        errorMessage = t('searchBox.locationDenied');
                         break;
                     case error.POSITION_UNAVAILABLE:
-                        errorMessage = 'Thông tin vị trí không khả dụng';
+                        errorMessage = t('searchBox.locationUnavailable');
                         break;
                     case error.TIMEOUT:
-                        errorMessage = 'Hết thời gian chờ lấy vị trí. Vui lòng thử lại.';
+                        errorMessage = t('searchBox.locationTimeout');
                         break;
                 }
                 setLocationError(errorMessage);
@@ -459,7 +456,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                                 <Icon size={20} />
                             </div>
                             <div className={styles.quickActionContent}>
-                                <p className={styles.quickActionTitle}>{feature.title}</p>
+                                <p className={styles.quickActionTitle}>{t(feature.title)}</p>
                             </div>
                         </div>
                     );
@@ -506,7 +503,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                         <button
                             ref={buttonRef}
                             type="button"
-                            data-tooltip="Đính kèm tập tin"
+                            data-tooltip={t('searchBox.attachFile')}
                             onClick={handleAttachmentClick}
                             className={clsx(styles.iconButton, {
                                 [styles.active]: showAttachmentModal,
@@ -518,7 +515,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                             <div ref={modalRef} className={styles.attachmentModal}>
                                 <button className={styles.menuItem} onClick={handleFileUpload}>
                                     <Paperclip size={18} />
-                                    <span>Add photos & files</span>
+                                    <span>{t('searchBox.addPhotosFiles')}</span>
                                 </button>
                                 <div className={styles.menuDivider}></div>
                                 <button
@@ -526,35 +523,35 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                                     onClick={() => handleMenuItemClick('create-image')}
                                 >
                                     <Image size={18} />
-                                    <span>Create image</span>
+                                    <span>{t('searchBox.createImage')}</span>
                                 </button>
                                 <button
                                     className={styles.menuItem}
                                     onClick={() => handleMenuItemClick('thinking')}
                                 >
                                     <Lightbulb size={18} />
-                                    <span>Thinking</span>
+                                    <span>{t('searchBox.thinking')}</span>
                                 </button>
                                 <button
                                     className={styles.menuItem}
                                     onClick={() => handleMenuItemClick('deep-research')}
                                 >
                                     <Telescope size={18} />
-                                    <span>Deep research</span>
+                                    <span>{t('searchBox.deepResearch')}</span>
                                 </button>
                                 <button
                                     className={styles.menuItem}
                                     onClick={() => handleMenuItemClick('study-learn')}
                                 >
                                     <BookOpen size={18} />
-                                    <span>Study and learn</span>
+                                    <span>{t('searchBox.studyLearn')}</span>
                                 </button>
                                 <button
                                     className={styles.menuItem}
                                     onClick={() => handleMenuItemClick('more')}
                                 >
                                     <MoreHorizontal size={18} />
-                                    <span>... More</span>
+                                    <span>{t('searchBox.more')}</span>
                                     <ChevronRight size={16} className={styles.chevronIcon} />
                                 </button>
                             </div>
@@ -565,7 +562,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                         <button
                             ref={locationButtonRef}
                             type="button"
-                            data-tooltip="Vị trí"
+                            data-tooltip={t('searchBox.location')}
                             onClick={handleLocationClick}
                             className={clsx(styles.iconButton, {
                                 [styles.active]: showLocationModal,
@@ -575,7 +572,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                         </button>
                         {userLocation && (
                             <span className={styles.locationBadge} title={userLocation.displayName}>
-                                Vị trí: {userLocation.displayName}
+                                {t('searchBox.locationLabel')} {userLocation.displayName}
                             </span>
                         )}
                         {showLocationModal && (
@@ -583,8 +580,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                                 {!userLocation && (
                                     <div className={styles.locationModalHeader}>
                                         <p className={styles.locationModalDescription}>
-                                            Bạn cần chọn vị trí để AI đề xuất bác sĩ, hoặc bệnh viện
-                                            phù hợp với vị trí của bạn!
+                                            {t('searchBox.locationRequired')}
                                         </p>
                                     </div>
                                 )}
@@ -594,14 +590,14 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                                     disabled={isGettingLocation}
                                 >
                                     <Navigation size={18} />
-                                    <span>Vị trí hiện tại</span>
+                                    <span>{t('searchBox.currentLocation')}</span>
                                     {isGettingLocation && (
                                         <div className={styles.loadingSpinner}></div>
                                     )}
                                 </button>
                                 <button className={styles.menuItem} onClick={handleInputLocation}>
                                     <MapPin size={18} />
-                                    <span>Nhập vị trí</span>
+                                    <span>{t('searchBox.inputLocation')}</span>
                                 </button>
                                 {locationError && (
                                     <div className={styles.locationError}>{locationError}</div>
@@ -612,7 +608,11 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
                     <button
                         type="button"
-                        data-tooltip={isRecording ? 'Dừng ghi âm' : 'Ghi âm'}
+                        data-tooltip={
+                            isRecording
+                                ? t('searchBox.stopRecording')
+                                : t('searchBox.startRecording')
+                        }
                         onClick={toggleRecording}
                         disabled={isFileAnalysisMode}
                         className={clsx(styles.micButton, {
@@ -624,7 +624,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
                     <button
                         type="button"
-                        data-tooltip="Xóa nội dung"
+                        data-tooltip={t('searchBox.clearContent')}
                         onClick={handleClear}
                         disabled={isFileAnalysisMode}
                         className={styles.iconButton}
@@ -635,13 +635,13 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
                 <button
                     type="button"
-                    data-tooltip="Gửi"
+                    data-tooltip={t('searchBox.send')}
                     onClick={handleSend}
                     disabled={isFileAnalysisMode}
                     className={styles.autoButton}
                 >
                     <Send size={14} />
-                    Gửi
+                    {t('searchBox.send')}
                 </button>
             </div>
 

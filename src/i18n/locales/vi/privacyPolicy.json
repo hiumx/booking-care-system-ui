@@ -7,7 +7,7 @@
     "sections": {
         "introduction": {
             "title": "1. Giới thiệu",
-            "description": "BookingCare cam kết bảo vệ quyền riêng tư và thông tin cá nhân của người dùng. Chính sách bảo mật này giải thích cách chúng tôi thu thập, sử dụng, lưu trữ và bảo vệ thông tin của bạn khi sử dụng dịch vụ của chúng tôi."
+            "description": "MedCure cam kết bảo vệ quyền riêng tư và thông tin cá nhân của người dùng. Chính sách bảo mật này giải thích cách chúng tôi thu thập, sử dụng, lưu trữ và bảo vệ thông tin của bạn khi sử dụng dịch vụ của chúng tôi."
         },
         "informationCollection": {
             "title": "2. Thông tin Chúng tôi Thu thập",
@@ -48,7 +48,7 @@
                 "legal": "Yêu cầu Pháp lý",
                 "legalValue": "Khi có yêu cầu từ cơ quan nhà nước có thẩm quyền",
                 "protection": "Bảo vệ Quyền lợi",
-                "protectionValue": "Để bảo vệ quyền lợi, tài sản hoặc an toàn của BookingCare và người dùng"
+                "protectionValue": "Để bảo vệ quyền lợi, tài sản hoặc an toàn của MedCure và người dùng"
             }
         },
         "informationSecurity": {
@@ -101,9 +101,9 @@
             "title": "11. Liên hệ",
             "description": "Nếu bạn có câu hỏi hoặc lo ngại về chính sách bảo mật này, vui lòng liên hệ:",
             "email": "Email",
-            "emailValue": "privacy@bookingcare.vn",
+            "emailValue": "medcure.contact@gmail.com",
             "hotline": "Hotline",
-            "hotlineValue": "+84 236 3 822 888",
+            "hotlineValue": "+84 763583081",
             "address": "Địa chỉ",
             "addressValue": "Đà Nẵng, Việt Nam"
         }

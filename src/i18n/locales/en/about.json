@@ -1,0 +1,91 @@
+{
+    "breadcrumb": {
+        "home": "Home",
+        "aboutUs": "About Us"
+    },
+    "title": "About Us",
+    "doctors": {
+        "title": "Featured Doctors",
+        "desc": "Meet our best doctors",
+        "viewAll": "View all doctors"
+    },
+    "aboutSection": {
+        "experience": "Over 25 years of experience",
+        "badge": "About our system",
+        "title": "We always bring the best medical services for your health",
+        "description1": "At MedCure, we understand the importance of convenient access to medical services. Our mission is to simplify finding and booking appointments with reputable doctors, helping you receive the care you need on time.",
+        "description2": "We strive for a world where everyone can easily access healthcare services. Whether it's routine checkups, specialist consultations, or emergencies, we always work to connect you with the right doctor quickly and efficiently.",
+        "emergencySupport": "Need emergency support?",
+        "phone": "+84 763583081"
+    },
+    "whyChoose": {
+        "title": "Why Choose Us",
+        "items": [
+            {
+                "id": "quality-doctors",
+                "title": "Quality Doctor Team",
+                "description": "Our platform partners with experienced doctors dedicated to providing the best quality medical care for you."
+            },
+            {
+                "id": "24-7-service",
+                "title": "24/7 Service",
+                "description": "Access, find doctors and book appointments anytime, anywhere — including nights, weekends and holidays."
+            },
+            {
+                "id": "quality-testing",
+                "title": "Quality Lab Services",
+                "description": "Linked with certified laboratories; fast, accurate results support effective diagnosis."
+            },
+            {
+                "id": "free-consultation",
+                "title": "Free Initial Consultation",
+                "description": "Start your healthcare journey easily with a free first consultation."
+            }
+        ]
+    },
+    "waySection": {
+        "title": "Accompanying you on your healthy journey with MedCure",
+        "description": "We prioritize your health with personalized and accessible services — making medical care simpler.",
+        "contactButton": "Contact Us"
+    },
+    "faq": {
+        "badge": "FAQ",
+        "title": "Frequently Asked Questions",
+        "satisfiedCustomers": "Satisfied Customers",
+        "items": [
+            {
+                "id": "one",
+                "question": "How do I book an appointment?",
+                "answer": "You can log in or create an account, find a doctor by specialty, area or available time and confirm your booking."
+            },
+            {
+                "id": "two",
+                "question": "Can I book an appointment online?",
+                "answer": "Yes. Just access the system, choose a suitable doctor/clinic and complete your booking in a few steps."
+            },
+            {
+                "id": "three",
+                "question": "Is my personal information secure?",
+                "answer": "All data is encrypted and only shared with doctors with your consent."
+            },
+            {
+                "id": "four",
+                "question": "Can I cancel or reschedule my appointment?",
+                "answer": "You can cancel or reschedule before the appointment time according to the clinic/doctor's policy."
+            },
+            {
+                "id": "five",
+                "question": "How do I find the right doctor/specialist?",
+                "answer": "You can filter by specialty, location, availability, ratings and cost to choose the right doctor."
+            }
+        ]
+    },
+    "testimonial": {
+        "loading": "Loading reviews...",
+        "noReviews": "No reviews yet",
+        "beFirst": "Be the first to review this hospital!",
+        "badge": "Testimonials",
+        "title": "What Customers Say",
+        "defaultUser": "User"
+    }
+}

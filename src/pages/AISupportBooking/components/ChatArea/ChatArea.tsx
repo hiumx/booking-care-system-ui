@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 import { Stethoscope, MessageCircle, Menu } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Message } from '@/types/ai.types';
@@ -98,7 +99,8 @@ const SuggestionTabs: React.FC<{
     suggestions: any[];
     activeTab: 'doctor' | 'hospital';
     onTabChange: (tab: 'doctor' | 'hospital') => void;
-}> = ({ suggestions, activeTab, onTabChange }) => {
+    t: (key: string) => string;
+}> = ({ suggestions, activeTab, onTabChange, t }) => {
     const doctorCount = suggestions.filter((s) => s.type === 'doctor').length;
     const hospitalCount = suggestions.filter((s) => s.type === 'hospital').length;
 
@@ -110,7 +112,7 @@ const SuggestionTabs: React.FC<{
                 })}
                 onClick={() => onTabChange('doctor')}
             >
-                Bác sĩ
+                {t('chatArea.doctorTab')}
                 {doctorCount > 0 && <span className={styles.tabBadge}>{doctorCount}</span>}
             </button>
             <button
@@ -119,7 +121,7 @@ const SuggestionTabs: React.FC<{
                 })}
                 onClick={() => onTabChange('hospital')}
             >
-                Bệnh viện
+                {t('chatArea.hospitalTab')}
                 {hospitalCount > 0 && <span className={styles.tabBadge}>{hospitalCount}</span>}
             </button>
         </>
@@ -214,6 +216,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     onNutritionClick,
     isFileAnalysisMode = false,
 }) => {
+    const { t } = useTranslation('aiSupport');
     const [inputValue, setInputValue] = useState('');
     const [activeTabs, setActiveTabs] = useState<Record<string, 'doctor' | 'hospital'>>({});
     const [serviceSelections, setServiceSelections] = useState<Record<string, string>>({});
@@ -278,7 +281,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
             const lastAIMessage = [...messages].reverse().find((m) => m.sender === 'ai');
 
             if (lastAIMessage?.disease?.confidence && lastAIMessage.disease.confidence >= 0.9) {
-                toast.warning('Chẩn đoán đã đạt độ tin cậy cao. Vui lòng tạo cuộc tư vấn mới.', {
+                toast.warning(t('chatArea.highConfidenceWarning'), {
                     position: 'top-right',
                     autoClose: 4000,
                 });
@@ -290,7 +293,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                 lastAIMessage.currentRound >= 2 &&
                 lastAIMessage.analysisComplete
             ) {
-                toast.info('Đã đạt số vòng tư vấn tối đa. Vui lòng bắt đầu cuộc trò chuyện mới.', {
+                toast.info(t('chatArea.maxRoundsWarning'), {
                     position: 'top-right',
                     autoClose: 4000,
                 });
@@ -345,7 +348,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                     <button
                         className={styles.menuButton}
                         onClick={onToggleSidebar}
-                        aria-label="Mở menu"
+                        aria-label={t('chatArea.openMenu')}
                     >
                         <Menu size={24} />
                     </button>
@@ -355,8 +358,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                         <Stethoscope size={24} />
                     </div>
                     <div className={styles.headerInfo}>
-                        <h3 className={styles.headerTitle}>AI tư vấn y tế</h3>
-                        <p className={styles.headerSubtitle}>Hỗ trợ đặt lịch khám bệnh 24/7</p>
+                        <h3 className={styles.headerTitle}>{t('chatArea.aiTitle')}</h3>
+                        <p className={styles.headerSubtitle}>{t('chatArea.aiSubtitle')}</p>
                     </div>
                 </div>
             </div>
@@ -367,74 +370,48 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                         <div className={styles.emptyIcon}>
                             <MessageCircle size={64} />
                         </div>
-                        <h3 className={styles.emptyTitle}>Chào mừng bạn đến với AI tư vấn y tế</h3>
+                        <h3 className={styles.emptyTitle}>{t('chatArea.welcomeTitle')}</h3>
                         <p className={styles.emptyDescription}>
-                            Tôi có thể giúp gì cho bạn? Bạn có thể mô tả triệu chứng, tôi sẽ giúp
-                            bạn tìm kiếm bác sĩ, bệnh viện.
+                            {t('chatArea.welcomeDescription')}
                         </p>
                         <div className={styles.suggestedQuestions}>
-                            <p className={styles.suggestedTitle}>Câu hỏi gợi ý:</p>
+                            <p className={styles.suggestedTitle}>{t('chatArea.suggestedTitle')}</p>
                             <div className={styles.questionChips}>
                                 <button
                                     className={styles.questionChip}
-                                    onClick={() =>
-                                        onSendMessage(
-                                            'Tôi bị chóng mặt thường xuyên, nên khám chuyên khoa nào?'
-                                        )
-                                    }
+                                    onClick={() => onSendMessage(t('chatArea.question1'))}
                                 >
-                                    Tôi bị chóng mặt thường xuyên, nên khám chuyên khoa nào?
+                                    {t('chatArea.question1')}
                                 </button>
                                 <button
                                     className={styles.questionChip}
-                                    onClick={() =>
-                                        onSendMessage(
-                                            'Tôi cảm thấy đau tức ngực, có cần đi cấp cứu không?'
-                                        )
-                                    }
+                                    onClick={() => onSendMessage(t('chatArea.question2'))}
                                 >
-                                    Tôi cảm thấy đau tức ngực, có cần đi cấp cứu không?
+                                    {t('chatArea.question2')}
                                 </button>
                                 <button
                                     className={styles.questionChip}
-                                    onClick={() =>
-                                        onSendMessage(
-                                            'Tôi bị đau bụng kéo dài nhiều ngày, nên khám bác sĩ gì?'
-                                        )
-                                    }
+                                    onClick={() => onSendMessage(t('chatArea.question3'))}
                                 >
-                                    Tôi bị đau bụng kéo dài nhiều ngày, nên khám bác sĩ gì?
+                                    {t('chatArea.question3')}
                                 </button>
                                 <button
                                     className={styles.questionChip}
-                                    onClick={() =>
-                                        onSendMessage(
-                                            'Tôi bị sốt cao không hạ, có cần đi khám ngay không?'
-                                        )
-                                    }
+                                    onClick={() => onSendMessage(t('chatArea.question4'))}
                                 >
-                                    Tôi bị sốt cao không hạ, có cần đi khám ngay không?
+                                    {t('chatArea.question4')}
                                 </button>
                                 <button
                                     className={styles.questionChip}
-                                    onClick={() =>
-                                        onSendMessage(
-                                            'Tôi bị khó thở và mệt nhiều, cần đến khoa nào?'
-                                        )
-                                    }
+                                    onClick={() => onSendMessage(t('chatArea.question5'))}
                                 >
-                                    Tôi bị khó thở và mệt nhiều, cần đến khoa nào?
+                                    {t('chatArea.question5')}
                                 </button>
                                 <button
                                     className={styles.questionChip}
-                                    onClick={() =>
-                                        onSendMessage(
-                                            'Tôi bị mất ngủ lâu ngày, có nên khám chuyên khoa tâm thần kinh không?'
-                                        )
-                                    }
+                                    onClick={() => onSendMessage(t('chatArea.question6'))}
                                 >
-                                    Tôi bị mất ngủ lâu ngày, có nên khám chuyên khoa tâm thần kinh
-                                    không?
+                                    {t('chatArea.question6')}
                                 </button>
                             </div>
                         </div>
@@ -466,6 +443,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                                             onTabChange={(tab) =>
                                                                 handleTabChange(message.id, tab)
                                                             }
+                                                            t={t}
                                                         />
                                                     </div>
                                                     {serviceTypes.length > 0 &&
@@ -473,7 +451,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                                             'doctor' && (
                                                             <div className={styles.serviceTypeRow}>
                                                                 <Select
-                                                                    title="Chọn loại dịch vụ"
+                                                                    title={t(
+                                                                        'chatArea.selectServiceType'
+                                                                    )}
                                                                     items={serviceTypes.map(
                                                                         (t) => ({
                                                                             label: t,
@@ -532,7 +512,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                                         onClick={handleConsultMore}
                                                     >
                                                         <MessageCircle size={18} className="me-2" />
-                                                        <span>Tư vấn thêm</span>
+                                                        <span>{t('chatArea.consultMore')}</span>
                                                     </button>
                                                 </div>
                                             ) : null;

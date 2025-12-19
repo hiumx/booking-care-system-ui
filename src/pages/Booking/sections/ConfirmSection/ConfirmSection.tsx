@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './ConfirmSection.module.scss';
 import { PATHS } from '@/routes/paths';
 import { useDoctorInfo } from '../../hooks';
@@ -14,6 +15,7 @@ interface ConfirmSectionProps {
 }
 
 const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
+    const { t, i18n } = useTranslation('booking');
     const doctor = useDoctorInfo();
 
     // Get selected date and time slots
@@ -22,17 +24,19 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
 
     // Format date and time for display
     const formattedAppointmentInfo = useMemo(() => {
+        const notSelected = t('confirmSection.notSelected');
         if (!selectedDate) {
             return {
-                date: 'Chưa chọn',
-                dateTime: 'Chưa chọn',
+                date: notSelected,
+                dateTime: notSelected,
                 slots: [],
                 totalDuration: 0,
             };
         }
 
+        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
         const date = new Date(selectedDate);
-        const formattedDate = date.toLocaleDateString('vi-VN', {
+        const formattedDate = date.toLocaleDateString(locale, {
             day: '2-digit',
             month: 'long',
             year: 'numeric',
@@ -60,7 +64,7 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
             slots: sortedSlots,
             totalDuration,
         };
-    }, [selectedDate, selectedSlots]);
+    }, [selectedDate, selectedSlots, t, i18n.language]);
 
     return (
         <fieldset className="d-block">
@@ -73,7 +77,7 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                     <div className="card-header pt-3">
                                         <h5 className="d-flex align-items-center flex-wrap rpw-gap-2">
                                             <i className="isax isax-tick-circle5 text-success me-2"></i>
-                                            Đặt lịch thành công
+                                            {t('confirmSection.success')}
                                         </h5>
                                     </div>
                                     <div className="card-header d-flex align-items-center flex-wrap rpw-gap-2">
@@ -81,22 +85,20 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                             <img src={client16} alt="patient-avatar" />
                                         </span>
                                         <p className="mb-0">
-                                            Lịch khám của bạn đã được xác nhận với{' '}
-                                            <span className="text-dark">{doctor.name} </span>. Vui
-                                            lòng đến trước{' '}
-                                            <span className="text-dark">15 phút </span> so với giờ
-                                            hẹn.
+                                            {t('confirmSection.message', {
+                                                doctorName: doctor.name,
+                                            })}
                                         </p>
                                     </div>
                                     <div className="card-body pb-1">
                                         <div className="d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between mb-3">
-                                            <h6>Thông tin lịch khám</h6>
+                                            <h6>{t('confirmSection.info.title')}</h6>
                                             <Link
                                                 to={PATHS.DOCTOR.ROOT}
                                                 className="btn btn-light rounded-pill"
                                             >
                                                 <i className="isax isax-calendar me-1"></i>
-                                                Đặt lại lịch
+                                                {t('confirmSection.info.reschedule')}
                                             </Link>
                                         </div>
                                         <div className="row">
@@ -105,7 +107,9 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                                 <>
                                                     <div className="col-md-6">
                                                         <div className="mb-3">
-                                                            <div className="form-label">Bác sĩ</div>
+                                                            <div className="form-label">
+                                                                {t('confirmSection.info.doctor')}
+                                                            </div>
                                                             <div className="form-plain-text">
                                                                 {doctor.name}
                                                             </div>
@@ -114,11 +118,13 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                                     <div className="col-md-6">
                                                         <div className="mb-3">
                                                             <div className="form-label">
-                                                                Chuyên khoa
+                                                                {t('confirmSection.info.specialty')}
                                                             </div>
                                                             <div className="form-plain-text">
                                                                 {doctor.specialty ||
-                                                                    'Chưa cập nhật'}
+                                                                    t(
+                                                                        'confirmSection.info.notUpdated'
+                                                                    )}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -128,7 +134,9 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                             {/* Date */}
                                             <div className="col-md-6">
                                                 <div className="mb-3">
-                                                    <div className="form-label">Ngày khám</div>
+                                                    <div className="form-label">
+                                                        {t('confirmSection.info.date')}
+                                                    </div>
                                                     <div className="form-plain-text">
                                                         {formattedAppointmentInfo.date}
                                                     </div>
@@ -139,12 +147,20 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                             <div className="col-md-6">
                                                 <div className="mb-3">
                                                     <div className="form-label">
-                                                        Tổng thời gian khám
+                                                        {t('confirmSection.info.totalDuration')}
                                                     </div>
                                                     <div className="form-plain-text">
                                                         {formattedAppointmentInfo.totalDuration > 0
-                                                            ? `${formattedAppointmentInfo.totalDuration} phút (${formattedAppointmentInfo.slots.length} khung giờ)`
-                                                            : 'Chưa chọn'}
+                                                            ? t(
+                                                                  'confirmSection.info.durationFormat',
+                                                                  {
+                                                                      duration:
+                                                                          formattedAppointmentInfo.totalDuration,
+                                                                      count: formattedAppointmentInfo
+                                                                          .slots.length,
+                                                                  }
+                                                              )
+                                                            : t('confirmSection.notSelected')}
                                                     </div>
                                                 </div>
                                             </div>
@@ -154,7 +170,7 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                                 <div className="col-md-12">
                                                     <div className="mb-3">
                                                         <div className="form-label mb-2">
-                                                            Các khung giờ đã đặt
+                                                            {t('confirmSection.info.bookedSlots')}
                                                         </div>
                                                         <div className="d-flex flex-wrap gap-2">
                                                             {formattedAppointmentInfo.slots.map(
@@ -177,26 +193,31 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                             <div className="col-md-6">
                                                 <div className="mb-3">
                                                     <label className="form-label">
-                                                        Hình thức khám
+                                                        {t('confirmSection.info.appointmentType')}
                                                     </label>
                                                     <div className="form-plain-text">
-                                                        Tại phòng khám
+                                                        {t('confirmSection.info.inPerson')}
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="col-md-6">
                                                 <div className="mb-3">
                                                     <label className="form-label">
-                                                        Địa điểm khám
+                                                        {t('confirmSection.info.location')}
                                                     </label>
                                                     <div className="form-plain-text">
-                                                        {doctor.location || 'Chưa cập nhật'}{' '}
+                                                        {doctor.location ||
+                                                            t(
+                                                                'confirmSection.info.notUpdated'
+                                                            )}{' '}
                                                         {doctor.location && (
                                                             <a
                                                                 href="javascript:void(0);"
                                                                 className="text-primary"
                                                             >
-                                                                Xem vị trí
+                                                                {t(
+                                                                    'confirmSection.info.viewLocation'
+                                                                )}
                                                             </a>
                                                         )}
                                                     </div>
@@ -208,18 +229,19 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                                 <div className="card">
                                     <div className="card-body d-flex align-items-center flex-wrap rpw-gap-2 justify-content-between">
                                         <div>
-                                            <h6 className="mb-1">Cần hỗ trợ?</h6>
+                                            <h6 className="mb-1">
+                                                {t('confirmSection.support.title')}
+                                            </h6>
                                             <p className="mb-0">
-                                                Gọi cho chúng tôi nếu bạn gặp vấn đề khi đặt lịch
-                                                hoặc hủy lịch.
+                                                {t('confirmSection.support.description')}
                                             </p>
                                         </div>
                                         <a
                                             href="javascript:void(0);"
                                             className="btn btn-light rounded-pill"
                                         >
-                                            <i className="isax isax-call5 me-1"></i>Gọi cho chúng
-                                            tôi
+                                            <i className="isax isax-call5 me-1"></i>
+                                            {t('confirmSection.support.callUs')}
                                         </a>
                                     </div>
                                 </div>
@@ -229,25 +251,27 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
                             <div className="card flex-fill">
                                 <div className="card-body d-flex flex-column justify-content-between">
                                     <div className="text-center">
-                                        <h6 className="fs-14 mb-2">Mã đặt lịch</h6>
+                                        <h6 className="fs-14 mb-2">
+                                            {t('confirmSection.qrCode.bookingId')}
+                                        </h6>
                                         <span className="booking-id-badge mb-3">DCRA12565</span>
                                         <span className="d-block mb-3">
                                             <img src={paymentQrIcon} alt="" />
                                         </span>
-                                        <p>Quét mã QR này để tải thông tin chi tiết về lịch hẹn</p>
+                                        <p>{t('confirmSection.qrCode.scanDescription')}</p>
                                     </div>
                                     <div>
                                         <a
                                             href="javascript:void(0);"
                                             className="btn w-100 mb-3 btn-md btn-dark prev_btns inline-flex align-items-center rounded-pill"
                                         >
-                                            Thêm vào lịch
+                                            {t('confirmSection.qrCode.addToCalendar')}
                                         </a>
                                         <Link
                                             to={PATHS.DOCTOR.ROOT}
                                             className="btn w-100 btn-md btn-primary-gradient next_btns inline-flex align-items-center rounded-pill"
                                         >
-                                            Đặt lịch mới
+                                            {t('confirmSection.qrCode.newBooking')}
                                         </Link>
                                     </div>
                                 </div>
@@ -259,7 +283,7 @@ const ConfirmSection: React.FC<ConfirmSectionProps> = ({ handleGoBack }) => {
             <div>
                 <div onClick={handleGoBack} className={styles.backToBookings}>
                     <i className="isax isax-arrow-left-2 me-1"></i>
-                    Quay lại danh sách đặt lịch
+                    {t('confirmSection.backToBookings')}
                 </div>
             </div>
         </fieldset>

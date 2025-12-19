@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 
@@ -25,6 +26,7 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
     onDelete,
     loading = false,
 }) => {
+    const { t } = useTranslation('userProfile');
     const [showScrollIndicator, setShowScrollIndicator] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showCannotDeleteAlert, setShowCannotDeleteAlert] = useState(false);
@@ -99,7 +101,7 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
             <Modal
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Tất cả các tài khoản ngân hàng"
+                title={t('wallet.otherAccountsModal.title')}
                 width="816px"
                 maxWidth="90vw"
                 minWidth="816px"
@@ -120,19 +122,25 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
                                 >
                                     <ul className="other-bank-info">
                                         <li className={styles.infoRow}>
-                                            <h6 className={styles.infoLabel}>Tên ngân hàng</h6>
+                                            <h6 className={styles.infoLabel}>
+                                                {t('wallet.otherAccountsModal.bankName')}
+                                            </h6>
                                             <span className={styles.infoValue}>
                                                 {account.bankCode}
                                             </span>
                                         </li>
                                         <li className={styles.infoRow}>
-                                            <h6 className={styles.infoLabel}>Số tài khoản</h6>
+                                            <h6 className={styles.infoLabel}>
+                                                {t('wallet.otherAccountsModal.accountNumber')}
+                                            </h6>
                                             <span className={styles.infoValue}>
                                                 {account.accountNumber}
                                             </span>
                                         </li>
                                         <li className={styles.infoRow}>
-                                            <h6 className={styles.infoLabel}>Tên tài khoản</h6>
+                                            <h6 className={styles.infoLabel}>
+                                                {t('wallet.otherAccountsModal.accountName')}
+                                            </h6>
                                             <span className={styles.infoValue}>
                                                 {account.accountName}
                                             </span>
@@ -140,7 +148,7 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
                                         <li className={styles.actionButtons}>
                                             {account.isDefault ? (
                                                 <span className={styles.currentLabel}>
-                                                    Mặc định
+                                                    {t('wallet.otherAccountsModal.default')}
                                                 </span>
                                             ) : (
                                                 <button
@@ -149,7 +157,9 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
                                                     onClick={() => handleSetDefault(account.id)}
                                                     disabled={loading}
                                                 >
-                                                    {loading ? 'Đang xử lý...' : 'Đặt làm mặc định'}
+                                                    {loading
+                                                        ? t('wallet.otherAccountsModal.processing')
+                                                        : t('wallet.otherAccountsModal.setDefault')}
                                                 </button>
                                             )}
 
@@ -162,8 +172,12 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
                                                 disabled={account.isDefault || loading}
                                                 title={
                                                     account.isDefault
-                                                        ? 'Không thể xóa tài khoản mặc định'
-                                                        : 'Xóa tài khoản'
+                                                        ? t(
+                                                              'wallet.otherAccountsModal.cannotDeleteDefault'
+                                                          )
+                                                        : t(
+                                                              'wallet.otherAccountsModal.deleteTooltip'
+                                                          )
                                                 }
                                             >
                                                 <i className="fa-solid fa-trash"></i>
@@ -176,7 +190,7 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
 
                         {accounts.length === 0 && (
                             <div className={styles.emptyState}>
-                                <p>Không tìm thấy tài khoản ngân hàng</p>
+                                <p>{t('wallet.otherAccountsModal.empty')}</p>
                             </div>
                         )}
 
@@ -189,7 +203,11 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
 
                 <div className={clsx(styles.modalFooter, 'modal-footer')}>
                     <div className="text-end">
-                        <Button text="Đóng" type="button" onClick={onClose} />
+                        <Button
+                            text={t('wallet.otherAccountsModal.close')}
+                            type="button"
+                            onClick={onClose}
+                        />
                     </div>
                 </div>
             </Modal>
@@ -199,10 +217,10 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
                 isOpen={showDeleteConfirm}
                 onClose={handleCloseDeleteConfirm}
                 onConfirm={handleConfirmDelete}
-                title="Xóa tài khoản"
-                message="Bạn có chắc chắn muốn xóa tài khoản này không? Hành động này không thể hoàn tác."
-                confirmText="Xóa"
-                cancelText="Hủy"
+                title={t('wallet.otherAccountsModal.deleteConfirm.title')}
+                message={t('wallet.otherAccountsModal.deleteConfirm.message')}
+                confirmText={t('wallet.otherAccountsModal.deleteConfirm.confirm')}
+                cancelText={t('wallet.otherAccountsModal.deleteConfirm.cancel')}
                 type="danger"
                 icon="fa-solid fa-trash"
             />
@@ -212,9 +230,9 @@ const OtherAccountsModal: React.FC<OtherAccountsModalProps> = ({
                 isOpen={showCannotDeleteAlert}
                 onClose={handleCloseCannotDeleteAlert}
                 onConfirm={handleCloseCannotDeleteAlert}
-                title="Không thể xóa"
-                message="Không thể xóa tài khoản đang được chọn làm mặc định. Vui lòng chọn tài khoản khác làm mặc định trước khi xóa."
-                confirmText="Đã hiểu"
+                title={t('wallet.otherAccountsModal.cannotDelete.title')}
+                message={t('wallet.otherAccountsModal.cannotDelete.message')}
+                confirmText={t('wallet.otherAccountsModal.cannotDelete.confirm')}
                 cancelText=""
                 type="warning"
                 icon="fa-solid fa-exclamation-triangle"

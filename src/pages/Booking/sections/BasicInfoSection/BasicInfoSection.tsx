@@ -120,10 +120,10 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ nextStep, prevStep 
     // Transform relatives to Select items
     const relativeSelectItems = useMemo(() => {
         return relatives.map((relative) => ({
-            label: `${relative.fullName} (${relative.relationshipDisplay}) - ${relative.age} tuổi`,
+            label: `${relative.fullName} (${relative.relationshipDisplay}) - ${relative.age} ${t('common:units.yearsOld')}`,
             value: relative.id,
         }));
-    }, [relatives]);
+    }, [relatives, t]);
 
     // Handle file selection (không upload ngay)
     const handleFileChange = (files: File[]) => {

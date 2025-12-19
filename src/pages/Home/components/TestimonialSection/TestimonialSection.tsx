@@ -1,9 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import { Link } from 'react-router-dom';
+
+import { ReviewService } from '@/services/review.service';
+import { Review } from '@/types/review.types';
+
 import patient22 from '@/assets/img/patients/patient22.jpg';
 import patient21 from '@/assets/img/patients/patient21.jpg';
 import patient from '@/assets/img/patients/patient.jpg';
@@ -36,7 +40,11 @@ interface TestimonialSectionProps {
 const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, counters }) => {
     const { t } = useTranslation('home');
 
-    // Get testimonials from translation
+    // State for API testimonials
+    const [apiTestimonials, setApiTestimonials] = useState<Testimonial[]>([]);
+    const [totalReviewsCount, setTotalReviewsCount] = useState<number | null>(null);
+
+    // Get testimonials from translation (fallback)
     const translatedTestimonials = t('testimonial.testimonials', {
         returnObjects: true,
     }) as Array<{
@@ -70,88 +78,135 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
         colorClass: colorClasses[index],
     }));
 
-    const displayTestimonials = testimonials || defaultTestimonials;
-    const displayCounters = counters || defaultCounters;
+    // Use testimonials in this order: props > API > translation fallback
+    const displayTestimonials =
+        testimonials || (apiTestimonials.length > 0 ? apiTestimonials : defaultTestimonials);
+
+    // Memoize displayCounters - use translation values directly, no API override
+    const displayCounters = useMemo(() => {
+        if (counters) return counters;
+        return defaultCounters;
+    }, [counters, defaultCounters]);
+
+    // Fetch testimonials from API
+    useEffect(() => {
+        if (testimonials) {
+            return; // Use provided testimonials
+        }
+
+        const fetchTestimonials = async () => {
+            try {
+                const response = await ReviewService.getTestimonialReviews({
+                    page: 1,
+                    pageSize: 20,
+                    minRating: 4,
+                });
+
+                if (response.success && response.data.reviews.length > 0) {
+                    const reviewTestimonials = response.data.reviews.map((review: Review) => ({
+                        id: review.id,
+                        rating: review.rating,
+                        title: `${review.rating} ${t('testimonial.starReview', { defaultValue: 'Star Review' })}`,
+                        comment: review.comment,
+                        authorName:
+                            review.patientInfo?.fullName ||
+                            t('testimonial.anonymousUser', { defaultValue: 'Anonymous User' }),
+                        authorLocation: t('testimonial.verifiedPatient', {
+                            defaultValue: 'Verified Patient',
+                        }),
+                        authorAvatar: review.patientInfo?.avatarUrl || patient,
+                    }));
+                    setApiTestimonials(reviewTestimonials);
+
+                    // Set total reviews count from API
+                    setTotalReviewsCount(response.data.totalCount);
+                }
+            } catch (error) {
+                console.error('Error fetching testimonial reviews:', error);
+                // Fall back to translation testimonials on error
+            }
+        };
+
+        fetchTestimonials();
+    }, [testimonials, t]);
 
     // Counter animation
-    const [countersAnimated, setCountersAnimated] = useState(false);
     const [counterValues, setCounterValues] = useState<Record<string | number, number>>({});
     const counterRef = useRef<HTMLDivElement>(null);
+    const hasAnimatedRef = useRef(false);
+    const timersRef = useRef<ReturnType<typeof setInterval>[]>([]);
+    const displayCountersRef = useRef(displayCounters);
 
+    // Keep displayCountersRef in sync
     useEffect(() => {
-        if (countersAnimated) return; // Already animated
+        displayCountersRef.current = displayCounters;
+    }, [displayCounters]);
 
-        const timers: NodeJS.Timeout[] = [];
+    const runAnimation = useCallback(() => {
+        if (hasAnimatedRef.current) return;
+        hasAnimatedRef.current = true;
 
-        const initializeCounters = () => {
-            const initialValues: Record<string | number, number> = {};
-            for (const counter of displayCounters) {
-                initialValues[counter.id] = 0;
-            }
-            setCounterValues(initialValues);
-        };
+        // Clear existing timers
+        for (const timer of timersRef.current) {
+            clearInterval(timer);
+        }
+        timersRef.current = [];
 
-        const updateCounterValue = (counterId: string | number, value: number) => {
-            setCounterValues((prev) => ({
-                ...prev,
-                [counterId]: value,
-            }));
-        };
+        const currentCounters = displayCountersRef.current;
 
-        const createCounterTimer = (counter: CounterItem): NodeJS.Timeout => {
-            const duration = 2000; // 2 seconds
+        // Initialize to 0
+        const initialValues: Record<string | number, number> = {};
+        for (const counter of currentCounters) {
+            initialValues[counter.id] = 0;
+        }
+        setCounterValues(initialValues);
+
+        // Animate each counter
+        for (const counter of currentCounters) {
+            const duration = 2000;
             const steps = 60;
             const increment = counter.value / steps;
             let current = 0;
 
-            const handleCounterUpdate = (timer: NodeJS.Timeout) => {
+            const timer = setInterval(() => {
                 current += increment;
-                const isComplete = current >= counter.value;
-                const valueToSet = isComplete ? counter.value : Math.floor(current);
-                updateCounterValue(counter.id, valueToSet);
-                if (isComplete) {
+                if (current >= counter.value) {
+                    setCounterValues((prev) => ({ ...prev, [counter.id]: counter.value }));
                     clearInterval(timer);
+                } else {
+                    setCounterValues((prev) => ({ ...prev, [counter.id]: Math.floor(current) }));
                 }
-            };
+            }, duration / steps);
 
-            const timer = setInterval(() => handleCounterUpdate(timer), duration / steps);
-            return timer;
-        };
+            timersRef.current.push(timer);
+        }
+    }, []);
 
-        const animateCounter = (counter: CounterItem) => {
-            const timer = createCounterTimer(counter);
-            timers.push(timer);
-        };
+    // IntersectionObserver setup - runs once on mount
+    useEffect(() => {
+        const currentRef = counterRef.current;
+        if (!currentRef) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
                 for (const entry of entries) {
-                    if (entry.isIntersecting && !countersAnimated) {
-                        setCountersAnimated(true);
-                        initializeCounters();
-                        for (const counter of displayCounters) {
-                            animateCounter(counter);
-                        }
+                    if (entry.isIntersecting && !hasAnimatedRef.current) {
+                        runAnimation();
                     }
                 }
             },
-            { threshold: 0.5 }
+            { threshold: 0.3 }
         );
 
-        if (counterRef.current) {
-            observer.observe(counterRef.current);
-        }
+        observer.observe(currentRef);
 
         return () => {
-            if (counterRef.current) {
-                observer.unobserve(counterRef.current);
-            }
-            // Cleanup timers
-            for (const timer of timers) {
+            observer.disconnect();
+            for (const timer of timersRef.current) {
                 clearInterval(timer);
             }
         };
-    }, [countersAnimated, displayCounters]);
+    }, [runAnimation]);
 
     const renderStars = (rating: number) => {
         return Array.from({ length: 5 }, (_, index) => (
@@ -184,7 +239,11 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
             <div className="container">
                 <div className="section-header sec-header-one text-center aos" data-aos="fade-up">
                     <span className="badge badge-primary">{t('testimonial.badge')}</span>
-                    <h2>{t('testimonial.title')}</h2>
+                    <h2>
+                        {totalReviewsCount === null
+                            ? t('testimonial.title')
+                            : `${totalReviewsCount.toLocaleString()}+ ${t('testimonial.titleSuffix', { defaultValue: 'Người dùng Tin tưởng Medcure Toàn cầu' })}`}
+                    </h2>
                 </div>
 
                 {/* Testimonial Slider */}

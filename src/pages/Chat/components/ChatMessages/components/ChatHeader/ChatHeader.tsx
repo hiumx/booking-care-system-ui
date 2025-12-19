@@ -1,13 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { useChat } from '@/providers/ChatProvider';
 import { RootState } from '@/store';
 import VideoCallWindow from '../../../VideoCallWindow';
 import TagManager from '../../../TagManager';
 import styles from './ChatHeader.module.scss';
+import userDefault from '@/assets/img/patients/patient.jpg';
 
 const ChatHeader = () => {
+    const { t } = useTranslation('chat');
     const { activeConversation, onlineUsers } = useChat();
     const userProfile = useSelector((state: RootState) => state.user.profile);
     // Backend uses uppercase accountId, normalize for comparison
@@ -97,20 +100,20 @@ const ChatHeader = () => {
                             <>
                                 <figure className={`avatar ${isOnline ? 'avatar-online' : ''}`}>
                                     <img
-                                        src={otherParticipant.avatarUrl || '/default-avatar.png'}
+                                        src={otherParticipant.avatarUrl || userDefault}
                                         alt="avatar"
                                     />
                                 </figure>
                                 <div className="mt-1">
                                     <h5>{otherParticipant.fullName}</h5>
                                     <small className="last-seen">
-                                        {isOnline ? 'Đang online' : 'Offline'}
+                                        {isOnline ? t('header.online') : t('header.offline')}
                                     </small>
                                 </div>
                             </>
                         ) : (
                             <div className="mt-1">
-                                <h5>Chọn hội thoại</h5>
+                                <h5>{t('header.selectConversation')}</h5>
                             </div>
                         )}
                     </div>
@@ -123,7 +126,7 @@ const ChatHeader = () => {
                                         'btn btn-outline-light chat-search-btn'
                                     )}
                                     onClick={() => setShowSearch(!showSearch)}
-                                    title="Tìm kiếm"
+                                    title={t('header.search')}
                                     disabled={!activeConversation}
                                 >
                                     <i className="fa-solid fa-magnifying-glass"></i>
@@ -136,7 +139,7 @@ const ChatHeader = () => {
                                             styles.chatSearchBtn,
                                             'btn btn-outline-light'
                                         )}
-                                        title="Quản lý nhãn"
+                                        title={t('header.manageTags')}
                                         onClick={() => setShowTagManager(!showTagManager)}
                                         disabled={!activeConversation}
                                     >
@@ -203,25 +206,25 @@ const ChatHeader = () => {
                                                     setShowDropdown(false);
                                                 }}
                                             >
-                                                Gọi video
+                                                {t('header.menu.videoCall')}
                                             </a>
                                             <a href="#" className="dropdown-item">
-                                                Tắt thông báo
+                                                {t('header.menu.muteNotifications')}
                                             </a>
                                             <a href="#" className="dropdown-item">
-                                                Tin nhắn biến mất
+                                                {t('header.menu.disappearingMessages')}
                                             </a>
                                             <a href="#" className="dropdown-item">
-                                                Xóa tin nhắn
+                                                {t('header.menu.deleteMessages')}
                                             </a>
                                             <a href="#" className="dropdown-item">
-                                                Xóa chat
+                                                {t('header.menu.deleteChat')}
                                             </a>
                                             <a href="#" className="dropdown-item">
-                                                Báo cáo
+                                                {t('header.menu.report')}
                                             </a>
                                             <a href="#" className="dropdown-item">
-                                                Chặn
+                                                {t('header.menu.block')}
                                             </a>
                                         </div>
                                     )}
@@ -239,7 +242,7 @@ const ChatHeader = () => {
                                 <input
                                     type="text"
                                     name="chat-search"
-                                    placeholder="Tìm kiếm tin nhắn"
+                                    placeholder={t('header.searchMessages')}
                                     className="form-control"
                                 />
                                 <div

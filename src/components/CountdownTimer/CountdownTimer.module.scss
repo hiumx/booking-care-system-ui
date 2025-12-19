@@ -18,16 +18,7 @@
 
     // Size variants
     &.size-small {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-
-        .icon {
-            font-size: 0.75rem;
-        }
-    }
-
-    &.size-medium {
-        padding: 0.5rem 0.75rem;
+        padding: 0.375rem 0.625rem;
         font-size: 0.875rem;
 
         .icon {
@@ -35,12 +26,21 @@
         }
     }
 
-    &.size-large {
-        padding: 0.75rem 1rem;
+    &.size-medium {
+        padding: 0.5rem 1rem;
         font-size: 1rem;
 
         .icon {
             font-size: 1rem;
+        }
+    }
+
+    &.size-large {
+        padding: 0.75rem 1.25rem;
+        font-size: 1.125rem;
+
+        .icon {
+            font-size: 1.125rem;
         }
     }
 

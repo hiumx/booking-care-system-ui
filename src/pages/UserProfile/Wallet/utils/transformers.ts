@@ -36,9 +36,12 @@ export const transformRefundHistoryToTransaction = (refundHistory: RefundHistory
         return `${firstFour} ${middle} ${lastFour}`;
     };
 
+    // Handle null bankAccount
+    const accountNumber = refundHistory.bankAccount?.accountNumber || 'N/A';
+
     return {
         id: refundHistory.id,
-        accountNo: maskAccountNumber(refundHistory.bankAccount.accountNumber),
+        accountNo: accountNumber === 'N/A' ? accountNumber : maskAccountNumber(accountNumber),
         reason: refundHistory.refundReason || 'Không có lý do',
         date: formatDate(refundHistory.updatedAt),
         amount: formatAmount(refundHistory.refundAmount),

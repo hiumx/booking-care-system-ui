@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
 import Favourite from './Favourite';
@@ -16,6 +17,7 @@ import { RootState, AppDispatch } from '@/store';
 import { fetchUnreadMessageCount } from '@/store/slices/userSlice';
 
 const UserProfile = () => {
+    const { t } = useTranslation('userProfile');
     const location = useLocation();
     const dispatch = useDispatch<AppDispatch>();
     const { profile } = useSelector((state: RootState) => state.user);
@@ -65,30 +67,33 @@ const UserProfile = () => {
 
         const baseItems = [
             { label: '', path: '/', isActive: false },
-            { label: 'Patient', isActive: false },
+            { label: t('breadcrumb.patient'), isActive: false },
         ];
 
-        // Tab configuration map - eliminates switch statement duplication
-        const tabConfig: Record<string, { label: string; title: string }> = {
-            appointments: { label: 'My Appointments', title: 'My Appointments' },
-            favourites: { label: 'Favourites', title: 'Favourites' },
-            relatives: { label: 'Người Thân', title: 'Quản lý người thân' },
-            dependent: { label: 'Dependants', title: 'Dependants' },
-            'medical-records': { label: 'Medical Records', title: 'Medical Records' },
-            wallet: { label: 'Wallet', title: 'Lịch sử hoàn tiền' },
-            invoices: { label: 'Invoices', title: 'Invoices' },
-            notifications: { label: 'Notifications', title: 'Danh sách thông báo' },
-            chat: { label: 'Messages', title: 'Messages' },
-            vitals: { label: 'Vitals', title: 'Vitals' },
-            settings: { label: 'Settings', title: 'Settings' },
+        // Tab to translation key mapping
+        const tabKeyMap: Record<string, string> = {
+            dashboard: 'dashboard',
+            appointments: 'appointments',
+            'appointment-detail': 'appointmentDetail',
+            favourites: 'favourites',
+            relatives: 'relatives',
+            dependent: 'dependent',
+            'medical-records': 'medicalRecords',
+            wallet: 'wallet',
+            invoices: 'invoices',
+            notifications: 'notifications',
+            chat: 'chat',
+            vitals: 'vitals',
+            settings: 'settings',
         };
 
-        // Get config for active tab or default to dashboard
-        const config = tabConfig[activeTab] || { label: 'Dashboard', title: 'Dashboard' };
+        // Get translation key for active tab or default to dashboard
+        const translationKey = tabKeyMap[activeTab] || 'dashboard';
+        const label = t(`breadcrumb.tabs.${translationKey}`);
 
         return {
-            items: [...baseItems, { label: config.label, isActive: true }],
-            title: config.title,
+            items: [...baseItems, { label, isActive: true }],
+            title: label,
         };
     };
 

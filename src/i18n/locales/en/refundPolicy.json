@@ -7,7 +7,7 @@
     "sections": {
         "overview": {
             "title": "1. Overview",
-            "description": "BookingCare's refund policy is designed to ensure the rights of both patients and healthcare facilities. This policy applies to all medical appointments made through the BookingCare platform."
+            "description": "MedCure's refund policy is designed to ensure the rights of both patients and healthcare facilities. This policy applies to all medical appointments made through the MedCure platform."
         },
         "refundRules": {
             "title": "2. Refund Rules Based on Cancellation Time",
@@ -37,7 +37,7 @@
                 "subtitle": "3.1. Cancellation by Hospital/Doctor",
                 "title": "100% Refund",
                 "description1": "If the appointment is canceled by the hospital or doctor (due to reasons from the healthcare facility), you will receive a 100% refund of the paid amount, regardless of cancellation time.",
-                "description2": "In this case, BookingCare will automatically process the refund and notify you via email or SMS."
+                "description2": "In this case, MedCure will automatically process the refund and notify you via email or SMS."
             },
             "pastAppointment": {
                 "subtitle": "3.2. Past Appointments",
@@ -49,7 +49,7 @@
             "items": [
                 {
                     "title": "Cancel Request",
-                    "description": "You cancel the appointment through the BookingCare app or website"
+                    "description": "You cancel the appointment through the MedCure app or website"
                 },
                 {
                     "title": "Automatic Calculation",
@@ -61,7 +61,7 @@
                 },
                 {
                     "title": "Processing",
-                    "description": "BookingCare will process the refund within 5-7 business days"
+                    "description": "MedCure will process the refund within 5-7 business days"
                 },
                 {
                     "title": "Receive Money",
@@ -85,16 +85,16 @@
         },
         "processingFee": {
             "title": "6. Processing Fee",
-            "description1": "BookingCare <strong>does not charge a refund processing fee</strong>. The full refund amount will be calculated according to the specified refund rate (100%, 50%, or 0%).",
+            "description1": "MedCure <strong>does not charge a refund processing fee</strong>. The full refund amount will be calculated according to the specified refund rate (100%, 50%, or 0%).",
             "description2": "However, if there are fees from the bank or payment service provider, these fees will be deducted from the refund amount."
         },
         "complaints": {
             "title": "7. Complaints and Support",
             "description": "If you have any questions or complaints about refunds, please contact us:",
             "email": "Email",
-            "emailValue": "refund@bookingcare.vn",
+            "emailValue": "medcure.contact@gmail.com",
             "hotline": "Hotline",
-            "hotlineValue": "+84 236 3 822 888",
+            "hotlineValue": "+84 763583081",
             "supportHours": "Support Hours",
             "supportHoursValue": "8:00 AM - 10:00 PM daily",
             "commitment": "We commit to responding to all requests within 24 hours and handling complaints fairly and transparently."
@@ -106,17 +106,17 @@
                 "Canceling the appointment less than 12 hours before the appointment time",
                 "Not showing up without prior notice",
                 "Service already used (already had the appointment)",
-                "Violating BookingCare or healthcare facility regulations",
+                "Violating MedCure or healthcare facility regulations",
                 "Fraud or use of invalid information"
             ]
         },
         "policyChanges": {
             "title": "9. Policy Changes",
-            "description": "BookingCare reserves the right to update or change this refund policy. Any changes will be announced on the website with the latest update date. The new policy will apply to appointments made after the update date."
+            "description": "MedCure reserves the right to update or change this refund policy. Any changes will be announced on the website with the latest update date. The new policy will apply to appointments made after the update date."
         },
         "additionalTerms": {
             "title": "10. Additional Terms",
-            "description1": "This refund policy is part of BookingCare's Terms of Use. By using the service, you agree to the terms in this policy.",
+            "description1": "This refund policy is part of MedCure's Terms of Use. By using the service, you agree to the terms in this policy.",
             "description2": "In case of conflict between the refund policy and other terms, the refund policy will take precedence for refund-related issues."
         },
         "importantNote": {

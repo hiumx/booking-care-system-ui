@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { Skeleton } from '@mui/material';
 import {
@@ -16,14 +17,6 @@ import {
 import { HospitalProfileResponse } from '@/types/hospital.types';
 import clsx from 'clsx';
 import styles from './SpecialtyServiceSection.module.scss';
-
-// Format currency helper
-const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND',
-    }).format(amount);
-};
 
 // Constants
 const INITIAL_DISPLAY_COUNT = 6;
@@ -44,9 +37,19 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
     hospitalData,
     isLoading,
 }) => {
+    const { t, i18n } = useTranslation('booking');
     const dispatch = useAppDispatch();
     const bookingState = useAppSelector((state) => state.booking);
     const scheduleState = useAppSelector((state) => state.schedule);
+
+    // Format currency helper with locale support
+    const formatCurrency = (amount: number) => {
+        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
+        return new Intl.NumberFormat(locale, {
+            style: 'currency',
+            currency: 'VND',
+        }).format(amount);
+    };
 
     // Helper to clear schedule data only if it has data (avoid unnecessary dispatches)
     const clearScheduleIfNeeded = () => {
@@ -166,21 +169,21 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
 
     // Get selected item name for display
     const getSelectedItemName = (): string => {
-        if (!hospitalData || !selectedId) return 'Chưa chọn';
+        if (!hospitalData || !selectedId) return t('specialtyServiceSection.notSelected');
 
         if (selectionType === 'specialty') {
             const specialty = hospitalData.specialties?.find((s) => s.id === selectedId);
-            return specialty?.name || 'Chưa chọn';
+            return specialty?.name || t('specialtyServiceSection.notSelected');
         } else if (selectionType === 'service') {
             const service = hospitalData.serviceMedicals?.find((s) => s.id === selectedId);
-            return service?.name || 'Chưa chọn';
+            return service?.name || t('specialtyServiceSection.notSelected');
         }
-        return 'Chưa chọn';
+        return t('specialtyServiceSection.notSelected');
     };
 
     // Build header info
     const hospitalInfo: BookingEntityInfo = {
-        name: hospitalData?.name || 'Đang tải...',
+        name: hospitalData?.name || t('specialtyServiceSection.loading'),
         subtitle: hospitalData?.address || '',
         location: hospitalData?.address || '',
         avatar: hospitalData?.avatarUrl || '/assets/img/hospital-placeholder.png',
@@ -188,16 +191,16 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
     };
 
     const getServiceType = () => {
-        if (selectionType === 'specialty') return 'Chuyên khoa';
-        if (selectionType === 'service') return 'Dịch vụ';
-        return 'Chưa chọn';
+        if (selectionType === 'specialty') return t('specialtyServiceSection.specialty');
+        if (selectionType === 'service') return t('specialtyServiceSection.service');
+        return t('specialtyServiceSection.notSelected');
     };
 
     const appointmentInfo: AppointmentInfo = {
         service: getSelectedItemName(),
         serviceType: getServiceType(),
-        dateTime: 'Chưa chọn',
-        appointmentType: 'Chưa chọn',
+        dateTime: t('specialtyServiceSection.notSelected'),
+        appointmentType: t('specialtyServiceSection.notSelected'),
     };
 
     if (isLoading) {
@@ -290,14 +293,14 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                 <div className="col-12">
                     <div className={styles.noResults}>
                         <i className="isax isax-search-status" aria-hidden="true"></i>
-                        <p className="mb-0">Không tìm thấy chuyên khoa phù hợp</p>
+                        <p className="mb-0">{t('specialtyServiceSection.noSpecialtyFound')}</p>
                     </div>
                 </div>
             );
         }
         return (
             <div className="col-12">
-                <p className="text-muted mb-0">Bệnh viện chưa có chuyên khoa nào</p>
+                <p className="text-muted mb-0">{t('specialtyServiceSection.noSpecialties')}</p>
             </div>
         );
     };
@@ -309,14 +312,14 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                 <div className="col-12">
                     <div className={styles.noResults}>
                         <i className="isax isax-search-status" aria-hidden="true"></i>
-                        <p className="mb-0">Không tìm thấy dịch vụ phù hợp</p>
+                        <p className="mb-0">{t('specialtyServiceSection.noServiceFound')}</p>
                     </div>
                 </div>
             );
         }
         return (
             <div className="col-12">
-                <p className="text-muted mb-0">Bệnh viện chưa có dịch vụ y tế nào</p>
+                <p className="text-muted mb-0">{t('specialtyServiceSection.noServices')}</p>
             </div>
         );
     };
@@ -325,7 +328,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
         <BookingSectionWrapper
             doctor={hospitalInfo}
             appointment={appointmentInfo}
-            nextStepTitle="Chọn loại khám"
+            nextStepTitle={t('specialtyServiceSection.nextStepTitle')}
             nextStep={handleNext}
             prevStep={prevStep}
             fieldsetId="specialty-service"
@@ -338,8 +341,8 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                     <div className="mb-4 pb-4 border-bottom">
                         <div className="d-flex align-items-center justify-content-between mb-3">
                             <h6 className="mb-0">
-                                <i className="isax isax-hospital me-2" aria-hidden="true"></i> Chọn
-                                chuyên khoa
+                                <i className="isax isax-hospital me-2" aria-hidden="true"></i>{' '}
+                                {t('specialtyServiceSection.selectSpecialty')}
                             </h6>
                         </div>
 
@@ -352,7 +355,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                 <input
                                     type="text"
                                     className={clsx('form-control', styles.searchInput)}
-                                    placeholder="Tìm kiếm chuyên khoa..."
+                                    placeholder={t('specialtyServiceSection.searchSpecialty')}
                                     value={specialtySearch}
                                     onChange={(e) => setSpecialtySearch(e.target.value)}
                                 />
@@ -417,7 +420,10 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                                           {specialty.doctorCount !== undefined && (
                                                               <span className="fs-14 text-muted d-block">
                                                                   <i className="isax isax-user me-1"></i>
-                                                                  {specialty.doctorCount} bác sĩ
+                                                                  {specialty.doctorCount}{' '}
+                                                                  {t(
+                                                                      'specialtyServiceSection.doctors'
+                                                                  )}
                                                               </span>
                                                           )}
                                                       </div>
@@ -439,11 +445,12 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                 >
                                     {showAllSpecialties ? (
                                         <>
-                                            Thu gọn <i className="isax isax-arrow-up-2"></i>
+                                            {t('specialtyServiceSection.collapse')}{' '}
+                                            <i className="isax isax-arrow-up-2"></i>
                                         </>
                                     ) : (
                                         <>
-                                            Xem thêm (
+                                            {t('specialtyServiceSection.showMore')} (
                                             {filteredSpecialties.length - INITIAL_DISPLAY_COUNT}){' '}
                                             <i className="isax isax-arrow-down-1"></i>
                                         </>
@@ -457,8 +464,8 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                     <div>
                         <div className="d-flex align-items-center justify-content-between mb-3">
                             <h6 className="mb-0">
-                                <i className="isax isax-briefcase me-2" aria-hidden="true"></i> Hoặc
-                                chọn dịch vụ y tế
+                                <i className="isax isax-briefcase me-2" aria-hidden="true"></i>{' '}
+                                {t('specialtyServiceSection.selectService')}
                             </h6>
                         </div>
 
@@ -471,7 +478,7 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                 <input
                                     type="text"
                                     className={clsx('form-control', styles.searchInput)}
-                                    placeholder="Tìm kiếm dịch vụ..."
+                                    placeholder={t('specialtyServiceSection.searchService')}
                                     value={serviceSearch}
                                     onChange={(e) => setServiceSearch(e.target.value)}
                                 />
@@ -553,11 +560,12 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                                 >
                                     {showAllServices ? (
                                         <>
-                                            Thu gọn <i className="isax isax-arrow-up-2"></i>
+                                            {t('specialtyServiceSection.collapse')}{' '}
+                                            <i className="isax isax-arrow-up-2"></i>
                                         </>
                                     ) : (
                                         <>
-                                            Xem thêm (
+                                            {t('specialtyServiceSection.showMore')} (
                                             {filteredServices.length - INITIAL_DISPLAY_COUNT}){' '}
                                             <i className="isax isax-arrow-down-1"></i>
                                         </>
@@ -570,8 +578,8 @@ const SpecialtyServiceSection: React.FC<SpecialtyServiceSectionProps> = ({
                     {/* Selection hint */}
                     {!canProceed && (
                         <div className="alert alert-info mt-3 mb-0">
-                            <i className="isax isax-info-circle me-2" aria-hidden="true"></i> Vui
-                            lòng chọn một chuyên khoa hoặc một dịch vụ y tế để tiếp tục
+                            <i className="isax isax-info-circle me-2" aria-hidden="true"></i>{' '}
+                            {t('specialtyServiceSection.selectionHint')}
                         </div>
                     )}
                 </div>

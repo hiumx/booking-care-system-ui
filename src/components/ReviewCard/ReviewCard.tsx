@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import styles from '@/pages/Doctor/DoctorProfile/DoctorProfile.module.scss';
 import reviewStyles from './ReviewCard.module.scss';
@@ -8,6 +9,7 @@ import EditReviewForm from './components/EditReviewForm';
 import EditReplyForm from './components/EditReplyForm';
 import Button from '@/components/Button';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import userDefault from '@/assets/img/patients/patient.jpg';
 
 interface Reply {
     id: number;
@@ -70,6 +72,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
     onEditReply,
     onDeleteReply,
 }) => {
+    const { t } = useTranslation('common');
     const [showReplyForm, setShowReplyForm] = useState<boolean>(false);
     const [replyToReplyId, setReplyToReplyId] = useState<number | null>(null);
     const [showEditForm, setShowEditForm] = useState<boolean>(false);
@@ -199,7 +202,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
         <div
             className={clsx('doc-review-card', reviewStyles.reviewCard, { 'mb-0': isLast })}
             role="article"
-            aria-label={`Review by ${review.name}`}
+            aria-label={t('review.reviewBy', { name: review.name })}
         >
             <div className="user-info-review">
                 <div className="reviewer-img">
@@ -207,13 +210,13 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                         to="#"
                         className={clsx(styles.link, 'avatar-img')}
                         onClick={(e) => e.preventDefault()}
-                        aria-label={`View profile of ${review.name}`}
+                        aria-label={t('review.viewProfile', { name: review.name })}
                     >
                         <img
-                            src={review.avatar || '/default-avatar.png'}
+                            src={review.avatar || userDefault}
                             alt={`${review.name}'s avatar`}
                             onError={(e) => {
-                                e.currentTarget.src = '/default-avatar.png';
+                                e.currentTarget.src = userDefault;
                             }}
                         />
                     </Link>
@@ -222,14 +225,14 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                             to="#"
                             className={styles.link}
                             onClick={(e) => e.preventDefault()}
-                            aria-label={`Review by ${review.name}`}
+                            aria-label={t('review.reviewBy', { name: review.name })}
                         >
-                            {review.name || 'Anonymous'}
+                            {review.name || t('review.anonymous')}
                         </Link>
                         <div
                             className="rating"
                             role="img"
-                            aria-label={`${displayRating} out of 5 stars`}
+                            aria-label={t('review.outOf5Stars', { rating: displayRating })}
                         >
                             {Array.from({ length: 5 }).map((_, i) => (
                                 <i
@@ -238,7 +241,9 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                                     aria-hidden="true"
                                 />
                             ))}
-                            <span className="sr-only">{displayRating} out of 5 stars</span>
+                            <span className="sr-only">
+                                {t('review.outOf5Stars', { rating: displayRating })}
+                            </span>
                             {review.timeAgo && (
                                 <span className="time-ago" aria-hidden="true">
                                     {' | '}
@@ -267,15 +272,16 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                             e.preventDefault();
                             handleReplyToReview();
                         }}
-                        aria-label="Reply to this review"
+                        aria-label={t('review.replyToReview')}
                     >
-                        <i className="fa-solid fa-reply me-2" aria-hidden="true"></i>Phản hồi
+                        <i className="fa-solid fa-reply me-2" aria-hidden="true"></i>
+                        {t('review.reply')}
                     </Link>
                 )}
 
                 {showEditButton && (
                     <Button
-                        text="Chỉnh sửa"
+                        text={t('review.edit')}
                         type="button"
                         className={reviewStyles.editButton}
                         onClick={handleEditReview}
@@ -284,7 +290,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
 
                 {showDeleteButton && (
                     <Button
-                        text="Xóa"
+                        text={t('review.delete')}
                         type="button"
                         className={reviewStyles.deleteButton}
                         onClick={handleDeleteReview}
@@ -311,10 +317,10 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                 isOpen={showDeleteConfirm}
                 onClose={handleCancelDelete}
                 onConfirm={handleConfirmDelete}
-                title="Xác nhận xóa đánh giá"
-                message="Bạn có chắc chắn muốn xóa đánh giá này? Hành động này không thể hoàn tác."
-                confirmText="Xóa"
-                cancelText="Hủy"
+                title={t('review.confirmDeleteTitle')}
+                message={t('review.confirmDeleteMessage')}
+                confirmText={t('review.confirmButton')}
+                cancelText={t('review.cancelButton')}
                 type="danger"
             />
 
@@ -325,7 +331,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                         reviewId={review.id}
                         onSubmitReply={handleReplySubmit}
                         onCancel={handleCancelReply}
-                        placeholder="Viết phản hồi cho đánh giá này..."
+                        placeholder={t('replyForm.replyToReview')}
                     />
                 </div>
             )}
@@ -345,13 +351,13 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                                         to="#"
                                         className={clsx(styles.link, 'avatar-img')}
                                         onClick={(e) => e.preventDefault()}
-                                        aria-label={`View profile of ${reply.name}`}
+                                        aria-label={t('review.viewProfile', { name: reply.name })}
                                     >
                                         <img
-                                            src={reply.avatar || '/default-avatar.png'}
+                                            src={reply.avatar || userDefault}
                                             alt={`${reply.name}'s avatar`}
                                             onError={(e) => {
-                                                e.currentTarget.src = '/default-avatar.png';
+                                                e.currentTarget.src = userDefault;
                                             }}
                                         />
                                     </Link>
@@ -360,9 +366,9 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                                             to="#"
                                             className={styles.link}
                                             onClick={(e) => e.preventDefault()}
-                                            aria-label={`Reply by ${reply.name}`}
+                                            aria-label={t('review.replyBy', { name: reply.name })}
                                         >
-                                            {reply.name || 'Anonymous'}
+                                            {reply.name || t('review.anonymous')}
                                         </Link>
                                     </div>
                                 </div>
@@ -373,7 +379,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                                 <EditReplyForm
                                     replyId={reply.id}
                                     initialText={reply.text}
-                                    placeholder={`Chỉnh sửa phản hồi cho ${reply.name}...`}
+                                    placeholder={t('replyForm.editReplyTo', { name: reply.name })}
                                     onSave={handleSaveReply}
                                     onCancel={handleCancelEditReply}
                                 />
@@ -397,13 +403,13 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                                                     e.preventDefault();
                                                     handleReplyToReply(reply.id);
                                                 }}
-                                                aria-label="Reply to this reply"
+                                                aria-label={t('review.replyToReply')}
                                             >
                                                 <i
                                                     className="fa-solid fa-reply me-2"
                                                     aria-hidden="true"
                                                 ></i>
-                                                Phản hồi
+                                                {t('review.reply')}
                                             </Link>
                                         )}
 
@@ -412,7 +418,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                                             currentReplyUserId &&
                                             reply.userId === currentReplyUserId && (
                                                 <Button
-                                                    text="Sửa"
+                                                    text={t('review.editReply')}
                                                     type="button"
                                                     className={reviewStyles.editReplyButton}
                                                     onClick={() => handleEditReply(reply.id)}
@@ -424,7 +430,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                                             currentReplyUserId &&
                                             reply.userId === currentReplyUserId && (
                                                 <Button
-                                                    text="Xóa"
+                                                    text={t('review.deleteReply')}
                                                     type="button"
                                                     className={reviewStyles.deleteReplyButton}
                                                     onClick={() => handleDeleteReply(reply.id)}
@@ -439,10 +445,10 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                                 isOpen={deletingReplyId === reply.id}
                                 onClose={handleCancelDeleteReply}
                                 onConfirm={handleConfirmDeleteReply}
-                                title="Xác nhận xóa phản hồi"
-                                message="Bạn có chắc chắn muốn xóa phản hồi này? Hành động này không thể hoàn tác."
-                                confirmText="Xóa"
-                                cancelText="Hủy"
+                                title={t('review.confirmDeleteReplyTitle')}
+                                message={t('review.confirmDeleteReplyMessage')}
+                                confirmText={t('review.confirmButton')}
+                                cancelText={t('review.cancelButton')}
                                 type="danger"
                             />
 
@@ -453,7 +459,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                                         reviewId={review.id}
                                         onSubmitReply={handleReplySubmit}
                                         onCancel={handleCancelReply}
-                                        placeholder={`Phản hồi cho ${reply.name}...`}
+                                        placeholder={t('replyForm.replyTo', { name: reply.name })}
                                     />
                                 </div>
                             )}

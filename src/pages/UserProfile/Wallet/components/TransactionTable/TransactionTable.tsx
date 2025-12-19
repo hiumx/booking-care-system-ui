@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { Skeleton } from '@mui/material';
 
@@ -11,6 +12,8 @@ interface TransactionTableProps {
 }
 
 const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loading, error }) => {
+    const { t } = useTranslation('userProfile');
+
     const renderStatusBadge = (status: string) => {
         const isCompleted = status === 'completed';
         return (
@@ -21,7 +24,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                 })}
             >
                 <i className="fa-solid fa-circle me-1 fs-5"></i>
-                {isCompleted ? 'Completed' : 'Pending'}
+                {isCompleted
+                    ? t('wallet.transactions.completed')
+                    : t('wallet.transactions.pending')}
             </span>
         );
     };
@@ -57,12 +62,12 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                                 <table className="table table-center mb-0">
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
-                                            <th>Số tài khoản</th>
-                                            <th>Lý do hoàn tiền</th>
-                                            <th>Cập nhật vào lúc</th>
-                                            <th>Số tiền hoàn trả</th>
-                                            <th>Trạng thái</th>
+                                            <th>{t('wallet.transactions.id')}</th>
+                                            <th>{t('wallet.transactions.accountNumber')}</th>
+                                            <th>{t('wallet.transactions.refundReason')}</th>
+                                            <th>{t('wallet.transactions.updatedAt')}</th>
+                                            <th>{t('wallet.transactions.refundAmount')}</th>
+                                            <th>{t('wallet.transactions.status')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -161,8 +166,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                             <div className="text-center p-4">
                                 <div className="text-muted">
                                     <i className="fa-solid fa-receipt fa-3x mb-3 d-block"></i>
-                                    <h5>Chưa có giao dịch nào</h5>
-                                    <p>Lịch sử hoàn tiền của bạn sẽ được hiển thị tại đây.</p>
+                                    <h5>{t('wallet.transactions.empty.title')}</h5>
+                                    <p>{t('wallet.transactions.empty.description')}</p>
                                 </div>
                             </div>
                         </div>
@@ -181,12 +186,12 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                             <table className="table table-center mb-0">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Số tài khoản</th>
-                                        <th>Lý do hoàn tiền</th>
-                                        <th>Cập nhật vào lúc</th>
-                                        <th>Số tiền hoàn trả</th>
-                                        <th>Trạng thái</th>
+                                        <th>{t('wallet.transactions.id')}</th>
+                                        <th>{t('wallet.transactions.accountNumber')}</th>
+                                        <th>{t('wallet.transactions.refundReason')}</th>
+                                        <th>{t('wallet.transactions.updatedAt')}</th>
+                                        <th>{t('wallet.transactions.refundAmount')}</th>
+                                        <th>{t('wallet.transactions.status')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>

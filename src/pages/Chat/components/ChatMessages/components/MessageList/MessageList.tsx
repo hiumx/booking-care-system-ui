@@ -1,11 +1,14 @@
 import { useEffect, useRef, Fragment } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { useChat } from '@/providers/ChatProvider';
 import { RootState } from '@/store';
 import MessageItem from './MessageItem';
 import CallLogItem from './CallLogItem';
+import userDefault from '@/assets/img/patients/patient.jpg';
 
 const MessageList = () => {
+    const { t } = useTranslation('chat');
     const {
         messages,
         activeConversation,
@@ -175,7 +178,7 @@ const MessageList = () => {
     if (!activeConversation) {
         return (
             <div className="messages text-center p-4">
-                <p className="text-muted">Chọn một hội thoại để bắt đầu nhắn tin</p>
+                <p className="text-muted">{t('messages.selectToStart')}</p>
             </div>
         );
     }
@@ -184,7 +187,7 @@ const MessageList = () => {
         return (
             <div className="messages text-center p-4">
                 <output className="spinner-border">
-                    <span className="visually-hidden">Đang tải tin nhắn...</span>
+                    <span className="visually-hidden">{t('messages.loading')}</span>
                 </output>
             </div>
         );
@@ -212,7 +215,7 @@ const MessageList = () => {
 
         // Yesterday
         if (messageDate >= yesterday) {
-            return `Hôm qua ${timeStr}`;
+            return `${t('messages.yesterday')} ${timeStr}`;
         }
 
         // This week: day name
@@ -262,7 +265,7 @@ const MessageList = () => {
                 isOwn: isOwnCall,
                 // Add caller info for display
                 callerName: callerInfo?.fullName || 'Unknown',
-                callerAvatar: callerInfo?.avatarUrl || '/default-avatar.png',
+                callerAvatar: callerInfo?.avatarUrl || userDefault,
             };
         }
 
@@ -273,7 +276,7 @@ const MessageList = () => {
             itemType: 'Message' as const,
             senderId: msg.senderId,
             senderName: msg.senderInfo?.fullName || 'Unknown',
-            senderAvatar: msg.senderInfo?.avatarUrl || '/default-avatar.png',
+            senderAvatar: msg.senderInfo?.avatarUrl || userDefault,
             content: msg.content,
             timestamp: formatMessageTimestamp(msg.createdAt || item.createdAt), // ✅ Smart formatting
             createdAt: msg.createdAt || item.createdAt,
@@ -320,10 +323,10 @@ const MessageList = () => {
         yesterday.setDate(yesterday.getDate() - 1);
 
         if (messageDate >= today) {
-            return 'Hôm nay';
+            return t('messages.today');
         }
         if (messageDate >= yesterday) {
-            return 'Hôm qua';
+            return t('messages.yesterday');
         }
         return messageDate.toLocaleDateString('vi-VN', {
             day: '2-digit',
@@ -348,9 +351,9 @@ const MessageList = () => {
             {isLoadingMoreMessages && (
                 <div className="text-center py-2">
                     <output className="spinner-border spinner-border-sm">
-                        <span className="visually-hidden">Đang tải tin nhắn cũ...</span>
+                        <span className="visually-hidden">{t('messages.loadingOld')}</span>
                     </output>
-                    <p className="text-muted small mt-1">Đang tải tin nhắn cũ...</p>
+                    <p className="text-muted small mt-1">{t('messages.loadingOld')}</p>
                 </div>
             )}
 
@@ -398,14 +401,14 @@ const MessageList = () => {
                 <div className="chats">
                     <div className="chat-avatar">
                         <img
-                            src={typingUser.avatarUrl || '/default-avatar.png'}
+                            src={typingUser.avatarUrl || userDefault}
                             className="dreams_chat"
                             alt="avatar"
                         />
                     </div>
                     <div className="chat-content chat-cont-type">
                         <div className="chat-profile-name chat-type-wrapper">
-                            <p>{typingUser.fullName} đang nhập...</p>
+                            <p>{t('messages.typing', { name: typingUser.fullName })}</p>
                         </div>
                     </div>
                 </div>

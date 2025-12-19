@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import BookingLayout from '@/layouts/BookingLayout';
 import { AppointmentService } from '@/services/appointment.service';
 import { AppointmentResponse } from '@/types/appointment.types';
@@ -21,6 +22,7 @@ import {
  * Supports: Doctor, Service, and Hospital appointments
  */
 const RequestRefund: React.FC = () => {
+    const { t, i18n } = useTranslation('booking');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [appointmentData, setAppointmentData] = useState<AppointmentResponse | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -41,8 +43,8 @@ const RequestRefund: React.FC = () => {
         if (hasDoctor) {
             return {
                 type: 'doctor' as const,
-                label: appointmentData.doctorInfo?.positionName || 'Bác sĩ',
-                name: appointmentData.doctorInfo?.fullName || 'Bác sĩ',
+                label: appointmentData.doctorInfo?.positionName || t('requestRefund.labels.doctor'),
+                name: appointmentData.doctorInfo?.fullName || t('requestRefund.labels.doctor'),
                 avatar: appointmentData.doctorInfo?.avatarUrl,
                 specialty: appointmentData.doctorInfo?.specialtyName,
                 fee: appointmentData.consultationFees,
@@ -52,8 +54,8 @@ const RequestRefund: React.FC = () => {
         if (hasService) {
             return {
                 type: 'service' as const,
-                label: 'Dịch vụ',
-                name: appointmentData.serviceInfo?.name || 'Dịch vụ',
+                label: t('requestRefund.labels.service'),
+                name: appointmentData.serviceInfo?.name || t('requestRefund.labels.service'),
                 avatar: appointmentData.serviceInfo?.imageUrl,
                 specialty: null,
                 fee: appointmentData.consultationFees || appointmentData.serviceInfo?.price,
@@ -62,13 +64,13 @@ const RequestRefund: React.FC = () => {
 
         return {
             type: 'hospital' as const,
-            label: 'Bệnh viện',
-            name: appointmentData.hospitalInfo?.name || 'Bệnh viện',
+            label: t('requestRefund.labels.hospital'),
+            name: appointmentData.hospitalInfo?.name || t('requestRefund.labels.hospital'),
             avatar: appointmentData.hospitalInfo?.avatarUrl,
             specialty: null,
             fee: appointmentData.consultationFees,
         };
-    }, [appointmentData]);
+    }, [appointmentData, t]);
 
     useEffect(() => {
         if (!validateAppointmentParams(appointmentId || null, rescheduleToken, navigate)) {
@@ -84,7 +86,7 @@ const RequestRefund: React.FC = () => {
         e.preventDefault();
 
         if (!appointmentId || !rescheduleToken) {
-            toast.error('Thông tin không hợp lệ');
+            toast.error(t('requestRefund.toast.invalidInfo'));
             return;
         }
 
@@ -97,14 +99,14 @@ const RequestRefund: React.FC = () => {
             });
 
             if (response.success) {
-                toast.success('Yêu cầu hoàn tiền đã được gửi thành công!');
+                toast.success(t('requestRefund.toast.success'));
                 navigate(PATHS.HOME);
             } else {
-                throw new Error(response.message || 'Không thể gửi yêu cầu hoàn tiền');
+                throw new Error(response.message || t('requestRefund.toast.error'));
             }
         } catch (error: any) {
             console.error('Error requesting refund:', error);
-            toast.error(error.message || 'Không thể gửi yêu cầu hoàn tiền');
+            toast.error(error.message || t('requestRefund.toast.error'));
         } finally {
             setIsSubmitting(false);
         }
@@ -126,7 +128,7 @@ const RequestRefund: React.FC = () => {
                                     <div className="card-header pt-3">
                                         <h5 className="d-flex align-items-center flex-wrap gap-2">
                                             <i className="isax isax-receipt-2 text-primary me-2"></i>{' '}
-                                            Yêu cầu hoàn tiền
+                                            {t('requestRefund.title')}
                                         </h5>
                                     </div>
 
@@ -139,7 +141,7 @@ const RequestRefund: React.FC = () => {
                                             />
                                         </span>
                                         <p className="mb-0">
-                                            Bạn đang yêu cầu hoàn tiền cho lịch hẹn với{' '}
+                                            {t('requestRefund.requestingRefundFor')}{' '}
                                             <span className="text-dark fw-semibold">
                                                 {displayInfo?.type === 'doctor' &&
                                                     `${displayInfo.label} `}
@@ -151,7 +153,7 @@ const RequestRefund: React.FC = () => {
                                     {/* Appointment Details */}
                                     <div className="card-body pb-3">
                                         <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between mb-3">
-                                            <h6>Thông tin lịch hẹn</h6>
+                                            <h6>{t('requestRefund.appointmentInfo')}</h6>
                                         </div>
 
                                         <div className="row">
@@ -175,7 +177,9 @@ const RequestRefund: React.FC = () => {
                                                     <div className="col-md-6">
                                                         <div className="mb-3">
                                                             <div className="form-label">
-                                                                Chuyên khoa
+                                                                {t(
+                                                                    'requestRefund.labels.specialty'
+                                                                )}
                                                             </div>
                                                             <div className="form-plain-text">
                                                                 {displayInfo.specialty}
@@ -187,16 +191,23 @@ const RequestRefund: React.FC = () => {
                                             {/* Date */}
                                             <div className="col-md-6">
                                                 <div className="mb-3">
-                                                    <div className="form-label">Ngày hẹn</div>
+                                                    <div className="form-label">
+                                                        {t('requestRefund.labels.date')}
+                                                    </div>
                                                     <div className="form-plain-text">
                                                         {new Date(
                                                             appointmentData?.appointmentDate || ''
-                                                        ).toLocaleDateString('vi-VN', {
-                                                            weekday: 'long',
-                                                            year: 'numeric',
-                                                            month: 'long',
-                                                            day: 'numeric',
-                                                        })}
+                                                        ).toLocaleDateString(
+                                                            i18n.language === 'vi'
+                                                                ? 'vi-VN'
+                                                                : 'en-US',
+                                                            {
+                                                                weekday: 'long',
+                                                                year: 'numeric',
+                                                                month: 'long',
+                                                                day: 'numeric',
+                                                            }
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -204,7 +215,9 @@ const RequestRefund: React.FC = () => {
                                             {/* Time */}
                                             <div className="col-md-6">
                                                 <div className="mb-3">
-                                                    <div className="form-label">Giờ hẹn</div>
+                                                    <div className="form-label">
+                                                        {t('requestRefund.labels.time')}
+                                                    </div>
                                                     <div className="form-plain-text">
                                                         {formatAppointmentTime(
                                                             appointmentData?.appointmentTimeId || ''
@@ -219,7 +232,7 @@ const RequestRefund: React.FC = () => {
                                                     <div className="col-md-6">
                                                         <div className="mb-3">
                                                             <div className="form-label">
-                                                                Địa điểm
+                                                                {t('requestRefund.labels.location')}
                                                             </div>
                                                             <div className="form-plain-text">
                                                                 {appointmentData.hospitalInfo.name}
@@ -234,7 +247,7 @@ const RequestRefund: React.FC = () => {
                                                     <div className="col-md-6">
                                                         <div className="mb-3">
                                                             <div className="form-label">
-                                                                Địa chỉ
+                                                                {t('requestRefund.labels.address')}
                                                             </div>
                                                             <div className="form-plain-text">
                                                                 {
@@ -251,14 +264,18 @@ const RequestRefund: React.FC = () => {
                                                 <div className="mb-3">
                                                     <div className="form-label">
                                                         {displayInfo?.type === 'service'
-                                                            ? 'Phí dịch vụ'
-                                                            : 'Phí khám'}
+                                                            ? t('requestRefund.labels.serviceFee')
+                                                            : t(
+                                                                  'requestRefund.labels.consultationFee'
+                                                              )}
                                                     </div>
                                                     <div className="form-plain-text text-success fw-semibold">
                                                         {(displayInfo?.fee || 0).toLocaleString(
-                                                            'vi-VN'
+                                                            i18n.language === 'vi'
+                                                                ? 'vi-VN'
+                                                                : 'en-US'
                                                         )}{' '}
-                                                        VNĐ
+                                                        {i18n.language === 'vi' ? 'VNĐ' : 'VND'}
                                                     </div>
                                                 </div>
                                             </div>
@@ -269,10 +286,8 @@ const RequestRefund: React.FC = () => {
                                             <div className="d-flex">
                                                 <i className="isax isax-info-circle text-primary me-2 mt-1"></i>
                                                 <div>
-                                                    <strong>Lưu ý:</strong> Yêu cầu hoàn tiền sẽ
-                                                    được xử lý trong vòng 3-5 ngày làm việc. Số tiền
-                                                    sẽ được chuyển vào tài khoản ngân hàng mà bạn đã
-                                                    đăng ký.
+                                                    <strong>{t('requestRefund.note.title')}</strong>{' '}
+                                                    {t('requestRefund.note.message')}
                                                 </div>
                                             </div>
                                         </div>
@@ -291,12 +306,14 @@ const RequestRefund: React.FC = () => {
                                                                 className="spinner-border spinner-border-sm me-2"
                                                                 aria-hidden="true"
                                                             ></output>{' '}
-                                                            Đang xử lý...
+                                                            {t('requestRefund.actions.processing')}
                                                         </>
                                                     ) : (
                                                         <>
                                                             <i className="isax isax-tick-circle me-2"></i>{' '}
-                                                            Xác nhận hoàn tiền
+                                                            {t(
+                                                                'requestRefund.actions.confirmRefund'
+                                                            )}
                                                         </>
                                                     )}
                                                 </button>

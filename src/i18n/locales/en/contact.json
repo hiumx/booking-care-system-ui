@@ -1,0 +1,151 @@
+{
+    "breadcrumb": {
+        "home": "Home",
+        "contact": "Partnership Contact"
+    },
+    "title": "Partnership Contact",
+    "header": {
+        "subtitle": "Partnership Contact",
+        "title": "Register to become a partner",
+        "description": "We are looking for reputable hospitals and clinics to partner with to provide the best healthcare services for users. Please fill in the information below to register for partnership."
+    },
+    "contactInfo": {
+        "address": {
+            "title": "Address",
+            "value": "Da Nang, Vietnam"
+        },
+        "phone": {
+            "title": "Phone Number",
+            "value": "+84 763583081"
+        },
+        "email": {
+            "title": "Email",
+            "value": "medcure.contact@gmail.com"
+        }
+    },
+    "steps": {
+        "ekyc": "Identity Verification",
+        "registration": "Registration Information"
+    },
+    "form": {
+        "ekycVerified": "Identity verification successful",
+        "representative": {
+            "title": "Representative Information",
+            "autoFillNote": "Representative name has been automatically filled from ID card",
+            "name": {
+                "label": "Representative Name",
+                "placeholder": "Enter representative full name"
+            },
+            "email": {
+                "label": "Representative Email",
+                "placeholder": "Enter representative email address"
+            },
+            "phone": {
+                "label": "Representative Phone",
+                "placeholder": "Enter representative phone number"
+            }
+        },
+        "identityCard": {
+            "label": "Representative ID Card"
+        },
+        "hospital": {
+            "title": "Hospital Information",
+            "description": "Please provide detailed information about the hospital you want to partner with",
+            "name": {
+                "label": "Hospital Name",
+                "placeholder": "Enter full hospital name"
+            },
+            "email": {
+                "label": "Hospital Email",
+                "placeholder": "Enter official hospital email address"
+            },
+            "phone": {
+                "label": "Hospital Phone",
+                "placeholder": "Enter main hospital phone number"
+            },
+            "address": {
+                "label": "Hospital Address",
+                "placeholder": "Enter full hospital address"
+            },
+            "taxCode": {
+                "label": "Business Tax Code",
+                "placeholder": "Enter business tax code (10 digits or 10 digits-XXX)"
+            },
+            "license": {
+                "label": "Operating License"
+            },
+            "businessCertificate": {
+                "label": "Business Registration Certificate"
+            }
+        },
+        "submit": {
+            "button": "Submit Partnership Application",
+            "submitting": "Submitting..."
+        }
+    },
+    "messages": {
+        "validationError": "Please check the information and fill in all required fields",
+        "success": "Partnership application has been submitted successfully! We will review and contact you as soon as possible.",
+        "error": "An error occurred while submitting the application. Please try again later."
+    },
+    "ekyc": {
+        "title": "Identity Verification (eKYC)",
+        "description": "Please verify your identity with ID card to ensure the authenticity of the registration",
+        "idCardFront": "ID Card Front Photo",
+        "idCardBack": "ID Card Back Photo",
+        "selfie": "Portrait Photo (Selfie)",
+        "livenessVideo": "Liveness Verification Video",
+        "placeholders": {
+            "front": "Front side",
+            "back": "Back side",
+            "selfie": "Take selfie",
+            "video": "Record 3-5 seconds"
+        },
+        "buttons": {
+            "upload": "Upload",
+            "capture": "Capture",
+            "record": "Record",
+            "verify": "Verify Identity",
+            "verifying": "Verifying...",
+            "retry": "Retry",
+            "cancel": "Cancel",
+            "startRecording": "Start Recording",
+            "stopRecording": "Stop"
+        },
+        "camera": {
+            "front": "Capture ID Card Front",
+            "back": "Capture ID Card Back",
+            "selfie": "Capture Portrait Photo",
+            "video": "Record Verification Video",
+            "videoInstruction": "Record your face for 3-5 seconds, turn your head slightly left and right",
+            "error": "Cannot access camera. Please check permissions."
+        },
+        "ocrResult": {
+            "title": "Information from ID Card",
+            "idNumber": "ID Number:",
+            "fullName": "Full Name:",
+            "dateOfBirth": "Date of Birth:",
+            "gender": "Gender:",
+            "address": "Address:",
+            "na": "N/A"
+        },
+        "faceMatch": {
+            "label": "Face Match Score:"
+        },
+        "status": {
+            "success": "Verification Successful!",
+            "failed": "Verification Failed",
+            "uploading": "Uploading images...",
+            "processing": "Verifying identity..."
+        },
+        "messages": {
+            "success": "Identity verification successful!",
+            "missingFiles": "Please provide all ID card photos and selfie",
+            "error": "An error occurred. Please try again.",
+            "verificationFailed": "Verification failed. Please try again."
+        },
+        "videoHelp": "Video helps verify you are a real person. Turn your head slightly left and right while recording.",
+        "removeImage": "Remove image",
+        "removeVideo": "Remove video"
+    }
+}

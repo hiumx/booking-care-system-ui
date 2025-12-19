@@ -1,0 +1,83 @@
+{
+    "profile": {
+        "breadcrumb": {
+            "home": "Trang Chủ",
+            "hospitals": "Bệnh viện"
+        },
+        "loading": "Đang tải thông tin bệnh viện...",
+        "defaultName": "Bệnh viện",
+        "sections": {
+            "specialties": "Chuyên khoa",
+            "doctorServices": {
+                "title": "Dịch vụ khám & tư vấn của bác sĩ",
+                "description": "Các dịch vụ khám và tư vấn chuyên khoa",
+                "count": "{{count}} dịch vụ"
+            },
+            "hospitalServices": {
+                "title": "Dịch vụ y tế tại bệnh viện",
+                "description": "Các dịch vụ y tế và xét nghiệm chuyên sâu",
+                "count": "{{count}} dịch vụ"
+            },
+            "introduction": "Giới thiệu",
+            "pricing": "Bảng giá",
+            "guide": "Hướng dẫn đi khám",
+            "faq": "Câu hỏi thường gặp"
+        },
+        "expand": "Mở rộng",
+        "collapse": "Thu gọn",
+        "pricing": {
+            "empty": "Chưa có thông tin bảng giá"
+        },
+        "guide": {
+            "step1": "Truy cập website",
+            "step1Content": "hoặc tải ứng dụng MedCure – Đặt lịch khám bệnh trên điện thoại.",
+            "step2": "Tìm kiếm",
+            "step3": "Chọn loại dịch vụ bạn mong muốn như",
+            "step3Default": "khám tổng quát, khám chuyên khoa, xét nghiệm, chẩn đoán hình ảnh...",
+            "step4": "Lựa chọn thời gian, bác sĩ và hình thức khám (tại bệnh viện hoặc tư vấn trực tuyến).",
+            "step5": "Xác nhận thông tin, nhận phiếu khám điện tử qua email hoặc ứng dụng.",
+            "note": "Lưu ý:",
+            "noteContent": "Vui lòng đến sớm 15 phút trước giờ hẹn để được hỗ trợ đón tiếp, do chi số cơ bản và hoàn thiện thủ tục trước khi vào khám."
+        },
+        "sidebar": {
+            "mapTitle": "Bản đồ {{name}}",
+            "bookNow": "Đặt khám ngay",
+            "locationInfo": "Thông tin vị trí và quảng cáo"
+        }
+    },
+    "list": {
+        "breadcrumb": {
+            "home": "Home",
+            "title": "Danh sách bệnh viện"
+        },
+        "title": "Bệnh viện",
+        "titleWithSpecialty": "Bệnh viện - {{specialty}}",
+        "results": {
+            "showing": "Hiển thị",
+            "hospitals": "Bệnh viện",
+            "filtered": "(đã lọc)"
+        },
+        "filters": {
+            "selectArea": "Chọn khu vực",
+            "province": "Tỉnh",
+            "district": "Quận/Huyện",
+            "selectSpecialty": "Chọn chuyên khoa",
+            "specialtyCount": "{{count}} chuyên khoa",
+            "searchPlaceholder": "Tìm kiếm Bệnh viện",
+            "clearSelection": "Xóa lựa chọn",
+            "activeFilters": "Bộ lọc đang áp dụng:",
+            "clearAll": "Xóa tất cả bộ lọc",
+            "clearAreaFilter": "Xóa bộ lọc khu vực",
+            "clearSpecialtyFilter": "Xóa bộ lọc chuyên khoa",
+            "clearSearch": "Xóa tìm kiếm"
+        },
+        "empty": {
+            "title": "Không tìm thấy bệnh viện nào",
+            "messageFiltered": "Không có bệnh viện nào phù hợp với bộ lọc của bạn. Hãy thử điều chỉnh bộ lọc hoặc tìm kiếm khác.",
+            "messageDefault": "Hiện tại chưa có bệnh viện nào trong hệ thống."
+        },
+        "modal": {
+            "specialtyTitle": "Tìm theo chuyên khoa"
+        }
+    }
+}

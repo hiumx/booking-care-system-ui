@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 import Pagination from '@/components/Pagination';
 import ReviewCard from '@/components/ReviewCard';
 import Button from '@/components/Button';
@@ -215,6 +216,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     onDeleteReply,
     className,
 }) => {
+    const { t } = useTranslation('common');
     const [showWriteReview, setShowWriteReview] = useState(false);
 
     // Use reviews directly from props (already paginated by server)
@@ -236,11 +238,11 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
         const diffInMs = now.getTime() - date.getTime();
         const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
-        if (diffInDays === 0) return 'Hôm nay';
-        if (diffInDays === 1) return 'Hôm qua';
-        if (diffInDays < 30) return `${diffInDays} ngày trước`;
-        if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} tháng trước`;
-        return `${Math.floor(diffInDays / 365)} năm trước`;
+        if (diffInDays === 0) return t('timeAgo.today');
+        if (diffInDays === 1) return t('timeAgo.yesterday');
+        if (diffInDays < 30) return t('timeAgo.daysAgo', { count: diffInDays });
+        if (diffInDays < 365) return t('timeAgo.monthsAgo', { count: Math.floor(diffInDays / 30) });
+        return t('timeAgo.yearsAgo', { count: Math.floor(diffInDays / 365) });
     };
 
     // Helper function to convert MongoDB ObjectId string to number
@@ -257,7 +259,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     return (
         <div className={clsx('review-section', styles.reviewSection, className)}>
             <div className="detail-title mb-3">
-                <h4>Đánh giá ({totalCount})</h4>
+                <h4>{t('review.titleWithCount', { count: totalCount })}</h4>
             </div>
 
             {/* Write Review Section */}
@@ -270,7 +272,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
                     />
                 ) : (
                     <Button
-                        text="Viết đánh giá"
+                        text={t('review.writeReview')}
                         type="button"
                         className="btn-primary"
                         onClick={() => setShowWriteReview(true)}
@@ -282,7 +284,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
             {isLoading && (
                 <div className="text-center py-4">
                     <output className="spinner-border">
-                        <span className="visually-hidden">Đang tải...</span>
+                        <span className="visually-hidden">{t('review.loading')}</span>
                     </output>
                 </div>
             )}
@@ -290,7 +292,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
             {/* Empty State */}
             {!isLoading && reviews.length === 0 && (
                 <div className="text-center py-4">
-                    <p className="text-muted">Chưa có đánh giá nào.</p>
+                    <p className="text-muted">{t('review.noReviews')}</p>
                 </div>
             )}
 

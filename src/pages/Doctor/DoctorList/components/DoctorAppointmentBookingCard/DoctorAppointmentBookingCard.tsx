@@ -1,7 +1,8 @@
 import clsx from 'clsx';
 import styles from './DoctorAppointmentBookingCard.module.scss';
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PATHS, replacePathParams } from '@/routes/paths';
 import { LanguageResponse } from '@/types/language.types';
 import { useFavoriteDoctor } from '@/hooks/useFavoriteDoctor';
@@ -46,6 +47,7 @@ const formatVND = (value: number): string => {
 };
 
 const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> = (props) => {
+    const { t } = useTranslation('doctor');
     const {
         doctorId,
         patientId,
@@ -106,7 +108,7 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
         }
 
         return {
-            serviceTypeName: 'Chưa cập nhật',
+            serviceTypeName: t('list.notUpdated'),
             amount: 0,
         };
     }, [prices, serviceTypeFilters]);
@@ -124,7 +126,7 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                         <Link to={replacePathParams(PATHS.DOCTOR.PROFILE, { id: doctorId })}>
                             <img
                                 src={image || 'https://bookingcaree.com/user-avatar-default.png'}
-                                alt="hình ảnh bác sĩ"
+                                alt={t('card.doctorImage')}
                             />
                         </Link>
                         <div
@@ -136,7 +138,7 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                             <div className="d-flex flex-column gap-1">
                                 <span className={clsx(styles.badge, styles.bgOrange, 'badge')}>
                                     <i className="fa-solid fa-star me-1"></i>
-                                    {rating > 0 ? rating.toFixed(1) : 'Chưa có đánh giá'}
+                                    {rating > 0 ? rating.toFixed(1) : t('card.noRating')}
                                 </span>
                             </div>
                             <button
@@ -147,7 +149,7 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                 onClick={handleFavoriteToggle}
                                 disabled={isFavoriteLoading}
                                 aria-label={
-                                    isFavorited ? 'Bỏ yêu thích bác sĩ' : 'Yêu thích bác sĩ'
+                                    isFavorited ? t('card.removeFavorite') : t('card.addFavorite')
                                 }
                             >
                                 <i className="fa fa-heart"></i>
@@ -165,7 +167,7 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                     'fs-14'
                                 )}
                             >
-                                Chuyên khoa:{' '}
+                                {t('card.specialty')}:{' '}
                                 <span
                                     className={clsx(
                                         styles.doctorSpecialty,
@@ -174,7 +176,7 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                         'fs-14'
                                     )}
                                 >
-                                    {specialty || 'Không xác định'}
+                                    {specialty || t('card.unknown')}
                                 </span>
                             </Link>
                         </div>
@@ -190,21 +192,21 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                                     })}
                                                     className={styles.doctorInfoName}
                                                 >
-                                                    {name || 'Bác sĩ Không xác định'}
+                                                    {name || t('card.unknown')}
                                                 </Link>
                                                 <i className="isax isax-tick-circle5 text-success ms-2"></i>
                                             </h6>
                                             <p className={clsx(styles.fs15, 'mb-2')}>
-                                                {position || 'Chuyên gia'}
+                                                {position || t('card.expert')}
                                             </p>
                                             <p className="d-flex align-items-center mb-0 fs-14">
                                                 <i className="isax isax-location text-dark me-2"></i>
-                                                {location || 'Không xác định'}
+                                                {location || t('card.unknown')}
                                                 <Link
                                                     to="#"
                                                     className="text-primary text-decoration-underline ms-2"
                                                 >
-                                                    Chỉ đường
+                                                    {t('card.directions')}
                                                 </Link>
                                             </p>
                                         </div>
@@ -219,13 +221,15 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                                 <i className="isax isax-language-square text-dark me-2"></i>
                                                 {languages && languages.length > 0
                                                     ? languages.map((lang) => lang.name).join(', ')
-                                                    : 'Không xác định ngôn ngữ'}
+                                                    : t('card.unknownLanguage')}
                                             </p>
                                             <p className="d-flex align-items-center mb-0 fs-14">
                                                 <i className="isax isax-calendar text-dark me-2"></i>
                                                 {yearsOfExperience
-                                                    ? `${yearsOfExperience} năm kinh nghiệm`
-                                                    : 'Không xác định'}
+                                                    ? t('card.yearsExperience', {
+                                                          years: yearsOfExperience,
+                                                      })
+                                                    : t('card.unknownExperience')}
                                             </p>
                                         </div>
                                     </div>
@@ -234,11 +238,13 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                             <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mt-3">
                                 <div className="d-flex align-items-center flex-wrap row-gap-3">
                                     <div className="me-3">
-                                        <p className={clsx(styles.fs15, 'mb-1')}>Phí khám</p>
+                                        <p className={clsx(styles.fs15, 'mb-1')}>
+                                            {t('card.consultationFee')}
+                                        </p>
                                         <h3 className="text-orange">
                                             {displayServiceInfo.amount > 0
                                                 ? formatVND(displayServiceInfo.amount)
-                                                : 'Liên hệ để biết giá'}
+                                                : t('card.contactForPrice')}
                                         </h3>
                                     </div>
                                 </div>
@@ -271,7 +277,9 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                         className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
                                     >
                                         <i className="isax isax-calendar-1 me-2"></i>
-                                        {isRescheduleMode ? 'Chọn bác sĩ này' : 'Đặt lịch khám'}
+                                        {isRescheduleMode
+                                            ? t('card.selectDoctor')
+                                            : t('card.bookAppointment')}
                                     </Link>
                                 </div>
                             </div>

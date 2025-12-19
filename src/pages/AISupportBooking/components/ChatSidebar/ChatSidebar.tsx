@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { MessageSquare, Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { RootState } from '@/store';
 import { PATHS } from '@/routes/paths';
@@ -75,6 +76,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
     isOpen = true,
     onToggle,
 }) => {
+    const { t } = useTranslation('aiSupport');
     const navigate = useNavigate();
     const { profile } = useSelector((state: RootState) => state.user);
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -94,7 +96,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
         if (profile?.fullName) {
             return profile.fullName;
         }
-        return 'Khách';
+        return t('sidebar.guest');
     };
 
     return (
@@ -102,13 +104,13 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
             <div className={styles.sidebarHeader}>
                 <div className={styles.title}>
                     <MessageSquare size={20} className={styles.titleIcon} />
-                    {isOpen && <span>Lịch sử chat</span>}
+                    {isOpen && <span>{t('sidebar.chatHistory')}</span>}
                 </div>
                 {onToggle && (
                     <button
                         className={styles.toggleButton}
                         onClick={onToggle}
-                        data-tooltip={isOpen ? 'Đóng' : 'Mở'}
+                        data-tooltip={isOpen ? t('sidebar.close') : t('sidebar.open')}
                     >
                         {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
                     </button>
@@ -119,16 +121,14 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                 <>
                     <button className={styles.newChatButton} onClick={onNewChat}>
                         <Plus size={18} />
-                        <span>Cuộc trò chuyện mới</span>
+                        <span>{t('chat.newConversation')}</span>
                     </button>
 
                     <div className={styles.chatList}>
                         {chatHistories.length === 0 ? (
                             <div className={styles.emptyState}>
-                                <p>Chưa có cuộc trò chuyện nào</p>
-                                <p className={styles.emptyHint}>
-                                    Nhấn nút "Cuộc trò chuyện mới" để bắt đầu
-                                </p>
+                                <p>{t('sidebar.noConversations')}</p>
+                                <p className={styles.emptyHint}>{t('sidebar.startHint')}</p>
                             </div>
                         ) : (
                             chatHistories.map((chat) => (
@@ -146,14 +146,21 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                     }}
                                     role="button"
                                     tabIndex={0}
-                                    aria-label={`Chọn cuộc trò chuyện: ${chat.title || chat.lastMessage || 'Cuộc trò chuyện'}`}
+                                    aria-label={t('sidebar.selectConversation', {
+                                        title:
+                                            chat.title ||
+                                            chat.lastMessage ||
+                                            t('sidebar.conversation'),
+                                    })}
                                 >
                                     <div className={styles.chatAvatar}>
                                         <UserAvatar />
                                     </div>
                                     <div className={styles.chatContent}>
                                         <div className={styles.chatTitle}>
-                                            {chat.title || chat.lastMessage || 'Cuộc trò chuyện'}
+                                            {chat.title ||
+                                                chat.lastMessage ||
+                                                t('sidebar.conversation')}
                                         </div>
                                         {chat.lastMessage && (
                                             <div className={styles.chatPreview}>
@@ -173,7 +180,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                                 e.stopPropagation();
                                                 onDeleteChat(chat.id);
                                             }}
-                                            data-tooltip="Xóa"
+                                            data-tooltip={t('sidebar.delete')}
                                         >
                                             <Trash2 size={16} />
                                         </button>
@@ -244,7 +251,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                             className={styles.upgradeButton}
                             onClick={() => navigate(PATHS.LOGIN)}
                         >
-                            Login
+                            {t('sidebar.login')}
                         </button>
                     )}
                 </div>

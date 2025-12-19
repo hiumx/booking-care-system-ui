@@ -13,14 +13,36 @@ import type {
 } from './useChatHub';
 
 // WebRTC Configuration
+// IMPORTANT: TURN server is required for production to handle NAT/firewall traversal
+// Without TURN, ~30% of connections will fail (users behind symmetric NAT)
 const RTC_CONFIG: RTCConfiguration = {
     iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
-        { urls: 'stun:stun3.l.google.com:19302' },
-        { urls: 'stun:stun4.l.google.com:19302' },
+        // STUN server (Metered.ca)
+        { urls: 'stun:stun.relay.metered.ca:80' },
+
+        // TURN servers (Metered.ca - required for NAT traversal)
+        {
+            urls: 'turn:global.relay.metered.ca:80',
+            username: import.meta.env.VITE_TURN_USERNAME || '',
+            credential: import.meta.env.VITE_TURN_CREDENTIAL || '',
+        },
+        {
+            urls: 'turn:global.relay.metered.ca:80?transport=tcp',
+            username: import.meta.env.VITE_TURN_USERNAME || '',
+            credential: import.meta.env.VITE_TURN_CREDENTIAL || '',
+        },
+        {
+            urls: 'turn:global.relay.metered.ca:443',
+            username: import.meta.env.VITE_TURN_USERNAME || '',
+            credential: import.meta.env.VITE_TURN_CREDENTIAL || '',
+        },
+        {
+            urls: 'turns:global.relay.metered.ca:443?transport=tcp',
+            username: import.meta.env.VITE_TURN_USERNAME || '',
+            credential: import.meta.env.VITE_TURN_CREDENTIAL || '',
+        },
     ],
+    iceCandidatePoolSize: 10, // Pre-gather candidates for faster connection
 };
 
 export type CallState =
@@ -396,7 +418,11 @@ export const useWebRTC = (
 
             // Handle connection state changes
             pc.onconnectionstatechange = () => {
-                console.log('[WebRTC] Connection state:', pc.connectionState);
+                console.log('[WebRTC] 📡 Connection state:', pc.connectionState);
+                console.log('[WebRTC] 📡 ICE connection state:', pc.iceConnectionState);
+                console.log('[WebRTC] 📡 ICE gathering state:', pc.iceGatheringState);
+                console.log('[WebRTC] 📡 Signaling state:', pc.signalingState);
+
                 switch (pc.connectionState) {
                     case 'connected':
                         console.log('[WebRTC] 🎯 Connection established, will create call log');
@@ -424,11 +450,35 @@ export const useWebRTC = (
             // Handle ICE connection state changes
             pc.oniceconnectionstatechange = () => {
                 console.log('[WebRTC] 🧊 ICE connection state:', pc.iceConnectionState);
+                console.log('[WebRTC] 🧊 Connection state:', pc.connectionState);
+
+                // ✅ Log ICE connection failures
+                if (pc.iceConnectionState === 'failed') {
+                    console.error('[WebRTC] ❌ ICE connection failed!');
+                    console.error('[WebRTC] ❌ This usually means:');
+                    console.error('[WebRTC] ❌ - NAT/Firewall blocking connection');
+                    console.error('[WebRTC] ❌ - TURN server needed but not configured');
+                    console.error('[WebRTC] ❌ - Network connectivity issues');
+
+                    // Try ICE restart
+                    console.log('[WebRTC] 🔄 Attempting ICE restart...');
+                    pc.restartIce();
+                } else if (pc.iceConnectionState === 'disconnected') {
+                    console.warn(
+                        '[WebRTC] ⚠️ ICE connection disconnected, waiting for reconnection...'
+                    );
+                }
             };
 
             // Handle ICE gathering state changes
             pc.onicegatheringstatechange = () => {
                 console.log('[WebRTC] 🧊 ICE gathering state:', pc.iceGatheringState);
+
+                if (pc.iceGatheringState === 'complete') {
+                    console.log('[WebRTC] ✅ ICE gathering complete');
+                    console.log('[WebRTC] 📊 Local description:', pc.localDescription?.type);
+                    console.log('[WebRTC] 📊 Remote description:', pc.remoteDescription?.type);
+                }
             };
 
             peerConnectionRef.current = pc;
@@ -1047,28 +1097,44 @@ export const useWebRTC = (
      */
     const handleReceiveIceCandidate = useCallback(async (data: ICECandidateData) => {
         try {
-            console.log('[WebRTC] Received ICE candidate from:', data.senderId);
+            console.log('[WebRTC] 🧊 Received ICE candidate from:', data.senderId);
+            console.log('[WebRTC] 🧊 Candidate data:', {
+                type: data.candidate?.candidate?.split(' ')[7], // Extract candidate type from SDP
+                protocol: data.candidate?.candidate?.split(' ')[2],
+                address: data.candidate?.candidate?.split(' ')[4],
+            });
 
             const pc = peerConnectionRef.current;
             if (!pc) {
                 // ✅ Queue candidate even if no peer connection yet
                 console.log('[WebRTC] ⏳ No peer connection yet, queueing ICE candidate');
+                console.log('[WebRTC] 📊 Queue size:', iceCandidateQueueRef.current.length + 1);
                 iceCandidateQueueRef.current.push(data.candidate);
                 return;
             }
 
+            console.log('[WebRTC] 📊 PC state:', {
+                connectionState: pc.connectionState,
+                iceConnectionState: pc.iceConnectionState,
+                signalingState: pc.signalingState,
+                hasRemoteDescription: !!pc.remoteDescription,
+            });
+
             // If remote description is not set yet, queue the candidate
             if (!pc.remoteDescription) {
                 console.log('[WebRTC] ⏳ Queueing ICE candidate (no remote description yet)');
+                console.log('[WebRTC] 📊 Queue size:', iceCandidateQueueRef.current.length + 1);
                 iceCandidateQueueRef.current.push(data.candidate);
                 return;
             }
 
             // Add ICE candidate
             await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
-            console.log('[WebRTC] ✅ Added ICE candidate');
+            console.log('[WebRTC] ✅ Added ICE candidate successfully');
+            console.log('[WebRTC] 📊 ICE connection state after add:', pc.iceConnectionState);
         } catch (error) {
             console.error('[WebRTC] ❌ Error adding ICE candidate:', error);
+            console.error('[WebRTC] ❌ Candidate that failed:', data.candidate);
         }
     }, []);
 

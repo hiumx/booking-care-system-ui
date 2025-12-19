@@ -1,0 +1,107 @@
+{
+    "loading": "Validating...",
+    "invalidToken": {
+        "title": "Invalid Token",
+        "defaultError": "Token is invalid or expired",
+        "validationError": "Unable to validate token. Please try again later.",
+        "contactAdmin": "Please contact admin to receive a new contract signing link."
+    },
+    "header": {
+        "title": "Electronic Contract Signing",
+        "subtitle": "Please read the contract carefully and complete the signing steps below"
+    },
+    "steps": {
+        "signature": "Signature",
+        "otp": "OTP Verification",
+        "confirm": "Confirm"
+    },
+    "contractInfo": {
+        "title": "Contract Information",
+        "contractNumber": "Contract Number",
+        "hospital": "Hospital",
+        "representative": "Representative",
+        "email": "Email"
+    },
+    "contractPreview": {
+        "title": "View Contract",
+        "draft": "Draft",
+        "warning": "Please read the entire contract content carefully before signing",
+        "openNewTab": "Open in new tab"
+    },
+    "signature": {
+        "title": "Draw your signature",
+        "description": "Draw your signature in the box below. This signature will be used to authenticate the contract.",
+        "placeholder": "Draw signature here",
+        "clear": "Clear and redraw",
+        "hasSignature": "Signature added"
+    },
+    "otp": {
+        "title": "OTP Verification",
+        "sent": "OTP code has been sent!",
+        "checkEmail": "Please check your email",
+        "inputLabel": "Enter OTP code (6 digits)",
+        "resendIn": "Resend code in",
+        "seconds": "seconds",
+        "resend": "Resend OTP code",
+        "inputComplete": "Code entered",
+        "sendTo": "OTP code will be sent to email",
+        "sendButton": "Send OTP code",
+        "sending": "Sending...",
+        "completeStep1": "Please complete step 1 (draw signature) before sending OTP"
+    },
+    "submit": {
+        "title": "Confirm Contract Signing",
+        "button": "Confirm and Sign Contract",
+        "processing": "Processing...",
+        "disclaimer": "By signing this contract, you confirm that you have read and agree to all terms in the contract. Your electronic signature is legally binding."
+    },
+    "toast": {
+        "otpSent": "OTP code has been sent to your email",
+        "otpSendFailed": "Unable to send OTP",
+        "otpSendError": "An error occurred while sending OTP",
+        "completeAllSteps": "Please complete all steps",
+        "drawSignature": "Please draw your signature",
+        "otpLength": "OTP code must be 6 digits",
+        "signSuccess": "Contract signed successfully!",
+        "signFailed": "Contract signing failed",
+        "signError": "An error occurred while signing the contract"
+    },
+    "success": {
+        "breadcrumb": {
+            "home": "Home",
+            "contractSigning": "Contract Signing",
+            "complete": "Complete"
+        },
+        "title": "Contract Signed Successfully",
+        "message": "Thank you for completing the electronic contract signing. The contract has been sent to",
+        "systemName": "MedCure",
+        "toReview": "for review and approval.",
+        "nextSteps": {
+            "title": "Next Steps",
+            "step1": "Contract has been signed successfully and sent to MedCure system",
+            "step2": "The admin team will review and approve the contract as soon as possible",
+            "step3": "You will receive an email notification when the contract is approved",
+            "step4": "After approval, the hospital account will be activated and you can log in to the system"
+        },
+        "timeline": {
+            "title": "Processing Timeline",
+            "step1": {
+                "title": "Sign Contract",
+                "status": "Completed"
+            },
+            "step2": {
+                "title": "Review Contract",
+                "status": "Pending"
+            },
+            "step3": {
+                "title": "Activate Account",
+                "status": "Waiting"
+            }
+        },
+        "support": {
+            "title": "Need Support?",
+            "description": "If you have any questions, please contact us:"
+        },
+        "backHome": "Back to Home"
+    }
+}

@@ -22,6 +22,7 @@ import {
     createAuthContactMethodFormProps,
 } from '@/components/Auth/AuthContactMethodForm';
 import { OtpInputGrid } from '@/components/Auth/OtpInputGrid';
+import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 
 interface ForgotPasswordProps {
     onSubmit?: (email: string, phone: string) => void;
@@ -34,6 +35,9 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onSubmit }) => {
     const { t } = useTranslation('auth');
     const dispatch = useDispatch<AppDispatch>();
     const { isLoading, error } = useSelector((state: RootState) => state.auth);
+
+    // Redirect to home if already authenticated
+    useAuthRedirect();
 
     const [email, setEmail] = useState('');
     const [step, setStep] = useState<'input' | 'otp'>('input');

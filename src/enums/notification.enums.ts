@@ -4,6 +4,7 @@
 export enum NotificationType {
     General = 'General',
     BookingConfirmation = 'BookingConfirmation',
+    BookingReminder = 'BookingReminder',
     PaymentReminder = 'PaymentReminder',
     Refund = 'Refund',
     AccountUpdate = 'AccountUpdate',
@@ -22,6 +23,7 @@ export enum NotificationType {
 export const NotificationTypeLabels: Record<NotificationType, string> = {
     [NotificationType.General]: 'Tin tức',
     [NotificationType.BookingConfirmation]: 'Phiếu khám',
+    [NotificationType.BookingReminder]: 'Nhắc lịch hẹn',
     [NotificationType.PaymentReminder]: 'Thông báo',
     [NotificationType.Refund]: 'Thông báo',
     [NotificationType.AccountUpdate]: 'Thông báo',
@@ -62,6 +64,7 @@ export const NotificationCategoryLabels: Record<NotificationCategory, string> = 
 export const getNotificationCategory = (type: NotificationType): NotificationCategory => {
     switch (type) {
         case NotificationType.BookingConfirmation:
+        case NotificationType.BookingReminder:
             return NotificationCategory.Appointment;
         case NotificationType.General:
         case NotificationType.SystemAlert:
@@ -89,7 +92,7 @@ export const getNotificationCategory = (type: NotificationType): NotificationCat
 export const getTypesByCategory = (category: NotificationCategory): NotificationType[] => {
     switch (category) {
         case NotificationCategory.Appointment:
-            return [NotificationType.BookingConfirmation];
+            return [NotificationType.BookingConfirmation, NotificationType.BookingReminder];
         case NotificationCategory.News:
             return [
                 NotificationType.General,
