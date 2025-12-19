@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import { useTranslation } from 'react-i18next';
@@ -82,19 +82,11 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
     const displayTestimonials =
         testimonials || (apiTestimonials.length > 0 ? apiTestimonials : defaultTestimonials);
 
-    // Update counters with real total reviews count if available
-    const displayCounters =
-        counters ||
-        defaultCounters.map((counter, index) => {
-            // Assuming the first counter (index 0) is for reviews count
-            if (index === 0 && totalReviewsCount !== null) {
-                return {
-                    ...counter,
-                    value: totalReviewsCount,
-                };
-            }
-            return counter;
-        });
+    // Memoize displayCounters - use translation values directly, no API override
+    const displayCounters = useMemo(() => {
+        if (counters) return counters;
+        return defaultCounters;
+    }, [counters, defaultCounters]);
 
     // Fetch testimonials from API
     useEffect(() => {
@@ -139,84 +131,82 @@ const TestimonialSection: React.FC<TestimonialSectionProps> = ({ testimonials, c
     }, [testimonials, t]);
 
     // Counter animation
-    const [countersAnimated, setCountersAnimated] = useState(false);
     const [counterValues, setCounterValues] = useState<Record<string | number, number>>({});
     const counterRef = useRef<HTMLDivElement>(null);
+    const hasAnimatedRef = useRef(false);
+    const timersRef = useRef<ReturnType<typeof setInterval>[]>([]);
+    const displayCountersRef = useRef(displayCounters);
 
+    // Keep displayCountersRef in sync
     useEffect(() => {
-        if (countersAnimated) return; // Already animated
+        displayCountersRef.current = displayCounters;
+    }, [displayCounters]);
 
-        const timers: NodeJS.Timeout[] = [];
+    const runAnimation = useCallback(() => {
+        if (hasAnimatedRef.current) return;
+        hasAnimatedRef.current = true;
 
-        const initializeCounters = () => {
-            const initialValues: Record<string | number, number> = {};
-            for (const counter of displayCounters) {
-                initialValues[counter.id] = 0;
-            }
-            setCounterValues(initialValues);
-        };
+        // Clear existing timers
+        for (const timer of timersRef.current) {
+            clearInterval(timer);
+        }
+        timersRef.current = [];
 
-        const updateCounterValue = (counterId: string | number, value: number) => {
-            setCounterValues((prev) => ({
-                ...prev,
-                [counterId]: value,
-            }));
-        };
+        const currentCounters = displayCountersRef.current;
 
-        const createCounterTimer = (counter: CounterItem): NodeJS.Timeout => {
-            const duration = 2000; // 2 seconds
+        // Initialize to 0
+        const initialValues: Record<string | number, number> = {};
+        for (const counter of currentCounters) {
+            initialValues[counter.id] = 0;
+        }
+        setCounterValues(initialValues);
+
+        // Animate each counter
+        for (const counter of currentCounters) {
+            const duration = 2000;
             const steps = 60;
             const increment = counter.value / steps;
             let current = 0;
 
-            const handleCounterUpdate = (timer: NodeJS.Timeout) => {
+            const timer = setInterval(() => {
                 current += increment;
-                const isComplete = current >= counter.value;
-                const valueToSet = isComplete ? counter.value : Math.floor(current);
-                updateCounterValue(counter.id, valueToSet);
-                if (isComplete) {
+                if (current >= counter.value) {
+                    setCounterValues((prev) => ({ ...prev, [counter.id]: counter.value }));
                     clearInterval(timer);
+                } else {
+                    setCounterValues((prev) => ({ ...prev, [counter.id]: Math.floor(current) }));
                 }
-            };
+            }, duration / steps);
 
-            const timer = setInterval(() => handleCounterUpdate(timer), duration / steps);
-            return timer;
-        };
+            timersRef.current.push(timer);
+        }
+    }, []);
 
-        const animateCounter = (counter: CounterItem) => {
-            const timer = createCounterTimer(counter);
-            timers.push(timer);
-        };
+    // IntersectionObserver setup - runs once on mount
+    useEffect(() => {
+        const currentRef = counterRef.current;
+        if (!currentRef) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
                 for (const entry of entries) {
-                    if (entry.isIntersecting && !countersAnimated) {
-                        setCountersAnimated(true);
-                        initializeCounters();
-                        for (const counter of displayCounters) {
-                            animateCounter(counter);
-                        }
+                    if (entry.isIntersecting && !hasAnimatedRef.current) {
+                        runAnimation();
                     }
                 }
             },
-            { threshold: 0.5 }
+            { threshold: 0.3 }
         );
 
-        if (counterRef.current) {
-            observer.observe(counterRef.current);
-        }
+        observer.observe(currentRef);
 
         return () => {
-            if (counterRef.current) {
-                observer.unobserve(counterRef.current);
-            }
-            // Cleanup timers
-            for (const timer of timers) {
+            observer.disconnect();
+            for (const timer of timersRef.current) {
                 clearInterval(timer);
             }
         };
-    }, [countersAnimated, displayCounters]);
+    }, [runAnimation]);
 
     const renderStars = (rating: number) => {
         return Array.from({ length: 5 }, (_, index) => (
