@@ -503,7 +503,7 @@ const Notifications = () => {
                                 type="button"
                                 onClick={() => setActiveCategory(NotificationCategory.Nutrition)}
                             >
-                                {NotificationCategoryLabels[NotificationCategory.Nutrition]}
+                                {t('notifications.tabs.nutrition')}
                                 <span
                                     style={
                                         nutritionCount > 0
@@ -524,7 +524,7 @@ const Notifications = () => {
                                 type="button"
                                 onClick={() => setActiveCategory(NotificationCategory.Workout)}
                             >
-                                {NotificationCategoryLabels[NotificationCategory.Workout]}
+                                {t('notifications.tabs.workout')}
                                 <span
                                     style={
                                         workoutCount > 0
