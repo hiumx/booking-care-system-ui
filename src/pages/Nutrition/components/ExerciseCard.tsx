@@ -1,6 +1,6 @@
 import React from 'react';
 import { Exercise } from '@/types/nutrition.types';
-import './ExerciseCard.scss';
+import styles from './ExerciseCard.module.scss';
 
 interface ExerciseCardProps {
     exercise: Exercise;
@@ -16,30 +16,34 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
     onComplete,
 }) => {
     return (
-        <div className={`exercise-card ${isCompleted ? 'completed' : ''}`}>
-            <div className="exercise-header">
-                <div className="exercise-number">{index + 1}</div>
-                <label className="checkbox-container">
+        <div className={`${styles['exercise-card']} ${isCompleted ? styles.completed : ''}`}>
+            <div className={styles['exercise-header']}>
+                <div className={styles['exercise-number']}>{index + 1}</div>
+                <label className={styles['checkbox-container']}>
                     <input type="checkbox" checked={isCompleted} onChange={onComplete} />
-                    <span className="checkmark"></span>
+                    <span className={styles.checkmark}></span>
                 </label>
             </div>
 
-            <div className="exercise-content">
-                <h4 className="exercise-name">{exercise.nameVi}</h4>
-                <p className="exercise-name-en">{exercise.nameEn}</p>
+            <div className={styles['exercise-content']}>
+                <h4 className={styles['exercise-name']}>{exercise.nameVi}</h4>
+                <p className={styles['exercise-name-en']}>{exercise.nameEn}</p>
 
-                <div className="exercise-details">
+                <div className={styles['exercise-details']}>
                     {exercise.sets > 0 && exercise.reps > 0 && (
-                        <span className="detail-item">
+                        <span className={styles['detail-item']}>
                             🔢 {exercise.sets} sets × {exercise.reps} reps
                         </span>
                     )}
                     {exercise.durationMinutes > 0 && (
-                        <span className="detail-item">⏱️ {exercise.durationMinutes} phút</span>
+                        <span className={styles['detail-item']}>
+                            ⏱️ {exercise.durationMinutes} phút
+                        </span>
                     )}
                     {exercise.intensity && (
-                        <span className={`intensity-badge ${exercise.intensity.toLowerCase()}`}>
+                        <span
+                            className={`${styles['intensity-badge']} ${styles[exercise.intensity.toLowerCase()]}`}
+                        >
                             {exercise.intensity === 'Low'
                                 ? 'Nhẹ'
                                 : exercise.intensity === 'Medium'
@@ -48,7 +52,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                         </span>
                     )}
                     {exercise.caloriesBurned && (
-                        <span className="detail-item">🔥 {exercise.caloriesBurned} kcal</span>
+                        <span className={styles['detail-item']}>
+                            🔥 {exercise.caloriesBurned} kcal
+                        </span>
                     )}
                 </div>
             </div>

@@ -45,6 +45,8 @@ import ContractSigningPage from '@/pages/ContractSigning/ContractSigningPage';
 import ContractSigningSuccessPage from '@/pages/ContractSigning/ContractSigningSuccessPage';
 import OnboardingWizard from '@/pages/Nutrition/OnboardingWizard';
 import RoadmapDashboard from '@/pages/Nutrition/RoadmapDashboard';
+import MealPlanDetail from '@/pages/Nutrition/MealPlanDetail';
+import WorkoutPlanDetail from '@/pages/Nutrition/WorkoutPlanDetail';
 
 const routes: RouteObject[] = [
     {
@@ -248,6 +250,14 @@ const routes: RouteObject[] = [
     {
         path: PATHS.NUTRITION.DASHBOARD,
         element: <RoadmapDashboard />,
+    },
+    {
+        path: PATHS.NUTRITION.MEAL_PLAN,
+        element: <MealPlanDetail />,
+    },
+    {
+        path: PATHS.NUTRITION.WORKOUT_PLAN,
+        element: <WorkoutPlanDetail />,
     },
     {
         path: PATHS.NOT_FOUND,

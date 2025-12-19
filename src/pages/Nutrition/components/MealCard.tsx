@@ -1,6 +1,6 @@
 import React from 'react';
 import { Meal } from '@/types/nutrition.types';
-import './MealCard.scss';
+import styles from './MealCard.module.scss';
 
 interface MealCardProps {
     meal: Meal;
@@ -41,47 +41,53 @@ const MealCard: React.FC<MealCardProps> = ({ meal, isCompleted, onComplete }) =>
     };
 
     return (
-        <div className={`meal-card ${isCompleted ? 'completed' : ''}`}>
-            <div className="meal-header">
-                <div className="meal-type">
-                    <span className="meal-icon">{getMealIcon(meal.mealType)}</span>
-                    <span className="meal-label">{getMealTypeLabel(meal.mealType)}</span>
+        <div className={`${styles['meal-card']} ${isCompleted ? styles.completed : ''}`}>
+            <div className={styles['meal-header']}>
+                <div className={styles['meal-type']}>
+                    <span className={styles['meal-icon']}>{getMealIcon(meal.mealType)}</span>
+                    <span className={styles['meal-label']}>{getMealTypeLabel(meal.mealType)}</span>
                 </div>
-                <label className="checkbox-container">
+                <label className={styles['checkbox-container']}>
                     <input type="checkbox" checked={isCompleted} onChange={onComplete} />
-                    <span className="checkmark"></span>
+                    <span className={styles.checkmark}></span>
                 </label>
             </div>
 
-            <div className="meal-content">
-                <h3 className="meal-name">{meal.recipe.nameVi}</h3>
-                <p className="meal-name-en">{meal.recipe.nameEn}</p>
+            <div className={styles['meal-content']}>
+                <h3 className={styles['meal-name']}>{meal.recipe.nameVi}</h3>
+                <p className={styles['meal-name-en']}>{meal.recipe.nameEn}</p>
 
-                <div className="meal-info">
-                    <span className="info-item">
+                <div className={styles['meal-info']}>
+                    <span className={styles['info-item']}>
                         ⏱️ {meal.recipe.prepTimeMinutes + meal.recipe.cookTimeMinutes} phút
                     </span>
-                    <span className="info-item">🍽️ {meal.recipe.servings} người</span>
+                    <span className={styles['info-item']}>🍽️ {meal.recipe.servings} người</span>
                 </div>
 
-                <div className="nutrition-info">
-                    <div className="nutrition-item">
-                        <span className="nutrition-label">Calories</span>
-                        <span className="nutrition-value">
+                <div className={styles['nutrition-info']}>
+                    <div className={styles['nutrition-item']}>
+                        <span className={styles['nutrition-label']}>Calories</span>
+                        <span className={styles['nutrition-value']}>
                             {meal.recipe.nutrition.calories} kcal
                         </span>
                     </div>
-                    <div className="nutrition-item">
-                        <span className="nutrition-label">Protein</span>
-                        <span className="nutrition-value">{meal.recipe.nutrition.proteinG}g</span>
+                    <div className={styles['nutrition-item']}>
+                        <span className={styles['nutrition-label']}>Protein</span>
+                        <span className={styles['nutrition-value']}>
+                            {meal.recipe.nutrition.proteinG}g
+                        </span>
                     </div>
-                    <div className="nutrition-item">
-                        <span className="nutrition-label">Carbs</span>
-                        <span className="nutrition-value">{meal.recipe.nutrition.carbsG}g</span>
+                    <div className={styles['nutrition-item']}>
+                        <span className={styles['nutrition-label']}>Carbs</span>
+                        <span className={styles['nutrition-value']}>
+                            {meal.recipe.nutrition.carbsG}g
+                        </span>
                     </div>
-                    <div className="nutrition-item">
-                        <span className="nutrition-label">Fat</span>
-                        <span className="nutrition-value">{meal.recipe.nutrition.fatG}g</span>
+                    <div className={styles['nutrition-item']}>
+                        <span className={styles['nutrition-label']}>Fat</span>
+                        <span className={styles['nutrition-value']}>
+                            {meal.recipe.nutrition.fatG}g
+                        </span>
                     </div>
                 </div>
             </div>

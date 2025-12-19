@@ -197,7 +197,7 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                 <ul className="main-nav">
                                     <li>
                                         <Link to={PATHS.NUTRITION.DASHBOARD}>
-                                            {t('menu.healthRoadmap', 'Lộ trình Sức khỏe')}
+                                            {t('menu.healthRoadmap', 'Sức khỏe của bạn')}
                                         </Link>
                                     </li>
                                     <li className="has-submenu">

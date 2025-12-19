@@ -1,5 +1,5 @@
 import React from 'react';
-import './ProgressCircle.scss';
+import styles from './ProgressCircle.module.scss';
 
 interface ProgressCircleProps {
     percentage: number;
@@ -12,17 +12,17 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({ percentage, size = 100 
     const offset = circumference - (percentage / 100) * circumference;
 
     return (
-        <div className="progress-circle" style={{ width: size, height: size }}>
+        <div className={styles['progress-circle']} style={{ width: size, height: size }}>
             <svg width={size} height={size}>
                 <circle
-                    className="progress-circle-bg"
+                    className={styles['progress-circle-bg']}
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
                     strokeWidth="8"
                 />
                 <circle
-                    className="progress-circle-fill"
+                    className={styles['progress-circle-fill']}
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
@@ -31,8 +31,8 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({ percentage, size = 100 
                     strokeDashoffset={offset}
                 />
             </svg>
-            <div className="progress-circle-text">
-                <span className="percentage">{Math.round(percentage)}%</span>
+            <div className={styles['progress-circle-text']}>
+                <span className={styles.percentage}>{Math.round(percentage)}%</span>
             </div>
         </div>
     );

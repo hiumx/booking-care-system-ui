@@ -1,6 +1,6 @@
 import React from 'react';
 import { DailyCompletion } from '@/types/nutrition.types';
-import './WeeklyChart.scss';
+import styles from './WeeklyChart.module.scss';
 
 interface WeeklyChartProps {
     weeklyCompletion: DailyCompletion[];
@@ -16,24 +16,24 @@ const WeeklyChart: React.FC<WeeklyChartProps> = ({ weeklyCompletion }) => {
     const maxPercentage = Math.max(...weeklyCompletion.map((d) => d.completionPercentage), 100);
 
     return (
-        <div className="weekly-chart">
+        <div className={styles['weekly-chart']}>
             {weeklyCompletion.map((day, index) => (
-                <div key={index} className="chart-bar">
-                    <div className="bar-container">
+                <div key={index} className={styles['chart-bar']}>
+                    <div className={styles['bar-container']}>
                         <div
-                            className={`bar-fill ${day.isFullyCompleted ? 'completed' : ''}`}
+                            className={`${styles['bar-fill']} ${day.isFullyCompleted ? styles.completed : ''}`}
                             style={{
                                 height: `${(day.completionPercentage / maxPercentage) * 100}%`,
                             }}
                         >
                             {day.completionPercentage > 0 && (
-                                <span className="bar-value">
+                                <span className={styles['bar-value']}>
                                     {Math.round(day.completionPercentage)}%
                                 </span>
                             )}
                         </div>
                     </div>
-                    <div className="bar-label">{getDayLabel(day.date)}</div>
+                    <div className={styles['bar-label']}>{getDayLabel(day.date)}</div>
                 </div>
             ))}
         </div>

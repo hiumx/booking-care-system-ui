@@ -1,5 +1,5 @@
 import React from 'react';
-import './StreakBadge.scss';
+import styles from './StreakBadge.module.scss';
 
 interface StreakBadgeProps {
     streakCount: number;
@@ -7,10 +7,10 @@ interface StreakBadgeProps {
 
 const StreakBadge: React.FC<StreakBadgeProps> = ({ streakCount }) => {
     return (
-        <div className="streak-badge">
-            <span className="streak-icon">🔥</span>
-            <span className="streak-count">{streakCount}</span>
-            <span className="streak-label">ngày liên tiếp</span>
+        <div className={styles['streak-badge']}>
+            <span className={styles['streak-icon']}>🔥</span>
+            <span className={styles['streak-count']}>{streakCount}</span>
+            <span className={styles['streak-label']}>ngày liên tiếp</span>
         </div>
     );
 };

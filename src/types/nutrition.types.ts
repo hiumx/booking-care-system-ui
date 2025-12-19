@@ -66,12 +66,19 @@ export interface MealPlan {
 
 export interface Meal {
     mealType: string; // "Breakfast", "Lunch", "Dinner", "Snack"
+    mealTime: string; // "08:00", "12:30", etc.
     recipe: Recipe;
 }
 
 export interface Recipe {
     nameVi: string;
     nameEn: string;
+    descriptionVi?: string; // Short description for UI
+    descriptionEn?: string;
+    imageUrl?: string; // Image URL for meal display
+    benefitsVi?: string; // Health benefits in Vietnamese
+    benefitsEn?: string; // Health benefits in English
+    mainIngredients?: string[]; // Top 3-5 main ingredients
     prepTimeMinutes: number;
     cookTimeMinutes: number;
     servings: number;
@@ -102,20 +109,42 @@ export interface WorkoutPlan {
 export interface Exercise {
     nameVi: string;
     nameEn: string;
+    descriptionVi?: string; // Short description about the exercise
+    descriptionEn?: string;
+    imageUrl?: string; // Image/GIF URL for exercise demonstration
+    videoUrl?: string; // Optional video tutorial URL
     durationMinutes: number;
     sets: number;
     reps: number;
-    intensity?: string;
+    intensity?: string; // "Low", "Medium", "High"
     caloriesBurned?: number;
+    targetMuscles?: string; // e.g., "Chest, Triceps, Shoulders"
+    instructions?: string[]; // Step-by-step instructions
 }
 
 export interface DailyPlan {
     date: string;
     mealPlan?: MealPlan;
     workoutPlan?: WorkoutPlan;
+    hydrationPlan?: HydrationPlan;
     completionPercentage: number;
     totalCaloriesConsumed: number;
     totalCaloriesBurned: number;
+}
+
+export interface HydrationPlan {
+    targetWaterLiters: number; // e.g., 2.5L
+    recommendedGlasses: number; // e.g., 8 glasses
+    glassSizeMl: number; // e.g., 250ml per glass
+    reminders: HydrationReminder[];
+    currentIntakeLiters: number; // Tracked intake
+    completedGlasses: number;
+}
+
+export interface HydrationReminder {
+    time: string; // "08:00", "10:00", etc.
+    message: string; // "Uống nước sau khi thức dậy"
+    amountMl: number; // Amount to drink
 }
 
 export interface ProgressStats {
@@ -173,13 +202,20 @@ export const ACTIVITY_LEVEL_OPTIONS = [
     { value: ActivityLevel.Moderate, label: '🏃 Trung bình', description: 'Tập 3-5 ngày/tuần' },
     { value: ActivityLevel.Active, label: '🏋️ Năng động', description: 'Tập 6-7 ngày/tuần' },
     { value: ActivityLevel.VeryActive, label: '🏅 Vận động viên', description: 'Tập 2 lần/ngày' },
+    {
+        value: 'SuperActive',
+        label: '🔥 Cực kỳ năng động',
+        description: 'Vận động viên chuyên nghiệp',
+    },
 ];
 
 export const HEALTH_GOAL_OPTIONS = [
-    { value: HealthGoal.WeightLoss, label: '📉 Giảm cân', icon: '📉' },
-    { value: HealthGoal.MuscleGain, label: '💪 Tăng cơ', icon: '💪' },
-    { value: HealthGoal.Maintenance, label: '🧘 Duy trì sức khỏe', icon: '🧘' },
-    { value: HealthGoal.HeartHealth, label: '❤️ Cải thiện tim mạch', icon: '❤️' },
+    { value: HealthGoal.WeightLoss, label: 'Giảm cân', icon: '📉' },
+    { value: HealthGoal.MuscleGain, label: 'Tăng cơ', icon: '💪' },
+    { value: HealthGoal.Maintenance, label: 'Duy trì sức khỏe', icon: '🧘' },
+    { value: HealthGoal.HeartHealth, label: 'Cải thiện tim mạch', icon: '❤️' },
+    { value: 'Flexibility', label: 'Tăng sự dẻo dai', icon: '🤸' },
+    { value: 'Endurance', label: 'Tăng sức bền', icon: '🏃‍♂️' },
 ];
 
 export const DIET_TYPE_OPTIONS = [
@@ -198,15 +234,17 @@ export const COMMON_ALLERGIES = [
     'Đậu nành',
     'Lúa mì',
     'Hạt',
+    'Cá',
+    'Tôm',
+    'Mè',
 ];
 
 export const COMMON_HEALTH_CONDITIONS = [
+    'Bình thường',
     'Tiểu đường',
     'Huyết áp cao',
-    'Đau dạ dày',
     'Cholesterol cao',
     'Bệnh tim',
-    'Không có',
 ];
 
 export const CUISINE_OPTIONS = ['Món Việt', 'Món Âu', 'Món Á', 'Món Nhật', 'Món Hàn'];

@@ -94,6 +94,8 @@ export const PATHS = {
         ROOT: '/nutrition',
         ONBOARDING: '/nutrition/onboarding',
         DASHBOARD: '/nutrition/dashboard',
+        MEAL_PLAN: '/nutrition/meal-plan/:date?',
+        WORKOUT_PLAN: '/nutrition/workout-plan/:date?',
     },
 
     // Not Found path

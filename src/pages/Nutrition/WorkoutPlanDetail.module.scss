@@ -1,0 +1,1150 @@
+@use '../../styles/variables' as *;
+
+.workoutPlanDetail {
+    background-color: #f8fafc;
+    min-height: calc(100vh - 68px);
+}
+
+// Hero Section
+.heroSection {
+    background: linear-gradient(to right, #eff6ff, #eef2ff);
+    padding: 48px 0;
+
+    .heroContainer {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .heroContent {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+
+        .heroLeft {
+            flex: 1;
+
+            .badge {
+                display: inline-block;
+                background: #dbeafe;
+                color: #0ea5e9;
+                padding: 6px 12px;
+                border-radius: 9999px;
+                font-size: 12px;
+                font-weight: 600;
+                margin-bottom: 12px;
+            }
+
+            h1 {
+                font-size: 15px;
+                font-weight: 600;
+                color: #0f172a;
+                margin: 0 0 8px 0;
+            }
+
+            p {
+                font-size: 14px;
+                color: #64748b;
+                max-width: 672px;
+                margin: 0;
+            }
+        }
+
+        .calorieCard {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+
+            .calorieItem {
+                text-align: center;
+                padding: 0 16px;
+
+                .label {
+                    font-size: 14px;
+                    color: #64748b;
+                    margin: 0 0 4px 0;
+                }
+
+                .value {
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #0f172a;
+                    margin: 0;
+
+                    span {
+                        font-size: 12px;
+                        font-weight: 400;
+                        color: #64748b;
+                    }
+
+                    &.consumed {
+                        color: #f59e0b;
+                    }
+                }
+            }
+
+            .divider {
+                width: 1px;
+                height: 40px;
+                background: #e2e8f0;
+            }
+
+            .progressRing {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                border: 4px solid #f59e0b;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                .percentage {
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: #0f172a;
+                }
+            }
+        }
+    }
+}
+
+// Main Section
+.mainSection {
+    padding: 64px 0;
+}
+
+// Date Navigation
+.dateNav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 48px;
+
+    .navBtn {
+        padding: 8px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+            background: #e2e8f0;
+        }
+
+        .material-icons {
+            color: #64748b;
+        }
+    }
+
+    .dateDisplay {
+        text-align: center;
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 4px 0;
+        }
+
+        p {
+            font-size: 14px;
+            color: #0ea5e9;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 0;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    font-size: 1.125rem;
+    color: $primary-color;
+}
+
+.noData {
+    text-align: center;
+    padding: 60px 20px;
+
+    h2 {
+        font-size: 24px;
+        color: $text-primary-color;
+        margin-bottom: 20px;
+    }
+
+    button {
+        padding: 12px 32px;
+        background: $primary-color;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+            background: darken($primary-color, 8%);
+        }
+    }
+}
+
+// Page Header
+.pageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 32px;
+
+    h1 {
+        font-size: 30px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 8px 0;
+    }
+
+    .pageSubtitle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #64748b;
+        margin: 0;
+
+        .material-icons {
+            font-size: 16px;
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 50%;
+        }
+    }
+
+    .headerActions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btnSecondary {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #0f172a;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        .material-icons {
+            font-size: 18px;
+            color: #64748b;
+        }
+
+        &:hover {
+            background: #f8fafc;
+        }
+    }
+
+    .btnPrimary {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: #0ea5e9;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+
+        .material-icons {
+            font-size: 18px;
+        }
+
+        &:hover {
+            background: #0284c7;
+        }
+    }
+}
+
+// Grid Layout
+.gridLayout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 32px;
+}
+
+// Main Content
+.mainContent {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.workoutCard {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f1f5f9;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -100px;
+        right: -100px;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(14, 165, 233, 0.05) 0%, transparent 70%);
+        pointer-events: none;
+    }
+}
+
+.workoutHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+
+    .categoryBadge {
+        display: inline-block;
+        background: #dbeafe;
+        color: #0369a1;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+    }
+
+    h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 12px 0;
+    }
+
+    .workoutMeta {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+
+        span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #0369a1;
+            background: #dbeafe;
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+
+            .material-icons {
+                font-size: 16px;
+                color: #0369a1;
+            }
+        }
+    }
+
+    .coachInfo {
+        text-align: right;
+
+        .coachLabel {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .coachProfile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            img {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                border: 2px solid #e2e8f0;
+            }
+
+            span {
+                font-size: 14px;
+                font-weight: 600;
+                color: #0f172a;
+            }
+        }
+    }
+}
+
+.aiRecommendation {
+    background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 32px;
+    display: flex;
+    gap: 16px;
+
+    .material-icons {
+        color: #3b82f6;
+        font-size: 24px;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    h4 {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e40af;
+        margin: 0 0 6px 0;
+    }
+
+    p {
+        font-size: 13px;
+        color: #1e3a8a;
+        line-height: 1.6;
+        margin: 0;
+    }
+}
+
+.exerciseSection {
+    h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 20px 0;
+    }
+}
+
+.exerciseList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.exerciseItem {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    transition: all 0.3s;
+    cursor: pointer;
+
+    &:hover {
+        background: white;
+        border-color: #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    &.completed {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+    }
+
+    .exerciseImage {
+        position: relative;
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        overflow: hidden;
+        flex-shrink: 0;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .playOverlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+
+            .material-icons {
+                color: white;
+                font-size: 32px;
+            }
+        }
+
+        &:hover .playOverlay {
+            opacity: 1;
+        }
+    }
+
+    .exerciseInfo {
+        flex: 1;
+
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin: 0 0 4px 0;
+        }
+
+        p {
+            font-size: 12px;
+            color: #64748b;
+            margin: 0 0 8px 0;
+        }
+
+        .targetMuscles {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #6366f1;
+            font-weight: 500;
+
+            .material-icons {
+                font-size: 16px;
+            }
+        }
+
+        .exerciseMeta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+
+            .metaBadge {
+                background: white;
+                border: 1px solid #e2e8f0;
+                padding: 4px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #0f172a;
+            }
+        }
+    }
+
+    .checkboxLabel {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+
+        input {
+            display: none;
+        }
+
+        .checkboxCustom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+
+            .material-icons {
+                font-size: 16px;
+                color: white;
+            }
+        }
+
+        input:checked + .checkboxCustom {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        span {
+            font-size: 13px;
+            font-weight: 500;
+            color: white;
+        }
+
+        input:checked ~ span {
+            color: #10b981;
+        }
+    }
+}
+
+.workoutFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #f1f5f9;
+
+    .footerInfo {
+        font-size: 14px;
+        color: #64748b;
+    }
+
+    .finishButton {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: #0f172a;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
+
+        .material-icons {
+            font-size: 18px;
+        }
+
+        &:hover {
+            background: #1e293b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.4);
+        }
+
+        &:active {
+            transform: scale(0.98);
+        }
+    }
+}
+
+// Nutrition Card
+.nutritionCard {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f1f5f9;
+    padding: 24px;
+
+    .nutritionHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+
+        h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+
+            .material-icons {
+                color: #10b981;
+            }
+        }
+
+        a {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0ea5e9;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .mealGrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .mealCard {
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid;
+
+        &.breakfast {
+            background: #fff7ed;
+            border-color: #fed7aa;
+
+            .mealLabel {
+                color: #c2410c;
+            }
+        }
+
+        &.lunch {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+
+            .mealLabel {
+                color: #15803d;
+            }
+        }
+
+        &.dinner {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+
+            .mealLabel {
+                color: #1e40af;
+            }
+        }
+
+        .mealLabel {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .mealName {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .mealStats {
+            font-size: 12px;
+            color: #64748b;
+        }
+    }
+}
+
+// Sidebar
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.progressCard {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f1f5f9;
+    padding: 24px;
+    text-align: center;
+
+    h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 24px 0;
+        text-align: left;
+    }
+
+    .progressRing {
+        width: 192px;
+        height: 192px;
+        position: relative;
+        margin: 0 auto 24px;
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .progressText {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            .percentage {
+                display: block;
+                font-size: 36px;
+                font-weight: 700;
+                color: #0f172a;
+                line-height: 1;
+            }
+
+            .label {
+                display: block;
+                font-size: 12px;
+                color: #64748b;
+                margin-top: 4px;
+            }
+        }
+    }
+
+    .statsGrid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .statBox {
+        background: #f8fafc;
+        padding: 12px;
+        border-radius: 12px;
+
+        .statValue {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            display: block;
+        }
+
+        .statLabel {
+            font-size: 12px;
+            color: #64748b;
+            display: block;
+            margin-top: 4px;
+        }
+    }
+}
+
+.upcomingCard {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f1f5f9;
+    padding: 24px;
+
+    .upcomingHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+
+        h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        button {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0ea5e9;
+            background: none;
+            border: none;
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .upcomingList {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .upcomingItem {
+        display: flex;
+        gap: 16px;
+
+        .upcomingDate {
+            width: 48px;
+            text-align: center;
+            flex-shrink: 0;
+            padding-top: 4px;
+
+            .dayLabel {
+                font-size: 10px;
+                font-weight: 700;
+                color: #9ca3af;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .dayNumber {
+                font-size: 18px;
+                font-weight: 700;
+                color: #0f172a;
+                margin-top: 2px;
+            }
+        }
+
+        .upcomingContent {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid;
+
+            &.purple {
+                background: #faf5ff;
+                border-color: #e9d5ff;
+            }
+
+            &.blue {
+                background: #eff6ff;
+                border-color: #bfdbfe;
+            }
+
+            &.orange {
+                background: #fff7ed;
+                border-color: #fed7aa;
+            }
+
+            .upcomingTitle {
+                font-size: 14px;
+                font-weight: 600;
+                color: #0f172a;
+                margin-bottom: 4px;
+            }
+
+            .upcomingTime {
+                font-size: 12px;
+                color: #64748b;
+            }
+        }
+    }
+}
+
+.hydrationCard {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    padding: 24px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        bottom: -50px;
+        right: -50px;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .material-icons {
+        font-size: 80px;
+        position: absolute;
+        right: -16px;
+        bottom: -16px;
+        opacity: 0.1;
+    }
+
+    h3 {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 4px 0;
+        position: relative;
+        z-index: 1;
+        color: white;
+    }
+
+    p {
+        font-size: 14px;
+        opacity: 0.9;
+        margin: 0 0 16px 0;
+        position: relative;
+        z-index: 1;
+        color: white;
+    }
+
+    .hydrationValue {
+        display: flex;
+        align-items: end;
+        gap: 4px;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+
+        .current {
+            font-size: 40px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .target {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+    }
+
+    .hydrationProgress {
+        width: 100%;
+        height: 8px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 16px;
+        position: relative;
+        z-index: 1;
+
+        .hydrationBar {
+            height: 100%;
+            background: white;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+    }
+
+    .addWaterBtn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        z-index: 1;
+
+        .material-icons {
+            font-size: 18px;
+            position: static;
+            opacity: 1;
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 1024px) {
+    .heroSection {
+        .heroContent {
+            flex-direction: column;
+            text-align: center;
+
+            .heroLeft {
+                h1 {
+                    font-size: 28px;
+                }
+
+                p {
+                    font-size: 16px;
+                }
+            }
+        }
+    }
+
+    .gridLayout {
+        grid-template-columns: 1fr;
+    }
+
+    .pageHeader {
+        flex-direction: column;
+        gap: 16px;
+
+        .headerActions {
+            width: 100%;
+
+            button {
+                flex: 1;
+            }
+        }
+    }
+
+    .nutritionCard .mealGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .heroSection {
+        padding: 32px 0;
+
+        .heroContent {
+            .calorieCard {
+                flex-direction: column;
+                width: 100%;
+
+                .divider {
+                    width: 100%;
+                    height: 1px;
+                }
+            }
+        }
+    }
+
+    .mainSection {
+        padding: 48px 0;
+    }
+
+    .workoutCard {
+        padding: 20px;
+    }
+
+    .workoutHeader {
+        flex-direction: column;
+        gap: 16px;
+
+        .coachInfo {
+            text-align: left;
+        }
+    }
+
+    .exerciseItem {
+        flex-direction: column;
+        align-items: start;
+
+        .exerciseImage {
+            width: 100%;
+            height: 160px;
+        }
+    }
+
+    .workoutFooter {
+        flex-direction: column;
+        gap: 16px;
+
+        .finishButton {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+}
