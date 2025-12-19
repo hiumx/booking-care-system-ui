@@ -1,3 +1,91 @@
+// Nutrition types (defined first to avoid forward reference)
+export interface DietaryPreferences {
+    isVegetarian: boolean;
+    isVegan: boolean;
+    isKeto: boolean;
+    isLowCarb: boolean;
+    isGlutenFree: boolean;
+    isDairyFree: boolean;
+    allergies: string[];
+}
+
+export interface NutritionProfile {
+    id: string;
+    userId: string;
+    heightCm: number;
+    weightKg: number;
+    bmi: number;
+    activityLevel: string;
+    healthGoal: string;
+    targetCalories: number;
+    targetProteinG: number;
+    targetCarbsG: number;
+    targetFatG: number;
+    healthConditions?: string[];
+    dietaryPreferences?: DietaryPreferences;
+}
+
+// REMOVED: Ingredient interface - not needed anymore
+
+export interface NutritionInfo {
+    calories: number;
+    proteinG: number;
+    carbsG: number;
+    fatG: number;
+    fiberG?: number;
+}
+
+export interface Recipe {
+    nameVi: string;
+    nameEn: string;
+    // SIMPLIFIED - removed: descriptionVi, descriptionEn, difficultyLevel, ingredients, instructionsVi, instructionsEn
+    prepTimeMinutes: number;
+    cookTimeMinutes: number;
+    servings: number;
+    nutrition: NutritionInfo;
+}
+
+export interface Meal {
+    mealType: string;
+    recipe: Recipe;
+}
+
+export interface MealPlan {
+    id: string;
+    date: string;
+    totalCalories: number;
+    totalProteinG: number;
+    totalCarbsG: number;
+    totalFatG: number;
+    meals: Meal[];
+}
+
+export interface Exercise {
+    nameVi: string;
+    nameEn: string;
+    durationMinutes: number;
+    sets: number; // Number of sets
+    reps: number; // Repetitions per set
+    intensity?: string; // "Low", "Medium", "High"
+    caloriesBurned?: number;
+    // SIMPLIFIED - removed: instructionsVi, instructionsEn
+}
+
+export interface WorkoutPlan {
+    id: string;
+    date: string;
+    workoutType: string;
+    durationMinutes: number;
+    estimatedCaloriesBurned: number;
+    exercises: Exercise[];
+}
+
+export interface NutritionCompletionData {
+    profile: NutritionProfile;
+    mealPlan: MealPlan;
+    workoutPlan: WorkoutPlan;
+}
+
 export interface Message {
     id: string;
     content: string;
@@ -12,6 +100,12 @@ export interface Message {
     canRequestMoreQuestions?: boolean; // Whether user can request more questions (true when round 1 && confidence < 90%)
     fileAttachment?: FileAttachment; // File attachment (for lab results)
     labResult?: LabResultAnalysis; // Lab result analysis
+
+    // Nutrition conversation fields
+    nutritionStep?: number; // Current step in nutrition conversation (1-6)
+    nutritionTotalSteps?: number; // Total steps in nutrition conversation (always 6)
+    nutritionComplete?: boolean; // Whether nutrition conversation is complete
+    nutritionData?: NutritionCompletionData; // Nutrition data when conversation is complete
 }
 
 // File attachment

@@ -10,6 +10,8 @@ const AI_ENDPOINTS = {
     SAVE_SESSION: (sessionId: string) => `/symptoms/sessions/${sessionId}/save`,
     LAB_RESULT_ANALYZE: '/lab-results/analyze',
     DERMATOLOGY_ANALYZE: '/dermatology/analyze',
+    NUTRITION_CONVERSATION_START: '/nutrition-conversation/start',
+    NUTRITION_CONVERSATION_ANSWER: '/nutrition-conversation/answer',
 } as const;
 
 // Types
@@ -329,6 +331,61 @@ export class AIService {
             );
         }
     }
+
+    /**
+     * Start nutrition conversation
+     */
+    static async startNutritionConversation(
+        sessionId: string
+    ): Promise<ApiResponse<NutritionConversationResponse>> {
+        try {
+            const response: any = await axiosInstance.post(
+                AI_ENDPOINTS.NUTRITION_CONVERSATION_START,
+                { sessionId }
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Nutrition conversation started',
+            };
+        } catch (error: any) {
+            console.error('Error starting nutrition conversation:', error);
+            throw new Error(
+                error.response?.data?.message ||
+                    error.message ||
+                    'Failed to start nutrition conversation. Please try again.'
+            );
+        }
+    }
+
+    /**
+     * Answer nutrition question
+     */
+    static async answerNutritionQuestion(
+        sessionId: string,
+        answer: string
+    ): Promise<ApiResponse<NutritionConversationResponse>> {
+        try {
+            const response: any = await axiosInstance.post(
+                AI_ENDPOINTS.NUTRITION_CONVERSATION_ANSWER,
+                { sessionId, answer }
+            );
+
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Answer processed',
+            };
+        } catch (error: any) {
+            console.error('Error answering nutrition question:', error);
+            throw new Error(
+                error.response?.data?.message ||
+                    error.message ||
+                    'Failed to process answer. Please try again.'
+            );
+        }
+    }
 }
 
 export interface SessionSummary {
@@ -339,4 +396,15 @@ export interface SessionSummary {
     createdAt: string;
     updatedAt: string;
     messageCount: number;
+}
+
+export interface NutritionConversationResponse {
+    sessionId: string;
+    question: string;
+    currentStep: number;
+    totalSteps: number;
+    isComplete: boolean;
+    profile?: import('@/types/ai.types').NutritionProfile;
+    mealPlan?: import('@/types/ai.types').MealPlan;
+    workoutPlan?: import('@/types/ai.types').WorkoutPlan;
 }

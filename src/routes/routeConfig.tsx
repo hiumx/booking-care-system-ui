@@ -44,6 +44,10 @@ import ServiceDetail from '@/pages/MedicalService/ServiceDetail/ServiceDetailPag
 import AISupportBooking from '@/pages/AISupportBooking';
 import ContractSigningPage from '@/pages/ContractSigning/ContractSigningPage';
 import ContractSigningSuccessPage from '@/pages/ContractSigning/ContractSigningSuccessPage';
+import OnboardingWizard from '@/pages/Nutrition/OnboardingWizard';
+import RoadmapDashboard from '@/pages/Nutrition/RoadmapDashboard';
+import MealPlanDetail from '@/pages/Nutrition/MealPlanDetail';
+import WorkoutPlanDetail from '@/pages/Nutrition/WorkoutPlanDetail';
 import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute';
 import NotFound from '@/pages/Errors/NotFound';
 
@@ -323,6 +327,22 @@ const routes: RouteObject[] = [
     },
 
     // 404 Not Found
+    {
+        path: PATHS.NUTRITION.ONBOARDING,
+        element: <OnboardingWizard />,
+    },
+    {
+        path: PATHS.NUTRITION.DASHBOARD,
+        element: <RoadmapDashboard />,
+    },
+    {
+        path: PATHS.NUTRITION.MEAL_PLAN,
+        element: <MealPlanDetail />,
+    },
+    {
+        path: PATHS.NUTRITION.WORKOUT_PLAN,
+        element: <WorkoutPlanDetail />,
+    },
     {
         path: PATHS.NOT_FOUND,
         element: <NotFound />,

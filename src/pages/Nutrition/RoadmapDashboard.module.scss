@@ -1,0 +1,1052 @@
+@use '../../styles/variables' as *;
+
+.dashboard {
+    background: #f9fafb;
+    min-height: calc(100vh - 68px);
+    padding: 32px 0;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    font-size: 1.125rem;
+    color: $primary-color;
+}
+
+// Dashboard Header
+.dashboardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+    gap: 32px;
+
+    @media (max-width: 1024px) {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.greeting {
+    flex: 1;
+
+    .greetingIcon {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 6px;
+
+        .material-icons,
+        .material-symbols-outlined {
+            font-size: 16px;
+            color: #9ca3af;
+        }
+    }
+
+    h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 6px 0;
+        line-height: 1.2;
+    }
+
+    p {
+        font-size: 15px;
+        color: #6b7280;
+        margin: 0;
+
+        .highlight {
+            font-weight: 700;
+            color: #19c3e6;
+        }
+    }
+}
+
+// Date Navigator
+.dateNavigator {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    gap: 2px;
+
+    .navBtn {
+        padding: 6px;
+        background: transparent;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .material-icons {
+            color: #9ca3af;
+            font-size: 18px;
+        }
+
+        &:hover {
+            background: #f9fafb;
+        }
+    }
+
+    .dateList {
+        display: flex;
+        gap: 2px;
+        padding: 0 4px;
+    }
+
+    .dateItem {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        height: 52px;
+        padding: 0 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #6b7280;
+
+        &:hover {
+            background: #f9fafb;
+        }
+
+        &.active {
+            background: #19c3e6;
+            color: white;
+            box-shadow: 0 2px 8px rgba(25, 195, 230, 0.25);
+        }
+
+        .dayLabel {
+            font-size: 11px;
+            font-weight: 600;
+            opacity: 0.85;
+            margin-bottom: 2px;
+        }
+
+        .dayNumber {
+            font-size: 15px;
+            font-weight: 700;
+        }
+    }
+}
+
+// No Plan State
+.noPlan {
+    background: white;
+    border-radius: 16px;
+    padding: 60px 30px;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+
+    h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 8px 0;
+    }
+
+    p {
+        color: #6b7280;
+        margin: 0 0 20px 0;
+        font-size: 15px;
+    }
+
+    .generateBtn {
+        padding: 11px 28px;
+        background: #19c3e6;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(25, 195, 230, 0.25);
+
+        &:hover:not(:disabled) {
+            background: #0ea5e9;
+            transform: translateY(-1px);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+}
+
+// 3 Column Grid Layout
+.gridLayout {
+    display: grid;
+    grid-template-columns: 320px 1fr 320px;
+    gap: 20px;
+    align-items: start;
+
+    @media (max-width: 1280px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// Left Column
+.leftColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+// Calories Card
+.caloriesCard {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+
+    .cardHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+
+        h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+    }
+
+    .calorieRing {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 14px;
+
+        .ringOuter {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ringInner {
+            width: calc(100% - 14px);
+            height: calc(100% - 14px);
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            .value {
+                font-size: 26px;
+                font-weight: 700;
+                color: #1f2937;
+                line-height: 1;
+            }
+
+            .target {
+                font-size: 11px;
+                color: #9ca3af;
+                margin-top: 3px;
+            }
+        }
+    }
+
+    .remaining {
+        text-align: center;
+        font-size: 13px;
+        color: #6b7280;
+        margin: 0;
+    }
+}
+
+// Macros Card
+.macrosCard {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+
+    h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 14px 0;
+    }
+
+    .macrosList {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .macroItem {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .macroIcon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        .macroIconInner {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+        }
+    }
+
+    .macroInfo {
+        flex: 1;
+    }
+
+    .macroLabel {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        margin-bottom: 5px;
+
+        span:first-child {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        span:last-child {
+            color: #9ca3af;
+            font-weight: 500;
+        }
+    }
+
+    .macroBar {
+        width: 100%;
+        height: 5px;
+        background: #f3f4f6;
+        border-radius: 3px;
+        overflow: hidden;
+
+        .macroFill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+    }
+}
+
+// Hydration Card
+.hydrationCard {
+    background: linear-gradient(135deg, rgba(25, 195, 230, 0.08) 0%, rgba(14, 165, 233, 0.04) 100%);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(25, 195, 230, 0.15);
+
+    .hydrationHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+
+        h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .hydrationTarget {
+            font-size: 13px;
+            font-weight: 600;
+            color: #19c3e6;
+        }
+    }
+
+    .waterDrops {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 14px;
+
+        .waterDropIcon {
+            font-size: 22px;
+            transition: all 0.2s;
+
+            &.filled {
+                color: #19c3e6;
+            }
+
+            &.empty {
+                color: rgba(25, 195, 230, 0.25);
+            }
+        }
+    }
+
+    .addWaterBtn {
+        width: 100%;
+        padding: 9px;
+        background: white;
+        color: #19c3e6;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+        &:hover {
+            background: #f9fafb;
+        }
+    }
+}
+
+// Center Column
+.centerColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+// Meal Timeline Card
+.mealTimelineCard {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+
+    .sectionHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+
+        .headerLeft {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .iconBox {
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                .material-icons,
+                .material-symbols-outlined {
+                    font-size: 18px;
+                }
+            }
+
+            h3 {
+                font-size: 17px;
+                font-weight: 700;
+                color: #1f2937;
+                margin: 0;
+            }
+
+            p {
+                font-size: 11px;
+                color: #9ca3af;
+                margin: 0;
+            }
+        }
+
+        .detailBtn {
+            background: none;
+            border: none;
+            color: #19c3e6;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+
+            &:hover {
+                background: #f0f9ff;
+            }
+        }
+    }
+
+    .mealTimeline {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        position: relative;
+    }
+
+    .mealItem {
+        display: flex;
+        gap: 12px;
+        position: relative;
+        z-index: 1;
+
+        &.upcoming {
+            opacity: 0.6;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+        .mealImage {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        .mealContent {
+            flex: 1;
+            background: #fafafa;
+            border-radius: 10px;
+            padding: 12px 14px;
+            transition: all 0.2s;
+            border: 1px solid #f3f4f6;
+
+            &:hover {
+                background: #f5f5f5;
+                border-color: #e5e7eb;
+            }
+        }
+
+        .mealInfo {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+
+            .mealType {
+                display: block;
+                font-size: 10px;
+                font-weight: 700;
+                color: #9ca3af;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+            }
+
+            h4 {
+                font-size: 14px;
+                font-weight: 700;
+                color: #1f2937;
+                margin: 0 0 3px 0;
+            }
+
+            p {
+                font-size: 12px;
+                color: #6b7280;
+                margin: 0 0 8px 0;
+                line-height: 1.4;
+            }
+
+            .mealTags {
+                display: flex;
+                gap: 6px;
+                flex-wrap: wrap;
+
+                span {
+                    font-size: 11px;
+                    font-weight: 600;
+                    background: white;
+                    color: #374151;
+                    padding: 3px 8px;
+                    border-radius: 5px;
+                    border: 1px solid #e5e7eb;
+                }
+            }
+
+            .mealCheckbox {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 2px solid #d1d5db;
+                cursor: pointer;
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                flex-shrink: 0;
+                margin-top: 2px;
+                position: relative;
+                background: white;
+                transition: all 0.2s;
+
+                &:checked {
+                    background: #19c3e6;
+                    border-color: #19c3e6;
+
+                    &::after {
+                        content: '✓';
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        color: white;
+                        font-size: 12px;
+                        font-weight: 700;
+                    }
+                }
+
+                &:hover {
+                    border-color: #19c3e6;
+                }
+            }
+        }
+    }
+}
+
+// Workout Card
+.workoutCard {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+
+    .sectionHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+
+        .headerLeft {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .iconBox {
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+
+                .material-icons {
+                    font-size: 18px;
+                }
+            }
+
+            h3 {
+                font-size: 17px;
+                font-weight: 700;
+                color: #1f2937;
+                margin: 0;
+            }
+
+            p {
+                font-size: 11px;
+                color: #9ca3af;
+                margin: 0;
+            }
+        }
+
+        .startBtn {
+            background: linear-gradient(135deg, #19c3e6 0%, #0ea5e9 100%);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(25, 195, 230, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            &:hover {
+                background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(25, 195, 230, 0.4);
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+
+            &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+            }
+        }
+    }
+
+    .exerciseList {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .exerciseItem {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        background: white;
+        transition: all 0.2s;
+
+        &:hover {
+            background: #fafafa;
+            border-color: #d1d5db;
+        }
+
+        .exerciseIcon {
+            width: 80px;
+            height: 80px;
+            background: #fef3c7;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+
+            .material-icons,
+            .material-symbols-outlined {
+                color: #f59e0b;
+                font-size: 20px;
+            }
+        }
+
+        .exerciseInfo {
+            flex: 1;
+
+            h4 {
+                font-size: 13px;
+                font-weight: 700;
+                color: #1f2937;
+                margin: 0 0 3px 0;
+            }
+
+            p {
+                font-size: 11px;
+                color: #9ca3af;
+                margin: 0;
+            }
+        }
+
+        .exerciseCheckbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #d1d5db;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: white;
+            position: relative;
+            transition: all 0.2s;
+
+            &:checked {
+                background: #19c3e6;
+                border-color: #19c3e6;
+
+                &::after {
+                    content: '✓';
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: white;
+                    font-size: 12px;
+                    font-weight: 700;
+                }
+            }
+
+            &:hover {
+                border-color: #19c3e6;
+            }
+        }
+    }
+}
+
+// Right Column
+.rightColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+// Weight Card
+.weightCard {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+
+    .weightHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+
+        h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .updateBtn {
+            background: none;
+            border: none;
+            color: #19c3e6;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 4px 8px;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .weightValue {
+        display: flex;
+        align-items: flex-end;
+        gap: 4px;
+        margin-bottom: 14px;
+
+        .weight {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1;
+        }
+
+        .unit {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 3px;
+        }
+
+        .change {
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #10b981;
+            margin-left: auto;
+            margin-bottom: 3px;
+
+            .material-icons,
+            .material-symbols-outlined {
+                font-size: 13px;
+            }
+        }
+    }
+
+    .weightChart {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 3px;
+        height: 90px;
+        margin-bottom: 8px;
+
+        .chartBar {
+            flex: 1;
+            background: #f3f4f6;
+            border-radius: 3px 3px 0 0;
+            transition: all 0.2s;
+
+            &:hover {
+                background: rgba(25, 195, 230, 0.2);
+            }
+
+            &.active {
+                background: #19c3e6;
+                box-shadow: 0 2px 8px rgba(25, 195, 230, 0.25);
+            }
+        }
+    }
+
+    .chartLabels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        font-weight: 600;
+        color: #9ca3af;
+
+        span {
+            flex: 1;
+            text-align: center;
+        }
+    }
+}
+
+// Streak Card
+.streakCard {
+    background: linear-gradient(135deg, #19c3e6 0%, #0ea5e9 100%);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(25, 195, 230, 0.25);
+
+    .streakContent {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        > div:first-child {
+            flex: 1;
+        }
+
+        .streakLabel {
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0.95;
+            margin: 0 0 6px 0;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .streakValue {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        .streakMessage {
+            font-size: 12px;
+            opacity: 0.95;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .streakIcon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+
+            .fireIcon {
+                font-size: 30px;
+                color: #ffffff;
+                line-height: 1;
+            }
+        }
+    }
+}
+
+// AI Insight Card
+.aiInsightCard {
+    background: #faf5ff;
+    border-radius: 14px;
+    padding: 18px;
+    border: 1px solid #e9d5ff;
+
+    .aiHeader {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+
+        .aiIcon {
+            color: #7c3aed;
+            font-size: 20px;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #7c3aed;
+            margin: 0;
+            line-height: 1;
+        }
+    }
+
+    p {
+        font-size: 13px;
+        color: #6b21a8;
+        line-height: 1.6;
+        margin: 0;
+        word-break: break-word;
+    }
+}
+
+// Responsive
+@media (max-width: 1280px) {
+    .gridLayout {
+        grid-template-columns: 1fr;
+    }
+
+    .leftColumn,
+    .centerColumn,
+    .rightColumn {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 16px;
+    }
+
+    .dashboardHeader {
+        gap: 16px;
+    }
+
+    .greeting h1 {
+        font-size: 24px;
+    }
+
+    .dateNavigator {
+        overflow-x: auto;
+    }
+}

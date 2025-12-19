@@ -1,6 +1,7 @@
 {
     "menu": {
         "quickBooking": "Quick Booking",
+        "healthRoadmap": "Health Roadmap",
         "booking": {
             "title": "Book Appointment",
             "doctor": "Book Doctor",
