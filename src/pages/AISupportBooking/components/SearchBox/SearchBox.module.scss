@@ -23,7 +23,7 @@
 
 .quickActions {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
     margin-bottom: 16px;
 
@@ -51,6 +51,25 @@
         border-color: #d0dbe8;
         background: #f1f5f9;
         transform: translateY(-2px);
+    }
+}
+
+.symptomActionCard {
+    background: linear-gradient(135deg, #e6f4ff 0%, #d0ebff 100%);
+    border-color: #91d5ff;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(14, 130, 253, 0.15);
+
+    &:hover {
+        background: linear-gradient(135deg, #d0ebff 0%, #b3e0ff 100%);
+        border-color: #0e82fd;
+        box-shadow: 0 12px 30px rgba(14, 130, 253, 0.25);
+
+        .quickActionIcon {
+            background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+            box-shadow: 0 6px 16px rgba(14, 130, 253, 0.4);
+            transform: scale(1.05);
+        }
     }
 }
 
@@ -180,6 +199,12 @@
             background: #9e9e9e;
         }
     }
+}
+
+.textareaDisabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: #9e9e9e;
 }
 
 .textareaRecording {

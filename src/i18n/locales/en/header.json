@@ -1,6 +1,7 @@
 {
     "menu": {
         "quickBooking": "Quick Booking",
+        "healthRoadmap": "Health Roadmap",
         "booking": {
             "title": "Book Appointment",
             "doctor": "Book Doctor",
@@ -11,6 +12,11 @@
             "specialty": "Book Specialty",
             "healthPackage": "Book Health Package",
             "onlineConsultation": "Online Consultation"
+        },
+        "health": {
+            "title": "Your Health",
+            "setupProfile": "Setup Health Profile",
+            "dashboard": "Dashboard"
         },
         "news": {
             "title": "News",

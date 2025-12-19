@@ -90,6 +90,15 @@ export const PATHS = {
         SUCCESS: '/contract-signing-success',
     },
 
+    // Nutrition paths
+    NUTRITION: {
+        ROOT: '/nutrition',
+        ONBOARDING: '/nutrition/onboarding',
+        DASHBOARD: '/nutrition/dashboard',
+        MEAL_PLAN: '/nutrition/meal-plan/:date?',
+        WORKOUT_PLAN: '/nutrition/workout-plan/:date?',
+    },
+
     // Not Found path
     NOT_FOUND: '*',
 } as const;

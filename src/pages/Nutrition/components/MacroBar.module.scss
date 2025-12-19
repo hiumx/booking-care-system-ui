@@ -1,0 +1,32 @@
+.macro-bar {
+    margin-bottom: 1rem;
+
+    .macro-bar-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+
+        .macro-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .macro-value {
+            font-size: 0.9rem;
+            color: #666;
+        }
+    }
+
+    .macro-bar-track {
+        height: 12px;
+        background: #f0f0f0;
+        border-radius: 6px;
+        overflow: hidden;
+
+        .macro-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+    }
+}
