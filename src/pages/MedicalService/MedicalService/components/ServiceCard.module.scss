@@ -1,0 +1,14 @@
+.cardImageWrapper.clinic-icon {
+    width: 110px;
+    aspect-ratio: 4 / 3; // hình chữ nhật, giúp card thấp hơn
+    border-radius: 10px;
+    overflow: hidden;
+    display: block;
+}
+
+.cardImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}

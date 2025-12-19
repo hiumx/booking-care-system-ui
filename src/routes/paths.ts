@@ -8,7 +8,7 @@ export const PATHS = {
     DEMO_DATE_RANGE_PICKER: '/demo/date-range-picker',
     FAQ: '/faq',
     BLOG: '/blog',
-    BLOG_DETAIL: '/blog/:slug',
+    BLOG_DETAIL: '/blog/:id',
     MEDICAL_TERMS: '/medical-terms',
     CATEGORY_ARTICLES: '/category/:categorySlug',
     CATEGORY_ARTICLES_DEMO: '/category-demo',

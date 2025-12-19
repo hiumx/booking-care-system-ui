@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './ServiceCard.module.scss';
 import { buildPath, PATHS, replacePathParams } from '@/routes/paths';
 import { Link } from 'react-router-dom';
 
@@ -13,19 +14,20 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ id, name, image, reverse }) =
     const fullLink = replacePathParams(buildPath(PATHS.Service.CATEGORIES), {
         servicesparentId: id,
     });
+
     return (
         <div
-            className={`service-types ${reverse ? 'service-type-right' : ''}`}
+            className={`service-types ${reverse ? 'service-type-right' : ''} ${styles.serviceCard}`}
             data-aos="fade-down"
         >
             {!reverse && (
-                <div className="doctor-image">
+                <div className={`doctor-image ${styles.imageWrapper}`}>
                     <Link to={fullLink}>
-                        <img src={image} alt={name} />
+                        <img src={image} alt={name} className={styles.image} />
                     </Link>
                 </div>
             )}
-            <div className="service-content">
+            <div className={`service-content ${styles.content}`}>
                 <h4>
                     <Link to={fullLink}>{name}</Link>
                 </h4>
@@ -34,9 +36,9 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ id, name, image, reverse }) =
                 </Link>
             </div>
             {reverse && (
-                <div className="doctor-image">
+                <div className={`doctor-image ${styles.imageWrapper}`}>
                     <Link to={fullLink}>
-                        <img src={image} alt={name} />
+                        <img src={image} alt={name} className={styles.image} />
                     </Link>
                 </div>
             )}

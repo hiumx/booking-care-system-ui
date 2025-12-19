@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { buildPath, PATHS, replacePathParams } from '@/routes/paths';
+import styles from './ServiceCard.module.scss';
 
 interface ServiceCardProps {
     id: string | number;
@@ -22,8 +23,8 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ id, name, image, servicecateg
             <div className="card clinic-item">
                 <div className="card-body">
                     <div className="d-flex align-items-center">
-                        <Link to={fullLink} className="clinic-icon">
-                            <img src={image} alt={name} />
+                        <Link to={fullLink} className={`clinic-icon ${styles.cardImageWrapper}`}>
+                            <img src={image} alt={name} className={styles.cardImage} />
                         </Link>
                         <div className="ms-3">
                             <h6 className="mb-1">
