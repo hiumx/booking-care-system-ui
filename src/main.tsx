@@ -6,8 +6,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'aos/dist/aos.css';
 import './styles/index.scss';
 import './assets/css/iconsax.css';
-import './assets/plugins/fontawesome/css/fontawesome.min.css';
-import './assets/plugins/fontawesome/css/all.min.css';
 import './assets/css/custom.css';
 import './assets/css/feather.css';
 // Import i18n configuration
