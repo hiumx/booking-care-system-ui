@@ -1,5 +1,184 @@
 // MainHeader responsive styles
 
+// Header top bar - normal flow, not fixed
+.headerTopbar {
+    // Normal position - scrolls with page
+    position: relative;
+
+    // Notification dropdown styles for header-topbar
+    :global(.noti-nav) {
+        position: relative;
+
+        // Hide Bootstrap dropdown caret arrow
+        :global(.dropdown-toggle)::after {
+            display: none !important;
+        }
+
+        :global(.dropdown-menu.notifications) {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            min-width: 320px;
+            max-width: 400px;
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e9ecef;
+            z-index: 10000;
+
+            // Arrow pointer
+            &::before {
+                content: '';
+                position: absolute;
+                top: -8px;
+                right: 15px;
+                width: 0;
+                height: 0;
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+                border-bottom: 8px solid #fff;
+            }
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: -9px;
+                right: 14px;
+                width: 0;
+                height: 0;
+                border-left: 9px solid transparent;
+                border-right: 9px solid transparent;
+                border-bottom: 9px solid #e9ecef;
+                z-index: -1;
+            }
+
+            :global(.topnav-dropdown-header) {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 15px;
+                border-bottom: 1px solid #e9ecef;
+                background: #f8f9fa;
+                border-radius: 8px 8px 0 0;
+            }
+
+            :global(.noti-content) {
+                max-height: 350px;
+                overflow-y: auto;
+
+                :global(.notification-list) {
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+
+                    :global(.notification-message) {
+                        border-bottom: 1px solid #f0f0f0;
+
+                        &:last-child {
+                            border-bottom: none;
+                        }
+
+                        a {
+                            display: block;
+                            padding: 12px 15px;
+                            transition: background-color 0.2s ease;
+
+                            &:hover {
+                                background-color: #f8f9fa;
+                            }
+                        }
+
+                        :global(.notify-block) {
+                            gap: 12px;
+                        }
+
+                        :global(.media-body) {
+                            flex: 1;
+                            min-width: 0;
+
+                            h6 {
+                                font-size: 14px;
+                                font-weight: 600;
+                                color: #333;
+                                margin-bottom: 4px;
+                            }
+
+                            :global(.noti-details) {
+                                font-size: 13px;
+                                color: #666;
+                                margin-bottom: 4px;
+                                line-height: 1.4;
+                                display: -webkit-box;
+                                -webkit-line-clamp: 2;
+                                line-clamp: 2;
+                                -webkit-box-orient: vertical;
+                                overflow: hidden;
+                            }
+                        }
+                    }
+                }
+            }
+
+            :global(.topnav-dropdown-footer) {
+                border-top: 1px solid #e9ecef;
+                padding: 8px 0;
+                text-align: center;
+                background: #f8f9fa;
+                border-radius: 0 0 8px 8px;
+            }
+        }
+    }
+}
+
+// Main header - initially relative, becomes fixed when scrolled past topbar
+.mainHeader {
+    // Default: relative position, scrolls with page normally
+    position: relative !important;
+    z-index: 9999;
+    -webkit-transition: all 0.5s ease;
+    -ms-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+
+    // When scrolled past topbar: becomes fixed and slides down from top
+    &.sticky {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        // Animation: slide down from top (fadeInDown from animate.css)
+        -webkit-animation: 500ms ease-in-out 0s normal none 1 running fadeInDown;
+        animation: 500ms ease-in-out 0s normal none 1 running fadeInDown;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+}
+
+// fadeInDown animation from animate.css - same as template uses
+@-webkit-keyframes fadeInDown {
+    from {
+        opacity: 0;
+        -webkit-transform: translate3d(0, -30px, 0);
+        transform: translate3d(0, -30px, 0);
+    }
+    to {
+        opacity: 1;
+        -webkit-transform: none;
+        transform: none;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        -webkit-transform: translate3d(0, -30px, 0);
+        transform: translate3d(0, -30px, 0);
+    }
+    to {
+        opacity: 1;
+        -webkit-transform: none;
+        transform: none;
+    }
+}
+
 // Fix menu items spacing on large screens
 .mainMenuWrapper {
     :global(.main-nav) {
