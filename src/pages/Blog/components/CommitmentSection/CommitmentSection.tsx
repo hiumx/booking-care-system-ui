@@ -18,7 +18,7 @@ const CommitmentSection: React.FC = () => {
 
     return (
         <section className={styles.commitmentSection}>
-            <h2 className={styles.title}>Cam Kết Từ YouMed</h2>
+            <h2 className={styles.title}>Cam Kết Từ Medcure</h2>
             <div className={styles.card}>
                 <div className={styles.headingBlock}>
                     <p className={styles.leadText}>
@@ -26,7 +26,7 @@ const CommitmentSection: React.FC = () => {
                         đối tượng độc giả
                     </p>
                     <div className={styles.cta}>
-                        Cam kết của chúng tôi
+                        Cam kết của chúng tôi{''}
                         <span className={styles.ctaIcon} aria-hidden="true">
                             →
                         </span>
