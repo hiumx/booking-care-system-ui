@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -62,6 +63,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     isFileAnalysisMode = false,
     hasChatMessages = false,
 }) => {
+    const { t } = useTranslation('aiSupport');
     const [isMultiLine, setIsMultiLine] = useState(false);
     const [showAttachmentModal, setShowAttachmentModal] = useState(false);
     const [showLocationModal, setShowLocationModal] = useState(forceShowLocationModal);
