@@ -18,8 +18,7 @@
             "healthNews": "Health News"
         },
         "contact": "Contact Us",
-        "aboutUs": "About Us",
-        "blog": "Health Blog"
+        "aboutUs": "About Us"
     },
     "auth": {
         "login": "Login",
