@@ -879,6 +879,15 @@ const AISupportBooking: React.FC = () => {
             return;
         }
 
+        // Kiểm tra nếu đang ở chế độ phân tích file (xét nghiệm hoặc ảnh da)
+        const hasFileAttachment = messages.some((m) => m.fileAttachment);
+        if (hasFileAttachment) {
+            toast.warning(
+                'Cuộc trò chuyện này chỉ dùng để phân tích file. Vui lòng tạo cuộc trò chuyện mới để chat.'
+            );
+            return;
+        }
+
         const trimmedContent = content.trim();
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -1332,6 +1341,7 @@ const AISupportBooking: React.FC = () => {
                             onLabResultFileSelect={handleLabResultFileSelect}
                             onDermatologyFileSelect={handleDermatologyFileSelect}
                             onNutritionClick={handleStartNutrition}
+                            isFileAnalysisMode={messages.some((m) => m.fileAttachment)}
                         />
                     )}
                 </div>

@@ -92,14 +92,11 @@ const RoadmapDashboard: React.FC = () => {
                 }
             }
 
-            const today = new Date();
-            const dateStr = today.toISOString().split('T')[0];
+            // Use selectedDate instead of today
+            const dateStr = selectedDate.toISOString().split('T')[0];
             const planData = await nutritionService.generateDailyPlan(dateStr);
 
-            if (selectedDate.toDateString() !== today.toDateString()) {
-                setSelectedDate(today);
-            }
-
+            // Don't change selectedDate - keep it as is
             setDailyPlan(planData);
 
             try {
@@ -145,7 +142,6 @@ const RoadmapDashboard: React.FC = () => {
         try {
             await nutritionService.completeMeal(dailyPlan.mealPlan.id, mealIndex);
             await loadData();
-            toast.success('Đã hoàn thành bữa ăn!');
         } catch (error) {
             console.error('Error completing meal:', error);
             toast.error('Không thể cập nhật bữa ăn');
@@ -157,7 +153,6 @@ const RoadmapDashboard: React.FC = () => {
         try {
             await nutritionService.completeExercise(dailyPlan.workoutPlan.id, exerciseIndex);
             await loadData();
-            toast.success('Đã hoàn thành bài tập!');
         } catch (error) {
             console.error('Error completing exercise:', error);
             toast.error('Không thể cập nhật bài tập');

@@ -195,11 +195,6 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                     </Link>
                                 </div>
                                 <ul className="main-nav">
-                                    <li>
-                                        <Link to={PATHS.NUTRITION.DASHBOARD}>
-                                            {t('menu.healthRoadmap', 'Sức khỏe của bạn')}
-                                        </Link>
-                                    </li>
                                     <li className="has-submenu">
                                         <Link to="#">
                                             {t('menu.booking.title')}{' '}
@@ -237,6 +232,27 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                             <li>
                                                 <Link to="#">
                                                     {t('menu.medicalServices.onlineConsultation')}
+                                                </Link>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li className="has-submenu">
+                                        <Link to="#">
+                                            {t('menu.health.title', 'Sức khỏe của bạn')}{' '}
+                                            <i className="fas fa-chevron-down"></i>
+                                        </Link>
+                                        <ul className="submenu">
+                                            <li>
+                                                <Link to={PATHS.NUTRITION.ONBOARDING}>
+                                                    {t(
+                                                        'menu.health.setupProfile',
+                                                        'Thiết lập hồ sơ sức khỏe'
+                                                    )}
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <Link to={PATHS.NUTRITION.DASHBOARD}>
+                                                    {t('menu.health.dashboard', 'Bảng điều khiển')}
                                                 </Link>
                                             </li>
                                         </ul>

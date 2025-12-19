@@ -28,6 +28,7 @@ interface ChatAreaProps {
     onLabResultFileSelect?: (file: File) => void;
     onDermatologyFileSelect?: (file: File) => void;
     onNutritionClick?: () => void;
+    isFileAnalysisMode?: boolean;
 }
 
 // Breakpoints cho SuggestionCard Carousel
@@ -211,6 +212,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     onLabResultFileSelect,
     onDermatologyFileSelect,
     onNutritionClick,
+    isFileAnalysisMode = false,
 }) => {
     const [inputValue, setInputValue] = useState('');
     const [activeTabs, setActiveTabs] = useState<Record<string, 'doctor' | 'hospital'>>({});
@@ -574,6 +576,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                     onLabResultFileSelect={onLabResultFileSelect}
                     onDermatologyFileSelect={onDermatologyFileSelect}
                     onNutritionClick={onNutritionClick}
+                    isFileAnalysisMode={isFileAnalysisMode}
                 />
             </div>
         </div>

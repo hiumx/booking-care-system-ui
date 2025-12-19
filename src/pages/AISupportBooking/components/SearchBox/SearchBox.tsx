@@ -11,8 +11,6 @@ import {
     Navigation,
     FileText,
     Stethoscope,
-    Pill,
-    ClipboardList,
     Image,
     Lightbulb,
     Telescope,
@@ -38,6 +36,8 @@ interface SearchBoxProps {
     onLabResultFileSelect?: (file: File) => void;
     onDermatologyFileSelect?: (file: File) => void;
     onNutritionClick?: () => void;
+    isFileAnalysisMode?: boolean;
+    hasChatMessages?: boolean;
 }
 
 interface ComingSoonFeature {
@@ -46,13 +46,7 @@ interface ComingSoonFeature {
     title: string;
 }
 
-const comingSoonFeatures: ComingSoonFeature[] = [
-    {
-        id: 'medical-history',
-        icon: ClipboardList,
-        title: 'Lịch sử khám bệnh',
-    },
-];
+const comingSoonFeatures: ComingSoonFeature[] = [];
 
 const SearchBox: React.FC<SearchBoxProps> = ({
     value,
@@ -64,7 +58,9 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     forceShowLocationModal = false,
     onLabResultFileSelect,
     onDermatologyFileSelect,
-    onNutritionClick,
+    onNutritionClick: _onNutritionClick,
+    isFileAnalysisMode = false,
+    hasChatMessages = false,
 }) => {
     const [isMultiLine, setIsMultiLine] = useState(false);
     const [showAttachmentModal, setShowAttachmentModal] = useState(false);
@@ -371,34 +367,17 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         >
             <div className={styles.quickActions}>
                 <div
-                    className={clsx(styles.quickActionCard, styles.labActionCard)}
-                    onClick={handleLabCardClick}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            handleLabCardClick();
-                        }
+                    className={clsx(styles.quickActionCard, styles.symptomActionCard)}
+                    onClick={() => {
+                        // Set default message for symptom analysis
+                        onChange('Tôi muốn phân tích triệu chứng');
                     }}
-                >
-                    <div className={styles.quickActionIcon}>
-                        <FileText size={20} />
-                    </div>
-                    <div className={styles.quickActionContent}>
-                        <p className={styles.quickActionTitle}>Phân tích kết quả xét nghiệm</p>
-                    </div>
-                </div>
-
-                <div
-                    className={clsx(styles.quickActionCard, styles.dermatologyActionCard)}
-                    onClick={handleDermatologyCardClick}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
-                            handleDermatologyCardClick();
+                            onChange('Tôi muốn phân tích triệu chứng');
                         }
                     }}
                 >
@@ -406,28 +385,65 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                         <Stethoscope size={20} />
                     </div>
                     <div className={styles.quickActionContent}>
-                        <p className={styles.quickActionTitle}>Phân tích hình ảnh y tế</p>
+                        <p className={styles.quickActionTitle}>Phân tích triệu chứng</p>
+                        <p className={styles.quickActionDescription}>
+                            Mô tả triệu chứng để AI tư vấn
+                        </p>
                     </div>
                 </div>
 
                 <div
-                    className={clsx(styles.quickActionCard, styles.nutritionActionCard)}
-                    onClick={onNutritionClick}
+                    className={clsx(styles.quickActionCard, styles.labActionCard, {
+                        [styles.disabledCard]: hasChatMessages,
+                    })}
+                    onClick={hasChatMessages ? undefined : handleLabCardClick}
                     role="button"
-                    tabIndex={0}
+                    tabIndex={hasChatMessages ? -1 : 0}
                     onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                        if (!hasChatMessages && (e.key === 'Enter' || e.key === ' ')) {
                             e.preventDefault();
-                            onNutritionClick?.();
+                            handleLabCardClick();
                         }
                     }}
+                    title={hasChatMessages ? 'Vui lòng tạo cuộc trò chuyện mới để gửi file' : ''}
                 >
                     <div className={styles.quickActionIcon}>
-                        <Pill size={20} />
+                        <FileText size={20} />
                     </div>
                     <div className={styles.quickActionContent}>
-                        <p className={styles.quickActionTitle}>
-                            Khuyến nghị dinh dưỡng và tập luyện cá nhân hóa
+                        <p className={styles.quickActionTitle}>Phân tích kết quả xét nghiệm</p>
+                        <p className={styles.quickActionDescription}>
+                            {hasChatMessages
+                                ? 'Tạo cuộc trò chuyện mới để gửi file'
+                                : 'Tải lên kết quả xét nghiệm'}
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    className={clsx(styles.quickActionCard, styles.dermatologyActionCard, {
+                        [styles.disabledCard]: hasChatMessages,
+                    })}
+                    onClick={hasChatMessages ? undefined : handleDermatologyCardClick}
+                    role="button"
+                    tabIndex={hasChatMessages ? -1 : 0}
+                    onKeyDown={(e) => {
+                        if (!hasChatMessages && (e.key === 'Enter' || e.key === ' ')) {
+                            e.preventDefault();
+                            handleDermatologyCardClick();
+                        }
+                    }}
+                    title={hasChatMessages ? 'Vui lòng tạo cuộc trò chuyện mới để gửi file' : ''}
+                >
+                    <div className={styles.quickActionIcon}>
+                        <Image size={20} />
+                    </div>
+                    <div className={styles.quickActionContent}>
+                        <p className={styles.quickActionTitle}>Phân tích hình ảnh y tế</p>
+                        <p className={styles.quickActionDescription}>
+                            {hasChatMessages
+                                ? 'Tạo cuộc trò chuyện mới để gửi file'
+                                : 'Tải lên hình ảnh để phân tích'}
                         </p>
                     </div>
                 </div>
@@ -468,13 +484,19 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
             <textarea
                 ref={textareaRef}
-                placeholder={placeholder}
+                placeholder={
+                    isFileAnalysisMode
+                        ? 'Cuộc trò chuyện này chỉ dùng để phân tích file. Vui lòng tạo cuộc trò chuyện mới để chat.'
+                        : placeholder
+                }
                 rows={1}
                 value={value}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
+                disabled={isFileAnalysisMode}
                 className={clsx(styles.textarea, {
                     [styles.textareaRecording]: isRecording,
+                    [styles.textareaDisabled]: isFileAnalysisMode,
                 })}
             />
 
@@ -592,6 +614,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                         type="button"
                         data-tooltip={isRecording ? 'Dừng ghi âm' : 'Ghi âm'}
                         onClick={toggleRecording}
+                        disabled={isFileAnalysisMode}
                         className={clsx(styles.micButton, {
                             [styles.recording]: isRecording,
                         })}
@@ -603,6 +626,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                         type="button"
                         data-tooltip="Xóa nội dung"
                         onClick={handleClear}
+                        disabled={isFileAnalysisMode}
                         className={styles.iconButton}
                     >
                         <Trash2 size={16} />
@@ -613,6 +637,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                     type="button"
                     data-tooltip="Gửi"
                     onClick={handleSend}
+                    disabled={isFileAnalysisMode}
                     className={styles.autoButton}
                 >
                     <Send size={14} />
