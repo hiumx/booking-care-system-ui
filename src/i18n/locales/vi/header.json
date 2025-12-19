@@ -13,6 +13,11 @@
             "healthPackage": "Đặt khám gói sức khỏe",
             "onlineConsultation": "Tư vấn trực tuyến"
         },
+        "health": {
+            "title": "Sức khỏe của bạn",
+            "setupProfile": "Thiết lập hồ sơ sức khỏe",
+            "dashboard": "Bảng điều khiển"
+        },
         "news": {
             "title": "Tin tức",
             "serviceNews": "Tin dịch vụ",

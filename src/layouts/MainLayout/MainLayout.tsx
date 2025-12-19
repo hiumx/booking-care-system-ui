@@ -18,7 +18,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     hasHeader = true,
 }) => {
     return (
-        <div className={styles.mainLayout}>
+        <div className="main-wrapper">
             {hasHeader && <MainHeader />}
             <main className={styles.contentContainer}>{children || <Outlet />}</main>
             {hasFooter && <MainFooter />}

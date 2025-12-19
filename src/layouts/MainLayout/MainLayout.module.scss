@@ -6,6 +6,8 @@
     justify-content: space-between;
 
     .contentContainer {
-        padding-top: 68px;
+        // No padding needed - header is in normal flow initially
+        // Content flows naturally below header
+        flex: 1;
     }
 }
