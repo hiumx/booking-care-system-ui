@@ -32,7 +32,7 @@ const Benefits: React.FC = () => {
     return (
         <section className={styles.benefitsSection} aria-label="Đặt khám tiện lợi cùng YouMed">
             <div className={styles.benefitsContainer}>
-                <h2 className={styles.benefitsTitle}>Đặt khám tiện lợi cùng YouMed</h2>
+                <h2 className={styles.benefitsTitle}>Đặt khám tiện lợi cùng Medcure</h2>
                 <div className={styles.statsRow}>
                     <div className={styles.statItem}>
                         <div className={styles.statNumber}>+25</div>

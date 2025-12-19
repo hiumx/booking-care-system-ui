@@ -12,10 +12,8 @@ type HospitalCardProps = {
     votes: { positive: number; total: number };
     experience: number; // Duration
     fees: number;
-    nextAvailable: string;
     linkDetail: string;
     linkBooking: string;
-    linkProfileHospital: string;
 };
 
 const HospitalCard: React.FC<HospitalCardProps> = ({
@@ -28,20 +26,16 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
     votes,
     experience,
     fees,
-    nextAvailable,
     linkDetail,
     linkBooking,
-    linkProfileHospital,
 }) => {
     return (
         <div className="col-lg-12">
             <div className="card doctor-list-card">
-                <div className="d-md-flex align-items-center">
+                <div className="d-md-flex align-items-start">
                     {/* Doctor Image */}
-                    <div className="card-img card-img-hover">
-                        <Link to={linkProfileHospital}>
-                            <img src={image} alt={name} />
-                        </Link>
+                    <div className={`card-img card-img-hover ${styles.imageWrapper}`}>
+                        <img src={image} alt={name} className={styles.image} />
                         <div className="grid-overlay-item d-flex align-items-center justify-content-between">
                             <span className="badge bg-orange">
                                 <i className="fa-solid fa-star me-1"></i>
@@ -68,7 +62,7 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                                     <div className="col-sm-7">
                                         <div>
                                             <h6 className="d-flex align-items-center mb-1">
-                                                <Link to={linkProfileHospital}>{name}</Link>
+                                                {name}
                                             </h6>
                                             <p className="mb-2 d-flex align-items-center">
                                                 {degrees}
@@ -123,10 +117,6 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                                             {fees.toLocaleString('vi-VN')} VNĐ
                                         </h3>
                                     </div>
-                                    <p className="mb-0">
-                                        Lịch trống tiếp theo <br />
-                                        {nextAvailable}
-                                    </p>
                                 </div>
                                 <div className="d-flex gap-2">
                                     <Link

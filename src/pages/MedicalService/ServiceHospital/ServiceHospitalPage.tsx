@@ -552,7 +552,6 @@ const ServiceHospitalPage: React.FC = () => {
                                 fees={hospital.hospital.fees}
                                 rating={hospital.hospital.rating}
                                 image={hospital.hospital.image}
-                                nextAvailable={hospital.hospital.nextAvailable}
                                 degrees={hospital.hospital.name} // Hospital name
                                 votes={hospital.hospital.votes}
                                 experience={hospital.hospital.experience} // Duration in minutes
@@ -564,9 +563,6 @@ const ServiceHospitalPage: React.FC = () => {
                                 })}
                                 linkBooking={replacePathParams(PATHS.BOOKING.SERVICE, {
                                     serviceMedicalId: hospital.hospital.idservice,
-                                })}
-                                linkProfileHospital={replacePathParams(PATHS.HOSPITAL.DETAIL, {
-                                    id: hospital.hospital.id,
                                 })}
                             />
                         ))}
