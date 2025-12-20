@@ -354,6 +354,9 @@ const WorkoutPlanDetail: React.FC = () => {
                                                     <div
                                                         key={index}
                                                         className={`${styles.exerciseItem} ${isCompleted ? styles.completed : ''}`}
+                                                        onClick={() =>
+                                                            handleCompleteExercise(index)
+                                                        }
                                                     >
                                                         <div className={styles.exerciseImage}>
                                                             <img
@@ -422,27 +425,32 @@ const WorkoutPlanDetail: React.FC = () => {
                                                             </div>
                                                         </div>
 
-                                                        <label className={styles.checkboxLabel}>
+                                                        <div
+                                                            className={styles.checkboxWrapper}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
                                                             <input
                                                                 type="checkbox"
                                                                 checked={isCompleted}
                                                                 onChange={() =>
                                                                     handleCompleteExercise(index)
                                                                 }
+                                                                className={styles.checkbox}
+                                                                id={`exercise-checkbox-${index}`}
                                                             />
-                                                            <div className={styles.checkboxCustom}>
-                                                                {isCompleted && (
-                                                                    <span className="material-icons">
-                                                                        check
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                            <span>
-                                                                {isCompleted
-                                                                    ? 'Đã xong'
-                                                                    : 'Đánh dấu xong'}
-                                                            </span>
-                                                        </label>
+                                                            <label
+                                                                htmlFor={`exercise-checkbox-${index}`}
+                                                                className={styles.checkboxLabel}
+                                                            >
+                                                                <span className={styles.checkmark}>
+                                                                    {isCompleted && (
+                                                                        <span className="material-icons">
+                                                                            check
+                                                                        </span>
+                                                                    )}
+                                                                </span>
+                                                            </label>
+                                                        </div>
                                                     </div>
                                                 );
                                             })}
