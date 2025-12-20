@@ -44,14 +44,23 @@ const RoadmapDashboard: React.FC = () => {
     const loadData = async () => {
         try {
             setLoading(true);
+
+            // Check profile first - redirect if not found
             try {
                 const profileData = await nutritionService.getProfile();
+                if (!profileData) {
+                    navigate(PATHS.NUTRITION.ONBOARDING);
+                    return;
+                }
                 setProfile(profileData);
             } catch (error: any) {
                 if (error.response?.status === 404) {
                     navigate(PATHS.NUTRITION.ONBOARDING);
                     return;
                 }
+                // For other errors, still redirect to onboarding
+                navigate(PATHS.NUTRITION.ONBOARDING);
+                return;
             }
 
             const dateStr = selectedDate.toISOString().split('T')[0];
@@ -132,8 +141,21 @@ const RoadmapDashboard: React.FC = () => {
         if (!dailyPlan?.hydrationPlan) return;
         const maxGlasses = dailyPlan.hydrationPlan.recommendedGlasses;
         if (hydrationGlasses < maxGlasses) {
-            setHydrationGlasses(hydrationGlasses + 1);
-            toast.success('Đã thêm 1 ly nước!');
+            const newGlasses = hydrationGlasses + 1;
+            setHydrationGlasses(newGlasses);
+
+            // Update dailyPlan state to reflect new water intake (250ml = 0.25L per glass)
+            setDailyPlan((prev) => {
+                if (!prev?.hydrationPlan) return prev;
+                return {
+                    ...prev,
+                    hydrationPlan: {
+                        ...prev.hydrationPlan,
+                        completedGlasses: newGlasses,
+                        currentIntakeLiters: newGlasses * 0.25,
+                    },
+                };
+            });
         }
     };
 
@@ -141,7 +163,35 @@ const RoadmapDashboard: React.FC = () => {
         if (!dailyPlan?.mealPlan) return;
         try {
             await nutritionService.completeMeal(dailyPlan.mealPlan.id, mealIndex);
-            await loadData();
+
+            // Update local state instead of reloading everything
+            setDailyPlan((prev) => {
+                if (!prev?.mealPlan) return prev;
+
+                const completedItems = prev.mealPlan.completedItems || [];
+                const isCompleted = completedItems.includes(mealIndex);
+
+                const newCompletedItems = isCompleted
+                    ? completedItems.filter((i) => i !== mealIndex)
+                    : [...completedItems, mealIndex];
+
+                // Recalculate completion percentage
+                const totalItems =
+                    (prev.mealPlan.meals?.length || 0) + (prev.workoutPlan?.exercises?.length || 0);
+                const completedCount =
+                    newCompletedItems.length + (prev.workoutPlan?.completedItems?.length || 0);
+                const newCompletionPercentage =
+                    totalItems > 0 ? (completedCount / totalItems) * 100 : 0;
+
+                return {
+                    ...prev,
+                    mealPlan: {
+                        ...prev.mealPlan,
+                        completedItems: newCompletedItems,
+                    },
+                    completionPercentage: newCompletionPercentage,
+                };
+            });
         } catch (error) {
             console.error('Error completing meal:', error);
             toast.error('Không thể cập nhật bữa ăn');
@@ -152,7 +202,35 @@ const RoadmapDashboard: React.FC = () => {
         if (!dailyPlan?.workoutPlan) return;
         try {
             await nutritionService.completeExercise(dailyPlan.workoutPlan.id, exerciseIndex);
-            await loadData();
+
+            // Update local state instead of reloading everything
+            setDailyPlan((prev) => {
+                if (!prev?.workoutPlan) return prev;
+
+                const completedItems = prev.workoutPlan.completedItems || [];
+                const isCompleted = completedItems.includes(exerciseIndex);
+
+                const newCompletedItems = isCompleted
+                    ? completedItems.filter((i) => i !== exerciseIndex)
+                    : [...completedItems, exerciseIndex];
+
+                // Recalculate completion percentage
+                const totalItems =
+                    (prev.mealPlan?.meals?.length || 0) + (prev.workoutPlan.exercises?.length || 0);
+                const completedCount =
+                    (prev.mealPlan?.completedItems?.length || 0) + newCompletedItems.length;
+                const newCompletionPercentage =
+                    totalItems > 0 ? (completedCount / totalItems) * 100 : 0;
+
+                return {
+                    ...prev,
+                    workoutPlan: {
+                        ...prev.workoutPlan,
+                        completedItems: newCompletedItems,
+                    },
+                    completionPercentage: newCompletionPercentage,
+                };
+            });
         } catch (error) {
             console.error('Error completing exercise:', error);
             toast.error('Không thể cập nhật bài tập');
@@ -599,7 +677,12 @@ const RoadmapDashboard: React.FC = () => {
                                                 Snack: 'Bữa phụ',
                                             };
                                             return (
-                                                <div key={index} className={styles.mealItem}>
+                                                <div
+                                                    key={index}
+                                                    className={styles.mealItem}
+                                                    onClick={() => handleCompleteMeal(index)}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
                                                     <div className={styles.mealImage}>
                                                         <img
                                                             src={
@@ -647,9 +730,11 @@ const RoadmapDashboard: React.FC = () => {
                                                             <input
                                                                 type="checkbox"
                                                                 checked={isCompleted}
-                                                                onChange={() =>
-                                                                    handleCompleteMeal(index)
-                                                                }
+                                                                onChange={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleCompleteMeal(index);
+                                                                }}
+                                                                onClick={(e) => e.stopPropagation()}
                                                                 className={styles.mealCheckbox}
                                                             />
                                                         </div>
@@ -708,7 +793,12 @@ const RoadmapDashboard: React.FC = () => {
                                                     index
                                                 ) || false;
                                             return (
-                                                <div key={index} className={styles.exerciseItem}>
+                                                <div
+                                                    key={index}
+                                                    className={styles.exerciseItem}
+                                                    onClick={() => handleCompleteExercise(index)}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
                                                     <div className={styles.exerciseIcon}>
                                                         {exercise.imageUrl ? (
                                                             <img
@@ -737,9 +827,11 @@ const RoadmapDashboard: React.FC = () => {
                                                     <input
                                                         type="checkbox"
                                                         checked={isCompleted}
-                                                        onChange={() =>
-                                                            handleCompleteExercise(index)
-                                                        }
+                                                        onChange={(e) => {
+                                                            e.stopPropagation();
+                                                            handleCompleteExercise(index);
+                                                        }}
+                                                        onClick={(e) => e.stopPropagation()}
                                                         className={styles.exerciseCheckbox}
                                                     />
                                                 </div>

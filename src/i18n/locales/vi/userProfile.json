@@ -252,6 +252,8 @@
         "tabs": {
             "appointment": "Lịch hẹn",
             "news": "Tin tức",
+            "nutrition": "Dinh dưỡng",
+            "workout": "Tập luyện",
             "system": "Hệ thống"
         },
         "options": "Tùy chọn",
