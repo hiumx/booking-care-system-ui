@@ -142,7 +142,6 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
             await dispatch(logoutAsync()).unwrap();
             dispatch(clearUserProfile()); // Clear user profile from state
             dispatch(clearNotifications()); // Clear notifications
-            toast.success(t('toast.logoutSuccess'));
             navigate(PATHS.HOME); // Redirect to home page
         } catch (error: unknown) {
             console.error('Logout failed:', error);

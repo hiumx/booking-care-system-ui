@@ -53,7 +53,6 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
         try {
             await dispatch(logoutAsync()).unwrap();
             dispatch(clearUserProfile()); // Clear user profile from state
-            toast.success(t('sidebar.toast.logoutSuccess'));
             navigate(PATHS.HOME); // Redirect to home page
         } catch (error: any) {
             console.error('Logout failed:', error);
