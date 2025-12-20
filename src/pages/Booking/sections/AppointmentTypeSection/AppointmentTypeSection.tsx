@@ -321,10 +321,16 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
     };
 
     const handleDoctorSelectionModeChange = (mode: 'hospital' | 'self') => {
+        // Only process if mode actually changes
+        if (doctorSelectionMode === mode) return;
+
         setDoctorSelectionMode(mode);
+        // Always clear schedule data when switching between modes
+        // because schedule is tied to either hospital assignment or specific doctor
+        clearScheduleIfNeeded();
+
         if (mode === 'hospital') {
-            // Clear doctor selection and schedule data when switching to hospital assignment
-            clearScheduleIfNeeded();
+            // Clear doctor selection when switching to hospital assignment
             setSelectedDoctor(null);
             dispatch(setSelectedDoctorId(null));
             dispatch(clearSelectedDoctor());
