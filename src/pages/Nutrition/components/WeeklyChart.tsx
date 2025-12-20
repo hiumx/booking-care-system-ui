@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { DailyCompletion } from '@/types/nutrition.types';
 import styles from './WeeklyChart.module.scss';
 
@@ -7,10 +8,21 @@ interface WeeklyChartProps {
 }
 
 const WeeklyChart: React.FC<WeeklyChartProps> = ({ weeklyCompletion }) => {
+    const { t } = useTranslation('nutrition');
+
     const getDayLabel = (dateStr: string) => {
         const date = new Date(dateStr);
-        const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-        return days[date.getDay()];
+        const dayIndex = date.getDay();
+        const dayKeys = [
+            'sunday',
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+        ];
+        return t(`weekDays.${dayKeys[dayIndex]}`);
     };
 
     const maxPercentage = Math.max(...weeklyCompletion.map((d) => d.completionPercentage), 100);

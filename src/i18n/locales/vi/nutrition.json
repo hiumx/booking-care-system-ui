@@ -1,0 +1,227 @@
+{
+    "breadcrumb": {
+        "home": "Trang chủ",
+        "yourHealth": "Sức khỏe của bạn",
+        "mealPlanDetail": "Thực đơn chi tiết",
+        "workoutPlanDetail": "Kế hoạch tập luyện",
+        "profileSetup": "Thiết lập hồ sơ"
+    },
+    "common": {
+        "kcal": "kcal",
+        "minutes": "phút",
+        "servings": "người",
+        "sets": "sets",
+        "reps": "reps",
+        "protein": "Protein",
+        "carbs": "Carbs",
+        "fat": "Fat",
+        "calories": "Calories",
+        "backToDashboard": "Quay lại Dashboard",
+        "viewWeekOverview": "Xem tổng quan tuần",
+        "today": "Hôm nay",
+        "remaining": "Còn lại",
+        "consecutiveDays": "ngày liên tiếp"
+    },
+    "mealTypes": {
+        "breakfast": "Bữa sáng",
+        "lunch": "Bữa trưa",
+        "dinner": "Bữa tối",
+        "snack": "Bữa phụ"
+    },
+    "intensity": {
+        "low": "Nhẹ",
+        "medium": "Trung bình",
+        "high": "Cao"
+    },
+    "weekDays": {
+        "sunday": "CN",
+        "monday": "T2",
+        "tuesday": "T3",
+        "wednesday": "T4",
+        "thursday": "T5",
+        "friday": "T6",
+        "saturday": "T7"
+    },
+    "mealPlanDetail": {
+        "title": "Thực đơn chi tiết",
+        "noData": "Không có thực đơn cho ngày này",
+        "badge": "Kế hoạch dinh dưỡng AI",
+        "heroTitle": "Lộ trình dinh dưỡng hàng ngày của bạn",
+        "heroDescription": "Theo dõi kế hoạch bữa ăn cá nhân hóa được tạo bởi AI dựa trên mục tiêu sức khỏe của bạn. Duy trì nhất quán để đạt được cân nặng mục tiêu.",
+        "dailyGoal": "Mục tiêu hàng ngày",
+        "consumed": "Đã tiêu thụ",
+        "mainIngredients": "Nguyên liệu chính:",
+        "markAsEaten": "Đánh dấu đã ăn",
+        "defaultBenefit": "Bữa ăn này cung cấp dinh dưỡng cân bằng cho cơ thể bạn."
+    },
+    "workoutPlanDetail": {
+        "title": "Kế hoạch tập luyện",
+        "noData": "Không có kế hoạch tập luyện cho ngày này",
+        "badge": "Kế hoạch tập luyện AI",
+        "heroTitle": "Lộ trình tập luyện hàng ngày của bạn",
+        "heroDescription": "Theo dõi kế hoạch tập luyện cá nhân hóa được tạo bởi AI dựa trên mục tiêu sức khỏe của bạn. Duy trì nhất quán để đạt được thể trạng mục tiêu.",
+        "dailyGoal": "Mục tiêu hàng ngày",
+        "burned": "Đã đốt cháy",
+        "categoryBadge": "Sức mạnh & Linh hoạt",
+        "defaultWorkoutType": "Sức mạnh thượng thân",
+        "coach": "Huấn luyện viên",
+        "aiCoach": "Medcure AI",
+        "aiRecommendation": "Khuyến nghị từ AI",
+        "aiRecommendationText": "Kế hoạch tập hôm nay được tinh chỉnh linh hoạt nhằm cân bằng giữa hiệu quả luyện tập và khả năng phục hồi của cơ thể. Các bài tập được sắp xếp hợp lý để bạn duy trì cường độ cần thiết, đồng thời hạn chế áp lực không cần thiết, giúp bạn tiếp tục tiến bộ một cách bền vững.",
+        "todayExercises": "Bài tập hôm nay",
+        "completedExercises": "Đã hoàn thành {{completed}}/{{total}} bài tập",
+        "trainingProgress": "Tiến độ tập luyện",
+        "goalAchieved": "Đạt mục tiêu",
+        "exercisesDone": "Bài tập đã xong",
+        "caloriesBurned": "Calo đã đốt",
+        "postWorkoutStretches": "Các bài giãn cơ sau buổi tập",
+        "gluteHipStretch": "Giãn cơ mông & hông",
+        "gluteHipStretchDesc": "Giảm áp lực hông, lưng dưới • 20–30 giây mỗi bên"
+    },
+    "dashboard": {
+        "title": "Sức khỏe của bạn",
+        "greeting": {
+            "morning": "Chào buổi sáng",
+            "noon": "Chào buổi trưa",
+            "afternoon": "Chào buổi chiều",
+            "evening": "Chào buổi tối",
+            "default": "Chào bạn"
+        },
+        "welcomeMessage": "Chào bạn, {{name}}! 👋",
+        "completionMessage": "Hôm nay bạn đã hoàn thành <highlight>{{percentage}}%</highlight> kế hoạch.",
+        "calories": "Calories",
+        "remaining": "Còn lại {{calories}} kcal",
+        "macros": "Dinh dưỡng (Macros)",
+        "hydration": {
+            "title": "Nước uống",
+            "addWater": "+ Thêm ly nước (250ml)"
+        },
+        "mealPlan": {
+            "title": "Thực đơn hôm nay",
+            "viewDetail": "Xem chi tiết",
+            "noMealPlan": "Chưa có thực đơn cho ngày này"
+        },
+        "workoutPlan": {
+            "title": "Kế hoạch tập luyện",
+            "viewDetail": "Xem chi tiết",
+            "noWorkoutPlan": "Chưa có kế hoạch tập luyện"
+        },
+        "generatePlan": "Tạo kế hoạch mới",
+        "generating": "Đang tạo..."
+    },
+    "onboarding": {
+        "title": "Thiết lập hồ sơ dinh dưỡng",
+        "sidebarTitle": "Sức khỏe của bạn AI",
+        "sidebarSubtitle": "Cá nhân hóa cho bạn",
+        "whyWeNeedThis": "Tại sao chúng tôi cần điều này?",
+        "whyWeNeedThisText": "AI sử dụng dữ liệu của bạn để tạo ra lộ trình dinh dưỡng và tập luyện an toàn, hiệu quả nhất phù hợp với mục tiêu sức khỏe.",
+        "steps": {
+            "basicMetrics": {
+                "title": "Chỉ số cơ bản",
+                "desc": "Chiều cao, cân nặng"
+            },
+            "goals": {
+                "title": "Mục tiêu",
+                "desc": "Giảm cân, tăng cơ"
+            },
+            "activityLevel": {
+                "title": "Mức độ vận động",
+                "desc": "Thói quen vận động"
+            },
+            "dietaryPreferences": {
+                "title": "Sở thích ăn uống",
+                "desc": "Chế độ ăn, dị ứng"
+            },
+            "healthConditions": {
+                "title": "Tình trạng sức khỏe",
+                "desc": "Bệnh lý nền"
+            }
+        },
+        "step1": {
+            "badge": "Thiết lập hồ sơ",
+            "title": "Chỉ số cơ thể của bạn",
+            "description": "Hãy cung cấp thông tin chính xác để AI có thể tính toán chỉ số BMI và nhu cầu dinh dưỡng hàng ngày dành riêng cho bạn.",
+            "biologicalGender": "Giới tính sinh học",
+            "male": "Nam",
+            "female": "Nữ",
+            "other": "Khác",
+            "age": "Tuổi",
+            "height": "Chiều cao (cm)",
+            "weight": "Cân nặng (kg)"
+        },
+        "step2": {
+            "badge": "Lộ trình cá nhân hóa",
+            "title": "Mục tiêu sức khỏe chính của bạn là gì?",
+            "description": "AI của chúng tôi sẽ điều chỉnh kế hoạch dinh dưỡng và tập luyện dựa trên những gì bạn muốn đạt được.",
+            "goals": {
+                "weightLoss": "Tập trung vào thâm hụt calo, các bài tập đốt cháy mỡ và thói quen ăn uống bền vững.",
+                "muscleGain": "Các kế hoạch tập luyện tập trung vào phì đại cơ và khuyến nghị bữa ăn giàu protein.",
+                "maintenance": "Phương pháp cân bằng để giữ cơ thể năng động và tối ưu hóa dinh dưỡng.",
+                "heartHealth": "Tăng cường sức bền, sức khỏe tim mạch và sự dẻo dai qua các hoạt động aerobic.",
+                "flexibility": "Cải thiện độ linh hoạt, giảm căng cơ và tăng khả năng vận động của cơ thể.",
+                "endurance": "Nâng cao sức chịu đựng, tăng cường thể lực và khả năng hoạt động lâu dài."
+            }
+        },
+        "step3": {
+            "badge": "Bước 3/5",
+            "title": "Bạn thường vận động ở mức nào?",
+            "description": "Mức độ vận động giúp chúng tôi tính toán chính xác lượng calo bạn đốt cháy mỗi ngày."
+        },
+        "step4": {
+            "badge": "Cá nhân hóa dinh dưỡng",
+            "title": "Sở thích ăn uống của bạn",
+            "description": "Để AI thiết kế thực đơn phù hợp nhất, hãy chia sẻ với chúng tôi về thói quen và các hạn chế trong ăn uống của bạn.",
+            "currentDiet": "Chế độ ăn hiện tại",
+            "allergiesTitle": "Dị ứng & Hạn chế",
+            "allergiesSubtitle": "Chọn những loại thực phẩm bạn bị dị ứng hoặc không dung nạp:",
+            "noAllergy": "Không dị ứng",
+            "favoriteCuisine": "Ẩm thực yêu thích",
+            "addOtherAllergy": "Thêm dị ứng khác",
+            "addOtherCuisine": "Thêm ẩm thực khác",
+            "enterOtherAllergy": "Nhập dị ứng khác...",
+            "enterOtherCuisine": "Nhập ẩm thực khác...",
+            "add": "Thêm",
+            "dietDescriptions": {
+                "regular": "Ăn đa dạng các loại thực phẩm",
+                "vegetarian": "Không thịt cá, có trứng sữa",
+                "vegan": "Hoàn toàn thực vật",
+                "keto": "Ít carb, nhiều chất béo",
+                "lowCarb": "Hạn chế tinh bột"
+            }
+        },
+        "step5": {
+            "badge": "Sức khỏe & Y tế",
+            "title": "Bạn có tình trạng sức khỏe nào cần lưu ý không?",
+            "description": "AI sẽ dựa vào thông tin này để điều chỉnh cường độ tập luyện và thực đơn, đảm bảo an toàn tuyệt đối cho bạn.",
+            "other": "Khác",
+            "addOtherCondition": "Thêm tình trạng sức khỏe khác",
+            "enterOtherCondition": "Nhập tình trạng sức khỏe khác...",
+            "customCondition": "Tình trạng sức khỏe tùy chỉnh",
+            "conditionDescriptions": {
+                "normal": "Sẵn sàng cho mọi cường độ tập luyện",
+                "diabetes": "Cần kiểm soát đường huyết",
+                "highBloodPressure": "Cần bài tập nhẹ nhàng",
+                "highCholesterol": "Cần chế độ ăn lành mạnh",
+                "heartDisease": "Cần kiểm soát nhịp tim"
+            }
+        },
+        "buttons": {
+            "next": "Tiếp theo",
+            "back": "Quay lại",
+            "submit": "Hoàn thành"
+        },
+        "validation": {
+            "completeInfo": "Vui lòng hoàn thành thông tin trước khi tiếp tục!",
+            "selectGenderHeightWeight": "Vui lòng chọn giới tính và nhập chiều cao, cân nặng hợp lệ!",
+            "selectHealthGoal": "Vui lòng chọn mục tiêu sức khỏe của bạn!",
+            "selectActivityLevel": "Vui lòng chọn mức độ vận động của bạn!",
+            "selectDietAndCuisine": "Vui lòng chọn chế độ ăn và ít nhất 1 món ăn yêu thích!",
+            "selectHealthCondition": "Vui lòng chọn ít nhất 1 tình trạng sức khỏe!"
+        },
+        "toast": {
+            "success": "Tạo hồ sơ dinh dưỡng thành công!",
+            "error": "Có lỗi xảy ra. Vui lòng thử lại!",
+            "updateProfileFirst": "Vui lòng cập nhật thông tin cá nhân (ngày sinh và giới tính) để thiết lập hồ sơ dinh dưỡng!"
+        }
+    }
+}

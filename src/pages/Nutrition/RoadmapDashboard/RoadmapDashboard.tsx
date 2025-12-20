@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb, { BreadcrumbItem } from '@/components/Breadcrumb/Breadcrumb';
@@ -13,6 +14,7 @@ import styles from './RoadmapDashboard.module.scss';
 
 const RoadmapDashboard: React.FC = () => {
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation('nutrition');
     const userProfile = useSelector((state: RootState) => state.user.profile);
     const [profile, setProfile] = useState<NutritionProfile | null>(null);
     const [dailyPlan, setDailyPlan] = useState<DailyPlan | null>(null);
@@ -248,17 +250,30 @@ const RoadmapDashboard: React.FC = () => {
     };
 
     const getDayLabel = (date: Date) => {
-        const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-        return days[date.getDay()];
+        const dayIndex = date.getDay();
+        const dayKeys = [
+            'sunday',
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+        ];
+        return t(`weekDays.${dayKeys[dayIndex]}`);
     };
 
     const getGreeting = () => {
         const hour = new Date().getHours();
-        if (hour >= 5 && hour < 12) return { text: 'Chào buổi sáng', icon: 'wb_sunny' };
-        if (hour >= 12 && hour < 14) return { text: 'Chào buổi trưa', icon: 'wb_sunny' };
-        if (hour >= 14 && hour < 18) return { text: 'Chào buổi chiều', icon: 'wb_twilight' };
-        if (hour >= 18 && hour < 22) return { text: 'Chào buổi tối', icon: 'nights_stay' };
-        return { text: 'Chào bạn', icon: 'bedtime' };
+        if (hour >= 5 && hour < 12)
+            return { text: t('dashboard.greeting.morning'), icon: 'wb_sunny' };
+        if (hour >= 12 && hour < 14)
+            return { text: t('dashboard.greeting.noon'), icon: 'wb_sunny' };
+        if (hour >= 14 && hour < 18)
+            return { text: t('dashboard.greeting.afternoon'), icon: 'wb_twilight' };
+        if (hour >= 18 && hour < 22)
+            return { text: t('dashboard.greeting.evening'), icon: 'nights_stay' };
+        return { text: t('dashboard.greeting.default'), icon: 'bedtime' };
     };
 
     const getUserName = () => {
@@ -267,18 +282,18 @@ const RoadmapDashboard: React.FC = () => {
             const firstName = userProfile.fullName.split(' ').pop();
             return firstName || userProfile.fullName;
         }
-        return 'bạn';
+        return i18n.language === 'vi' ? 'bạn' : 'there';
     };
 
     const breadcrumbItems: BreadcrumbItem[] = [
-        { label: 'Trang chủ', path: PATHS.HOME },
-        { label: 'Sức khỏe của bạn', isActive: true },
+        { label: t('breadcrumb.home'), path: PATHS.HOME },
+        { label: t('breadcrumb.yourHealth'), isActive: true },
     ];
 
     if (loading) {
         return (
             <MainLayout>
-                <Breadcrumb items={breadcrumbItems} title="Sức khỏe của bạn" />
+                <Breadcrumb items={breadcrumbItems} title={t('dashboard.title')} />
                 <NutritionSkeleton type="dashboard" />
             </MainLayout>
         );
@@ -286,7 +301,7 @@ const RoadmapDashboard: React.FC = () => {
 
     return (
         <MainLayout>
-            <Breadcrumb items={breadcrumbItems} title="Sức khỏe của bạn" />
+            <Breadcrumb items={breadcrumbItems} title={t('dashboard.title')} />
 
             <div className={styles.dashboard}>
                 <div className={styles.container}>
@@ -299,13 +314,25 @@ const RoadmapDashboard: React.FC = () => {
                                 </span>
                                 <span>{getGreeting().text}</span>
                             </div>
-                            <h1>Chào bạn, {getUserName()}! 👋</h1>
+                            <h1>{t('dashboard.welcomeMessage', { name: getUserName() })}</h1>
                             <p>
-                                Hôm nay bạn đã hoàn thành{' '}
-                                <span className={styles.highlight}>
-                                    {(dailyPlan?.completionPercentage || 0).toFixed(2)}%
-                                </span>{' '}
-                                kế hoạch.
+                                {i18n.language === 'vi' ? (
+                                    <>
+                                        Hôm nay bạn đã hoàn thành{' '}
+                                        <span className={styles.highlight}>
+                                            {(dailyPlan?.completionPercentage || 0).toFixed(2)}%
+                                        </span>{' '}
+                                        kế hoạch.
+                                    </>
+                                ) : (
+                                    <>
+                                        Today you have completed{' '}
+                                        <span className={styles.highlight}>
+                                            {(dailyPlan?.completionPercentage || 0).toFixed(2)}%
+                                        </span>{' '}
+                                        of your plan.
+                                    </>
+                                )}
                             </p>
                         </div>
 
@@ -327,7 +354,9 @@ const RoadmapDashboard: React.FC = () => {
                                             onClick={() => handleSelectDate(date)}
                                         >
                                             <span className={styles.dayLabel}>
-                                                {isCurrentDay ? 'Nay' : getDayLabel(date)}
+                                                {isCurrentDay
+                                                    ? t('common.today')
+                                                    : getDayLabel(date)}
                                             </span>
                                             <span className={styles.dayNumber}>
                                                 {date.getDate()}
@@ -349,7 +378,7 @@ const RoadmapDashboard: React.FC = () => {
                             {/* Calories Card */}
                             <div className={styles.caloriesCard}>
                                 <div className={styles.cardHeader}>
-                                    <h3>Calories</h3>
+                                    <h3>{t('dashboard.calories')}</h3>
                                     <span
                                         className="material-symbols-outlined"
                                         style={{ color: '#ff9f43' }}
@@ -395,7 +424,9 @@ const RoadmapDashboard: React.FC = () => {
                                                     </div>
                                                 </div>
                                                 <p className={styles.remaining}>
-                                                    Còn lại {Math.round(remaining)} kcal
+                                                    {t('dashboard.remaining', {
+                                                        calories: Math.round(remaining),
+                                                    })}
                                                 </p>
                                             </>
                                         );
@@ -405,7 +436,7 @@ const RoadmapDashboard: React.FC = () => {
 
                             {/* Macros Breakdown */}
                             <div className={styles.macrosCard}>
-                                <h3>Dinh dưỡng (Macros)</h3>
+                                <h3>{t('dashboard.macros')}</h3>
                                 <div className={styles.macrosList}>
                                     {(() => {
                                         // Calculate macros from completed meals only
@@ -550,7 +581,7 @@ const RoadmapDashboard: React.FC = () => {
                             {/* Hydration */}
                             <div className={styles.hydrationCard}>
                                 <div className={styles.hydrationHeader}>
-                                    <h3>Nước uống</h3>
+                                    <h3>{t('dashboard.hydration.title')}</h3>
                                     <span className={styles.hydrationTarget}>
                                         {dailyPlan?.hydrationPlan
                                             ? `${dailyPlan.hydrationPlan.currentIntakeLiters.toFixed(1)}L / ${dailyPlan.hydrationPlan.targetWaterLiters}L`
@@ -568,7 +599,7 @@ const RoadmapDashboard: React.FC = () => {
                                     ))}
                                 </div>
                                 <button className={styles.addWaterBtn} onClick={handleAddWater}>
-                                    + Thêm ly nước (250ml)
+                                    {t('dashboard.hydration.addWater')}
                                 </button>
                             </div>
                         </div>
@@ -591,7 +622,7 @@ const RoadmapDashboard: React.FC = () => {
                                             </span>
                                         </div>
                                         <div>
-                                            <h3>Thực đơn hôm nay</h3>
+                                            <h3>{t('dashboard.mealPlan.title')}</h3>
                                             <p>Đề xuất bởi Medcure AI</p>
                                         </div>
                                     </div>
@@ -606,7 +637,7 @@ const RoadmapDashboard: React.FC = () => {
                                 <div className={styles.mealTimeline}>
                                     {!dailyPlan?.mealPlan ? (
                                         <div style={{ textAlign: 'center', padding: '2rem' }}>
-                                            <p>Chưa có kế hoạch cho ngày này</p>
+                                            <p>{t('dashboard.mealPlan.noMealPlan')}</p>
                                             {(() => {
                                                 const today = new Date();
                                                 today.setHours(0, 0, 0, 0);
@@ -658,8 +689,8 @@ const RoadmapDashboard: React.FC = () => {
                                                             auto_awesome
                                                         </span>
                                                         {generating
-                                                            ? 'Đang tạo...'
-                                                            : 'Tạo kế hoạch'}
+                                                            ? t('dashboard.generating')
+                                                            : t('dashboard.generatePlan')}
                                                     </button>
                                                 );
                                             })()}
@@ -762,7 +793,7 @@ const RoadmapDashboard: React.FC = () => {
                                             </span>
                                         </div>
                                         <div>
-                                            <h3>Kế hoạch tập luyện</h3>
+                                            <h3>{t('dashboard.workoutPlan.title')}</h3>
                                             <p>
                                                 Mục tiêu:{' '}
                                                 {profile?.healthGoal === 'WeightLoss'
@@ -784,7 +815,7 @@ const RoadmapDashboard: React.FC = () => {
                                 <div className={styles.exerciseList}>
                                     {!dailyPlan?.workoutPlan ? (
                                         <div style={{ textAlign: 'center', padding: '2rem' }}>
-                                            <p>Chưa có kế hoạch tập luyện</p>
+                                            <p>{t('dashboard.workoutPlan.noWorkoutPlan')}</p>
                                         </div>
                                     ) : (
                                         dailyPlan.workoutPlan.exercises.map((exercise, index) => {

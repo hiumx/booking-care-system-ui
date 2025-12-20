@@ -41,6 +41,8 @@ import specialtyVi from './locales/vi/specialty.json';
 import specialtyEn from './locales/en/specialty.json';
 import termsOfServiceVi from './locales/vi/termsOfService.json';
 import termsOfServiceEn from './locales/en/termsOfService.json';
+import nutritionVi from './locales/vi/nutrition.json';
+import nutritionEn from './locales/en/nutrition.json';
 
 // Define resources
 const resources = {
@@ -64,6 +66,7 @@ const resources = {
         contractSigning: contractSigningVi,
         specialty: specialtyVi,
         termsOfService: termsOfServiceVi,
+        nutrition: nutritionVi,
     },
     en: {
         common: commonEn,
@@ -85,6 +88,7 @@ const resources = {
         contractSigning: contractSigningEn,
         specialty: specialtyEn,
         termsOfService: termsOfServiceEn,
+        nutrition: nutritionEn,
     },
 };
 
@@ -119,6 +123,7 @@ configuredI18n.init({
         'contractSigning',
         'specialty',
         'termsOfService',
+        'nutrition',
     ],
 
     // Language detection configuration
