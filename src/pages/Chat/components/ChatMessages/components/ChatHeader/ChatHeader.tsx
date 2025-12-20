@@ -177,59 +177,6 @@ const ChatHeader = () => {
                                     )}
                                 </div>
                             </li>
-                            <li className="list-inline-item">
-                                <div className="dropdown" ref={dropdownRef}>
-                                    <button
-                                        className={clsx(
-                                            styles.btnMenu,
-                                            'btn btn-outline-light no-bg'
-                                        )}
-                                        onClick={() => setShowDropdown((prev) => !prev)}
-                                        disabled={!activeConversation}
-                                    >
-                                        <i className="fa-solid fa-ellipsis-vertical"></i>
-                                    </button>
-                                    {showDropdown && (
-                                        <div
-                                            className={clsx(
-                                                styles.dropdownMenu,
-                                                'dropdown-menu dropdown-menu-end show'
-                                            )}
-                                            style={{ display: 'block' }}
-                                        >
-                                            <a
-                                                href="#"
-                                                className="dropdown-item"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    setShowVideoCall(true);
-                                                    setShowDropdown(false);
-                                                }}
-                                            >
-                                                {t('header.menu.videoCall')}
-                                            </a>
-                                            <a href="#" className="dropdown-item">
-                                                {t('header.menu.muteNotifications')}
-                                            </a>
-                                            <a href="#" className="dropdown-item">
-                                                {t('header.menu.disappearingMessages')}
-                                            </a>
-                                            <a href="#" className="dropdown-item">
-                                                {t('header.menu.deleteMessages')}
-                                            </a>
-                                            <a href="#" className="dropdown-item">
-                                                {t('header.menu.deleteChat')}
-                                            </a>
-                                            <a href="#" className="dropdown-item">
-                                                {t('header.menu.report')}
-                                            </a>
-                                            <a href="#" className="dropdown-item">
-                                                {t('header.menu.block')}
-                                            </a>
-                                        </div>
-                                    )}
-                                </div>
-                            </li>
                         </ul>
                     </div>
                     {/* Chat Search */}
