@@ -181,6 +181,8 @@
         "tabs": {
             "appointment": "Appointments",
             "news": "News",
+            "nutrition": "Nutrition",
+            "workout": "Workout",
             "system": "System"
         },
         "options": "Options",

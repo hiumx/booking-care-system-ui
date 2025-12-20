@@ -26,10 +26,10 @@ const OnboardingWizard: React.FC = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState<CreateNutritionProfileDto>({
-        heightCm: 170,
-        weightKg: 65,
-        activityLevel: 'Moderate',
-        healthGoal: 'Maintenance',
+        heightCm: 0,
+        weightKg: 0,
+        activityLevel: '',
+        healthGoal: '',
         healthConditions: [],
         dietaryPreferences: {
             dietType: 'Regular',
@@ -62,6 +62,11 @@ const OnboardingWizard: React.FC = () => {
     const [showCustomHealthCondition, setShowCustomHealthCondition] = useState(false);
     const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
 
+    // Store all custom items that have been added (even if unchecked)
+    const [allCustomAllergies, setAllCustomAllergies] = useState<string[]>([]);
+    const [allCustomCuisines, setAllCustomCuisines] = useState<string[]>([]);
+    const [allCustomHealthConditions, setAllCustomHealthConditions] = useState<string[]>([]);
+
     // Load existing nutrition profile if available
     useEffect(() => {
         const loadExistingProfile = async () => {
@@ -82,6 +87,22 @@ const OnboardingWizard: React.FC = () => {
                             preferredCuisines: ['Món Việt'],
                         },
                     });
+
+                    // Extract custom items (items not in predefined lists)
+                    const customAllergies = (
+                        existingProfile.dietaryPreferences?.allergies || []
+                    ).filter((item) => !COMMON_ALLERGIES.includes(item));
+                    const customCuisines = (
+                        existingProfile.dietaryPreferences?.preferredCuisines || []
+                    ).filter((item) => !CUISINE_OPTIONS.includes(item));
+                    const customHealthConds = (existingProfile.healthConditions || []).filter(
+                        (item) => !COMMON_HEALTH_CONDITIONS.includes(item)
+                    );
+
+                    setAllCustomAllergies(customAllergies);
+                    setAllCustomCuisines(customCuisines);
+                    setAllCustomHealthConditions(customHealthConds);
+
                     // Set gender based on user profile
                     if (userProfile?.gender) {
                         const genderStr = String(userProfile.gender).toLowerCase();
@@ -249,17 +270,35 @@ const OnboardingWizard: React.FC = () => {
     };
 
     const toggleArrayItem = (array: string[], item: string) => {
-        if (array.includes(item)) {
-            return array.filter((i) => i !== item);
+        // Special logic for health conditions
+        // If selecting "Bình thường", clear all other conditions
+        if (item === 'Bình thường') {
+            if (array.includes(item)) {
+                return array.filter((i) => i !== item);
+            }
+            return ['Bình thường'];
         }
-        return [...array, item];
+
+        // If selecting any other condition, remove "Bình thường" first
+        const filteredArray = array.filter((i) => i !== 'Bình thường');
+
+        if (filteredArray.includes(item)) {
+            return filteredArray.filter((i) => i !== item);
+        }
+        return [...filteredArray, item];
     };
 
     const handleAddCustomAllergy = () => {
         if (customAllergy.trim()) {
+            const newAllergy = customAllergy.trim();
+            // Add to allCustomAllergies if not already there
+            if (!allCustomAllergies.includes(newAllergy)) {
+                setAllCustomAllergies([...allCustomAllergies, newAllergy]);
+            }
+            // Add to active allergies
             updateDietaryPreferences('allergies', [
                 ...(formData.dietaryPreferences?.allergies || []),
-                customAllergy.trim(),
+                newAllergy,
             ]);
             setCustomAllergy('');
             setShowCustomAllergy(false);
@@ -268,9 +307,15 @@ const OnboardingWizard: React.FC = () => {
 
     const handleAddCustomCuisine = () => {
         if (customCuisine.trim()) {
+            const newCuisine = customCuisine.trim();
+            // Add to allCustomCuisines if not already there
+            if (!allCustomCuisines.includes(newCuisine)) {
+                setAllCustomCuisines([...allCustomCuisines, newCuisine]);
+            }
+            // Add to active cuisines
             updateDietaryPreferences('preferredCuisines', [
                 ...(formData.dietaryPreferences?.preferredCuisines || []),
-                customCuisine.trim(),
+                newCuisine,
             ]);
             setCustomCuisine('');
             setShowCustomCuisine(false);
@@ -279,9 +324,15 @@ const OnboardingWizard: React.FC = () => {
 
     const handleAddCustomHealthCondition = () => {
         if (customHealthCondition.trim()) {
+            const newCondition = customHealthCondition.trim();
+            // Add to allCustomHealthConditions if not already there
+            if (!allCustomHealthConditions.includes(newCondition)) {
+                setAllCustomHealthConditions([...allCustomHealthConditions, newCondition]);
+            }
+            // Add to active health conditions
             updateFormData('healthConditions', [
                 ...(formData.healthConditions || []),
-                customHealthCondition.trim(),
+                newCondition,
             ]);
             setCustomHealthCondition('');
             setShowCustomHealthCondition(false);
@@ -401,16 +452,18 @@ const OnboardingWizard: React.FC = () => {
                                                 </h2>
                                                 <div className={styles.genderGrid}>
                                                     <label
-                                                        className={`${styles.genderCard} ${selectedGender === 'male' ? styles.selected : ''}`}
+                                                        className={`${styles.genderCard} ${selectedGender === 'male' ? styles.selected : ''} ${styles.disabled}`}
+                                                        style={{
+                                                            cursor: 'not-allowed',
+                                                            opacity: 0.6,
+                                                        }}
                                                     >
                                                         <input
                                                             type="radio"
                                                             name="gender"
                                                             value="male"
                                                             checked={selectedGender === 'male'}
-                                                            onChange={() =>
-                                                                setSelectedGender('male')
-                                                            }
+                                                            disabled
                                                         />
                                                         <div className={styles.genderContent}>
                                                             <div className={styles.genderIcon}>
@@ -427,16 +480,18 @@ const OnboardingWizard: React.FC = () => {
                                                         </div>
                                                     </label>
                                                     <label
-                                                        className={`${styles.genderCard} ${selectedGender === 'female' ? styles.selected : ''}`}
+                                                        className={`${styles.genderCard} ${selectedGender === 'female' ? styles.selected : ''} ${styles.disabled}`}
+                                                        style={{
+                                                            cursor: 'not-allowed',
+                                                            opacity: 0.6,
+                                                        }}
                                                     >
                                                         <input
                                                             type="radio"
                                                             name="gender"
                                                             value="female"
                                                             checked={selectedGender === 'female'}
-                                                            onChange={() =>
-                                                                setSelectedGender('female')
-                                                            }
+                                                            disabled
                                                         />
                                                         <div className={styles.genderContent}>
                                                             <div className={styles.genderIcon}>
@@ -453,16 +508,18 @@ const OnboardingWizard: React.FC = () => {
                                                         </div>
                                                     </label>
                                                     <label
-                                                        className={`${styles.genderCard} ${selectedGender === 'other' ? styles.selected : ''}`}
+                                                        className={`${styles.genderCard} ${selectedGender === 'other' ? styles.selected : ''} ${styles.disabled}`}
+                                                        style={{
+                                                            cursor: 'not-allowed',
+                                                            opacity: 0.6,
+                                                        }}
                                                     >
                                                         <input
                                                             type="radio"
                                                             name="gender"
                                                             value="other"
                                                             checked={selectedGender === 'other'}
-                                                            onChange={() =>
-                                                                setSelectedGender('other')
-                                                            }
+                                                            disabled
                                                         />
                                                         <div className={styles.genderContent}>
                                                             <div className={styles.genderIcon}>
@@ -912,44 +969,36 @@ const OnboardingWizard: React.FC = () => {
                                                             </span>
                                                         </label>
                                                     ))}
-                                                    {formData.dietaryPreferences?.allergies
-                                                        ?.filter(
-                                                            (allergy) =>
-                                                                !COMMON_ALLERGIES.includes(allergy)
-                                                        )
-                                                        .map((allergy) => (
-                                                            <label
-                                                                key={allergy}
-                                                                className={styles.pill}
-                                                            >
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={true}
-                                                                    onChange={() =>
-                                                                        updateDietaryPreferences(
-                                                                            'allergies',
-                                                                            toggleArrayItem(
-                                                                                formData
-                                                                                    .dietaryPreferences
-                                                                                    ?.allergies ||
-                                                                                    [],
-                                                                                allergy
-                                                                            )
+                                                    {allCustomAllergies.map((allergy) => (
+                                                        <label
+                                                            key={allergy}
+                                                            className={styles.pill}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={formData.dietaryPreferences?.allergies?.includes(
+                                                                    allergy
+                                                                )}
+                                                                onChange={() =>
+                                                                    updateDietaryPreferences(
+                                                                        'allergies',
+                                                                        toggleArrayItem(
+                                                                            formData
+                                                                                .dietaryPreferences
+                                                                                ?.allergies || [],
+                                                                            allergy
                                                                         )
-                                                                    }
-                                                                />
-                                                                <span
-                                                                    className={styles.pillContent}
-                                                                >
-                                                                    <span
-                                                                        className={styles.pillEmoji}
-                                                                    >
-                                                                        ✨
-                                                                    </span>
-                                                                    {allergy}
+                                                                    )
+                                                                }
+                                                            />
+                                                            <span className={styles.pillContent}>
+                                                                <span className={styles.pillEmoji}>
+                                                                    ✨
                                                                 </span>
-                                                            </label>
-                                                        ))}
+                                                                {allergy}
+                                                            </span>
+                                                        </label>
+                                                    ))}
                                                     {!showCustomAllergy ? (
                                                         <button
                                                             type="button"
@@ -1034,44 +1083,37 @@ const OnboardingWizard: React.FC = () => {
                                                             </span>
                                                         </label>
                                                     ))}
-                                                    {formData.dietaryPreferences?.preferredCuisines
-                                                        ?.filter(
-                                                            (cuisine) =>
-                                                                !CUISINE_OPTIONS.includes(cuisine)
-                                                        )
-                                                        .map((cuisine) => (
-                                                            <label
-                                                                key={cuisine}
-                                                                className={styles.pill}
-                                                            >
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={true}
-                                                                    onChange={() =>
-                                                                        updateDietaryPreferences(
-                                                                            'preferredCuisines',
-                                                                            toggleArrayItem(
-                                                                                formData
-                                                                                    .dietaryPreferences
-                                                                                    ?.preferredCuisines ||
-                                                                                    [],
-                                                                                cuisine
-                                                                            )
+                                                    {allCustomCuisines.map((cuisine) => (
+                                                        <label
+                                                            key={cuisine}
+                                                            className={styles.pill}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={formData.dietaryPreferences?.preferredCuisines?.includes(
+                                                                    cuisine
+                                                                )}
+                                                                onChange={() =>
+                                                                    updateDietaryPreferences(
+                                                                        'preferredCuisines',
+                                                                        toggleArrayItem(
+                                                                            formData
+                                                                                .dietaryPreferences
+                                                                                ?.preferredCuisines ||
+                                                                                [],
+                                                                            cuisine
                                                                         )
-                                                                    }
-                                                                />
-                                                                <span
-                                                                    className={styles.pillContent}
-                                                                >
-                                                                    <span
-                                                                        className={styles.pillEmoji}
-                                                                    >
-                                                                        ✨
-                                                                    </span>
-                                                                    {cuisine}
+                                                                    )
+                                                                }
+                                                            />
+                                                            <span className={styles.pillContent}>
+                                                                <span className={styles.pillEmoji}>
+                                                                    ✨
                                                                 </span>
-                                                            </label>
-                                                        ))}
+                                                                {cuisine}
+                                                            </span>
+                                                        </label>
+                                                    ))}
                                                     {!showCustomCuisine ? (
                                                         <button
                                                             type="button"
@@ -1218,56 +1260,46 @@ const OnboardingWizard: React.FC = () => {
                                                     </p>
                                                 </div>
                                             </label>
-                                            {formData.healthConditions
-                                                ?.filter(
-                                                    (condition) =>
-                                                        !COMMON_HEALTH_CONDITIONS.includes(
+                                            {allCustomHealthConditions.map((condition) => (
+                                                <label
+                                                    key={condition}
+                                                    className={styles.optionCard}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={formData.healthConditions?.includes(
                                                             condition
-                                                        )
-                                                )
-                                                .map((condition) => (
-                                                    <label
-                                                        key={condition}
-                                                        className={styles.optionCard}
-                                                    >
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={true}
-                                                            onChange={() =>
-                                                                updateFormData(
-                                                                    'healthConditions',
-                                                                    toggleArrayItem(
-                                                                        formData.healthConditions ||
-                                                                            [],
-                                                                        condition
-                                                                    )
+                                                        )}
+                                                        onChange={() =>
+                                                            updateFormData(
+                                                                'healthConditions',
+                                                                toggleArrayItem(
+                                                                    formData.healthConditions || [],
+                                                                    condition
                                                                 )
-                                                            }
-                                                        />
-                                                        <div className={styles.cardContent}>
-                                                            <div className={styles.cardHeader}>
-                                                                <h3 className={styles.cardTitle}>
-                                                                    <span
-                                                                        className={styles.cardIcon}
-                                                                    >
-                                                                        ✨
-                                                                    </span>
-                                                                    {condition}
-                                                                </h3>
+                                                            )
+                                                        }
+                                                    />
+                                                    <div className={styles.cardContent}>
+                                                        <div className={styles.cardHeader}>
+                                                            <h3 className={styles.cardTitle}>
+                                                                <span className={styles.cardIcon}>
+                                                                    ✨
+                                                                </span>
+                                                                {condition}
+                                                            </h3>
+                                                            <div className={styles.cardCheckbox}>
                                                                 <div
-                                                                    className={styles.cardCheckbox}
-                                                                >
-                                                                    <div
-                                                                        className={styles.checkDot}
-                                                                    ></div>
-                                                                </div>
+                                                                    className={styles.checkDot}
+                                                                ></div>
                                                             </div>
-                                                            <p className={styles.cardDescription}>
-                                                                Tình trạng sức khỏe tùy chỉnh
-                                                            </p>
                                                         </div>
-                                                    </label>
-                                                ))}
+                                                        <p className={styles.cardDescription}>
+                                                            Tình trạng sức khỏe tùy chỉnh
+                                                        </p>
+                                                    </div>
+                                                </label>
+                                            ))}
                                         </div>
 
                                         {showCustomHealthCondition && (
