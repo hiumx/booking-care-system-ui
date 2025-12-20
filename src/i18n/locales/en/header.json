@@ -13,6 +13,11 @@
             "healthPackage": "Book Health Package",
             "onlineConsultation": "Online Consultation"
         },
+        "health": {
+            "title": "Your Health",
+            "setupProfile": "Setup Health Profile",
+            "dashboard": "Dashboard"
+        },
         "news": {
             "title": "News",
             "serviceNews": "Service News",
