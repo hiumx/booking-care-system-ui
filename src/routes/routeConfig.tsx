@@ -44,10 +44,10 @@ import ServiceDetail from '@/pages/MedicalService/ServiceDetail/ServiceDetailPag
 import AISupportBooking from '@/pages/AISupportBooking';
 import ContractSigningPage from '@/pages/ContractSigning/ContractSigningPage';
 import ContractSigningSuccessPage from '@/pages/ContractSigning/ContractSigningSuccessPage';
-import OnboardingWizard from '@/pages/Nutrition/OnboardingWizard';
-import RoadmapDashboard from '@/pages/Nutrition/RoadmapDashboard';
+import OnboardingWizard from '@/pages/Nutrition/OnboardingWizard/OnboardingWizard';
+import RoadmapDashboard from '@/pages/Nutrition/RoadmapDashboard/RoadmapDashboard';
 import MealPlanDetail from '@/pages/Nutrition/MealPlanDetail';
-import WorkoutPlanDetail from '@/pages/Nutrition/WorkoutPlanDetail';
+import WorkoutPlanDetail from '@/pages/Nutrition/WorkoutPlanDetail/WorkoutPlanDetail';
 import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute';
 import NotFound from '@/pages/Errors/NotFound';
 

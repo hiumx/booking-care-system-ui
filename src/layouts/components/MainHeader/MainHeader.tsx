@@ -650,23 +650,10 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                                 </li>
                                             </ul>
                                         </li>
-                                        <li className="has-submenu">
-                                            <Link to="#">
-                                                {t('menu.health.title')}{' '}
-                                                <i className="fas fa-chevron-down"></i>
+                                        <li>
+                                            <Link to={PATHS.NUTRITION.DASHBOARD}>
+                                                {t('menu.health.title')}
                                             </Link>
-                                            <ul className="submenu">
-                                                <li>
-                                                    <Link to={PATHS.NUTRITION.ONBOARDING}>
-                                                        {t('menu.health.setupProfile')}
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link to={PATHS.NUTRITION.DASHBOARD}>
-                                                        {t('menu.health.dashboard')}
-                                                    </Link>
-                                                </li>
-                                            </ul>
                                         </li>
                                         <li className="has-submenu">
                                             <Link to="#">
