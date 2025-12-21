@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useRef, useEffect, useState, useMemo } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useRef,
+    useEffect,
+    useState,
+    useCallback,
+    useMemo,
+} from 'react';
 import { useSelector } from 'react-redux';
 import * as signalR from '@microsoft/signalr';
 import { RootState } from '@/store';
@@ -6,6 +14,8 @@ import { RootState } from '@/store';
 interface ChatHubContextValue {
     connection: signalR.HubConnection | null;
     isConnected: boolean;
+    /** Check if connection is truly ready to send */
+    isReady: () => boolean;
 }
 
 const ChatHubContext = createContext<ChatHubContextValue | undefined>(undefined);
@@ -27,14 +37,24 @@ export const ChatHubProvider: React.FC<ChatHubProviderProps> = ({ children }) =>
     const userId = userProfile?.accountId || userProfile?.id || '';
 
     const connectionRef = useRef<signalR.HubConnection | null>(null);
+    const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
     const [isConnected, setIsConnected] = useState(false);
 
     // Connect via API Gateway instead of direct service connection
     const chatServiceUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
     const chatHubUrl = `${chatServiceUrl}/chatHub`;
 
+    // Helper to check if connection is truly ready
+    const isReady = useCallback(() => {
+        const conn = connectionRef.current;
+        return conn !== null && conn.state === signalR.HubConnectionState.Connected;
+    }, []);
+
     // Create and manage SignalR connection
     useEffect(() => {
+        let isMounted = true;
+        let currentConnection: signalR.HubConnection | null = null;
+
         // Only connect if we have a userId
         if (!userId) {
             console.log('[ChatHubContext] ⏳ Waiting for user authentication...');
@@ -45,7 +65,7 @@ export const ChatHubProvider: React.FC<ChatHubProviderProps> = ({ children }) =>
         const hubUrlWithUserId = `${chatHubUrl}?userId=${encodeURIComponent(userId)}`;
 
         // Create SignalR connection
-        const connection = new signalR.HubConnectionBuilder()
+        const newConnection = new signalR.HubConnectionBuilder()
             .withUrl(hubUrlWithUserId, {
                 accessTokenFactory: () => accessToken || '',
                 transport:
@@ -64,58 +84,89 @@ export const ChatHubProvider: React.FC<ChatHubProviderProps> = ({ children }) =>
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
+        currentConnection = newConnection;
+
         // Connection lifecycle handlers
-        connection.onreconnecting(() => {
+        newConnection.onreconnecting(() => {
             console.log('[ChatHubContext] 🔄 Reconnecting...');
-            setIsConnected(false);
+            if (isMounted) {
+                setIsConnected(false);
+            }
         });
 
-        connection.onreconnected(() => {
+        newConnection.onreconnected(() => {
             console.log('[ChatHubContext] ✅ Reconnected successfully');
-            setIsConnected(true);
+            if (isMounted) {
+                setIsConnected(true);
+            }
         });
 
-        connection.onclose((error) => {
-            console.log('[ChatHubContext] ❌ Connection closed', error);
-            setIsConnected(false);
+        newConnection.onclose((error) => {
+            if (isMounted) {
+                console.log('[ChatHubContext] ❌ Connection closed', error);
+                setIsConnected(false);
+                setConnection(null);
+            }
         });
 
         // Start connection
         const startConnection = async () => {
-            try {
-                await connection.start();
+            if (!isMounted) return;
 
-                setIsConnected(true);
+            try {
+                await newConnection.start();
+                if (isMounted) {
+                    console.log('[ChatHubContext] ✅ Connected successfully with userId:', userId);
+                    connectionRef.current = newConnection;
+                    setConnection(newConnection); // ✅ Trigger re-render with new connection
+                    setIsConnected(true);
+                }
             } catch (error) {
-                console.error('[ChatHubContext] ❌ Connection failed:', error);
-                setIsConnected(false);
-                // Retry after 5 seconds
-                setTimeout(startConnection, 5000);
+                if (isMounted) {
+                    console.error('[ChatHubContext] ❌ Connection failed:', error);
+                    setIsConnected(false);
+                    setConnection(null);
+                    // Retry after 5 seconds only if still mounted
+                    setTimeout(() => {
+                        if (isMounted) {
+                            startConnection();
+                        }
+                    }, 5000);
+                }
             }
         };
 
         startConnection();
 
-        // Store connection reference
-        connectionRef.current = connection;
-
         // Cleanup on unmount or userId change
         return () => {
+            isMounted = false;
             console.log('[ChatHubContext] 🔌 Disconnecting...');
-            if (connectionRef.current) {
-                connectionRef.current.stop();
-                connectionRef.current = null;
+            if (currentConnection) {
+                // Only stop if connection is in a stable state
+                const state = currentConnection.state;
+                if (
+                    state === signalR.HubConnectionState.Connected ||
+                    state === signalR.HubConnectionState.Disconnected
+                ) {
+                    currentConnection.stop().catch(() => {
+                        // Silently ignore stop errors during unmount
+                    });
+                }
             }
-            setIsConnected(false);
+            connectionRef.current = null;
+            setConnection(null);
         };
     }, [userId, accessToken, chatHubUrl]);
 
+    // ✅ Memoize value - connection and isConnected are state so they trigger re-render correctly
     const value: ChatHubContextValue = useMemo(
         () => ({
-            connection: connectionRef.current,
+            connection,
             isConnected,
+            isReady,
         }),
-        [isConnected]
+        [connection, isConnected, isReady]
     );
 
     return <ChatHubContext.Provider value={value}>{children}</ChatHubContext.Provider>;
