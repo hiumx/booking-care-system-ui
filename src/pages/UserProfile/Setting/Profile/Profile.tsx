@@ -228,13 +228,17 @@ const Profile = () => {
                 setDateOfBirthError(error);
             },
             address: () => {
-                let error = '';
-                if (!value.trim()) {
-                    error = t('profile.fields.address.required');
-                } else if (value.trim().length < 5) {
-                    error = t('profile.fields.address.minLength');
+                // Clear error when user starts typing valid content
+                // Only show minLength error on submit, not during typing
+                if (value.trim().length >= 5) {
+                    setAddressError('');
+                } else if (addressError && value.trim().length > 0) {
+                    // Clear "required" error when user starts typing
+                    // but don't show minLength error yet (will validate on submit)
+                    if (addressError === t('profile.fields.address.required')) {
+                        setAddressError('');
+                    }
                 }
-                setAddressError(error);
             },
         };
 
@@ -275,10 +279,11 @@ const Profile = () => {
         if (!updateData.firstName?.trim()) {
             setFirstNameError(t('profile.fields.firstName.required'));
             hasError = true;
-        } else if (updateData.firstName.trim().length < 2) {
-            setFirstNameError(t('profile.fields.firstName.minLength'));
-            hasError = true;
         }
+        // else if (updateData.firstName.trim().length < 2) {
+        //     setFirstNameError(t('profile.fields.firstName.minLength'));
+        //     hasError = true;
+        // }
 
         // Validate lastName
         if (!updateData.lastName?.trim()) {
@@ -395,7 +400,16 @@ const Profile = () => {
             toast.success(t('profile.messages.updateSuccess'));
         } catch (error: any) {
             console.error('Failed to update profile:', error);
-            toast.error(error.message || t('profile.messages.updateError'));
+            // Handle error with detailed message from backend
+            const errorMessage = error?.message || t('profile.messages.updateError');
+            const errorList = error?.errors as string[] | undefined;
+
+            if (errorList && errorList.length > 0) {
+                // Show first detailed error if available
+                toast.error(errorList[0]);
+            } else {
+                toast.error(errorMessage);
+            }
         } finally {
             setIsUploadingAvatar(false);
         }

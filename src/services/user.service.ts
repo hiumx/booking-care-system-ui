@@ -1,4 +1,4 @@
-import axiosInstance, { ApiResponse } from '@/configs/axios.config';
+import axiosInstance, { ApiResponse, ApiRequestError } from '@/configs/axios.config';
 import { UserProfile, UpdateUserRequest } from '@/types/user.types';
 
 // Base API endpoints for users
@@ -25,7 +25,9 @@ export class UserService {
                 message: response.message,
             };
         } catch (error: any) {
-            throw new Error(error.message || 'User service health check failed');
+            throw error instanceof ApiRequestError
+                ? error
+                : new Error(error.message || 'User service health check failed');
         }
     }
 
@@ -41,7 +43,9 @@ export class UserService {
                 message: response.message || 'User profile retrieved successfully',
             };
         } catch (error: any) {
-            throw new Error(error.message || 'Failed to get user profile');
+            throw error instanceof ApiRequestError
+                ? error
+                : new Error(error.message || 'Failed to get user profile');
         }
     }
 
@@ -59,7 +63,10 @@ export class UserService {
                 message: response.message || 'User profile updated successfully',
             };
         } catch (error: any) {
-            throw new Error(error.message || 'Failed to update user profile');
+            // Re-throw ApiRequestError to preserve error details
+            throw error instanceof ApiRequestError
+                ? error
+                : new Error(error.message || 'Failed to update user profile');
         }
     }
 
@@ -75,7 +82,9 @@ export class UserService {
                 message: response.message || 'User retrieved successfully',
             };
         } catch (error: any) {
-            throw new Error(error.message || 'Failed to get user');
+            throw error instanceof ApiRequestError
+                ? error
+                : new Error(error.message || 'Failed to get user');
         }
     }
 
@@ -97,7 +106,9 @@ export class UserService {
                 message: response.message || 'User updated successfully',
             };
         } catch (error: any) {
-            throw new Error(error.message || 'Failed to update user');
+            throw error instanceof ApiRequestError
+                ? error
+                : new Error(error.message || 'Failed to update user');
         }
     }
 }

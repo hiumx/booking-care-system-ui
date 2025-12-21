@@ -30,7 +30,13 @@ export const updateUserProfile = createAsyncThunk(
             const response = await UserService.updateUserProfile(updateData);
             return response.data;
         } catch (error: any) {
-            return rejectWithValue(error?.message || 'Failed to update user profile');
+            // Preserve full error details from ApiRequestError
+            const errorPayload = {
+                message: error?.message || 'Failed to update user profile',
+                errors: error?.errors || [],
+                status: error?.status,
+            };
+            return rejectWithValue(errorPayload);
         }
     }
 );

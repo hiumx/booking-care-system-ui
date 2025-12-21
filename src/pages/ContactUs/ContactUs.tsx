@@ -59,10 +59,17 @@ const ContactUs: React.FC = () => {
 
     const handleInputChange = (field: string, value: string) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
-        if (errors[field]) {
+
+        // Map form field names to validation error keys
+        const errorKeyMap: Record<string, string> = {
+            address: 'hospitalAddress',
+        };
+        const errorKey = errorKeyMap[field] || field;
+
+        if (errors[errorKey]) {
             setErrors((prev) => {
                 const newErrors = { ...prev };
-                delete newErrors[field];
+                delete newErrors[errorKey];
                 return newErrors;
             });
         }

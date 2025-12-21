@@ -71,14 +71,18 @@ const handleNetworkError = (error: AxiosError) => {
         method: error.config?.method,
         network: true,
     });
-    return Promise.reject(new Error('Không thể kết nối đến máy chủ!'));
+    return Promise.reject(
+        new ApiRequestError('Không thể kết nối đến máy chủ!', undefined, undefined, true)
+    );
 };
 
-const handleForbiddenError = (err: any) => {
+const handleForbiddenError = (err: any, status: number) => {
     if (globalThis.window !== undefined) {
         globalThis.location.href = '/error-403';
     }
-    return Promise.reject(new Error(err?.message || 'Access forbidden'));
+    return Promise.reject(
+        new ApiRequestError(err?.message || 'Access forbidden', status, err?.errors)
+    );
 };
 
 const queueFailedRequest = (originalRequest: ExtendedAxiosRequestConfig) => {
@@ -156,7 +160,7 @@ const handleResponseError = async (error: AxiosError) => {
 
     // Handle 403 errors
     if (error.response?.status === 403) {
-        return handleForbiddenError(err);
+        return handleForbiddenError(err, error.response.status);
     }
 
     // Handle 401 errors with token refresh
@@ -170,7 +174,7 @@ const handleResponseError = async (error: AxiosError) => {
         return handleTokenRefresh(originalRequest);
     }
 
-    // Log and reject other errors
+    // Log and reject other errors with full details
     console.error('API Error:', {
         url: error.config?.url,
         method: error.config?.method,
@@ -178,7 +182,11 @@ const handleResponseError = async (error: AxiosError) => {
         data: err,
     });
 
-    throw new Error(err?.message || error.message || 'An error occurred');
+    const errorMessage = err?.message || error.message || 'An error occurred';
+    const errorStatus = error.response?.status;
+    const errorList = err?.errors;
+
+    throw new ApiRequestError(errorMessage, errorStatus, errorList);
 };
 
 // Response interceptor for handling responses and errors
@@ -224,7 +232,25 @@ export interface ApiError {
     status?: number;
     code?: string;
     data?: any;
+    errors?: string[];
     isNetworkError: boolean;
+}
+
+/**
+ * Custom error class to preserve API error details
+ */
+export class ApiRequestError extends Error {
+    status?: number;
+    errors?: string[];
+    isNetworkError: boolean;
+
+    constructor(message: string, status?: number, errors?: string[], isNetworkError = false) {
+        super(message);
+        this.name = 'ApiRequestError';
+        this.status = status;
+        this.errors = errors;
+        this.isNetworkError = isNetworkError;
+    }
 }
 
 export default instance;
