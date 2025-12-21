@@ -99,15 +99,52 @@
         "mealPlan": {
             "title": "Today's Meal Plan",
             "viewDetail": "View detail",
-            "noMealPlan": "No meal plan for this day"
+            "noMealPlan": "No meal plan for this day",
+            "recommendedBy": "Recommended by Medcure AI",
+            "cannotGeneratePast": "Cannot generate plan for past dates",
+            "richProtein": "High protein",
+            "richFiber": "High fiber"
         },
         "workoutPlan": {
             "title": "Workout Plan",
             "viewDetail": "View detail",
-            "noWorkoutPlan": "No workout plan yet"
+            "noWorkoutPlan": "No workout plan yet",
+            "goal": "Goal",
+            "minutes": "min"
+        },
+        "healthGoals": {
+            "WeightLoss": "Weight Loss",
+            "MuscleGain": "Muscle Gain",
+            "Maintenance": "Maintenance",
+            "HeartHealth": "Heart Health",
+            "Flexibility": "Flexibility",
+            "Endurance": "Endurance"
+        },
+        "weight": {
+            "title": "Weight",
+            "update": "+ Update",
+            "unit": "kg",
+            "age": "years old"
+        },
+        "streak": {
+            "title": "Streak",
+            "days": "{{count}} days",
+            "notStarted": "Not started yet",
+            "keepGoing": "You're doing great! 🔥",
+            "startNow": "Start your streak now!"
+        },
+        "aiInsight": {
+            "title": "AI Insight",
+            "defaultMessage": "\"Compared to yesterday, you consumed slightly less Protein. Try to complete the salmon dish at dinner to reach your goal!\""
         },
         "generatePlan": "Generate New Plan",
-        "generating": "Generating..."
+        "generating": "Generating...",
+        "toast": {
+            "profileRequired": "Please complete your personal information first!",
+            "generateError": "An error occurred while generating the plan. Please try again!",
+            "updateMealError": "Cannot update meal",
+            "updateExerciseError": "Cannot update exercise"
+        }
     },
     "onboarding": {
         "title": "Nutrition Profile Setup",

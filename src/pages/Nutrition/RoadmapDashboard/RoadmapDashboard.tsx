@@ -97,7 +97,7 @@ const RoadmapDashboard: React.FC = () => {
                     const profileData = await nutritionService.getProfile();
                     setProfile(profileData);
                 } catch {
-                    toast.warning('Bạn cần hoàn thành thông tin cá nhân trước!');
+                    toast.warning(t('dashboard.toast.profileRequired'));
                     navigate(PATHS.NUTRITION.ONBOARDING);
                     return;
                 }
@@ -119,10 +119,10 @@ const RoadmapDashboard: React.FC = () => {
         } catch (error: any) {
             console.error('Error generating plan:', error);
             if (error.response?.data?.message?.includes('Nutrition profile not found')) {
-                toast.warning('Bạn cần hoàn thành thông tin cá nhân trước!');
+                toast.warning(t('dashboard.toast.profileRequired'));
                 navigate(PATHS.NUTRITION.ONBOARDING);
             } else {
-                toast.error('Có lỗi xảy ra khi tạo kế hoạch. Vui lòng thử lại!');
+                toast.error(t('dashboard.toast.generateError'));
             }
         } finally {
             setGenerating(false);
@@ -196,7 +196,7 @@ const RoadmapDashboard: React.FC = () => {
             });
         } catch (error) {
             console.error('Error completing meal:', error);
-            toast.error('Không thể cập nhật bữa ăn');
+            toast.error(t('dashboard.toast.updateMealError'));
         }
     };
 
@@ -235,7 +235,7 @@ const RoadmapDashboard: React.FC = () => {
             });
         } catch (error) {
             console.error('Error completing exercise:', error);
-            toast.error('Không thể cập nhật bài tập');
+            toast.error(t('dashboard.toast.updateExerciseError'));
         }
     };
 
@@ -623,14 +623,14 @@ const RoadmapDashboard: React.FC = () => {
                                         </div>
                                         <div>
                                             <h3>{t('dashboard.mealPlan.title')}</h3>
-                                            <p>Đề xuất bởi Medcure AI</p>
+                                            <p>{t('dashboard.mealPlan.recommendedBy')}</p>
                                         </div>
                                     </div>
                                     <button
                                         className={styles.detailBtn}
                                         onClick={handleNavigateToMealPlan}
                                     >
-                                        Xem chi tiết
+                                        {t('dashboard.mealPlan.viewDetail')}
                                     </button>
                                 </div>
 
@@ -653,8 +653,9 @@ const RoadmapDashboard: React.FC = () => {
                                                                 marginTop: '1rem',
                                                             }}
                                                         >
-                                                            Không thể tạo kế hoạch cho ngày trong
-                                                            quá khứ
+                                                            {t(
+                                                                'dashboard.mealPlan.cannotGeneratePast'
+                                                            )}
                                                         </p>
                                                     );
                                                 }
@@ -701,11 +702,16 @@ const RoadmapDashboard: React.FC = () => {
                                                 dailyPlan.mealPlan?.completedItems?.includes(
                                                     index
                                                 ) || false;
-                                            const mealTypeMap: { [key: string]: string } = {
-                                                Breakfast: 'Bữa sáng',
-                                                Lunch: 'Bữa trưa',
-                                                Dinner: 'Bữa tối',
-                                                Snack: 'Bữa phụ',
+                                            const getMealType = (mealType: string) => {
+                                                const typeMap: { [key: string]: string } = {
+                                                    Breakfast: 'breakfast',
+                                                    Lunch: 'lunch',
+                                                    Dinner: 'dinner',
+                                                    Snack: 'snack',
+                                                };
+                                                return t(
+                                                    `mealTypes.${typeMap[mealType] || 'breakfast'}`
+                                                );
                                             };
                                             return (
                                                 <div
@@ -727,14 +733,24 @@ const RoadmapDashboard: React.FC = () => {
                                                         <div className={styles.mealInfo}>
                                                             <div>
                                                                 <span className={styles.mealType}>
-                                                                    {mealTypeMap[meal.mealType] ||
-                                                                        meal.mealType}{' '}
-                                                                    • {meal.mealTime}
+                                                                    {getMealType(meal.mealType)} •{' '}
+                                                                    {meal.mealTime}
                                                                 </span>
-                                                                <h4>{meal.recipe.nameVi}</h4>
+                                                                <h4>
+                                                                    {i18n.language === 'vi'
+                                                                        ? meal.recipe.nameVi
+                                                                        : meal.recipe.nameEn ||
+                                                                          meal.recipe.nameVi}
+                                                                </h4>
                                                                 {meal.recipe.descriptionVi && (
                                                                     <p>
-                                                                        {meal.recipe.descriptionVi}
+                                                                        {i18n.language === 'vi'
+                                                                            ? meal.recipe
+                                                                                  .descriptionVi
+                                                                            : meal.recipe
+                                                                                  .descriptionEn ||
+                                                                              meal.recipe
+                                                                                  .descriptionVi}
                                                                     </p>
                                                                 )}
                                                                 <div className={styles.mealTags}>
@@ -743,17 +759,23 @@ const RoadmapDashboard: React.FC = () => {
                                                                             meal.recipe.nutrition
                                                                                 .calories
                                                                         )}{' '}
-                                                                        Kcal
+                                                                        {t('common.kcal')}
                                                                     </span>
                                                                     {meal.recipe.nutrition
                                                                         .proteinG > 20 && (
-                                                                        <span>Giàu protein</span>
+                                                                        <span>
+                                                                            {t(
+                                                                                'dashboard.mealPlan.richProtein'
+                                                                            )}
+                                                                        </span>
                                                                     )}
                                                                     {meal.recipe.nutrition.fiberG &&
                                                                         meal.recipe.nutrition
                                                                             .fiberG > 5 && (
                                                                             <span>
-                                                                                Giàu chất xơ
+                                                                                {t(
+                                                                                    'dashboard.mealPlan.richFiber'
+                                                                                )}
                                                                             </span>
                                                                         )}
                                                                 </div>
@@ -795,12 +817,12 @@ const RoadmapDashboard: React.FC = () => {
                                         <div>
                                             <h3>{t('dashboard.workoutPlan.title')}</h3>
                                             <p>
-                                                Mục tiêu:{' '}
-                                                {profile?.healthGoal === 'WeightLoss'
-                                                    ? 'Giảm cân'
-                                                    : profile?.healthGoal === 'MuscleGain'
-                                                      ? 'Tăng cơ'
-                                                      : 'Duy trì sức khỏe'}
+                                                {t('dashboard.workoutPlan.goal')}:{' '}
+                                                {profile?.healthGoal
+                                                    ? t(
+                                                          `dashboard.healthGoals.${profile.healthGoal}`
+                                                      )
+                                                    : t('dashboard.healthGoals.Maintenance')}
                                             </p>
                                         </div>
                                     </div>
@@ -808,7 +830,7 @@ const RoadmapDashboard: React.FC = () => {
                                         className={styles.startBtn}
                                         onClick={handleNavigateToWorkoutPlan}
                                     >
-                                        Xem chi tiết
+                                        {t('dashboard.workoutPlan.viewDetail')}
                                     </button>
                                 </div>
 
@@ -849,10 +871,17 @@ const RoadmapDashboard: React.FC = () => {
                                                         )}
                                                     </div>
                                                     <div className={styles.exerciseInfo}>
-                                                        <h4>{exercise.nameVi}</h4>
+                                                        <h4>
+                                                            {i18n.language === 'vi'
+                                                                ? exercise.nameVi
+                                                                : exercise.nameEn ||
+                                                                  exercise.nameVi}
+                                                        </h4>
                                                         <p>
-                                                            {exercise.durationMinutes} phút •{' '}
-                                                            {exercise.caloriesBurned || 0} kcal
+                                                            {exercise.durationMinutes}{' '}
+                                                            {t('dashboard.workoutPlan.minutes')} •{' '}
+                                                            {exercise.caloriesBurned || 0}{' '}
+                                                            {t('common.kcal')}
                                                         </p>
                                                     </div>
                                                     <input
@@ -878,20 +907,24 @@ const RoadmapDashboard: React.FC = () => {
                             {/* Weight Chart */}
                             <div className={styles.weightCard}>
                                 <div className={styles.weightHeader}>
-                                    <h3>Cân nặng</h3>
+                                    <h3>{t('dashboard.weight.title')}</h3>
                                     <button
                                         className={styles.updateBtn}
                                         onClick={() => navigate(PATHS.NUTRITION.ONBOARDING)}
                                     >
-                                        + Cập nhật
+                                        {t('dashboard.weight.update')}
                                     </button>
                                 </div>
                                 <div className={styles.weightValue}>
                                     <span className={styles.weight}>
                                         {profile?.weightKg || 65.2}
                                     </span>
-                                    <span className={styles.unit}>kg</span>
-                                    <span className={styles.change}>{profile?.age || 25} tuổi</span>
+                                    <span className={styles.unit}>
+                                        {t('dashboard.weight.unit')}
+                                    </span>
+                                    <span className={styles.change}>
+                                        {profile?.age || 25} {t('dashboard.weight.age')}
+                                    </span>
                                 </div>
                                 <div className={styles.weightChart}>
                                     {[60, 58, 62, 55, 59, 57, 54].map((height, index) => (
@@ -915,17 +948,21 @@ const RoadmapDashboard: React.FC = () => {
                             <div className={styles.streakCard}>
                                 <div className={styles.streakContent}>
                                     <div>
-                                        <p className={styles.streakLabel}>Chuỗi ngày</p>
+                                        <p className={styles.streakLabel}>
+                                            {t('dashboard.streak.title')}
+                                        </p>
                                         <h3 className={styles.streakValue}>
                                             {progressStats?.streakCount
-                                                ? `${progressStats.streakCount} ngày`
-                                                : 'Chưa bắt đầu'}
+                                                ? t('dashboard.streak.days', {
+                                                      count: progressStats.streakCount,
+                                                  })
+                                                : t('dashboard.streak.notStarted')}
                                         </h3>
                                         <p className={styles.streakMessage}>
                                             {progressStats?.streakCount &&
                                             progressStats.streakCount > 0
-                                                ? 'Bạn đang làm rất tốt! 🔥'
-                                                : 'Hãy bắt đầu chuỗi ngày của bạn!'}
+                                                ? t('dashboard.streak.keepGoing')
+                                                : t('dashboard.streak.startNow')}
                                         </p>
                                     </div>
                                     <div className={styles.streakIcon}>
@@ -944,12 +981,9 @@ const RoadmapDashboard: React.FC = () => {
                                     <span className={`material-symbols-outlined ${styles.aiIcon}`}>
                                         auto_awesome
                                     </span>
-                                    <h3>AI Nhận xét</h3>
+                                    <h3>{t('dashboard.aiInsight.title')}</h3>
                                 </div>
-                                <p>
-                                    "So với hôm qua, bạn đã nạp ít Protein hơn một chút. Hãy cố gắng
-                                    hoàn thành món cá hồi vào bữa tối để đạt mục tiêu nhé!"
-                                </p>
+                                <p>{t('dashboard.aiInsight.defaultMessage')}</p>
                             </div>
                         </div>
                     </div>

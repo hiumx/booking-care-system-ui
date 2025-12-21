@@ -99,15 +99,52 @@
         "mealPlan": {
             "title": "Thực đơn hôm nay",
             "viewDetail": "Xem chi tiết",
-            "noMealPlan": "Chưa có thực đơn cho ngày này"
+            "noMealPlan": "Chưa có thực đơn cho ngày này",
+            "recommendedBy": "Đề xuất bởi Medcure AI",
+            "cannotGeneratePast": "Không thể tạo kế hoạch cho ngày trong quá khứ",
+            "richProtein": "Giàu protein",
+            "richFiber": "Giàu chất xơ"
         },
         "workoutPlan": {
             "title": "Kế hoạch tập luyện",
             "viewDetail": "Xem chi tiết",
-            "noWorkoutPlan": "Chưa có kế hoạch tập luyện"
+            "noWorkoutPlan": "Chưa có kế hoạch tập luyện",
+            "goal": "Mục tiêu",
+            "minutes": "phút"
+        },
+        "healthGoals": {
+            "WeightLoss": "Giảm cân",
+            "MuscleGain": "Tăng cơ",
+            "Maintenance": "Duy trì sức khỏe",
+            "HeartHealth": "Sức khỏe tim mạch",
+            "Flexibility": "Tăng độ dẻo dai",
+            "Endurance": "Tăng sức bền"
+        },
+        "weight": {
+            "title": "Cân nặng",
+            "update": "+ Cập nhật",
+            "unit": "kg",
+            "age": "tuổi"
+        },
+        "streak": {
+            "title": "Chuỗi ngày",
+            "days": "{{count}} ngày",
+            "notStarted": "Chưa bắt đầu",
+            "keepGoing": "Bạn đang làm rất tốt! 🔥",
+            "startNow": "Hãy bắt đầu chuỗi ngày của bạn!"
+        },
+        "aiInsight": {
+            "title": "AI Nhận xét",
+            "defaultMessage": "\"So với hôm qua, bạn đã nạp ít Protein hơn một chút. Hãy cố gắng hoàn thành món cá hồi vào bữa tối để đạt mục tiêu nhé!\""
         },
         "generatePlan": "Tạo kế hoạch mới",
-        "generating": "Đang tạo..."
+        "generating": "Đang tạo...",
+        "toast": {
+            "profileRequired": "Bạn cần hoàn thành thông tin cá nhân trước!",
+            "generateError": "Có lỗi xảy ra khi tạo kế hoạch. Vui lòng thử lại!",
+            "updateMealError": "Không thể cập nhật bữa ăn",
+            "updateExerciseError": "Không thể cập nhật bài tập"
+        }
     },
     "onboarding": {
         "title": "Thiết lập hồ sơ dinh dưỡng",
