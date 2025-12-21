@@ -32,6 +32,7 @@ export const createDoctorListItems = (
         node: (
             <DoctorCard
                 key={doctor.id}
+                doctorId={doctor.id}
                 image={doctor.image}
                 name={doctor.name}
                 specialty={doctor.specialty}
