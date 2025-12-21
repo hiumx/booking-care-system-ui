@@ -107,7 +107,7 @@ export const useFacebookAuth = (onSuccess?: () => void, onError?: (error: string
                             });
 
                             setIsLoading(false);
-                            toast.success('Đăng nhập Facebook thành công!');
+
                             onSuccess?.();
                         } catch (error) {
                             setIsLoading(false);

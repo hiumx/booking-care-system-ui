@@ -52,6 +52,7 @@ export const useHoldSlot = ({
         holdSlotState,
         setHoldSlotState,
         startCountdown,
+        stopCountdown: baseStopCountdown,
         resetHoldSlotState,
         setLoading,
         setError,
@@ -65,13 +66,13 @@ export const useHoldSlot = ({
         appointmentTimeId: AppointmentTime;
     } | null>(null);
 
-    // Stop countdown timer
-    const stopCountdown = useCallback(() => {
+    // Full reset (stop countdown + reset state + clear slot)
+    const fullReset = useCallback(() => {
         resetHoldSlotState();
         setCurrentHeldSlot(null);
     }, [resetHoldSlotState]);
 
-    // Release current held slot
+    // Release current held slot (API call + full reset)
     const releaseSlot = useCallback(async () => {
         if (!currentHeldSlot) return;
 
@@ -83,13 +84,29 @@ export const useHoldSlot = ({
                 appointmentTimeId: currentHeldSlot.appointmentTimeId,
             });
 
-            stopCountdown();
+            fullReset();
         } catch (error: any) {
             console.error('Error releasing slot:', error);
-            // Still stop countdown even if API call fails
-            stopCountdown();
+            // Still reset even if API call fails
+            fullReset();
         }
-    }, [currentHeldSlot, stopCountdown]);
+    }, [currentHeldSlot, fullReset]);
+
+    // Release slot via API only (no state reset - used when switching slots)
+    const releaseSlotApiOnly = useCallback(async () => {
+        if (!currentHeldSlot) return;
+
+        try {
+            await HoldSlotService.releaseSlot({
+                targetId: currentHeldSlot.targetId,
+                targetType: currentHeldSlot.targetType,
+                date: currentHeldSlot.date,
+                appointmentTimeId: currentHeldSlot.appointmentTimeId,
+            });
+        } catch (error: any) {
+            console.error('Error releasing slot (API only):', error);
+        }
+    }, [currentHeldSlot]);
 
     // Hold a slot
     const holdSlot = useCallback(
@@ -104,9 +121,10 @@ export const useHoldSlot = ({
                 setCurrentHeldSlot,
                 setHoldSlotState,
                 startCountdown,
+                stopCountdown: baseStopCountdown,
                 setLoading,
                 setError,
-                releaseExistingSlot: releaseSlot,
+                releaseSlotApi: releaseSlotApiOnly,
                 executeHoldRequest: () =>
                     HoldSlotService.holdSlot({
                         targetId,
@@ -127,9 +145,10 @@ export const useHoldSlot = ({
             setCurrentHeldSlot,
             setHoldSlotState,
             startCountdown,
+            baseStopCountdown,
             setLoading,
             setError,
-            releaseSlot,
+            releaseSlotApiOnly,
         ]
     );
 
@@ -137,7 +156,7 @@ export const useHoldSlot = ({
     const releaseAllSlots = useCallback(async () => {
         try {
             const releasedCount = await HoldSlotService.releaseAllSlots();
-            stopCountdown();
+            fullReset();
 
             if (releasedCount > 0) {
                 toast.info(`Đã hủy ${releasedCount} slot đang giữ`);
@@ -146,7 +165,7 @@ export const useHoldSlot = ({
             console.error('Error releasing all slots:', error);
             toast.error('Không thể hủy tất cả slot đang giữ');
         }
-    }, [stopCountdown]);
+    }, [fullReset]);
 
     // Check remaining time for current held slot
     const checkRemainingTime = useCallback(async () => {
@@ -163,7 +182,7 @@ export const useHoldSlot = ({
             if (remainingSeconds <= 0) {
                 // Slot expired on server - just stop countdown
                 // Don't call onSlotExpired here as countdown interval will handle it
-                stopCountdown();
+                fullReset();
             } else {
                 // Update remaining time
                 setHoldSlotState((prev) => ({
@@ -174,7 +193,7 @@ export const useHoldSlot = ({
         } catch (error) {
             console.error('Error checking remaining time:', error);
         }
-    }, [currentHeldSlot, stopCountdown]);
+    }, [currentHeldSlot, fullReset, setHoldSlotState]);
 
     // Periodically check remaining time with server (every 30 seconds)
     usePeriodicCheck({

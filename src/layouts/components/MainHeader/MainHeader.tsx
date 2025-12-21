@@ -143,7 +143,6 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true, hasTopbar = tr
             await dispatch(logoutAsync()).unwrap();
             dispatch(clearUserProfile()); // Clear user profile from state
             dispatch(clearNotifications()); // Clear notifications
-            toast.success(t('toast.logoutSuccess'));
             navigate(PATHS.HOME); // Redirect to home page
         } catch (error: unknown) {
             console.error('Logout failed:', error);
@@ -669,7 +668,9 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true, hasTopbar = tr
                                                     <Link to="#">{t('menu.news.serviceNews')}</Link>
                                                 </li>
                                                 <li>
-                                                    <Link to={PATHS.BLOG}>{t('menu.blog')}</Link>
+                                                    <Link to={PATHS.BLOG}>
+                                                        {t('menu.news.healthNews')}
+                                                    </Link>
                                                 </li>
                                             </ul>
                                         </li>
