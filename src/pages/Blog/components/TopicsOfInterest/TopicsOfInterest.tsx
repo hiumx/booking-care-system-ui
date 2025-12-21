@@ -1,6 +1,5 @@
 import React from 'react';
 import styles from './TopicsOfInterest.module.scss';
-import { Link } from 'react-router-dom';
 
 const TopicsOfInterest: React.FC = () => {
     const topics = [
@@ -96,13 +95,18 @@ const TopicsOfInterest: React.FC = () => {
 
             <div className={styles.topicsGrid}>
                 {topics.map((topic) => (
-                    <Link key={topic.id} to={topic.href} className={styles.topicCard}>
+                    <div
+                        key={topic.id}
+                        className={styles.topicCard}
+                        role="article"
+                        aria-label={topic.name}
+                    >
                         <div className={styles.topicIcon}>
                             <img src={topic.image} alt={topic.name} />
                         </div>
                         <h3 className={styles.topicName}>{topic.name}</h3>
                         <p className={styles.topicDescription}>{topic.description}</p>
-                    </Link>
+                    </div>
                 ))}
             </div>
         </section>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styles from './Blog.module.scss';
-import BlogHeader from '@/pages/Blog/components/BlogHeader/BlogHeader';
+import MainHeader from '@/layouts/components/MainHeader/MainHeader';
 import FeaturedArticles from '@/pages/Blog/components/FeaturedBlog/FeaturedBlog';
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb';
 import BlogSlideComponent from '@/pages/Blog/components/BlogSlider/BlogSlider';
 import MedcureServices from '@/pages/Blog/components/MedicalServices';
 import MedicalDictionary from '@/pages/Blog/components/MedicalDictionary';
@@ -14,12 +14,12 @@ import { BlogService } from '@/services/blog.service';
 import { BlogSummaryDto, BlogStatus } from '@/types/blog.types';
 import { useApiCall } from '@/hooks/useApiCall';
 import Spinner from '@/components/Spinner';
+import { PATHS } from '@/routes/paths';
 
 const Blog: React.FC = () => {
     const [featuredBlogs, setFeaturedBlogs] = useState<BlogSummaryDto[]>([]);
     const [recentBlogs, setRecentBlogs] = useState<BlogSummaryDto[]>([]);
-    const [searchKeyword, setSearchKeyword] = useState<string>('');
-    const navigate = useNavigate();
+    // no global search on this page (BlogHeader removed)
 
     // Fetch featured blogs
     const {
@@ -32,7 +32,6 @@ const Blog: React.FC = () => {
             status: BlogStatus.Active,
             page: 1,
             pageSize: 3,
-            keyword: searchKeyword || undefined,
         });
         return response.data;
     });
@@ -47,7 +46,6 @@ const Blog: React.FC = () => {
             status: BlogStatus.Active,
             page: 1,
             pageSize: 10,
-            keyword: searchKeyword || undefined,
         });
         return response.data;
     });
@@ -61,7 +59,7 @@ const Blog: React.FC = () => {
     useEffect(() => {
         fetchFeatured();
         fetchRecent();
-    }, [searchKeyword]);
+    }, []);
 
     useEffect(() => {
         if (featuredData) {
@@ -87,25 +85,21 @@ const Blog: React.FC = () => {
         return `Ngày đăng: ${date.getDate()} Th${date.getMonth() + 1}, ${date.getFullYear()}`;
     };
 
-    const handleSearch = (keyword: string) => {
-        setSearchKeyword(keyword);
-        // Navigate to CategoryBlogs page to show search results
-        if (!keyword || !keyword.trim()) {
-            navigate('/category/all');
-            return;
-        }
-        const params = new URLSearchParams({
-            category: 'all',
-            search: keyword.trim(),
-            page: '1',
-        });
-        navigate(`/category/all?${params.toString()}`);
+    const breadcrumbData = {
+        items: [
+            { label: 'Trang chủ', path: PATHS.HOME, isActive: false },
+            { label: 'Bản tin sức khỏe', path: PATHS.BLOG, isActive: true },
+        ],
+        title: 'Bản tin sức khỏe',
     };
+
+    // No search on this page (BlogHeader removed)
 
     return (
         <>
-            {/* Header Section: Logo, Search & Navigation */}
-            <BlogHeader onSearch={handleSearch} />
+            {/* Main header + Blog header */}
+            <MainHeader />
+            <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
 
             <div className={styles.blogContainer}>
                 {/* Loading State */}

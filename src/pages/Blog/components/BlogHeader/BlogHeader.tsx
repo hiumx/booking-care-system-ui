@@ -1,16 +1,12 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './BlogHeader.module.scss';
-import { PATHS } from '@/routes/paths';
-import clsx from 'clsx';
-import logo from '@/assets/img/logo.svg';
 
 interface BlogHeaderProps {
     onSearch?: (keyword: string) => void;
 }
 
 const BlogHeader: React.FC<BlogHeaderProps> = ({ onSearch }) => {
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [searchValue, setSearchValue] = useState<string>('');
     const searchInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
@@ -38,56 +34,29 @@ const BlogHeader: React.FC<BlogHeaderProps> = ({ onSearch }) => {
     };
 
     return (
-        <header className={styles.blogHeader}>
-            {/* Top Section: Logo and Search */}
-            <div className={styles.topSection}>
-                <button
-                    type="button"
-                    className={styles.menuBtn}
-                    aria-label={isMobileMenuOpen ? 'Đóng menu' : 'Mở menu'}
-                    onClick={() => setIsMobileMenuOpen((v) => !v)}
-                >
-                    <i className={isMobileMenuOpen ? 'fas fa-times' : 'fas fa-bars'}></i>
-                </button>
-
-                <div className="navbar-header">
-                    <Link to={PATHS.HOME} className="navbar-brand logo">
-                        <img src={logo} className={clsx(styles.logoImg, 'img-fluid')} alt="Logo" />
-                    </Link>
+        <div className={styles.blogHeader}>
+            <div className={styles.searchSection} style={{ width: '100%' }}>
+                <div className={styles.searchBar} style={{ maxWidth: '720px', margin: '0 auto' }}>
+                    <input
+                        ref={searchInputRef}
+                        type="text"
+                        placeholder="Tìm kiếm bài viết, thông tin bệnh, thuốc ..."
+                        className={styles.searchInput}
+                        id="globalBlogHeaderSearchInput"
+                        value={searchValue}
+                        onChange={(e) => setSearchValue(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleSearch();
+                            }
+                        }}
+                    />
+                    <button className={styles.searchBtn} onClick={handleSearch} aria-label="Search">
+                        <i className="fas fa-search"></i>
+                    </button>
                 </div>
-
-                <div className={styles.searchSection}>
-                    <div className={styles.searchBar}>
-                        <input
-                            ref={searchInputRef}
-                            type="text"
-                            placeholder="Tìm kiếm bài viết, thông tin bệnh, thuốc ..."
-                            className={styles.searchInput}
-                            id="globalBlogHeaderSearchInput"
-                            value={searchValue}
-                            onChange={(e) => setSearchValue(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleSearch();
-                                }
-                            }}
-                        />
-                        <button className={styles.searchBtn} onClick={handleSearch}>
-                            <i className="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <button
-                    type="button"
-                    className={styles.mobileSearchBtn}
-                    aria-label="Search"
-                    onClick={() => navigate('/category/all')}
-                >
-                    <i className="fas fa-search"></i>
-                </button>
             </div>
-        </header>
+        </div>
     );
 };
 
