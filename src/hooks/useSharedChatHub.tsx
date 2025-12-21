@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useRef } from 'react';
+import * as signalR from '@microsoft/signalr';
 import { useChatHubConnection } from '@/contexts/ChatHubContext';
 import { SendMessageHub } from '@/types/communication.types';
 import { ChatHubCallbacks } from './useChatHub';
+
+/**
+ * Helper to check if connection is ready to send/invoke
+ */
+const isConnectionReady = (connection: signalR.HubConnection | null): boolean => {
+    return connection !== null && connection.state === signalR.HubConnectionState.Connected;
+};
 
 /**
  * Hook to use shared ChatHub connection with event callbacks
@@ -10,7 +18,7 @@ import { ChatHubCallbacks } from './useChatHub';
  * - Multiple components can use this hook with different callbacks
  */
 export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
-    const { connection, isConnected } = useChatHubConnection();
+    const { connection, isConnected, isReady } = useChatHubConnection();
     const callbacksRef = useRef<ChatHubCallbacks | undefined>(callbacks);
 
     // Update callbacks ref when callbacks change (but don't re-register)
@@ -147,60 +155,76 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
         // Cleanup - remove handlers on unmount
         return () => {
             console.log('[useSharedChatHub] 🧹 Removing event handlers');
-            connection.off('ReceiveMessage', receiveMessageHandler);
-            connection.off('MessageRead', messageReadHandler);
-            connection.off('AllMessagesRead', allMessagesReadHandler);
-            connection.off('MessageRecalled', messageRecalledHandler);
-            connection.off('UserStartedTyping', userStartedTypingHandler);
-            connection.off('UserStoppedTyping', userStoppedTypingHandler);
-            connection.off('UserOnline', userOnlineHandler);
-            connection.off('UserOffline', userOfflineHandler);
-            connection.off('OnlineUsers', onlineUsersHandler);
-            connection.off('JoinedConversation', joinedConversationHandler);
-            connection.off('LeftConversation', leftConversationHandler);
-            connection.off('ErrorMessage', errorHandler);
-            connection.off('Error', errorHandler);
-            connection.off('error', errorHandler);
-            // WebRTC Call events
-            connection.off('IncomingCall', incomingCallHandler);
-            connection.off('CallAccepted', callAcceptedHandler);
-            connection.off('CallDeclined', callDeclinedHandler);
-            connection.off('CallEnded', callEndedHandler);
-            connection.off('UserBusy', userBusyHandler);
-            connection.off('ReceiveOffer', receiveOfferHandler);
-            connection.off('ReceiveAnswer', receiveAnswerHandler);
-            connection.off('ReceiveIceCandidate', receiveIceCandidateHandler);
-            connection.off('CallLogUpdated', callLogUpdatedHandler);
+            // Check if connection still exists and is in a valid state before removing handlers
+            if (!connection) {
+                return;
+            }
+
+            try {
+                const state = connection.state;
+                // Only remove handlers if connection is in a stable state
+                if (
+                    state === signalR.HubConnectionState.Connected ||
+                    state === signalR.HubConnectionState.Disconnected
+                ) {
+                    connection.off('ReceiveMessage', receiveMessageHandler);
+                    connection.off('MessageRead', messageReadHandler);
+                    connection.off('AllMessagesRead', allMessagesReadHandler);
+                    connection.off('MessageRecalled', messageRecalledHandler);
+                    connection.off('UserStartedTyping', userStartedTypingHandler);
+                    connection.off('UserStoppedTyping', userStoppedTypingHandler);
+                    connection.off('UserOnline', userOnlineHandler);
+                    connection.off('UserOffline', userOfflineHandler);
+                    connection.off('OnlineUsers', onlineUsersHandler);
+                    connection.off('JoinedConversation', joinedConversationHandler);
+                    connection.off('LeftConversation', leftConversationHandler);
+                    connection.off('ErrorMessage', errorHandler);
+                    connection.off('Error', errorHandler);
+                    connection.off('error', errorHandler);
+                    // WebRTC Call events
+                    connection.off('IncomingCall', incomingCallHandler);
+                    connection.off('CallAccepted', callAcceptedHandler);
+                    connection.off('CallDeclined', callDeclinedHandler);
+                    connection.off('CallEnded', callEndedHandler);
+                    connection.off('UserBusy', userBusyHandler);
+                    connection.off('ReceiveOffer', receiveOfferHandler);
+                    connection.off('ReceiveAnswer', receiveAnswerHandler);
+                    connection.off('ReceiveIceCandidate', receiveIceCandidateHandler);
+                    connection.off('CallLogUpdated', callLogUpdatedHandler);
+                }
+            } catch {
+                // Silently fail during cleanup
+            }
         };
     }, [connection]);
 
     // Hub methods
     const joinConversation = useCallback(
         async (conversationId: string) => {
-            if (!connection || !isConnected) {
+            if (!isConnectionReady(connection)) {
+                console.warn('[useSharedChatHub] ⚠️ Cannot join - connection not ready');
                 throw new Error('ChatHub is not connected');
             }
             try {
-                await connection.invoke('JoinConversation', conversationId);
+                await connection!.invoke('JoinConversation', conversationId);
             } catch (error) {
                 console.error('[useSharedChatHub] ❌ Error joining conversation:', error);
                 throw error;
             }
         },
-        [connection, isConnected]
+        [connection]
     );
 
     const leaveConversation = useCallback(
         async (conversationId: string) => {
-            if (!connection || !isConnected) {
+            if (!isConnectionReady(connection)) {
                 console.warn('[useSharedChatHub] ⚠️ Cannot leave conversation - not connected');
-                return; // ✅ Don't throw error, just return silently during cleanup
+                return;
             }
             try {
-                await connection.invoke('LeaveConversation', conversationId);
+                await connection!.invoke('LeaveConversation', conversationId);
                 console.log('[useSharedChatHub] ✅ Left conversation:', conversationId);
             } catch (error: any) {
-                // ✅ Don't throw if connection was closed (common during cleanup)
                 if (error?.message?.includes('connection being closed')) {
                     console.warn(
                         '[useSharedChatHub] ⚠️ Connection closed while leaving conversation'
@@ -208,15 +232,18 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
                     return;
                 }
                 console.error('[useSharedChatHub] ❌ Error leaving conversation:', error);
-                // Don't throw - leaving conversation shouldn't break the app
             }
         },
-        [connection, isConnected]
+        [connection]
     );
 
     const sendMessage = useCallback(
         async (request: SendMessageHub) => {
-            if (!connection || !isConnected) {
+            if (!isConnectionReady(connection)) {
+                console.warn(
+                    '[useSharedChatHub] ⚠️ Cannot send message - connection not ready, state:',
+                    connection?.state
+                );
                 throw new Error('ChatHub is not connected');
             }
             try {
@@ -227,39 +254,39 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
                 };
 
                 console.log('[useSharedChatHub] 📤 Sending message:', pascalCaseRequest);
-                await connection.invoke('SendMessage', pascalCaseRequest);
+                await connection!.invoke('SendMessage', pascalCaseRequest);
                 console.log('[useSharedChatHub] ✅ Message sent');
             } catch (error) {
                 console.error('[useSharedChatHub] ❌ Error sending message:', error);
                 throw error;
             }
         },
-        [connection, isConnected]
+        [connection]
     );
 
     const markMessageAsRead = useCallback(
         async (messageId: string) => {
-            if (!connection || !isConnected) {
+            if (!isConnectionReady(connection)) {
                 throw new Error('ChatHub is not connected');
             }
             try {
-                await connection.invoke('MarkMessageAsRead', messageId);
+                await connection!.invoke('MarkMessageAsRead', messageId);
                 console.log(`[useSharedChatHub] ✅ Marked message as read: ${messageId}`);
             } catch (error) {
                 console.error('[useSharedChatHub] ❌ Error marking message as read:', error);
                 throw error;
             }
         },
-        [connection, isConnected]
+        [connection]
     );
 
     const markAllMessagesAsRead = useCallback(
         async (conversationId: string) => {
-            if (!connection || !isConnected) {
+            if (!isConnectionReady(connection)) {
                 throw new Error('ChatHub is not connected');
             }
             try {
-                await connection.invoke('MarkAllMessagesAsRead', conversationId);
+                await connection!.invoke('MarkAllMessagesAsRead', conversationId);
             } catch (error: any) {
                 const errorMessage = error?.message || error?.toString() || '';
 
@@ -277,53 +304,53 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
                 throw error;
             }
         },
-        [connection, isConnected]
+        [connection]
     );
 
     const startTyping = useCallback(
         async (conversationId: string) => {
-            if (!connection || !isConnected) return;
+            if (!isConnectionReady(connection)) return;
             try {
-                await connection.invoke('StartTyping', conversationId);
+                await connection!.invoke('StartTyping', conversationId);
             } catch (error) {
                 console.error('[useSharedChatHub] ❌ Error sending typing indicator:', error);
             }
         },
-        [connection, isConnected]
+        [connection]
     );
 
     const stopTyping = useCallback(
         async (conversationId: string) => {
-            if (!connection || !isConnected) return;
+            if (!isConnectionReady(connection)) return;
             try {
-                await connection.invoke('StopTyping', conversationId);
+                await connection!.invoke('StopTyping', conversationId);
             } catch (error) {
                 console.error('[useSharedChatHub] ❌ Error stopping typing indicator:', error);
             }
         },
-        [connection, isConnected]
+        [connection]
     );
 
     const getOnlineUsers = useCallback(async () => {
-        if (!connection || !isConnected) {
+        if (!isConnectionReady(connection)) {
             throw new Error('ChatHub is not connected');
         }
         try {
-            await connection.invoke('GetOnlineUsers');
+            await connection!.invoke('GetOnlineUsers');
         } catch (error) {
             console.error('[useSharedChatHub] ❌ Error getting online users:', error);
             throw error;
         }
-    }, [connection, isConnected]);
+    }, [connection]);
 
     // WebRTC Call methods
     const startCall = useCallback(
         async (calleeId: string, conversationId: string, callType: string = 'video') => {
-            if (!connection || !isConnected) {
+            if (!isConnectionReady(connection)) {
                 throw new Error('ChatHub is not connected');
             }
             try {
-                await connection.invoke('StartCall', {
+                await connection!.invoke('StartCall', {
                     CalleeId: calleeId,
                     ConversationId: conversationId,
                     CallType: callType,
@@ -333,16 +360,16 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
                 throw error;
             }
         },
-        [connection, isConnected]
+        [connection]
     );
 
     const acceptCall = useCallback(
         async (callerId: string, conversationId: string) => {
-            if (!connection || !isConnected) {
+            if (!isConnectionReady(connection)) {
                 throw new Error('ChatHub is not connected');
             }
             try {
-                await connection.invoke('AcceptCall', {
+                await connection!.invoke('AcceptCall', {
                     CallerId: callerId,
                     ConversationId: conversationId,
                 });
@@ -351,16 +378,16 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
                 throw error;
             }
         },
-        [connection, isConnected]
+        [connection]
     );
 
     const declineCall = useCallback(
         async (callerId: string, reason?: string) => {
-            if (!connection || !isConnected) {
+            if (!isConnectionReady(connection)) {
                 throw new Error('ChatHub is not connected');
             }
             try {
-                await connection.invoke('DeclineCall', {
+                await connection!.invoke('DeclineCall', {
                     CallerId: callerId,
                     Reason: reason || 'declined',
                 });
@@ -369,16 +396,16 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
                 throw error;
             }
         },
-        [connection, isConnected]
+        [connection]
     );
 
     const endCall = useCallback(
         async (otherUserId: string, reason?: string) => {
-            if (!connection || !isConnected) {
+            if (!isConnectionReady(connection)) {
                 throw new Error('ChatHub is not connected');
             }
             try {
-                await connection.invoke('EndCall', {
+                await connection!.invoke('EndCall', {
                     OtherUserId: otherUserId,
                     Reason: reason || 'ended',
                 });
@@ -387,12 +414,13 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
                 throw error;
             }
         },
-        [connection, isConnected]
+        [connection]
     );
 
     return {
         connection,
         isConnected,
+        isReady,
         // Chat methods
         joinConversation,
         leaveConversation,
