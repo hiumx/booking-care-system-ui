@@ -25,7 +25,8 @@
     }
 
     .cardImg {
-        width: 300px;
+        width: 100%;
+        max-width: 276px;
         height: 250px; // Fixed height to ensure consistent image size
         position: relative;
         border-radius: 10px 0 0 10px;
