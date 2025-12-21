@@ -664,7 +664,9 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                                     <Link to="#">{t('menu.news.serviceNews')}</Link>
                                                 </li>
                                                 <li>
-                                                    <Link to={PATHS.BLOG}>{t('menu.blog')}</Link>
+                                                    <Link to={PATHS.BLOG}>
+                                                        {t('menu.news.healthNews')}
+                                                    </Link>
                                                 </li>
                                             </ul>
                                         </li>

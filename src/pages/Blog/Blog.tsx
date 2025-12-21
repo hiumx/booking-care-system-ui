@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Blog.module.scss';
 import BlogHeader from '@/pages/Blog/components/BlogHeader/BlogHeader';
 import FeaturedArticles from '@/pages/Blog/components/FeaturedBlog/FeaturedBlog';
@@ -18,6 +19,7 @@ const Blog: React.FC = () => {
     const [featuredBlogs, setFeaturedBlogs] = useState<BlogSummaryDto[]>([]);
     const [recentBlogs, setRecentBlogs] = useState<BlogSummaryDto[]>([]);
     const [searchKeyword, setSearchKeyword] = useState<string>('');
+    const navigate = useNavigate();
 
     // Fetch featured blogs
     const {
@@ -87,6 +89,17 @@ const Blog: React.FC = () => {
 
     const handleSearch = (keyword: string) => {
         setSearchKeyword(keyword);
+        // Navigate to CategoryBlogs page to show search results
+        if (!keyword || !keyword.trim()) {
+            navigate('/category/all');
+            return;
+        }
+        const params = new URLSearchParams({
+            category: 'all',
+            search: keyword.trim(),
+            page: '1',
+        });
+        navigate(`/category/all?${params.toString()}`);
     };
 
     return (

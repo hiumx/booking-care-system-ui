@@ -87,6 +87,7 @@ export interface BlogFilterParameters {
     status?: BlogStatus;
     featured?: boolean;
     keyword?: string;
+    titleOnly?: boolean;
     page?: number;
     pageSize?: number;
     categoryId?: number;
