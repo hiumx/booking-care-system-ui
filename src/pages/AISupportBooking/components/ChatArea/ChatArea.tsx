@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { Stethoscope, MessageCircle, Menu } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { Message } from '@/types/ai.types';
@@ -13,6 +14,8 @@ import Select from '@/components/Select';
 import styles from './ChatArea.module.scss';
 import MiniBookingInline from './components/MiniBookingModal/MiniBookingInline';
 import { AppointmentType } from '@/enums/appointment.enums';
+import { clearBookingState } from '@/store/slices/bookingSlice';
+import { resetScheduleState } from '@/store/slices/schedule.slice';
 
 interface ChatAreaProps {
     messages: Message[];
@@ -217,6 +220,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     isFileAnalysisMode = false,
 }) => {
     const { t } = useTranslation('aiSupport');
+    const dispatch = useDispatch();
     const [inputValue, setInputValue] = useState('');
     const [activeTabs, setActiveTabs] = useState<Record<string, 'doctor' | 'hospital'>>({});
     const [serviceSelections, setServiceSelections] = useState<Record<string, string>>({});
@@ -236,9 +240,21 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         scrollToBottom();
     }, [messages, isAITyping]);
 
+    // Clear booking state when chat changes
     useEffect(() => {
+        if (miniBooking) {
+            dispatch(clearBookingState());
+            dispatch(resetScheduleState());
+        }
         setMiniBooking(null);
-    }, [activeChatId]);
+    }, [activeChatId, dispatch]);
+
+    // Handler to close mini booking and clear state
+    const handleCloseMiniBooking = () => {
+        dispatch(clearBookingState());
+        dispatch(resetScheduleState());
+        setMiniBooking(null);
+    };
 
     const getActiveTabForMessage = (messageId: string) => {
         return activeTabs[messageId] ?? 'doctor';
@@ -249,6 +265,10 @@ const ChatArea: React.FC<ChatAreaProps> = ({
             ...prev,
             [messageId]: tab,
         }));
+        // Close MiniBookingInline when switching tabs
+        if (miniBooking) {
+            handleCloseMiniBooking();
+        }
     };
 
     const handleServiceTypeChange = (messageId: string, serviceType: string) => {
@@ -316,10 +336,15 @@ const ChatArea: React.FC<ChatAreaProps> = ({
             .find((m) => m.sender === 'ai' && m.suggestions && m.suggestions.length > 0);
         const messageId = lastMsgWithSuggestions?.id || (messages[messages.length - 1]?.id ?? '');
 
+        // Clear previous booking state first to ensure clean state for new selection
+        dispatch(clearBookingState());
+        dispatch(resetScheduleState());
+
         if (type === 'doctor' && suggestionId) {
             // Show inline booking for doctor
             setMiniBooking({
                 doctorId: suggestionId,
+                hospitalId: undefined,
                 messageId,
                 appointmentType: options?.appointmentType ?? AppointmentType.IN_PERSON,
             });
@@ -329,6 +354,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         if (type === 'hospital' && suggestionId) {
             // Show inline booking for hospital
             setMiniBooking({
+                doctorId: undefined,
                 hospitalId: suggestionId,
                 messageId,
                 appointmentType: options?.appointmentType ?? AppointmentType.IN_PERSON,
@@ -521,12 +547,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                                 )}
                                 {miniBooking && miniBooking.messageId === message.id && (
                                     <MiniBookingInline
+                                        key={`mini-booking-${miniBooking.doctorId || miniBooking.hospitalId}`}
                                         doctorId={miniBooking.doctorId}
                                         hospitalId={miniBooking.hospitalId}
                                         appointmentType={miniBooking.appointmentType}
-                                        onClose={() => {
-                                            setMiniBooking(null);
-                                        }}
+                                        onClose={handleCloseMiniBooking}
                                     />
                                 )}
                             </div>
