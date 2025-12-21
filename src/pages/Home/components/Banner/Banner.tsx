@@ -84,6 +84,9 @@ const Banner: React.FC = () => {
                                     onBlur={handleHoverEnd}
                                     whileHover={{ scale: 1.05 }}
                                     transition={{ type: 'spring', stiffness: 300 }}
+                                    style={{
+                                        border: '2px #1082fdb3 solid',
+                                    }}
                                 >
                                     <div className="avatar-list-stacked avatar-group-lg">
                                         <span className="avatar avatar-rounded">
@@ -94,7 +97,9 @@ const Banner: React.FC = () => {
                                         </span>
                                     </div>
                                     <div className="me-2">
-                                        <h6 className="mb-1">{t('banner.aiSupport.title')}</h6>
+                                        <h6 className="mb-1" style={{ color: '#1082fd' }}>
+                                            {t('banner.aiSupport.title')}
+                                        </h6>
                                         <div className="d-flex align-items-center">
                                             <div className="d-flex align-items-center">
                                                 <i className="fa-solid fa-star text-orange me-1"></i>
@@ -113,8 +118,6 @@ const Banner: React.FC = () => {
                                         top: tooltipPos ? `${tooltipPos.top}px` : '-9999px',
                                         left: tooltipPos ? `${tooltipPos.left}px` : '-9999px',
                                         transform: 'translateX(-50%)',
-                                        background:
-                                            'linear-gradient(990deg, #BDFCFF, #0066FF 0%, #2EA8FF 50% 100%)',
                                         color: '#ffffff',
                                         fontSize: '0.875rem',
                                         padding: '0.5rem 1rem',
