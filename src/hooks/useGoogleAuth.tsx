@@ -23,8 +23,6 @@ export const useGoogleAuth = (
 
                 // Use auth hook's googleLogin method
                 await googleLogin({ accessToken: tokenResponse.access_token });
-
-                toast.success('Đăng nhập thành công');
                 onSuccess?.();
             } catch (error) {
                 console.error('Google authentication failed:', error);

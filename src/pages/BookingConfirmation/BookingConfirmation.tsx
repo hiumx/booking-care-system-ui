@@ -1,5 +1,5 @@
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useMemo, useEffect, useState, useRef } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb from '@/components/Breadcrumb';
@@ -23,7 +23,6 @@ const BookingConfirmation: React.FC = () => {
 
     const [appointment, setAppointment] = useState<AppointmentResponse | null>(null);
     const [loading, setLoading] = useState(true);
-    const hasShownToast = useRef(false);
 
     // Fetch appointment data
     useEffect(() => {
@@ -66,17 +65,6 @@ const BookingConfirmation: React.FC = () => {
             !!appointment?.specialtyInfo && !appointment?.doctorInfo && !appointment?.serviceInfo
         );
     }, [appointment]);
-
-    // Show success toast when appointment is loaded
-    useEffect(() => {
-        if (appointment && !hasShownToast.current) {
-            hasShownToast.current = true;
-            const message = isSpecialtyBooking
-                ? t('confirmation.toast.successSpecialty')
-                : t('confirmation.toast.successPayment');
-            toast.success(message);
-        }
-    }, [appointment, isSpecialtyBooking, t]);
 
     // Format appointment info from API data
     const formattedAppointmentInfo = useMemo(() => {
