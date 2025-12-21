@@ -665,9 +665,6 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true, hasTopbar = tr
                                             </Link>
                                             <ul className="submenu">
                                                 <li>
-                                                    <Link to="#">{t('menu.news.serviceNews')}</Link>
-                                                </li>
-                                                <li>
                                                     <Link to={PATHS.BLOG}>
                                                         {t('menu.news.healthNews')}
                                                     </Link>

@@ -334,7 +334,7 @@ const ContractSigningPage: React.FC = () => {
                                     onClick={handleClearSignature}
                                     disabled={!hasSignature}
                                 >
-                                    <i className="isax isax-trash5 me-1"></i> {t('signature.clear')}
+                                    <i className="isax isax-trash me-1"></i> {t('signature.clear')}
                                 </button>
                                 {hasSignature && (
                                     <span className="badge bg-success">
