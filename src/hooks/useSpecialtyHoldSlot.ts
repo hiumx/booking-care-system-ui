@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { HoldSlotService } from '@/services/holdSlot.service';
 import { AppointmentTime } from '@/enums/appointment.enums';
-import { toast } from 'react-toastify';
 import { useBaseHoldSlot } from './useBaseHoldSlot';
 import { usePeriodicCheck } from './usePeriodicCheck';
 import { executeHoldSlot } from './useHoldSlotShared';
@@ -56,6 +55,7 @@ export const useSpecialtyHoldSlot = ({
         holdSlotState,
         setHoldSlotState,
         startCountdown,
+        stopCountdown: baseStopCountdown,
         resetHoldSlotState,
         setLoading,
         setError,
@@ -64,13 +64,13 @@ export const useSpecialtyHoldSlot = ({
 
     const [currentHeldSlot, setCurrentHeldSlot] = useState<CurrentHeldSpecialtySlot | null>(null);
 
-    // Stop countdown timer
-    const stopCountdown = useCallback(() => {
+    // Full reset (stop countdown + reset state + clear slot)
+    const fullReset = useCallback(() => {
         resetHoldSlotState();
         setCurrentHeldSlot(null);
     }, [resetHoldSlotState]);
 
-    // Release current held slot
+    // Release current held slot (API call + full reset)
     const releaseSlot = useCallback(async () => {
         if (!currentHeldSlot) return;
 
@@ -82,13 +82,28 @@ export const useSpecialtyHoldSlot = ({
                 appointmentTimeId: currentHeldSlot.appointmentTimeId,
             });
 
-            stopCountdown();
-            toast.info('Đã hủy giữ chỗ');
+            fullReset();
         } catch (error: any) {
             console.error('Error releasing specialty slot:', error);
-            stopCountdown();
+            fullReset();
         }
-    }, [currentHeldSlot, stopCountdown]);
+    }, [currentHeldSlot, fullReset]);
+
+    // Release slot via API only (no state reset - used when switching slots)
+    const releaseSlotApiOnly = useCallback(async () => {
+        if (!currentHeldSlot) return;
+
+        try {
+            await HoldSlotService.releaseSpecialtySlot({
+                hospitalId: currentHeldSlot.hospitalId,
+                specialtyId: currentHeldSlot.specialtyId,
+                date: currentHeldSlot.date,
+                appointmentTimeId: currentHeldSlot.appointmentTimeId,
+            });
+        } catch (error: any) {
+            console.error('Error releasing specialty slot (API only):', error);
+        }
+    }, [currentHeldSlot]);
 
     // Hold a specialty slot
     const holdSlot = useCallback(
@@ -104,9 +119,10 @@ export const useSpecialtyHoldSlot = ({
                 setCurrentHeldSlot,
                 setHoldSlotState,
                 startCountdown,
+                stopCountdown: baseStopCountdown,
                 setLoading,
                 setError,
-                releaseExistingSlot: releaseSlot,
+                releaseSlotApi: releaseSlotApiOnly,
                 executeHoldRequest: () =>
                     HoldSlotService.holdSpecialtySlot({
                         hospitalId,
@@ -129,9 +145,10 @@ export const useSpecialtyHoldSlot = ({
             setCurrentHeldSlot,
             setHoldSlotState,
             startCountdown,
+            baseStopCountdown,
             setLoading,
             setError,
-            releaseSlot,
+            releaseSlotApiOnly,
         ]
     );
 
@@ -148,7 +165,7 @@ export const useSpecialtyHoldSlot = ({
             );
 
             if (remainingSeconds <= 0) {
-                stopCountdown();
+                fullReset();
             } else {
                 setHoldSlotState((prev) => ({
                     ...prev,
@@ -158,7 +175,7 @@ export const useSpecialtyHoldSlot = ({
         } catch (error) {
             console.error('Error checking remaining time:', error);
         }
-    }, [currentHeldSlot, stopCountdown]);
+    }, [currentHeldSlot, fullReset, setHoldSlotState]);
 
     // Periodically check remaining time with server (every 30 seconds)
     usePeriodicCheck({

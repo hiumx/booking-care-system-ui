@@ -12,7 +12,6 @@ import { LoginRequest } from '@/types/auth.types';
 import { useAuth } from '@/hooks/useAuth';
 import { usePhoneInput } from '@/hooks/usePhoneInput';
 import { AuthService } from '@/services/auth.service';
-import { toast } from 'react-toastify';
 
 const Login: React.FC = () => {
     const { t } = useTranslation('auth');
@@ -70,7 +69,6 @@ const Login: React.FC = () => {
 
         try {
             await login(credentials);
-            toast.success(t('login.success'));
             navigate(PATHS.HOME);
         } catch (error) {
             console.error('Login error:', error);

@@ -35,9 +35,10 @@ const TOPBAR_HEIGHT = 40;
 
 interface HeaderProps {
     isHeaderMenu?: boolean;
+    hasTopbar?: boolean;
 }
 
-const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
+const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true, hasTopbar = true }) => {
     const { t } = useTranslation('header');
     const { isDark, setDarkMode } = useTheme();
     const dispatch = useDispatch<AppDispatch>();
@@ -142,7 +143,6 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
             await dispatch(logoutAsync()).unwrap();
             dispatch(clearUserProfile()); // Clear user profile from state
             dispatch(clearNotifications()); // Clear notifications
-            toast.success(t('toast.logoutSuccess'));
             navigate(PATHS.HOME); // Redirect to home page
         } catch (error: unknown) {
             console.error('Logout failed:', error);
@@ -195,388 +195,391 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
 
     return (
         <>
-            <div className={clsx('header-topbar', styles.headerTopbar)}>
-                <div className="container">
-                    <div className="topbar-info">
-                        {/* Left side: Contact info */}
-                        <div className="d-flex align-items-center gap-3 header-info">
-                            <p>
-                                <i className="isax isax-message-text5 me-1"></i>
-                                <a href="mailto:medcure.contact@gmail.com">
-                                    medcure.contact@gmail.com
-                                </a>
-                            </p>
-                            <p>
-                                <i className="isax isax-call5 me-1"></i>
-                                <a href="tel:+84123456789">1900 1979</a>
-                            </p>
-                        </div>
-                        {/* Right side: Notification, Message, Dark mode, Language, Social icons */}
-                        <ul>
-                            {/* Dark Mode Toggle */}
-                            <li className="header-theme">
-                                <Link
-                                    to="#"
-                                    id="dark-mode-toggle"
-                                    className={`theme-toggle ${isDark ? '' : 'activate'}`}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        setDarkMode(true);
-                                    }}
-                                    aria-label="Enable dark mode"
-                                >
-                                    <i className="isax isax-sun-1"></i>
-                                </Link>
-                                <Link
-                                    to="#"
-                                    id="light-mode-toggle"
-                                    className={`theme-toggle ${isDark ? 'activate' : ''}`}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        setDarkMode(false);
-                                    }}
-                                    aria-label="Enable light mode"
-                                >
-                                    <i className="isax isax-moon"></i>
-                                </Link>
-                            </li>
-                            {/* Notification & Message icons for authenticated users */}
-                            {isAuthenticated && (
-                                <>
-                                    <li
-                                        className="nav-item dropdown noti-nav"
-                                        ref={notificationRef}
+            {hasTopbar && (
+                <div className={clsx('header-topbar', styles.headerTopbar)}>
+                    <div className="container">
+                        <div className="topbar-info">
+                            {/* Left side: Contact info */}
+                            <div className="d-flex align-items-center gap-3 header-info">
+                                <p>
+                                    <i className="isax isax-message-text5 me-1"></i>
+                                    <a href="mailto:medcure.contact@gmail.com">
+                                        medcure.contact@gmail.com
+                                    </a>
+                                </p>
+                                <p>
+                                    <i className="isax isax-call5 me-1"></i>
+                                    <a href="tel:+84123456789">1900 1979</a>
+                                </p>
+                            </div>
+                            {/* Right side: Notification, Message, Dark mode, Language, Social icons */}
+                            <ul>
+                                {/* Dark Mode Toggle */}
+                                <li className="header-theme">
+                                    <Link
+                                        to="#"
+                                        id="dark-mode-toggle"
+                                        className={`theme-toggle ${isDark ? '' : 'activate'}`}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setDarkMode(true);
+                                        }}
+                                        aria-label="Enable dark mode"
                                     >
-                                        <Link
-                                            to="#"
-                                            className="dropdown-toggle nav-link p-0"
-                                            data-bs-toggle="dropdown"
-                                            style={{ position: 'relative' }}
-                                            aria-label="Notifications"
+                                        <i className="isax isax-sun-1"></i>
+                                    </Link>
+                                    <Link
+                                        to="#"
+                                        id="light-mode-toggle"
+                                        className={`theme-toggle ${isDark ? 'activate' : ''}`}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setDarkMode(false);
+                                        }}
+                                        aria-label="Enable light mode"
+                                    >
+                                        <i className="isax isax-moon"></i>
+                                    </Link>
+                                </li>
+                                {/* Notification & Message icons for authenticated users */}
+                                {isAuthenticated && (
+                                    <>
+                                        <li
+                                            className="nav-item dropdown noti-nav"
+                                            ref={notificationRef}
                                         >
-                                            <i className="isax isax-notification-bing"></i>
-                                            {unreadCount > 0 && (
-                                                <span
-                                                    className="badge badge-pill bg-danger"
+                                            <Link
+                                                to="#"
+                                                className="dropdown-toggle nav-link p-0"
+                                                data-bs-toggle="dropdown"
+                                                style={{ position: 'relative' }}
+                                                aria-label="Notifications"
+                                            >
+                                                <i className="isax isax-notification-bing"></i>
+                                                {unreadCount > 0 && (
+                                                    <span
+                                                        className="badge badge-pill bg-danger"
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: '-8px',
+                                                            right: '-9px',
+                                                            fontSize: '10px',
+                                                            padding: '2px 6px',
+                                                            minWidth: '12px',
+                                                            height: '14px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            borderRadius: '10px',
+                                                            fontWeight: '600',
+                                                        }}
+                                                    >
+                                                        {unreadCount > 99 ? '99+' : unreadCount}
+                                                    </span>
+                                                )}
+                                            </Link>
+                                            <div className="dropdown-menu notifications dropdown-menu-end">
+                                                <div className="topnav-dropdown-header">
+                                                    <span className="notification-title">
+                                                        {t('notification.title')}
+                                                    </span>
+                                                    {unreadCount > 0 && (
+                                                        <button
+                                                            type="button"
+                                                            className="clear-noti"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                handleMarkAllAsRead();
+                                                            }}
+                                                            style={{
+                                                                background: 'none',
+                                                                border: 'none',
+                                                                color: '#0d6efd',
+                                                                cursor: 'pointer',
+                                                                fontSize: '13px',
+                                                                fontWeight: 500,
+                                                                padding: 0,
+                                                            }}
+                                                        >
+                                                            {t('notification.markAllRead')}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <div className="noti-content">
+                                                    <ul className="notification-list">
+                                                        {notifications.length === 0 ? (
+                                                            <li className="notification-message">
+                                                                <div className="text-center py-3">
+                                                                    <p className="text-muted">
+                                                                        {t(
+                                                                            'notification.noNotifications'
+                                                                        )}
+                                                                    </p>
+                                                                </div>
+                                                            </li>
+                                                        ) : (
+                                                            notifications.map((notification) => {
+                                                                const localizedNotification =
+                                                                    getLocalizedNotification(
+                                                                        notification,
+                                                                        currentLanguage
+                                                                    );
+                                                                return (
+                                                                    <li
+                                                                        key={notification.id}
+                                                                        className="notification-message"
+                                                                    >
+                                                                        <Link
+                                                                            to="#"
+                                                                            onClick={(e) => {
+                                                                                e.preventDefault();
+                                                                                handleNotificationClick(
+                                                                                    notification.id,
+                                                                                    notification.actionUrl
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            <div className="notify-block d-flex">
+                                                                                <span
+                                                                                    className="avatar"
+                                                                                    style={{
+                                                                                        width: '40px',
+                                                                                        height: '40px',
+                                                                                        borderRadius:
+                                                                                            '50%',
+                                                                                        backgroundColor:
+                                                                                            '#e3f2fd',
+                                                                                        display:
+                                                                                            'flex',
+                                                                                        alignItems:
+                                                                                            'center',
+                                                                                        justifyContent:
+                                                                                            'center',
+                                                                                        flexShrink: 0,
+                                                                                    }}
+                                                                                >
+                                                                                    <i
+                                                                                        className={
+                                                                                            notification.icon ||
+                                                                                            'isax isax-notification'
+                                                                                        }
+                                                                                        style={{
+                                                                                            fontSize:
+                                                                                                '20px',
+                                                                                            color: '#1976d2',
+                                                                                        }}
+                                                                                    ></i>
+                                                                                </span>
+                                                                                <div className="media-body">
+                                                                                    <div
+                                                                                        style={{
+                                                                                            display:
+                                                                                                'flex',
+                                                                                            justifyContent:
+                                                                                                'space-between',
+                                                                                            alignItems:
+                                                                                                'flex-start',
+                                                                                            marginBottom:
+                                                                                                '4px',
+                                                                                        }}
+                                                                                    >
+                                                                                        <h6
+                                                                                            style={{
+                                                                                                marginBottom: 0,
+                                                                                            }}
+                                                                                        >
+                                                                                            {
+                                                                                                localizedNotification.title
+                                                                                            }
+                                                                                        </h6>
+                                                                                        {!notification.isRead && (
+                                                                                            <span
+                                                                                                className="badge bg-danger"
+                                                                                                style={{
+                                                                                                    fontSize:
+                                                                                                        '10px',
+                                                                                                    padding:
+                                                                                                        '2px 8px',
+                                                                                                    marginLeft:
+                                                                                                        '8px',
+                                                                                                }}
+                                                                                            >
+                                                                                                {t(
+                                                                                                    'notification.new'
+                                                                                                )}
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                    <p className="noti-details">
+                                                                                        {
+                                                                                            localizedNotification.content
+                                                                                        }
+                                                                                    </p>
+                                                                                    <span
+                                                                                        className="notification-time"
+                                                                                        style={{
+                                                                                            display:
+                                                                                                'flex',
+                                                                                            alignItems:
+                                                                                                'center',
+                                                                                            gap: '4px',
+                                                                                            fontSize:
+                                                                                                '12px',
+                                                                                            color: '#6c757d',
+                                                                                        }}
+                                                                                    >
+                                                                                        <i
+                                                                                            className="isax isax-clock"
+                                                                                            style={{
+                                                                                                fontSize:
+                                                                                                    '14px',
+                                                                                            }}
+                                                                                        ></i>
+                                                                                        {formatNotificationTime(
+                                                                                            notification.createdAt
+                                                                                        )}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </Link>
+                                                                    </li>
+                                                                );
+                                                            })
+                                                        )}
+                                                    </ul>
+                                                </div>
+                                                <div
+                                                    className="topnav-dropdown-footer"
                                                     style={{
-                                                        position: 'absolute',
-                                                        top: '-8px',
-                                                        right: '-9px',
-                                                        fontSize: '10px',
-                                                        padding: '2px 6px',
-                                                        minWidth: '12px',
-                                                        height: '14px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        borderRadius: '10px',
-                                                        fontWeight: '600',
+                                                        borderTop: '1px solid #e9ecef',
+                                                        padding: '5px 0',
+                                                        textAlign: 'center',
+                                                        backgroundColor: '#f8f9fa',
                                                     }}
                                                 >
-                                                    {unreadCount > 99 ? '99+' : unreadCount}
-                                                </span>
-                                            )}
-                                        </Link>
-                                        <div className="dropdown-menu notifications dropdown-menu-end">
-                                            <div className="topnav-dropdown-header">
-                                                <span className="notification-title">
-                                                    {t('notification.title')}
-                                                </span>
-                                                {unreadCount > 0 && (
                                                     <button
                                                         type="button"
-                                                        className="clear-noti"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            handleMarkAllAsRead();
+                                                        onClick={() => {
+                                                            if (notificationRef.current) {
+                                                                const dropdownElement =
+                                                                    notificationRef.current.querySelector(
+                                                                        '.dropdown-menu'
+                                                                    );
+                                                                if (dropdownElement) {
+                                                                    dropdownElement.classList.remove(
+                                                                        'show'
+                                                                    );
+                                                                }
+                                                            }
+                                                            navigate(
+                                                                `${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=notifications`
+                                                            );
                                                         }}
                                                         style={{
                                                             background: 'none',
                                                             border: 'none',
                                                             color: '#0d6efd',
-                                                            cursor: 'pointer',
-                                                            fontSize: '13px',
                                                             fontWeight: 500,
-                                                            padding: 0,
+                                                            fontSize: '14px',
+                                                            cursor: 'pointer',
+                                                            padding: '8px 16px',
+                                                            width: '100%',
+                                                            transition: 'color 0.2s ease',
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.color = '#0a58ca';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.color = '#0d6efd';
                                                         }}
                                                     >
-                                                        {t('notification.markAllRead')}
+                                                        {t('notification.viewAll')}
                                                     </button>
-                                                )}
+                                                </div>
                                             </div>
-                                            <div className="noti-content">
-                                                <ul className="notification-list">
-                                                    {notifications.length === 0 ? (
-                                                        <li className="notification-message">
-                                                            <div className="text-center py-3">
-                                                                <p className="text-muted">
-                                                                    {t(
-                                                                        'notification.noNotifications'
-                                                                    )}
-                                                                </p>
-                                                            </div>
-                                                        </li>
-                                                    ) : (
-                                                        notifications.map((notification) => {
-                                                            const localizedNotification =
-                                                                getLocalizedNotification(
-                                                                    notification,
-                                                                    currentLanguage
-                                                                );
-                                                            return (
-                                                                <li
-                                                                    key={notification.id}
-                                                                    className="notification-message"
-                                                                >
-                                                                    <Link
-                                                                        to="#"
-                                                                        onClick={(e) => {
-                                                                            e.preventDefault();
-                                                                            handleNotificationClick(
-                                                                                notification.id,
-                                                                                notification.actionUrl
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        <div className="notify-block d-flex">
-                                                                            <span
-                                                                                className="avatar"
-                                                                                style={{
-                                                                                    width: '40px',
-                                                                                    height: '40px',
-                                                                                    borderRadius:
-                                                                                        '50%',
-                                                                                    backgroundColor:
-                                                                                        '#e3f2fd',
-                                                                                    display: 'flex',
-                                                                                    alignItems:
-                                                                                        'center',
-                                                                                    justifyContent:
-                                                                                        'center',
-                                                                                    flexShrink: 0,
-                                                                                }}
-                                                                            >
-                                                                                <i
-                                                                                    className={
-                                                                                        notification.icon ||
-                                                                                        'isax isax-notification'
-                                                                                    }
-                                                                                    style={{
-                                                                                        fontSize:
-                                                                                            '20px',
-                                                                                        color: '#1976d2',
-                                                                                    }}
-                                                                                ></i>
-                                                                            </span>
-                                                                            <div className="media-body">
-                                                                                <div
-                                                                                    style={{
-                                                                                        display:
-                                                                                            'flex',
-                                                                                        justifyContent:
-                                                                                            'space-between',
-                                                                                        alignItems:
-                                                                                            'flex-start',
-                                                                                        marginBottom:
-                                                                                            '4px',
-                                                                                    }}
-                                                                                >
-                                                                                    <h6
-                                                                                        style={{
-                                                                                            marginBottom: 0,
-                                                                                        }}
-                                                                                    >
-                                                                                        {
-                                                                                            localizedNotification.title
-                                                                                        }
-                                                                                    </h6>
-                                                                                    {!notification.isRead && (
-                                                                                        <span
-                                                                                            className="badge bg-danger"
-                                                                                            style={{
-                                                                                                fontSize:
-                                                                                                    '10px',
-                                                                                                padding:
-                                                                                                    '2px 8px',
-                                                                                                marginLeft:
-                                                                                                    '8px',
-                                                                                            }}
-                                                                                        >
-                                                                                            {t(
-                                                                                                'notification.new'
-                                                                                            )}
-                                                                                        </span>
-                                                                                    )}
-                                                                                </div>
-                                                                                <p className="noti-details">
-                                                                                    {
-                                                                                        localizedNotification.content
-                                                                                    }
-                                                                                </p>
-                                                                                <span
-                                                                                    className="notification-time"
-                                                                                    style={{
-                                                                                        display:
-                                                                                            'flex',
-                                                                                        alignItems:
-                                                                                            'center',
-                                                                                        gap: '4px',
-                                                                                        fontSize:
-                                                                                            '12px',
-                                                                                        color: '#6c757d',
-                                                                                    }}
-                                                                                >
-                                                                                    <i
-                                                                                        className="isax isax-clock"
-                                                                                        style={{
-                                                                                            fontSize:
-                                                                                                '14px',
-                                                                                        }}
-                                                                                    ></i>
-                                                                                    {formatNotificationTime(
-                                                                                        notification.createdAt
-                                                                                    )}
-                                                                                </span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </Link>
-                                                                </li>
-                                                            );
-                                                        })
-                                                    )}
-                                                </ul>
-                                            </div>
-                                            <div
-                                                className="topnav-dropdown-footer"
-                                                style={{
-                                                    borderTop: '1px solid #e9ecef',
-                                                    padding: '5px 0',
-                                                    textAlign: 'center',
-                                                    backgroundColor: '#f8f9fa',
-                                                }}
+                                        </li>
+                                        <li className="nav-item noti-nav">
+                                            <Link
+                                                to={PATHS.CHAT}
+                                                className="nav-link p-0"
+                                                style={{ position: 'relative' }}
+                                                aria-label="Messages"
                                             >
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        if (notificationRef.current) {
-                                                            const dropdownElement =
-                                                                notificationRef.current.querySelector(
-                                                                    '.dropdown-menu'
-                                                                );
-                                                            if (dropdownElement) {
-                                                                dropdownElement.classList.remove(
-                                                                    'show'
-                                                                );
-                                                            }
-                                                        }
-                                                        navigate(
-                                                            `${PATHS.USER.ROOT}/${PATHS.USER.PROFILE}?tab=notifications`
-                                                        );
-                                                    }}
-                                                    style={{
-                                                        background: 'none',
-                                                        border: 'none',
-                                                        color: '#0d6efd',
-                                                        fontWeight: 500,
-                                                        fontSize: '14px',
-                                                        cursor: 'pointer',
-                                                        padding: '8px 16px',
-                                                        width: '100%',
-                                                        transition: 'color 0.2s ease',
-                                                    }}
-                                                    onMouseEnter={(e) => {
-                                                        e.currentTarget.style.color = '#0a58ca';
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        e.currentTarget.style.color = '#0d6efd';
-                                                    }}
-                                                >
-                                                    {t('notification.viewAll')}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li className="nav-item noti-nav">
-                                        <Link
-                                            to={PATHS.CHAT}
-                                            className="nav-link p-0"
-                                            style={{ position: 'relative' }}
-                                            aria-label="Messages"
-                                        >
-                                            <i className="isax isax-message-2"></i>
-                                            {unreadMessageCount > 0 && (
-                                                <span
-                                                    className="badge badge-pill bg-success"
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: '-8px',
-                                                        right: '-9px',
-                                                        fontSize: '10px',
-                                                        padding: '2px 6px',
-                                                        minWidth: '12px',
-                                                        height: '14px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        borderRadius: '10px',
-                                                        fontWeight: '600',
-                                                    }}
-                                                >
-                                                    {unreadMessageCount > 99
-                                                        ? '99+'
-                                                        : unreadMessageCount}
-                                                </span>
-                                            )}
-                                        </Link>
-                                    </li>
-                                </>
-                            )}
+                                                <i className="isax isax-message-2"></i>
+                                                {unreadMessageCount > 0 && (
+                                                    <span
+                                                        className="badge badge-pill bg-success"
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: '-8px',
+                                                            right: '-9px',
+                                                            fontSize: '10px',
+                                                            padding: '2px 6px',
+                                                            minWidth: '12px',
+                                                            height: '14px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            borderRadius: '10px',
+                                                            fontWeight: '600',
+                                                        }}
+                                                    >
+                                                        {unreadMessageCount > 99
+                                                            ? '99+'
+                                                            : unreadMessageCount}
+                                                    </span>
+                                                )}
+                                            </Link>
+                                        </li>
+                                    </>
+                                )}
 
-                            {/* Language Switcher */}
-                            <li className="d-inline-flex align-items-center">
-                                <LanguageSwitcher />
-                            </li>
-                            {/* Social Icons */}
-                            <li className="social-header">
-                                <div className="social-icon">
-                                    <a
-                                        href="https://facebook.com"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        aria-label="Facebook"
-                                    >
-                                        <i className="fa-brands fa-facebook"></i>
-                                    </a>
-                                    <a
-                                        href="https://twitter.com"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        aria-label="Twitter"
-                                    >
-                                        <i className="fa-brands fa-x-twitter"></i>
-                                    </a>
-                                    <a
-                                        href="https://instagram.com"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        aria-label="Instagram"
-                                    >
-                                        <i className="fa-brands fa-instagram"></i>
-                                    </a>
-                                    <a
-                                        href="https://linkedin.com"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        aria-label="LinkedIn"
-                                    >
-                                        <i className="fa-brands fa-linkedin"></i>
-                                    </a>
-                                </div>
-                            </li>
-                        </ul>
+                                {/* Language Switcher */}
+                                <li className="d-inline-flex align-items-center">
+                                    <LanguageSwitcher />
+                                </li>
+                                {/* Social Icons */}
+                                <li className="social-header">
+                                    <div className="social-icon">
+                                        <a
+                                            href="https://facebook.com"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            aria-label="Facebook"
+                                        >
+                                            <i className="fa-brands fa-facebook"></i>
+                                        </a>
+                                        <a
+                                            href="https://twitter.com"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            aria-label="Twitter"
+                                        >
+                                            <i className="fa-brands fa-x-twitter"></i>
+                                        </a>
+                                        <a
+                                            href="https://instagram.com"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            aria-label="Instagram"
+                                        >
+                                            <i className="fa-brands fa-instagram"></i>
+                                        </a>
+                                        <a
+                                            href="https://linkedin.com"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            aria-label="LinkedIn"
+                                        >
+                                            <i className="fa-brands fa-linkedin"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
             <header
                 className={clsx(
                     'header header-custom header-fixed inner-header',
@@ -665,7 +668,9 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true }) => {
                                                     <Link to="#">{t('menu.news.serviceNews')}</Link>
                                                 </li>
                                                 <li>
-                                                    <Link to={PATHS.BLOG}>{t('menu.blog')}</Link>
+                                                    <Link to={PATHS.BLOG}>
+                                                        {t('menu.news.healthNews')}
+                                                    </Link>
                                                 </li>
                                             </ul>
                                         </li>

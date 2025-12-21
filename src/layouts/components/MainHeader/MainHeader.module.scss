@@ -4,7 +4,7 @@
 .headerTopbar {
     // Normal position - scrolls with page
     position: relative;
-
+    padding: 4px 0 !important;
     // Notification dropdown styles for header-topbar
     :global(.noti-nav) {
         position: relative;

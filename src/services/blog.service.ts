@@ -50,6 +50,7 @@ const buildBlogQueryParams = (params?: BlogFilterParameters): Record<string, any
         ['source', 'source'],
         ['status', 'status'],
         ['keyword', 'keyword'],
+        ['titleOnly', 'titleOnly'],
         ['categoryId', 'categoryId'],
     ];
 

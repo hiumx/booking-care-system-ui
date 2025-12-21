@@ -15,6 +15,7 @@ const CategoryBlogs: React.FC = () => {
     const { categorySlug } = useParams<{ categorySlug: string }>();
 
     const [searchTerm, setSearchTerm] = useState('');
+    const [inputSearch, setInputSearch] = useState('');
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
     const [selectedCategorySlug, setSelectedCategorySlug] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -50,6 +51,7 @@ const CategoryBlogs: React.FC = () => {
             // Fetch all blogs
             if (searchTerm.trim()) {
                 params.keyword = searchTerm.trim();
+                params.titleOnly = true;
             }
         } else {
             // Fetch by category
@@ -58,6 +60,7 @@ const CategoryBlogs: React.FC = () => {
             }
             if (searchTerm.trim()) {
                 params.keyword = searchTerm.trim();
+                params.titleOnly = true;
             }
         }
 
@@ -131,6 +134,7 @@ const CategoryBlogs: React.FC = () => {
         const pageFromUrl = Number.parseInt(searchParams.get('page') || '1', 10);
 
         setSearchTerm(searchFromUrl);
+        setInputSearch(searchFromUrl);
         setCurrentPage(pageFromUrl);
 
         if (categoryFromUrl === 'all') {
@@ -193,9 +197,14 @@ const CategoryBlogs: React.FC = () => {
         } else if (selectedCategorySlug) {
             params.category = selectedCategorySlug;
         }
-        if (searchTerm.trim()) {
-            params.search = searchTerm.trim();
+        const trimmed = inputSearch.trim();
+        // Apply search only on submit; search in titles only
+        if (trimmed) {
+            params.search = trimmed;
+            params.titleOnly = 'true';
         }
+        // update applied searchTerm (used for fetching)
+        setSearchTerm(trimmed);
         setSearchParams(params);
     };
 
@@ -270,6 +279,25 @@ const CategoryBlogs: React.FC = () => {
         setSearchParams(params);
         // Scroll to top when page changes
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Handle search coming from the global header (BlogHeader)
+    const handleHeaderSearch = (keyword: string) => {
+        const trimmed = keyword.trim();
+        setInputSearch(trimmed);
+        setCurrentPage(1);
+        // Switch to "all" mode to show search across all categories
+        setIsAllMode(true);
+        setSelectedCategoryId(null);
+        setSelectedCategorySlug('');
+
+        if (!trimmed) {
+            setSearchParams({ category: 'all', page: '1' });
+            return;
+        }
+
+        // Trigger search across titles only
+        setSearchParams({ category: 'all', search: trimmed, titleOnly: 'true', page: '1' });
     };
 
     // Get current category name
@@ -363,7 +391,7 @@ const CategoryBlogs: React.FC = () => {
 
     return (
         <div className={styles.categoryArticles}>
-            <BlogHeader />
+            <BlogHeader onSearch={handleHeaderSearch} />
 
             <div className={styles.container}>
                 <Breadcrumb items={breadcrumbItems} />
@@ -388,8 +416,8 @@ const CategoryBlogs: React.FC = () => {
                             <input
                                 type="text"
                                 placeholder="Từ khóa tìm kiếm"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                value={inputSearch}
+                                onChange={(e) => setInputSearch(e.target.value)}
                                 className={styles.searchInput}
                             />
                             <button type="submit" className={styles.searchBtn}>
