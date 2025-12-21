@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb, { BreadcrumbItem } from '@/components/Breadcrumb/Breadcrumb';
 import NutritionSkeleton from '@/components/Loading/NutritionSkeleton';
@@ -11,6 +12,7 @@ import styles from './WorkoutPlanDetail.module.scss';
 const WorkoutPlanDetail: React.FC = () => {
     const navigate = useNavigate();
     const { date } = useParams<{ date: string }>();
+    const { t, i18n } = useTranslation('nutrition');
     const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
     const [loading, setLoading] = useState(true);
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -112,7 +114,7 @@ const WorkoutPlanDetail: React.FC = () => {
 
     // Get average intensity level
     const getAverageIntensity = () => {
-        if (!workoutPlan || workoutPlan.exercises.length === 0) return 'Trung bình';
+        if (!workoutPlan || workoutPlan.exercises.length === 0) return t('intensity.medium');
 
         const intensityMap: { [key: string]: number } = {
             low: 1,
@@ -130,12 +132,12 @@ const WorkoutPlanDetail: React.FC = () => {
             }
         });
 
-        if (count === 0) return 'Trung bình';
+        if (count === 0) return t('intensity.medium');
 
         const avgIntensity = totalIntensity / count;
-        if (avgIntensity <= 1.5) return 'Nhẹ';
-        if (avgIntensity <= 2.5) return 'Trung bình';
-        return 'Cao';
+        if (avgIntensity <= 1.5) return t('intensity.low');
+        if (avgIntensity <= 2.5) return t('intensity.medium');
+        return t('intensity.high');
     };
 
     const getIntensityColor = (intensity?: string) => {
@@ -154,26 +156,26 @@ const WorkoutPlanDetail: React.FC = () => {
     const getIntensityLabel = (intensity?: string) => {
         switch (intensity?.toLowerCase()) {
             case 'low':
-                return 'Nhẹ';
+                return t('intensity.low');
             case 'medium':
-                return 'Trung bình';
+                return t('intensity.medium');
             case 'high':
-                return 'Cao';
+                return t('intensity.high');
             default:
-                return 'Trung bình';
+                return t('intensity.medium');
         }
     };
 
     const breadcrumbItems: BreadcrumbItem[] = [
-        { label: 'Trang chủ', path: PATHS.HOME },
-        { label: 'Sức khỏe của bạn', path: PATHS.NUTRITION.DASHBOARD },
-        { label: 'Kế hoạch tập luyện', isActive: true },
+        { label: t('breadcrumb.home'), path: PATHS.HOME },
+        { label: t('breadcrumb.yourHealth'), path: PATHS.NUTRITION.DASHBOARD },
+        { label: t('breadcrumb.workoutPlanDetail'), isActive: true },
     ];
 
     if (loading) {
         return (
             <MainLayout>
-                <Breadcrumb items={breadcrumbItems} title="Kế hoạch tập luyện" />
+                <Breadcrumb items={breadcrumbItems} title={t('workoutPlanDetail.title')} />
                 <NutritionSkeleton type="workoutPlan" />
             </MainLayout>
         );
@@ -182,11 +184,11 @@ const WorkoutPlanDetail: React.FC = () => {
     if (!workoutPlan) {
         return (
             <MainLayout>
-                <Breadcrumb items={breadcrumbItems} title="Kế hoạch tập luyện" />
+                <Breadcrumb items={breadcrumbItems} title={t('workoutPlanDetail.title')} />
                 <div className={styles.noData}>
-                    <h2>Không có kế hoạch tập luyện cho ngày này</h2>
+                    <h2>{t('workoutPlanDetail.noData')}</h2>
                     <button onClick={() => navigate(PATHS.NUTRITION.DASHBOARD)}>
-                        Quay lại Dashboard
+                        {t('common.backToDashboard')}
                     </button>
                 </div>
             </MainLayout>
@@ -199,7 +201,7 @@ const WorkoutPlanDetail: React.FC = () => {
 
     return (
         <MainLayout>
-            <Breadcrumb items={breadcrumbItems} title="Kế hoạch tập luyện" />
+            <Breadcrumb items={breadcrumbItems} title={t('workoutPlanDetail.title')} />
 
             <div className={styles.workoutPlanDetail}>
                 {/* Hero Header Section */}
@@ -207,27 +209,25 @@ const WorkoutPlanDetail: React.FC = () => {
                     <div className={styles.heroContainer}>
                         <div className={styles.heroContent}>
                             <div className={styles.heroLeft}>
-                                <span className={styles.badge}>Kế hoạch tập luyện AI</span>
-                                <h1>Lộ trình tập luyện hàng ngày của bạn</h1>
-                                <p>
-                                    Theo dõi kế hoạch tập luyện cá nhân hóa được tạo bởi AI dựa trên
-                                    mục tiêu sức khỏe của bạn. Duy trì nhất quán để đạt được thể
-                                    trạng mục tiêu.
-                                </p>
+                                <span className={styles.badge}>{t('workoutPlanDetail.badge')}</span>
+                                <h1>{t('workoutPlanDetail.heroTitle')}</h1>
+                                <p>{t('workoutPlanDetail.heroDescription')}</p>
                             </div>
 
                             <div className={styles.calorieCard}>
                                 <div className={styles.calorieItem}>
-                                    <p className={styles.label}>Mục tiêu hàng ngày</p>
+                                    <p className={styles.label}>
+                                        {t('workoutPlanDetail.dailyGoal')}
+                                    </p>
                                     <p className={styles.value}>
-                                        {getTotalCalories()} <span>kcal</span>
+                                        {getTotalCalories()} <span>{t('common.kcal')}</span>
                                     </p>
                                 </div>
                                 <div className={styles.divider}></div>
                                 <div className={styles.calorieItem}>
-                                    <p className={styles.label}>Đã đốt cháy</p>
+                                    <p className={styles.label}>{t('workoutPlanDetail.burned')}</p>
                                     <p className={`${styles.value} ${styles.consumed}`}>
-                                        {getCaloriesBurned()} <span>kcal</span>
+                                        {getCaloriesBurned()} <span>{t('common.kcal')}</span>
                                     </p>
                                 </div>
                                 <div className={styles.progressRing}>
@@ -259,10 +259,11 @@ const WorkoutPlanDetail: React.FC = () => {
                                         const selected = new Date(selectedDate);
                                         selected.setHours(0, 0, 0, 0);
                                         const isToday = selected.getTime() === today.getTime();
+                                        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
 
                                         return isToday
-                                            ? `Hôm nay, ${selectedDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short' })}`
-                                            : selectedDate.toLocaleDateString('vi-VN', {
+                                            ? `${t('common.today')}, ${selectedDate.toLocaleDateString(locale, { day: 'numeric', month: 'short' })}`
+                                            : selectedDate.toLocaleDateString(locale, {
                                                   weekday: 'long',
                                                   day: 'numeric',
                                                   month: 'short',
@@ -270,7 +271,7 @@ const WorkoutPlanDetail: React.FC = () => {
                                     })()}
                                 </h2>
                                 <p onClick={() => navigate(PATHS.NUTRITION.DASHBOARD)}>
-                                    Xem tổng quan tuần
+                                    {t('common.viewWeekOverview')}
                                 </p>
                             </div>
                             <button className={styles.navBtn} onClick={() => handleDateChange(1)}>
@@ -287,21 +288,22 @@ const WorkoutPlanDetail: React.FC = () => {
                                     <div className={styles.workoutHeader}>
                                         <div>
                                             <span className={styles.categoryBadge}>
-                                                Sức mạnh & Linh hoạt
+                                                {t('workoutPlanDetail.categoryBadge')}
                                             </span>
                                             <h2>
-                                                {workoutPlan.workoutType || 'Sức mạnh thượng thân'}
+                                                {workoutPlan.workoutType ||
+                                                    t('workoutPlanDetail.defaultWorkoutType')}
                                             </h2>
                                             <div className={styles.workoutMeta}>
                                                 <span>
                                                     <span className="material-icons">timer</span>{' '}
-                                                    {getTotalDuration()} phút
+                                                    {getTotalDuration()} {t('common.minutes')}
                                                 </span>
                                                 <span>
                                                     <span className="material-symbols-outlined">
                                                         local_fire_department
                                                     </span>{' '}
-                                                    {getTotalCalories()} kcal
+                                                    {getTotalCalories()} {t('common.kcal')}
                                                 </span>
                                                 <span>
                                                     <span className="material-icons">
@@ -312,13 +314,15 @@ const WorkoutPlanDetail: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className={styles.coachInfo}>
-                                            <div className={styles.coachLabel}>Huấn luyện viên</div>
+                                            <div className={styles.coachLabel}>
+                                                {t('workoutPlanDetail.coach')}
+                                            </div>
                                             <div className={styles.coachProfile}>
                                                 <img
                                                     src="https://img.freepik.com/premium-psd/happy-robot-3d-ai-character-chat-bot-mascot-gpt-chatbot-icon-artificial-intelligence_95505-496.jpg?semt=ais_incoming&w=740&q=80"
                                                     alt="Coach"
                                                 />
-                                                <span>Medcure AI</span>
+                                                <span>{t('workoutPlanDetail.aiCoach')}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -329,21 +333,14 @@ const WorkoutPlanDetail: React.FC = () => {
                                             auto_awesome
                                         </span>
                                         <div>
-                                            <h4>Khuyến nghị từ AI</h4>
-                                            <p>
-                                                Kế hoạch tập hôm nay được tinh chỉnh linh hoạt nhằm
-                                                cân bằng giữa hiệu quả luyện tập và khả năng phục
-                                                hồi của cơ thể. Các bài tập được sắp xếp hợp lý để
-                                                bạn duy trì cường độ cần thiết, đồng thời hạn chế áp
-                                                lực không cần thiết, giúp bạn tiếp tục tiến bộ một
-                                                cách bền vững.
-                                            </p>
+                                            <h4>{t('workoutPlanDetail.aiRecommendation')}</h4>
+                                            <p>{t('workoutPlanDetail.aiRecommendationText')}</p>
                                         </div>
                                     </div>
 
                                     {/* Exercise List */}
                                     <div className={styles.exerciseSection}>
-                                        <h3>Bài tập hôm nay</h3>
+                                        <h3>{t('workoutPlanDetail.todayExercises')}</h3>
 
                                         <div className={styles.exerciseList}>
                                             {workoutPlan.exercises.map((exercise, index) => {
@@ -459,7 +456,10 @@ const WorkoutPlanDetail: React.FC = () => {
                                         {/* Footer */}
                                         <div className={styles.workoutFooter}>
                                             <div className={styles.footerInfo}>
-                                                Đã hoàn thành {completedCount}/{totalCount} bài tập
+                                                {t('workoutPlanDetail.completedExercises', {
+                                                    completed: completedCount,
+                                                    total: totalCount,
+                                                })}
                                             </div>
                                         </div>
                                     </div>
@@ -470,7 +470,7 @@ const WorkoutPlanDetail: React.FC = () => {
                             <div className={styles.sidebar}>
                                 {/* Weekly Progress */}
                                 <div className={styles.progressCard}>
-                                    <h3>Tiến độ tập luyện</h3>
+                                    <h3>{t('workoutPlanDetail.trainingProgress')}</h3>
                                     <div className={styles.progressRing}>
                                         <svg viewBox="0 0 100 100">
                                             <circle
@@ -497,7 +497,9 @@ const WorkoutPlanDetail: React.FC = () => {
                                             <span className={styles.percentage}>
                                                 {Math.round(completionPercentage)}%
                                             </span>
-                                            <span className={styles.label}>Đạt mục tiêu</span>
+                                            <span className={styles.label}>
+                                                {t('workoutPlanDetail.goalAchieved')}
+                                            </span>
                                         </div>
                                     </div>
                                     <div className={styles.statsGrid}>
@@ -505,13 +507,17 @@ const WorkoutPlanDetail: React.FC = () => {
                                             <div className={styles.statValue}>
                                                 {getCompletedExercisesCount()}
                                             </div>
-                                            <div className={styles.statLabel}>Bài tập đã xong</div>
+                                            <div className={styles.statLabel}>
+                                                {t('workoutPlanDetail.exercisesDone')}
+                                            </div>
                                         </div>
                                         <div className={styles.statBox}>
                                             <div className={styles.statValue}>
                                                 {formatCalories(getCaloriesBurned())}
                                             </div>
-                                            <div className={styles.statLabel}>Calo đã đốt</div>
+                                            <div className={styles.statLabel}>
+                                                {t('workoutPlanDetail.caloriesBurned')}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -519,7 +525,7 @@ const WorkoutPlanDetail: React.FC = () => {
                                 {/* Upcoming Workouts */}
                                 <div className={styles.upcomingCard}>
                                     <div className={styles.upcomingHeader}>
-                                        <h3>Các bài giãn cơ sau buổi tập</h3>
+                                        <h3>{t('workoutPlanDetail.postWorkoutStretches')}</h3>
                                     </div>
                                     <div className={styles.upcomingList}>
                                         <div className={styles.upcomingItem}>
@@ -527,10 +533,10 @@ const WorkoutPlanDetail: React.FC = () => {
                                                 className={`${styles.upcomingContent} ${styles.purple}`}
                                             >
                                                 <div className={styles.upcomingTitle}>
-                                                    Giãn cơ mông & hông
+                                                    {t('workoutPlanDetail.gluteHipStretch')}
                                                 </div>
                                                 <div className={styles.upcomingTime}>
-                                                    Giảm áp lực hông, lưng dưới • 20–30 giây mỗi bên
+                                                    {t('workoutPlanDetail.gluteHipStretchDesc')}
                                                 </div>
                                             </div>
                                         </div>

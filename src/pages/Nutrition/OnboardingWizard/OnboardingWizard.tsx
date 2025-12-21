@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb, { BreadcrumbItem } from '@/components/Breadcrumb/Breadcrumb';
@@ -22,6 +23,7 @@ import styles from './OnboardingWizard.module.scss';
 
 const OnboardingWizard: React.FC = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation('nutrition');
     const userProfile = useSelector((state: RootState) => state.user.profile);
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -147,12 +149,9 @@ const OnboardingWizard: React.FC = () => {
                     console.log(
                         '[OnboardingWizard] Missing required info, redirecting to profile settings'
                     );
-                    toast.warning(
-                        'Vui lòng cập nhật thông tin cá nhân (ngày sinh và giới tính) để thiết lập hồ sơ dinh dưỡng!',
-                        {
-                            autoClose: 5000,
-                        }
-                    );
+                    toast.warning(t('onboarding.toast.updateProfileFirst'), {
+                        autoClose: 5000,
+                    });
                     navigate('/user/profile?tab=settings');
                 } else {
                     console.log(
@@ -201,23 +200,23 @@ const OnboardingWizard: React.FC = () => {
 
     const handleNext = () => {
         if (!validateStep(currentStep)) {
-            let errorMessage = 'Vui lòng hoàn thành thông tin trước khi tiếp tục!';
+            let errorMessage = t('onboarding.validation.completeInfo');
 
             switch (currentStep) {
                 case 1:
-                    errorMessage = 'Vui lòng chọn giới tính và nhập chiều cao, cân nặng hợp lệ!';
+                    errorMessage = t('onboarding.validation.selectGenderHeightWeight');
                     break;
                 case 2:
-                    errorMessage = 'Vui lòng chọn mục tiêu sức khỏe của bạn!';
+                    errorMessage = t('onboarding.validation.selectHealthGoal');
                     break;
                 case 3:
-                    errorMessage = 'Vui lòng chọn mức độ vận động của bạn!';
+                    errorMessage = t('onboarding.validation.selectActivityLevel');
                     break;
                 case 4:
-                    errorMessage = 'Vui lòng chọn chế độ ăn và ít nhất 1 món ăn yêu thích!';
+                    errorMessage = t('onboarding.validation.selectDietAndCuisine');
                     break;
                 case 5:
-                    errorMessage = 'Vui lòng chọn ít nhất 1 tình trạng sức khỏe!';
+                    errorMessage = t('onboarding.validation.selectHealthCondition');
                     break;
             }
 
@@ -242,11 +241,11 @@ const OnboardingWizard: React.FC = () => {
         try {
             setLoading(true);
             await nutritionService.createOrUpdateProfile(formData);
-            toast.success('Tạo hồ sơ dinh dưỡng thành công!');
+            toast.success(t('onboarding.toast.success'));
             navigate(PATHS.NUTRITION.DASHBOARD);
         } catch {
             console.error('Error occurred');
-            toast.error('Có lỗi xảy ra. Vui lòng thử lại!');
+            toast.error(t('onboarding.toast.error'));
         } finally {
             setLoading(false);
         }
@@ -347,9 +346,9 @@ const OnboardingWizard: React.FC = () => {
 
     // Breadcrumb items
     const breadcrumbItems: BreadcrumbItem[] = [
-        { label: 'Trang chủ', path: PATHS.HOME },
-        { label: 'Sức khỏe của bạn', path: PATHS.NUTRITION.DASHBOARD },
-        { label: 'Thiết lập hồ sơ', isActive: true },
+        { label: t('breadcrumb.home'), path: PATHS.HOME },
+        { label: t('breadcrumb.yourHealth'), path: PATHS.NUTRITION.DASHBOARD },
+        { label: t('breadcrumb.profileSetup'), isActive: true },
     ];
 
     // Sidebar component
@@ -368,17 +367,37 @@ const OnboardingWizard: React.FC = () => {
                         </svg>
                     </div>
                     <div className={styles.sidebarTitle}>
-                        <h2>Sức khỏe của bạn AI</h2>
-                        <p>Cá nhân hóa cho bạn</p>
+                        <h2>{t('onboarding.sidebarTitle')}</h2>
+                        <p>{t('onboarding.sidebarSubtitle')}</p>
                     </div>
                 </div>
                 <div className={styles.stepsList}>
                     {[
-                        { id: 1, title: 'Chỉ số cơ bản', desc: 'Chiều cao, cân nặng' },
-                        { id: 2, title: 'Mục tiêu', desc: 'Giảm cân, tăng cơ' },
-                        { id: 3, title: 'Mức độ vận động', desc: 'Thói quen vận động' },
-                        { id: 4, title: 'Sở thích ăn uống', desc: 'Chế độ ăn, dị ứng' },
-                        { id: 5, title: 'Tình trạng sức khỏe', desc: 'Bệnh lý nền' },
+                        {
+                            id: 1,
+                            title: t('onboarding.steps.basicMetrics.title'),
+                            desc: t('onboarding.steps.basicMetrics.desc'),
+                        },
+                        {
+                            id: 2,
+                            title: t('onboarding.steps.goals.title'),
+                            desc: t('onboarding.steps.goals.desc'),
+                        },
+                        {
+                            id: 3,
+                            title: t('onboarding.steps.activityLevel.title'),
+                            desc: t('onboarding.steps.activityLevel.desc'),
+                        },
+                        {
+                            id: 4,
+                            title: t('onboarding.steps.dietaryPreferences.title'),
+                            desc: t('onboarding.steps.dietaryPreferences.desc'),
+                        },
+                        {
+                            id: 5,
+                            title: t('onboarding.steps.healthConditions.title'),
+                            desc: t('onboarding.steps.healthConditions.desc'),
+                        },
                     ].map((step) => (
                         <div key={step.id} className={styles.stepItem}>
                             <div
@@ -411,19 +430,16 @@ const OnboardingWizard: React.FC = () => {
                     <svg fill="currentColor" viewBox="0 0 20 20">
                         <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
                     </svg>
-                    <h3>Tại sao chúng tôi cần điều này?</h3>
+                    <h3>{t('onboarding.whyWeNeedThis')}</h3>
                 </div>
-                <p className={styles.infoText}>
-                    AI sử dụng dữ liệu của bạn để tạo ra lộ trình dinh dưỡng và tập luyện an toàn,
-                    hiệu quả nhất phù hợp với mục tiêu sức khỏe.
-                </p>
+                <p className={styles.infoText}>{t('onboarding.whyWeNeedThisText')}</p>
             </div>
         </aside>
     );
 
     return (
         <MainLayout>
-            <Breadcrumb items={breadcrumbItems} title="Thiết lập hồ sơ dinh dưỡng" />
+            <Breadcrumb items={breadcrumbItems} title={t('onboarding.title')} />
             <div className={styles.wizardContainer}>
                 <div className={styles.wizardWrapper}>
                     <Sidebar />
@@ -434,12 +450,14 @@ const OnboardingWizard: React.FC = () => {
                             {currentStep === 1 && (
                                 <div>
                                     <div className={styles.stepHeader}>
-                                        <span className={styles.stepBadge}>Thiết lập hồ sơ</span>
-                                        <h1 className={styles.stepTitle}>Chỉ số cơ thể của bạn</h1>
+                                        <span className={styles.stepBadge}>
+                                            {t('onboarding.step1.badge')}
+                                        </span>
+                                        <h1 className={styles.stepTitle}>
+                                            {t('onboarding.step1.title')}
+                                        </h1>
                                         <p className={styles.stepDescription}>
-                                            Hãy cung cấp thông tin chính xác để AI có thể tính toán
-                                            chỉ số BMI và nhu cầu dinh dưỡng hàng ngày dành riêng
-                                            cho bạn.
+                                            {t('onboarding.step1.description')}
                                         </p>
                                     </div>
 
@@ -448,7 +466,7 @@ const OnboardingWizard: React.FC = () => {
                                             {/* Gender Selection */}
                                             <div className={styles.section}>
                                                 <h2 className={styles.sectionTitle}>
-                                                    Giới tính sinh học
+                                                    {t('onboarding.step1.biologicalGender')}
                                                 </h2>
                                                 <div className={styles.genderGrid}>
                                                     <label
@@ -470,7 +488,7 @@ const OnboardingWizard: React.FC = () => {
                                                                 ♂
                                                             </div>
                                                             <div className={styles.genderLabel}>
-                                                                Nam
+                                                                {t('onboarding.step1.male')}
                                                             </div>
                                                             <div className={styles.genderCheckbox}>
                                                                 <div
@@ -498,7 +516,7 @@ const OnboardingWizard: React.FC = () => {
                                                                 ♀
                                                             </div>
                                                             <div className={styles.genderLabel}>
-                                                                Nữ
+                                                                {t('onboarding.step1.female')}
                                                             </div>
                                                             <div className={styles.genderCheckbox}>
                                                                 <div
@@ -526,7 +544,7 @@ const OnboardingWizard: React.FC = () => {
                                                                 ⚧
                                                             </div>
                                                             <div className={styles.genderLabel}>
-                                                                Khác
+                                                                {t('onboarding.step1.other')}
                                                             </div>
                                                             <div className={styles.genderCheckbox}>
                                                                 <div
@@ -542,7 +560,7 @@ const OnboardingWizard: React.FC = () => {
                                             <div className={styles.metricsRow}>
                                                 <div className={styles.metricGroup}>
                                                     <Input
-                                                        label="Tuổi"
+                                                        label={t('onboarding.step1.age')}
                                                         type="number"
                                                         value={String(userAge || 25)}
                                                         disabled
@@ -551,7 +569,7 @@ const OnboardingWizard: React.FC = () => {
 
                                                 <div className={styles.metricGroup}>
                                                     <Input
-                                                        label="Chiều cao (cm)"
+                                                        label={t('onboarding.step1.height')}
                                                         type="number"
                                                         value={String(formData.heightCm)}
                                                         onChange={(e) =>
@@ -568,7 +586,7 @@ const OnboardingWizard: React.FC = () => {
 
                                                 <div className={styles.metricGroup}>
                                                     <Input
-                                                        label="Cân nặng (kg)"
+                                                        label={t('onboarding.step1.weight')}
                                                         type="number"
                                                         value={String(formData.weightKg)}
                                                         onChange={(e) =>
@@ -586,14 +604,14 @@ const OnboardingWizard: React.FC = () => {
 
                                             <div className={styles.wizardFooter}>
                                                 <Button
-                                                    text="Quay lại"
+                                                    text={t('onboarding.buttons.back')}
                                                     type="button"
                                                     onClick={handleBack}
                                                     isDisabled={currentStep === 1}
                                                     className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
                                                 />
                                                 <Button
-                                                    text="Tiếp tục"
+                                                    text={t('onboarding.buttons.next')}
                                                     type="button"
                                                     onClick={handleNext}
                                                     className={styles.btnPrimary}
@@ -609,14 +627,13 @@ const OnboardingWizard: React.FC = () => {
                                 <div>
                                     <div className={styles.stepHeader}>
                                         <span className={styles.stepBadge}>
-                                            Lộ trình cá nhân hóa
+                                            {t('onboarding.step2.badge')}
                                         </span>
                                         <h1 className={styles.stepTitle}>
-                                            Mục tiêu sức khỏe chính của bạn là gì?
+                                            {t('onboarding.step2.title')}
                                         </h1>
                                         <p className={styles.stepDescription}>
-                                            AI của chúng tôi sẽ điều chỉnh kế hoạch dinh dưỡng và
-                                            tập luyện dựa trên những gì bạn muốn đạt được.
+                                            {t('onboarding.step2.description')}
                                         </p>
                                     </div>
 
@@ -652,17 +669,29 @@ const OnboardingWizard: React.FC = () => {
                                                         </h3>
                                                         <p className={styles.cardDescription}>
                                                             {goal.value === 'WeightLoss' &&
-                                                                'Tập trung vào thâm hụt calo, các bài tập đốt cháy mỡ và thói quen ăn uống bền vững.'}
+                                                                t(
+                                                                    'onboarding.step2.goals.weightLoss'
+                                                                )}
                                                             {goal.value === 'MuscleGain' &&
-                                                                'Các kế hoạch tập luyện tập trung vào phì đại cơ và khuyến nghị bữa ăn giàu protein.'}
+                                                                t(
+                                                                    'onboarding.step2.goals.muscleGain'
+                                                                )}
                                                             {goal.value === 'Maintenance' &&
-                                                                'Phương pháp cân bằng để giữ cơ thể năng động và tối ưu hóa dinh dưỡng.'}
+                                                                t(
+                                                                    'onboarding.step2.goals.maintenance'
+                                                                )}
                                                             {goal.value === 'HeartHealth' &&
-                                                                'Tăng cường sức bền, sức khỏe tim mạch và sự dẻo dai qua các hoạt động aerobic.'}
+                                                                t(
+                                                                    'onboarding.step2.goals.heartHealth'
+                                                                )}
                                                             {goal.value === 'Flexibility' &&
-                                                                'Cải thiện độ linh hoạt, giảm căng cơ và tăng khả năng vận động của cơ thể.'}
+                                                                t(
+                                                                    'onboarding.step2.goals.flexibility'
+                                                                )}
                                                             {goal.value === 'Endurance' &&
-                                                                'Nâng cao sức chịu đựng, tăng cường thể lực và khả năng hoạt động lâu dài.'}
+                                                                t(
+                                                                    'onboarding.step2.goals.endurance'
+                                                                )}
                                                         </p>
                                                     </div>
                                                 </label>
@@ -671,13 +700,13 @@ const OnboardingWizard: React.FC = () => {
 
                                         <div className={styles.wizardFooter}>
                                             <Button
-                                                text="Quay lại"
+                                                text={t('onboarding.buttons.back')}
                                                 type="button"
                                                 onClick={handleBack}
                                                 className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
                                             />
                                             <Button
-                                                text="Tiếp tục"
+                                                text={t('onboarding.buttons.next')}
                                                 type="button"
                                                 onClick={handleNext}
                                                 className={styles.btnPrimary}
@@ -691,13 +720,14 @@ const OnboardingWizard: React.FC = () => {
                             {currentStep === 3 && (
                                 <div>
                                     <div className={styles.stepHeader}>
-                                        <span className={styles.stepBadge}>Bước 3/5</span>
+                                        <span className={styles.stepBadge}>
+                                            {t('onboarding.step3.badge')}
+                                        </span>
                                         <h1 className={styles.stepTitle}>
-                                            Bạn thường vận động ở mức nào?
+                                            {t('onboarding.step3.title')}
                                         </h1>
                                         <p className={styles.stepDescription}>
-                                            Mức độ vận động giúp chúng tôi tính toán chính xác lượng
-                                            calo bạn đốt cháy mỗi ngày.
+                                            {t('onboarding.step3.description')}
                                         </p>
                                     </div>
 
@@ -750,13 +780,13 @@ const OnboardingWizard: React.FC = () => {
 
                                         <div className={styles.wizardFooter}>
                                             <Button
-                                                text="Quay lại"
+                                                text={t('onboarding.buttons.back')}
                                                 type="button"
                                                 onClick={handleBack}
                                                 className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
                                             />
                                             <Button
-                                                text="Tiếp tục"
+                                                text={t('onboarding.buttons.next')}
                                                 type="button"
                                                 onClick={handleNext}
                                                 className={styles.btnPrimary}
@@ -771,15 +801,13 @@ const OnboardingWizard: React.FC = () => {
                                 <div>
                                     <div className={styles.stepHeader}>
                                         <span className={styles.stepBadge}>
-                                            Cá nhân hóa dinh dưỡng
+                                            {t('onboarding.step4.badge')}
                                         </span>
                                         <h1 className={styles.stepTitle}>
-                                            Sở thích ăn uống của bạn
+                                            {t('onboarding.step4.title')}
                                         </h1>
                                         <p className={styles.stepDescription}>
-                                            Để AI thiết kế thực đơn phù hợp nhất, hãy chia sẻ với
-                                            chúng tôi về thói quen và các hạn chế trong ăn uống của
-                                            bạn.
+                                            {t('onboarding.step4.description')}
                                         </p>
                                     </div>
 
@@ -799,7 +827,7 @@ const OnboardingWizard: React.FC = () => {
                                                             d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                                                         />
                                                     </svg>
-                                                    Chế độ ăn hiện tại
+                                                    {t('onboarding.step4.currentDiet')}
                                                 </h2>
                                                 <div className={styles.dietGrid}>
                                                     {DIET_TYPE_OPTIONS.map((diet) => (
@@ -858,16 +886,26 @@ const OnboardingWizard: React.FC = () => {
                                                                     </h3>
                                                                     <p className={styles.dietDesc}>
                                                                         {diet.value === 'Regular' &&
-                                                                            'Ăn đa dạng các loại thực phẩm'}
+                                                                            t(
+                                                                                'onboarding.step4.dietDescriptions.regular'
+                                                                            )}
                                                                         {diet.value ===
                                                                             'Vegetarian' &&
-                                                                            'Không thịt cá, có trứng sữa'}
+                                                                            t(
+                                                                                'onboarding.step4.dietDescriptions.vegetarian'
+                                                                            )}
                                                                         {diet.value === 'Vegan' &&
-                                                                            'Hoàn toàn thực vật'}
+                                                                            t(
+                                                                                'onboarding.step4.dietDescriptions.vegan'
+                                                                            )}
                                                                         {diet.value === 'Keto' &&
-                                                                            'Ít carb, nhiều chất béo'}
+                                                                            t(
+                                                                                'onboarding.step4.dietDescriptions.keto'
+                                                                            )}
                                                                         {diet.value === 'LowCarb' &&
-                                                                            'Hạn chế tinh bột'}
+                                                                            t(
+                                                                                'onboarding.step4.dietDescriptions.lowCarb'
+                                                                            )}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -892,11 +930,10 @@ const OnboardingWizard: React.FC = () => {
                                                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                                                         />
                                                     </svg>
-                                                    Dị ứng & Hạn chế
+                                                    {t('onboarding.step4.allergiesTitle')}
                                                 </h2>
                                                 <p className={styles.sectionSubtitle}>
-                                                    Chọn những loại thực phẩm bạn bị dị ứng hoặc
-                                                    không dung nạp:
+                                                    {t('onboarding.step4.allergiesSubtitle')}
                                                 </p>
                                                 <div className={styles.pillsContainer}>
                                                     <label className={styles.pill}>
@@ -926,7 +963,7 @@ const OnboardingWizard: React.FC = () => {
                                                             <span className={styles.pillEmoji}>
                                                                 ✅
                                                             </span>
-                                                            Không dị ứng
+                                                            {t('onboarding.step4.noAllergy')}
                                                         </span>
                                                     </label>
                                                     {COMMON_ALLERGIES.map((allergy) => (
@@ -956,14 +993,14 @@ const OnboardingWizard: React.FC = () => {
                                                                     {allergy === 'Hải sản' && '🦐'}
                                                                     {allergy === 'Đậu phộng' &&
                                                                         '🥜'}
-                                                                    {allergy === 'Sữa' && '🥛'}
+                                                                    {allergy === 'Sữa' && '�'}
                                                                     {allergy === 'Trứng' && '🥚'}
                                                                     {allergy === 'Đậu nành' && '🫘'}
                                                                     {allergy === 'Lúa mì' && '🌾'}
                                                                     {allergy === 'Hạt' && '🌰'}
                                                                     {allergy === 'Cá' && '🐟'}
                                                                     {allergy === 'Tôm' && '🦐'}
-                                                                    {allergy === 'Mè' && '🌱'}
+                                                                    {allergy === 'Mè' && '�'}
                                                                 </span>
                                                                 {allergy}
                                                             </span>
@@ -1006,7 +1043,9 @@ const OnboardingWizard: React.FC = () => {
                                                                 setShowCustomAllergy(true)
                                                             }
                                                             className={styles.btnAddIcon}
-                                                            title="Thêm dị ứng khác"
+                                                            title={t(
+                                                                'onboarding.step4.addOtherAllergy'
+                                                            )}
                                                         >
                                                             +
                                                         </button>
@@ -1014,7 +1053,9 @@ const OnboardingWizard: React.FC = () => {
                                                         <>
                                                             <Input
                                                                 type="text"
-                                                                placeholder="Nhập dị ứng khác..."
+                                                                placeholder={t(
+                                                                    'onboarding.step4.enterOtherAllergy'
+                                                                )}
                                                                 value={customAllergy}
                                                                 onChange={(e) =>
                                                                     setCustomAllergy(e.target.value)
@@ -1027,7 +1068,7 @@ const OnboardingWizard: React.FC = () => {
                                                                 type="button"
                                                                 onClick={handleAddCustomAllergy}
                                                                 className={styles.btnAddIcon}
-                                                                title="Thêm"
+                                                                title={t('onboarding.step4.add')}
                                                             >
                                                                 +
                                                             </button>
@@ -1052,7 +1093,7 @@ const OnboardingWizard: React.FC = () => {
                                                             d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
                                                         />
                                                     </svg>
-                                                    Ẩm thực yêu thích
+                                                    {t('onboarding.step4.favoriteCuisine')}
                                                 </h2>
                                                 <div className={styles.pillsContainer}>
                                                     {CUISINE_OPTIONS.map((cuisine) => (
@@ -1121,7 +1162,9 @@ const OnboardingWizard: React.FC = () => {
                                                                 setShowCustomCuisine(true)
                                                             }
                                                             className={styles.btnAddIcon}
-                                                            title="Thêm ẩm thực khác"
+                                                            title={t(
+                                                                'onboarding.step4.addOtherCuisine'
+                                                            )}
                                                         >
                                                             +
                                                         </button>
@@ -1129,7 +1172,9 @@ const OnboardingWizard: React.FC = () => {
                                                         <>
                                                             <Input
                                                                 type="text"
-                                                                placeholder="Nhập ẩm thực khác..."
+                                                                placeholder={t(
+                                                                    'onboarding.step4.enterOtherCuisine'
+                                                                )}
                                                                 value={customCuisine}
                                                                 onChange={(e) =>
                                                                     setCustomCuisine(e.target.value)
@@ -1142,7 +1187,7 @@ const OnboardingWizard: React.FC = () => {
                                                                 type="button"
                                                                 onClick={handleAddCustomCuisine}
                                                                 className={styles.btnAddIcon}
-                                                                title="Thêm"
+                                                                title={t('onboarding.step4.add')}
                                                             >
                                                                 +
                                                             </button>
@@ -1153,13 +1198,13 @@ const OnboardingWizard: React.FC = () => {
 
                                             <div className={styles.wizardFooter}>
                                                 <Button
-                                                    text="Quay lại"
+                                                    text={t('onboarding.buttons.back')}
                                                     type="button"
                                                     onClick={handleBack}
                                                     className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
                                                 />
                                                 <Button
-                                                    text="Tiếp tục"
+                                                    text={t('onboarding.buttons.next')}
                                                     type="button"
                                                     onClick={handleNext}
                                                     className={styles.btnPrimary}
@@ -1174,13 +1219,14 @@ const OnboardingWizard: React.FC = () => {
                             {currentStep === 5 && (
                                 <div>
                                     <div className={styles.stepHeader}>
-                                        <span className={styles.stepBadge}>Sức khỏe & Y tế</span>
+                                        <span className={styles.stepBadge}>
+                                            {t('onboarding.step5.badge')}
+                                        </span>
                                         <h1 className={styles.stepTitle}>
-                                            Bạn có tình trạng sức khỏe nào cần lưu ý không?
+                                            {t('onboarding.step5.title')}
                                         </h1>
                                         <p className={styles.stepDescription}>
-                                            AI sẽ dựa vào thông tin này để điều chỉnh cường độ tập
-                                            luyện và thực đơn, đảm bảo an toàn tuyệt đối cho bạn.
+                                            {t('onboarding.step5.description')}
                                         </p>
                                     </div>
 
@@ -1229,15 +1275,25 @@ const OnboardingWizard: React.FC = () => {
                                                         </h3>
                                                         <p className={styles.cardDescription}>
                                                             {condition === 'Bình thường' &&
-                                                                'Sẵn sàng cho mọi cường độ tập luyện'}
+                                                                t(
+                                                                    'onboarding.step5.conditionDescriptions.normal'
+                                                                )}
                                                             {condition === 'Tiểu đường' &&
-                                                                'Cần kiểm soát đường huyết'}
+                                                                t(
+                                                                    'onboarding.step5.conditionDescriptions.diabetes'
+                                                                )}
                                                             {condition === 'Huyết áp cao' &&
-                                                                'Cần bài tập nhẹ nhàng'}
+                                                                t(
+                                                                    'onboarding.step5.conditionDescriptions.highBloodPressure'
+                                                                )}
                                                             {condition === 'Cholesterol cao' &&
-                                                                'Cần chế độ ăn lành mạnh'}
+                                                                t(
+                                                                    'onboarding.step5.conditionDescriptions.highCholesterol'
+                                                                )}
                                                             {condition === 'Bệnh tim' &&
-                                                                'Cần kiểm soát nhịp tim'}
+                                                                t(
+                                                                    'onboarding.step5.conditionDescriptions.heartDisease'
+                                                                )}
                                                         </p>
                                                     </div>
                                                 </label>
@@ -1252,11 +1308,11 @@ const OnboardingWizard: React.FC = () => {
                                                             <span className={styles.cardIcon}>
                                                                 ➕
                                                             </span>
-                                                            Khác
+                                                            {t('onboarding.step5.other')}
                                                         </h3>
                                                     </div>
                                                     <p className={styles.cardDescription}>
-                                                        Thêm tình trạng sức khỏe khác
+                                                        {t('onboarding.step5.addOtherCondition')}
                                                     </p>
                                                 </div>
                                             </label>
@@ -1295,7 +1351,7 @@ const OnboardingWizard: React.FC = () => {
                                                             </div>
                                                         </div>
                                                         <p className={styles.cardDescription}>
-                                                            Tình trạng sức khỏe tùy chỉnh
+                                                            {t('onboarding.step5.customCondition')}
                                                         </p>
                                                     </div>
                                                 </label>
@@ -1309,7 +1365,9 @@ const OnboardingWizard: React.FC = () => {
                                             >
                                                 <Input
                                                     type="text"
-                                                    placeholder="Nhập tình trạng sức khỏe khác..."
+                                                    placeholder={t(
+                                                        'onboarding.step5.enterOtherCondition'
+                                                    )}
                                                     value={customHealthCondition}
                                                     onChange={(e) =>
                                                         setCustomHealthCondition(e.target.value)
@@ -1320,7 +1378,7 @@ const OnboardingWizard: React.FC = () => {
                                                     type="button"
                                                     onClick={handleAddCustomHealthCondition}
                                                     className={styles.btnAddIcon}
-                                                    title="Thêm"
+                                                    title={t('onboarding.step4.add')}
                                                 >
                                                     +
                                                 </button>
@@ -1329,13 +1387,17 @@ const OnboardingWizard: React.FC = () => {
 
                                         <div className={styles.wizardFooter}>
                                             <Button
-                                                text="Quay lại"
+                                                text={t('onboarding.buttons.back')}
                                                 type="button"
                                                 onClick={handleBack}
                                                 className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
                                             />
                                             <Button
-                                                text={loading ? 'Đang xử lý...' : 'Hoàn thành'}
+                                                text={
+                                                    loading
+                                                        ? `${t('onboarding.buttons.submit')}...`
+                                                        : t('onboarding.buttons.submit')
+                                                }
                                                 type="button"
                                                 onClick={handleNext}
                                                 isDisabled={loading}

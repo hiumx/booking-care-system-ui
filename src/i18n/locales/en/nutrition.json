@@ -1,0 +1,264 @@
+{
+    "breadcrumb": {
+        "home": "Home",
+        "yourHealth": "Your Health",
+        "mealPlanDetail": "Meal Plan Detail",
+        "workoutPlanDetail": "Workout Plan",
+        "profileSetup": "Profile Setup"
+    },
+    "common": {
+        "kcal": "kcal",
+        "minutes": "min",
+        "servings": "servings",
+        "sets": "sets",
+        "reps": "reps",
+        "protein": "Protein",
+        "carbs": "Carbs",
+        "fat": "Fat",
+        "calories": "Calories",
+        "backToDashboard": "Back to Dashboard",
+        "viewWeekOverview": "View week overview",
+        "today": "Today",
+        "remaining": "Remaining",
+        "consecutiveDays": "consecutive days"
+    },
+    "mealTypes": {
+        "breakfast": "Breakfast",
+        "lunch": "Lunch",
+        "dinner": "Dinner",
+        "snack": "Snack"
+    },
+    "intensity": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+    },
+    "weekDays": {
+        "sunday": "Sun",
+        "monday": "Mon",
+        "tuesday": "Tue",
+        "wednesday": "Wed",
+        "thursday": "Thu",
+        "friday": "Fri",
+        "saturday": "Sat"
+    },
+    "mealPlanDetail": {
+        "title": "Meal Plan Detail",
+        "noData": "No meal plan for this day",
+        "badge": "AI Nutrition Plan",
+        "heroTitle": "Your Daily Nutrition Roadmap",
+        "heroDescription": "Track your personalized meal plan created by AI based on your health goals. Stay consistent to achieve your target weight.",
+        "dailyGoal": "Daily Goal",
+        "consumed": "Consumed",
+        "mainIngredients": "Main ingredients:",
+        "markAsEaten": "Mark as eaten",
+        "defaultBenefit": "This meal provides balanced nutrition for your body."
+    },
+    "workoutPlanDetail": {
+        "title": "Workout Plan",
+        "noData": "No workout plan for this day",
+        "badge": "AI Workout Plan",
+        "heroTitle": "Your Daily Workout Roadmap",
+        "heroDescription": "Track your personalized workout plan created by AI based on your health goals. Stay consistent to achieve your target fitness.",
+        "dailyGoal": "Daily Goal",
+        "burned": "Burned",
+        "categoryBadge": "Strength & Flexibility",
+        "defaultWorkoutType": "Upper Body Strength",
+        "coach": "Coach",
+        "aiCoach": "Medcure AI",
+        "aiRecommendation": "AI Recommendation",
+        "aiRecommendationText": "Today's workout plan is flexibly adjusted to balance training effectiveness and body recovery. Exercises are arranged logically to help you maintain the necessary intensity while limiting unnecessary pressure, helping you continue to progress sustainably.",
+        "todayExercises": "Today's Exercises",
+        "completedExercises": "Completed {{completed}}/{{total}} exercises",
+        "trainingProgress": "Training Progress",
+        "goalAchieved": "Goal Achieved",
+        "exercisesDone": "Exercises Done",
+        "caloriesBurned": "Calories Burned",
+        "postWorkoutStretches": "Post-workout Stretches",
+        "gluteHipStretch": "Glute & Hip Stretch",
+        "gluteHipStretchDesc": "Reduce hip and lower back pressure • 20-30 seconds each side"
+    },
+    "dashboard": {
+        "title": "Your Health",
+        "greeting": {
+            "morning": "Good morning",
+            "noon": "Good noon",
+            "afternoon": "Good afternoon",
+            "evening": "Good evening",
+            "default": "Hello"
+        },
+        "welcomeMessage": "Hello, {{name}}! 👋",
+        "completionMessage": "Today you have completed <highlight>{{percentage}}%</highlight> of your plan.",
+        "calories": "Calories",
+        "remaining": "{{calories}} kcal remaining",
+        "macros": "Nutrition (Macros)",
+        "hydration": {
+            "title": "Hydration",
+            "addWater": "+ Add glass of water (250ml)"
+        },
+        "mealPlan": {
+            "title": "Today's Meal Plan",
+            "viewDetail": "View detail",
+            "noMealPlan": "No meal plan for this day",
+            "recommendedBy": "Recommended by Medcure AI",
+            "cannotGeneratePast": "Cannot generate plan for past dates",
+            "richProtein": "High protein",
+            "richFiber": "High fiber"
+        },
+        "workoutPlan": {
+            "title": "Workout Plan",
+            "viewDetail": "View detail",
+            "noWorkoutPlan": "No workout plan yet",
+            "goal": "Goal",
+            "minutes": "min"
+        },
+        "healthGoals": {
+            "WeightLoss": "Weight Loss",
+            "MuscleGain": "Muscle Gain",
+            "Maintenance": "Maintenance",
+            "HeartHealth": "Heart Health",
+            "Flexibility": "Flexibility",
+            "Endurance": "Endurance"
+        },
+        "weight": {
+            "title": "Weight",
+            "update": "+ Update",
+            "unit": "kg",
+            "age": "years old"
+        },
+        "streak": {
+            "title": "Streak",
+            "days": "{{count}} days",
+            "notStarted": "Not started yet",
+            "keepGoing": "You're doing great! 🔥",
+            "startNow": "Start your streak now!"
+        },
+        "aiInsight": {
+            "title": "AI Insight",
+            "defaultMessage": "\"Compared to yesterday, you consumed slightly less Protein. Try to complete the salmon dish at dinner to reach your goal!\""
+        },
+        "generatePlan": "Generate New Plan",
+        "generating": "Generating...",
+        "toast": {
+            "profileRequired": "Please complete your personal information first!",
+            "generateError": "An error occurred while generating the plan. Please try again!",
+            "updateMealError": "Cannot update meal",
+            "updateExerciseError": "Cannot update exercise"
+        }
+    },
+    "onboarding": {
+        "title": "Nutrition Profile Setup",
+        "sidebarTitle": "Your Health AI",
+        "sidebarSubtitle": "Personalized for you",
+        "whyWeNeedThis": "Why do we need this?",
+        "whyWeNeedThisText": "AI uses your data to create the safest and most effective nutrition and workout roadmap tailored to your health goals.",
+        "steps": {
+            "basicMetrics": {
+                "title": "Basic Metrics",
+                "desc": "Height, weight"
+            },
+            "goals": {
+                "title": "Goals",
+                "desc": "Lose weight, build muscle"
+            },
+            "activityLevel": {
+                "title": "Activity Level",
+                "desc": "Exercise habits"
+            },
+            "dietaryPreferences": {
+                "title": "Dietary Preferences",
+                "desc": "Diet type, allergies"
+            },
+            "healthConditions": {
+                "title": "Health Conditions",
+                "desc": "Underlying conditions"
+            }
+        },
+        "step1": {
+            "badge": "Profile Setup",
+            "title": "Your Body Metrics",
+            "description": "Please provide accurate information so AI can calculate your BMI and daily nutritional needs specifically for you.",
+            "biologicalGender": "Biological Gender",
+            "male": "Male",
+            "female": "Female",
+            "other": "Other",
+            "age": "Age",
+            "height": "Height (cm)",
+            "weight": "Weight (kg)"
+        },
+        "step2": {
+            "badge": "Personalized Roadmap",
+            "title": "What is your main health goal?",
+            "description": "Our AI will adjust your nutrition and workout plan based on what you want to achieve.",
+            "goals": {
+                "weightLoss": "Focus on calorie deficit, fat-burning exercises, and sustainable eating habits.",
+                "muscleGain": "Training plans focused on muscle hypertrophy and high-protein meal recommendations.",
+                "maintenance": "Balanced approach to keep your body active and optimize nutrition.",
+                "heartHealth": "Enhance endurance, cardiovascular health, and flexibility through aerobic activities.",
+                "flexibility": "Improve flexibility, reduce muscle tension, and increase body mobility.",
+                "endurance": "Enhance stamina, improve fitness, and long-term activity capacity."
+            }
+        },
+        "step3": {
+            "badge": "Step 3/5",
+            "title": "What is your usual activity level?",
+            "description": "Activity level helps us accurately calculate how many calories you burn each day."
+        },
+        "step4": {
+            "badge": "Personalized Nutrition",
+            "title": "Your dietary preferences",
+            "description": "To help AI design the most suitable menu, please share with us your eating habits and restrictions.",
+            "currentDiet": "Current Diet",
+            "allergiesTitle": "Allergies & Restrictions",
+            "allergiesSubtitle": "Select foods you are allergic to or intolerant of:",
+            "noAllergy": "No allergies",
+            "favoriteCuisine": "Favorite Cuisines",
+            "addOtherAllergy": "Add other allergy",
+            "addOtherCuisine": "Add other cuisine",
+            "enterOtherAllergy": "Enter other allergy...",
+            "enterOtherCuisine": "Enter other cuisine...",
+            "add": "Add",
+            "dietDescriptions": {
+                "regular": "Eat a variety of foods",
+                "vegetarian": "No meat or fish, includes eggs and dairy",
+                "vegan": "Completely plant-based",
+                "keto": "Low carb, high fat",
+                "lowCarb": "Limited starches"
+            }
+        },
+        "step5": {
+            "badge": "Health & Medical",
+            "title": "Do you have any health conditions to note?",
+            "description": "AI will use this information to adjust workout intensity and menu, ensuring absolute safety for you.",
+            "other": "Other",
+            "addOtherCondition": "Add other health condition",
+            "enterOtherCondition": "Enter other health condition...",
+            "customCondition": "Custom health condition",
+            "conditionDescriptions": {
+                "normal": "Ready for any workout intensity",
+                "diabetes": "Need to control blood sugar",
+                "highBloodPressure": "Need gentle exercises",
+                "highCholesterol": "Need a healthy diet",
+                "heartDisease": "Need to control heart rate"
+            }
+        },
+        "buttons": {
+            "next": "Next",
+            "back": "Back",
+            "submit": "Complete"
+        },
+        "validation": {
+            "completeInfo": "Please complete the information before continuing!",
+            "selectGenderHeightWeight": "Please select gender and enter valid height and weight!",
+            "selectHealthGoal": "Please select your health goal!",
+            "selectActivityLevel": "Please select your activity level!",
+            "selectDietAndCuisine": "Please select diet type and at least 1 preferred cuisine!",
+            "selectHealthCondition": "Please select at least 1 health condition!"
+        },
+        "toast": {
+            "success": "Nutrition profile created successfully!",
+            "error": "An error occurred. Please try again!",
+            "updateProfileFirst": "Please update your personal information (date of birth and gender) to set up your nutrition profile!"
+        }
+    }
+}
