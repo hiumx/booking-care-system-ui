@@ -10,16 +10,18 @@ interface MainLayoutProps {
     children: ReactNode;
     hasFooter?: boolean;
     hasHeader?: boolean;
+    hasTopbar?: boolean;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({
     children,
     hasFooter = true,
     hasHeader = true,
+    hasTopbar = true,
 }) => {
     return (
         <div className="main-wrapper">
-            {hasHeader && <MainHeader />}
+            {hasHeader && <MainHeader hasTopbar={hasTopbar} />}
             <main className={styles.contentContainer}>{children || <Outlet />}</main>
             {hasFooter && <MainFooter />}
         </div>
