@@ -219,6 +219,7 @@ const SmartBooking: React.FC = () => {
                                             >
                                                 {activeTab === 'doctors' && (
                                                     <DoctorCard
+                                                        doctorId={(item as Doctor).id}
                                                         image={(item as Doctor).avatar}
                                                         name={(item as Doctor).name}
                                                         specialty={(item as Doctor).specialty}

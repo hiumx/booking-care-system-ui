@@ -1,8 +1,11 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import { Briefcase } from 'lucide-react';
+import { useSelector } from 'react-redux';
 import { PATHS } from '@/routes/paths';
+import { useFavoriteDoctor } from '@/hooks/useFavoriteDoctor';
+import { RootState } from '@/store';
 import styles from './DoctorCard.module.scss';
 
 export type DoctorCardProps = {
@@ -21,6 +24,8 @@ export type DoctorCardProps = {
     bookingLink?: string;
     specialtiesLink?: string;
     className?: string;
+    doctorId?: string; // Add doctorId for favorite functionality
+    initialIsFavorited?: boolean; // Initial favorite status (optional)
 };
 
 const DoctorCard: FC<DoctorCardProps> = ({
@@ -39,14 +44,22 @@ const DoctorCard: FC<DoctorCardProps> = ({
     bookingLink = '#',
     specialtiesLink = '#',
     className,
+    doctorId,
+    initialIsFavorited,
 }) => {
     // Tạo link cho hospital
     const hospitalLink = hospitalId ? `${PATHS.HOSPITAL.ROOT}/${hospitalId}` : '#';
-    const [isFavorite, setIsFavorite] = useState(false);
 
-    const toggleFavorite = () => {
-        setIsFavorite((prev) => !prev);
-    };
+    // Get patient ID from Redux store
+    const userProfile = useSelector((state: RootState) => state.user.profile);
+    const patientId = userProfile?.id;
+
+    // Use favorite doctor hook
+    const { isFavorited, isLoading, toggleFavorite } = useFavoriteDoctor(
+        patientId,
+        doctorId,
+        initialIsFavorited
+    );
 
     return (
         <div className={clsx(styles.doctorCardContainer, 'card', className)}>
@@ -60,11 +73,12 @@ const DoctorCard: FC<DoctorCardProps> = ({
                     </span>
                     <div className={styles.favWrapper}>
                         <button
-                            className={`${styles.favIcon} ${isFavorite ? styles.active : ''}`}
+                            className={`${styles.favIcon} ${isFavorited ? styles.active : ''}`}
                             onClick={toggleFavorite}
+                            disabled={isLoading}
                         >
                             <i
-                                className={`fa${isFavorite ? ' fa-heart' : ' fa-regular fa-heart'}`}
+                                className={`fa${isFavorited ? ' fa-heart' : ' fa-regular fa-heart'}`}
                             ></i>
                         </button>
                     </div>
