@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import MainLayout from '@/layouts/MainLayout';
 import Breadcrumb, { BreadcrumbItem } from '@/components/Breadcrumb/Breadcrumb';
 import NutritionSkeleton from '@/components/Loading/NutritionSkeleton';
@@ -10,6 +11,7 @@ import styles from './MealPlanDetail.module.scss';
 const MealPlanDetail: React.FC = () => {
     const navigate = useNavigate();
     const { date } = useParams<{ date: string }>();
+    const { t, i18n } = useTranslation('nutrition');
     const [mealPlan, setMealPlan] = useState<MealPlan | null>(null);
     const [profile, setProfile] = useState<NutritionProfile | null>(null);
     const [loading, setLoading] = useState(true);
@@ -86,13 +88,13 @@ const MealPlanDetail: React.FC = () => {
     const getMealTypeLabel = (mealType: string) => {
         switch (mealType.toLowerCase()) {
             case 'breakfast':
-                return 'Bữa sáng';
+                return t('mealTypes.breakfast');
             case 'lunch':
-                return 'Bữa trưa';
+                return t('mealTypes.lunch');
             case 'dinner':
-                return 'Bữa tối';
+                return t('mealTypes.dinner');
             case 'snack':
-                return 'Bữa phụ';
+                return t('mealTypes.snack');
             default:
                 return mealType;
         }
@@ -118,14 +120,14 @@ const MealPlanDetail: React.FC = () => {
         }
     };
     const breadcrumbItems: BreadcrumbItem[] = [
-        { label: 'Trang chủ', path: PATHS.HOME },
-        { label: 'Sức khỏe của bạn', path: PATHS.NUTRITION.DASHBOARD },
-        { label: 'Thực đơn chi tiết', isActive: true },
+        { label: t('breadcrumb.home'), path: PATHS.HOME },
+        { label: t('breadcrumb.yourHealth'), path: PATHS.NUTRITION.DASHBOARD },
+        { label: t('breadcrumb.mealPlanDetail'), isActive: true },
     ];
     if (loading) {
         return (
             <MainLayout>
-                <Breadcrumb items={breadcrumbItems} title="Thực đơn chi tiết" />
+                <Breadcrumb items={breadcrumbItems} title={t('mealPlanDetail.title')} />
                 <NutritionSkeleton type="mealPlan" />
             </MainLayout>
         );
@@ -133,11 +135,11 @@ const MealPlanDetail: React.FC = () => {
     if (!mealPlan) {
         return (
             <MainLayout>
-                <Breadcrumb items={breadcrumbItems} title="Thực đơn chi tiết" />
+                <Breadcrumb items={breadcrumbItems} title={t('mealPlanDetail.title')} />
                 <div className={styles.noData}>
-                    <h2>Không có thực đơn cho ngày này</h2>
+                    <h2>{t('mealPlanDetail.noData')}</h2>
                     <button onClick={() => navigate(PATHS.NUTRITION.DASHBOARD)}>
-                        Quay lại Dashboard
+                        {t('common.backToDashboard')}
                     </button>
                 </div>
             </MainLayout>
@@ -145,33 +147,31 @@ const MealPlanDetail: React.FC = () => {
     }
     return (
         <MainLayout>
-            <Breadcrumb items={breadcrumbItems} title="Thực đơn chi tiết" />
+            <Breadcrumb items={breadcrumbItems} title={t('mealPlanDetail.title')} />
             <div className={styles.mealPlanDetail}>
                 {/* Hero Header Section */}
                 <section className={styles.heroSection}>
                     <div className={styles.heroContainer}>
                         <div className={styles.heroContent}>
                             <div className={styles.heroLeft}>
-                                <span className={styles.badge}>Kế hoạch dinh dưỡng AI</span>
-                                <h1>Lộ trình dinh dưỡng hàng ngày của bạn</h1>
-                                <p>
-                                    Theo dõi kế hoạch bữa ăn cá nhân hóa được tạo bởi AI dựa trên
-                                    mục tiêu sức khỏe của bạn. Duy trì nhất quán để đạt được cân
-                                    nặng mục tiêu.
-                                </p>
+                                <span className={styles.badge}>{t('mealPlanDetail.badge')}</span>
+                                <h1>{t('mealPlanDetail.heroTitle')}</h1>
+                                <p>{t('mealPlanDetail.heroDescription')}</p>
                             </div>
                             <div className={styles.calorieCard}>
                                 <div className={styles.calorieItem}>
-                                    <p className={styles.label}>Mục tiêu hàng ngày</p>
+                                    <p className={styles.label}>{t('mealPlanDetail.dailyGoal')}</p>
                                     <p className={styles.value}>
-                                        {profile?.targetCalories || 2100} <span>kcal</span>
+                                        {profile?.targetCalories || 2100}{' '}
+                                        <span>{t('common.kcal')}</span>
                                     </p>
                                 </div>
                                 <div className={styles.divider}></div>
                                 <div className={styles.calorieItem}>
-                                    <p className={styles.label}>Đã tiêu thụ</p>
+                                    <p className={styles.label}>{t('mealPlanDetail.consumed')}</p>
                                     <p className={`${styles.value} ${styles.consumed}`}>
-                                        {calculateConsumedCalories()} <span>kcal</span>
+                                        {calculateConsumedCalories()}{' '}
+                                        <span>{t('common.kcal')}</span>
                                     </p>
                                 </div>
                                 <div className={styles.progressRing}>
@@ -204,9 +204,10 @@ const MealPlanDetail: React.FC = () => {
                                         const selected = new Date(selectedDate);
                                         selected.setHours(0, 0, 0, 0);
                                         const isToday = selected.getTime() === today.getTime();
+                                        const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
                                         return isToday
-                                            ? `Hôm nay, ${selectedDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short' })}`
-                                            : selectedDate.toLocaleDateString('vi-VN', {
+                                            ? `${t('common.today')}, ${selectedDate.toLocaleDateString(locale, { day: 'numeric', month: 'short' })}`
+                                            : selectedDate.toLocaleDateString(locale, {
                                                   weekday: 'long',
                                                   day: 'numeric',
                                                   month: 'short',
@@ -214,7 +215,7 @@ const MealPlanDetail: React.FC = () => {
                                     })()}
                                 </h2>
                                 <p onClick={() => navigate(PATHS.NUTRITION.DASHBOARD)}>
-                                    Xem tổng quan tuần
+                                    {t('common.viewWeekOverview')}
                                 </p>
                             </div>
                             <button className={styles.navBtn} onClick={() => handleDateChange(1)}>
@@ -324,7 +325,9 @@ const MealPlanDetail: React.FC = () => {
                                                                 }
                                                                 className={styles.checkbox}
                                                             />
-                                                            <span>Đánh dấu đã ăn</span>
+                                                            <span>
+                                                                {t('mealPlanDetail.markAsEaten')}
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -333,7 +336,7 @@ const MealPlanDetail: React.FC = () => {
                                                     <p>
                                                         "
                                                         {meal.recipe.benefitsVi ||
-                                                            'Bữa ăn này cung cấp dinh dưỡng cân bằng cho cơ thể bạn.'}
+                                                            t('mealPlanDetail.defaultBenefit')}
                                                         "
                                                     </p>
                                                 </div>
@@ -441,7 +444,9 @@ const MealPlanDetail: React.FC = () => {
                                                                 }
                                                                 className={styles.checkbox}
                                                             />
-                                                            <span>Đánh dấu đã ăn</span>
+                                                            <span>
+                                                                {t('mealPlanDetail.markAsEaten')}
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -450,7 +455,7 @@ const MealPlanDetail: React.FC = () => {
                                                     <p>
                                                         "
                                                         {meal.recipe.benefitsVi ||
-                                                            'Bữa ăn này cung cấp dinh dưỡng cân bằng cho cơ thể bạn.'}
+                                                            t('mealPlanDetail.defaultBenefit')}
                                                         "
                                                     </p>
                                                 </div>

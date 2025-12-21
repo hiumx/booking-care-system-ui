@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Exercise } from '@/types/nutrition.types';
 import styles from './ExerciseCard.module.scss';
 
@@ -15,6 +16,21 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
     isCompleted,
     onComplete,
 }) => {
+    const { t } = useTranslation('nutrition');
+
+    const getIntensityLabel = (intensity: string) => {
+        switch (intensity.toLowerCase()) {
+            case 'low':
+                return t('intensity.low');
+            case 'medium':
+                return t('intensity.medium');
+            case 'high':
+                return t('intensity.high');
+            default:
+                return intensity;
+        }
+    };
+
     return (
         <div className={`${styles['exercise-card']} ${isCompleted ? styles.completed : ''}`}>
             <div className={styles['exercise-header']}>
@@ -32,28 +48,25 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 <div className={styles['exercise-details']}>
                     {exercise.sets > 0 && exercise.reps > 0 && (
                         <span className={styles['detail-item']}>
-                            🔢 {exercise.sets} sets × {exercise.reps} reps
+                            🔢 {exercise.sets} {t('common.sets')} × {exercise.reps}{' '}
+                            {t('common.reps')}
                         </span>
                     )}
                     {exercise.durationMinutes > 0 && (
                         <span className={styles['detail-item']}>
-                            ⏱️ {exercise.durationMinutes} phút
+                            ⏱️ {exercise.durationMinutes} {t('common.minutes')}
                         </span>
                     )}
                     {exercise.intensity && (
                         <span
                             className={`${styles['intensity-badge']} ${styles[exercise.intensity.toLowerCase()]}`}
                         >
-                            {exercise.intensity === 'Low'
-                                ? 'Nhẹ'
-                                : exercise.intensity === 'Medium'
-                                  ? 'Trung bình'
-                                  : 'Cao'}
+                            {getIntensityLabel(exercise.intensity)}
                         </span>
                     )}
                     {exercise.caloriesBurned && (
                         <span className={styles['detail-item']}>
-                            🔥 {exercise.caloriesBurned} kcal
+                            🔥 {exercise.caloriesBurned} {t('common.kcal')}
                         </span>
                     )}
                 </div>

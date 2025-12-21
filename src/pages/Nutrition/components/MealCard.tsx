@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Meal } from '@/types/nutrition.types';
 import styles from './MealCard.module.scss';
 
@@ -10,6 +11,8 @@ interface MealCardProps {
 }
 
 const MealCard: React.FC<MealCardProps> = ({ meal, isCompleted, onComplete }) => {
+    const { t } = useTranslation('nutrition');
+
     const getMealIcon = (mealType: string) => {
         switch (mealType.toLowerCase()) {
             case 'breakfast':
@@ -28,13 +31,13 @@ const MealCard: React.FC<MealCardProps> = ({ meal, isCompleted, onComplete }) =>
     const getMealTypeLabel = (mealType: string) => {
         switch (mealType.toLowerCase()) {
             case 'breakfast':
-                return 'Bữa sáng';
+                return t('mealTypes.breakfast');
             case 'lunch':
-                return 'Bữa trưa';
+                return t('mealTypes.lunch');
             case 'dinner':
-                return 'Bữa tối';
+                return t('mealTypes.dinner');
             case 'snack':
-                return 'Bữa phụ';
+                return t('mealTypes.snack');
             default:
                 return mealType;
         }
@@ -59,32 +62,35 @@ const MealCard: React.FC<MealCardProps> = ({ meal, isCompleted, onComplete }) =>
 
                 <div className={styles['meal-info']}>
                     <span className={styles['info-item']}>
-                        ⏱️ {meal.recipe.prepTimeMinutes + meal.recipe.cookTimeMinutes} phút
+                        ⏱️ {meal.recipe.prepTimeMinutes + meal.recipe.cookTimeMinutes}{' '}
+                        {t('common.minutes')}
                     </span>
-                    <span className={styles['info-item']}>🍽️ {meal.recipe.servings} người</span>
+                    <span className={styles['info-item']}>
+                        🍽️ {meal.recipe.servings} {t('common.servings')}
+                    </span>
                 </div>
 
                 <div className={styles['nutrition-info']}>
                     <div className={styles['nutrition-item']}>
-                        <span className={styles['nutrition-label']}>Calories</span>
+                        <span className={styles['nutrition-label']}>{t('common.calories')}</span>
                         <span className={styles['nutrition-value']}>
-                            {meal.recipe.nutrition.calories} kcal
+                            {meal.recipe.nutrition.calories} {t('common.kcal')}
                         </span>
                     </div>
                     <div className={styles['nutrition-item']}>
-                        <span className={styles['nutrition-label']}>Protein</span>
+                        <span className={styles['nutrition-label']}>{t('common.protein')}</span>
                         <span className={styles['nutrition-value']}>
                             {meal.recipe.nutrition.proteinG}g
                         </span>
                     </div>
                     <div className={styles['nutrition-item']}>
-                        <span className={styles['nutrition-label']}>Carbs</span>
+                        <span className={styles['nutrition-label']}>{t('common.carbs')}</span>
                         <span className={styles['nutrition-value']}>
                             {meal.recipe.nutrition.carbsG}g
                         </span>
                     </div>
                     <div className={styles['nutrition-item']}>
-                        <span className={styles['nutrition-label']}>Fat</span>
+                        <span className={styles['nutrition-label']}>{t('common.fat')}</span>
                         <span className={styles['nutrition-value']}>
                             {meal.recipe.nutrition.fatG}g
                         </span>

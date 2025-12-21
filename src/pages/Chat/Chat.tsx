@@ -59,7 +59,7 @@ const ChatContent = () => {
 
 const Chat = () => {
     return (
-        <MainLayout hasFooter={false}>
+        <MainLayout hasFooter={false} hasTopbar={false}>
             <ChatProvider>
                 <ChatContent />
             </ChatProvider>
