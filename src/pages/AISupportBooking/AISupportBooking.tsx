@@ -305,7 +305,7 @@ const AISupportBooking: React.FC = () => {
                         avatar: '',
                         conversationType:
                             session.conversationType ||
-                            session.ConversationType ||
+                            (session as any).ConversationType ||
                             ConversationType.SYMPTOM_ANALYSIS,
                     };
                 });
