@@ -6,9 +6,21 @@ import { ChatHubCallbacks } from './useChatHub';
 
 /**
  * Helper to check if connection is ready to send/invoke
+ * CRITICAL: Always check this before any invoke() call
  */
 const isConnectionReady = (connection: signalR.HubConnection | null): boolean => {
-    return connection !== null && connection.state === signalR.HubConnectionState.Connected;
+    if (!connection) return false;
+    const state = connection.state;
+    // Only Connected state is valid for sending
+    return state === signalR.HubConnectionState.Connected;
+};
+
+/**
+ * Get human-readable connection state for logging
+ */
+const getConnectionStateString = (connection: signalR.HubConnection | null): string => {
+    if (!connection) return 'null';
+    return signalR.HubConnectionState[connection.state] || 'unknown';
 };
 
 /**
@@ -198,11 +210,14 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
         };
     }, [connection]);
 
-    // Hub methods
+    // Hub methods - All methods now include proper state checking and logging
     const joinConversation = useCallback(
         async (conversationId: string) => {
             if (!isConnectionReady(connection)) {
-                console.warn('[useSharedChatHub] ⚠️ Cannot join - connection not ready');
+                console.warn(
+                    '[useSharedChatHub] ⚠️ Cannot join - connection state:',
+                    getConnectionStateString(connection)
+                );
                 throw new Error('ChatHub is not connected');
             }
             try {
@@ -218,7 +233,10 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
     const leaveConversation = useCallback(
         async (conversationId: string) => {
             if (!isConnectionReady(connection)) {
-                console.warn('[useSharedChatHub] ⚠️ Cannot leave conversation - not connected');
+                console.warn(
+                    '[useSharedChatHub] ⚠️ Cannot leave conversation - state:',
+                    getConnectionStateString(connection)
+                );
                 return;
             }
             try {
@@ -241,8 +259,8 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
         async (request: SendMessageHub) => {
             if (!isConnectionReady(connection)) {
                 console.warn(
-                    '[useSharedChatHub] ⚠️ Cannot send message - connection not ready, state:',
-                    connection?.state
+                    '[useSharedChatHub] ⚠️ Cannot send message - connection state:',
+                    getConnectionStateString(connection)
                 );
                 throw new Error('ChatHub is not connected');
             }
@@ -267,6 +285,10 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
     const markMessageAsRead = useCallback(
         async (messageId: string) => {
             if (!isConnectionReady(connection)) {
+                console.warn(
+                    '[useSharedChatHub] ⚠️ Cannot mark as read - state:',
+                    getConnectionStateString(connection)
+                );
                 throw new Error('ChatHub is not connected');
             }
             try {
@@ -283,6 +305,10 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
     const markAllMessagesAsRead = useCallback(
         async (conversationId: string) => {
             if (!isConnectionReady(connection)) {
+                console.warn(
+                    '[useSharedChatHub] ⚠️ Cannot mark all as read - state:',
+                    getConnectionStateString(connection)
+                );
                 throw new Error('ChatHub is not connected');
             }
             try {
@@ -333,6 +359,10 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
 
     const getOnlineUsers = useCallback(async () => {
         if (!isConnectionReady(connection)) {
+            console.warn(
+                '[useSharedChatHub] ⚠️ Cannot get online users - state:',
+                getConnectionStateString(connection)
+            );
             throw new Error('ChatHub is not connected');
         }
         try {
@@ -343,10 +373,14 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
         }
     }, [connection]);
 
-    // WebRTC Call methods
+    // WebRTC Call methods - All with proper state checking
     const startCall = useCallback(
         async (calleeId: string, conversationId: string, callType: string = 'video') => {
             if (!isConnectionReady(connection)) {
+                console.warn(
+                    '[useSharedChatHub] ⚠️ Cannot start call - state:',
+                    getConnectionStateString(connection)
+                );
                 throw new Error('ChatHub is not connected');
             }
             try {
@@ -366,6 +400,10 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
     const acceptCall = useCallback(
         async (callerId: string, conversationId: string) => {
             if (!isConnectionReady(connection)) {
+                console.warn(
+                    '[useSharedChatHub] ⚠️ Cannot accept call - state:',
+                    getConnectionStateString(connection)
+                );
                 throw new Error('ChatHub is not connected');
             }
             try {
@@ -384,6 +422,10 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
     const declineCall = useCallback(
         async (callerId: string, reason?: string) => {
             if (!isConnectionReady(connection)) {
+                console.warn(
+                    '[useSharedChatHub] ⚠️ Cannot decline call - state:',
+                    getConnectionStateString(connection)
+                );
                 throw new Error('ChatHub is not connected');
             }
             try {
@@ -402,6 +444,10 @@ export const useSharedChatHub = (callbacks?: ChatHubCallbacks) => {
     const endCall = useCallback(
         async (otherUserId: string, reason?: string) => {
             if (!isConnectionReady(connection)) {
+                console.warn(
+                    '[useSharedChatHub] ⚠️ Cannot end call - state:',
+                    getConnectionStateString(connection)
+                );
                 throw new Error('ChatHub is not connected');
             }
             try {
