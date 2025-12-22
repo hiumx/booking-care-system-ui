@@ -1,4 +1,4 @@
-import { Status } from '../enums/common.enums';
+import { Status, Gender } from '../enums/common.enums';
 import { PositionResponse } from './position.types';
 import { SpecialtyResponse } from './specialty.types';
 import { LanguageResponse } from './language.types';
