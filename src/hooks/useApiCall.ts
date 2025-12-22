@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
 interface UseApiCallOptions {
     immediate?: boolean;
@@ -23,11 +23,22 @@ export function useApiCall<T>(
     const [error, setError] = useState<string | null>(null);
     const hasFetched = useRef(false);
 
-    const execute = async () => {
+    // Keep a ref to the latest apiCall so the returned `execute` function can be
+    // stable across renders while still calling the latest callback.
+    const apiCallRef = useRef(apiCall);
+    // update ref when apiCall changes
+    useEffect(() => {
+        apiCallRef.current = apiCall;
+    }, [apiCall]);
+
+    // Stable execute function: callers can safely include `execute` in deps
+    // arrays without triggering repeated effect runs. It calls the latest
+    // `apiCall` stored in `apiCallRef`.
+    const execute = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
-            const result = await apiCall();
+            const result = await apiCallRef.current();
             setData(result);
         } catch (err: any) {
             const errorMessage = err.message || 'API call failed';
@@ -36,7 +47,7 @@ export function useApiCall<T>(
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [onError]);
 
     const clearError = () => {
         setError(null);
