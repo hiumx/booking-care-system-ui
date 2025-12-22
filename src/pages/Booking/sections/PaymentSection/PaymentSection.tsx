@@ -258,7 +258,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
     // Business rule: TELEHEALTH = 100% payment, IN_PERSON = 30% deposit
     const TOTAL_AMOUNT = isSupplementaryPayment ? supplementaryAmount : getConsultationFee();
     const appointmentType = bookingState.appointmentType || AppointmentType.IN_PERSON;
-    const DEPOSIT_PERCENTAGE = appointmentType === AppointmentType.TELEHEALTH ? 1.0 : 0.3;
+    const DEPOSIT_PERCENTAGE = appointmentType === AppointmentType.TELEHEALTH ? 1 : 0.3;
 
     // Calculate deposit from total amount (or final amount if discount applied)
     const TOTAL_AFTER_DISCOUNT = appliedDiscount ? appliedDiscount.finalAmount : TOTAL_AMOUNT;

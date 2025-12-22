@@ -166,7 +166,7 @@ const ChooseNewDoctor: React.FC = () => {
         const appointmentType = originalAppointment?.appointmentType;
 
         // Business rule: TELEHEALTH = 100% payment, IN_PERSON = 30% deposit
-        const depositRate = appointmentType === 'TELEHEALTH' ? 1.0 : 0.3;
+        const depositRate = appointmentType === 'TELEHEALTH' ? 1 : 0.3;
 
         // Get the correct price based on appointment type
         const serviceTypeName =
