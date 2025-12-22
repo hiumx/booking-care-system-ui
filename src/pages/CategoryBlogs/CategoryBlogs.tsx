@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useParams } from 'react-router-dom';
-import BlogHeader from '@/pages/Blog/components/BlogHeader';
-import Breadcrumb from '@/pages/BlogDetail/components/Breadcrumb';
+import MainHeader from '@/layouts/components/MainHeader/MainHeader';
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb';
 import BlogCard from '@/components/BLogCard';
 import styles from './CategoryBlogs.module.scss';
 import { BlogService } from '@/services/blog.service';
@@ -281,25 +281,6 @@ const CategoryBlogs: React.FC = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Handle search coming from the global header (BlogHeader)
-    const handleHeaderSearch = (keyword: string) => {
-        const trimmed = keyword.trim();
-        setInputSearch(trimmed);
-        setCurrentPage(1);
-        // Switch to "all" mode to show search across all categories
-        setIsAllMode(true);
-        setSelectedCategoryId(null);
-        setSelectedCategorySlug('');
-
-        if (!trimmed) {
-            setSearchParams({ category: 'all', page: '1' });
-            return;
-        }
-
-        // Trigger search across titles only
-        setSearchParams({ category: 'all', search: trimmed, titleOnly: 'true', page: '1' });
-    };
-
     // Get current category name
     const getCurrentCategoryName = () => {
         if (isAllMode) return 'Tất cả bài viết';
@@ -391,21 +372,12 @@ const CategoryBlogs: React.FC = () => {
 
     return (
         <div className={styles.categoryArticles}>
-            <BlogHeader onSearch={handleHeaderSearch} />
-
+            <MainHeader />
             <div className={styles.container}>
-                <Breadcrumb items={breadcrumbItems} />
-
-                <div className={styles.header}>
-                    <h1 className={styles.title}>
-                        {isAllMode ? 'Tất cả bài viết' : getCurrentCategoryName()}
-                    </h1>
-                    <p className={styles.subtitle}>
-                        {isAllMode
-                            ? 'Tổng hợp các bài viết mới nhất'
-                            : `Tổng hợp các bài viết về ${getCurrentCategoryName().toLowerCase()}`}
-                    </p>
-                </div>
+                <Breadcrumb
+                    items={breadcrumbItems}
+                    title={isAllMode ? 'Tất cả bài viết' : getCurrentCategoryName()}
+                />
 
                 {/* Search and Filter Section */}
                 <div

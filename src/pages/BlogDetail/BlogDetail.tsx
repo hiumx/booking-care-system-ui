@@ -1,11 +1,11 @@
 import React, { MouseEvent, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './BlogDetail.module.scss';
-import BlogHeader from '@/pages/Blog/components/BlogHeader/BlogHeader';
+import MainHeader from '@/layouts/components/MainHeader/MainHeader';
 import { PATHS, replacePathParams } from '@/routes/paths';
 import authorAvatar from '@/assets/img/about-img1.jpg';
 import BlogSlider from '@/components/BlogSlider';
-import Breadcrumb from '@/pages/BlogDetail/components/Breadcrumb';
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb';
 import MetaInfo from '@/pages/BlogDetail/components/MetaInfo';
 import TableOfContents from '@/pages/BlogDetail/components/TableOfContents';
 import Benefits from '@/pages/BlogDetail/components/Benefits';
@@ -71,7 +71,8 @@ const BlogDetail: React.FC = () => {
         if (id) {
             fetchBlog();
         }
-    }, [id]);
+        // include fetchBlog in deps to satisfy linter (stable reference from useApiCall)
+    }, [id, fetchBlog]);
 
     useEffect(() => {
         if (blogData) {
@@ -91,7 +92,8 @@ const BlogDetail: React.FC = () => {
         } else {
             setRelatedBlogs([]);
         }
-    }, [blog?.category?.id, blog?.id]);
+        // include fetchRelated in deps to satisfy linter (stable reference from useApiCall)
+    }, [blog?.category?.id, blog?.id, fetchRelated]);
 
     const handleTocClick = (e: MouseEvent<HTMLAnchorElement>, id: string) => {
         e.preventDefault();
@@ -134,14 +136,34 @@ const BlogDetail: React.FC = () => {
         return sections;
     };
 
+    // Convert category name to slug (same logic as CategoryBlogs)
+    const categoryNameToSlug = (name: string): string => {
+        const normalized = name.toLowerCase().normalize('NFD');
+        const slug = (normalized as any)
+            .replaceAll(/[\u0300-\u036f]/g, '')
+            .replaceAll(/đ/g, 'd')
+            .replaceAll(/Đ/g, 'D')
+            .replaceAll(/[^a-z0-9]+/g, '-');
+
+        let start = 0;
+        let end = slug.length;
+
+        while (start < end && slug[start] === '-') {
+            start++;
+        }
+
+        while (end > start && slug[end - 1] === '-') {
+            end--;
+        }
+
+        return slug.slice(start, end);
+    };
+
     if (isLoadingBlog) {
         return (
-            <>
-                <BlogHeader />
-                <div style={{ textAlign: 'center', padding: '4rem' }}>
-                    <Spinner />
-                </div>
-            </>
+            <div style={{ textAlign: 'center', padding: '4rem' }}>
+                <Spinner />
+            </div>
         );
     }
 
@@ -153,34 +175,34 @@ const BlogDetail: React.FC = () => {
             !blogError; // If no error but no blog data, assume not found
 
         return (
-            <>
-                <BlogHeader />
-                <div style={{ textAlign: 'center', padding: '4rem' }}>
-                    <h2>{isNotFound ? 'Blog không tồn tại' : 'Đã xảy ra lỗi'}</h2>
-                    {!isNotFound && blogError && (
-                        <p style={{ color: '#dc3545', marginBottom: '1rem' }}>{blogError}</p>
-                    )}
-                    <button onClick={() => navigate(PATHS.BLOG)} className="btn btn-primary">
-                        Quay lại danh sách blog
-                    </button>
-                </div>
-            </>
+            <div style={{ textAlign: 'center', padding: '4rem' }}>
+                <h2>{isNotFound ? 'Blog không tồn tại' : 'Đã xảy ra lỗi'}</h2>
+                {!isNotFound && blogError && (
+                    <p style={{ color: '#dc3545', marginBottom: '1rem' }}>{blogError}</p>
+                )}
+                <button onClick={() => navigate(PATHS.BLOG)} className="btn btn-primary">
+                    Quay lại danh sách blog
+                </button>
+            </div>
         );
     }
 
     const sections = parseContentSections(blog.contentVi);
-    const categories = [
-        { label: 'Trang chủ', path: PATHS.HOME },
-        { label: 'Bản tin sức khỏe', path: PATHS.BLOG },
-        ...(blog.category ? [{ label: blog.category.categoryName }] : []),
-    ];
+    const breadcrumbData = {
+        items: [
+            { label: 'Trang chủ', path: PATHS.HOME, isActive: false },
+            { label: 'Bản tin sức khỏe', path: PATHS.BLOG, isActive: false },
+            { label: 'Bài viết chi tiết', isActive: true },
+        ],
+        title: 'Bài viết chi tiết',
+    };
 
     return (
         <>
-            <BlogHeader />
+            <MainHeader />
             <div className={styles.blogDetailContainer}>
                 {/* Breadcrumb under BlogHeader */}
-                <Breadcrumb items={categories} />
+                <Breadcrumb items={breadcrumbData.items} title={breadcrumbData.title} />
 
                 <div className={styles.mainArea}>
                     {/* Left: Article */}
@@ -214,7 +236,19 @@ const BlogDetail: React.FC = () => {
                                 <h2 className={styles.relatedSliderTitle}>Bài viết liên quan</h2>
                                 <button
                                     className="btn btn-primary-gradient"
-                                    onClick={() => navigate(PATHS.BLOG)}
+                                    onClick={() => {
+                                        const categoryName = blog.category?.categoryName;
+                                        if (categoryName) {
+                                            const slug = categoryNameToSlug(categoryName);
+                                            navigate(
+                                                replacePathParams(PATHS.CATEGORY_ARTICLES, {
+                                                    categorySlug: slug,
+                                                })
+                                            );
+                                        } else {
+                                            navigate(PATHS.BLOG);
+                                        }
+                                    }}
                                 >
                                     XEM TẤT CẢ
                                 </button>

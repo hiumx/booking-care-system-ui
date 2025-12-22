@@ -18,26 +18,6 @@ const TabAccordion: React.FC = () => {
                         >
                             Miễn trừ trách nhiệm
                         </button>
-                        <span className={styles.tabDivider}>›</span>
-                        <button
-                            type="button"
-                            className={`${styles.tabItem} ${active === 'refs' ? styles.activeTab : ''}`}
-                            onClick={() => setActive('refs')}
-                            role="tab"
-                            aria-selected={active === 'refs'}
-                        >
-                            Tài liệu tham khảo
-                        </button>
-                        <span className={styles.tabDivider}>›</span>
-                        <button
-                            type="button"
-                            className={`${styles.tabItem} ${active === 'feedback' ? styles.activeTab : ''}`}
-                            onClick={() => setActive('feedback')}
-                            role="tab"
-                            aria-selected={active === 'feedback'}
-                        >
-                            Góp ý về bài viết
-                        </button>
                     </div>
 
                     <div className={styles.tabPanel} role="tabpanel">
