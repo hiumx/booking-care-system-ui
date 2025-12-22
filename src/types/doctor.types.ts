@@ -1,4 +1,5 @@
-import { Gender, Status } from '../enums/common.enums';
+import { Status } from '../enums/common.enums';
+import { DoctorGender } from '../enums/doctor-gender.enums';
 import { PositionResponse } from './position.types';
 import { SpecialtyResponse } from './specialty.types';
 import { LanguageResponse } from './language.types';
@@ -11,7 +12,7 @@ export interface DoctorResponse {
     address?: string;
     firstName: string;
     lastName: string;
-    gender?: Gender;
+    gender?: string; // Backend returns string: 'MALE', 'FEMALE', 'OTHER'
     positionId?: string;
     specialtyId?: string;
     hospitalId?: string;
@@ -107,7 +108,7 @@ export interface DoctorQueryRequest {
     maxPrice?: number;
     minRating?: number;
     maxRating?: number;
-    gender?: Gender;
+    gender?: DoctorGender;
     languageIds?: string[];
     serviceTypeIds?: string[];
     sortBy?: 'name' | 'rating' | 'price' | 'experience' | 'createdAt';
@@ -147,7 +148,7 @@ export interface DoctorSearchParams {
     };
     ratingFilter?: number;
     ratingFilters?: number[]; // Support multiple rating filters
-    genderFilter?: Gender;
+    genderFilter?: DoctorGender;
     genderFilters?: string[]; // Support multiple gender filters
     experienceRange?: { min: number; max: number }; // New slider format like price
     experienceFilter?: string; // Keep for backward compatibility

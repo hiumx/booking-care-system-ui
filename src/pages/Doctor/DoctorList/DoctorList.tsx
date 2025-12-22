@@ -19,7 +19,8 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { searchDoctorsAsync, filterDoctorsAsync } from '@/store/slices/doctorSlice';
 import { getServiceTypesAsync } from '@/store/slices/serviceTypeSlice';
 import { getLanguagesAsync } from '@/store/slices/languageSlice';
-import { Status, Gender } from '@/enums/common.enums';
+import { Status } from '@/enums/common.enums';
+import { DoctorGender } from '@/enums/doctor-gender.enums';
 
 // Import images
 import docProfile01 from '@/assets/img/doctor-grid/doctor-grid-01.jpg';
@@ -98,7 +99,7 @@ const DoctorList: React.FC = () => {
     >([]); // Keep for backward compatibility
     const [availabilityFilter, setAvailabilityFilter] = useState('');
     const [consultationTypeFilter, setConsultationTypeFilter] = useState('');
-    const [genderFilter, setGenderFilter] = useState<Gender | undefined>(undefined);
+    const [genderFilter, setGenderFilter] = useState<DoctorGender | undefined>(undefined);
     const [genderFilters, setGenderFilters] = useState<string[]>([]);
     const [priceFilter, setPriceFilter] = useState<{ min: number; max: number } | undefined>(
         undefined
@@ -815,11 +816,11 @@ const DoctorList: React.FC = () => {
 
     const handleGenderFilter = (gender: string) => {
         if (gender) {
-            // Map gender IDs to Gender enum values
-            const genderMap: { [key: string]: Gender } = {
-                'checkebox-sm14': Gender.MALE,
-                'checkebox-sm15': Gender.FEMALE,
-                'checkebox-sm16': Gender.OTHER,
+            // Map gender IDs to DoctorGender enum values
+            const genderMap: { [key: string]: DoctorGender } = {
+                'checkebox-sm14': DoctorGender.MALE,
+                'checkebox-sm15': DoctorGender.FEMALE,
+                'checkebox-sm16': DoctorGender.OTHER,
             };
             setGenderFilter(genderMap[gender]);
         } else {
