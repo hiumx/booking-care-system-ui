@@ -34,6 +34,7 @@ export interface DoctorAppointmentBookingCardProps {
         token: string;
         rescheduleSpecialtyId: string;
         rescheduleHospitalId: string;
+        appointmentType?: string; // TELEHEALTH or IN_PERSON
     };
 }
 
@@ -252,7 +253,7 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                     <Link
                                         to={
                                             isRescheduleMode && rescheduleParams
-                                                ? `${replacePathParams(PATHS.BOOKING.CHOOSE_NEW_DOCTOR, { doctorId })}?rescheduleFor=${rescheduleParams.appointmentId}&token=${rescheduleParams.token}&rescheduleSpecialtyId=${rescheduleParams.rescheduleSpecialtyId}&rescheduleHospitalId=${rescheduleParams.rescheduleHospitalId}`
+                                                ? `${replacePathParams(PATHS.BOOKING.CHOOSE_NEW_DOCTOR, { doctorId })}?rescheduleFor=${rescheduleParams.appointmentId}&token=${rescheduleParams.token}&rescheduleSpecialtyId=${rescheduleParams.rescheduleSpecialtyId}&rescheduleHospitalId=${rescheduleParams.rescheduleHospitalId}${rescheduleParams.appointmentType ? `&appointmentType=${rescheduleParams.appointmentType}` : ''}`
                                                 : (() => {
                                                       const basePath = replacePathParams(
                                                           PATHS.BOOKING.ROOT,

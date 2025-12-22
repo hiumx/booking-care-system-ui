@@ -9,12 +9,14 @@ import StepWizard from '@/components/StepWizard';
 import { AppointmentService } from '@/services/appointment.service';
 import PaymentService from '@/services/payment.service';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { PATHS, replacePathParams } from '@/routes/paths';
+import { PATHS } from '@/routes/paths';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
 import BookingLoadingSpinner from '@/components/BookingLoadingSpinner';
 import { getDoctorByIdAsync } from '@/store/slices/doctorSlice';
+import { setAppointmentType } from '@/store/slices/bookingSlice';
 import { getAppointmentDateTime } from '@/utils/appointment-utils';
+import { AppointmentType } from '@/enums/appointment.enums';
 
 /**
  * ChooseNewDoctor Page - Option 3
@@ -75,6 +77,29 @@ const ChooseNewDoctor: React.FC = () => {
     const skipDateTime = searchParams.get('skipDateTime') === 'true'; // From Option 2 (hospital assigned)
     const isStaffAssigned = searchParams.get('isStaffAssigned') === 'true'; // True = ConfirmNewDoctor, False = UpdateAppointment
     const newDoctorIdParam = searchParams.get('newDoctorId'); // For staff-assigned flow
+    const appointmentTypeFromUrl = searchParams.get('appointmentType'); // TELEHEALTH or IN_PERSON
+
+    // Update Redux store with appointmentType from URL
+    useEffect(() => {
+        if (appointmentTypeFromUrl) {
+            const type =
+                appointmentTypeFromUrl === 'TELEHEALTH'
+                    ? AppointmentType.TELEHEALTH
+                    : AppointmentType.IN_PERSON;
+            dispatch(setAppointmentType(type));
+        }
+    }, [appointmentTypeFromUrl, dispatch]);
+
+    // Also update from original appointment data if URL param is not available
+    useEffect(() => {
+        if (originalAppointment?.appointmentType && !appointmentTypeFromUrl) {
+            const type =
+                originalAppointment.appointmentType === 'TELEHEALTH'
+                    ? AppointmentType.TELEHEALTH
+                    : AppointmentType.IN_PERSON;
+            dispatch(setAppointmentType(type));
+        }
+    }, [originalAppointment, appointmentTypeFromUrl, dispatch]);
 
     useEffect(() => {
         if (!rescheduleAppointmentId || !rescheduleToken || !doctorId) {
@@ -138,10 +163,24 @@ const ChooseNewDoctor: React.FC = () => {
 
     const calculatePriceDifference = () => {
         const originalPrice = originalAppointment?.consultationFees || 0;
-        const newDoctorFullPrice = doctorState.selectedDoctor?.prices?.[0]?.amount || 0;
+        const appointmentType = originalAppointment?.appointmentType;
 
-        // Business rule: newPrice is 30% deposit of the full price
-        const newPrice = newDoctorFullPrice * 0.3;
+        // Business rule: TELEHEALTH = 100% payment, IN_PERSON = 30% deposit
+        const depositRate = appointmentType === 'TELEHEALTH' ? 1.0 : 0.3;
+
+        // Get the correct price based on appointment type
+        const serviceTypeName =
+            appointmentType === 'TELEHEALTH' ? 'Tư vấn trực tuyến' : 'Khám trực tiếp';
+        const newDoctorPrice = doctorState.selectedDoctor?.prices?.find(
+            (p) => p.serviceTypeName === serviceTypeName
+        );
+        const newDoctorFullPrice =
+            newDoctorPrice?.amount || doctorState.selectedDoctor?.prices?.[0]?.amount || 0;
+
+        // For TELEHEALTH: compare full price (100%)
+        // For IN_PERSON: compare deposit amount (30%)
+        const newPrice = newDoctorFullPrice * depositRate;
+
         // If original appointment has no payment (originalPrice = 0), treat as equal
         if (originalPrice === 0) {
             setPriceDifference({ type: 'none', amount: 0 });
@@ -180,12 +219,23 @@ const ChooseNewDoctor: React.FC = () => {
         }
     };
 
+    // Helper function to get correct doctorPriceId based on appointment type
+    const getDoctorPriceId = (): string => {
+        const appointmentType = originalAppointment?.appointmentType;
+        const serviceTypeName =
+            appointmentType === 'TELEHEALTH' ? 'Tư vấn trực tuyến' : 'Khám trực tiếp';
+        const price = doctorState.selectedDoctor?.prices?.find(
+            (p) => p.serviceTypeName === serviceTypeName
+        );
+        return price?.id || doctorState.selectedDoctor?.prices?.[0]?.id || '';
+    };
+
     // Helper function to call chooseNewDoctor API
     const callChooseNewDoctorAPI = async (
         newAppointmentDate: string,
         newAppointmentTimeId: string
     ) => {
-        const doctorPriceId = doctorState.selectedDoctor?.prices?.[0]?.id || '';
+        const doctorPriceId = getDoctorPriceId();
 
         return await AppointmentService.chooseNewDoctor({
             appointmentId: rescheduleAppointmentId || '',
@@ -265,7 +315,7 @@ const ChooseNewDoctor: React.FC = () => {
 
         try {
             // Step 1: Call backend to update appointment with new doctor first
-            const doctorPriceId = doctorState.selectedDoctor?.prices?.[0]?.id || '';
+            const doctorPriceId = getDoctorPriceId();
 
             const chooseResponse = await AppointmentService.chooseNewDoctor({
                 appointmentId: rescheduleAppointmentId,
@@ -338,7 +388,6 @@ const ChooseNewDoctor: React.FC = () => {
             const response = await callChooseNewDoctorAPI(newAppointmentDate, newAppointmentTimeId);
 
             if (response.success && response.data) {
-                toast.success(response.data.message);
                 if (response.data.action === 'refund_created') {
                     toast.info(
                         t('chooseNewDoctor.toast.refundAmount', {
@@ -376,8 +425,11 @@ const ChooseNewDoctor: React.FC = () => {
                 rescheduleToken
             ) {
                 // If patient-chosen (Option 3), go back to DoctorList with filters
+                const appointmentTypeParam = appointmentTypeFromUrl
+                    ? `&appointmentType=${appointmentTypeFromUrl}`
+                    : '';
                 navigate(
-                    `${PATHS.DOCTOR.ROOT}?hospitalId=${rescheduleHospitalId}&specialtyId=${rescheduleSpecialtyId}&rescheduleFor=${rescheduleAppointmentId}&token=${rescheduleToken}`
+                    `${PATHS.DOCTOR.ROOT}?hospitalId=${rescheduleHospitalId}&specialtyId=${rescheduleSpecialtyId}&rescheduleFor=${rescheduleAppointmentId}&token=${rescheduleToken}${appointmentTypeParam}`
                 );
             } else {
                 // Fallback to doctor list
@@ -391,10 +443,8 @@ const ChooseNewDoctor: React.FC = () => {
                     `${PATHS.BOOKING.CONFIRM_NEW_DOCTOR.replace(':appointmentId', rescheduleAppointmentId)}?token=${rescheduleToken}&newDoctorId=${newDoctorIdParam}`
                 );
             } else {
-                // Patient-chosen: go back to step 1 (DateTimeSection)
-                navigate(
-                    `${replacePathParams(PATHS.BOOKING.CHOOSE_NEW_DOCTOR, { doctorId: doctorId! })}?rescheduleFor=${rescheduleAppointmentId}&token=${rescheduleToken}&rescheduleSpecialtyId=${rescheduleSpecialtyId}&rescheduleHospitalId=${rescheduleHospitalId}`
-                );
+                // Don't navigate, just change step to preserve state
+                setCurrentStep(1);
             }
         }
     };
@@ -432,12 +482,25 @@ const ChooseNewDoctor: React.FC = () => {
                                     <div className="alert alert-light mb-3">
                                         <i className="ti ti-info-circle me-2"></i>
                                         <strong>
-                                            {t('chooseNewDoctor.depositNote').split(':')[0]}:
+                                            {originalAppointment?.appointmentType === 'TELEHEALTH'
+                                                ? t('chooseNewDoctor.telehealthNote', {
+                                                      defaultValue: 'Tư vấn trực tuyến',
+                                                  }).split(':')[0]
+                                                : t('chooseNewDoctor.depositNote').split(':')[0]}
+                                            :
                                         </strong>
-                                        {t('chooseNewDoctor.depositNote')
-                                            .split(':')
-                                            .slice(1)
-                                            .join(':')}
+                                        {originalAppointment?.appointmentType === 'TELEHEALTH'
+                                            ? t('chooseNewDoctor.telehealthNote', {
+                                                  defaultValue:
+                                                      'Thanh toán 100% phí tư vấn trực tuyến',
+                                              })
+                                                  .split(':')
+                                                  .slice(1)
+                                                  .join(':')
+                                            : t('chooseNewDoctor.depositNote')
+                                                  .split(':')
+                                                  .slice(1)
+                                                  .join(':')}
                                     </div>
                                     <div
                                         className={`alert ${getPriceAlertClass(priceDifference.type)} mb-4`}
