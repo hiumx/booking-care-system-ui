@@ -40,12 +40,25 @@ const ConfirmNewDoctor: React.FC = () => {
     const newDoctorId = searchParams.get('newDoctorId');
 
     // Calculate price difference between original and new doctor
+    // Business rule: TELEHEALTH = 100% payment, IN_PERSON = 30% deposit
     const calculatePriceDifference = () => {
         if (!appointmentData || !newDoctor) return;
 
         const originalPrice = appointmentData.consultationFees || 0;
-        const newDoctorFullPrice = newDoctor.prices?.[0]?.amount || 0;
-        const newPrice = newDoctorFullPrice * 0.3;
+        const appointmentType = appointmentData.appointmentType;
+
+        // TELEHEALTH = 100% payment, IN_PERSON = 30% deposit
+        const depositRate = appointmentType === 'TELEHEALTH' ? 1 : 0.3;
+
+        // Get the correct price based on appointment type
+        const serviceTypeName =
+            appointmentType === 'TELEHEALTH' ? 'Tư vấn trực tuyến' : 'Khám trực tiếp';
+        const newDoctorPrice = newDoctor.prices?.find((p) => p.serviceTypeName === serviceTypeName);
+        const newDoctorFullPrice = newDoctorPrice?.amount || newDoctor.prices?.[0]?.amount || 0;
+
+        // For TELEHEALTH: compare full price (100%)
+        // For IN_PERSON: compare deposit amount (30%)
+        const newPrice = newDoctorFullPrice * depositRate;
 
         if (originalPrice === 0) {
             setPriceDifference({ type: 'none', amount: 0 });
@@ -100,6 +113,15 @@ const ConfirmNewDoctor: React.FC = () => {
         }
     };
 
+    // Helper function to get correct doctorPriceId based on appointment type
+    const getDoctorPriceId = (): string => {
+        const appointmentType = appointmentData?.appointmentType;
+        const serviceTypeName =
+            appointmentType === 'TELEHEALTH' ? 'Tư vấn trực tuyến' : 'Khám trực tiếp';
+        const price = newDoctor?.prices?.find((p) => p.serviceTypeName === serviceTypeName);
+        return price?.id || newDoctor?.prices?.[0]?.id || '';
+    };
+
     const handleConfirm = async () => {
         if (!appointmentId || !rescheduleToken || !newDoctorId) {
             toast.error(t('confirmNewDoctor.toast.invalidInfo'));
@@ -116,7 +138,7 @@ const ConfirmNewDoctor: React.FC = () => {
         try {
             const newAppointmentDate = appointmentData.appointmentDate;
             const newAppointmentTimeId = appointmentData.appointmentTimeId;
-            const doctorPriceId = newDoctor.prices?.[0]?.id || '';
+            const doctorPriceId = getDoctorPriceId();
 
             const response = await AppointmentService.chooseNewDoctor({
                 appointmentId,
@@ -354,14 +376,44 @@ const ConfirmNewDoctor: React.FC = () => {
                                                         </div>
                                                         <div className="col-12">
                                                             <small className="text-muted d-block mb-1">
-                                                                {t(
-                                                                    'confirmNewDoctor.newDoctor.newDeposit'
-                                                                )}
+                                                                {appointmentData?.appointmentType ===
+                                                                'TELEHEALTH'
+                                                                    ? t(
+                                                                          'confirmNewDoctor.newDoctor.newPayment'
+                                                                      )
+                                                                    : t(
+                                                                          'confirmNewDoctor.newDoctor.newDeposit'
+                                                                      )}
                                                             </small>
                                                             <p className="mb-0 fw-medium text-primary">
                                                                 {formatPrice(
-                                                                    (newDoctor.prices?.[0]
-                                                                        ?.amount || 0) * 0.3
+                                                                    (() => {
+                                                                        const appointmentType =
+                                                                            appointmentData?.appointmentType;
+                                                                        const depositRate =
+                                                                            appointmentType ===
+                                                                            'TELEHEALTH'
+                                                                                ? 1
+                                                                                : 0.3;
+                                                                        const serviceTypeName =
+                                                                            appointmentType ===
+                                                                            'TELEHEALTH'
+                                                                                ? 'Tư vấn trực tuyến'
+                                                                                : 'Khám trực tiếp';
+                                                                        const price =
+                                                                            newDoctor.prices?.find(
+                                                                                (p) =>
+                                                                                    p.serviceTypeName ===
+                                                                                    serviceTypeName
+                                                                            );
+                                                                        return (
+                                                                            (price?.amount ||
+                                                                                newDoctor
+                                                                                    .prices?.[0]
+                                                                                    ?.amount ||
+                                                                                0) * depositRate
+                                                                        );
+                                                                    })()
                                                                 )}
                                                             </p>
                                                         </div>

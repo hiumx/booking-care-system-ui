@@ -34,6 +34,7 @@ export interface DoctorAppointmentBookingCardProps {
         token: string;
         rescheduleSpecialtyId: string;
         rescheduleHospitalId: string;
+        appointmentType?: string; // TELEHEALTH or IN_PERSON
     };
 }
 
@@ -249,38 +250,50 @@ const DoctorAppointmentBookingCard: React.FC<DoctorAppointmentBookingCardProps> 
                                     </div>
                                 </div>
                                 <div className={styles.bookingButtonContainer}>
-                                    <Link
-                                        to={
-                                            isRescheduleMode && rescheduleParams
-                                                ? `${replacePathParams(PATHS.BOOKING.CHOOSE_NEW_DOCTOR, { doctorId })}?rescheduleFor=${rescheduleParams.appointmentId}&token=${rescheduleParams.token}&rescheduleSpecialtyId=${rescheduleParams.rescheduleSpecialtyId}&rescheduleHospitalId=${rescheduleParams.rescheduleHospitalId}`
-                                                : (() => {
-                                                      const basePath = replacePathParams(
-                                                          PATHS.BOOKING.ROOT,
-                                                          { doctorId }
-                                                      );
-                                                      // Check if service type is online consultation
-                                                      const isOnlineConsultation =
-                                                          displayServiceInfo.serviceTypeName
-                                                              .toLowerCase()
-                                                              .includes('tư vấn trực tuyến') ||
-                                                          displayServiceInfo.serviceTypeName
-                                                              .toLowerCase()
-                                                              .includes('tu van truc tuyen') ||
-                                                          displayServiceInfo.serviceTypeName
-                                                              .toLowerCase()
-                                                              .includes('truc tuyen');
-                                                      return isOnlineConsultation
-                                                          ? `${basePath}?appointmentType=TELEHEALTH`
-                                                          : basePath;
-                                                  })()
-                                        }
-                                        className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
-                                    >
-                                        <i className="isax isax-calendar-1 me-2"></i>
-                                        {isRescheduleMode
-                                            ? t('card.selectDoctor')
-                                            : t('card.bookAppointment')}
-                                    </Link>
+                                    {(() => {
+                                        // Helper function to build booking URL
+                                        const buildBookingUrl = (): string => {
+                                            if (isRescheduleMode && rescheduleParams) {
+                                                const basePath = replacePathParams(
+                                                    PATHS.BOOKING.CHOOSE_NEW_DOCTOR,
+                                                    { doctorId }
+                                                );
+                                                const appointmentTypeParam =
+                                                    rescheduleParams.appointmentType
+                                                        ? `&appointmentType=${rescheduleParams.appointmentType}`
+                                                        : '';
+                                                return `${basePath}?rescheduleFor=${rescheduleParams.appointmentId}&token=${rescheduleParams.token}&rescheduleSpecialtyId=${rescheduleParams.rescheduleSpecialtyId}&rescheduleHospitalId=${rescheduleParams.rescheduleHospitalId}${appointmentTypeParam}`;
+                                            }
+
+                                            const basePath = replacePathParams(PATHS.BOOKING.ROOT, {
+                                                doctorId,
+                                            });
+
+                                            // Check if service type is online consultation
+                                            const serviceTypeLower =
+                                                displayServiceInfo.serviceTypeName.toLowerCase();
+                                            const isOnlineConsultation =
+                                                serviceTypeLower.includes('tư vấn trực tuyến') ||
+                                                serviceTypeLower.includes('tu van truc tuyen') ||
+                                                serviceTypeLower.includes('truc tuyen');
+
+                                            return isOnlineConsultation
+                                                ? `${basePath}?appointmentType=TELEHEALTH`
+                                                : basePath;
+                                        };
+
+                                        return (
+                                            <Link
+                                                to={buildBookingUrl()}
+                                                className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill"
+                                            >
+                                                <i className="isax isax-calendar-1 me-2"></i>
+                                                {isRescheduleMode
+                                                    ? t('card.selectDoctor')
+                                                    : t('card.bookAppointment')}
+                                            </Link>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         </div>
