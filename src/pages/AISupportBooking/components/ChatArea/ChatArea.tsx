@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Stethoscope, MessageCircle, Menu } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { Message } from '@/types/ai.types';
+import { Message, ConversationType } from '@/types/ai.types';
 import MessageBubble from './components/MessageBubble';
 import SuggestionCard from './components/SuggestionCard';
 import TypingIndicator from './components/TypingIndicator';
@@ -32,7 +32,8 @@ interface ChatAreaProps {
     onLabResultFileSelect?: (file: File) => void;
     onDermatologyFileSelect?: (file: File) => void;
     onNutritionClick?: () => void;
-    isFileAnalysisMode?: boolean;
+    onSymptomClick?: () => void;
+    conversationType?: ConversationType;
 }
 
 // Breakpoints cho SuggestionCard Carousel
@@ -217,7 +218,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     onLabResultFileSelect,
     onDermatologyFileSelect,
     onNutritionClick,
-    isFileAnalysisMode = false,
+    onSymptomClick,
+    conversationType,
 }) => {
     const { t } = useTranslation('aiSupport');
     const dispatch = useDispatch();
@@ -232,6 +234,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         appointmentType: AppointmentType;
     } | null>(null);
 
+    // Helper function to get conversation type badge
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -581,7 +584,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                     onLabResultFileSelect={onLabResultFileSelect}
                     onDermatologyFileSelect={onDermatologyFileSelect}
                     onNutritionClick={onNutritionClick}
-                    isFileAnalysisMode={isFileAnalysisMode}
+                    onSymptomClick={onSymptomClick}
+                    conversationType={conversationType}
+                    hasMessages={messages.length > 0}
                 />
             </div>
         </div>

@@ -178,12 +178,19 @@ export interface Suggestion {
     hospital?: Hospital;
 }
 
+export enum ConversationType {
+    SYMPTOM_ANALYSIS = 0,
+    LAB_RESULT_ANALYSIS = 1,
+    MEDICAL_IMAGE_ANALYSIS = 2,
+}
+
 export interface ChatHistory {
     id: string;
     title: string;
     lastMessage: string;
     lastMessageTime: string;
     avatar: string;
+    conversationType: ConversationType;
 }
 
 // Lab result analysis response from API

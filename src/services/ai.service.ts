@@ -1,4 +1,5 @@
 import axiosInstance, { ApiResponse } from '@/configs/axios.config';
+import { ConversationType } from '@/types/ai.types';
 
 // Base API endpoint for AI service
 // Backend route: /api/v{version}/symptoms/{everything}
@@ -8,6 +9,7 @@ const AI_ENDPOINTS = {
     HEALTH: '/symptoms/health',
     SESSION: (sessionId: string) => `/symptoms/sessions/${sessionId}`,
     SAVE_SESSION: (sessionId: string) => `/symptoms/sessions/${sessionId}/save`,
+    CREATE_SESSION: '/symptoms/sessions',
     LAB_RESULT_ANALYZE: '/lab-results/analyze',
     DERMATOLOGY_ANALYZE: '/dermatology/analyze',
     NUTRITION_CONVERSATION_START: '/nutrition-conversation/start',
@@ -104,6 +106,29 @@ export interface SymptomAnalysisResponse {
 
 export class AIService {
     /**
+     * Create a new conversation session
+     */
+    static async createSession(
+        request: CreateSessionRequest
+    ): Promise<ApiResponse<CreateSessionResponse>> {
+        try {
+            const response: any = await axiosInstance.post(AI_ENDPOINTS.CREATE_SESSION, request);
+            return {
+                success: response.success ?? true,
+                data: response.data,
+                message: response.message || 'Session created successfully',
+            };
+        } catch (error: any) {
+            console.error('Error creating session:', error);
+            throw new Error(
+                error.response?.data?.message ||
+                    error.message ||
+                    'Failed to create session. Please try again.'
+            );
+        }
+    }
+
+    /**
      * Health check for AI service
      */
     static async healthCheck(): Promise<ApiResponse> {
@@ -187,6 +212,21 @@ export class AIService {
     static async getUserSessions(): Promise<ApiResponse<SessionSummary[]>> {
         try {
             const response: any = await axiosInstance.get(`${AI_ENDPOINTS.BASE}/sessions`);
+
+            // Debug: Log response to check conversationType
+            console.log('[AIService.getUserSessions] Response:', response);
+            if (response.data && response.data.length > 0) {
+                console.log('[AIService.getUserSessions] First session:', response.data[0]);
+                console.log(
+                    '[AIService.getUserSessions] conversationType:',
+                    response.data[0].conversationType
+                );
+                console.log(
+                    '[AIService.getUserSessions] ConversationType:',
+                    response.data[0].ConversationType
+                );
+            }
+
             return {
                 success: response.success ?? true,
                 data: response.data || [],
@@ -396,6 +436,19 @@ export interface SessionSummary {
     createdAt: string;
     updatedAt: string;
     messageCount: number;
+    conversationType: ConversationType;
+}
+
+export interface CreateSessionRequest {
+    conversationType: ConversationType;
+    initialMessage?: string;
+}
+
+export interface CreateSessionResponse {
+    sessionId: string;
+    conversationType: ConversationType;
+    createdAt: string;
+    title: string;
 }
 
 export interface NutritionConversationResponse {

@@ -20,6 +20,7 @@ import {
     ChevronRight,
 } from 'lucide-react';
 import ModalArea from '@/components/ModalArea/ModalArea';
+import { ConversationType } from '@/types/ai.types';
 import styles from './SearchBox.module.scss';
 
 interface SearchBoxProps {
@@ -37,8 +38,9 @@ interface SearchBoxProps {
     onLabResultFileSelect?: (file: File) => void;
     onDermatologyFileSelect?: (file: File) => void;
     onNutritionClick?: () => void;
-    isFileAnalysisMode?: boolean;
-    hasChatMessages?: boolean;
+    onSymptomClick?: () => void;
+    conversationType?: ConversationType;
+    hasMessages?: boolean;
 }
 
 interface ComingSoonFeature {
@@ -60,8 +62,9 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     onLabResultFileSelect,
     onDermatologyFileSelect,
     onNutritionClick: _onNutritionClick,
-    isFileAnalysisMode = false,
-    hasChatMessages = false,
+    onSymptomClick,
+    conversationType,
+    hasMessages: _hasMessages = false,
 }) => {
     const { t } = useTranslation('aiSupport');
     const [isMultiLine, setIsMultiLine] = useState(false);
@@ -366,19 +369,57 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         >
             <div className={styles.quickActions}>
                 <div
-                    className={clsx(styles.quickActionCard, styles.symptomActionCard)}
+                    className={clsx(styles.quickActionCard, styles.symptomActionCard, {
+                        [styles.active]: conversationType === ConversationType.SYMPTOM_ANALYSIS,
+                        [styles.disabled]:
+                            // Disable if in different chat type
+                            conversationType !== undefined &&
+                            conversationType !== ConversationType.SYMPTOM_ANALYSIS,
+                    })}
                     onClick={() => {
-                        // Set default message for symptom analysis
-                        onChange('Tôi muốn phân tích triệu chứng');
-                    }}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
+                        // Disable if in different chat type
+                        if (
+                            conversationType !== undefined &&
+                            conversationType !== ConversationType.SYMPTOM_ANALYSIS
+                        ) {
+                            return;
+                        }
+                        if (onSymptomClick) {
+                            onSymptomClick();
+                        } else {
+                            // Fallback: Set default message for symptom analysis
                             onChange('Tôi muốn phân tích triệu chứng');
                         }
                     }}
+                    role="button"
+                    tabIndex={
+                        conversationType !== undefined &&
+                        conversationType !== ConversationType.SYMPTOM_ANALYSIS
+                            ? -1
+                            : 0
+                    }
+                    onKeyDown={(e) => {
+                        if (
+                            conversationType !== undefined &&
+                            conversationType !== ConversationType.SYMPTOM_ANALYSIS
+                        ) {
+                            return;
+                        }
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            if (onSymptomClick) {
+                                onSymptomClick();
+                            } else {
+                                onChange('Tôi muốn phân tích triệu chứng');
+                            }
+                        }
+                    }}
+                    title={
+                        conversationType !== undefined &&
+                        conversationType !== ConversationType.SYMPTOM_ANALYSIS
+                            ? 'Vui lòng tạo cuộc trò chuyện mới để phân tích triệu chứng.'
+                            : undefined
+                    }
                 >
                     <div className={styles.quickActionIcon}>
                         <Stethoscope size={20} />
@@ -393,46 +434,89 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
                 <div
                     className={clsx(styles.quickActionCard, styles.labActionCard, {
-                        [styles.disabledCard]: hasChatMessages,
+                        [styles.active]: conversationType === ConversationType.LAB_RESULT_ANALYSIS,
+                        [styles.disabled]:
+                            // Disable if in different chat type
+                            conversationType !== undefined &&
+                            conversationType !== ConversationType.LAB_RESULT_ANALYSIS,
                     })}
-                    onClick={hasChatMessages ? undefined : handleLabCardClick}
+                    onClick={
+                        conversationType !== undefined &&
+                        conversationType !== ConversationType.LAB_RESULT_ANALYSIS
+                            ? undefined
+                            : handleLabCardClick
+                    }
                     role="button"
-                    tabIndex={hasChatMessages ? -1 : 0}
+                    tabIndex={
+                        conversationType !== undefined &&
+                        conversationType !== ConversationType.LAB_RESULT_ANALYSIS
+                            ? -1
+                            : 0
+                    }
                     onKeyDown={(e) => {
-                        if (!hasChatMessages && (e.key === 'Enter' || e.key === ' ')) {
+                        const shouldDisable =
+                            conversationType !== undefined &&
+                            conversationType !== ConversationType.LAB_RESULT_ANALYSIS;
+
+                        if (!shouldDisable && (e.key === 'Enter' || e.key === ' ')) {
                             e.preventDefault();
                             handleLabCardClick();
                         }
                     }}
-                    title={hasChatMessages ? 'Vui lòng tạo cuộc trò chuyện mới để gửi file' : ''}
+                    title={
+                        conversationType !== undefined &&
+                        conversationType !== ConversationType.LAB_RESULT_ANALYSIS
+                            ? 'Vui lòng tạo cuộc trò chuyện mới để phân tích xét nghiệm.'
+                            : undefined
+                    }
                 >
                     <div className={styles.quickActionIcon}>
                         <FileText size={20} />
                     </div>
                     <div className={styles.quickActionContent}>
                         <p className={styles.quickActionTitle}>Phân tích kết quả xét nghiệm</p>
-                        <p className={styles.quickActionDescription}>
-                            {hasChatMessages
-                                ? 'Tạo cuộc trò chuyện mới để gửi file'
-                                : 'Tải lên kết quả xét nghiệm'}
-                        </p>
+                        <p className={styles.quickActionDescription}>Tải lên kết quả xét nghiệm</p>
                     </div>
                 </div>
 
                 <div
                     className={clsx(styles.quickActionCard, styles.dermatologyActionCard, {
-                        [styles.disabledCard]: hasChatMessages,
+                        [styles.active]:
+                            conversationType === ConversationType.MEDICAL_IMAGE_ANALYSIS,
+                        [styles.disabled]:
+                            // Disable if in different chat type
+                            conversationType !== undefined &&
+                            conversationType !== ConversationType.MEDICAL_IMAGE_ANALYSIS,
                     })}
-                    onClick={hasChatMessages ? undefined : handleDermatologyCardClick}
+                    onClick={
+                        conversationType !== undefined &&
+                        conversationType !== ConversationType.MEDICAL_IMAGE_ANALYSIS
+                            ? undefined
+                            : handleDermatologyCardClick
+                    }
                     role="button"
-                    tabIndex={hasChatMessages ? -1 : 0}
+                    tabIndex={
+                        conversationType !== undefined &&
+                        conversationType !== ConversationType.MEDICAL_IMAGE_ANALYSIS
+                            ? -1
+                            : 0
+                    }
                     onKeyDown={(e) => {
-                        if (!hasChatMessages && (e.key === 'Enter' || e.key === ' ')) {
+                        const shouldDisable =
+                            conversationType !== undefined &&
+                            conversationType !== ConversationType.MEDICAL_IMAGE_ANALYSIS;
+
+                        if (!shouldDisable && (e.key === 'Enter' || e.key === ' ')) {
                             e.preventDefault();
                             handleDermatologyCardClick();
                         }
                     }}
-                    title={hasChatMessages ? 'Vui lòng tạo cuộc trò chuyện mới để gửi file' : ''}
+                    title={
+                        conversationType !== undefined &&
+                        conversationType !== ConversationType.MEDICAL_IMAGE_ANALYSIS
+                            ? 'Vui lòng tạo cuộc trò chuyện mới để phân tích hình ảnh y tế.'
+                            : undefined
+                    }
                 >
                     <div className={styles.quickActionIcon}>
                         <Image size={20} />
@@ -440,9 +524,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                     <div className={styles.quickActionContent}>
                         <p className={styles.quickActionTitle}>Phân tích hình ảnh y tế</p>
                         <p className={styles.quickActionDescription}>
-                            {hasChatMessages
-                                ? 'Tạo cuộc trò chuyện mới để gửi file'
-                                : 'Tải lên hình ảnh để phân tích'}
+                            Tải lên hình ảnh để phân tích
                         </p>
                     </div>
                 </div>
@@ -483,19 +565,13 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
             <textarea
                 ref={textareaRef}
-                placeholder={
-                    isFileAnalysisMode
-                        ? 'Cuộc trò chuyện này chỉ dùng để phân tích file. Vui lòng tạo cuộc trò chuyện mới để chat.'
-                        : placeholder
-                }
+                placeholder={placeholder}
                 rows={1}
                 value={value}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                disabled={isFileAnalysisMode}
                 className={clsx(styles.textarea, {
                     [styles.textareaRecording]: isRecording,
-                    [styles.textareaDisabled]: isFileAnalysisMode,
                 })}
             />
 
@@ -616,7 +692,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                                 : t('searchBox.startRecording')
                         }
                         onClick={toggleRecording}
-                        disabled={isFileAnalysisMode}
                         className={clsx(styles.micButton, {
                             [styles.recording]: isRecording,
                         })}
@@ -628,7 +703,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                         type="button"
                         data-tooltip={t('searchBox.clearContent')}
                         onClick={handleClear}
-                        disabled={isFileAnalysisMode}
                         className={styles.iconButton}
                     >
                         <Trash2 size={16} />
@@ -639,7 +713,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                     type="button"
                     data-tooltip={t('searchBox.send')}
                     onClick={handleSend}
-                    disabled={isFileAnalysisMode}
                     className={styles.autoButton}
                 >
                     <Send size={14} />
