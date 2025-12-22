@@ -640,12 +640,9 @@ const MainHeader: React.FC<HeaderProps> = ({ isHeaderMenu = true, hasTopbar = tr
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link to="#">
-                                                        {t('menu.medicalServices.healthPackage')}
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link to="#">
+                                                    <Link
+                                                        to={`${PATHS.DOCTOR.ROOT}?serviceTypeId=511e327a-037d-4622-90e7-e667c4e14c55&pageNumber=1&pageSize=10`}
+                                                    >
                                                         {t(
                                                             'menu.medicalServices.onlineConsultation'
                                                         )}
