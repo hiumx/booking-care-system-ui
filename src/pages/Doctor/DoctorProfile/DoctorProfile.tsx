@@ -45,7 +45,7 @@ import '@/styles/bio-content.scss';
 import ScheduleAvailability from '@/components/ScheduleAvailability';
 import HospitalInfo from '@/components/HospitalInfo';
 import ExpandableText from '@/components/ExpandableText';
-import { Gender } from '@/enums/common.enums';
+import { DoctorGender, getDoctorGenderDisplayText } from '@/enums/doctor-gender.enums';
 import { PATHS, replacePathParams } from '@/routes/paths';
 
 const DoctorProfile: React.FC = () => {
@@ -154,15 +154,10 @@ const DoctorProfile: React.FC = () => {
     const averageRating = formatAverageRating(reviewStatistics?.averageRating);
     const totalReviews = reviewStatistics?.totalReviews || 0;
 
-    // Function to get gender display text
-    const getGenderDisplayText = (gender: Gender | undefined) => {
-        if (gender === Gender.FEMALE) {
-            return t('profile.gender.female');
-        }
-        if (gender === Gender.MALE) {
-            return t('profile.gender.male');
-        }
-        return t('profile.gender.other');
+    // Function to get gender display text - now using DoctorGender enum
+    const getGenderDisplayText = (gender: string | undefined) => {
+        if (!gender) return t('profile.gender.other');
+        return getDoctorGenderDisplayText(gender as DoctorGender);
     };
 
     // Count completed appointments (mock data for now)

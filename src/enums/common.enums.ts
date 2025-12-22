@@ -20,15 +20,15 @@ export enum Gender {
     /**
      * Male gender.
      */
-    MALE = 'MALE',
+    MALE,
 
     /**
      * Female gender.
      */
-    FEMALE = 'FEMALE',
+    FEMALE,
 
     /**
      * Other or unspecified gender.
      */
-    OTHER = 'OTHER',
+    OTHER,
 }

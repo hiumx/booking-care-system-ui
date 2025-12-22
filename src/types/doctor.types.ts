@@ -1,4 +1,4 @@
-import { Gender, Status } from '../enums/common.enums';
+import { Status } from '../enums/common.enums';
 import { PositionResponse } from './position.types';
 import { SpecialtyResponse } from './specialty.types';
 import { LanguageResponse } from './language.types';
@@ -11,7 +11,7 @@ export interface DoctorResponse {
     address?: string;
     firstName: string;
     lastName: string;
-    gender?: Gender;
+    gender?: string; // Backend returns string: 'MALE', 'FEMALE', 'OTHER'
     positionId?: string;
     specialtyId?: string;
     hospitalId?: string;
