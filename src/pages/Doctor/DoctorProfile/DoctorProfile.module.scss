@@ -176,3 +176,11 @@
         margin-left: 4px;
     }
 }
+
+.doctorProfileImage {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+}

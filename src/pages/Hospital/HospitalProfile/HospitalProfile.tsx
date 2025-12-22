@@ -19,7 +19,7 @@ import ExpandableText from '@/components/ExpandableText';
 import { SpecialtyItem } from './components/SpecialtyItem';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store';
-import { getHospitalByIdAsync } from '@/store/slices/hospitalSlice';
+import { getHospitalByIdAsync, clearSelectedHospital } from '@/store/slices/hospitalSlice';
 import { HospitalProfileResponse } from '@/types/hospital.types';
 import { PATHS } from '@/routes/paths';
 import { HospitalFaqService } from '@/services/hospitalFaq.service';
@@ -99,6 +99,13 @@ const HospitalProfile: React.FC = () => {
             dispatch(getHospitalByIdAsync(id));
         }
     }, [dispatch, id]);
+
+    // Cleanup: Clear selected hospital when component unmounts
+    useEffect(() => {
+        return () => {
+            dispatch(clearSelectedHospital());
+        };
+    }, [dispatch]);
 
     // Fetch FAQs when hospital ID is available
     useEffect(() => {

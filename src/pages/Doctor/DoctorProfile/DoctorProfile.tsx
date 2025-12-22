@@ -187,7 +187,7 @@ const DoctorProfile: React.FC = () => {
                                     <div className="doctor-img">
                                         <img
                                             src={doctor.avatarUrl || doctorImg}
-                                            className="img-fluid"
+                                            className={styles.doctorProfileImage}
                                             alt="User"
                                         />
                                     </div>

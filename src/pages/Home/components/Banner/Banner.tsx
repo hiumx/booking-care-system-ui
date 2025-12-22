@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { motion, useAnimation } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import SearchInput from '@/components/SearchInput';
 import { PATHS } from '@/routes/paths';
@@ -19,42 +19,11 @@ import bannerIcon01 from '@/assets/img/bg/banner-icon-01.svg';
 const Banner: React.FC = () => {
     const { t } = useTranslation('home');
     const navigate = useNavigate();
-    const [isTooltipVisible, setIsTooltipVisible] = useState(false);
-    const [tooltipPos, setTooltipPos] = useState<{ top: number; left: number } | null>(null);
-    const controls = useAnimation();
     const buttonRef = useRef<HTMLButtonElement | null>(null);
 
     const handleNavigate = () => {
         navigate(PATHS.AI_SUPPORT_BOOKING);
     };
-
-    const updateTooltipPosition = () => {
-        if (!buttonRef.current) return;
-        const rect = buttonRef.current.getBoundingClientRect();
-        setTooltipPos({ top: rect.bottom + 8, left: rect.left + rect.width / 2 });
-    };
-
-    const handleHoverStart = () => {
-        setIsTooltipVisible(true);
-        updateTooltipPosition();
-        controls.start({ opacity: 1, scale: 1 });
-    };
-
-    const handleHoverEnd = () => {
-        setIsTooltipVisible(false);
-        controls.start({ opacity: 0, scale: 0.9 });
-    };
-
-    useEffect(() => {
-        if (!isTooltipVisible) return;
-        const onResize = () => updateTooltipPosition();
-        window.addEventListener('resize', onResize);
-        window.addEventListener('scroll', onResize, true);
-        return () => {
-            window.removeEventListener('resize', onResize);
-            window.removeEventListener('scroll', onResize, true);
-        };
-    }, [isTooltipVisible]);
 
     return (
         <section
@@ -78,10 +47,6 @@ const Banner: React.FC = () => {
                                     ref={buttonRef}
                                     className="rating-appointment d-inline-flex align-items-center gap-2"
                                     onClick={handleNavigate}
-                                    onMouseEnter={handleHoverStart}
-                                    onMouseLeave={handleHoverEnd}
-                                    onFocus={handleHoverStart}
-                                    onBlur={handleHoverEnd}
                                     whileHover={{ scale: 1.05 }}
                                     transition={{ type: 'spring', stiffness: 300 }}
                                     style={{
@@ -112,36 +77,6 @@ const Banner: React.FC = () => {
                                         </div>
                                     </div>
                                 </motion.button>
-                                <motion.div
-                                    style={{
-                                        position: 'fixed',
-                                        top: tooltipPos ? `${tooltipPos.top}px` : '-9999px',
-                                        left: tooltipPos ? `${tooltipPos.left}px` : '-9999px',
-                                        transform: 'translateX(-50%)',
-                                        color: '#ffffff',
-                                        fontSize: '0.875rem',
-                                        padding: '0.5rem 1rem',
-                                        borderRadius: '0.5rem',
-                                        boxShadow:
-                                            '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-                                        zIndex: 100000,
-                                        whiteSpace: 'nowrap',
-                                        pointerEvents: 'none',
-                                        visibility: isTooltipVisible ? 'visible' : 'hidden',
-                                    }}
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={
-                                        isTooltipVisible
-                                            ? { opacity: 1, scale: 1 }
-                                            : { opacity: 0, scale: 0.95 }
-                                    }
-                                    transition={{ duration: 0.15 }}
-                                >
-                                    <span className={styles.bannerText}>
-                                        {t('banner.aiSupport.tooltip')}
-                                    </span>
-                                    <span className={styles.tooltipArrow} />
-                                </motion.div>
                             </motion.div>
                             <h1 className="display-5">
                                 <span className={styles.bannerText}>
