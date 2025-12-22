@@ -7,12 +7,14 @@ import DateTimeSection from './sections/DateTimeSection';
 import StepWizard from '@/components/StepWizard';
 import { BOOKING_STEPS } from './data/data';
 import { AppointmentService } from '@/services/appointment.service';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { PATHS } from '@/routes/paths';
 import styles from './Booking.module.scss';
 import clsx from 'clsx';
 import BookingLoadingState from './components/BookingLoadingState';
 import { loadAppointmentData, validateAppointmentParams } from '@/utils/appointment-utils';
+import { setAppointmentType } from '@/store/slices/bookingSlice';
+import { AppointmentType } from '@/enums/appointment.enums';
 
 /**
  * RescheduleAppointment Page - Option 1
@@ -24,6 +26,7 @@ const RescheduleAppointment: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const { appointmentId } = useParams<{ appointmentId: string }>();
     const [searchParams] = useSearchParams();
 
@@ -31,6 +34,29 @@ const RescheduleAppointment: React.FC = () => {
 
     const rescheduleToken = searchParams.get('token');
     const doctorId = searchParams.get('doctorId');
+    const appointmentTypeFromUrl = searchParams.get('appointmentType');
+
+    // Update Redux store with appointmentType from URL
+    useEffect(() => {
+        if (appointmentTypeFromUrl) {
+            const type =
+                appointmentTypeFromUrl === 'TELEHEALTH'
+                    ? AppointmentType.TELEHEALTH
+                    : AppointmentType.IN_PERSON;
+            dispatch(setAppointmentType(type));
+        }
+    }, [appointmentTypeFromUrl, dispatch]);
+
+    // Also update from appointment data if URL param is not available
+    useEffect(() => {
+        if (appointmentData?.appointmentType && !appointmentTypeFromUrl) {
+            const type =
+                appointmentData.appointmentType === 'TELEHEALTH'
+                    ? AppointmentType.TELEHEALTH
+                    : AppointmentType.IN_PERSON;
+            dispatch(setAppointmentType(type));
+        }
+    }, [appointmentData, appointmentTypeFromUrl, dispatch]);
 
     useEffect(() => {
         if (!validateAppointmentParams(appointmentId || null, rescheduleToken, navigate)) {

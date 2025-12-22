@@ -140,6 +140,7 @@
             "payment": "Thanh Toán"
         },
         "depositNote": "Lưu ý: Bạn chỉ cần thanh toán cọc 30% giá khám. Số tiền còn lại sẽ được thanh toán khi hoàn thành khám.",
+        "telehealthNote": "Lưu ý: Tư vấn trực tuyến yêu cầu thanh toán 100% phí khám.",
         "priceDifference": {
             "equal": "Cọc khám giống nhau, bạn không cần thanh toán thêm",
             "higher": "Bác sĩ mới có cọc cao hơn {{amount}}, bạn cần thanh toán thêm",
@@ -175,7 +176,8 @@
             "hospital": "Bệnh viện",
             "experience": "Kinh nghiệm",
             "years": "năm",
-            "newDeposit": "Phí cọc mới (30%)"
+            "newDeposit": "Phí cọc mới (30%)",
+            "newPayment": "Phí khám mới (100%)"
         },
         "priceDifference": {
             "higher": "Cọc cao hơn",
@@ -377,11 +379,13 @@
             "discount": "Giảm giá",
             "totalAfterDiscount": "Tổng sau giảm giá",
             "depositFee": "Phí đặt cọc (30%)",
+            "fullPaymentFee": "Phí tư vấn trực tuyến (100%)",
             "supplementaryAmount": "Số tiền cần thanh toán thêm",
             "finalAmount": "Số tiền thanh toán",
             "supplementaryFinalAmount": "Số tiền cần thanh toán thêm"
         },
         "depositNote": "Bạn chỉ cần thanh toán đặt cọc 30% ({{depositAmount}} đ) để xác nhận lịch hẹn. Số tiền còn lại ({{remainingAmount}} đ) sẽ được thanh toán trực tiếp tại phòng khám.",
+        "telehealthNote": "Tư vấn trực tuyến yêu cầu thanh toán 100% phí khám ({{amount}} đ) để xác nhận lịch hẹn.",
         "supplementaryNote": "Bác sĩ mới có cọc cao hơn. Bạn cần thanh toán thêm {{amount}} đ để xác nhận lịch hẹn. Số tiền còn lại sẽ được thanh toán khi hoàn thành khám.",
         "noPriceWarning": "Không tìm thấy thông tin giá khám. Vui lòng quay lại và chọn lại {{entity}}.",
         "entityService": "dịch vụ",

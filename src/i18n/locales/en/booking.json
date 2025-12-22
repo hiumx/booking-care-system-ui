@@ -140,6 +140,7 @@
             "payment": "Payment"
         },
         "depositNote": "Note: You only need to pay a 30% deposit. The remaining amount will be paid upon completion.",
+        "telehealthNote": "Note: Telehealth consultation requires 100% payment upfront.",
         "priceDifference": {
             "equal": "Same deposit amount, no additional payment required",
             "higher": "New doctor has a higher deposit of {{amount}}, additional payment required",
@@ -175,7 +176,8 @@
             "hospital": "Hospital",
             "experience": "Experience",
             "years": "years",
-            "newDeposit": "New Deposit (30%)"
+            "newDeposit": "New Deposit (30%)",
+            "newPayment": "New Payment (100%)"
         },
         "priceDifference": {
             "higher": "Higher deposit",
@@ -377,11 +379,13 @@
             "discount": "Discount",
             "totalAfterDiscount": "Total After Discount",
             "depositFee": "Deposit Fee (30%)",
+            "fullPaymentFee": "Telehealth Fee (100%)",
             "supplementaryAmount": "Additional Payment Required",
             "finalAmount": "Payment Amount",
             "supplementaryFinalAmount": "Additional Payment Required"
         },
         "depositNote": "You only need to pay a 30% deposit ({{depositAmount}}) to confirm your appointment. The remaining amount ({{remainingAmount}}) will be paid directly at the clinic.",
+        "telehealthNote": "Telehealth consultation requires 100% payment ({{amount}}) to confirm your appointment.",
         "supplementaryNote": "The new doctor has a higher deposit. You need to pay an additional {{amount}} to confirm the appointment. The remaining amount will be paid upon completion.",
         "noPriceWarning": "Price information not found. Please go back and select {{entity}} again.",
         "entityService": "service",

@@ -49,6 +49,10 @@ const DoctorList: React.FC = () => {
     const rescheduleAppointmentId = searchParams.get('rescheduleFor');
     const rescheduleToken = searchParams.get('token');
 
+    // Get appointmentType from URL for reschedule flow (TELEHEALTH or IN_PERSON)
+    // This determines which service type to filter doctors by
+    const appointmentTypeFromUrl = searchParams.get('appointmentType');
+
     // Get common params (works for both reschedule and normal search flow)
     const specialtyIdFromUrl = searchParams.get('specialtyId');
     const hospitalIdFromUrl = searchParams.get('hospitalId');
@@ -178,6 +182,16 @@ const DoctorList: React.FC = () => {
     };
 
     const initializeServiceTypeFilter = () => {
+        // Priority 1: If appointmentType is provided in URL (from reschedule flow)
+        // Map TELEHEALTH -> 'Tư vấn trực tuyến', IN_PERSON -> 'Khám trực tiếp'
+        if (appointmentTypeFromUrl) {
+            const serviceTypeName =
+                appointmentTypeFromUrl === 'TELEHEALTH' ? 'Tư vấn trực tuyến' : 'Khám trực tiếp';
+            setServiceTypeFilters([serviceTypeName]);
+            return;
+        }
+
+        // Priority 2: If serviceTypeId is provided in URL
         if (serviceTypeFromUrl && serviceTypes.length > 0) {
             const serviceType = serviceTypes.find((st) => st.id === serviceTypeFromUrl);
             if (serviceType) {
@@ -532,6 +546,7 @@ const DoctorList: React.FC = () => {
                               token: rescheduleToken!,
                               rescheduleSpecialtyId: specialtyIdFromUrl!,
                               rescheduleHospitalId: hospitalIdFromUrl!,
+                              appointmentType: appointmentTypeFromUrl || undefined,
                           }
                         : undefined
                 }
