@@ -11,7 +11,7 @@ import ChatAreaSkeleton from './components/ChatArea/ChatAreaSkeleton';
 import { AppDispatch, RootState } from '@/store';
 import { fetchUserProfile } from '@/store/slices/userSlice';
 import styles from './AISupportBooking.module.scss';
-import { Message, ChatHistory, Suggestion } from '@/types/ai.types';
+import { Message, ChatHistory, Suggestion, ConversationType } from '@/types/ai.types';
 import { PATHS, replacePathParams } from '@/routes/paths';
 import { AIService, SymptomAnalysisRequest } from '@/services/ai.service';
 
@@ -303,6 +303,10 @@ const AISupportBooking: React.FC = () => {
                         lastMessage: session.lastMessage || '',
                         lastMessageTime: formattedTime,
                         avatar: '',
+                        conversationType:
+                            session.conversationType ||
+                            (session as any).ConversationType ||
+                            ConversationType.SYMPTOM_ANALYSIS,
                     };
                 });
 
@@ -326,8 +330,22 @@ const AISupportBooking: React.FC = () => {
                             (chat) => !backendIds.has(chat.id)
                         );
 
-                        // Merge: local-only chats (newest) first, then sorted backend histories
-                        return [...localOnlyChats, ...historiesFromBackend];
+                        // Merge backend histories with local state, preserving conversationType from local if exists
+                        const mergedBackendHistories = historiesFromBackend.map((backendChat) => {
+                            const localChat = prevHistories.find((c) => c.id === backendChat.id);
+                            // If chat exists in local state and has conversationType, preserve it
+                            // This prevents overwriting with default SYMPTOM_ANALYSIS
+                            if (localChat && localChat.conversationType) {
+                                return {
+                                    ...backendChat,
+                                    conversationType: localChat.conversationType,
+                                };
+                            }
+                            return backendChat;
+                        });
+
+                        // Merge: local-only chats (newest) first, then merged backend histories
+                        return [...localOnlyChats, ...mergedBackendHistories];
                     });
                 } else {
                     // Full reload (first time load), already sorted by updatedAt (newest first)
@@ -429,93 +447,51 @@ const AISupportBooking: React.FC = () => {
     }, [chatId, isAuthenticated, userLocation, navigate, fetchChatMessages]);
 
     // Generate GUID-like string for session ID
-    const generateSessionId = (): string => {
-        if (globalThis.crypto?.randomUUID) {
-            return globalThis.crypto.randomUUID();
+    // Create new session with conversation type
+    const createNewSession = async (
+        conversationType: ConversationType,
+        initialMessage?: string
+    ): Promise<string> => {
+        try {
+            const response = await AIService.createSession({
+                conversationType,
+                initialMessage,
+            });
+
+            if (response.success && response.data) {
+                const newSession = response.data;
+
+                // Add to local state
+                const history: ChatHistory = {
+                    id: newSession.sessionId,
+                    title: newSession.title || initialMessage || t('chat.newConversation'),
+                    lastMessage: initialMessage || '',
+                    lastMessageTime: t('chat.justNow'),
+                    avatar: '',
+                    conversationType: newSession.conversationType,
+                };
+
+                setChatHistories((prev) => [history, ...prev]);
+                setActiveChatId(newSession.sessionId);
+                setMessages([]);
+                setIsLoadingChat(false);
+
+                navigate(
+                    replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, {
+                        chatId: newSession.sessionId,
+                    }),
+                    { replace: true }
+                );
+
+                return newSession.sessionId;
+            }
+
+            throw new Error('Failed to create session');
+        } catch (error: any) {
+            console.error('Error creating session:', error);
+            toast.error(error.message || t('errors.cannotCreateSession'));
+            throw error;
         }
-
-        // Ensure crypto.getRandomValues is available for secure random generation
-        if (!globalThis.crypto?.getRandomValues) {
-            throw new Error('Crypto API not available. Secure random generation is required.');
-        }
-
-        const bytes = new Uint8Array(16);
-        globalThis.crypto.getRandomValues(bytes);
-
-        // Set version (4) and variant bits for UUID v4
-        bytes[6] = (bytes[6] & 0x0f) | 0x40;
-        bytes[8] = (bytes[8] & 0x3f) | 0x80;
-
-        const byteToHex = (byte: number) => {
-            return byte.toString(16).padStart(2, '0');
-        };
-
-        const segments = [
-            bytes.slice(0, 4),
-            bytes.slice(4, 6),
-            bytes.slice(6, 8),
-            bytes.slice(8, 10),
-            bytes.slice(10, 16),
-        ];
-
-        return segments.map((segment) => Array.from(segment, byteToHex).join('')).join('-');
-    };
-
-    const formatChatTimestamp = (date: Date = new Date()) => {
-        return date.toLocaleString('vi-VN', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-        });
-    };
-
-    const buildChatHistory = (id: string, initialContent?: string): ChatHistory => {
-        const trimmed = initialContent?.trim() ?? '';
-        let title = t('chat.newConversation');
-        if (trimmed.length > 0) {
-            title = trimmed.length > 30 ? `${trimmed.substring(0, 30)}...` : trimmed;
-        }
-
-        return {
-            id,
-            title,
-            lastMessage: trimmed,
-            lastMessageTime: trimmed ? t('chat.justNow') : formatChatTimestamp(),
-            avatar: '',
-        };
-    };
-
-    const startLocalChat = (
-        initialContent?: string,
-        options: { preserveMessages?: boolean; replaceHistory?: boolean } = {}
-    ): string => {
-        const newChatId = generateSessionId();
-        const history = buildChatHistory(newChatId, initialContent);
-
-        newlyCreatedChatsRef.current.add(newChatId);
-        setChatHistories((prev) => [history, ...prev]);
-        setActiveChatId(newChatId);
-
-        if (!options.preserveMessages) {
-            setMessages([]);
-            setIsLoadingChat(false);
-        }
-
-        navigate(replacePathParams(PATHS.AI_SUPPORT_BOOKING_CHAT, { chatId: newChatId }), {
-            replace: options.replaceHistory ?? false,
-        });
-
-        return newChatId;
-    };
-
-    const ensureChatSession = (initialContent: string): string => {
-        if (activeChatId) {
-            return activeChatId;
-        }
-        return startLocalChat(initialContent, { preserveMessages: true, replaceHistory: true });
     };
 
     // Helper function to map API response to suggestions
@@ -846,7 +822,10 @@ const AISupportBooking: React.FC = () => {
         }
 
         // Create new chat for nutrition conversation
-        const newChatId = startLocalChat('Tôi muốn tạo kế hoạch dinh dưỡng');
+        const newChatId = await createNewSession(
+            ConversationType.SYMPTOM_ANALYSIS,
+            'Tôi muốn tạo kế hoạch dinh dưỡng'
+        );
 
         // Call nutrition conversation API
         setIsAITyping(true);
@@ -872,6 +851,44 @@ const AISupportBooking: React.FC = () => {
         }
     };
 
+    // Handler for starting symptom analysis
+    const handleStartSymptomAnalysis = async () => {
+        if (!isAuthenticated) {
+            navigate(
+                `${PATHS.LOGIN}?returnUrl=${encodeURIComponent(globalThis.location.pathname)}`
+            );
+            return;
+        }
+
+        // Kiểm tra vị trí
+        if (!userLocation) {
+            toast.error('Vui lòng chọn vị trí trước khi bắt đầu');
+            return;
+        }
+
+        // Get current chat type
+        const currentChat = chatHistories.find((c) => c.id === activeChatId);
+        const conversationType = currentChat?.conversationType;
+
+        // If already in symptom analysis chat with no messages, do nothing
+        if (
+            conversationType === ConversationType.SYMPTOM_ANALYSIS &&
+            !messages.some((m) => m.fileAttachment) &&
+            messages.length === 0
+        ) {
+            // Already in correct chat type with no messages, do nothing
+            return;
+        }
+
+        // If in symptom analysis chat with messages, do nothing (already active)
+        if (conversationType === ConversationType.SYMPTOM_ANALYSIS && messages.length > 0) {
+            return;
+        }
+
+        // Create new symptom analysis chat
+        await createNewSession(ConversationType.SYMPTOM_ANALYSIS);
+    };
+
     const handleSendMessage = async (content: string) => {
         if (!content.trim()) return;
 
@@ -886,6 +903,21 @@ const AISupportBooking: React.FC = () => {
         // Kiểm tra vị trí trước khi gửi message
         if (!userLocation) {
             // Modal vị trí sẽ tự động hiển thị trong SearchBox
+            return;
+        }
+
+        // Get conversation type from current chat
+        const currentChat = chatHistories.find((c) => c.id === activeChatId);
+        const conversationType = currentChat?.conversationType;
+
+        // VALIDATE: Không cho gửi text message trong chat phân tích file
+        if (
+            conversationType === ConversationType.LAB_RESULT_ANALYSIS ||
+            conversationType === ConversationType.MEDICAL_IMAGE_ANALYSIS
+        ) {
+            toast.warning(
+                'Cuộc trò chuyện này chỉ dùng để phân tích file. Vui lòng tạo cuộc trò chuyện mới để chat.'
+            );
             return;
         }
 
@@ -906,11 +938,19 @@ const AISupportBooking: React.FC = () => {
             timestamp: new Date(),
         };
 
+        // Create new chat if no active chat - always use SYMPTOM_ANALYSIS type for text messages
+        let currentChatId = activeChatId;
+        if (!currentChatId) {
+            // Create new symptom analysis session
+            currentChatId = await createNewSession(
+                ConversationType.SYMPTOM_ANALYSIS,
+                trimmedContent
+            );
+        }
+
+        // Add user message AFTER creating session (to avoid being cleared by setMessages([]))
         const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
-
-        // Create new chat if no active chat
-        let currentChatId = ensureChatSession(trimmedContent);
 
         // Check if in nutrition conversation
         const lastAiMessage = messages.filter((m) => m.sender === 'ai').pop();
@@ -1037,7 +1077,7 @@ const AISupportBooking: React.FC = () => {
         }
     };
 
-    const handleNewChat = () => {
+    const handleNewChat = async () => {
         // Kiểm tra authentication
         if (!isAuthenticated) {
             navigate(
@@ -1052,7 +1092,11 @@ const AISupportBooking: React.FC = () => {
             return;
         }
 
-        startLocalChat(undefined, { preserveMessages: false, replaceHistory: false });
+        // Clear active chat to show welcome screen
+        // User will choose function by clicking on one of the 3 cards
+        setActiveChatId(null);
+        setMessages([]);
+        navigate(PATHS.AI_SUPPORT_BOOKING);
     };
 
     // Helper function to handle chat deletion navigation
@@ -1142,6 +1186,25 @@ const AISupportBooking: React.FC = () => {
             return;
         }
 
+        // Get conversation type from current chat
+        const currentChat = chatHistories.find((c) => c.id === activeChatId);
+        const conversationType = currentChat?.conversationType;
+
+        // VALIDATE: Chỉ cho upload nếu chưa có chat hoặc chat đúng loại
+        if (conversationType && conversationType !== ConversationType.LAB_RESULT_ANALYSIS) {
+            toast.warning('Vui lòng tạo cuộc trò chuyện mới để phân tích xét nghiệm');
+            return;
+        }
+
+        // Create new session with LAB_RESULT_ANALYSIS type
+        let currentChatId = activeChatId;
+        if (!currentChatId || conversationType !== ConversationType.LAB_RESULT_ANALYSIS) {
+            currentChatId = await createNewSession(
+                ConversationType.LAB_RESULT_ANALYSIS,
+                t('messages.analyzeLabResult')
+            );
+        }
+
         // Create user message with file attachment
         // Note: Content format must match backend marker text for upload limit check
         const userMessage: Message = {
@@ -1159,9 +1222,6 @@ const AISupportBooking: React.FC = () => {
         const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
 
-        // Create new chat if no active chat
-        let currentChatId = ensureChatSession(t('messages.analyzeLabResult'));
-
         // Call AI API to analyze lab result
         setIsAITyping(true);
 
@@ -1178,24 +1238,7 @@ const AISupportBooking: React.FC = () => {
         } catch (error: any) {
             console.error('Error analyzing lab result:', error);
 
-            // Check if error is about upload limit
-            // Backend returns BadRequest with message in error.response.data.message
-            const errorMessage = error?.response?.data?.message || error?.message || '';
-
-            if (
-                errorMessage
-                    .toLowerCase()
-                    .includes('mỗi cuộc trò chuyện chỉ hỗ trợ phân tích một file xét nghiệm')
-            ) {
-                // Show clear message to user
-                toast.info(t('errors.labResultLimit'));
-                // Remove the user message since upload was rejected
-                setMessages((prev) => prev.filter((m) => m.id !== userMessage.id));
-                setIsAITyping(false);
-                return;
-            }
-
-            // Show generic error message to user
+            // Show error message to user
             const errorContent = getErrorMessage(error);
 
             const errorMsg: Message = {
@@ -1234,6 +1277,25 @@ const AISupportBooking: React.FC = () => {
             return;
         }
 
+        // Get conversation type from current chat
+        const currentChat = chatHistories.find((c) => c.id === activeChatId);
+        const conversationType = currentChat?.conversationType;
+
+        // VALIDATE: Chỉ cho upload nếu chưa có chat hoặc chat đúng loại
+        if (conversationType && conversationType !== ConversationType.MEDICAL_IMAGE_ANALYSIS) {
+            toast.warning('Vui lòng tạo cuộc trò chuyện mới để phân tích hình ảnh y tế');
+            return;
+        }
+
+        // Create new session with MEDICAL_IMAGE_ANALYSIS type
+        let currentChatId = activeChatId;
+        if (!currentChatId || conversationType !== ConversationType.MEDICAL_IMAGE_ANALYSIS) {
+            currentChatId = await createNewSession(
+                ConversationType.MEDICAL_IMAGE_ANALYSIS,
+                t('messages.analyzeDermatology')
+            );
+        }
+
         // Create user message with file attachment
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -1249,9 +1311,6 @@ const AISupportBooking: React.FC = () => {
 
         const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
-
-        // Create new chat if no active chat
-        let currentChatId = ensureChatSession(t('messages.analyzeDermatology'));
 
         // Call AI API to analyze dermatology image
         setIsAITyping(true);
@@ -1349,7 +1408,10 @@ const AISupportBooking: React.FC = () => {
                             onLabResultFileSelect={handleLabResultFileSelect}
                             onDermatologyFileSelect={handleDermatologyFileSelect}
                             onNutritionClick={handleStartNutrition}
-                            isFileAnalysisMode={messages.some((m) => m.fileAttachment)}
+                            onSymptomClick={handleStartSymptomAnalysis}
+                            conversationType={
+                                chatHistories.find((c) => c.id === activeChatId)?.conversationType
+                            }
                         />
                     )}
                 </div>

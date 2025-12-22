@@ -22,14 +22,15 @@
         "selectLocationDermatology": "Vui lòng chọn vị trí trước khi phân tích ảnh da",
         "labResultLimit": "Mỗi cuộc trò chuyện chỉ hỗ trợ phân tích một file xét nghiệm. Vui lòng tạo cuộc trò chuyện mới để tiếp tục với file khác nhé!",
         "labResultFailed": "Không thể phân tích kết quả xét nghiệm. Vui lòng thử lại.",
-        "dermatologyFailed": "Không thể phân tích ảnh da. Vui lòng thử lại."
+        "dermatologyFailed": "Không thể phân tích ảnh da. Vui lòng thử lại.",
+        "cannotCreateSession": "Không thể tạo cuộc trò chuyện. Vui lòng thử lại."
     },
     "success": {
         "labResultAnalyzed": "Đã phân tích kết quả xét nghiệm thành công",
         "dermatologyAnalyzed": "Đã phân tích ảnh da thành công"
     },
     "labResult": {
-        "title": "KẾT QUẢ PHÂN TÍCH XÉT NGHIỆM:",
+        "title": "kết quả phân tích xét nghiệm:",
         "normalIndicators": "Các chỉ số bình thường:",
         "abnormalIndicators": "Các chỉ số bất thường:",
         "reference": "Tham chiếu",
@@ -39,7 +40,7 @@
         "recommendedSpecialties": "Chuyên khoa phù hợp"
     },
     "dermatology": {
-        "title": "KẾT QUẢ PHÂN TÍCH ẢNH DA:",
+        "title": "Kết quả phân tích ảnh da:",
         "diagnosis": "Chẩn đoán khả năng",
         "confidence": "Độ tin cậy",
         "biopsyRecommended": "Khuyến nghị sinh thiết: Có",

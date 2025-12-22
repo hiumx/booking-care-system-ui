@@ -18542,6 +18542,7 @@ header.inner-header .header-nav .header-navbar-rht li.noti-nav > a i {
   border-color: #0E82FD;
   margin-left: 15px;
   width: auto;
+  padding: 5px 10px;
 }
 @media (max-width: 1399.96px) {
   .doc-profile-card-bottom .bottom-book-btn .clinic-booking .apt-btn {
@@ -27397,7 +27398,6 @@ a.mute-video.stop {
   font-weight: 500;
   letter-spacing: 1px;
   text-align: center;
-  text-transform: capitalize;
   width: 100%;
   padding: 8px 16px;
   border-radius: 44px;

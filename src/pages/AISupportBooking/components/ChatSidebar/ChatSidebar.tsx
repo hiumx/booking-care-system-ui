@@ -99,6 +99,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
         return t('sidebar.guest');
     };
 
+    // Get conversation type icon
     return (
         <div className={clsx(styles.sidebar, { [styles.closed]: !isOpen })}>
             <div className={styles.sidebarHeader}>
