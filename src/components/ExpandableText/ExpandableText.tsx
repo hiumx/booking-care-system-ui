@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 import clsx from 'clsx';
 import '@/styles/bio-content.scss';
 
@@ -16,12 +15,7 @@ const decodeHtml = (html: string): string => {
     return txt.value;
 };
 
-// Strip HTML tags to calculate text length
-const stripHtml = (html: string): string => {
-    const tmp = document.createElement('DIV');
-    tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
-};
+// (stripHtml removed — component renders full HTML so length checks/truncation are not used)
 
 // Convert YouTube watch URL to embed URL
 const getYouTubeEmbedUrl = (url: string): string | null => {
@@ -90,22 +84,17 @@ const convertOembedToIframe = (html: string): string => {
     return doc.body.innerHTML;
 };
 
-// Truncate HTML while preserving structure
-const getTruncatedHtml = (html: string, maxLength: number): string => {
-    const stripped = stripHtml(html);
-    if (stripped.length <= maxLength) return html;
-
-    const truncatedText = stripped.substring(0, maxLength) + '...';
-    return `<p>${truncatedText}</p>`;
-};
+// (truncation removed — component now renders full HTML)
 
 /**
  * Reusable component for expandable HTML text with "Show more/Show less" functionality
  * Renders HTML content from CKEditor
  */
-const ExpandableText: React.FC<ExpandableTextProps> = ({ text = '', limit = 300, className }) => {
-    const [expanded, setExpanded] = useState(false);
-
+const ExpandableText: React.FC<ExpandableTextProps> = ({
+    text = '',
+    limit: _limit = 300,
+    className,
+}) => {
     if (!text) {
         return <p className={className}>Không có thông tin</p>;
     }
@@ -113,11 +102,8 @@ const ExpandableText: React.FC<ExpandableTextProps> = ({ text = '', limit = 300,
     let decodedText = decodeHtml(text);
     decodedText = convertOembedToIframe(decodedText);
 
-    const textContent = stripHtml(decodedText);
-    const isLongText = textContent.length > limit;
-
-    const displayText =
-        expanded || !isLongText ? decodedText : getTruncatedHtml(decodedText, limit);
+    // Always render full decoded HTML (no truncation)
+    const displayText = decodedText;
 
     return (
         <div>
@@ -125,24 +111,7 @@ const ExpandableText: React.FC<ExpandableTextProps> = ({ text = '', limit = 300,
                 className={clsx('bio-content', className)}
                 dangerouslySetInnerHTML={{ __html: displayText }}
             />
-            {isLongText && (
-                <Link
-                    to="#"
-                    className="show-more d-flex align-items-center"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        setExpanded((prev) => !prev);
-                    }}
-                >
-                    {expanded ? 'Thu gọn' : 'Xem thêm'}
-                    <i
-                        className={clsx('fa-solid', 'ms-2', {
-                            'fa-chevron-up': expanded,
-                            'fa-chevron-down': !expanded,
-                        })}
-                    ></i>
-                </Link>
-            )}
+            {/* Always show full content — no "Xem thêm/Thu gọn" */}
         </div>
     );
 };

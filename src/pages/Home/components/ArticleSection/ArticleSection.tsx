@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PATHS } from '@/routes/paths';
@@ -6,6 +6,7 @@ import article01 from '@/assets/img/blog/article-01.jpg';
 import article02 from '@/assets/img/blog/article-02.jpg';
 import article03 from '@/assets/img/blog/article-03.jpg';
 import article04 from '@/assets/img/blog/article-04.jpg';
+import BlogService from '@/services/blog.service';
 
 interface Article {
     id: string | number;
@@ -13,6 +14,7 @@ interface Article {
     title: string;
     description: string;
     category: string;
+    tag?: string;
     date: string;
     day: string;
     month: string;
@@ -32,6 +34,7 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ articles }) => {
     }) as Array<{ category: string; title: string; description: string }>;
 
     const imagePaths = [article01, article02, article03, article04];
+    const [fetchedArticles, setFetchedArticles] = useState<Article[] | null>(null);
 
     // Month names based on language
     const monthNames = {
@@ -53,12 +56,87 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ articles }) => {
         id: index + 1,
         image: imagePaths[index] || article01,
         ...item,
+        tag: '',
         date: dates[index].date,
         day: dates[index].day,
         month: months[dates[index].monthIndex],
     }));
 
-    const displayArticles = articles || defaultArticles;
+    useEffect(() => {
+        let isMounted = true;
+        async function loadLatestBlogs() {
+            try {
+                const res = await BlogService.getBlogs({ page: 1, pageSize: 4 });
+                const items = res.data?.items ?? (res.data as any) ?? [];
+                const articlesFromApi: Article[] = (items || [])
+                    .slice(0, 4)
+                    .map((item: any, index: number) => {
+                        const itemDate = item.publishedAt
+                            ? new Date(item.publishedAt)
+                            : item.date
+                              ? new Date(item.date)
+                              : new Date();
+                        const day = String(itemDate.getDate()).padStart(2, '0');
+                        const month = months[itemDate.getMonth()] || months[0];
+                        return {
+                            id: item.id ?? index + 1,
+                            image:
+                                item.thumbnailUrl || item.image || imagePaths[index] || article01,
+                            title: item.titleVi || item.title || item.name || '',
+                            description: item.excerpt || item.description || '',
+                            category: item.category?.categoryName || item.category || '',
+                            date:
+                                item.publishedAt ||
+                                item.date ||
+                                itemDate.toISOString().split('T')[0],
+                            day,
+                            month,
+                            slug: item.slug ?? String(item.id),
+                        };
+                    });
+                if (isMounted) setFetchedArticles(articlesFromApi);
+            } catch {
+                // swallow error, keep fallback content
+            }
+            return;
+        }
+        loadLatestBlogs();
+        return () => {
+            isMounted = false;
+        };
+    }, [i18n.language]);
+
+    const displayArticles = articles || fetchedArticles || defaultArticles;
+    // Helpers to extract/clean excerpt similar to FeaturedBlog
+    const getRawExcerpt = (item: any): string | null => {
+        return (
+            item?.excerpt ||
+            item?.summary ||
+            item?.contentVi ||
+            item?.content ||
+            item?.description ||
+            null
+        );
+    };
+
+    const decodeHtmlEntities = (html: string) => {
+        const txt = document.createElement('textarea');
+        txt.innerHTML = html;
+        return txt.value;
+    };
+
+    const stripHtmlTags = (html?: string) => {
+        if (!html) return '';
+        const decoded = decodeHtmlEntities(html);
+        const tmp = document.createElement('div');
+        tmp.innerHTML = decoded;
+        return (tmp.textContent || tmp.innerText || '').trim();
+    };
+
+    const truncate = (text: string, max = 120) => {
+        if (!text) return '';
+        return text.length > max ? text.slice(0, max).trimEnd() + '...' : text;
+    };
 
     return (
         <section className="article-section">
@@ -92,7 +170,7 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ articles }) => {
                                 </div>
                                 <div className="article-info">
                                     <span className="badge badge-cyan mb-2">
-                                        {article.category}
+                                        {article.tag || article.category}
                                     </span>
                                     <h6 className="mb-2">
                                         <Link
@@ -106,7 +184,12 @@ const ArticleSection: React.FC<ArticleSectionProps> = ({ articles }) => {
                                             {article.title}
                                         </Link>
                                     </h6>
-                                    <p>{article.description}</p>
+                                    {(() => {
+                                        const raw = getRawExcerpt(article as any);
+                                        const text = raw ? stripHtmlTags(raw) : '';
+                                        const excerpt = truncate(text, 120);
+                                        return excerpt ? <p>{excerpt}</p> : null;
+                                    })()}
                                 </div>
                             </div>
                         </div>

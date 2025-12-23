@@ -10,6 +10,39 @@ interface FeaturedBlogProps {
 }
 
 const FeaturedBlog: React.FC<FeaturedBlogProps> = ({ featuredBlogs, formatDate }) => {
+    // Helper: try to extract an excerpt from possible fields on BlogSummaryDto
+    const getRawExcerpt = (blog: BlogSummaryDto): string | null => {
+        // Some API responses may include short content fields not typed in BlogSummaryDto
+        const anyBlog = blog as any;
+        return (
+            anyBlog.excerpt ||
+            anyBlog.summary ||
+            anyBlog.contentVi ||
+            anyBlog.content ||
+            anyBlog.description ||
+            null
+        );
+    };
+
+    const decodeHtmlEntities = (html: string) => {
+        const txt = document.createElement('textarea');
+        txt.innerHTML = html;
+        return txt.value;
+    };
+
+    const stripHtmlTags = (html?: string) => {
+        if (!html) return '';
+        // Decode HTML entities first (backend may return escaped HTML like '&lt;img ...&gt;')
+        const decoded = decodeHtmlEntities(html);
+        const tmp = document.createElement('div');
+        tmp.innerHTML = decoded;
+        return (tmp.textContent || tmp.innerText || '').trim();
+    };
+
+    const truncate = (text: string, max = 120) => {
+        if (!text) return '';
+        return text.length > max ? text.slice(0, max).trimEnd() + '...' : text;
+    };
     // Get main article (first featured blog) and small articles (next 2)
     const mainArticle = featuredBlogs[0];
     const smallArticles = featuredBlogs.slice(1, 3);
@@ -105,6 +138,17 @@ const FeaturedBlog: React.FC<FeaturedBlogProps> = ({ featuredBlogs, formatDate }
                                 >
                                     {article.titleVi}
                                 </Link>
+                                {/* Excerpt to avoid empty-looking cards; prefer API-provided short fields when available */}
+                                {(() => {
+                                    const raw = getRawExcerpt(article);
+                                    const text = raw ? stripHtmlTags(raw) : '';
+                                    const excerpt = truncate(text, 100);
+                                    return excerpt ? (
+                                        <p className={styles.smallArticleExcerpt} aria-hidden>
+                                            {excerpt}
+                                        </p>
+                                    ) : null;
+                                })()}
                                 <div className={styles.smallArticleMeta}>
                                     {article.createdByName && (
                                         <Link

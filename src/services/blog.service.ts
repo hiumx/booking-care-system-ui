@@ -15,6 +15,7 @@ import {
     BlogRelationItemDto,
     BlogRelationType,
 } from '@/types/blog.types';
+import { BlogStatus } from '@/types/blog.types';
 
 // Base API endpoint for blog service
 const BLOG_ENDPOINTS = {
@@ -128,7 +129,12 @@ export class BlogService {
      */
     static async createBlog(request: CreateBlogRequest): Promise<ApiResponse<BlogDetailDto>> {
         try {
-            const response: any = await axiosInstance.post(BLOG_ENDPOINTS.CREATE_BLOG, request);
+            // ensure newly created blogs default to Pending for moderation
+            const payload = {
+                ...request,
+                status: (request as any).status ?? BlogStatus.Pending,
+            };
+            const response: any = await axiosInstance.post(BLOG_ENDPOINTS.CREATE_BLOG, payload);
             return {
                 success: response.success ?? true,
                 data: response.data || response,

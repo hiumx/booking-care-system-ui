@@ -98,11 +98,30 @@ const BlogDetail: React.FC = () => {
     const handleTocClick = (e: MouseEvent<HTMLAnchorElement>, id: string) => {
         e.preventDefault();
         const el = document.getElementById(id);
-        if (!el) return;
         const headerOffset = 90; // offset for sticky BlogHeader
-        const elementPosition = el.getBoundingClientRect().top + window.scrollY;
-        const offsetPosition = elementPosition - headerOffset;
-        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+
+        const scrollToElement = (targetEl: HTMLElement) => {
+            const elementPosition = targetEl.getBoundingClientRect().top + window.scrollY;
+            const offsetPosition = elementPosition - headerOffset;
+            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+        };
+
+        if (el) {
+            scrollToElement(el);
+            return;
+        }
+
+        // If the target element is not present (commonly because ExpandableText is truncated),
+        // request ExpandableText instances to expand, then try again shortly.
+        window.dispatchEvent(new CustomEvent('expandExpandableText'));
+
+        // Try again on next animation frame (gives ExpandableText time to render full HTML)
+        requestAnimationFrame(() => {
+            const elAfterExpand = document.getElementById(id);
+            if (elAfterExpand) {
+                scrollToElement(elAfterExpand);
+            }
+        });
     };
 
     const formatDate = (dateString?: string) => {
@@ -119,21 +138,32 @@ const BlogDetail: React.FC = () => {
     };
 
     // Parse HTML content to extract sections for table of contents
+    // and inject id attributes into heading tags so anchors can target them.
     const parseContentSections = (content: string) => {
-        // Simple regex to find h2 tags - can be enhanced
-        const h2Regex = /<h2[^>]*>(.*?)<\/h2>/gi;
         const sections: { id: string; title: string }[] = [];
-        let match;
-        let index = 0;
-
-        while ((match = h2Regex.exec(content)) !== null) {
-            const title = stripHtmlTags(match[1]);
-            const id = `section-${index}`;
-            sections.push({ id, title });
-            index++;
+        if (!content) {
+            return { sections, contentWithIds: content };
         }
 
-        return sections;
+        const h2Regex = /<h2([^>]*)>(.*?)<\/h2>/gi;
+        let index = 0;
+
+        const contentWithIds = content.replace(h2Regex, (fullMatch, attrs, innerHtml) => {
+            const title = stripHtmlTags(innerHtml);
+            const id = `section-${index++}`;
+            sections.push({ id, title });
+
+            // If the heading already has an id attribute, preserve it and don't add another.
+            if (/\bid\s*=/i.test(attrs || '')) {
+                return `<h2${attrs}>${innerHtml}</h2>`;
+            }
+
+            // Ensure attrs string (may be empty) is placed after the id attribute
+            const attrsString = attrs ? `${attrs}` : '';
+            return `<h2 id="${id}"${attrsString}>${innerHtml}</h2>`;
+        });
+
+        return { sections, contentWithIds };
     };
 
     // Convert category name to slug (same logic as CategoryBlogs)
@@ -187,7 +217,7 @@ const BlogDetail: React.FC = () => {
         );
     }
 
-    const sections = parseContentSections(blog.contentVi);
+    const { sections, contentWithIds: processedContent } = parseContentSections(blog.contentVi);
     const breadcrumbData = {
         items: [
             { label: 'Trang chủ', path: PATHS.HOME, isActive: false },
@@ -218,7 +248,7 @@ const BlogDetail: React.FC = () => {
                             <TableOfContents items={sections} onClick={handleTocClick} />
                         )}
                         <div className={styles.blogContent}>
-                            <ExpandableText text={blog.contentVi} limit={500} />
+                            <ExpandableText text={processedContent} limit={500} />
                         </div>
                         <Benefits />
                         <TabAccordion />
