@@ -162,5 +162,13 @@
         "female": "Nữ",
         "other": "Khác",
         "notUpdated": "Chưa cập nhật"
+    },
+    "filePreview": {
+        "close": "Đóng",
+        "download": "Tải xuống",
+        "openInNewTab": "Mở trong tab mới",
+        "cannotPreview": "Không thể xem trước tệp này",
+        "downloadFile": "tải xuống tệp",
+        "docViewerNote": "Xem trước được cung cấp bởi Google Docs Viewer. Nếu không hiển thị, vui lòng"
     }
 }

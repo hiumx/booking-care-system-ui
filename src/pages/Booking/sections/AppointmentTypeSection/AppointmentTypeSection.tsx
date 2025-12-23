@@ -118,6 +118,8 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
     // Check if user selected service (not specialty) - service requires IN_PERSON only
     const isServiceSelected = !!bookingState.selectedServiceMedicalId;
     const isSpecialtySelected = !!bookingState.selectedSpecialtyId;
+    // Check if TELEHEALTH is selected - requires self-select doctor
+    const isTelehealthSelected = selectedType === AppointmentType.TELEHEALTH;
 
     // Auto-set IN_PERSON for service selection
     useEffect(() => {
@@ -126,6 +128,13 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
             dispatch(setAppointmentType(AppointmentType.IN_PERSON));
         }
     }, [isServiceSelected, dispatch]);
+
+    // Auto-switch to 'self' mode when TELEHEALTH is selected (hospital assign not allowed)
+    useEffect(() => {
+        if (isTelehealthSelected && doctorSelectionMode === 'hospital') {
+            setDoctorSelectionMode('self');
+        }
+    }, [isTelehealthSelected, doctorSelectionMode]);
 
     // Fetch languages for filter dropdown
     useEffect(() => {
@@ -317,12 +326,16 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
         setSelectedDoctor(null);
         dispatch(setSelectedDoctorId(null));
         dispatch(clearSelectedDoctor());
-        setDoctorSelectionMode('hospital');
+        // For TELEHEALTH, force 'self' mode (hospital assign not allowed)
+        // For IN_PERSON, default to 'hospital' mode
+        setDoctorSelectionMode(type === AppointmentType.TELEHEALTH ? 'self' : 'hospital');
     };
 
     const handleDoctorSelectionModeChange = (mode: 'hospital' | 'self') => {
         // Only process if mode actually changes
         if (doctorSelectionMode === mode) return;
+        // Prevent switching to 'hospital' mode for TELEHEALTH
+        if (mode === 'hospital' && isTelehealthSelected) return;
 
         setDoctorSelectionMode(mode);
         // Always clear schedule data when switching between modes
@@ -420,7 +433,9 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
     const renderNoDoctorsMessage = () => (
         <div className="alert alert-info mb-0">
             <i className="isax isax-info-circle me-2" aria-hidden="true"></i>{' '}
-            {t('appointmentTypeSection.doctorSelection.noDoctorsMessage')}
+            {isTelehealthSelected
+                ? t('appointmentTypeSection.doctorSelection.noDoctorsMessageTelehealth')
+                : t('appointmentTypeSection.doctorSelection.noDoctorsMessage')}
         </div>
     );
 
@@ -565,18 +580,26 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                 <div className="col-md-6 mb-3 mb-md-0">
                                     <div
                                         role="button"
-                                        tabIndex={0}
+                                        tabIndex={isTelehealthSelected ? -1 : 0}
                                         className={clsx(
                                             styles.doctorItem,
                                             'service-item',
-                                            doctorSelectionMode === 'hospital' && 'active'
+                                            doctorSelectionMode === 'hospital' && 'active',
+                                            isTelehealthSelected && styles.disabled
                                         )}
-                                        onClick={() => handleDoctorSelectionModeChange('hospital')}
+                                        onClick={() =>
+                                            !isTelehealthSelected &&
+                                            handleDoctorSelectionModeChange('hospital')
+                                        }
                                         onKeyDown={(e) => {
-                                            if (e.key === 'Enter' || e.key === ' ') {
+                                            if (
+                                                !isTelehealthSelected &&
+                                                (e.key === 'Enter' || e.key === ' ')
+                                            ) {
                                                 handleDoctorSelectionModeChange('hospital');
                                             }
                                         }}
+                                        aria-disabled={isTelehealthSelected}
                                     >
                                         <input
                                             id="doctorSelectionModeHospital"
@@ -587,6 +610,7 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                             onChange={() =>
                                                 handleDoctorSelectionModeChange('hospital')
                                             }
+                                            disabled={isTelehealthSelected}
                                         />
                                         <label
                                             className="form-check-label ms-2"
@@ -606,9 +630,13 @@ const AppointmentTypeSection: React.FC<AppointmentTypeSectionProps> = ({
                                                         )}
                                                     </span>
                                                     <span className="fs-14 text-muted">
-                                                        {t(
-                                                            'appointmentTypeSection.doctorSelection.hospitalAssignDesc'
-                                                        )}
+                                                        {isTelehealthSelected
+                                                            ? t(
+                                                                  'appointmentTypeSection.doctorSelection.hospitalAssignDisabledTelehealth'
+                                                              )
+                                                            : t(
+                                                                  'appointmentTypeSection.doctorSelection.hospitalAssignDesc'
+                                                              )}
                                                     </span>
                                                 </span>
                                             </span>

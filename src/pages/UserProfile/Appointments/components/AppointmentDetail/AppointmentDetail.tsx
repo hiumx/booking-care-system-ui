@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -19,6 +19,47 @@ import {
     formatAppointmentDate,
     getAppointmentTypeText,
 } from '../../utils/appointment-format.utils';
+import FilePreviewModal from '@/components/FilePreviewModal';
+
+// Auto-complete result text that should be hidden
+const AUTO_COMPLETE_RESULT = 'Tự động hoàn thành - Đã qua ngày hẹn';
+
+/**
+ * Check if result is a file URL
+ */
+const isFileUrl = (result: string): boolean => {
+    // Check for common file extensions or URL patterns
+    return (
+        /\.(pdf|doc|docx|jpg|jpeg|png|gif|webp)(\?|$)/i.test(result) ||
+        result.startsWith('http://') ||
+        result.startsWith('https://')
+    );
+};
+
+/**
+ * Get file name from URL
+ */
+const getFileNameFromUrl = (url: string): string => {
+    try {
+        const urlObj = new URL(url);
+        const pathname = urlObj.pathname;
+        const fileName = pathname.split('/').pop() || 'file';
+        // Remove query params from filename
+        return fileName.split('?')[0];
+    } catch {
+        return 'result-file';
+    }
+};
+
+/**
+ * Check if result should be displayed
+ * Hide if it's the auto-complete message
+ */
+const shouldShowResult = (result?: string): boolean => {
+    if (!result) return false;
+    if (result.trim() === AUTO_COMPLETE_RESULT) return false;
+    return true;
+};
 
 const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     appointment,
@@ -27,6 +68,9 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
     onReschedule,
 }) => {
     const { t, i18n } = useTranslation('userProfile');
+
+    // File preview modal state
+    const [isFilePreviewOpen, setIsFilePreviewOpen] = useState(false);
 
     // Configuration cho từng trạng thái
     const getStatusConfig = (): StatusConfig => {
@@ -369,10 +413,39 @@ const AppointmentDetail: React.FC<AppointmentDetailProps> = ({
                             <span>{appointment.visitType}</span>
                         </li>
                     )}
+                    {/* Result section - only show for COMPLETED status and valid result */}
+                    {appointment.status === AppointmentStatus.COMPLETED &&
+                        shouldShowResult(appointment.result) && (
+                            <li>
+                                <h6>{t('appointments.detailCard.result')}</h6>
+                                {isFileUrl(appointment.result!) ? (
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline-primary"
+                                        onClick={() => setIsFilePreviewOpen(true)}
+                                    >
+                                        <i className="isax isax-document-text me-1"></i>
+                                        {t('appointments.detailCard.viewResult')}
+                                    </button>
+                                ) : (
+                                    <span>{appointment.result}</span>
+                                )}
+                            </li>
+                        )}
                     {renderBottomSection()}
                 </ul>
             </div>
             {/* /Appointment Detail Card */}
+
+            {/* File Preview Modal for result */}
+            {appointment.result && isFileUrl(appointment.result) && (
+                <FilePreviewModal
+                    isOpen={isFilePreviewOpen}
+                    fileUrl={appointment.result}
+                    fileName={getFileNameFromUrl(appointment.result)}
+                    onClose={() => setIsFilePreviewOpen(false)}
+                />
+            )}
         </div>
     );
 };

@@ -162,5 +162,13 @@
         "female": "Female",
         "other": "Other",
         "notUpdated": "Not updated"
+    },
+    "filePreview": {
+        "close": "Close",
+        "download": "Download",
+        "openInNewTab": "Open in new tab",
+        "cannotPreview": "Cannot preview this file",
+        "downloadFile": "download the file",
+        "docViewerNote": "Preview provided by Google Docs Viewer. If not displayed, please"
     }
 }
