@@ -1237,7 +1237,9 @@ const Appointments: React.FC = () => {
                 reasonPlaceholder={t('appointments.cancelModal.reasonPlaceholder')}
                 minReasonLength={10}
                 refundInfo={
-                    selectedAppointmentToCancel && selectedAppointmentToCancel.consultationFees > 0
+                    (selectedAppointmentToCancel &&
+                        selectedAppointmentToCancel.consultationFees > 0) ||
+                    selectedAppointmentToCancel?.appointmentType === 'TELEHEALTH'
                         ? getRefundInfo(
                               selectedAppointmentToCancel.appointmentDate,
                               selectedAppointmentToCancel.appointmentTimeId,

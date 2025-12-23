@@ -54,18 +54,18 @@ export interface UpdateUserRequest {
     avatarUrl?: string;
 }
 
-// Helper function to get Vietnamese gender text
-export const getGenderText = (gender: Gender | undefined): string => {
-    if (gender === undefined || gender === null) return 'Chưa cập nhật';
+// Helper function to get gender translation key
+export const getGenderTranslationKey = (gender: Gender | undefined): string => {
+    if (gender === undefined || gender === null) return 'gender.notUpdated';
 
     switch (gender) {
         case Gender.MALE:
-            return 'Nam';
+            return 'gender.male';
         case Gender.FEMALE:
-            return 'Nữ';
+            return 'gender.female';
         case Gender.OTHER:
-            return 'Khác';
+            return 'gender.other';
         default:
-            return 'Chưa cập nhật';
+            return 'gender.notUpdated';
     }
 };

@@ -238,6 +238,8 @@
             "dateTime": "Ngày & Giờ Hẹn",
             "location": "Vị trí",
             "visitType": "Loại Thăm Khám",
+            "result": "Kết quả khám",
+            "viewResult": "Xem kết quả",
             "waitingConfirmation": "Đang chờ xác nhận",
             "startSession": "Bắt Đầu Phiên",
             "rescheduleStatus": "Trạng thái: Đặt lại lịch",

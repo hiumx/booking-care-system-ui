@@ -167,6 +167,8 @@
             "dateTime": "Date & Time",
             "location": "Location",
             "visitType": "Visit Type",
+            "result": "Examination Result",
+            "viewResult": "View Result",
             "waitingConfirmation": "Waiting for confirmation",
             "startSession": "Start Session",
             "rescheduleStatus": "Status: Reschedule",
