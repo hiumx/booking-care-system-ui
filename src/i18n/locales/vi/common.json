@@ -156,5 +156,11 @@
         "fileSizeExceeded": "Tệp \"{{fileName}}\" vượt quá kích thước tối đa {{maxSize}}MB",
         "selectFileAriaLabel": "Chọn tệp để tải lên",
         "removeFile": "Xóa tệp"
+    },
+    "gender": {
+        "male": "Nam",
+        "female": "Nữ",
+        "other": "Khác",
+        "notUpdated": "Chưa cập nhật"
     }
 }

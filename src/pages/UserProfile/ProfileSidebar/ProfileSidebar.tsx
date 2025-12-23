@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { UserProfile, getGenderText } from '@/types/user.types';
+import { UserProfile, getGenderTranslationKey } from '@/types/user.types';
 import { AppDispatch, RootState } from '@/store';
 import { logoutAsync } from '@/store/slices/authSlice';
 import { clearUserProfile } from '@/store/slices/userSlice';
@@ -15,7 +15,7 @@ interface ProfileSidebarProps {
 }
 
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) => {
-    const { t, i18n } = useTranslation('userProfile');
+    const { t, i18n } = useTranslation(['userProfile', 'common']);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { unreadCount } = useSelector((state: RootState) => state.notification);
@@ -102,7 +102,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
                             </h5>
                         </div>
                         <span>
-                            {t('sidebar.gender')}: {getGenderText(userData.gender)}{' '}
+                            {t('sidebar.gender')}:{' '}
+                            {t(getGenderTranslationKey(userData.gender), { ns: 'common' })}{' '}
                             <i className="fa-solid fa-circle"></i>
                             {t('sidebar.dateOfBirth')}: {formatDateOfBirth(userData.dateOfBirth)}
                         </span>

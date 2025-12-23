@@ -1,12 +1,14 @@
 import React, { forwardRef } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
-import { vi } from 'date-fns/locale';
+import { vi, enUS } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DateInput.scss';
 
-// Register Vietnamese locale
+// Register locales
 registerLocale('vi', vi);
+registerLocale('en', enUS);
 
 interface DateInputProps {
     label?: string;
@@ -75,14 +77,46 @@ const DateInput: React.FC<DateInputProps> = ({
     maxDate,
     minDate,
 }) => {
-    // Convert string to Date object
-    const dateValue = value ? new Date(value) : null;
+    const { i18n } = useTranslation();
+    const currentLanguage = i18n.language;
+
+    // Get date format based on language
+    const getDateFormat = () => {
+        return currentLanguage === 'vi' ? 'dd/MM/yyyy' : 'MM/dd/yyyy';
+    };
+
+    // Get locale for DatePicker
+    const getLocale = () => {
+        return currentLanguage === 'vi' ? 'vi' : 'en';
+    };
+
+    // Convert string to Date object, handling timezone properly
+    const dateValue = value
+        ? (() => {
+              try {
+                  // Parse YYYY-MM-DD format without timezone conversion
+                  const parts = value.split('-');
+                  if (parts.length === 3) {
+                      const year = parseInt(parts[0], 10);
+                      const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+                      const day = parseInt(parts[2], 10);
+                      return new Date(year, month, day);
+                  }
+                  return null;
+              } catch {
+                  return null;
+              }
+          })()
+        : null;
 
     // Handle date change
     const handleDateChange = (date: Date | null) => {
         if (date && onChange) {
-            // Format to YYYY-MM-DD for consistency with backend
-            const formattedDate = date.toISOString().split('T')[0];
+            // Format to YYYY-MM-DD using local date parts to avoid timezone issues
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
             onChange(formattedDate);
         } else if (!date && onChange) {
             onChange('');
@@ -101,8 +135,8 @@ const DateInput: React.FC<DateInputProps> = ({
                 selected={dateValue}
                 onChange={handleDateChange}
                 customInput={<CustomInput />}
-                locale="vi"
-                dateFormat="dd/MM/yyyy"
+                locale={getLocale()}
+                dateFormat={getDateFormat()}
                 placeholderText={placeholder}
                 disabled={disabled}
                 maxDate={maxDate}

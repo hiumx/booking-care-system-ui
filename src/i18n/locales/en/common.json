@@ -156,5 +156,11 @@
         "fileSizeExceeded": "File \"{{fileName}}\" exceeds maximum size of {{maxSize}}MB",
         "selectFileAriaLabel": "Select files to upload",
         "removeFile": "Remove file"
+    },
+    "gender": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other",
+        "notUpdated": "Not updated"
     }
 }
