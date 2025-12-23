@@ -292,11 +292,13 @@
             "description": "Bạn có thể chọn bác sĩ hoặc để bệnh viện phân công bác sĩ phù hợp",
             "hospitalAssign": "Để bệnh viện phân công",
             "hospitalAssignDesc": "Bác sĩ phù hợp nhất",
+            "hospitalAssignDisabledTelehealth": "Không khả dụng cho tư vấn trực tuyến",
             "selfSelect": "Tự chọn bác sĩ",
             "loading": "Đang tải...",
             "doctorsAvailable": "{{count}} bác sĩ có sẵn",
             "noDoctors": "Không có bác sĩ",
             "noDoctorsMessage": "Không tìm thấy bác sĩ phù hợp. Vui lòng chọn \"Để bệnh viện phân công\".",
+            "noDoctorsMessageTelehealth": "Không tìm thấy bác sĩ hỗ trợ tư vấn trực tuyến cho chuyên khoa này. Vui lòng chọn \"Khám trực tiếp\" hoặc thử chuyên khoa khác.",
             "selectDoctorHint": "Chọn bác sĩ bạn muốn khám",
             "noDoctorsFound": "Không tìm thấy bác sĩ phù hợp",
             "selectOrGoBack": "Vui lòng chọn một bác sĩ hoặc quay lại chọn \"Để bệnh viện phân công\""

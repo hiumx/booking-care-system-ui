@@ -292,11 +292,13 @@
             "description": "You can choose a doctor or let the hospital assign the most suitable one",
             "hospitalAssign": "Let hospital assign",
             "hospitalAssignDesc": "Most suitable doctor",
+            "hospitalAssignDisabledTelehealth": "Not available for online consultation",
             "selfSelect": "Choose doctor yourself",
             "loading": "Loading...",
             "doctorsAvailable": "{{count}} doctors available",
             "noDoctors": "No doctors",
             "noDoctorsMessage": "No suitable doctors found. Please select \"Let hospital assign\".",
+            "noDoctorsMessageTelehealth": "No doctors available for online consultation in this specialty. Please select \"In-person visit\" or try another specialty.",
             "selectDoctorHint": "Select the doctor you want to see",
             "noDoctorsFound": "No suitable doctors found",
             "selectOrGoBack": "Please select a doctor or go back to \"Let hospital assign\""

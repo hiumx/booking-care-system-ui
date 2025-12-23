@@ -97,8 +97,20 @@ const Profile = () => {
     const formatDateForInput = (dateString: string): string => {
         if (!dateString) return '';
         try {
+            // If already in YYYY-MM-DD format, return as is
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                return dateString;
+            }
+            // If in ISO format (with time), extract date part only
+            if (dateString.includes('T')) {
+                return dateString.split('T')[0];
+            }
+            // Fallback: parse and format
             const date = new Date(dateString);
-            return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+            const year = date.getUTCFullYear();
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(date.getUTCDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         } catch {
             return '';
         }
