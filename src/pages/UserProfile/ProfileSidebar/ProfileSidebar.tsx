@@ -35,13 +35,23 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ userData, activeTab }) 
     };
 
     // Helper function to format date of birth based on current language
+    // Uses UTC methods to avoid timezone conversion issues
     const formatDateOfBirth = (dateString: string | undefined) => {
         if (!dateString) return t('sidebar.notUpdated');
 
         try {
             const date = new Date(dateString);
-            const locale = i18n.language === 'vi' ? 'vi-VN' : 'en-US';
-            return date.toLocaleDateString(locale);
+            // Use UTC methods to avoid timezone shift
+            const day = date.getUTCDate();
+            const month = date.getUTCMonth() + 1;
+            const year = date.getUTCFullYear();
+
+            if (i18n.language === 'vi') {
+                // Vietnamese format: dd/MM/yyyy
+                return `${day}/${month}/${year}`;
+            }
+            // English format: MM/dd/yyyy
+            return `${month}/${day}/${year}`;
         } catch {
             return dateString;
         }
