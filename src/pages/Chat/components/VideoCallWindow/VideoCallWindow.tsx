@@ -196,7 +196,7 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
     const userId = profile?.accountId || '';
 
     // Get global chat context for clearing processed calls
-    const { clearProcessedCall } = useGlobalChat();
+    const { clearProcessedCall, setIsInCall } = useGlobalChat();
 
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
@@ -241,6 +241,15 @@ const VideoCallWindow: React.FC<VideoCallWindowProps> = ({
 
                 // ✅ Update ref synchronously (before React re-renders)
                 callStateRef.current = state;
+
+                // ✅ FIX #6: Update global call state
+                const isActiveCall =
+                    state === 'calling' ||
+                    state === 'ringing' ||
+                    state === 'connecting' ||
+                    state === 'connected';
+                setIsInCall(isActiveCall);
+                console.log('[VideoCallWindow] 📞 Set global isInCall:', isActiveCall);
 
                 if (
                     state === 'ended' ||
