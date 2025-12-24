@@ -37,6 +37,11 @@ export interface BlogSummaryDto {
     id: string;
     titleVi: string;
     thumbnailUrl?: string;
+    /**
+     * Optional short summary/excerpt for list cards. Backend should provide this field
+     * to avoid the need for extra detail requests per-card.
+     */
+    excerpt?: string;
     tag?: string;
     source?: string;
     createdByName?: string;
@@ -53,6 +58,10 @@ export interface BlogRelationItemDto {
     blogId: string;
     relationType: BlogRelationType;
     titleVi: string;
+    /**
+     * Optional short summary/excerpt for related blog items.
+     */
+    excerpt?: string;
     thumbnailUrl?: string;
     tag?: string;
     source?: string;
