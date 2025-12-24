@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './HospitalCard.module.scss';
+import medcureLogo from '@/assets/img/image_error.jpg';
 
 type HospitalCardProps = {
     image: string;
@@ -35,7 +36,17 @@ const HospitalCard: React.FC<HospitalCardProps> = ({
                 <div className="d-md-flex align-items-start">
                     {/* Doctor Image */}
                     <div className={`card-img card-img-hover ${styles.imageWrapper}`}>
-                        <img src={image} alt={name} className={styles.image} />
+                        <img
+                            src={image ?? medcureLogo}
+                            alt={name}
+                            className={styles.image}
+                            onError={(e) => {
+                                // Fallback to Medcure logo if provided image fails to load
+                                if (e.currentTarget.src !== medcureLogo) {
+                                    e.currentTarget.src = medcureLogo;
+                                }
+                            }}
+                        />
                         <div className="grid-overlay-item d-flex align-items-center justify-content-between">
                             <span className="badge bg-orange">
                                 <i className="fa-solid fa-star me-1"></i>

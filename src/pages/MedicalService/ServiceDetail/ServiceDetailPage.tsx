@@ -30,6 +30,7 @@ import '@/assets/css/feather.css';
 import { buildPath, PATHS, replacePathParams } from '@/routes/paths';
 import { HospitalCarousel } from '@/components/SimpleCarousel';
 import { getServicesWithHospitalAsync } from '@/store/slices/medicalServiceSlice';
+import medcureLogo from '@/assets/img/image_error.jpg';
 
 const ServiceDetailPage: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -221,9 +222,14 @@ const ServiceDetailPage: React.FC = () => {
                                 <div className="doc-info-left">
                                     <div className="doctor-img">
                                         <img
-                                            src={currentService.imageUrl}
+                                            src={currentService.imageUrl ?? medcureLogo}
                                             className="img-fluid"
                                             alt="Service"
+                                            onError={(e) => {
+                                                if (e.currentTarget.src !== medcureLogo) {
+                                                    e.currentTarget.src = medcureLogo;
+                                                }
+                                            }}
                                         />
                                     </div>
                                     <div className="doc-info-cont">
