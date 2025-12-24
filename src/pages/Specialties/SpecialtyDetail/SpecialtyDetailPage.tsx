@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import styles from './SpecialtyDetailPage.module.scss';
@@ -25,6 +25,7 @@ type TabType = 'doctor' | 'hospital';
 const SpecialtyDetailPage: React.FC = () => {
     const { t } = useTranslation('specialty');
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const { id: specialtyId } = useParams<{ id: string }>();
 
     const [activeTab, setActiveTab] = useState<TabType>('doctor');
@@ -214,23 +215,44 @@ const SpecialtyDetailPage: React.FC = () => {
             amount,
         })) || [];
 
-    const renderDoctorCard = (doctor: DoctorResponse) => (
-        <DoctorAppointmentBookingCard
-            key={doctor.id}
-            doctorId={doctor.id}
-            patientId={patientId}
-            name={`${doctor.lastName} ${doctor.firstName}`}
-            specialty={doctor.specialty?.name || t('detail.notUpdated')}
-            position={doctor.position?.name || t('detail.notUpdated')}
-            prices={formatDoctorPrices(doctor.prices)}
-            rating={doctor.reviewStatistics?.averageRating || 0}
-            location={doctor.hospital?.name || doctor.address || t('detail.notUpdated')}
-            yearsOfExperience={doctor.yearsOfExperience}
-            isFavorite={doctor.isFavorited || false}
-            languages={doctor.languages || []}
-            image={doctor.avatarUrl || '/default-doctor.png'}
-        />
-    );
+    const renderDoctorCard = (doctor: DoctorResponse) => {
+        const doctorProfileUrl = `/doctors/profile/${doctor.id}`;
+
+        return (
+            <div
+                key={doctor.id}
+                onClick={(e) => {
+                    // Check if click is on image or name link
+                    const target = e.target as HTMLElement;
+                    const isLink = target.closest('a');
+
+                    if (isLink) {
+                        const href = isLink.getAttribute('href');
+                        // Only intercept profile links (relative paths)
+                        if (href && href.includes('profile') && !href.startsWith('/doctors')) {
+                            e.preventDefault();
+                            navigate(doctorProfileUrl);
+                        }
+                    }
+                }}
+            >
+                <DoctorAppointmentBookingCard
+                    doctorId={doctor.id}
+                    patientId={patientId}
+                    name={`${doctor.lastName} ${doctor.firstName}`}
+                    specialty={doctor.specialty?.name || t('detail.notUpdated')}
+                    position={doctor.position?.name || t('detail.notUpdated')}
+                    prices={formatDoctorPrices(doctor.prices)}
+                    rating={doctor.reviewStatistics?.averageRating || 0}
+                    location={doctor.hospital?.name || doctor.address || t('detail.notUpdated')}
+                    yearsOfExperience={doctor.yearsOfExperience}
+                    isFavorite={doctor.isFavorited || false}
+                    languages={doctor.languages || []}
+                    image={doctor.avatarUrl || '/default-doctor.png'}
+                />
+            </div>
+        );
+    };
 
     // Render helpers to avoid nested ternary
     const renderDoctorListContent = () => {
