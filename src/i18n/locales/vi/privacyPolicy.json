@@ -1,0 +1,111 @@
+{
+    "title": "Chính sách Bảo mật",
+    "breadcrumb": {
+        "home": "Trang chủ",
+        "current": "Chính sách Bảo mật"
+    },
+    "sections": {
+        "introduction": {
+            "title": "1. Giới thiệu",
+            "description": "MedCure cam kết bảo vệ quyền riêng tư và thông tin cá nhân của người dùng. Chính sách bảo mật này giải thích cách chúng tôi thu thập, sử dụng, lưu trữ và bảo vệ thông tin của bạn khi sử dụng dịch vụ của chúng tôi."
+        },
+        "informationCollection": {
+            "title": "2. Thông tin Chúng tôi Thu thập",
+            "subtitle": "2.1. Thông tin Cá nhân",
+            "description": "Chúng tôi có thể thu thập các thông tin sau:",
+            "items": {
+                "registration": "Thông tin Đăng ký",
+                "registrationValue": "Họ tên, email, số điện thoại, ngày sinh, giới tính",
+                "medical": "Thông tin Y tế",
+                "medicalValue": "Tiền sử bệnh, thông tin đặt lịch khám, kết quả khám bệnh (nếu bạn chia sẻ)",
+                "payment": "Thông tin Thanh toán",
+                "paymentValue": "Thông tin thẻ tín dụng, tài khoản ngân hàng (được xử lý bởi các đối tác thanh toán an toàn)",
+                "technical": "Thông tin Kỹ thuật",
+                "technicalValue": "Địa chỉ IP, loại trình duyệt, thiết bị sử dụng, dữ liệu vị trí"
+            }
+        },
+        "informationUsage": {
+            "title": "3. Mục đích Sử dụng Thông tin",
+            "description": "Chúng tôi sử dụng thông tin của bạn để:",
+            "items": [
+                "Cung cấp và cải thiện dịch vụ đặt lịch khám bệnh",
+                "Xử lý đặt lịch và thanh toán",
+                "Gửi thông báo về lịch hẹn, cập nhật dịch vụ",
+                "Cá nhân hóa trải nghiệm người dùng",
+                "Phân tích và cải thiện chất lượng dịch vụ",
+                "Tuân thủ các yêu cầu pháp lý và quy định",
+                "Bảo vệ quyền lợi và an toàn của người dùng"
+            ]
+        },
+        "informationSharing": {
+            "title": "4. Chia sẻ Thông tin",
+            "description": "Chúng tôi không bán hoặc cho thuê thông tin cá nhân của bạn. Chúng tôi chỉ chia sẻ thông tin trong các trường hợp sau:",
+            "items": {
+                "healthcare": "Với Bác sĩ và Cơ sở Y tế",
+                "healthcareValue": "Chia sẻ thông tin cần thiết để hoàn thành dịch vụ đặt lịch khám",
+                "partners": "Với Đối tác Dịch vụ",
+                "partnersValue": "Các nhà cung cấp dịch vụ thanh toán, lưu trữ dữ liệu, phân tích (với cam kết bảo mật)",
+                "legal": "Yêu cầu Pháp lý",
+                "legalValue": "Khi có yêu cầu từ cơ quan nhà nước có thẩm quyền",
+                "protection": "Bảo vệ Quyền lợi",
+                "protectionValue": "Để bảo vệ quyền lợi, tài sản hoặc an toàn của MedCure và người dùng"
+            }
+        },
+        "informationSecurity": {
+            "title": "5. Bảo mật Thông tin",
+            "description": "Chúng tôi áp dụng các biện pháp bảo mật tiên tiến:",
+            "items": [
+                "Mã hóa dữ liệu trong quá trình truyền tải (SSL/TLS)",
+                "Mã hóa dữ liệu khi lưu trữ",
+                "Kiểm soát truy cập nghiêm ngặt",
+                "Giám sát và phát hiện các hoạt động bất thường",
+                "Đào tạo nhân viên về bảo mật thông tin",
+                "Kiểm tra bảo mật định kỳ"
+            ]
+        },
+        "userRights": {
+            "title": "6. Quyền của Người dùng",
+            "description": "Theo quy định của pháp luật, bạn có quyền:",
+            "items": {
+                "access": "Truy cập",
+                "accessValue": "Yêu cầu xem thông tin cá nhân của bạn",
+                "edit": "Chỉnh sửa",
+                "editValue": "Cập nhật hoặc sửa đổi thông tin không chính xác",
+                "delete": "Xóa",
+                "deleteValue": "Yêu cầu xóa thông tin cá nhân (trừ khi pháp luật yêu cầu lưu trữ)",
+                "withdraw": "Rút lại Đồng ý",
+                "withdrawValue": "Rút lại sự đồng ý xử lý dữ liệu cá nhân",
+                "complaint": "Khiếu nại",
+                "complaintValue": "Khiếu nại về việc xử lý dữ liệu cá nhân"
+            },
+            "contactEmail": "Để thực hiện các quyền trên, vui lòng liên hệ với chúng tôi qua email:",
+            "email": "privacy@bookingcare.vn"
+        },
+        "cookies": {
+            "title": "7. Cookie và Công nghệ Theo dõi",
+            "description": "Chúng tôi sử dụng cookie và các công nghệ tương tự để cải thiện trải nghiệm người dùng, phân tích lưu lượng truy cập và cá nhân hóa nội dung. Bạn có thể quản lý cookie thông qua cài đặt trình duyệt của mình."
+        },
+        "storage": {
+            "title": "8. Thời gian Lưu trữ",
+            "description": "Chúng tôi lưu trữ thông tin cá nhân của bạn trong thời gian cần thiết để thực hiện các mục đích đã nêu hoặc theo yêu cầu của pháp luật. Sau khi hết thời hạn lưu trữ, thông tin sẽ được xóa hoặc ẩn danh hóa."
+        },
+        "children": {
+            "title": "9. Bảo vệ Trẻ em",
+            "description": "Dịch vụ của chúng tôi không dành cho trẻ em dưới 18 tuổi. Chúng tôi không cố ý thu thập thông tin từ trẻ em. Nếu phát hiện thông tin của trẻ em, chúng tôi sẽ xóa ngay lập tức."
+        },
+        "policyChanges": {
+            "title": "10. Thay đổi Chính sách",
+            "description": "Chúng tôi có thể cập nhật chính sách bảo mật này theo thời gian. Mọi thay đổi sẽ được thông báo trên trang web này với ngày cập nhật mới nhất. Chúng tôi khuyến khích bạn thường xuyên xem lại chính sách này."
+        },
+        "contact": {
+            "title": "11. Liên hệ",
+            "description": "Nếu bạn có câu hỏi hoặc lo ngại về chính sách bảo mật này, vui lòng liên hệ:",
+            "email": "Email",
+            "emailValue": "medcure.contact@gmail.com",
+            "hotline": "Hotline",
+            "hotlineValue": "+84 763583081",
+            "address": "Địa chỉ",
+            "addressValue": "Đà Nẵng, Việt Nam"
+        }
+    }
+}

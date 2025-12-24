@@ -1,0 +1,56 @@
+.iconContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pageLink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    text-decoration: none;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    font-size: 14px;
+
+    span {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    &.prevLink,
+    &.nextLink {
+        font-size: 14px;
+    }
+
+    &.disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    &.ellipsis {
+        padding: 0;
+        cursor: default;
+    }
+}
+
+.paginationList {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    gap: 5px;
+    align-items: center;
+}

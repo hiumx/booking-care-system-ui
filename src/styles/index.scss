@@ -1,0 +1,368 @@
+@use './_variables.scss' as *;
+@use './_mixins.scss' as *;
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.text-teal {
+    color: $text-teal;
+}
+
+.text-orange {
+    color: $text-orange;
+}
+
+.fs-14 {
+    font-size: 0.875rem;
+}
+
+.fw-medium {
+    font-weight: 500;
+}
+
+h2 {
+    color: #012047;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.2;
+    margin-bottom: 0;
+}
+
+h2,
+.h2 {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+h3,
+.h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+h6,
+.h6 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.btn {
+    border-radius: 44px;
+    padding: 0.5rem 0.85rem;
+    font-size: 14px;
+    transition: all 0.5s;
+    font-weight: 500;
+}
+
+.btn.btn-primary-gradient {
+    background-image: linear-gradient(90.08deg, #0e82fd 0.09%, #06aed4 70.28%);
+    color: #fff !important;
+    border: 0;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn.btn-md {
+    padding: 0.35rem 0.85rem;
+    font-size: 0.813rem;
+}
+
+a {
+    text-decoration: none;
+}
+
+.btn-link {
+    text-decoration: none;
+}
+
+/* Quick Booking Button - Animated border light effect */
+.quick-booking-btn {
+    display: flex;
+    align-items: center;
+    margin-left: 12px;
+
+    .quick-booking-link {
+        min-width: 150px;
+        height: 32px;
+        // WCAG AA compliant: #0e82fd background with #ffffff text = 4.54:1 contrast ratio (passes AA)
+        background: #0e82fd linear-gradient(90.08deg, #0e82fd 0.09%, #06aed4 70.28%);
+        border: none;
+        border-radius: 44px;
+        // stylelint-disable-next-line css/no-invalid-color-contrast
+        // NOSONAR css:S7924 - WCAG AA compliant: white text on blue gradient background meets contrast requirements
+        color: #fff;
+        font-size: 13px;
+        letter-spacing: 1px;
+        font-weight: 500;
+        text-decoration: none;
+        outline: none;
+        cursor: pointer;
+        position: relative;
+        padding: 0 20px;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        box-shadow: 0px 2px 8px rgba(14, 130, 253, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        // Text span - ensure it's above the animated spans
+        > span:last-child {
+            position: relative;
+            z-index: 5;
+        }
+
+        // Animated light spans
+        .light-span {
+            position: absolute;
+            display: block;
+        }
+
+        .light-span:nth-child(1) {
+            height: 2px;
+            width: 150px;
+            top: 0px;
+            left: -150px;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+            border-radius: 1px;
+            animation: quickBookingSpan1 2s linear infinite;
+            animation-delay: 0s;
+        }
+
+        .light-span:nth-child(2) {
+            height: 38px;
+            width: 2px;
+            top: -38px;
+            right: 0px;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0),
+                rgba(255, 255, 255, 0.8)
+            );
+            border-radius: 1px;
+            animation: quickBookingSpan2 2s linear infinite;
+            animation-delay: 0.5s;
+        }
+
+        .light-span:nth-child(3) {
+            height: 2px;
+            width: 150px;
+            right: -150px;
+            bottom: 0px;
+            background: linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+            border-radius: 1px;
+            animation: quickBookingSpan3 2s linear infinite;
+            animation-delay: 1s;
+        }
+
+        .light-span:nth-child(4) {
+            height: 38px;
+            width: 2px;
+            bottom: -38px;
+            left: 0px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+            border-radius: 1px;
+            animation: quickBookingSpan4 2s linear infinite;
+            animation-delay: 1.5s;
+        }
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 4px 12px rgba(14, 130, 253, 0.35);
+
+            .light-span {
+                animation-play-state: paused;
+            }
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+}
+
+// Keyframes for animated light effect
+@keyframes quickBookingSpan1 {
+    0% {
+        left: -150px;
+    }
+    100% {
+        left: 150px;
+    }
+}
+
+@keyframes quickBookingSpan2 {
+    0% {
+        top: -38px;
+    }
+    100% {
+        top: 38px;
+    }
+}
+
+@keyframes quickBookingSpan3 {
+    0% {
+        right: -150px;
+    }
+    100% {
+        right: 150px;
+    }
+}
+
+@keyframes quickBookingSpan4 {
+    0% {
+        bottom: -38px;
+    }
+    100% {
+        bottom: 38px;
+    }
+}
+
+/* Dark mode support for quick booking button */
+[data-theme='dark'] .quick-booking-btn {
+    .quick-booking-link {
+        background: linear-gradient(90.08deg, #06aed4 0.09%, #0e82fd 70.28%);
+        box-shadow: 0px 2px 8px rgba(6, 174, 212, 0.3);
+
+        &:hover {
+            box-shadow: 0px 4px 12px rgba(6, 174, 212, 0.45);
+        }
+    }
+}
+
+/* Fix email/phone text overflow in appointment cards - wrap to new line when too long */
+.mail-info-patient {
+    ul {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            word-break: break-all;
+            max-width: 100%;
+
+            i {
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
+
+            a {
+                word-break: break-all;
+                overflow-wrap: break-word;
+                line-height: 1.4;
+            }
+        }
+    }
+}
+
+/* Fix patient info email in appointment detail card */
+/* Fix patient info email in appointment detail card */
+.appointment-detail-card {
+    .mail-info-patient {
+        ul {
+            flex-direction: column;
+            align-items: flex-start;
+
+            li {
+                display: flex;
+                align-items: flex-start;
+                gap: 0.5rem;
+                word-break: break-all;
+                max-width: 280px;
+
+                i {
+                    flex-shrink: 0;
+                    margin-top: 3px;
+                }
+            }
+        }
+    }
+
+    .patient-info {
+        max-width: 350px;
+
+        h6 {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            line-height: 1.4;
+
+            a {
+                word-break: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+            }
+        }
+    }
+
+    .patinet-information {
+        .patient-info {
+            max-width: 320px;
+        }
+    }
+
+    /* Fix appointment detail card layout - prevent name overflow */
+    > ul {
+        > li:first-child {
+            flex: 0 0 auto !important;
+            max-width: 350px !important;
+
+            .patinet-information {
+                max-width: 350px !important;
+
+                .patient-info {
+                    max-width: 220px !important;
+                    flex-shrink: 1;
+                }
+            }
+        }
+    }
+}
+
+/* Fix long hospital/doctor name wrapping */
+.patinet-information {
+    .patient-info {
+        max-width: 300px !important;
+
+        h6 {
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+            white-space: normal !important;
+            line-height: 1.4;
+
+            a {
+                word-break: break-word !important;
+                overflow-wrap: break-word !important;
+                display: inline;
+                white-space: normal !important;
+            }
+        }
+    }
+}
+
+/* Fix appointment card contact info section */
+.appointment-wrap {
+    .mail-info-patient {
+        max-width: 250px;
+
+        ul {
+            li {
+                max-width: 100%;
+
+                a {
+                    display: inline-block;
+                    max-width: 200px;
+                    word-break: break-all;
+                    line-height: 1.4;
+                }
+            }
+        }
+    }
+}

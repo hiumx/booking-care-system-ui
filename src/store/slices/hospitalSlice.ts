@@ -1,0 +1,201 @@
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { HospitalService } from '@/services/hospital.service';
+import {
+    HospitalState,
+    HospitalFilterRequest,
+    HospitalSearchParams,
+    HospitalListOptimizedFilterRequest,
+} from '@/types/hospital.types';
+
+// Initial state
+const initialState: HospitalState = {
+    hospitals: [],
+    simpleHospitals: [], // For optimized API
+    optimizedHospitals: [], // For optimized list API
+    selectedHospital: null,
+    isLoading: false,
+    error: null,
+    pagination: {
+        page: 1,
+        pageSize: 10,
+        totalCount: 0,
+        totalPages: 0,
+    },
+    filters: {
+        page: 1,
+        pageSize: 10,
+    },
+};
+
+// Async thunks
+export const getHospitalsAsync = createAsyncThunk(
+    'hospital/getHospitals',
+    async (params: HospitalSearchParams, { rejectWithValue }) => {
+        try {
+            const filter: HospitalFilterRequest = {
+                ...params,
+                page: params.page || 1,
+                pageSize: params.pageSize || 10,
+            };
+            const response = await HospitalService.getHospitals(filter);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Failed to get hospitals');
+        }
+    }
+);
+
+export const getHospitalByIdAsync = createAsyncThunk(
+    'hospital/getHospitalById',
+    async (id: string, { rejectWithValue }) => {
+        try {
+            const response = await HospitalService.getHospitalById(id);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Failed to get hospital');
+        }
+    }
+);
+
+// New async thunk for optimized API
+export const getAllHospitalsAsync = createAsyncThunk(
+    'hospital/getAllHospitals',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await HospitalService.getAllHospitals();
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Failed to get all hospitals');
+        }
+    }
+);
+
+// New async thunk for optimized hospital list with filters and pagination
+export const getOptimizedHospitalListAsync = createAsyncThunk(
+    'hospital/getOptimizedHospitalList',
+    async (params: HospitalListOptimizedFilterRequest, { rejectWithValue }) => {
+        try {
+            const response = await HospitalService.getOptimizedHospitalList(params);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Failed to get optimized hospital list');
+        }
+    }
+);
+
+// Hospital slice
+const hospitalSlice = createSlice({
+    name: 'hospital',
+    initialState,
+    reducers: {
+        clearError: (state) => {
+            state.error = null;
+        },
+        clearSelectedHospital: (state) => {
+            state.selectedHospital = null;
+        },
+        setFilters: (state, action) => {
+            state.filters = { ...state.filters, ...action.payload };
+        },
+        clearFilters: (state) => {
+            state.filters = {
+                page: 1,
+                pageSize: 10,
+            };
+        },
+        setPagination: (state, action) => {
+            state.pagination = { ...state.pagination, ...action.payload };
+        },
+        clearHospitals: (state) => {
+            state.hospitals = [];
+            state.pagination = {
+                page: 1,
+                pageSize: 10,
+                totalCount: 0,
+                totalPages: 0,
+            };
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            // Get hospitals cases
+            .addCase(getHospitalsAsync.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getHospitalsAsync.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.hospitals = action.payload.hospitals;
+                state.pagination = {
+                    page: action.payload.page,
+                    pageSize: action.payload.pageSize,
+                    totalCount: action.payload.totalCount,
+                    totalPages: action.payload.totalPages,
+                };
+                state.error = null;
+            })
+            .addCase(getHospitalsAsync.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+            })
+            // Get hospital by ID cases
+            .addCase(getHospitalByIdAsync.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getHospitalByIdAsync.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.selectedHospital = action.payload;
+                state.error = null;
+            })
+            .addCase(getHospitalByIdAsync.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+            })
+            // Get all hospitals (optimized) cases
+            .addCase(getAllHospitalsAsync.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getAllHospitalsAsync.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.simpleHospitals = action.payload;
+                state.error = null;
+            })
+            .addCase(getAllHospitalsAsync.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+            })
+            // Get optimized hospital list cases
+            .addCase(getOptimizedHospitalListAsync.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getOptimizedHospitalListAsync.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.optimizedHospitals = action.payload.hospitals;
+                state.pagination = {
+                    page: action.payload.page,
+                    pageSize: action.payload.pageSize,
+                    totalCount: action.payload.totalCount,
+                    totalPages: action.payload.totalPages,
+                };
+                state.error = null;
+            })
+            .addCase(getOptimizedHospitalListAsync.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+            });
+    },
+});
+
+export const {
+    clearError,
+    clearSelectedHospital,
+    setFilters,
+    clearFilters,
+    setPagination,
+    clearHospitals,
+} = hospitalSlice.actions;
+
+export default hospitalSlice.reducer;

@@ -1,0 +1,21 @@
+// src/components/QuickNavigation/QuickNavigation.module.scss
+.quickNavigation {
+    .list-group-item {
+        border: 1px solid #e9ecef;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background-color: #f8f9fa;
+            transform: translateX(4px);
+        }
+
+        i {
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+
+        .fw-medium {
+            color: #495057;
+        }
+    }
+}

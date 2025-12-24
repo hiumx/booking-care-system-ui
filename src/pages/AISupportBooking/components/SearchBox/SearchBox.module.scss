@@ -1,0 +1,772 @@
+.searchBoxWrapper {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+
+    &.recording {
+        border-color: #e02424;
+        box-shadow: 0 0 10px rgba(224, 36, 36, 0.5);
+        background: #fff5f5;
+    }
+
+    &.multiLine {
+        padding: 8px;
+    }
+}
+
+.quickActions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.quickActionCard {
+    border: 1px solid #ebeff5;
+    border-radius: 12px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: #d0dbe8;
+        background: #f1f5f9;
+        transform: translateY(-2px);
+    }
+
+    &.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+        background: #f1f5f9;
+        border-color: #d0dbe8;
+
+        &:hover {
+            transform: none;
+        }
+    }
+}
+
+.symptomActionCard {
+    background: linear-gradient(135deg, #e6f4ff 0%, #d0ebff 100%);
+    border-color: #91d5ff;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(14, 130, 253, 0.15);
+
+    &:hover {
+        background: linear-gradient(135deg, #d0ebff 0%, #b3e0ff 100%);
+        border-color: #0e82fd;
+        box-shadow: 0 12px 30px rgba(14, 130, 253, 0.25);
+
+        .quickActionIcon {
+            background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+            box-shadow: 0 6px 16px rgba(14, 130, 253, 0.4);
+            transform: scale(1.05);
+        }
+    }
+}
+
+.labActionCard {
+    background: linear-gradient(135deg, #e6f4ff 0%, #d0ebff 100%);
+    border-color: #91d5ff;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(14, 130, 253, 0.15);
+
+    &:hover {
+        background: linear-gradient(135deg, #d0ebff 0%, #b3e0ff 100%);
+        border-color: #0e82fd;
+        box-shadow: 0 12px 30px rgba(14, 130, 253, 0.25);
+
+        .quickActionIcon {
+            background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+            box-shadow: 0 6px 16px rgba(14, 130, 253, 0.4);
+            transform: scale(1.05);
+        }
+    }
+}
+
+.dermatologyActionCard {
+    background: linear-gradient(135deg, #e6f4ff 0%, #d0ebff 100%);
+    border-color: #91d5ff;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(14, 130, 253, 0.15);
+
+    &:hover {
+        background: linear-gradient(135deg, #d0ebff 0%, #b3e0ff 100%);
+        border-color: #0e82fd;
+        box-shadow: 0 12px 30px rgba(14, 130, 253, 0.25);
+
+        .quickActionIcon {
+            background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+            box-shadow: 0 6px 16px rgba(14, 130, 253, 0.4);
+            transform: scale(1.05);
+        }
+    }
+}
+
+.comingSoonCard {
+    background: linear-gradient(135deg, #e6f4ff 0%, #d0ebff 100%);
+    border-color: #91d5ff;
+    box-shadow: 0 12px 30px rgba(14, 130, 253, 0.15);
+    cursor: default;
+
+    &:hover {
+        background: linear-gradient(135deg, #d0ebff 0%, #b3e0ff 100%);
+        border-color: #0e82fd;
+        box-shadow: 0 12px 30px rgba(14, 130, 253, 0.25);
+
+        .quickActionIcon {
+            background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+            box-shadow: 0 6px 16px rgba(14, 130, 253, 0.4);
+            transform: scale(1.05);
+        }
+    }
+}
+
+.quickActionIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0e82fd 0%, #06aed4 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(14, 130, 253, 0.3);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.quickActionContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: center;
+}
+
+.quickActionTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+}
+
+.quickActionDescription {
+    font-size: 13px;
+    color: #475569;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 14px;
+    background: transparent;
+    padding: 0;
+    box-sizing: border-box;
+    line-height: 1.5em;
+    transition: color 0.3s ease;
+    height: auto;
+    min-height: 1.5em;
+    max-height: calc(1.5em * 3); // 3 lines max (22.5px * 3 = 67.5px)
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #bdbdbd;
+        border-radius: 10px;
+
+        &:hover {
+            background: #9e9e9e;
+        }
+    }
+}
+
+.textareaDisabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: #9e9e9e;
+}
+
+.textareaRecording {
+    color: #e02424;
+    animation: blinkText 1s infinite;
+}
+
+@keyframes blinkText {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.iconRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin-top: 4px;
+}
+
+.leftIcons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    position: relative;
+}
+
+.attachmentWrapper,
+.locationWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.locationBadge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #e3f2fd;
+    color: #0066cc;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 1px solid #0066cc;
+    line-height: 1.4;
+    vertical-align: middle;
+    box-sizing: border-box;
+}
+
+.iconButton {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+    position: relative;
+
+    &.active {
+        background: #e3f2fd;
+        border-color: #0066cc;
+        color: #0066cc; // Improved contrast ratio
+    }
+
+    &:hover {
+        background: #f5f5f5;
+    }
+
+    // Tooltip
+    &::before {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-8px);
+        padding: 6px 10px;
+        background: #212121;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        border-radius: 6px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.2s ease;
+        margin-bottom: 4px;
+        z-index: 1000;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-4px);
+        border: 5px solid transparent;
+        border-top-color: #212121;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.2s ease;
+        z-index: 1000;
+    }
+
+    &:hover::before,
+    &:hover::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.autoButton {
+    min-width: 60px;
+    height: 40px;
+    border-radius: 20px;
+    background: #111;
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 12px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s ease;
+    position: relative;
+
+    &:hover {
+        background: #333;
+    }
+
+    // Tooltip
+    &::before {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-8px);
+        padding: 6px 10px;
+        background: #212121;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        border-radius: 6px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.2s ease;
+        margin-bottom: 4px;
+        z-index: 1000;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-4px);
+        border: 5px solid transparent;
+        border-top-color: #212121;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.2s ease;
+        z-index: 1000;
+    }
+
+    &:hover::before,
+    &:hover::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.micButton {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #111;
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    position: relative;
+
+    &.recording {
+        background: #e02424;
+        animation: pulse 1s infinite;
+    }
+
+    &:hover:not(.recording) {
+        background: #333;
+    }
+
+    // Tooltip
+    &::before {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-8px);
+        padding: 6px 10px;
+        background: #212121;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        border-radius: 6px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.2s ease;
+        margin-bottom: 4px;
+        z-index: 1000;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-4px);
+        border: 5px solid transparent;
+        border-top-color: #212121;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.2s ease;
+        z-index: 1000;
+    }
+
+    &:hover::before,
+    &:hover::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.locationModalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    animation: fadeIn 0.2s ease;
+}
+
+.attachmentModal {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    padding: 8px;
+    z-index: 1000;
+    animation: slideUp 0.2s ease;
+
+    .attachmentGrid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .comingSoonCard {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+        border: 1px dashed #cbd5e0;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 120px;
+        cursor: not-allowed;
+        opacity: 0.7;
+        transition: all 0.3s ease;
+
+        &:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+        }
+
+        .comingSoonIcon {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+
+        .comingSoonTitle {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            text-align: center;
+        }
+
+        .comingSoonBadge {
+            font-size: 11px;
+            padding: 4px 12px;
+            background: #edf2f7;
+            color: #718096;
+            border-radius: 12px;
+            border: 1px solid #cbd5e0;
+            font-weight: 500;
+        }
+    }
+
+    .menuItem {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #212121;
+        text-align: left;
+        transition: background 0.2s ease;
+
+        &:hover {
+            background: #f5f5f5;
+        }
+
+        &:active {
+            background: #e0e0e0;
+        }
+
+        svg {
+            flex-shrink: 0;
+            color: #757575;
+        }
+
+        span {
+            flex: 1;
+        }
+
+        .chevronIcon {
+            margin-left: auto;
+            color: #9e9e9e;
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loadingSpinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e0e0e0;
+            border-top-color: #0066cc;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: auto;
+        }
+    }
+
+    .menuDivider {
+        height: 1px;
+        background: #e0e0e0;
+        margin: 4px 0;
+    }
+
+    .locationModalHeader {
+        padding: 12px;
+        border-bottom: 1px solid #e0e0e0;
+        margin-bottom: 4px;
+
+        .locationModalDescription {
+            font-size: 13px;
+            color: #757575;
+            line-height: 1.5;
+            margin: 0;
+            text-align: center;
+        }
+    }
+
+    .locationError {
+        padding: 8px 12px;
+        background: #ffebee;
+        border: 1px solid #f44336;
+        border-radius: 6px;
+        color: #c62828;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .searchBoxWrapper {
+        padding: 6px;
+        border-radius: 8px;
+    }
+
+    .textarea {
+        font-size: 14px;
+        padding: 0;
+        max-height: calc(1.4em * 3); // 3 lines max for mobile
+    }
+
+    .iconButton {
+        width: 36px;
+        height: 36px;
+    }
+
+    .autoButton {
+        min-width: 50px;
+        height: 36px;
+        font-size: 12px;
+        padding: 0 10px;
+    }
+
+    .micButton {
+        width: 36px;
+        height: 36px;
+    }
+
+    .attachmentModal {
+        min-width: 200px;
+        padding: 6px;
+
+        .menuItem {
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+    }
+
+    .locationBadge {
+        max-width: 150px;
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+}
+
+@media (max-width: 576px) {
+    .searchBoxWrapper {
+        padding: 4px;
+    }
+
+    .textarea {
+        font-size: 13px;
+        padding: 0;
+        max-height: calc(1.3em * 3); // 3 lines max for small mobile
+    }
+
+    .leftIcons {
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    .iconButton {
+        width: 32px;
+        height: 32px;
+    }
+
+    .autoButton {
+        min-width: 45px;
+        height: 32px;
+        font-size: 11px;
+        padding: 0 8px;
+    }
+
+    .micButton {
+        width: 32px;
+        height: 32px;
+    }
+
+    .attachmentModal {
+        min-width: 180px;
+        padding: 4px;
+
+        .menuItem {
+            padding: 8px;
+            font-size: 12px;
+            gap: 10px;
+
+            svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+    }
+
+    .locationBadge {
+        max-width: 120px;
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+}

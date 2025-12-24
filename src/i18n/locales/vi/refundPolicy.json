@@ -1,0 +1,127 @@
+{
+    "title": "Chính sách Hoàn tiền",
+    "breadcrumb": {
+        "home": "Trang chủ",
+        "current": "Chính sách Hoàn tiền"
+    },
+    "sections": {
+        "overview": {
+            "title": "1. Tổng quan",
+            "description": "Chính sách hoàn tiền của MedCure được thiết kế để đảm bảo quyền lợi của cả bệnh nhân và các cơ sở y tế. Chính sách này áp dụng cho tất cả các đặt lịch khám bệnh được thực hiện thông qua nền tảng MedCure."
+        },
+        "refundRules": {
+            "title": "2. Quy định Hoàn tiền theo Thời gian Hủy lịch",
+            "description": "Mức hoàn tiền được tính dựa trên thời gian từ lúc hủy lịch hẹn đến thời điểm khám bệnh dự kiến:",
+            "refund100": {
+                "title": "Hoàn tiền 100%",
+                "description": "Khi hủy lịch hẹn <strong>trước 24 giờ</strong> so với thời gian khám bệnh dự kiến",
+                "example": "Ví dụ",
+                "exampleValue": "Nếu lịch hẹn của bạn là 14:00 ngày 15/01, bạn cần hủy trước 14:00 ngày 14/01 để được hoàn tiền 100%."
+            },
+            "refund50": {
+                "title": "Hoàn tiền 50%",
+                "description": "Khi hủy lịch hẹn trong khoảng <strong>từ 12 đến 24 giờ</strong> trước thời gian khám bệnh dự kiến",
+                "example": "Ví dụ",
+                "exampleValue": "Nếu lịch hẹn của bạn là 14:00 ngày 15/01, bạn hủy từ 14:00 ngày 14/01 đến 02:00 ngày 15/01 sẽ được hoàn tiền 50%."
+            },
+            "refund0": {
+                "title": "Không hoàn tiền",
+                "description": "Khi hủy lịch hẹn <strong>dưới 12 giờ</strong> trước thời gian khám bệnh dự kiến",
+                "example": "Ví dụ",
+                "exampleValue": "Nếu lịch hẹn của bạn là 14:00 ngày 15/01, bạn hủy sau 02:00 ngày 15/01 sẽ không được hoàn tiền."
+            }
+        },
+        "specialCases": {
+            "title": "3. Trường hợp Đặc biệt",
+            "hospitalCancel": {
+                "subtitle": "3.1. Hủy bởi Bệnh viện/Bác sĩ",
+                "title": "Hoàn tiền 100%",
+                "description1": "Nếu lịch hẹn bị hủy bởi bệnh viện hoặc bác sĩ (do lý do từ phía cơ sở y tế), bạn sẽ được hoàn lại 100% chi phí đã thanh toán, không phụ thuộc vào thời gian hủy.",
+                "description2": "Trong trường hợp này, MedCure sẽ tự động xử lý hoàn tiền và thông báo cho bạn qua email hoặc SMS."
+            },
+            "pastAppointment": {
+                "subtitle": "3.2. Lịch hẹn đã qua",
+                "description": "Bạn không thể hủy các lịch hẹn đã qua thời gian khám bệnh. Nếu bạn không đến khám mà không thông báo trước, bạn sẽ không được hoàn tiền."
+            }
+        },
+        "refundProcess": {
+            "title": "4. Quy trình Hoàn tiền",
+            "items": [
+                {
+                    "title": "Yêu cầu Hủy lịch",
+                    "description": "Bạn thực hiện hủy lịch hẹn thông qua ứng dụng hoặc website MedCure"
+                },
+                {
+                    "title": "Tính toán Tự động",
+                    "description": "Hệ thống sẽ tự động tính toán mức hoàn tiền dựa trên thời gian hủy"
+                },
+                {
+                    "title": "Xác nhận",
+                    "description": "Bạn sẽ nhận được thông báo về mức hoàn tiền và thời gian xử lý"
+                },
+                {
+                    "title": "Xử lý",
+                    "description": "MedCure sẽ xử lý hoàn tiền trong vòng 5-7 ngày làm việc"
+                },
+                {
+                    "title": "Nhận tiền",
+                    "description": "Tiền sẽ được hoàn lại vào tài khoản hoặc phương thức thanh toán ban đầu"
+                }
+            ]
+        },
+        "refundMethods": {
+            "title": "5. Phương thức Hoàn tiền",
+            "description": "Tiền sẽ được hoàn lại theo phương thức thanh toán ban đầu:",
+            "items": {
+                "creditCard": "Thẻ tín dụng/Ghi nợ",
+                "creditCardValue": "Hoàn lại vào tài khoản thẻ (5-7 ngày làm việc)",
+                "eWallet": "Ví điện tử",
+                "eWalletValue": "Hoàn lại vào ví điện tử (1-3 ngày làm việc)",
+                "bankTransfer": "Chuyển khoản ngân hàng",
+                "bankTransferValue": "Hoàn lại vào tài khoản ngân hàng (3-5 ngày làm việc)"
+            },
+            "note": "Lưu ý",
+            "noteValue": "Thời gian nhận tiền có thể thay đổi tùy theo ngân hàng hoặc nhà cung cấp dịch vụ thanh toán."
+        },
+        "processingFee": {
+            "title": "6. Phí Xử lý",
+            "description1": "MedCure <strong>không thu phí xử lý hoàn tiền</strong>. Toàn bộ số tiền được hoàn lại sẽ được tính theo mức hoàn tiền đã quy định (100%, 50% hoặc 0%).",
+            "description2": "Tuy nhiên, nếu có phí từ phía ngân hàng hoặc nhà cung cấp dịch vụ thanh toán, phí này sẽ được trừ vào số tiền hoàn lại."
+        },
+        "complaints": {
+            "title": "7. Khiếu nại và Hỗ trợ",
+            "description": "Nếu bạn có bất kỳ thắc mắc hoặc khiếu nại nào về việc hoàn tiền, vui lòng liên hệ với chúng tôi:",
+            "email": "Email",
+            "emailValue": "medcure.contact@gmail.com",
+            "hotline": "Hotline",
+            "hotlineValue": "+84 763583081",
+            "supportHours": "Thời gian hỗ trợ",
+            "supportHoursValue": "8:00 - 22:00 hàng ngày",
+            "commitment": "Chúng tôi cam kết phản hồi mọi yêu cầu trong vòng 24 giờ và xử lý khiếu nại một cách công bằng, minh bạch."
+        },
+        "noRefundCases": {
+            "title": "8. Các Trường hợp Không được Hoàn tiền",
+            "description": "Bạn sẽ không được hoàn tiền trong các trường hợp sau:",
+            "items": [
+                "Hủy lịch hẹn dưới 12 giờ trước thời gian khám",
+                "Không đến khám mà không thông báo trước",
+                "Đã sử dụng dịch vụ (đã khám bệnh)",
+                "Vi phạm các quy định của MedCure hoặc cơ sở y tế",
+                "Gian lận hoặc sử dụng thông tin không hợp lệ"
+            ]
+        },
+        "policyChanges": {
+            "title": "9. Thay đổi Chính sách",
+            "description": "MedCure có quyền cập nhật hoặc thay đổi chính sách hoàn tiền này. Mọi thay đổi sẽ được thông báo trên trang web với ngày cập nhật mới nhất. Chính sách mới sẽ áp dụng cho các đặt lịch được thực hiện sau ngày cập nhật."
+        },
+        "additionalTerms": {
+            "title": "10. Điều khoản Bổ sung",
+            "description1": "Chính sách hoàn tiền này là một phần của Điều khoản Sử dụng của MedCure. Bằng việc sử dụng dịch vụ, bạn đồng ý với các điều khoản trong chính sách này.",
+            "description2": "Trong trường hợp có mâu thuẫn giữa chính sách hoàn tiền và các điều khoản khác, chính sách hoàn tiền sẽ được ưu tiên áp dụng cho các vấn đề liên quan đến hoàn tiền."
+        },
+        "importantNote": {
+            "title": "Lưu ý quan trọng",
+            "description": "Thời gian hủy lịch được tính theo múi giờ UTC. Vui lòng kiểm tra kỹ thời gian trước khi hủy để đảm bảo bạn được hoàn tiền đúng mức quy định."
+        }
+    }
+}

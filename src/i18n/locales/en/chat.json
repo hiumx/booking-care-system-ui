@@ -1,0 +1,130 @@
+{
+    "sidebar": {
+        "title": "All Messages",
+        "tags": "Tags",
+        "hideTag": "Hide tags",
+        "showTag": "Show tags",
+        "searchPlaceholder": "Search",
+        "filterByTags": "Filter by {{count}} tags",
+        "clearFilter": "Clear filter",
+        "recentMessages": "Recent Messages",
+        "noConversations": "No conversations",
+        "loading": "Loading..."
+    },
+    "header": {
+        "selectConversation": "Select a conversation",
+        "online": "Online",
+        "offline": "Offline",
+        "search": "Search",
+        "manageTags": "Manage tags",
+        "searchMessages": "Search messages",
+        "menu": {
+            "videoCall": "Video call",
+            "muteNotifications": "Mute notifications",
+            "disappearingMessages": "Disappearing messages",
+            "deleteMessages": "Delete messages",
+            "deleteChat": "Delete chat",
+            "report": "Report",
+            "block": "Block"
+        }
+    },
+    "messages": {
+        "selectToStart": "Select a conversation to start messaging",
+        "loading": "Loading messages...",
+        "loadingOld": "Loading older messages...",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "typing": "{{name}} is typing...",
+        "noMessages": "No messages"
+    },
+    "footer": {
+        "placeholder": "Type your message...",
+        "placeholderWithFile": "Add a caption for the file...",
+        "sending": "Sending...",
+        "removeFile": "Remove file",
+        "menu": {
+            "document": "Document",
+            "camera": "Camera",
+            "gallery": "Gallery",
+            "audio": "Audio"
+        },
+        "speech": {
+            "listening": "Listening...",
+            "startRecording": "Click to start recording",
+            "stopRecording": "Click to stop listening",
+            "notSupported": "Speech Recognition is not supported on this browser",
+            "error": "Error: {{error}}"
+        },
+        "toast": {
+            "fileSent": "File sent successfully",
+            "sendFailed": "Unable to send message",
+            "invalidFileType": "Invalid file type"
+        }
+    },
+    "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{{count}} minutes ago",
+        "hoursAgo": "{{count}} hours ago",
+        "daysAgo": "{{count}} days ago"
+    },
+    "attachments": {
+        "sentImage": "Sent an image",
+        "sentVideo": "Sent a video",
+        "sentAudio": "Sent audio",
+        "sentFile": "Sent a file",
+        "voiceMessage": "Voice message",
+        "systemMessage": "System message"
+    },
+    "tagManager": {
+        "title": "Manage Tags",
+        "createNew": "Create new tag",
+        "loading": "Loading...",
+        "noTags": "No tags yet",
+        "editTag": "Edit tag",
+        "deleteTag": "Delete tag",
+        "deleting": "Deleting",
+        "tagTypes": {
+            "custom": "Custom",
+            "system": "System",
+            "important": "Important",
+            "work": "Work",
+            "personal": "Personal",
+            "shopping": "Shopping",
+            "travel": "Travel",
+            "family": "Family",
+            "vip": "VIP",
+            "archived": "Archived"
+        },
+        "createModal": {
+            "title": "Create New Tag",
+            "tagName": "Tag Name",
+            "tagNamePlaceholder": "Enter tag name...",
+            "color": "Color",
+            "tagType": "Tag Type",
+            "cancel": "Cancel",
+            "create": "Create"
+        },
+        "editModal": {
+            "title": "Edit Tag",
+            "tagName": "Tag Name",
+            "tagNamePlaceholder": "Enter tag name...",
+            "color": "Color",
+            "tagType": "Tag Type",
+            "cancel": "Cancel",
+            "update": "Update"
+        },
+        "deleteConfirm": {
+            "title": "Delete Tag",
+            "messageWithCount": "Are you sure you want to delete the tag \"{{name}}\"? This tag is being used in {{count}} conversations.",
+            "message": "Are you sure you want to delete the tag \"{{name}}\"?",
+            "confirm": "Delete",
+            "cancel": "Cancel"
+        },
+        "errors": {
+            "updateFailed": "Unable to update tag. Please try again.",
+            "deleteFailed": "Unable to delete tag. Please try again.",
+            "addFailed": "Unable to add tag. Please try again.",
+            "removeFailed": "Unable to remove tag. Please try again."
+        }
+    }
+}

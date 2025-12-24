@@ -1,0 +1,308 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background: white;
+    border: none;
+    border-radius: 12px;
+    width: 600px;
+    max-width: 90vw;
+    max-height: 85vh; /* Giữ max-height như yêu cầu */
+    display: flex;
+    flex-direction: column;
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: auto; /* Cho phép cuộn để hiển thị footer */
+    /* Center the dialog in viewport */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    z-index: 1001;
+}
+
+.modalContent::backdrop {
+    background: transparent;
+}
+
+.modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0; /* Ngăn header co lại */
+}
+
+.modalTitleSection {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.modalTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.currentSelection {
+    display: flex;
+    align-items: center;
+}
+
+.selectionText {
+    font-size: 14px;
+    color: #2563eb;
+    background-color: #eff6ff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.modalActions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.clearButton {
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: #f9fafb;
+        color: #374151;
+        border-color: #9ca3af;
+    }
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+
+        &:hover {
+            background-color: white;
+            color: #6b7280;
+            border-color: #d1d5db;
+        }
+    }
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        background-color: #f3f4f6;
+        color: #374151;
+    }
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+
+        &:hover {
+            background-color: transparent;
+            color: #6b7280;
+        }
+    }
+}
+
+.searchContainer {
+    padding: 1.5rem 1rem;
+    flex-shrink: 0; /* Ngăn search container co lại */
+}
+
+.searchInputWrapper {
+    position: relative;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    background-color: #f3f4f6;
+    border-radius: 0.75rem;
+    border: none;
+    color: #374151;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+
+    &::placeholder {
+        color: #6b7280;
+    }
+
+    &:focus {
+        outline: none;
+        background-color: white;
+        box-shadow: 0 0 0 2px #f3f4f6;
+    }
+}
+
+.modalBody {
+    flex: 1;
+    display: flex;
+    max-height: calc(
+        85vh - 60px - 64px - 60px
+    ); /* Trừ chiều cao của header (~60px), search (~64px), và footer (~60px) */
+    overflow: hidden; /* Ngăn body tràn ra ngoài */
+}
+
+.provinceList,
+.districtList {
+    flex: 1;
+    overflow-y: auto; /* Cho phép cuộn riêng cho mỗi danh sách */
+}
+
+.provinceList {
+    background-color: #f9fafb;
+}
+
+.districtList {
+    background-color: white;
+}
+
+.provinceItem,
+.districtItem {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    padding: 16px 24px;
+    cursor: pointer;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    text-align: left;
+    outline: none;
+
+    &:hover {
+        background-color: #f3f4f6;
+    }
+
+    &.active {
+        background-color: #eff6ff;
+        color: #2563eb;
+        font-weight: 600;
+        position: relative;
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background-color: #2563eb;
+        }
+    }
+}
+
+.provinceName,
+.districtName {
+    flex: 1;
+}
+
+.checkIcon {
+    color: #2563eb;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+.modalFooter {
+    padding: 16px 24px;
+    background-color: #f9fafb;
+    display: flex;
+    justify-content: flex-end;
+    min-height: 60px; /* Đảm bảo footer có chiều cao cố định */
+    flex-shrink: 0; /* Ngăn footer co lại */
+    position: sticky; /* Giữ footer cố định ở dưới cùng */
+    bottom: 0; /* Đặt ở dưới cùng của modalContent */
+    z-index: 10; /* Đảm bảo footer không bị che */
+}
+
+.applyButton {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    visibility: visible;
+    opacity: 1;
+    min-width: 100px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        background-color: #1d4ed8;
+        box-shadow:
+            0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+}
+
+.noResults {
+    padding: 16px 24px;
+    color: #6b7280;
+    font-size: 14px;
+    text-align: center;
+}
+
+.loading {
+    padding: 16px 24px;
+    color: #6b7280;
+    font-size: 16px;
+    text-align: center;
+}

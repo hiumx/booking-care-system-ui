@@ -1,0 +1,75 @@
+{
+    "title": "Thông báo Pháp lý",
+    "breadcrumb": {
+        "home": "Trang chủ",
+        "current": "Thông báo Pháp lý"
+    },
+    "sections": {
+        "companyInfo": {
+            "title": "1. Thông tin Doanh nghiệp",
+            "description": "MedCure là nền tảng đặt lịch khám bệnh trực tuyến, được vận hành bởi công ty MedCure Technology JSC.",
+            "items": {
+                "companyName": "Tên công ty",
+                "companyNameValue": "MedCure Technology Joint Stock Company",
+                "address": "Địa chỉ",
+                "addressValue": "Đà Nẵng, Việt Nam",
+                "email": "Email",
+                "emailValue": "medcure.contact@gmail.com",
+                "hotline": "Hotline",
+                "hotlineValue": "+84 763583081"
+            }
+        },
+        "purpose": {
+            "title": "2. Mục đích và Phạm vi hoạt động",
+            "description": "MedCure cung cấp dịch vụ kết nối giữa bệnh nhân và các cơ sở y tế (bệnh viện, phòng khám, bác sĩ) để đặt lịch khám bệnh trực tuyến. Chúng tôi không trực tiếp cung cấp dịch vụ y tế mà chỉ đóng vai trò là nền tảng trung gian kết nối."
+        },
+        "userResponsibilities": {
+            "title": "3. Trách nhiệm của Người dùng",
+            "description": "Khi sử dụng dịch vụ của MedCure, người dùng cam kết:",
+            "items": [
+                "Cung cấp thông tin chính xác, đầy đủ và cập nhật",
+                "Tuân thủ các quy định về đặt lịch và hủy lịch hẹn",
+                "Không sử dụng dịch vụ cho mục đích bất hợp pháp",
+                "Bảo mật thông tin tài khoản và không chia sẻ với bên thứ ba",
+                "Tôn trọng quyền lợi của các bác sĩ và cơ sở y tế"
+            ]
+        },
+        "bookingcareResponsibilities": {
+            "title": "4. Trách nhiệm của MedCure",
+            "description": "MedCure cam kết:",
+            "items": [
+                "Bảo mật thông tin cá nhân của người dùng theo quy định pháp luật",
+                "Cung cấp dịch vụ ổn định, an toàn và tiện lợi",
+                "Xử lý khiếu nại của người dùng một cách công bằng và kịp thời",
+                "Tuân thủ các quy định pháp luật về bảo vệ dữ liệu cá nhân"
+            ]
+        },
+        "liabilityLimitation": {
+            "title": "5. Giới hạn Trách nhiệm",
+            "description1": "MedCure không chịu trách nhiệm về chất lượng dịch vụ y tế được cung cấp bởi các bác sĩ hoặc cơ sở y tế. Trách nhiệm về chẩn đoán, điều trị và chăm sóc sức khỏe thuộc về các bác sĩ và cơ sở y tế đã cung cấp dịch vụ.",
+            "description2": "MedCure không chịu trách nhiệm về các thiệt hại gián tiếp, ngẫu nhiên hoặc hậu quả phát sinh từ việc sử dụng hoặc không thể sử dụng dịch vụ."
+        },
+        "intellectualProperty": {
+            "title": "6. Quyền Sở hữu Trí tuệ",
+            "description": "Tất cả nội dung trên website MedCure, bao gồm logo, hình ảnh, văn bản, phần mềm và các tài sản khác, đều thuộc quyền sở hữu của MedCure hoặc được cấp phép sử dụng. Người dùng không được phép sao chép, sử dụng hoặc phân phối bất kỳ nội dung nào mà không có sự cho phép bằng văn bản từ MedCure."
+        },
+        "changes": {
+            "title": "7. Thay đổi và Cập nhật",
+            "description": "MedCure có quyền thay đổi, cập nhật hoặc bổ sung các điều khoản trong thông báo pháp lý này mà không cần thông báo trước. Người dùng nên thường xuyên kiểm tra để cập nhật các thay đổi mới nhất."
+        },
+        "lawAndDisputes": {
+            "title": "8. Luật Áp dụng và Giải quyết Tranh chấp",
+            "description": "Thông báo pháp lý này được điều chỉnh bởi pháp luật Việt Nam. Mọi tranh chấp phát sinh sẽ được giải quyết thông qua thương lượng. Nếu không đạt được thỏa thuận, tranh chấp sẽ được đưa ra Tòa án có thẩm quyền tại Việt Nam để giải quyết."
+        },
+        "contact": {
+            "title": "9. Liên hệ",
+            "description": "Nếu bạn có bất kỳ câu hỏi nào về thông báo pháp lý này, vui lòng liên hệ với chúng tôi:",
+            "email": "Email",
+            "emailValue": "medcure.contact@gmail.com",
+            "hotline": "Hotline",
+            "hotlineValue": "+84 763583081",
+            "address": "Địa chỉ",
+            "addressValue": "Đà Nẵng, Việt Nam"
+        }
+    }
+}

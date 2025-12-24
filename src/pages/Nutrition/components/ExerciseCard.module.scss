@@ -1,0 +1,153 @@
+.exercise-card {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    gap: 1rem;
+    transition: all 0.3s;
+
+    &:hover {
+        border-color: #667eea;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    }
+
+    &.completed {
+        background: #f0f4ff;
+        border-color: #667eea;
+
+        .exercise-content {
+            opacity: 0.7;
+        }
+    }
+
+    .exercise-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+
+        .exercise-number {
+            width: 32px;
+            height: 32px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-container {
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+
+            input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+
+                &:checked ~ .checkmark {
+                    background-color: #667eea;
+                    border-color: #667eea;
+
+                    &:after {
+                        display: block;
+                    }
+                }
+            }
+
+            .checkmark {
+                display: block;
+                width: 24px;
+                height: 24px;
+                background-color: white;
+                border: 2px solid #ddd;
+                border-radius: 4px;
+                transition: all 0.3s;
+
+                &:after {
+                    content: '';
+                    position: absolute;
+                    display: none;
+                    left: 8px;
+                    top: 4px;
+                    width: 6px;
+                    height: 12px;
+                    border: solid white;
+                    border-width: 0 2px 2px 0;
+                    transform: rotate(45deg);
+                }
+            }
+        }
+    }
+
+    .exercise-content {
+        flex: 1;
+
+        .exercise-name {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .exercise-name-en {
+            margin: 0 0 1rem 0;
+            color: #999;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        .exercise-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+
+            .detail-item {
+                font-size: 0.9rem;
+                color: #666;
+                padding: 0.25rem 0.75rem;
+                background: #f8f9fa;
+                border-radius: 12px;
+            }
+
+            .intensity-badge {
+                padding: 0.25rem 0.75rem;
+                border-radius: 12px;
+                font-size: 0.85rem;
+                font-weight: 600;
+
+                &.low {
+                    background: #d4edda;
+                    color: #155724;
+                }
+
+                &.medium {
+                    background: #fff3cd;
+                    color: #856404;
+                }
+
+                &.high {
+                    background: #f8d7da;
+                    color: #721c24;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .exercise-card {
+        flex-direction: column;
+
+        .exercise-header {
+            flex-direction: row;
+            justify-content: space-between;
+            width: 100%;
+        }
+    }
+}

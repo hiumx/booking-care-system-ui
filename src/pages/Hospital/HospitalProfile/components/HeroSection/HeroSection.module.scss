@@ -1,0 +1,635 @@
+:root {
+    --main-image-height: 420px; /* Fixed height for main image */
+    --small-image-size: 134px; /* Fixed size for all small images */
+    --image-gap: 10px; /* Gap between images */
+}
+
+/* Hero section and its children (mapped 1:1 to DOM structure) */
+.hero {
+    padding: 24px 0 32px;
+    background: #fff;
+}
+
+.container {
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 0 20px; /* Thêm padding để không dính sát lề */
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 380px 1fr; /* Right gallery slightly larger */
+    gap: 24px;
+    align-items: stretch; /* Ensure both columns have equal height */
+    min-height: 0; /* Allow grid items to shrink */
+}
+
+/* Left Info Card */
+.card {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0; /* Allow flex item to shrink */
+}
+
+.cardHeader {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.iconBtn {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f5f7fa;
+    border: none;
+    cursor: pointer;
+    color: black;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ctaWrap {
+    width: 100%;
+    flex-shrink: 0;
+}
+
+/* Right Gallery - matches sample layout */
+.gallery {
+    border-radius: 7px;
+    overflow: hidden;
+    position: relative;
+}
+
+.galleryGrid {
+    width: 100%;
+    height: calc(
+        var(--main-image-height) + var(--small-image-size) + var(--image-gap)
+    ); /* Total height = main + bottom row + gap */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: var(--main-image-height) var(--small-image-size); /* 2 rows: main height, then small image height */
+    grid-gap: var(--image-gap);
+    gap: var(--image-gap);
+}
+
+.mainLarge {
+    grid-column: 1 / span 3; /* spans 3 columns */
+    grid-row: 1; /* first row */
+    width: 100%;
+    height: var(--main-image-height);
+    object-fit: cover;
+    border-radius: 7px;
+}
+
+.sideStack {
+    grid-column: 4; /* 4th column */
+    grid-row: 1; /* first row */
+    display: flex;
+    flex-direction: column;
+    gap: var(--image-gap);
+    height: var(--main-image-height); /* Same height as main image */
+}
+
+.sideItem {
+    width: 100%;
+    height: var(--small-image-size); /* Fixed height for each side image */
+    object-fit: cover;
+    border-radius: 7px;
+}
+
+.bottomRow {
+    grid-column: 1 / span 4; /* spans all 4 columns */
+    grid-row: 2; /* second row */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--image-gap);
+}
+
+.thumb {
+    width: 100%;
+    height: var(--small-image-size); /* Same size as side images */
+    object-fit: cover;
+    border-radius: 7px;
+    border: none; /* Loại bỏ viền đen */
+    outline: none; /* Loại bỏ outline */
+}
+
+.thumbOverlay {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    border: none; /* Loại bỏ viền đen */
+    outline: none; /* Loại bỏ outline */
+    background: none; /* Loại bỏ background */
+}
+
+img {
+    transition: transform 0.35s ease;
+    border: none; /* Loại bỏ viền đen cho tất cả hình ảnh */
+    outline: none; /* Loại bỏ outline */
+
+    &:hover img {
+        transform: scale(1.06);
+    }
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(13, 23, 38, 0.45);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    border-radius: 7px;
+    font-size: 18px;
+    text-decoration: underline; /* underline remainingCount */
+    transition:
+        background 0.25s ease,
+        transform 0.25s ease;
+
+    &:hover .overlay {
+        background: rgba(13, 23, 38, 0.55);
+    }
+}
+
+/* Lightbox and related components (outside of .hero, sibling in DOM) */
+.lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.lightboxContent {
+    background: #fff;
+    width: min(1200px, 96vw);
+    max-height: 90vh;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.lightboxHeader {
+    position: sticky;
+    top: 0;
+    padding: 14px 18px;
+    background: linear-gradient(90deg, #0ea5e9 0%, #22c1c3 100%);
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(2, 44, 74, 0.12);
+}
+
+.lightboxTitle {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.4;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 70%;
+}
+
+.lightboxClose {
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px; /* fontawesome icon size */
+    line-height: 1;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        transform 0.1s ease;
+    position: relative;
+    margin-left: auto; /* push to the right edge */
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.28);
+    }
+
+    &:active {
+        transform: scale(0.96);
+    }
+}
+
+.lightboxGrid {
+    margin-top: 20px;
+    padding: 12px;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.lightboxImg {
+    width: 100%;
+    height: 160px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+/* Responsive adjustments: keep structure mapping intact */
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 16px; /* Giảm padding trên tablet */
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 20px; /* Giảm gap trên tablet */
+    }
+
+    .galleryGrid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto; /* Main, side, bottom */
+    }
+
+    .mainLarge {
+        grid-column: 1;
+        grid-row: 1;
+        height: 300px;
+    }
+
+    .sideStack {
+        grid-column: 1;
+        grid-row: 2;
+        height: auto;
+        flex-direction: row; /* Horizontal on tablet */
+    }
+
+    .sideItem {
+        height: 120px;
+    }
+
+    .bottomRow {
+        grid-column: 1;
+        grid-row: 3;
+    }
+
+    .thumb {
+        height: 120px;
+    }
+}
+
+/* Responsive Design - Progressive Image Display */
+/* Mobile First: Show only main image */
+@media (max-width: 576px) {
+    .container {
+        padding: 0 12px; /* Giảm padding trên mobile */
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 16px; /* Giảm gap trên mobile */
+    }
+
+    .card {
+        padding: 16px; /* Giảm padding card trên mobile */
+        border-radius: 12px;
+    }
+
+    .galleryGrid {
+        display: block !important; /* Change from grid to block on mobile */
+        height: auto !important;
+    }
+
+    .mainLarge {
+        display: block !important;
+        width: 100% !important;
+        height: 250px !important;
+        border-radius: 12px;
+        object-fit: cover;
+    }
+
+    /* Completely hide side images and bottom row on mobile */
+    .sideStack,
+    .bottomRow {
+        display: none !important;
+    }
+}
+
+/* Small tablets: Show main + 1 side image */
+@media (min-width: 577px) and (max-width: 768px) {
+    .container {
+        padding: 0 16px; /* Padding phù hợp cho small tablet */
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 18px; /* Gap phù hợp cho small tablet */
+    }
+
+    .galleryGrid {
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: auto;
+        gap: 8px;
+    }
+
+    .mainLarge {
+        grid-column: 1;
+        grid-row: 1;
+        height: 250px;
+    }
+
+    .sideStack {
+        grid-column: 2;
+        grid-row: 1;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    /* Show only first image */
+    .sideItem:not(:first-child) {
+        display: none;
+    }
+
+    .sideItem:first-child {
+        height: 250px;
+    }
+
+    /* Hide bottom row */
+    .bottomRow {
+        display: none;
+    }
+}
+
+/* Medium tablets: Show main + 2 side images */
+@media (min-width: 769px) and (max-width: 992px) {
+    .container {
+        padding: 0 18px; /* Padding phù hợp cho medium tablet */
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 22px; /* Gap phù hợp cho medium tablet */
+    }
+
+    .galleryGrid {
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: auto;
+        gap: 12px;
+    }
+
+    .mainLarge {
+        height: 320px;
+        border-radius: 12px;
+        object-fit: cover;
+    }
+
+    /* Show first 2 images */
+    .sideItem:nth-child(n + 3) {
+        display: none;
+    }
+
+    .sideItem {
+        height: 154px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    /* Hide bottom row */
+    .bottomRow {
+        display: none;
+    }
+}
+
+/* Large tablets: Show main + all 3 side images */
+@media (min-width: 993px) and (max-width: 1200px) {
+    .grid {
+        grid-template-columns: 350px 1fr;
+        gap: 20px;
+    }
+
+    .galleryGrid {
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: auto;
+        gap: 10px;
+    }
+
+    .mainLarge {
+        height: 350px;
+    }
+
+    .sideItem {
+        height: 113px;
+    }
+
+    /* Hide bottom row */
+    .bottomRow {
+        display: none;
+    }
+}
+
+/* Desktop: Show everything (default styles above) */
+@media (min-width: 1201px) {
+    /* Use default styles - all images visible */
+}
+
+/* Avatar container - wrapper cho avatar và badge */
+.avatarContainer {
+    position: relative;
+    display: inline-block;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+}
+
+.avatar {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: scale(1.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* Avatar badge - tick xanh overlay */
+.avatarBadge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #1ca345;
+}
+
+/* Badge icon - tick icon bên trong badge */
+.badgeIcon {
+    width: 20px;
+    height: 20px;
+    color: #1ca345; /* Màu xanh cho icon */
+}
+
+/* Card wrapper - thay thế cho card doc-profile-card */
+.cardWrapper {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Card body - thay thế cho card-body */
+.cardBody {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1;
+}
+
+/* Hospital widget - thay thế cho doctor-widget doctor-profile-two */
+.hospitalWidget {
+    margin-top: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hospital info - thay thế cho doc-info-right */
+.hospitalInfo {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hospital activities - thay thế cho doctors-activities */
+.hospitalActivities {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Hospital activity item - thay thế cho li trong doctors-activities */
+.hospitalActivityItem {
+    color: #1e293b;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    flex: 1;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* Hospital info item - thay thế cho hospital-info */
+.hospitalInfoItem {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    width: 100%;
+    height: 100%;
+}
+
+/* Hospital info icon - thay thế cho list-icon */
+.hospitalInfoIcon {
+    width: 35px;
+    height: 35px;
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 10px;
+
+    img {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+    }
+}
+
+/* Hospital info text - thay thế cho p trong hospital-info */
+.hospitalInfoText {
+    color: #1e293b;
+    font-size: 14px;
+    margin-bottom: 0;
+    font-weight: 500;
+    flex: 1;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 575.98px) {
+    .hospitalActivityItem {
+        display: block;
+    }
+
+    .hospitalInfoItem {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hospitalInfoIcon {
+        margin-bottom: 8px;
+        margin-right: 0;
+    }
+}

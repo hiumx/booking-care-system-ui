@@ -1,0 +1,244 @@
+// Appointments styling
+.headerListBtns {
+    li {
+        margin-left: 0px !important;
+    }
+}
+// Date Range Picker styling
+.dateRangePickerWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .clearDateBtn {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #dc3545;
+        border: none;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+
+        &:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+        }
+
+        &:active {
+            transform: scale(0.95);
+        }
+
+        i {
+            font-size: 12px;
+        }
+    }
+
+    .appointmentDatePicker {
+        max-width: 320px;
+        :global(.dateRangePicker) {
+            .trigger {
+                font-size: 14px;
+                min-height: 40px;
+                padding: 8px 12px;
+            }
+
+            .dropdown {
+                min-width: 640px; // Đủ rộng cho 2 tháng side by side
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+                border-radius: 12px;
+
+                // Đảm bảo 2 tháng hiển thị ngang hàng trên desktop
+                :global(.rdrCalendarWrapper) {
+                    display: flex;
+                    flex-direction: row;
+                }
+
+                :global(.rdrDateRangeWrapper) {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 0;
+                }
+
+                // Responsive cho mobile
+                @media (max-width: 768px) {
+                    min-width: 320px;
+                    :global(.rdrCalendarWrapper),
+                    :global(.rdrDateRangeWrapper) {
+                        flex-direction: column;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Filter head styling
+.filterHead {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    // Remove blue focus/active state from filter button
+    :global(.form-sorts.dropdown) {
+        :global(.dropdown-toggle),
+        :global(.dropdown-toggle.btn),
+        :global(a.dropdown-toggle),
+        :global(a.dropdown-toggle.btn) {
+            &:focus,
+            &:focus-visible {
+                outline: none !important;
+                box-shadow: none !important;
+                border-color: #fff !important;
+                background-color: #fff !important;
+                color: #333 !important;
+            }
+
+            &:active {
+                background-color: #fff !important;
+                border-color: #fff !important;
+                box-shadow: none !important;
+                color: #333 !important;
+            }
+
+            &:hover {
+                background-color: #fff !important;
+                border-color: #fff !important;
+                color: #333 !important;
+                text-decoration: none !important;
+            }
+
+            // Remove all Bootstrap button blue states
+            &.btn:focus,
+            &.btn:focus-visible,
+            &.btn.focus {
+                outline: none !important;
+                box-shadow: none !important;
+            }
+
+            &.btn:active,
+            &.btn.active {
+                background-color: #fff !important;
+                border-color: #fff !important;
+                box-shadow: none !important;
+            }
+        }
+    }
+}
+
+// Fix appointment card layout - allow wrap when content is long
+:global(.appointment-wrap) {
+    > ul {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 0.75rem 1.5rem;
+
+        > li {
+            &:first-child {
+                flex: 1 1 250px;
+                min-width: 200px;
+            }
+
+            &:global(.appointment-info) {
+                flex: 0 0 auto;
+            }
+
+            &:global(.mail-info-patient) {
+                flex: 1 1 200px;
+            }
+
+            &:global(.appointment-detail-btn),
+            &:last-child:not(:first-child) {
+                flex: 0 0 auto;
+                margin-left: auto;
+            }
+        }
+    }
+
+    // Fix appointment card contact info section
+    :global(.mail-info-patient) {
+        max-width: 250px;
+
+        ul {
+            li {
+                max-width: 100%;
+
+                a {
+                    display: inline-block;
+                    max-width: 200px;
+                    word-break: break-all;
+                    line-height: 1.4;
+                }
+            }
+        }
+    }
+}
+
+// Fix email/phone text overflow - wrap to new line when too long
+:global(.mail-info-patient) {
+    ul {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            word-break: break-all;
+            max-width: 100%;
+
+            i {
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
+
+            a {
+                word-break: break-all;
+                overflow-wrap: break-word;
+            }
+        }
+    }
+}
+
+// Fix patient info email in detail card
+:global(.appointment-detail-card) {
+    :global(.mail-info-patient) {
+        ul {
+            flex-direction: column;
+            align-items: flex-start;
+
+            li {
+                display: flex;
+                align-items: flex-start;
+                gap: 0.5rem;
+                word-break: break-all;
+                max-width: 280px;
+
+                i {
+                    flex-shrink: 0;
+                    margin-top: 3px;
+                }
+            }
+        }
+    }
+
+    :global(.patient-info) {
+        h6 {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+    }
+}

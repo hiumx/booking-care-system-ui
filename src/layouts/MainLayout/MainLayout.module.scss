@@ -1,0 +1,13 @@
+// Styling for the main layout
+.mainLayout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: space-between;
+
+    .contentContainer {
+        // No padding needed - header is in normal flow initially
+        // Content flows naturally below header
+        flex: 1;
+    }
+}

@@ -1,0 +1,174 @@
+{
+    "app": {
+        "name": "MedCure",
+        "description": "Online medical appointment booking platform"
+    },
+    "actions": {
+        "save": "Save",
+        "add": "Add new",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "view": "View",
+        "search": "Search",
+        "filter": "Filter",
+        "reset": "Reset",
+        "submit": "Submit",
+        "confirm": "Confirm",
+        "back": "Back",
+        "next": "Next",
+        "close": "Close",
+        "loading": "Loading...",
+        "processing": "Processing...",
+        "clear": "Clear",
+        "apply": "Apply"
+    },
+    "validation": {
+        "required": "This field is required",
+        "invalidEmail": "Invalid email address",
+        "invalidPhone": "Invalid phone number",
+        "minLength": "Minimum {{count}} characters",
+        "maxLength": "Maximum {{count}} characters"
+    },
+    "messages": {
+        "success": "Success!",
+        "error": "An error occurred!",
+        "uploadSuccess": "Upload successful",
+        "uploadError": "Failed to upload file",
+        "deleteSuccess": "Deleted successfully",
+        "deleteError": "Failed to delete",
+        "saveSuccess": "Saved successfully",
+        "saveError": "Failed to save"
+    },
+    "language": {
+        "vietnamese": "Tiếng Việt",
+        "english": "English",
+        "switchTo": "Switch to {{language}}",
+        "switchLanguage": "Select Language"
+    },
+    "review": {
+        "title": "Reviews",
+        "titleWithCount": "Reviews ({{count}})",
+        "writeReview": "Write a review",
+        "reply": "Reply",
+        "edit": "Edit",
+        "delete": "Delete",
+        "editReply": "Edit",
+        "deleteReply": "Delete",
+        "anonymous": "Anonymous",
+        "outOf5Stars": "{{rating}} out of 5 stars",
+        "viewProfile": "View profile of {{name}}",
+        "reviewBy": "Review by {{name}}",
+        "replyBy": "Reply by {{name}}",
+        "replyToReview": "Reply to this review",
+        "replyToReply": "Reply",
+        "loading": "Loading...",
+        "noReviews": "No reviews yet.",
+        "confirmDeleteTitle": "Confirm delete review",
+        "confirmDeleteMessage": "Are you sure you want to delete this review? This action cannot be undone.",
+        "confirmDeleteReplyTitle": "Confirm delete reply",
+        "confirmDeleteReplyMessage": "Are you sure you want to delete this reply? This action cannot be undone.",
+        "confirmButton": "Delete",
+        "cancelButton": "Cancel"
+    },
+    "reviewForm": {
+        "editTitle": "Edit review",
+        "yourRating": "Your rating",
+        "required": "*",
+        "selectRating": "Select rating",
+        "ratingText": "{{rating}}/5 stars",
+        "reviewContent": "Review content",
+        "reviewPlaceholder": "Share your experience with the doctor... (minimum 5 characters)",
+        "minChars": "{{current}}/{{min}} minimum characters",
+        "remainingChars": "{{count}} characters remaining",
+        "cancel": "Cancel",
+        "updateReview": "Update review",
+        "submitReply": "Submit reply",
+        "saveChanges": "Save changes"
+    },
+    "replyForm": {
+        "placeholder": "Write your reply...",
+        "placeholderWithMin": "{{placeholder}} (minimum 3 characters)",
+        "editPlaceholder": "Edit reply...",
+        "replyToReview": "Write a reply to this review...",
+        "replyTo": "Reply to {{name}}...",
+        "editReplyTo": "Edit reply to {{name}}...",
+        "emptyError": "Please enter reply content",
+        "minLengthError": "Reply must be at least {{min}} characters",
+        "maxLengthError": "Reply cannot exceed {{max}} characters",
+        "minChars": "{{current}}/{{min}} minimum characters",
+        "remainingChars": "{{count}} characters remaining",
+        "submit": "Submit reply",
+        "cancel": "Cancel",
+        "save": "Save changes"
+    },
+    "timeAgo": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "daysAgo": "{{count}} days ago",
+        "monthsAgo": "{{count}} months ago",
+        "yearsAgo": "{{count}} years ago"
+    },
+    "writeReview": {
+        "title": "Write a review for",
+        "ratingLabel": "Rating",
+        "starTitle": "{{count}} stars",
+        "contentLabel": "Review content",
+        "required": "*",
+        "placeholder": "Share your experience with the doctor... (minimum 5 characters)",
+        "minChars": "{{current}}/{{min}} minimum characters",
+        "remainingChars": "{{count}} characters remaining",
+        "termsText": "I have read and agree to the",
+        "termsLink": "Terms & Conditions",
+        "submitButton": "Add review",
+        "cancelButton": "Cancel"
+    },
+    "testimonialSection": {
+        "loading": "Loading reviews...",
+        "noReviews": "No reviews yet",
+        "beFirst": "Be the first to review this hospital!"
+    },
+    "dateRangePicker": {
+        "placeholder": "Select date range",
+        "clearSelection": "Clear selection",
+        "openPicker": "Open date range picker",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "thisWeek": "This Week",
+        "lastWeek": "Last Week",
+        "thisMonth": "This Month",
+        "lastMonth": "Last Month"
+    },
+    "aiAssistant": {
+        "label": "AI Assistant"
+    },
+    "units": {
+        "yearsOld": "years old",
+        "years": "years",
+        "months": "months",
+        "days": "days"
+    },
+    "fileInput": {
+        "dragDropOrSelect": "Drag and drop files here or",
+        "selectFile": "select files",
+        "supportedFormats": "Supported: Images, PDF, DOC, DOCX (Max {{maxSize}}MB)",
+        "filesSelected": "{{count}} file(s) selected",
+        "fileSizeExceeded": "File \"{{fileName}}\" exceeds maximum size of {{maxSize}}MB",
+        "selectFileAriaLabel": "Select files to upload",
+        "removeFile": "Remove file"
+    },
+    "gender": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other",
+        "notUpdated": "Not updated"
+    },
+    "filePreview": {
+        "close": "Close",
+        "download": "Download",
+        "openInNewTab": "Open in new tab",
+        "cannotPreview": "Cannot preview this file",
+        "downloadFile": "download the file",
+        "docViewerNote": "Preview provided by Google Docs Viewer. If not displayed, please"
+    }
+}

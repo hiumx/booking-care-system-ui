@@ -1,0 +1,107 @@
+{
+    "loading": "Đang xác thực...",
+    "invalidToken": {
+        "title": "Token không hợp lệ",
+        "defaultError": "Token không hợp lệ hoặc đã hết hạn",
+        "validationError": "Không thể xác thực token. Vui lòng thử lại sau.",
+        "contactAdmin": "Vui lòng liên hệ admin để nhận link ký hợp đồng mới."
+    },
+    "header": {
+        "title": "Ký hợp đồng điện tử",
+        "subtitle": "Vui lòng đọc kỹ hợp đồng và hoàn thành các bước ký bên dưới"
+    },
+    "steps": {
+        "signature": "Chữ ký",
+        "otp": "Xác thực OTP",
+        "confirm": "Xác nhận"
+    },
+    "contractInfo": {
+        "title": "Thông tin hợp đồng",
+        "contractNumber": "Số hợp đồng",
+        "hospital": "Bệnh viện",
+        "representative": "Người đại diện",
+        "email": "Email"
+    },
+    "contractPreview": {
+        "title": "Xem hợp đồng",
+        "draft": "Bản nháp",
+        "warning": "Vui lòng đọc kỹ toàn bộ nội dung hợp đồng trước khi ký",
+        "openNewTab": "Mở trong tab mới"
+    },
+    "signature": {
+        "title": "Vẽ chữ ký của bạn",
+        "description": "Vẽ chữ ký của bạn trong khung bên dưới. Chữ ký này sẽ được sử dụng để xác thực hợp đồng.",
+        "placeholder": "Vẽ chữ ký tại đây",
+        "clear": "Xóa và vẽ lại",
+        "hasSignature": "Đã có chữ ký"
+    },
+    "otp": {
+        "title": "Xác thực OTP",
+        "sent": "Mã OTP đã được gửi!",
+        "checkEmail": "Vui lòng kiểm tra email của bạn",
+        "inputLabel": "Nhập mã OTP (6 chữ số)",
+        "resendIn": "Gửi lại mã sau",
+        "seconds": "giây",
+        "resend": "Gửi lại mã OTP",
+        "inputComplete": "Đã nhập đủ",
+        "sendTo": "Mã OTP sẽ được gửi đến email",
+        "sendButton": "Gửi mã OTP",
+        "sending": "Đang gửi...",
+        "completeStep1": "Vui lòng hoàn thành bước 1 (vẽ chữ ký) trước khi gửi OTP"
+    },
+    "submit": {
+        "title": "Xác nhận ký hợp đồng",
+        "button": "Xác nhận ký hợp đồng",
+        "processing": "Đang xử lý...",
+        "disclaimer": "Bằng việc ký hợp đồng, bạn xác nhận đã đọc và đồng ý với tất cả các điều khoản trong hợp đồng. Chữ ký điện tử của bạn có giá trị pháp lý."
+    },
+    "toast": {
+        "otpSent": "Mã OTP đã được gửi đến email của bạn",
+        "otpSendFailed": "Không thể gửi OTP",
+        "otpSendError": "Có lỗi xảy ra khi gửi OTP",
+        "completeAllSteps": "Vui lòng hoàn thành tất cả các bước",
+        "drawSignature": "Vui lòng vẽ chữ ký của bạn",
+        "otpLength": "Mã OTP phải có 6 chữ số",
+        "signSuccess": "Ký hợp đồng thành công!",
+        "signFailed": "Ký hợp đồng thất bại",
+        "signError": "Có lỗi xảy ra khi ký hợp đồng"
+    },
+    "success": {
+        "breadcrumb": {
+            "home": "Trang chủ",
+            "contractSigning": "Ký hợp đồng",
+            "complete": "Hoàn tất"
+        },
+        "title": "Ký hợp đồng thành công",
+        "message": "Cảm ơn bạn đã hoàn tất việc ký hợp đồng điện tử. Hợp đồng đã được gửi đến hệ thống",
+        "systemName": "MedCure",
+        "toReview": "để xem xét và phê duyệt.",
+        "nextSteps": {
+            "title": "Bước tiếp theo",
+            "step1": "Hợp đồng đã được ký thành công và gửi đến hệ thống MedCure",
+            "step2": "Đội ngũ quản trị sẽ xem xét và phê duyệt hợp đồng trong thời gian sớm nhất",
+            "step3": "Bạn sẽ nhận được email thông báo khi hợp đồng được phê duyệt",
+            "step4": "Sau khi phê duyệt, tài khoản bệnh viện sẽ được kích hoạt và bạn có thể đăng nhập vào hệ thống"
+        },
+        "timeline": {
+            "title": "Quy trình xử lý",
+            "step1": {
+                "title": "Ký hợp đồng",
+                "status": "Hoàn thành"
+            },
+            "step2": {
+                "title": "Xem xét hợp đồng",
+                "status": "Đang chờ"
+            },
+            "step3": {
+                "title": "Kích hoạt tài khoản",
+                "status": "Chờ xử lý"
+            }
+        },
+        "support": {
+            "title": "Cần hỗ trợ?",
+            "description": "Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi:"
+        },
+        "backHome": "Về trang chủ"
+    }
+}

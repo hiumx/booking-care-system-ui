@@ -1,0 +1,128 @@
+.modalItem {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; // 12px
+    padding: 1rem; // 16px
+    border-radius: 0.75rem; // 12px
+    transition: all 0.2s ease;
+    background-color: #f9fafb;
+    border: 0.0625rem solid transparent; // 1px
+    outline: none;
+
+    &:hover {
+        background-color: #f3f4f6;
+    }
+
+    &.selected {
+        background-color: #eff6ff;
+        border-color: #bfdbfe;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+}
+
+.iconContainer {
+    width: 2.5rem; // 40px
+    height: 2.5rem; // 40px
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.blue {
+        background-color: #dbeafe;
+        svg {
+            color: #2563eb;
+        }
+    }
+
+    &.green {
+        background-color: #dcfce7;
+        svg {
+            color: #16a34a;
+        }
+    }
+
+    &.red {
+        background-color: #fee2e2;
+        svg {
+            color: #dc2626;
+        }
+    }
+
+    &.orange {
+        background-color: #fed7aa;
+        svg {
+            color: #ea580c;
+        }
+    }
+
+    &.purple {
+        background-color: #f3e8ff;
+        svg {
+            color: #9333ea;
+        }
+    }
+
+    &.pink {
+        background-color: #fce7f3;
+        svg {
+            color: #ec4899;
+        }
+    }
+
+    &.yellow {
+        background-color: #fef3c7;
+        svg {
+            color: #d97706;
+        }
+    }
+
+    &.indigo {
+        background-color: #e0e7ff;
+        svg {
+            color: #4f46e5;
+        }
+    }
+
+    &.teal {
+        background-color: #ccfbf1;
+        svg {
+            color: #0d9488;
+        }
+    }
+
+    &.cyan {
+        background-color: #cffafe;
+        svg {
+            color: #0891b2;
+        }
+    }
+}
+
+.specialtyName {
+    color: #374151;
+    font-weight: 500;
+    text-align: left;
+    flex: 1;
+    font-size: 1rem;
+}
+
+.imageIcon {
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.imageIconHospital {
+    width: 100px;
+    height: 50px;
+}
+
+.imageIconSpecialty {
+    width: 50px;
+    height: 50px;
+}

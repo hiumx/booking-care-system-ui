@@ -1,0 +1,7 @@
+// inside any component.scss or .module.scss
+
+.button:disabled {
+    background: #d1d5db !important; // gray-300
+    color: #6b7280 !important; // gray-300
+    border: none;
+}

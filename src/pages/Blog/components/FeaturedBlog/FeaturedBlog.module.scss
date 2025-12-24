@@ -1,0 +1,308 @@
+.featuredArticlesSection {
+    margin-bottom: 40px;
+
+    .articlesGrid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 20px;
+        align-items: start; // Align items to the top
+
+        .mainArticleColumn {
+            .mainArticle {
+                background: white;
+                border-radius: 12px;
+                overflow: hidden;
+                border: 1px solid #e9ecef;
+                transition: transform 0.3s ease;
+                text-decoration: none;
+                color: inherit;
+                display: block;
+                height: 100%;
+
+                // Only zoom image when hovering the image/link itself
+                .imageLink:hover .mainArticleImage {
+                    transform: scale(1.04);
+                }
+
+                .imageLink {
+                    display: block;
+                    text-decoration: none;
+                    overflow: hidden;
+                    border-top-left-radius: 12px;
+                    border-top-right-radius: 12px;
+                }
+
+                .mainArticleImage {
+                    width: 100%;
+                    height: 330px;
+                    object-fit: cover;
+                    object-position: center;
+                    display: block;
+                    image-rendering: -webkit-optimize-contrast;
+                    image-rendering: crisp-edges;
+                    transition: transform 0.3s ease;
+                }
+
+                .mainArticleContent {
+                    padding: 15px;
+
+                    .articleTag {
+                        display: inline-block;
+                        background: #007bff;
+                        color: white;
+                        padding: 4px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        margin-bottom: 10px;
+                    }
+
+                    .mainArticleTitle {
+                        font-size: 18px;
+                        font-weight: 700;
+                        color: #333;
+                        margin: 0 0 15px 0;
+                        line-height: 1.4;
+                        transition: color 0.3s ease;
+                        cursor: pointer;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3;
+                        line-clamp: 3;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    .mainArticleMeta {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 4px;
+                        font-size: 12px;
+                        color: #666;
+                        margin-top: 10px;
+
+                        .articleAuthor {
+                            font-weight: 600;
+                            color: #333;
+                            text-decoration: none;
+                            transition: color 0.2s ease;
+
+                            &:hover {
+                                color: #0d6efd;
+                            }
+                        }
+
+                        .articleDate {
+                            color: #666;
+                        }
+                    }
+                }
+
+                // title color only when hovering the title itself
+                .mainArticleTitle:hover {
+                    color: #007bff;
+                }
+            }
+        }
+
+        .smallArticlesColumn {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+
+            .smallArticle {
+                background: white;
+                border-radius: 12px;
+                overflow: hidden;
+                border: 1px solid #e9ecef;
+                transition: transform 0.3s ease;
+                text-decoration: none;
+                color: inherit;
+                display: flex;
+                flex-direction: row;
+                flex: 1;
+                height: calc(50% - 10px);
+                min-height: 0; // Allow flex items to shrink
+
+                // remove card lift; zoom only when hovering the image wrapper
+                .smallArticleImage:hover img {
+                    transform: scale(1.06);
+                }
+
+                .smallArticleContent {
+                    padding: 15px;
+                    display: flex;
+                    flex-direction: column;
+                    flex-grow: 1;
+                    justify-content: space-between;
+                    order: 1;
+                    min-height: 0; // Allow content to shrink
+
+                    .articleTag {
+                        display: inline-block;
+                        background: #007bff;
+                        color: white;
+                        padding: 4px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        margin-bottom: 8px;
+                        align-self: flex-start;
+                    }
+
+                    .smallArticleTitle {
+                        font-size: 18px;
+                        font-weight: 700;
+                        color: #333;
+                        margin: 0 0 8px 0;
+                        line-height: 1.4;
+                        transition: color 0.3s ease;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3;
+                        line-clamp: 3;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        flex-shrink: 1; // Allow title to shrink
+                    }
+
+                    .smallArticleDescription {
+                        font-size: 14px;
+                        color: #666;
+                        line-height: 1.5;
+                        margin: 0 0 10px 0;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3;
+                        line-clamp: 3;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        flex-shrink: 1; // Allow description to shrink
+                    }
+
+                    .smallArticleMeta {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 4px;
+                        font-size: 12px;
+                        color: #666;
+                        margin-top: auto;
+                        min-height: 18px;
+                        flex-shrink: 0; // Prevent meta from shrinking
+
+                        .articleAuthor {
+                            font-weight: 600;
+                            color: #333;
+                            text-decoration: none;
+                            transition: color 0.2s ease;
+
+                            &:hover {
+                                color: #0d6efd;
+                            }
+                        }
+
+                        .articleDate {
+                            color: #666;
+                        }
+                    }
+                }
+
+                .smallArticleImage {
+                    width: 100px;
+                    height: 100px;
+                    flex-shrink: 0;
+                    display: block;
+                    order: 2;
+                    align-self: flex-start;
+                    margin: 15px;
+                    border-radius: 8px;
+                    overflow: hidden;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        display: block;
+                        transition: transform 0.3s ease;
+                    }
+                }
+
+                .smallArticleTitle:hover {
+                    color: #007bff;
+                }
+            }
+        }
+
+        .articleAuthor {
+            font-weight: 600;
+            color: #333;
+            text-decoration: none;
+            transition: color 0.2s ease;
+
+            &:hover {
+                color: #0d6efd;
+            }
+        }
+
+        .articleDate {
+            color: #999;
+        }
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .featuredArticlesSection {
+        .articlesGrid {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .mainArticleColumn {
+            .mainArticle {
+                .mainArticleImage {
+                    height: 250px;
+                }
+
+                .mainArticleContent {
+                    .mainArticleTitle {
+                        font-size: 22px;
+                    }
+                }
+            }
+        }
+
+        .smallArticlesColumn {
+            height: auto;
+
+            .smallArticle {
+                flex-direction: column;
+                height: auto;
+
+                .smallArticleImage {
+                    width: 100%;
+                    height: 180px;
+                    order: 1;
+                    margin: 0;
+                    border-radius: 0;
+                }
+
+                .smallArticleContent {
+                    padding: 20px;
+                    order: 2;
+
+                    .smallArticleTitle {
+                        font-size: 18px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .featuredArticlesSection {
+        padding: 0 15px;
+    }
+}

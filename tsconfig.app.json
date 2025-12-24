@@ -9,11 +9,35 @@
 
         /* Bundler mode */
         "moduleResolution": "bundler",
-        "allowImportingTsExtensions": true,
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "noEmit": false,
         "isolatedModules": true,
         "moduleDetection": "force",
-        "noEmit": true,
+        "composite": true,
         "jsx": "react-jsx",
+
+        /* Output configuration */
+        "outDir": "./dist",
+        "rootDir": "./src",
+
+        /* Path mapping */
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["src/*"],
+            "@/components/*": ["src/components/*"],
+            "@/pages/*": ["src/pages/*"],
+            "@/layouts/*": ["src/layouts/*"],
+            "@/hooks/*": ["src/hooks/*"],
+            "@/services/*": ["src/services/*"],
+            "@/utils/*": ["src/utils/*"],
+            "@/types/*": ["src/types/*"],
+            "@/constants/*": ["src/constants/*"],
+            "@/store/*": ["src/store/*"],
+            "@/assets/*": ["src/assets/*"],
+            "@/examples/*": ["src/examples/*"]
+        },
 
         /* Linting */
         "strict": true,
@@ -22,5 +46,6 @@
         "noFallthroughCasesInSwitch": true,
         "noUncheckedSideEffectImports": true
     },
-    "include": ["src"]
+    "include": ["src/**/*", "src/**/*.json"],
+    "exclude": ["node_modules", "dist"]
 }

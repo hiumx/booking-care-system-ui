@@ -1,0 +1,690 @@
+@use '../../../styles/variables' as *;
+
+.mealPlanDetail {
+    background-color: #f8fafc;
+    min-height: calc(100vh - 68px);
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    font-size: 1.125rem;
+    color: $primary-color;
+}
+
+.noData {
+    text-align: center;
+    padding: 60px 20px;
+
+    h2 {
+        font-size: 24px;
+        color: $text-primary-color;
+        margin-bottom: 20px;
+    }
+
+    button {
+        padding: 12px 32px;
+        background: $primary-color;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+            background: darken($primary-color, 8%);
+        }
+    }
+}
+
+// Hero Section
+.heroSection {
+    background: linear-gradient(to right, #eff6ff, #eef2ff);
+    padding: 48px 0;
+
+    .heroContainer {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .heroContent {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+
+        .heroLeft {
+            flex: 1;
+
+            .badge {
+                display: inline-block;
+                background: #dbeafe;
+                color: #0ea5e9;
+                padding: 6px 12px;
+                border-radius: 9999px;
+                font-size: 12px;
+                font-weight: 600;
+                margin-bottom: 12px;
+            }
+
+            h1 {
+                font-size: 15px;
+                font-weight: 600;
+                color: #0f172a;
+                margin: 0 0 8px 0;
+            }
+
+            p {
+                font-size: 14px;
+                color: #64748b;
+                max-width: 672px;
+                margin: 0;
+            }
+        }
+
+        .calorieCard {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+
+            .calorieItem {
+                text-align: center;
+                padding: 0 16px;
+
+                .label {
+                    font-size: 14px;
+                    color: #64748b;
+                    margin: 0 0 4px 0;
+                }
+
+                .value {
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #0f172a;
+                    margin: 0;
+
+                    span {
+                        font-size: 12px;
+                        font-weight: 400;
+                        color: #64748b;
+                    }
+
+                    &.consumed {
+                        color: #10b981;
+                    }
+                }
+            }
+
+            .divider {
+                width: 1px;
+                height: 40px;
+                background: #e2e8f0;
+            }
+
+            .progressRing {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                border: 4px solid #10b981;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                .percentage {
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: #0f172a;
+                }
+            }
+        }
+    }
+}
+
+// Main Section
+.mainSection {
+    padding: 64px 0;
+
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+}
+
+// Date Navigation
+.dateNav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 48px;
+
+    .navBtn {
+        padding: 8px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+            background: #e2e8f0;
+        }
+
+        .material-icons {
+            color: #64748b;
+        }
+    }
+
+    .dateDisplay {
+        text-align: center;
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 4px 0;
+        }
+
+        p {
+            font-size: 14px;
+            color: #0ea5e9;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 0;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+// Meals Timeline - Alternating Layout
+.mealsTimeline {
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e2e8f0;
+        transform: translateX(-50%);
+        z-index: 0;
+    }
+}
+
+.timelineRow {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 32px;
+    margin-bottom: 40px;
+    align-items: start;
+}
+
+.leftSide,
+.rightSide {
+    position: relative;
+    z-index: 1;
+}
+
+.timelineCenter {
+    display: flex;
+    justify-content: center;
+    padding-top: 80px;
+    position: relative;
+    z-index: 2;
+
+    .timelineDot {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px #e2e8f0;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &.completed {
+            background: #10b981;
+            box-shadow:
+                0 0 0 2px #10b981,
+                0 0 0 4px #d1fae5;
+
+            &::after {
+                content: '✓';
+                position: absolute;
+                color: white;
+                font-size: 18px;
+                font-weight: bold;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
+    }
+}
+
+.mealCard {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f1f5f9;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: row;
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+
+    &.completed {
+        // Removed opacity to keep meal card clear when completed
+    }
+
+    .mealImage {
+        position: relative;
+        width: 160px;
+        min-width: 160px;
+        height: auto;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .imagePlaceholder {
+            font-size: 56px;
+        }
+
+        .mealBadge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #0f172a;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    .mealContent {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .mealHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+
+            h3 {
+                font-size: 15px;
+                font-weight: 600;
+                color: #0f172a;
+                margin: 0;
+                flex: 1;
+            }
+
+            .calories {
+                background: #d1fae5;
+                color: #059669;
+                padding: 4px 10px;
+                border-radius: 12px;
+                font-size: 13px;
+                font-weight: 700;
+                white-space: nowrap;
+                margin-left: 12px;
+            }
+        }
+
+        .mealDescription {
+            color: #64748b;
+            font-size: 13px;
+            margin: 0 0 12px 0;
+            line-height: 1.5;
+        }
+
+        .ingredients {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 12px;
+            font-size: 12px;
+
+            .ingredientsLabel {
+                color: #64748b;
+                font-weight: 600;
+            }
+
+            .ingredientsList {
+                color: #0f172a;
+                font-weight: 500;
+            }
+        }
+
+        .macros {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+
+            .macroItem {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+
+                .macroLabel {
+                    font-size: 12px;
+                    color: #64748b;
+                    font-weight: 500;
+                }
+
+                .macroValue {
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: #0f172a;
+                }
+            }
+        }
+
+        .checkboxLabel {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            margin-top: auto;
+
+            .checkbox {
+                appearance: none;
+                -webkit-appearance: none;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 2px solid #cbd5e1;
+                cursor: pointer;
+                position: relative;
+                transition: all 0.2s ease;
+                background: white;
+
+                &:checked {
+                    background: #0ea5e9;
+                    border-color: #0ea5e9;
+
+                    &::after {
+                        content: '✓';
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        color: white;
+                        font-size: 14px;
+                        font-weight: bold;
+                    }
+                }
+
+                &:hover {
+                    border-color: #0ea5e9;
+                }
+            }
+
+            span {
+                font-size: 13px;
+                font-weight: 500;
+                color: #64748b;
+            }
+
+            &:hover span {
+                color: #0ea5e9;
+            }
+        }
+    }
+}
+
+.tipCard {
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 12px;
+
+    .tipIcon {
+        font-size: 28px;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    p {
+        font-size: 13px;
+        color: #64748b;
+        font-style: italic;
+        margin: 0;
+        text-align: left;
+        max-width: 400px;
+        flex: 1;
+    }
+}
+
+// Water Section
+.waterSection {
+    margin-top: 32px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    .waterContent {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        .waterHeader {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+
+            .waterIcon {
+                width: 48px;
+                height: 48px;
+                background: #dbeafe;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                .material-icons {
+                    color: #0ea5e9;
+                    font-size: 28px;
+                }
+            }
+
+            h4 {
+                font-size: 18px;
+                font-weight: 700;
+                color: #0f172a;
+                margin: 0 0 4px 0;
+            }
+
+            p {
+                font-size: 14px;
+                color: #64748b;
+                margin: 0;
+            }
+        }
+
+        .waterGlasses {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+
+            .glass {
+                width: 60px;
+                height: 36px;
+                background: #e0f2fe;
+                border: 2px solid #bae6fd;
+                border-radius: 18px;
+                cursor: pointer;
+                transition: all 0.2s;
+
+                &.filled {
+                    background: #0ea5e9;
+                    border-color: #0ea5e9;
+                }
+
+                &:hover {
+                    background: #7dd3fc;
+                    border-color: #38bdf8;
+                }
+            }
+
+            .addWater {
+                width: 36px;
+                height: 36px;
+                background: #dbeafe;
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-left: 8px;
+                transition: all 0.2s;
+
+                .material-icons {
+                    color: #0ea5e9;
+                    font-size: 20px;
+                }
+
+                &:hover {
+                    background: #0ea5e9;
+
+                    .material-icons {
+                        color: white;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 1024px) {
+    .heroSection {
+        .heroContent {
+            flex-direction: column;
+            text-align: center;
+
+            .heroLeft {
+                h1 {
+                    font-size: 28px;
+                }
+
+                p {
+                    font-size: 16px;
+                }
+            }
+        }
+    }
+
+    .mealsTimeline {
+        &::before {
+            left: 30px;
+        }
+    }
+
+    .timelineRow {
+        grid-template-columns: 60px 1fr;
+        gap: 16px;
+
+        .leftSide {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .rightSide {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .timelineCenter {
+            grid-column: 1;
+            grid-row: 1;
+            padding-top: 40px;
+        }
+
+        .tipCard {
+            display: none;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .heroSection {
+        padding: 32px 0;
+
+        .heroContent {
+            .calorieCard {
+                flex-direction: column;
+                width: 100%;
+
+                .divider {
+                    width: 100%;
+                    height: 1px;
+                }
+            }
+        }
+    }
+
+    .mainSection {
+        padding: 48px 0;
+    }
+
+    .mealCard {
+        flex-direction: column;
+
+        .mealImage {
+            width: 100%;
+            height: 180px;
+        }
+    }
+
+    .waterSection {
+        .waterContent {
+            .waterGlasses {
+                flex-wrap: wrap;
+            }
+        }
+    }
+}

@@ -1,0 +1,41 @@
+.breadcrumb {
+    max-width: 1200px;
+    margin: 0 auto 16px auto;
+
+    ol {
+        display: flex;
+        flex-wrap: wrap;
+        list-style: none;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+
+        li {
+            color: #6b7280;
+
+            &::after {
+                content: '/';
+                margin: 0 8px;
+                color: #cbd5e1;
+            }
+
+            &:last-child::after {
+                content: '';
+            }
+
+            a {
+                color: #0ea5e9;
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+}
+
+.active span {
+    color: #0f172a;
+    font-weight: 600;
+}

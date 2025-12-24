@@ -1,0 +1,199 @@
+:global {
+    .chat-footer a {
+        text-decoration: none;
+    }
+}
+
+// Wrapper to handle file preview + form layout
+.chatFooterWrapper {
+    position: relative;
+}
+
+.dropdownMenuUp {
+    position: absolute;
+    bottom: 64px !important;
+    left: 0 !important;
+    z-index: 100;
+    display: block;
+
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.emojiVisible {
+    display: block !important;
+}
+
+// File Preview Area - Positioned absolutely ABOVE the form
+// This prevents layout shift and doesn't cover the input
+.filePreviewArea {
+    position: absolute;
+    bottom: 100%; // Position directly above the form
+    left: 0;
+    right: 0;
+    background: #f8f9fa;
+    border: 1px solid #e1e4e8;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    padding: 12px;
+    z-index: 10;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+    pointer-events: auto;
+
+    // Ensure it's positioned relative to the footer wrapper
+    margin-bottom: 92px;
+}
+
+.filePreviewItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: #007bff;
+        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+    }
+}
+
+.filePreviewImage {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #e1e4e8;
+    flex-shrink: 0;
+}
+
+.filePreviewIcon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
+    flex-shrink: 0;
+
+    i {
+        font-size: 24px;
+        color: white;
+    }
+}
+
+.filePreviewInfo {
+    flex: 1;
+    min-width: 0; // Allow text truncation
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.filePreviewName {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.filePreviewSize {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.removeFileBtn {
+    background: transparent;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 4px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    &:hover {
+        background: #dc3545;
+        color: white;
+    }
+
+    i {
+        font-size: 14px;
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .filePreviewArea {
+        padding: 10px;
+    }
+
+    .filePreviewItem {
+        padding: 6px;
+    }
+
+    .filePreviewImage,
+    .filePreviewIcon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .filePreviewIcon i {
+        font-size: 20px;
+    }
+
+    .filePreviewName {
+        font-size: 13px;
+    }
+
+    .filePreviewSize {
+        font-size: 11px;
+    }
+}
+
+// ✅ Microphone recording animation
+.listening {
+    color: #ff6b6b !important;
+    animation: pulse-red 1s infinite;
+}
+
+@keyframes pulse-red {
+    0% {
+        color: #ff6b6b;
+        transform: scale(1);
+    }
+    50% {
+        color: #ff5252;
+        transform: scale(1.1);
+    }
+    100% {
+        color: #ff6b6b;
+        transform: scale(1);
+    }
+}
+
+@keyframes recording-pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.recordingPulse {
+    animation: recording-pulse 0.8s infinite;
+}

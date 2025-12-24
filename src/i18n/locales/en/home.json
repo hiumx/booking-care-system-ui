@@ -1,0 +1,303 @@
+{
+    "searchInput": {
+        "doctorPlaceholder": "Enter doctor name",
+        "hospitalPlaceholder": "Select hospital",
+        "specialtyPlaceholder": "Select specialty",
+        "locationPlaceholder": "Select location",
+        "searchButton": "Search",
+        "hospitalModalTitle": "Search by Hospital",
+        "specialtyModalTitle": "Search by Specialty"
+    },
+    "sections": {
+        "specialties": {
+            "title": "Top Specialties",
+            "desc": "Care and Support",
+            "viewAll": "View all specialties"
+        },
+        "hospitals": {
+            "title": "Top Hospitals",
+            "desc": "Explore featured hospitals",
+            "viewAll": "View all hospitals"
+        },
+        "doctors": {
+            "title": "Top Doctors",
+            "desc": "Meet the best doctors",
+            "viewAll": "View all doctors"
+        },
+        "services": {
+            "title": "Our",
+            "titleSuffix": "Services",
+            "subtitle": "Special offers when booking multiple services. Book today!"
+        }
+    },
+    "banner": {
+        "aiSupport": {
+            "title": "Booking Support",
+            "rating": "5.0 stars",
+            "tooltip": "Click for smart booking!"
+        },
+        "headline": {
+            "part1": "Health Check: Find your doctor",
+            "highlight": "for you",
+            "part2": "today"
+        },
+        "stats": {
+            "appointments": {
+                "count": "100",
+                "label": "Appointments",
+                "sublabel": "completed"
+            },
+            "patients": {
+                "count": "1000",
+                "label": "Satisfied patients"
+            }
+        }
+    },
+    "horizontalServices": {
+        "services": [
+            "Multi Speciality Treatments & Doctors",
+            "Lab Testing Services",
+            "Medicines & Supplies",
+            "Hospitals & Clinics",
+            "Health Care Services",
+            "Talk to Doctors",
+            "Home Care Services"
+        ]
+    },
+    "reasons": {
+        "badge": "Why Book With Us",
+        "title": "Compelling Reasons to Choose",
+        "items": [
+            {
+                "title": "Follow-Up Care",
+                "description": "We ensure continuity of care through regular follow-ups and communication, helping you stay on track with health goals."
+            },
+            {
+                "title": "Patient-Centered Approach",
+                "description": "We prioritize your comfort and preferences, tailoring our services to meet your individual needs and Care from Our Experts"
+            },
+            {
+                "title": "Convenient Access",
+                "description": "Easily book appointments online or through our dedicated customer service team, with flexible hours to fit your schedule."
+            }
+        ]
+    },
+    "bookus": {
+        "badge": "Why Book With Us",
+        "title": "We are committed to understanding your",
+        "titleHighlight": "unique needs and delivering care.",
+        "description": "As a trusted healthcare provider in our community, we are passionate about promoting health and wellness beyond the clinic. We actively engage in community outreach programs, health fairs, and educational workshop.",
+        "visionMission": [
+            {
+                "number": "01",
+                "title": "Our Vision",
+                "description": "We envision a community where everyone has access to high-quality healthcare and the resources they need to lead healthy, fulfilling lives."
+            },
+            {
+                "number": "02",
+                "title": "Our Mission",
+                "description": "We envision a community where everyone has access to high-quality healthcare and the resources they need to lead healthy, fulfilling lives."
+            }
+        ],
+        "bookItems": [
+            {
+                "title": "Search For Doctors",
+                "description": "Search for a doctor based on specialization, location, or availability for your Treatments"
+            },
+            {
+                "title": "Check Doctor Profile",
+                "description": "Explore detailed doctor profiles on our platform to make informed healthcare decisions."
+            },
+            {
+                "title": "Schedule Appointment",
+                "description": "After choose your preferred doctor, select a convenient time slot, & confirm your appointment."
+            },
+            {
+                "title": "Get Your Solution",
+                "description": "Discuss your health concerns with the doctor and receive the personalized advice & with solution."
+            }
+        ]
+    },
+    "testimonial": {
+        "badge": "Testimonials",
+        "title": "15k Users Trust Medcure Worldwide",
+        "titleSuffix": "Users Trust Medcure Worldwide",
+        "starReview": "Star Review",
+        "anonymousUser": "Anonymous User",
+        "verifiedPatient": "Verified Patient",
+        "testimonials": [
+            {
+                "rating": 5,
+                "title": "Nice Treatment",
+                "comment": "I had a wonderful experience the staff was friendly and attentive, and Dr. Smith took the time to explain everything clearly.",
+                "authorName": "Deny Hendrawan",
+                "authorLocation": "United States"
+            },
+            {
+                "rating": 5,
+                "title": "Good Hospitability",
+                "comment": "Genuinely cares about his patients. He helped me understand my condition and worked with me to create a plan.",
+                "authorName": "Johnson DWayne",
+                "authorLocation": "United States"
+            },
+            {
+                "rating": 5,
+                "title": "Nice Treatment",
+                "comment": "I had a great experience with Dr. Chen. She was not only professional but also made me feel comfortable discussing.",
+                "authorName": "Rayan Smith",
+                "authorLocation": "United States"
+            },
+            {
+                "rating": 5,
+                "title": "Excellent Service",
+                "comment": "I had a wonderful experience the staff was friendly and attentive, and Dr. Smith took the time to explain everything clearly.",
+                "authorName": "Sofia Doe",
+                "authorLocation": "United States"
+            }
+        ],
+        "counters": [
+            {
+                "value": 500,
+                "suffix": "+",
+                "label": "Doctors Available"
+            },
+            {
+                "value": 18,
+                "suffix": "+",
+                "label": "Specialities"
+            },
+            {
+                "value": 30,
+                "suffix": "K",
+                "label": "Bookings Done"
+            },
+            {
+                "value": 97,
+                "suffix": "+",
+                "label": "Hospitals & Clinic"
+            },
+            {
+                "value": 317,
+                "suffix": "+",
+                "label": "Lab Tests Available"
+            }
+        ]
+    },
+    "faq": {
+        "badge": "FAQ'S",
+        "title": "Your Questions are Answered",
+        "items": [
+            {
+                "question": "How do I book an appointment with a doctor?",
+                "answer": "Yes, simply visit our website and log in or create an account. Search for a doctor based on specialization, location, or availability & confirm your booking."
+            },
+            {
+                "question": "Can I request a specific doctor when booking my appointment?",
+                "answer": "Yes, you can usually request a specific doctor when booking your appointment, though availability may vary based on their schedule."
+            },
+            {
+                "question": "What should I do if I need to cancel or reschedule my appointment?",
+                "answer": "If you need to cancel or reschedule your appointment, contact the doctor as soon as possible to inform them and to reschedule for another available time slot."
+            },
+            {
+                "question": "What if I'm running late for my appointment?",
+                "answer": "If you know you will be late, it's courteous to call the doctor's office and inform them. Depending on their policy and schedule, they may be able to accommodate you or reschedule your appointment."
+            },
+            {
+                "question": "Can I book appointments for family members or dependents?",
+                "answer": "Yes, in many cases, you can book appointments for family members or dependents. However, you may need to provide their personal information and consent to do so."
+            }
+        ]
+    },
+    "article": {
+        "badge": "Recent Blogs",
+        "title": "Stay Updated With Our Latest Articles",
+        "viewAll": "View All Articles",
+        "articles": [
+            {
+                "category": "Treatments",
+                "title": "Understanding and Preventing Glaucoma: A Detailed Guide",
+                "description": "Glaucoma is a leading cause of blind worldwide, yet many...."
+            },
+            {
+                "category": "Neurology",
+                "title": "Understanding and Preventing Glaucoma: A Detailed Guide",
+                "description": "Discover the intersection of technology and neurology, transforming...."
+            },
+            {
+                "category": "Dental",
+                "title": "5 Essential Tips for Maintaining Optimal Oral Health",
+                "description": "Learn the top five daily practices to keep your teeth...."
+            },
+            {
+                "category": "Care & Treatment",
+                "title": "Beating Strong: The Digital Revol in Cardiac Care",
+                "description": "Discover how digital advancements are transforming cardiac care..."
+            }
+        ]
+    },
+    "info": {
+        "heading": "Working for Your Better Health.",
+        "customerSupport": {
+            "label": "Customer Support",
+            "value": "+84 763583081"
+        },
+        "email": {
+            "label": "Drop Us an Email",
+            "value": "medcure.contact@gmail.com"
+        }
+    },
+    "footer": {
+        "company": {
+            "title": "Company",
+            "links": [
+                { "text": "About", "path": "/about-us" },
+                { "text": "Features", "path": "#" },
+                { "text": "Works", "path": "#" },
+                { "text": "Careers", "path": "#" },
+                { "text": "Locations", "path": "#" }
+            ]
+        },
+        "treatments": {
+            "title": "Treatments",
+            "links": [
+                { "text": "Dental", "path": "#" },
+                { "text": "Cardiac", "path": "#" },
+                { "text": "Spinal Cord", "path": "#" },
+                { "text": "Hair Growth", "path": "#" },
+                { "text": "Anemia & Disorder", "path": "#" }
+            ]
+        },
+        "specialities": {
+            "title": "Specialities",
+            "links": [
+                { "text": "Transplant", "path": "#" },
+                { "text": "Cardiologist", "path": "#" },
+                { "text": "Oncology", "path": "#" },
+                { "text": "Pediatrics", "path": "#" },
+                { "text": "Gynacology", "path": "#" }
+            ]
+        },
+        "utilities": {
+            "title": "Utilites",
+            "links": [
+                { "text": "Pricing", "path": "/subscription-plans" },
+                { "text": "Contact", "path": "/contact-us" },
+                { "text": "Request A Quote", "path": "#" },
+                { "text": "Premium Membership", "path": "#" },
+                { "text": "Integrations", "path": "#" }
+            ]
+        },
+        "newsletter": {
+            "title": "Newsletter",
+            "description": "Subscribe & Stay Updated from the MedCure",
+            "placeholder": "Enter Email Address",
+            "button": "Send"
+        },
+        "connectWithUs": "Connect With Us",
+        "copyright": "Copyright © 2025 MedCure. All Rights Reserved",
+        "legalNotice": "Legal Notice",
+        "privacyPolicy": "Privacy Policy",
+        "refundPolicy": "Refund Policy"
+    }
+}

@@ -1,0 +1,123 @@
+{
+    "title": "Terms of Service",
+    "breadcrumb": {
+        "home": "Home",
+        "current": "Terms of Service"
+    },
+    "sections": {
+        "introduction": {
+            "title": "1. Introduction",
+            "description": "Welcome to MedCure. By accessing and using our services, you agree to comply with the terms and conditions set forth in this document. Please read carefully before using the service."
+        },
+        "definitions": {
+            "title": "2. Definitions",
+            "description": "In these terms, the following terms are understood as follows:",
+            "items": {
+                "service": "Service",
+                "serviceValue": "The MedCure online medical appointment booking platform and all related features",
+                "user": "User",
+                "userValue": "Any individual who registers and uses MedCure services",
+                "healthcare": "Healthcare Facility",
+                "healthcareValue": "Hospitals, clinics, doctors and healthcare providers partnering with MedCure",
+                "content": "Content",
+                "contentValue": "All information, text, images, videos and data displayed on the platform"
+            }
+        },
+        "accountRegistration": {
+            "title": "3. Account Registration",
+            "description": "To fully use MedCure features, you need to register an account with the following conditions:",
+            "items": [
+                "You must be 18 years or older or have consent from a legal guardian",
+                "Registration information must be accurate, complete and up-to-date",
+                "You are responsible for keeping your login information secure",
+                "Each person may only register one account",
+                "You must notify us immediately if you discover unauthorized access to your account"
+            ]
+        },
+        "serviceUsage": {
+            "title": "4. Service Usage",
+            "description": "When using MedCure services, you agree to:",
+            "items": [
+                "Use the service for lawful and appropriate purposes",
+                "Not use the service to harm others or the system",
+                "Not interfere with the normal operation of the platform",
+                "Not collect other users' information without consent",
+                "Comply with all applicable laws and regulations",
+                "Not post content that violates the law or third-party rights"
+            ]
+        },
+        "bookingPolicy": {
+            "title": "5. Booking Policy",
+            "description": "Regulations regarding medical appointment booking:",
+            "items": {
+                "confirmation": "Confirmation",
+                "confirmationValue": "Appointments are only confirmed after receiving notification from the system",
+                "cancellation": "Cancellation",
+                "cancellationValue": "You can cancel appointments 24 hours in advance without charge. Late cancellation may incur fees",
+                "reschedule": "Rescheduling",
+                "rescheduleValue": "Appointments can be rescheduled depending on availability at the healthcare facility",
+                "noShow": "No-show",
+                "noShowValue": "Not showing up without notice may affect your service usage rights"
+            }
+        },
+        "paymentTerms": {
+            "title": "6. Payment Terms",
+            "description": "Payment regulations on MedCure:",
+            "items": [
+                "Service prices are clearly displayed before booking",
+                "Payment can be made through supported methods",
+                "Deposit fees (if any) will be deducted from the total consultation cost",
+                "Refunds are processed according to MedCure's refund policy",
+                "MedCure is not responsible for additional fees incurred at healthcare facilities"
+            ]
+        },
+        "intellectualProperty": {
+            "title": "7. Intellectual Property Rights",
+            "description": "All content on MedCure including but not limited to: logos, designs, text, images, software are owned by MedCure or its licensors. You may not copy, distribute or use for commercial purposes without written consent."
+        },
+        "disclaimer": {
+            "title": "8. Disclaimer",
+            "description": "MedCure provides a platform connecting users with healthcare facilities. We are not responsible for:",
+            "items": [
+                "Quality of medical services provided by healthcare facilities",
+                "Treatment results or medical advice",
+                "Damages arising from using information on the platform",
+                "Service interruptions due to technical errors or maintenance",
+                "Actions of third parties on the platform"
+            ]
+        },
+        "limitation": {
+            "title": "9. Limitation of Liability",
+            "description": "In all cases, MedCure's liability to you shall not exceed the amount you have paid for services in the most recent 12 months. This applies to all types of damages, whether direct or indirect."
+        },
+        "termination": {
+            "title": "10. Service Termination",
+            "description": "MedCure reserves the right to suspend or terminate your account if:",
+            "items": [
+                "Violation of these terms of service",
+                "Providing false or fraudulent information",
+                "Engaging in behavior harmful to other users or the system",
+                "As required by competent authorities",
+                "Inactive for an extended period (over 24 months)"
+            ]
+        },
+        "changes": {
+            "title": "11. Changes to Terms",
+            "description": "MedCure reserves the right to modify these terms at any time. Changes will take effect immediately upon posting on the platform. Continued use of the service after changes means you accept the new terms."
+        },
+        "governingLaw": {
+            "title": "12. Governing Law",
+            "description": "These terms are governed and interpreted according to Vietnamese law. Any disputes arising will be resolved at competent courts in Vietnam."
+        },
+        "contact": {
+            "title": "13. Contact",
+            "description": "If you have questions about these terms of service, please contact:",
+            "email": "Email",
+            "emailValue": "medcure.contact@gmail.com",
+            "hotline": "Hotline",
+            "hotlineValue": "+84 763583081",
+            "address": "Address",
+            "addressValue": "Da Nang, Vietnam"
+        }
+    }
+}

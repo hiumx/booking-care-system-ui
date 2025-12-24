@@ -1,0 +1,303 @@
+{
+    "searchInput": {
+        "doctorPlaceholder": "Nhập tên bác sĩ",
+        "hospitalPlaceholder": "Chọn bệnh viện",
+        "specialtyPlaceholder": "Chọn chuyên khoa",
+        "locationPlaceholder": "Chọn địa điểm",
+        "searchButton": "Tìm kiếm",
+        "hospitalModalTitle": "Tìm theo Bệnh viện",
+        "specialtyModalTitle": "Tìm theo chuyên khoa"
+    },
+    "sections": {
+        "specialties": {
+            "title": "Chuyên khoa hàng đầu",
+            "desc": "Chăm sóc và hỗ trợ",
+            "viewAll": "Xem tất cả chuyên khoa"
+        },
+        "hospitals": {
+            "title": "Bệnh viện hàng đầu",
+            "desc": "Khám phá các bệnh viện nổi bật",
+            "viewAll": "Xem tất cả bệnh viện"
+        },
+        "doctors": {
+            "title": "Bác sĩ hàng đầu",
+            "desc": "Gặp gỡ các bác sĩ giỏi nhất",
+            "viewAll": "Xem tất cả bác sĩ"
+        },
+        "services": {
+            "title": "Dịch Vụ",
+            "titleSuffix": "Của Chúng Tôi",
+            "subtitle": "Ưu đãi đặc biệt khi đặt nhiều dịch vụ. Đặt ngay hôm nay!"
+        }
+    },
+    "banner": {
+        "aiSupport": {
+            "title": "Hỗ trợ đặt lịch",
+            "rating": "5.0 sao",
+            "tooltip": "Click vào đặt lịch thông minh nha!"
+        },
+        "headline": {
+            "part1": "Khám sức khỏe: Tìm bác sĩ",
+            "highlight": "của bạn",
+            "part2": "ngay hôm nay"
+        },
+        "stats": {
+            "appointments": {
+                "count": "100",
+                "label": "Cuộc hẹn",
+                "sublabel": "đã hoàn thành"
+            },
+            "patients": {
+                "count": "1000",
+                "label": "Bệnh nhân hài lòng"
+            }
+        }
+    },
+    "horizontalServices": {
+        "services": [
+            "Điều trị đa chuyên khoa & Bác sĩ",
+            "Dịch vụ Xét nghiệm",
+            "Thuốc & Vật tư y tế",
+            "Bệnh viện & Phòng khám",
+            "Dịch vụ Chăm sóc Sức khỏe",
+            "Tư vấn với Bác sĩ",
+            "Dịch vụ Chăm sóc Tại nhà"
+        ]
+    },
+    "reasons": {
+        "badge": "Tại sao chọn chúng tôi",
+        "title": "Lý do thuyết phục để lựa chọn",
+        "items": [
+            {
+                "title": "Chăm sóc Theo dõi",
+                "description": "Chúng tôi đảm bảo tính liên tục trong chăm sóc thông qua các cuộc theo dõi và giao tiếp thường xuyên, giúp bạn duy trì mục tiêu sức khỏe."
+            },
+            {
+                "title": "Phương pháp Lấy Bệnh nhân làm Trung tâm",
+                "description": "Chúng tôi ưu tiên sự thoải mái và sở thích của bạn, điều chỉnh dịch vụ để đáp ứng nhu cầu cá nhân và Chăm sóc từ các Chuyên gia của chúng tôi"
+            },
+            {
+                "title": "Truy cập Thuận tiện",
+                "description": "Dễ dàng đặt lịch hẹn trực tuyến hoặc thông qua đội ngũ dịch vụ khách hàng chuyên dụng của chúng tôi, với giờ làm việc linh hoạt phù hợp với lịch trình của bạn."
+            }
+        ]
+    },
+    "bookus": {
+        "badge": "Tại sao đặt lịch với chúng tôi",
+        "title": "Chúng tôi cam kết hiểu rõ",
+        "titleHighlight": "nhu cầu riêng của bạn và cung cấp dịch vụ chăm sóc.",
+        "description": "Là nhà cung cấp dịch vụ chăm sóc sức khỏe đáng tin cậy trong cộng đồng, chúng tôi đam mê thúc đẩy sức khỏe và hạnh phúc vượt ra ngoài phòng khám. Chúng tôi tích cực tham gia các chương trình tiếp cận cộng đồng, hội chợ sức khỏe và hội thảo giáo dục.",
+        "visionMission": [
+            {
+                "number": "01",
+                "title": "Tầm nhìn của chúng tôi",
+                "description": "Chúng tôi hình dung một cộng đồng nơi mọi người đều có thể tiếp cận dịch vụ chăm sóc sức khỏe chất lượng cao và các nguồn lực cần thiết để có cuộc sống khỏe mạnh, viên mãn."
+            },
+            {
+                "number": "02",
+                "title": "Sứ mệnh của chúng tôi",
+                "description": "Chúng tôi hình dung một cộng đồng nơi mọi người đều có thể tiếp cận dịch vụ chăm sóc sức khỏe chất lượng cao và các nguồn lực cần thiết để có cuộc sống khỏe mạnh, viên mãn."
+            }
+        ],
+        "bookItems": [
+            {
+                "title": "Tìm kiếm Bác sĩ",
+                "description": "Tìm kiếm bác sĩ dựa trên chuyên khoa, địa điểm hoặc lịch trống cho việc Điều trị của bạn"
+            },
+            {
+                "title": "Xem Hồ sơ Bác sĩ",
+                "description": "Khám phá hồ sơ bác sĩ chi tiết trên nền tảng của chúng tôi để đưa ra quyết định chăm sóc sức khỏe sáng suốt."
+            },
+            {
+                "title": "Đặt lịch hẹn",
+                "description": "Sau khi chọn bác sĩ ưa thích, chọn khung giờ thuận tiện và xác nhận lịch hẹn của bạn."
+            },
+            {
+                "title": "Nhận Giải pháp",
+                "description": "Thảo luận về các vấn đề sức khỏe của bạn với bác sĩ và nhận lời khuyên cá nhân hóa cùng giải pháp."
+            }
+        ]
+    },
+    "testimonial": {
+        "badge": "Đánh giá",
+        "title": "15k Người dùng Tin tưởng Medcure Toàn cầu",
+        "titleSuffix": "Người dùng Tin tưởng Medcure Toàn cầu",
+        "starReview": "Đánh giá sao",
+        "anonymousUser": "Người dùng ẩn danh",
+        "verifiedPatient": "Bệnh nhân đã xác thực",
+        "testimonials": [
+            {
+                "rating": 5,
+                "title": "Điều trị Tuyệt vời",
+                "comment": "Tôi đã có trải nghiệm tuyệt vời, nhân viên thân thiện và chu đáo, và Bác sĩ Smith đã dành thời gian giải thích mọi thứ một cách rõ ràng.",
+                "authorName": "Deny Hendrawan",
+                "authorLocation": "Hoa Kỳ"
+            },
+            {
+                "rating": 5,
+                "title": "Sự Hiếu khách Tốt",
+                "comment": "Thực sự quan tâm đến bệnh nhân của mình. Anh ấy đã giúp tôi hiểu tình trạng của mình và cùng tôi xây dựng kế hoạch điều trị.",
+                "authorName": "Johnson DWayne",
+                "authorLocation": "Hoa Kỳ"
+            },
+            {
+                "rating": 5,
+                "title": "Điều trị Tuyệt vời",
+                "comment": "Tôi đã có trải nghiệm tuyệt vời với Bác sĩ Chen. Cô ấy không chỉ chuyên nghiệp mà còn khiến tôi cảm thấy thoải mái khi thảo luận.",
+                "authorName": "Rayan Smith",
+                "authorLocation": "Hoa Kỳ"
+            },
+            {
+                "rating": 5,
+                "title": "Dịch vụ Xuất sắc",
+                "comment": "Tôi đã có trải nghiệm tuyệt vời, nhân viên thân thiện và chu đáo, và Bác sĩ Smith đã dành thời gian giải thích mọi thứ một cách rõ ràng.",
+                "authorName": "Sofia Doe",
+                "authorLocation": "Hoa Kỳ"
+            }
+        ],
+        "counters": [
+            {
+                "value": 500,
+                "suffix": "+",
+                "label": "Bác sĩ Có sẵn"
+            },
+            {
+                "value": 18,
+                "suffix": "+",
+                "label": "Chuyên khoa"
+            },
+            {
+                "value": 30,
+                "suffix": "K",
+                "label": "Lịch hẹn Đã đặt"
+            },
+            {
+                "value": 97,
+                "suffix": "+",
+                "label": "Bệnh viện & Phòng khám"
+            },
+            {
+                "value": 317,
+                "suffix": "+",
+                "label": "Xét nghiệm Có sẵn"
+            }
+        ]
+    },
+    "faq": {
+        "badge": "Câu hỏi thường gặp",
+        "title": "Câu hỏi của bạn được trả lời",
+        "items": [
+            {
+                "question": "Làm thế nào để đặt lịch hẹn với bác sĩ?",
+                "answer": "Có, chỉ cần truy cập trang web của chúng tôi và đăng nhập hoặc tạo tài khoản. Tìm kiếm bác sĩ dựa trên chuyên khoa, địa điểm hoặc lịch trống và xác nhận đặt lịch của bạn."
+            },
+            {
+                "question": "Tôi có thể yêu cầu một bác sĩ cụ thể khi đặt lịch hẹn không?",
+                "answer": "Có, bạn thường có thể yêu cầu một bác sĩ cụ thể khi đặt lịch hẹn, mặc dù lịch trống có thể thay đổi tùy theo lịch trình của họ."
+            },
+            {
+                "question": "Tôi nên làm gì nếu cần hủy hoặc đổi lịch hẹn?",
+                "answer": "Nếu bạn cần hủy hoặc đổi lịch hẹn, hãy liên hệ với bác sĩ càng sớm càng tốt để thông báo và đặt lại cho một khung giờ khác có sẵn."
+            },
+            {
+                "question": "Nếu tôi đến muộn cho lịch hẹn thì sao?",
+                "answer": "Nếu bạn biết mình sẽ đến muộn, việc gọi điện cho phòng khám của bác sĩ và thông báo là lịch sự. Tùy thuộc vào chính sách và lịch trình của họ, họ có thể sắp xếp cho bạn hoặc đổi lịch hẹn."
+            },
+            {
+                "question": "Tôi có thể đặt lịch hẹn cho thành viên gia đình hoặc người phụ thuộc không?",
+                "answer": "Có, trong nhiều trường hợp, bạn có thể đặt lịch hẹn cho thành viên gia đình hoặc người phụ thuộc. Tuy nhiên, bạn có thể cần cung cấp thông tin cá nhân và sự đồng ý của họ để làm điều đó."
+            }
+        ]
+    },
+    "article": {
+        "badge": "Blog gần đây",
+        "title": "Cập nhật với các Bài viết Mới nhất của chúng tôi",
+        "viewAll": "Xem tất cả Bài viết",
+        "articles": [
+            {
+                "category": "Điều trị",
+                "title": "Hiểu và Phòng ngừa Bệnh Tăng nhãn áp: Hướng dẫn Chi tiết",
+                "description": "Bệnh tăng nhãn áp là nguyên nhân hàng đầu gây mù lòa trên toàn thế giới, nhưng nhiều người...."
+            },
+            {
+                "category": "Thần kinh học",
+                "title": "Hiểu và Phòng ngừa Bệnh Tăng nhãn áp: Hướng dẫn Chi tiết",
+                "description": "Khám phá sự giao thoa giữa công nghệ và thần kinh học, đang biến đổi...."
+            },
+            {
+                "category": "Nha khoa",
+                "title": "5 Mẹo Thiết yếu để Duy trì Sức khỏe Răng miệng Tối ưu",
+                "description": "Tìm hiểu năm thực hành hàng ngày hàng đầu để giữ cho răng của bạn...."
+            },
+            {
+                "category": "Chăm sóc & Điều trị",
+                "title": "Mạnh mẽ Hơn: Cuộc Cách mạng Số trong Chăm sóc Tim mạch",
+                "description": "Khám phá cách các tiến bộ kỹ thuật số đang biến đổi chăm sóc tim mạch..."
+            }
+        ]
+    },
+    "info": {
+        "heading": "Làm việc vì Sức khỏe Tốt hơn của Bạn.",
+        "customerSupport": {
+            "label": "Hỗ trợ Khách hàng",
+            "value": "+84 763583081"
+        },
+        "email": {
+            "label": "Gửi Email cho chúng tôi",
+            "value": "medcure.contact@gmail.com"
+        }
+    },
+    "footer": {
+        "company": {
+            "title": "Công ty",
+            "links": [
+                { "text": "Về chúng tôi", "path": "/about-us" },
+                { "text": "Tính năng", "path": "#" },
+                { "text": "Công việc", "path": "#" },
+                { "text": "Tuyển dụng", "path": "#" },
+                { "text": "Địa điểm", "path": "#" }
+            ]
+        },
+        "treatments": {
+            "title": "Điều trị",
+            "links": [
+                { "text": "Nha khoa", "path": "#" },
+                { "text": "Tim mạch", "path": "#" },
+                { "text": "Tủy sống", "path": "#" },
+                { "text": "Mọc tóc", "path": "#" },
+                { "text": "Thiếu máu & Rối loạn", "path": "#" }
+            ]
+        },
+        "specialities": {
+            "title": "Chuyên khoa",
+            "links": [
+                { "text": "Ghép tạng", "path": "#" },
+                { "text": "Tim mạch học", "path": "#" },
+                { "text": "Ung thư học", "path": "#" },
+                { "text": "Nhi khoa", "path": "#" },
+                { "text": "Phụ khoa", "path": "#" }
+            ]
+        },
+        "utilities": {
+            "title": "Tiện ích",
+            "links": [
+                { "text": "Bảng giá", "path": "/subscription-plans" },
+                { "text": "Liên hệ", "path": "/contact-us" },
+                { "text": "Yêu cầu Báo giá", "path": "#" },
+                { "text": "Thành viên Cao cấp", "path": "#" },
+                { "text": "Tích hợp", "path": "#" }
+            ]
+        },
+        "newsletter": {
+            "title": "Bản tin",
+            "description": "Đăng ký & Cập nhật từ MedCure",
+            "placeholder": "Nhập địa chỉ email",
+            "button": "Gửi"
+        },
+        "connectWithUs": "Kết nối với chúng tôi",
+        "copyright": "Bản quyền © 2025 MedCure. Bảo lưu mọi quyền",
+        "legalNotice": "Thông báo Pháp lý",
+        "privacyPolicy": "Chính sách Bảo mật",
+        "refundPolicy": "Chính sách Hoàn tiền"
+    }
+}

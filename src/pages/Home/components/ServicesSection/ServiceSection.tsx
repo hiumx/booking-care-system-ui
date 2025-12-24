@@ -1,0 +1,62 @@
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import SectionHeader from 'src/pages/Home/components/ServicesSection/components/SectionHeader';
+import ServiceColumn from 'src/pages/Home/components/ServicesSection/components/ServiceColumn';
+import ServiceImageCenter from 'src/pages/Home/components/ServicesSection/components/ServiceImageCenter';
+import serviceSecBg from '@/assets/img/bg/sercice-sec-bg.png';
+import serviceImg from '@/assets/img/service/service-img.jpg';
+import serviceImg01 from '@/assets/img/service/service-img-01.jpg';
+import serviceImg02 from '@/assets/img/service/service-img-02.jpg';
+
+interface Service {
+    id: string;
+    name: string;
+    image: string;
+}
+
+interface ServiceSectionProps {
+    leftServices: Service[];
+    rightServices: Service[];
+}
+
+const ServiceSection: React.FC<ServiceSectionProps> = ({ leftServices, rightServices }) => {
+    const { t } = useTranslation('home');
+
+    return (
+        <section className="service-sec-fourteen">
+            <div className="section-bg">
+                <img src={serviceSecBg} alt="Background" />
+            </div>
+            <div className="container">
+                <SectionHeader
+                    title={t('sections.services.title')}
+                    titleSuffix={t('sections.services.titleSuffix')}
+                    subtitle={t('sections.services.subtitle')}
+                    data-aos="fade-up"
+                />
+                <div className="row justify-content-center">
+                    {/* Left services */}
+                    <div className="col-lg-4 col-md-12 d-flex" data-aos="fade-right">
+                        <ServiceColumn services={leftServices} />
+                    </div>
+
+                    {/* Center images */}
+                    <div className="col-lg-4 col-md-6 d-flex" data-aos="zoom-in">
+                        <ServiceImageCenter
+                            mainImage={serviceImg}
+                            imageOne={serviceImg01}
+                            imageTwo={serviceImg02}
+                        />
+                    </div>
+
+                    {/* Right services */}
+                    <div className="col-lg-4 col-md-12 d-flex" data-aos="fade-left">
+                        <ServiceColumn services={rightServices} reverse />
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+export default ServiceSection;

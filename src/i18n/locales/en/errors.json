@@ -1,0 +1,28 @@
+{
+    "api": {
+        "INVALID_CREDENTIALS": "Invalid email or password",
+        "USER_NOT_FOUND": "User not found",
+        "USER_ALREADY_EXISTS": "This email is already registered",
+        "APPOINTMENT_SLOT_TAKEN": "This time slot is already taken",
+        "APPOINTMENT_NOT_FOUND": "Appointment not found",
+        "DOCTOR_NOT_AVAILABLE": "Doctor is not available at this time",
+        "PAYMENT_FAILED": "Payment failed",
+        "INVALID_TOKEN": "Session expired",
+        "UNAUTHORIZED": "You don't have permission to perform this action",
+        "FORBIDDEN": "Access denied",
+        "VALIDATION_ERROR": "Invalid data",
+        "FILE_TOO_LARGE": "File too large (max 10MB)",
+        "INVALID_FILE_TYPE": "File type not supported",
+        "NETWORK_ERROR": "Network connection error",
+        "SERVER_ERROR": "Server error, please try again later",
+        "UNKNOWN_ERROR": "An error occurred, please try again"
+    },
+    "validation": {
+        "EMAIL_REQUIRED": "Please enter email",
+        "EMAIL_INVALID": "Invalid email",
+        "PASSWORD_REQUIRED": "Please enter password",
+        "PASSWORD_TOO_SHORT": "Password must be at least 6 characters",
+        "PHONE_INVALID": "Invalid phone number",
+        "REQUIRED_FIELD": "This field is required"
+    }
+}

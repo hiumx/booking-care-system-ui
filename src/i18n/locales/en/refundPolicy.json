@@ -1,0 +1,127 @@
+{
+    "title": "Refund Policy",
+    "breadcrumb": {
+        "home": "Home",
+        "current": "Refund Policy"
+    },
+    "sections": {
+        "overview": {
+            "title": "1. Overview",
+            "description": "MedCure's refund policy is designed to ensure the rights of both patients and healthcare facilities. This policy applies to all medical appointments made through the MedCure platform."
+        },
+        "refundRules": {
+            "title": "2. Refund Rules Based on Cancellation Time",
+            "description": "The refund amount is calculated based on the time from cancellation to the scheduled appointment time:",
+            "refund100": {
+                "title": "100% Refund",
+                "description": "When canceling the appointment <strong>more than 24 hours</strong> before the scheduled appointment time",
+                "example": "Example",
+                "exampleValue": "If your appointment is at 2:00 PM on January 15, you need to cancel before 2:00 PM on January 14 to receive a 100% refund."
+            },
+            "refund50": {
+                "title": "50% Refund",
+                "description": "When canceling the appointment <strong>between 12 and 24 hours</strong> before the scheduled appointment time",
+                "example": "Example",
+                "exampleValue": "If your appointment is at 2:00 PM on January 15, canceling from 2:00 PM on January 14 to 2:00 AM on January 15 will result in a 50% refund."
+            },
+            "refund0": {
+                "title": "No Refund",
+                "description": "When canceling the appointment <strong>less than 12 hours</strong> before the scheduled appointment time",
+                "example": "Example",
+                "exampleValue": "If your appointment is at 2:00 PM on January 15, canceling after 2:00 AM on January 15 will not receive a refund."
+            }
+        },
+        "specialCases": {
+            "title": "3. Special Cases",
+            "hospitalCancel": {
+                "subtitle": "3.1. Cancellation by Hospital/Doctor",
+                "title": "100% Refund",
+                "description1": "If the appointment is canceled by the hospital or doctor (due to reasons from the healthcare facility), you will receive a 100% refund of the paid amount, regardless of cancellation time.",
+                "description2": "In this case, MedCure will automatically process the refund and notify you via email or SMS."
+            },
+            "pastAppointment": {
+                "subtitle": "3.2. Past Appointments",
+                "description": "You cannot cancel appointments that have passed the appointment time. If you do not show up without prior notice, you will not receive a refund."
+            }
+        },
+        "refundProcess": {
+            "title": "4. Refund Process",
+            "items": [
+                {
+                    "title": "Cancel Request",
+                    "description": "You cancel the appointment through the MedCure app or website"
+                },
+                {
+                    "title": "Automatic Calculation",
+                    "description": "The system will automatically calculate the refund amount based on cancellation time"
+                },
+                {
+                    "title": "Confirmation",
+                    "description": "You will receive a notification about the refund amount and processing time"
+                },
+                {
+                    "title": "Processing",
+                    "description": "MedCure will process the refund within 5-7 business days"
+                },
+                {
+                    "title": "Receive Money",
+                    "description": "Money will be refunded to the account or original payment method"
+                }
+            ]
+        },
+        "refundMethods": {
+            "title": "5. Refund Methods",
+            "description": "Money will be refunded according to the original payment method:",
+            "items": {
+                "creditCard": "Credit/Debit Card",
+                "creditCardValue": "Refund to card account (5-7 business days)",
+                "eWallet": "E-Wallet",
+                "eWalletValue": "Refund to e-wallet (1-3 business days)",
+                "bankTransfer": "Bank Transfer",
+                "bankTransferValue": "Refund to bank account (3-5 business days)"
+            },
+            "note": "Note",
+            "noteValue": "The time to receive money may vary depending on the bank or payment service provider."
+        },
+        "processingFee": {
+            "title": "6. Processing Fee",
+            "description1": "MedCure <strong>does not charge a refund processing fee</strong>. The full refund amount will be calculated according to the specified refund rate (100%, 50%, or 0%).",
+            "description2": "However, if there are fees from the bank or payment service provider, these fees will be deducted from the refund amount."
+        },
+        "complaints": {
+            "title": "7. Complaints and Support",
+            "description": "If you have any questions or complaints about refunds, please contact us:",
+            "email": "Email",
+            "emailValue": "medcure.contact@gmail.com",
+            "hotline": "Hotline",
+            "hotlineValue": "+84 763583081",
+            "supportHours": "Support Hours",
+            "supportHoursValue": "8:00 AM - 10:00 PM daily",
+            "commitment": "We commit to responding to all requests within 24 hours and handling complaints fairly and transparently."
+        },
+        "noRefundCases": {
+            "title": "8. Cases Not Eligible for Refund",
+            "description": "You will not receive a refund in the following cases:",
+            "items": [
+                "Canceling the appointment less than 12 hours before the appointment time",
+                "Not showing up without prior notice",
+                "Service already used (already had the appointment)",
+                "Violating MedCure or healthcare facility regulations",
+                "Fraud or use of invalid information"
+            ]
+        },
+        "policyChanges": {
+            "title": "9. Policy Changes",
+            "description": "MedCure reserves the right to update or change this refund policy. Any changes will be announced on the website with the latest update date. The new policy will apply to appointments made after the update date."
+        },
+        "additionalTerms": {
+            "title": "10. Additional Terms",
+            "description1": "This refund policy is part of MedCure's Terms of Use. By using the service, you agree to the terms in this policy.",
+            "description2": "In case of conflict between the refund policy and other terms, the refund policy will take precedence for refund-related issues."
+        },
+        "importantNote": {
+            "title": "Important Note",
+            "description": "Cancellation time is calculated in UTC timezone. Please check the time carefully before canceling to ensure you receive the correct refund amount."
+        }
+    }
+}

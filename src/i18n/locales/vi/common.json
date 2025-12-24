@@ -1,0 +1,174 @@
+{
+    "app": {
+        "name": "MedCure",
+        "description": "Nền tảng đặt lịch khám bệnh trực tuyến"
+    },
+    "actions": {
+        "save": "Lưu",
+        "add": "Thêm mới",
+        "cancel": "Hủy",
+        "delete": "Xóa",
+        "edit": "Chỉnh sửa",
+        "view": "Xem",
+        "search": "Tìm kiếm",
+        "filter": "Lọc",
+        "reset": "Đặt lại",
+        "submit": "Gửi",
+        "confirm": "Xác nhận",
+        "back": "Quay lại",
+        "next": "Tiếp theo",
+        "close": "Đóng",
+        "loading": "Đang tải...",
+        "processing": "Đang xử lý...",
+        "clear": "Xóa",
+        "apply": "Áp dụng"
+    },
+    "validation": {
+        "required": "Trường này là bắt buộc",
+        "invalidEmail": "Email không hợp lệ",
+        "invalidPhone": "Số điện thoại không hợp lệ",
+        "minLength": "Tối thiểu {{count}} ký tự",
+        "maxLength": "Tối đa {{count}} ký tự"
+    },
+    "messages": {
+        "success": "Thành công!",
+        "error": "Có lỗi xảy ra!",
+        "uploadSuccess": "Tải lên thành công",
+        "uploadError": "Không thể tải tệp lên",
+        "deleteSuccess": "Xóa thành công",
+        "deleteError": "Không thể xóa",
+        "saveSuccess": "Lưu thành công",
+        "saveError": "Không thể lưu"
+    },
+    "language": {
+        "vietnamese": "Tiếng Việt",
+        "english": "English",
+        "switchTo": "Chuyển sang {{language}}",
+        "switchLanguage": "Chọn ngôn ngữ"
+    },
+    "review": {
+        "title": "Đánh giá",
+        "titleWithCount": "Đánh giá ({{count}})",
+        "writeReview": "Viết đánh giá",
+        "reply": "Phản hồi",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "editReply": "Sửa",
+        "deleteReply": "Xóa",
+        "anonymous": "Ẩn danh",
+        "outOf5Stars": "{{rating}} trên 5 sao",
+        "viewProfile": "Xem hồ sơ của {{name}}",
+        "reviewBy": "Đánh giá bởi {{name}}",
+        "replyBy": "Phản hồi bởi {{name}}",
+        "replyToReview": "Phản hồi đánh giá này",
+        "replyToReply": "Phản hồi",
+        "loading": "Đang tải...",
+        "noReviews": "Chưa có đánh giá nào.",
+        "confirmDeleteTitle": "Xác nhận xóa đánh giá",
+        "confirmDeleteMessage": "Bạn có chắc chắn muốn xóa đánh giá này? Hành động này không thể hoàn tác.",
+        "confirmDeleteReplyTitle": "Xác nhận xóa phản hồi",
+        "confirmDeleteReplyMessage": "Bạn có chắc chắn muốn xóa phản hồi này? Hành động này không thể hoàn tác.",
+        "confirmButton": "Xóa",
+        "cancelButton": "Hủy"
+    },
+    "reviewForm": {
+        "editTitle": "Chỉnh sửa đánh giá",
+        "yourRating": "Đánh giá của bạn",
+        "required": "*",
+        "selectRating": "Chọn rating",
+        "ratingText": "{{rating}}/5 sao",
+        "reviewContent": "Nội dung đánh giá",
+        "reviewPlaceholder": "Chia sẻ trải nghiệm của bạn về bác sĩ... (tối thiểu 5 ký tự)",
+        "minChars": "{{current}}/{{min}} ký tự tối thiểu",
+        "remainingChars": "{{count}} ký tự còn lại",
+        "cancel": "Hủy",
+        "updateReview": "Cập nhật đánh giá",
+        "submitReply": "Gửi phản hồi",
+        "saveChanges": "Lưu thay đổi"
+    },
+    "replyForm": {
+        "placeholder": "Viết phản hồi của bạn...",
+        "placeholderWithMin": "{{placeholder}} (tối thiểu 3 ký tự)",
+        "editPlaceholder": "Chỉnh sửa phản hồi...",
+        "replyToReview": "Viết phản hồi cho đánh giá này...",
+        "replyTo": "Phản hồi cho {{name}}...",
+        "editReplyTo": "Chỉnh sửa phản hồi cho {{name}}...",
+        "emptyError": "Vui lòng nhập nội dung phản hồi",
+        "minLengthError": "Nội dung phản hồi phải có ít nhất {{min}} ký tự",
+        "maxLengthError": "Nội dung phản hồi không được vượt quá {{max}} ký tự",
+        "minChars": "{{current}}/{{min}} ký tự tối thiểu",
+        "remainingChars": "{{count}} ký tự còn lại",
+        "submit": "Gửi phản hồi",
+        "cancel": "Hủy",
+        "save": "Lưu thay đổi"
+    },
+    "timeAgo": {
+        "today": "Hôm nay",
+        "yesterday": "Hôm qua",
+        "daysAgo": "{{count}} ngày trước",
+        "monthsAgo": "{{count}} tháng trước",
+        "yearsAgo": "{{count}} năm trước"
+    },
+    "writeReview": {
+        "title": "Viết đánh giá cho",
+        "ratingLabel": "Đánh giá",
+        "starTitle": "{{count}} sao",
+        "contentLabel": "Nội dung đánh giá",
+        "required": "*",
+        "placeholder": "Chia sẻ trải nghiệm của bạn với bác sĩ... (tối thiểu 5 ký tự)",
+        "minChars": "{{current}}/{{min}} ký tự tối thiểu",
+        "remainingChars": "{{count}} ký tự còn lại",
+        "termsText": "Tôi đã đọc và đồng ý với",
+        "termsLink": "Điều khoản & Điều kiện",
+        "submitButton": "Thêm đánh giá",
+        "cancelButton": "Hủy"
+    },
+    "testimonialSection": {
+        "loading": "Đang tải đánh giá...",
+        "noReviews": "Chưa có đánh giá",
+        "beFirst": "Hãy là người đầu tiên đánh giá bệnh viện này!"
+    },
+    "dateRangePicker": {
+        "placeholder": "Chọn khoảng thời gian",
+        "clearSelection": "Xóa lựa chọn",
+        "openPicker": "Mở bộ chọn khoảng thời gian",
+        "today": "Hôm nay",
+        "yesterday": "Hôm qua",
+        "thisWeek": "Tuần này",
+        "lastWeek": "Tuần trước",
+        "thisMonth": "Tháng này",
+        "lastMonth": "Tháng trước"
+    },
+    "aiAssistant": {
+        "label": "Trợ lý AI"
+    },
+    "units": {
+        "yearsOld": "tuổi",
+        "years": "năm",
+        "months": "tháng",
+        "days": "ngày"
+    },
+    "fileInput": {
+        "dragDropOrSelect": "Kéo thả tệp vào đây hoặc",
+        "selectFile": "chọn tệp",
+        "supportedFormats": "Hỗ trợ: Ảnh, PDF, DOC, DOCX (Tối đa {{maxSize}}MB)",
+        "filesSelected": "{{count}} tệp đã chọn",
+        "fileSizeExceeded": "Tệp \"{{fileName}}\" vượt quá kích thước tối đa {{maxSize}}MB",
+        "selectFileAriaLabel": "Chọn tệp để tải lên",
+        "removeFile": "Xóa tệp"
+    },
+    "gender": {
+        "male": "Nam",
+        "female": "Nữ",
+        "other": "Khác",
+        "notUpdated": "Chưa cập nhật"
+    },
+    "filePreview": {
+        "close": "Đóng",
+        "download": "Tải xuống",
+        "openInNewTab": "Mở trong tab mới",
+        "cannotPreview": "Không thể xem trước tệp này",
+        "downloadFile": "tải xuống tệp",
+        "docViewerNote": "Xem trước được cung cấp bởi Google Docs Viewer. Nếu không hiển thị, vui lòng"
+    }
+}

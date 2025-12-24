@@ -1,0 +1,161 @@
+// Modal slide up/down animation
+.modalAnimate {
+    animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modalAnimateLeave {
+    animation: modalSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideUp {
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes modalSlideDown {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+}
+
+// Responsive modal dialog
+.responsiveModal {
+    max-width: 800px !important;
+    width: 800px !important;
+    height: 550px !important;
+    max-height: 550px !important;
+    .modalContent {
+        height: 100% !important;
+        max-height: 100% !important;
+        overflow: hidden !important;
+        display: flex !important;
+    }
+
+    .prescribeDownload {
+        height: 68px !important;
+
+        ul {
+            margin-bottom: 0;
+            li {
+                margin-right: 0;
+            }
+        }
+    }
+    // Small phones (up to 767px)
+    @media (max-width: 767px) {
+        max-width: 95vw !important;
+        width: 95vw !important;
+        height: 550px !important;
+        max-height: 550px !important;
+        .modalContent {
+            overflow: auto !important;
+            padding: 1rem !important;
+        }
+        .prescribeDownload {
+            display: flex;
+        }
+    }
+
+    // Small laptops and tablets (768px - 1023px)
+    @media (min-width: 768px) and (max-width: 1023px) {
+        max-width: 700px !important;
+        width: 700px !important;
+        height: 550px !important;
+        max-height: 550px !important;
+    }
+    @media (max-height: 776px) {
+        .modalContent {
+            overflow: auto !important;
+            padding: 1rem !important;
+        }
+    }
+
+    // Desktop and above - maintain consistent size
+    @media (min-width: 1024px) {
+        max-width: 800px !important;
+        width: 800px !important;
+        height: 550px !important;
+        max-height: 550px !important;
+    }
+}
+.paymentMethodText {
+    white-space: nowrap;
+
+    // Allow wrapping on small screens
+    @media (max-width: 767px) {
+        white-space: normal;
+    }
+}
+
+.invoiceTableWrap {
+    tbody,
+    td,
+    tfoot,
+    th,
+    thead,
+    tr {
+        border-style: none !important;
+    }
+
+    // Make table responsive on small screens
+    @media (max-width: 767px) {
+        .tableResponsive {
+            font-size: 0.875rem;
+        }
+
+        th,
+        td {
+            padding: 0.5rem !important;
+        }
+    }
+}
+
+// Responsive invoice content
+.invoiceContent {
+    @media (max-width: 767px) {
+        .invoiceInfo {
+            margin-bottom: 1.5rem;
+        }
+
+        .invoiceDetails {
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .invoiceLogo img {
+            display: none;
+        }
+    }
+}
+
+// Prevent body scroll when modal is open
+.modalOpen {
+    overflow: hidden !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+// Enhanced modal backdrop to prevent scroll
+.modalBackdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 1040 !important;
+    // Prevent scroll events from bubbling to body
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: auto !important;
+}

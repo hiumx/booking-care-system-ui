@@ -1,0 +1,132 @@
+.youMedServices {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e9ecef; // no default shadow per requirement
+    .logoSection {
+        text-align: center;
+        margin-bottom: 30px;
+
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            color: #007bff;
+            margin: 0 0 15px 0;
+        }
+
+        .description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+            margin: 0;
+        }
+    }
+
+    .servicesList {
+        .serviceItem {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            .serviceIcon {
+                width: 50px;
+                height: 50px;
+                background: #f8f9fa;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 15px;
+                cursor: pointer;
+                overflow: hidden; // keep zoomed image within box
+
+                img {
+                    width: 80%;
+                    height: 80%;
+                    object-fit: contain;
+                    transition: transform 0.25s ease;
+                    will-change: transform;
+                }
+            }
+
+            .serviceInfo {
+                flex: 1;
+
+                .serviceName {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #333;
+                    margin: 0 0 5px 0;
+
+                    a {
+                        color: inherit;
+                        text-decoration: none;
+                        transition: color 0.2s ease;
+                    }
+                }
+
+                .serviceDescription {
+                    font-size: 12px;
+                    color: #888;
+                    margin: 0;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    cursor: pointer;
+                }
+            }
+
+            &:hover {
+                .serviceIcon {
+                    //background: #e3f2fd;
+
+                    img {
+                        transform: scale(1.08); // hover zoom
+                    }
+                }
+
+                .serviceName {
+                    color: #007bff;
+                }
+            }
+        }
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .youMedServices {
+        padding: 16px;
+
+        .logoSection {
+            .logo {
+                font-size: 28px;
+            }
+        }
+
+        .servicesList {
+            .serviceItem {
+                padding: 12px 0;
+
+                .serviceIcon {
+                    width: 40px;
+                    height: 40px;
+
+                    img {
+                        transform: none;
+                    }
+                }
+
+                .serviceInfo {
+                    .serviceName {
+                        font-size: 15px;
+                    }
+                }
+            }
+        }
+    }
+}

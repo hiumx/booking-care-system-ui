@@ -1,0 +1,133 @@
+/**
+ * Path constants for the application
+ */
+export const PATHS = {
+    // General paths
+    HOME: '/',
+    DEMO: '/demo',
+    DEMO_DATE_RANGE_PICKER: '/demo/date-range-picker',
+    FAQ: '/faq',
+    BLOG: '/blog',
+    BLOG_DETAIL: '/blog/:id',
+    MEDICAL_TERMS: '/medical-terms',
+    CATEGORY_ARTICLES: '/category/:categorySlug',
+    CATEGORY_ARTICLES_DEMO: '/category-demo',
+    SUBSCRIPTION_PLANS: '/subscription-plans',
+    ABOUT_US: '/about-us',
+    CONTACT_US: '/contact-us',
+    SMART_BOOKING: '/smart-booking',
+    LEGAL_NOTICE: '/legal-notice',
+    PRIVACY_POLICY: '/privacy-policy',
+    TERMS_OF_SERVICE: '/terms-of-service',
+    REFUND_POLICY: '/refund-policy',
+    AI_SUPPORT_BOOKING: '/ai-support-booking',
+    AI_SUPPORT_BOOKING_CHAT: '/ai-support-booking/:chatId',
+
+    // Authentication paths
+    LOGIN: '/login',
+    REGISTER: '/register',
+    FORGOT_PASSWORD: '/forgot-password',
+    RESET_PASSWORD: '/reset-password',
+    CHAT: '/chat',
+    // Management paths
+    SCREEN_MANAGEMENT: '/screen-management',
+
+    // User paths
+    USER: {
+        ROOT: '/user',
+        PROFILE: 'profile',
+        SETTINGS: 'settings',
+    },
+
+    // Hospital paths
+    HOSPITAL: {
+        ROOT: '/hospitals',
+        DETAIL: ':id',
+    },
+
+    // Doctor paths
+    DOCTOR: {
+        ROOT: '/doctors',
+        PROFILE: 'profile/:id',
+    },
+
+    // Specialties paths
+    SPECIALTIES: {
+        ROOT: '/specialties',
+        PROFILE: 'profile',
+        DETAIL: '/specialties/:id',
+    },
+
+    // Service paths
+    Service: {
+        ROOT: '/servicesparent', // List all services
+        CATEGORIES: '/servicesparent/:servicesparentId/categories', // List categories of a service
+        SERVICES: '/servicesparent/:servicesparentId/serviceschild/:serviceschildId/services', // List hospitals of a category
+        DETAIL: '/servicesparent/:servicesparentId/serviceschild/:serviceschildId/services/:servicesId', // Service detail in hospital
+    },
+
+    // Booking
+    BOOKING: {
+        ROOT: '/booking/:doctorId',
+        SERVICE: '/booking/service/:serviceMedicalId',
+        HOSPITAL: '/booking/hospital/:hospitalId',
+        CONFIRMATION: '/booking/confirmation/:appointmentId',
+        RESCHEDULE: '/booking/reschedule/:appointmentId',
+        CONFIRM_NEW_DOCTOR: '/booking/confirm-doctor/:appointmentId',
+        REQUEST_REFUND: '/booking/refund/:appointmentId',
+        CHOOSE_NEW_DOCTOR: '/booking/:doctorId/choose-new-doctor',
+    },
+
+    // Dashboard paths
+    DASHBOARD: {
+        ROOT: '/dashboard',
+        SETTINGS: 'settings',
+    },
+
+    // Contract Signing paths
+    CONTRACT_SIGNING: {
+        ROOT: '/contract-signing/:token',
+        SUCCESS: '/contract-signing-success',
+    },
+
+    // Nutrition paths
+    NUTRITION: {
+        ROOT: '/nutrition',
+        ONBOARDING: '/nutrition/onboarding',
+        DASHBOARD: '/nutrition/dashboard',
+        MEAL_PLAN: '/nutrition/meal-plan/:date?',
+        WORKOUT_PLAN: '/nutrition/workout-plan/:date?',
+    },
+
+    // Not Found path
+    NOT_FOUND: '*',
+} as const;
+
+/**
+ * Utility function to get relative path
+ * @param parts
+ * @returns
+ */
+export function buildPath(...parts: string[]): string {
+    return parts
+        .filter(Boolean)
+        .map((p, i) => (i === 0 ? p.replace(/\/+$/, '') : p.replace(/^\/+|\/+$/g, '')))
+        .join('/')
+        .replace(/\/{2,}/g, '/');
+}
+
+/**
+ * Replaces path parameters like :param with actual values.
+ * @param path Path string with :param
+ * @param params Object with key-value pairs to replace in path
+ * @returns Path with parameters replaced
+ */
+export function replacePathParams(path: string, params: Record<string, string | number>): string {
+    return path.replace(/:([a-zA-Z0-9_]+)/g, (_, key) => {
+        const value = params[key];
+        if (value === undefined) {
+            throw new Error(`Missing value for path parameter: ${key}`);
+        }
+        return encodeURIComponent(String(value));
+    });
+}

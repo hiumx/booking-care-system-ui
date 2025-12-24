@@ -1,0 +1,485 @@
+{
+    "steps": {
+        "dateTime": "Date & Time",
+        "basicInfo": "Basic Info",
+        "payment": "Payment",
+        "confirmation": "Confirmation",
+        "specialtyService": "Specialty/Service",
+        "appointmentType": "Appointment Type"
+    },
+    "common": {
+        "back": "Back",
+        "notSelected": "Not selected",
+        "copyright": "Copyright © {{year}}. All rights reserved, MedCure",
+        "holdSlot": "Hold {{time}}"
+    },
+    "header": {
+        "appointmentInfo": "Appointment Information",
+        "timeSlots": "Time Slots",
+        "slotsCount": "{{count}} slots",
+        "noTimeSlot": "No time slot selected",
+        "appointmentDate": "Appointment Date",
+        "appointmentType": "Appointment Type",
+        "specialty": "Specialty",
+        "service": "Service",
+        "doctor": "Doctor"
+    },
+    "confirmation": {
+        "breadcrumb": {
+            "home": "Home",
+            "medicalService": "Medical Services",
+            "specialtyBooking": "Book by Specialty",
+            "doctorBooking": "Book Appointment",
+            "title": "Booking Confirmation"
+        },
+        "toast": {
+            "appointmentNotFound": "Appointment ID not found",
+            "loadError": "Unable to load appointment information",
+            "successSpecialty": "Booking successful! The hospital will assign a doctor for you.",
+            "successPayment": "Payment successful! Your appointment has been confirmed."
+        },
+        "loading": "Loading...",
+        "success": "Booking Successful",
+        "message": {
+            "service": "Your appointment for <strong>{{serviceName}}</strong> service has been confirmed.",
+            "specialty": "Your appointment for <strong>{{specialtyName}}</strong> specialty has been received. The hospital will assign a suitable doctor for you.",
+            "doctor": "Your appointment has been confirmed with <strong>{{position}} {{doctorName}}</strong>.",
+            "arriveEarly": "Please arrive <strong>15 minutes</strong> before your appointment time."
+        },
+        "info": {
+            "title": "Appointment Information",
+            "reschedule": "Reschedule",
+            "doctor": "Doctor",
+            "specialty": "Specialty",
+            "notUpdated": "Not updated",
+            "waitingAssignment": "Waiting for assignment",
+            "service": "Service",
+            "servicePrice": "Service Price",
+            "date": "Appointment Date",
+            "time": "Appointment Time",
+            "noTimeInfo": "No information available",
+            "bookedSlot": "Booked Time Slot",
+            "appointmentType": "Appointment Type",
+            "inPerson": "In-person",
+            "online": "Online",
+            "location": "Location",
+            "viewLocation": "View location"
+        },
+        "specialtyAlert": {
+            "title": "Waiting for Doctor Assignment",
+            "message": "Your appointment has been received. The hospital will assign a doctor suitable for <strong>{{specialtyName}}</strong> specialty and notify you via email/phone."
+        },
+        "support": {
+            "title": "Need Help?",
+            "description": "Call us if you have any issues with booking or cancellation.",
+            "callUs": "Call Us"
+        },
+        "qrCode": {
+            "bookingId": "Booking ID",
+            "scanDescription": "Scan QR code to view appointment details on another device",
+            "addToCalendar": "Add to Calendar",
+            "newBooking": "New Booking"
+        }
+    },
+    "basicInfo": {
+        "title": "Patient information",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Email address",
+        "phoneNumber": "Phone number",
+        "symptoms": "Symptoms",
+        "attachments": "Attachments",
+        "optional": "(Optional)",
+        "bookingFor": "Booking for",
+        "forSelf": "Myself",
+        "forRelative": "Family member",
+        "selectRelative": "Select family member",
+        "selectRelativePlaceholder": "-- Select family member --",
+        "noRelatives": "You don't have any family members yet.",
+        "addRelative": "Add family member",
+        "manageRelatives": "Manage family members",
+        "pleaseSelectRelative": "Please select a family member",
+        "placeholder": {
+            "firstName": "Enter first name",
+            "lastName": "Enter last name",
+            "email": "Enter email address",
+            "phoneNumber": "Enter phone number",
+            "symptoms": "Enter symptoms"
+        },
+        "attachmentInfo": {
+            "title": "When should you attach files?",
+            "followUp": "Follow-up visit: Test results, images from previous visit",
+            "chronic": "Chronic disease: Medical records, old prescriptions",
+            "remote": "Remote consultation: Symptom photos, external examination results",
+            "acceptedFormats": "Accepted:",
+            "formats": "Images (JPG, PNG), PDF, Word (DOC, DOCX) - Max 10MB/file"
+        },
+        "filesSelected": "{{count}} file(s) selected",
+        "uploadNote": "Files will be uploaded when you proceed to the next step"
+    },
+    "payment": {
+        "selectMethod": "Select payment method",
+        "methods": {
+            "momo": "MoMo Wallet",
+            "vnpay": "VNPay",
+            "cash": "Cash",
+            "card": "Credit/Debit Card"
+        }
+    },
+    "appointment": {
+        "date": "Appointment date",
+        "time": "Appointment time",
+        "doctor": "Doctor",
+        "specialty": "Specialty",
+        "hospital": "Hospital",
+        "fee": "Consultation fee"
+    },
+    "chooseNewDoctor": {
+        "steps": {
+            "dateTime": "Date & Time",
+            "payment": "Payment"
+        },
+        "depositNote": "Note: You only need to pay a 30% deposit. The remaining amount will be paid upon completion.",
+        "telehealthNote": "Note: Telehealth consultation requires 100% payment upfront.",
+        "priceDifference": {
+            "equal": "Same deposit amount, no additional payment required",
+            "higher": "New doctor has a higher deposit of {{amount}}, additional payment required",
+            "lower": "New doctor has a lower deposit of {{amount}}, you will receive a refund"
+        },
+        "toast": {
+            "invalidInfo": "Invalid information",
+            "loadError": "Unable to load appointment information",
+            "selectDateTime": "Please select date and time",
+            "updateError": "Unable to update appointment",
+            "paymentError": "Unable to process payment",
+            "paymentUrlError": "Payment URL not received",
+            "redirectingPayment": "Redirecting to payment gateway...",
+            "refundError": "Unable to process refund request",
+            "refundAmount": "Refund amount: {{amount}}"
+        }
+    },
+    "confirmNewDoctor": {
+        "title": "Confirm Doctor Change",
+        "subtitle": "The hospital has assigned a new doctor for you",
+        "loading": "Loading doctor information...",
+        "currentAppointment": {
+            "title": "Current Appointment",
+            "doctor": "Doctor",
+            "date": "Appointment Date",
+            "time": "Appointment Time",
+            "location": "Location",
+            "depositPaid": "Deposit Paid",
+            "notUpdated": "Not updated"
+        },
+        "newDoctor": {
+            "title": "Newly Assigned Doctor",
+            "hospital": "Hospital",
+            "experience": "Experience",
+            "years": "years",
+            "newDeposit": "New Deposit (30%)",
+            "newPayment": "New Payment (100%)"
+        },
+        "priceDifference": {
+            "higher": "Higher deposit",
+            "higherNote": "Additional payment required.",
+            "lower": "Lower deposit",
+            "lowerNote": "You will receive a refund.",
+            "equal": "Same deposit. No additional payment required."
+        },
+        "actions": {
+            "processing": "Processing...",
+            "confirmAndPay": "Confirm & Pay",
+            "confirmNewDoctor": "Confirm New Doctor"
+        },
+        "toast": {
+            "invalidInfo": "Invalid information",
+            "loadError": "Unable to load information",
+            "loadAppointmentError": "Unable to load appointment information",
+            "loadDoctorError": "Unable to load new doctor information",
+            "notEnoughInfo": "Information not fully loaded",
+            "updateSuccess": "Doctor updated successfully!",
+            "paymentRequired": "New doctor has a higher deposit. Please pay the difference to confirm.",
+            "refundSuccess": "Doctor updated and refund request created!",
+            "updateError": "Unable to update doctor",
+            "error": "An error occurred, please try again"
+        }
+    },
+    "requestRefund": {
+        "title": "Request Refund",
+        "requestingRefundFor": "You are requesting a refund for your appointment with",
+        "appointmentInfo": "Appointment Information",
+        "labels": {
+            "doctor": "Doctor",
+            "service": "Service",
+            "hospital": "Hospital",
+            "specialty": "Specialty",
+            "date": "Appointment Date",
+            "time": "Appointment Time",
+            "location": "Location",
+            "address": "Address",
+            "serviceFee": "Service Fee",
+            "consultationFee": "Consultation Fee"
+        },
+        "note": {
+            "title": "Note:",
+            "message": "Refund requests will be processed within 3-5 business days. The amount will be transferred to your registered bank account."
+        },
+        "actions": {
+            "processing": "Processing...",
+            "confirmRefund": "Confirm Refund"
+        },
+        "toast": {
+            "invalidInfo": "Invalid information",
+            "success": "Refund request submitted successfully!",
+            "error": "Unable to submit refund request"
+        }
+    },
+    "rescheduleAppointment": {
+        "loading": "Loading appointment information...",
+        "toast": {
+            "selectDateTime": "Please select a new date and time",
+            "invalidInfo": "Invalid information",
+            "success": "Appointment rescheduled successfully!",
+            "error": "Unable to reschedule appointment"
+        }
+    },
+    "confirmSection": {
+        "notSelected": "Not selected",
+        "success": "Booking Successful",
+        "message": "Your appointment has been confirmed with {{doctorName}}. Please arrive 15 minutes before your appointment time.",
+        "info": {
+            "title": "Appointment Information",
+            "reschedule": "Reschedule",
+            "doctor": "Doctor",
+            "specialty": "Specialty",
+            "notUpdated": "Not updated",
+            "date": "Appointment Date",
+            "totalDuration": "Total Duration",
+            "durationFormat": "{{duration}} minutes ({{count}} time slots)",
+            "bookedSlots": "Booked Time Slots",
+            "appointmentType": "Appointment Type",
+            "inPerson": "In-person",
+            "location": "Location",
+            "viewLocation": "View location"
+        },
+        "support": {
+            "title": "Need Help?",
+            "description": "Call us if you have any issues with booking or cancellation.",
+            "callUs": "Call Us"
+        },
+        "qrCode": {
+            "bookingId": "Booking ID",
+            "scanDescription": "Scan this QR code to download appointment details",
+            "addToCalendar": "Add to Calendar",
+            "newBooking": "New Booking"
+        },
+        "backToBookings": "Back to bookings list"
+    },
+    "appointmentTypeSection": {
+        "nextStepTitle": "Select date & time",
+        "loading": "Loading...",
+        "notSelected": "Not selected",
+        "specialty": "Specialty",
+        "service": "Service",
+        "appointmentType": {
+            "title": "Select appointment type",
+            "inPerson": "In-person visit",
+            "telehealth": "Online consultation",
+            "serviceOnlyInPerson": "Medical services only support in-person visits at the hospital"
+        },
+        "doctorSelection": {
+            "title": "Select doctor (optional)",
+            "description": "You can choose a doctor or let the hospital assign the most suitable one",
+            "hospitalAssign": "Let hospital assign",
+            "hospitalAssignDesc": "Most suitable doctor",
+            "hospitalAssignDisabledTelehealth": "Not available for online consultation",
+            "selfSelect": "Choose doctor yourself",
+            "loading": "Loading...",
+            "doctorsAvailable": "{{count}} doctors available",
+            "noDoctors": "No doctors",
+            "noDoctorsMessage": "No suitable doctors found. Please select \"Let hospital assign\".",
+            "noDoctorsMessageTelehealth": "No doctors available for online consultation in this specialty. Please select \"In-person visit\" or try another specialty.",
+            "selectDoctorHint": "Select the doctor you want to see",
+            "noDoctorsFound": "No suitable doctors found",
+            "selectOrGoBack": "Please select a doctor or go back to \"Let hospital assign\""
+        },
+        "filters": {
+            "title": "Filters",
+            "searchPlaceholder": "Search by doctor name...",
+            "allPrices": "All prices",
+            "priceLow": "Under 300K",
+            "priceMedium": "300K - 500K",
+            "priceHigh": "Over 500K",
+            "allRatings": "All ratings",
+            "rating4Plus": "4+ stars",
+            "rating3Plus": "3+ stars",
+            "rating2Plus": "2+ stars",
+            "allExperience": "All experience",
+            "experience1to3": "1-3 years",
+            "experience4to7": "4-7 years",
+            "experience8Plus": "8+ years",
+            "allGenders": "All genders",
+            "male": "Male",
+            "female": "Female",
+            "allLanguages": "All languages",
+            "reset": "Clear filters",
+            "foundDoctors": "Found {{count}} matching doctors",
+            "noMatchingDoctors": "No doctors match the filters. Try adjusting the filters or",
+            "clearFilters": "clear filters"
+        },
+        "doctorCard": {
+            "notUpdated": "Not updated",
+            "yearsExperience": "years experience"
+        }
+    },
+    "paymentSection": {
+        "notSelected": "Not selected",
+        "bookingOptions": {
+            "title": "Select booking method",
+            "specialtyNotice": "With specialty booking, the hospital will assign a suitable doctor for you. The consultation fee will be notified after the doctor is assigned and you will pay directly at the hospital.",
+            "depositOption": {
+                "label": "💳 Deposit and pay now",
+                "ariaLabel": "Deposit and pay now - Get 10% off total consultation fee",
+                "saveBadge": "Save 10%",
+                "benefit1": "Get <strong>10%</strong> off total consultation fee",
+                "benefit2": "Guaranteed appointment slot",
+                "depositPayment": "Deposit payment:"
+            },
+            "noPaymentOption": {
+                "label": "📅 Book without deposit",
+                "ariaLabel": "Book without deposit - Pay full amount at visit",
+                "benefit1": "Pay full amount at visit",
+                "benefit2": "No upfront payment required",
+                "benefit3": "Flexible appointment changes"
+            }
+        },
+        "paymentGateway": "Payment Gateway",
+        "loadingPaymentMethods": "Loading payment methods...",
+        "noPaymentMethods": "No payment methods available at the moment",
+        "paymentMethodInfo": "You will be redirected to {{methodName}} payment gateway to complete the transaction. {{methodName}} supports payment via:",
+        "paymentMethodOptions": {
+            "atmBank": "ATM Card/Bank Account",
+            "internationalCard": "International Cards (Visa, Mastercard, JCB, AMEX)",
+            "eWallet": "VNPay E-Wallet",
+            "qrCode": "QR Code"
+        },
+        "appointmentInfo": {
+            "title": "Appointment Information",
+            "date": "Appointment Date",
+            "time": "Appointment Time",
+            "timeNotSelected": "Time not selected",
+            "selectedSlots": "Selected time slots ({{count}} slots - {{duration}} minutes)",
+            "hospital": "Hospital",
+            "specialty": "Specialty",
+            "service": "Service",
+            "doctor": "Doctor",
+            "notUpdated": "Not updated"
+        },
+        "paymentInfo": {
+            "title": "Payment Information",
+            "totalFee": "Total Consultation Fee",
+            "discount": "Discount",
+            "totalAfterDiscount": "Total After Discount",
+            "depositFee": "Deposit Fee (30%)",
+            "fullPaymentFee": "Telehealth Fee (100%)",
+            "supplementaryAmount": "Additional Payment Required",
+            "finalAmount": "Payment Amount",
+            "supplementaryFinalAmount": "Additional Payment Required"
+        },
+        "depositNote": "You only need to pay a 30% deposit ({{depositAmount}}) to confirm your appointment. The remaining amount ({{remainingAmount}}) will be paid directly at the clinic.",
+        "telehealthNote": "Telehealth consultation requires 100% payment ({{amount}}) to confirm your appointment.",
+        "supplementaryNote": "The new doctor has a higher deposit. You need to pay an additional {{amount}} to confirm the appointment. The remaining amount will be paid upon completion.",
+        "noPriceWarning": "Price information not found. Please go back and select {{entity}} again.",
+        "entityService": "service",
+        "entityDoctor": "doctor",
+        "specialtyPaymentNote": "You will pay the consultation fee directly at the hospital after a doctor is assigned.",
+        "specialtyPaymentTitle": "Pay at hospital:",
+        "discount": {
+            "label": "Discount Code",
+            "placeholder": "Enter discount code",
+            "apply": "Apply",
+            "validating": "Validating...",
+            "removeTitle": "Remove discount code",
+            "discountAmount": "Save {{amount}}"
+        },
+        "buttons": {
+            "processing": "Processing...",
+            "pay": "Pay",
+            "depositAndPay": "Deposit & Pay",
+            "bookNow": "Book Now",
+            "continue": "Continue"
+        },
+        "toast": {
+            "enterDiscountCode": "Please enter a discount code",
+            "hospitalNotFound": "Hospital information not found",
+            "discountIdError": "Error: Discount information not received from server",
+            "discountSuccess": "Discount code applied successfully!",
+            "discountInvalid": "Invalid discount code",
+            "discountValidateError": "Unable to validate discount code",
+            "discountRemoved": "Discount code removed",
+            "selectPaymentMethod": "Please select a payment method",
+            "invalidPaymentMethod": "Invalid payment method",
+            "noPriceError": "Price information not found. Please try again.",
+            "noPaymentNotSupported": "Booking without payment is not supported yet"
+        }
+    },
+    "timeSlots": {
+        "morning": "Morning (8:00 - 12:00)",
+        "afternoon": "Afternoon (12:00 - 17:00)",
+        "evening": "Evening (17:00 - 21:00)"
+    },
+    "dateTimeSection": {
+        "nextStepTitle": {
+            "reschedule": "Confirm Reschedule",
+            "default": "Add Basic Information"
+        },
+        "selectedDate": "Selected date:",
+        "loading": "Loading...",
+        "loadingSchedule": "Loading schedule...",
+        "noSlotsForDate": "No available slots for selected date",
+        "selectAnotherDate": "Please select another date",
+        "selectDate": "Please select a date",
+        "toast": {
+            "holdExpired": "Hold time expired. Please select a time slot again.",
+            "holdProcessing": "Processing hold...",
+            "cannotSelectSlot": "Cannot select this time slot",
+            "loginRequired": "Please login to book an appointment",
+            "holdFailed": "Cannot hold slot - missing doctor or service information"
+        }
+    },
+    "specialtyServiceSection": {
+        "notSelected": "Not selected",
+        "loading": "Loading...",
+        "specialty": "Specialty",
+        "service": "Service",
+        "nextStepTitle": "Select appointment type",
+        "selectSpecialty": "Select specialty",
+        "selectService": "Or select medical service",
+        "searchSpecialty": "Search specialty...",
+        "searchService": "Search service...",
+        "noSpecialtyFound": "No matching specialty found",
+        "noServiceFound": "No matching service found",
+        "noSpecialties": "Hospital has no specialties",
+        "noServices": "Hospital has no medical services",
+        "doctors": "doctors",
+        "collapse": "Collapse",
+        "showMore": "Show more",
+        "selectionHint": "Please select a specialty or a medical service to continue"
+    },
+    "bookingPage": {
+        "toast": {
+            "loadHospitalError": "Unable to load hospital information",
+            "pleaseLogin": "Please login",
+            "updatePhone": "Please update your phone number",
+            "userNotFound": "User information not found",
+            "selectDateTime": "Please select date and time",
+            "createRequestError": "Unable to create booking request",
+            "createAppointmentError": "Unable to create appointment",
+            "appointmentIdError": "Appointment ID not received",
+            "paymentUrlError": "Payment URL not received",
+            "redirectingPayment": "Redirecting to payment gateway...",
+            "processError": "Unable to complete the process",
+            "bookingSuccessNoPayment": "Booking successful! Please pay when you arrive."
+        }
+    }
+}

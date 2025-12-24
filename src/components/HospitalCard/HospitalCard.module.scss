@@ -1,0 +1,435 @@
+// Clinic Carousel Item Styles - CSS Module
+// Modern, clean design with excellent UX
+
+// Color Variables
+$primary-color: #007bff;
+$primary-color-dark: #0056b3; // Manual calculation for better performance
+$secondary-color: #6c757d;
+$success-color: #28a745;
+$warning-color: #ffc107;
+$danger-color: #dc3545;
+$light-color: #f8f9fa;
+$dark-color: #343a40;
+$white: #ffffff;
+
+// Border and Shadow Variables
+$border-radius: 12px;
+$border-radius-sm: 8px;
+$box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+$box-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.15);
+$border-light: rgba(0, 0, 0, 0.125);
+
+// Animation Variables
+$transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast: all 0.2s ease-in-out;
+
+// Typography
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+.clinicCarouselItem {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .clinicCard {
+        width: 100%;
+        flex: 1;
+        border: 1px solid $border-light;
+        border-radius: $border-radius;
+        box-shadow: $box-shadow;
+        transition: $transition-base;
+        overflow: hidden;
+        position: relative;
+        background: $white;
+        min-height: 320px;
+        display: flex;
+        flex-direction: column;
+
+        &:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            border-color: $primary-color;
+
+            .clinicImage {
+                transform: scale(1.05);
+            }
+
+            .bookNowBtn {
+                background: $primary-color-dark !important;
+                border-color: $primary-color-dark !important;
+            }
+        }
+
+        // Focus state for accessibility
+        &:focus-within {
+            .bookNowBtn,
+            .viewDetailsBtn {
+                &:not(:hover) {
+                    box-shadow: 0 0 0 2px rgba($primary-color, 0.25);
+                }
+            }
+        }
+    }
+
+    // Image Section
+    .clinicImageContainer {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+        background: $light-color;
+        border-radius: $border-radius $border-radius 0 0;
+
+        .clinicImage {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: $transition-base;
+        }
+
+        .imageOverlay {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: flex-end;
+            z-index: 2;
+        }
+
+        .distanceBadge {
+            background: rgba($dark-color, 0.8);
+            color: $white;
+            padding: 4px 8px;
+            border-radius: $border-radius-sm;
+            font-size: $font-size-sm;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            backdrop-filter: blur(10px);
+
+            i {
+                font-size: 12px;
+            }
+        }
+
+        .specialtyIndicator {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, $primary-color, $primary-color-dark);
+            color: $white;
+            padding: 8px 12px;
+            border-radius: $border-radius-sm;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba($primary-color, 0.3);
+            border: 1px solid rgba($white, 0.2);
+
+            .specialtyCount {
+                display: block;
+                font-size: 18px;
+                font-weight: $font-weight-bold;
+                line-height: 1;
+                margin-bottom: 2px;
+            }
+
+            .specialtyText {
+                display: block;
+                font-size: 9px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                opacity: 0.95;
+                font-weight: $font-weight-medium;
+            }
+        }
+    }
+
+    // Card Body
+    .clinicBody {
+        padding: 10px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: $white;
+        justify-content: flex-start;
+
+        .clinicName {
+            display: flex;
+            align-items: center;
+            min-height: 32px;
+            font-size: $font-size-lg;
+            font-weight: $font-weight-semibold;
+            color: #124992;
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .locationSection {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: $secondary-color;
+            min-height: 20px;
+            margin: 0;
+
+            .locationIcon {
+                font-size: 14px;
+                color: $primary-color;
+            }
+
+            .locationText {
+                font-size: $font-size-sm;
+                line-height: 1.4;
+            }
+        }
+
+        .specialtiesSection {
+            min-height: 40px;
+            margin-top: 4px;
+
+            .specialtiesLabel {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: linear-gradient(
+                    135deg,
+                    rgba(147, 51, 234, 0.1),
+                    rgba(147, 51, 234, 0.05)
+                );
+                color: #9333ea;
+                padding: 4px 10px;
+                border-radius: 16px;
+                font-size: 12px;
+                font-weight: $font-weight-semibold;
+                margin-bottom: 8px;
+                border: 1px solid rgba(147, 51, 234, 0.15);
+                backdrop-filter: blur(10px);
+                box-shadow: 0 2px 4px rgba(147, 51, 234, 0.1);
+                transition: $transition-fast;
+
+                i {
+                    font-size: 11px;
+                    opacity: 0.8;
+                }
+
+                span {
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    font-size: 11px;
+                }
+
+                &:hover {
+                    background: linear-gradient(
+                        135deg,
+                        rgba(147, 51, 234, 0.15),
+                        rgba(147, 51, 234, 0.08)
+                    );
+                    box-shadow: 0 3px 6px rgba(147, 51, 234, 0.15);
+                    transform: translateY(-1px);
+                }
+            }
+
+            .specialtiesContainer {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+
+                .specialtyTag {
+                    background: rgba($primary-color, 0.1);
+                    color: $primary-color;
+                    padding: 3px 8px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: $font-weight-medium;
+                    border: 1px solid rgba($primary-color, 0.2);
+
+                    &.more {
+                        background: rgba($secondary-color, 0.1);
+                        color: $secondary-color;
+                        border-color: rgba($secondary-color, 0.2);
+                    }
+                }
+            }
+        }
+    }
+
+    // Loading state
+    &.loading {
+        .clinicCard {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .clinicImage {
+            background: linear-gradient(
+                90deg,
+                $light-color 25%,
+                rgba($light-color, 0.5) 50%,
+                $light-color 75%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+    }
+}
+
+// Keyframe animations
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+// Responsive Design
+@media (max-width: 1200px) {
+    .clinicCarouselItem {
+        .clinicImageContainer {
+            height: 180px;
+        }
+
+        .clinicBody {
+            padding: 16px;
+
+            .clinicName {
+                font-size: $font-size-base;
+                min-height: 40px;
+            }
+        }
+    }
+}
+
+@media (max-width: 992px) {
+    .clinicCarouselItem {
+        .clinicImageContainer {
+            height: 160px;
+        }
+
+        .clinicBody {
+            padding: 14px;
+
+            .clinicName {
+                font-size: $font-size-sm;
+                min-height: 36px;
+            }
+
+            .specialtiesSection .specialtiesContainer .specialtyTag {
+                font-size: 0.7rem;
+                padding: 3px 6px;
+            }
+        }
+
+        .specialtyIndicator {
+            padding: 6px 10px;
+
+            .specialtyCount {
+                font-size: 16px;
+            }
+
+            .specialtyText {
+                font-size: 8px;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .clinicCarouselItem {
+        .clinicImageContainer {
+            height: 200px;
+        }
+
+        .clinicBody {
+            padding: 16px;
+
+            .clinicName {
+                font-size: $font-size-base;
+                min-height: 44px;
+            }
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    .clinicCarouselItem {
+        .clinicImageContainer {
+            height: 180px;
+        }
+
+        .clinicBody {
+            padding: 12px;
+
+            .clinicName {
+                font-size: $font-size-sm;
+                min-height: 40px;
+            }
+
+            .specialtiesSection .specialtiesContainer {
+                gap: 4px;
+
+                .specialtyTag {
+                    font-size: 0.65rem;
+                    padding: 2px 6px;
+                }
+            }
+        }
+    }
+}
+
+// Quick Booking Button
+.bookingButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 16px;
+    margin-top: 16px;
+    background: linear-gradient(135deg, #0ce0ff 0%, #15558d 100%);
+    border: none;
+    border-radius: $border-radius-sm;
+    color: $white;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    transition: $transition-base;
+    box-shadow: 0 4px 15px rgba(12, 224, 255, 0.25);
+
+    i {
+        font-size: 1.1rem;
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(12, 224, 255, 0.35);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+// Skeleton specific styles
+.skeletonIndicator {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    backdrop-filter: none !important;
+}

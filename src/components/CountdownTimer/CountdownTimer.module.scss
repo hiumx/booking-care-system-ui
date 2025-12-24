@@ -1,0 +1,119 @@
+.countdownTimer {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+
+    .icon {
+        font-size: 0.875rem;
+    }
+
+    .time {
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.05em;
+    }
+
+    // Size variants
+    &.size-small {
+        padding: 0.375rem 0.625rem;
+        font-size: 0.875rem;
+
+        .icon {
+            font-size: 0.875rem;
+        }
+    }
+
+    &.size-medium {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+
+        .icon {
+            font-size: 1rem;
+        }
+    }
+
+    &.size-large {
+        padding: 0.75rem 1.25rem;
+        font-size: 1.125rem;
+
+        .icon {
+            font-size: 1.125rem;
+        }
+    }
+
+    // Color variants
+    &.variant-default {
+        background-color: #e3f2fd;
+        color: #0d47a1; // Darker blue for better contrast (was #1976d2)
+        border: 1px solid #bbdefb;
+
+        .icon {
+            color: #0d47a1; // Darker blue for better contrast
+        }
+    }
+
+    &.variant-warning {
+        background-color: #fff3e0;
+        color: #bf360c; // Even darker orange for WCAG AA compliance (was #e65100)
+        border: 1px solid #ffcc02;
+        animation: pulse-warning 2s infinite;
+
+        .icon {
+            color: #bf360c; // Even darker orange for WCAG AA compliance
+        }
+    }
+
+    &.variant-danger {
+        background-color: #ffebee;
+        color: #b71c1c; // Darker red for better contrast (was #d32f2f)
+        border: 1px solid #ffcdd2;
+        animation: pulse-danger 1s infinite;
+
+        .icon {
+            color: #b71c1c; // Darker red for better contrast
+        }
+    }
+}
+
+// Animations
+@keyframes pulse-warning {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.02);
+        opacity: 0.9;
+    }
+}
+
+@keyframes pulse-danger {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+    .countdownTimer {
+        &.size-medium {
+            padding: 0.375rem 0.625rem;
+            font-size: 0.8125rem;
+        }
+
+        &.size-large {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+    }
+}

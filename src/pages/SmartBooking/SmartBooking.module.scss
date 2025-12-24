@@ -1,0 +1,564 @@
+// SmartBooking Responsive Styles
+.smartBooking {
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 50%, #e3f2fd 100%);
+}
+
+.searchContainer {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.headerSection {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.headerWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.headerIcon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.headerBrain {
+    color: #fff;
+}
+
+.headerTitle h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #212529;
+    margin: 0;
+}
+
+.featuresRow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.featureItem {
+    width: 100%;
+}
+
+.featureBox {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+    min-height: 80px;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+}
+
+.featureIcon {
+    color: #0d6efd;
+    flex-shrink: 0;
+}
+
+.featureText {
+    font-weight: 600;
+    color: #212529;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+/* Responsive breakpoints for features */
+@media (max-width: 1200px) {
+    .featuresRow {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .featuresRow {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        width: 100%;
+        padding: 0 1rem;
+    }
+
+    .featureBox {
+        padding: 0.75rem;
+        min-height: 70px;
+    }
+
+    .featureText {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .featuresRow {
+        padding: 0 0.5rem;
+    }
+
+    .featureBox {
+        padding: 0.5rem;
+        min-height: 60px;
+    }
+
+    .featureText {
+        font-size: 15px;
+    }
+}
+
+.loadingWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0d6efd;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.resultsWrapper {
+    margin-top: 2rem;
+}
+
+/* Shared 90% width container for all blocks */
+.content90 {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.cardGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    align-items: stretch;
+}
+
+.cardCol {
+    width: 100%;
+    display: flex;
+    min-height: 0;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1200px) {
+    .cardGrid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .cardGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .content90 {
+        width: 95%;
+    }
+}
+
+@media (max-width: 768px) {
+    .cardGrid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .headerTitle h1 {
+        font-size: 1.5rem;
+    }
+
+    .content90 {
+        width: 100%;
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .cardGrid {
+        gap: 0.75rem;
+    }
+
+    .content90 {
+        padding: 0 0.5rem;
+    }
+}
+
+/* Service-specific responsive - max 3 services per row */
+.cardGrid.services {
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+}
+
+@media (max-width: 992px) {
+    .cardGrid.services {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .cardGrid.services {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Skeleton Loading Styles */
+.skeletonCard {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: shimmer 1.5s infinite;
+}
+
+.skeletonImage {
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeletonContent {
+    .skeletonTitle {
+        width: 70%;
+        height: 20px;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        animation: shimmer 1.5s infinite;
+    }
+
+    .skeletonSubtitle {
+        width: 50%;
+        height: 16px;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        animation: shimmer 1.5s infinite;
+    }
+
+    .skeletonText {
+        width: 90%;
+        height: 14px;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        border-radius: 4px;
+        animation: shimmer 1.5s infinite;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.smart-booking {
+    // Mobile-first responsive design
+    @media (max-width: 576px) {
+        .search-container {
+            padding: 1rem 0.5rem;
+        }
+
+        .header-section {
+            text-align: center;
+
+            .header-icon {
+                width: 48px;
+                height: 48px;
+                margin-bottom: 1rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+                margin-bottom: 0.5rem;
+            }
+
+            p {
+                font-size: 1rem;
+                margin-bottom: 0;
+            }
+        }
+
+        .search-box {
+            .location-bar {
+                padding: 0.75rem 1rem;
+            }
+
+            .input-area {
+                padding: 1rem;
+
+                .voice-button {
+                    width: 40px;
+                    height: 40px;
+                }
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+
+                .btn {
+                    width: 100%;
+                }
+            }
+        }
+
+        .ai-insights {
+            padding: 1rem;
+
+            .insight-item {
+                margin-bottom: 1rem;
+            }
+        }
+
+        .results-header {
+            flex-direction: column;
+            gap: 1rem;
+
+            .sort-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        .card-grid {
+            .col-lg-4 {
+                margin-bottom: 1rem;
+            }
+        }
+
+        .search-history {
+            padding: 1rem;
+
+            .history-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+
+                .btn {
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    // Tablet styles
+    @media (min-width: 577px) and (max-width: 768px) {
+        .search-container {
+            padding: 1.5rem 1rem;
+        }
+
+        .header-section {
+            .header-icon {
+                width: 56px;
+                height: 56px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .search-box {
+            .action-buttons {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+            }
+        }
+
+        .cardGrid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    // Desktop styles
+    @media (min-width: 769px) {
+        .search-container {
+            padding: 2rem 1.5rem;
+        }
+
+        .header-section {
+            .header-icon {
+                width: 64px;
+                height: 64px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        .search-box {
+            .action-buttons {
+                gap: 1rem;
+            }
+        }
+
+        .cardGrid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    // Large desktop styles
+    @media (min-width: 1200px) {
+        .search-container {
+            padding: 3rem 2rem;
+        }
+
+        .header-section {
+            h1 {
+                font-size: 3rem;
+            }
+        }
+    }
+}
+
+// Card hover animations
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+}
+
+// Loading animations
+.loading-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+// Gradient backgrounds
+.gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+}
+
+.gradient-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.gradient-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+
+// Accessibility improvements
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+// Focus styles for keyboard navigation
+.focus-visible {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+    .card {
+        border: 2px solid #000;
+    }
+
+    .btn-primary {
+        background-color: #000;
+        border-color: #000;
+    }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+    .card-hover {
+        transition: none;
+
+        &:hover {
+            transform: none;
+        }
+    }
+
+    .loading-pulse {
+        animation: none;
+    }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+    .smart-booking {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+
+        .card {
+            background: #2d2d2d;
+            border-color: #404040;
+            color: #ffffff;
+        }
+
+        .text-muted {
+            color: #adb5bd !important;
+        }
+
+        .bg-light {
+            background-color: #404040 !important;
+        }
+    }
+}

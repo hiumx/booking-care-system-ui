@@ -1,0 +1,53 @@
+{
+    "menu": {
+        "quickBooking": "Đặt khám nhanh",
+        "healthRoadmap": "Sức khỏe của bạn",
+        "booking": {
+            "title": "Đặt khám",
+            "doctor": "Đặt khám bác sĩ",
+            "hospital": "Đặt khám bệnh viện"
+        },
+        "medicalServices": {
+            "title": "Dịch vụ y tế",
+            "specialty": "Đặt khám chuyên khoa",
+            "healthPackage": "Đặt khám gói sức khỏe",
+            "onlineConsultation": "Tư vấn trực tuyến"
+        },
+        "health": {
+            "title": "Sức khỏe của bạn",
+            "setupProfile": "Thiết lập hồ sơ sức khỏe",
+            "dashboard": "Bảng điều khiển"
+        },
+        "news": {
+            "title": "Tin tức",
+            "serviceNews": "Tin dịch vụ",
+            "healthNews": "Tin y tế"
+        },
+        "contact": "Liên hệ hợp tác",
+        "aboutUs": "Về chúng tôi"
+    },
+    "auth": {
+        "login": "Đăng nhập",
+        "register": "Đăng ký",
+        "logout": "Đăng xuất"
+    },
+    "user": {
+        "patient": "Bệnh nhân",
+        "appointments": "Lịch hẹn",
+        "profile": "Thông tin cá nhân"
+    },
+    "notification": {
+        "title": "Thông báo",
+        "markAllRead": "Đọc tất cả",
+        "noNotifications": "Chưa có thông báo nào",
+        "new": "Mới",
+        "viewAll": "Xem tất cả",
+        "markedAllRead": "Đã đánh dấu tất cả là đã đọc",
+        "markAllError": "Không thể đánh dấu tất cả"
+    },
+    "toast": {
+        "loadProfileError": "Không thể tải thông tin người dùng",
+        "logoutSuccess": "Đăng xuất thành công",
+        "logoutError": "Không thể đăng xuất. Vui lòng thử lại"
+    }
+}

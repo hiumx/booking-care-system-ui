@@ -1,0 +1,123 @@
+{
+    "title": "Điều khoản Dịch vụ",
+    "breadcrumb": {
+        "home": "Trang chủ",
+        "current": "Điều khoản Dịch vụ"
+    },
+    "sections": {
+        "introduction": {
+            "title": "1. Giới thiệu",
+            "description": "Chào mừng bạn đến với MedCure. Bằng việc truy cập và sử dụng dịch vụ của chúng tôi, bạn đồng ý tuân thủ các điều khoản và điều kiện được nêu trong tài liệu này. Vui lòng đọc kỹ trước khi sử dụng dịch vụ."
+        },
+        "definitions": {
+            "title": "2. Định nghĩa",
+            "description": "Trong điều khoản này, các thuật ngữ sau được hiểu như sau:",
+            "items": {
+                "service": "Dịch vụ",
+                "serviceValue": "Nền tảng đặt lịch khám bệnh trực tuyến MedCure và tất cả các tính năng liên quan",
+                "user": "Người dùng",
+                "userValue": "Bất kỳ cá nhân nào đăng ký và sử dụng dịch vụ của MedCure",
+                "healthcare": "Cơ sở Y tế",
+                "healthcareValue": "Bệnh viện, phòng khám, bác sĩ và các nhà cung cấp dịch vụ y tế hợp tác với MedCure",
+                "content": "Nội dung",
+                "contentValue": "Tất cả thông tin, văn bản, hình ảnh, video và dữ liệu được hiển thị trên nền tảng"
+            }
+        },
+        "accountRegistration": {
+            "title": "3. Đăng ký Tài khoản",
+            "description": "Để sử dụng đầy đủ các tính năng của MedCure, bạn cần đăng ký tài khoản với các điều kiện sau:",
+            "items": [
+                "Bạn phải từ 18 tuổi trở lên hoặc có sự đồng ý của người giám hộ hợp pháp",
+                "Thông tin đăng ký phải chính xác, đầy đủ và cập nhật",
+                "Bạn chịu trách nhiệm bảo mật thông tin đăng nhập của mình",
+                "Mỗi người chỉ được đăng ký một tài khoản",
+                "Bạn phải thông báo ngay cho chúng tôi nếu phát hiện truy cập trái phép vào tài khoản"
+            ]
+        },
+        "serviceUsage": {
+            "title": "4. Sử dụng Dịch vụ",
+            "description": "Khi sử dụng dịch vụ của MedCure, bạn đồng ý:",
+            "items": [
+                "Sử dụng dịch vụ cho mục đích hợp pháp và phù hợp",
+                "Không sử dụng dịch vụ để gây hại cho người khác hoặc hệ thống",
+                "Không can thiệp vào hoạt động bình thường của nền tảng",
+                "Không thu thập thông tin người dùng khác mà không có sự đồng ý",
+                "Tuân thủ tất cả các quy định pháp luật hiện hành",
+                "Không đăng tải nội dung vi phạm pháp luật hoặc quyền của bên thứ ba"
+            ]
+        },
+        "bookingPolicy": {
+            "title": "5. Chính sách Đặt lịch",
+            "description": "Quy định về việc đặt lịch khám bệnh:",
+            "items": {
+                "confirmation": "Xác nhận",
+                "confirmationValue": "Lịch hẹn chỉ được xác nhận sau khi nhận được thông báo từ hệ thống",
+                "cancellation": "Hủy lịch",
+                "cancellationValue": "Bạn có thể hủy lịch hẹn trước 24 giờ mà không mất phí. Hủy muộn có thể bị tính phí",
+                "reschedule": "Đổi lịch",
+                "rescheduleValue": "Có thể đổi lịch hẹn tùy thuộc vào tình trạng còn chỗ của cơ sở y tế",
+                "noShow": "Không đến khám",
+                "noShowValue": "Không đến khám mà không thông báo có thể ảnh hưởng đến quyền sử dụng dịch vụ"
+            }
+        },
+        "paymentTerms": {
+            "title": "6. Điều khoản Thanh toán",
+            "description": "Quy định về thanh toán trên MedCure:",
+            "items": [
+                "Giá dịch vụ được hiển thị rõ ràng trước khi đặt lịch",
+                "Thanh toán có thể thực hiện qua các phương thức được hỗ trợ",
+                "Phí đặt cọc (nếu có) sẽ được trừ vào tổng chi phí khám",
+                "Hoàn tiền được thực hiện theo chính sách hoàn tiền của MedCure",
+                "MedCure không chịu trách nhiệm về các khoản phí phát sinh tại cơ sở y tế"
+            ]
+        },
+        "intellectualProperty": {
+            "title": "7. Quyền Sở hữu Trí tuệ",
+            "description": "Tất cả nội dung trên MedCure bao gồm nhưng không giới hạn: logo, thiết kế, văn bản, hình ảnh, phần mềm đều thuộc quyền sở hữu của MedCure hoặc các bên cấp phép. Bạn không được sao chép, phân phối hoặc sử dụng cho mục đích thương mại mà không có sự đồng ý bằng văn bản."
+        },
+        "disclaimer": {
+            "title": "8. Miễn trừ Trách nhiệm",
+            "description": "MedCure cung cấp nền tảng kết nối người dùng với cơ sở y tế. Chúng tôi không chịu trách nhiệm về:",
+            "items": [
+                "Chất lượng dịch vụ y tế do cơ sở y tế cung cấp",
+                "Kết quả điều trị hoặc tư vấn y tế",
+                "Thiệt hại phát sinh từ việc sử dụng thông tin trên nền tảng",
+                "Gián đoạn dịch vụ do lỗi kỹ thuật hoặc bảo trì",
+                "Hành vi của bên thứ ba trên nền tảng"
+            ]
+        },
+        "limitation": {
+            "title": "9. Giới hạn Trách nhiệm",
+            "description": "Trong mọi trường hợp, trách nhiệm của MedCure đối với bạn sẽ không vượt quá số tiền bạn đã thanh toán cho dịch vụ trong 12 tháng gần nhất. Điều này áp dụng cho tất cả các loại thiệt hại, dù trực tiếp hay gián tiếp."
+        },
+        "termination": {
+            "title": "10. Chấm dứt Dịch vụ",
+            "description": "MedCure có quyền tạm ngưng hoặc chấm dứt tài khoản của bạn nếu:",
+            "items": [
+                "Vi phạm các điều khoản dịch vụ này",
+                "Cung cấp thông tin sai lệch hoặc gian lận",
+                "Có hành vi gây hại cho người dùng khác hoặc hệ thống",
+                "Theo yêu cầu của cơ quan có thẩm quyền",
+                "Không hoạt động trong thời gian dài (trên 24 tháng)"
+            ]
+        },
+        "changes": {
+            "title": "11. Thay đổi Điều khoản",
+            "description": "MedCure có quyền sửa đổi các điều khoản này bất cứ lúc nào. Các thay đổi sẽ có hiệu lực ngay khi được đăng tải trên nền tảng. Việc tiếp tục sử dụng dịch vụ sau khi thay đổi đồng nghĩa với việc bạn chấp nhận các điều khoản mới."
+        },
+        "governingLaw": {
+            "title": "12. Luật Áp dụng",
+            "description": "Các điều khoản này được điều chỉnh và giải thích theo pháp luật Việt Nam. Mọi tranh chấp phát sinh sẽ được giải quyết tại tòa án có thẩm quyền tại Việt Nam."
+        },
+        "contact": {
+            "title": "13. Liên hệ",
+            "description": "Nếu bạn có câu hỏi về các điều khoản dịch vụ này, vui lòng liên hệ:",
+            "email": "Email",
+            "emailValue": "medcure.contact@gmail.com",
+            "hotline": "Hotline",
+            "hotlineValue": "+84 763583081",
+            "address": "Địa chỉ",
+            "addressValue": "Đà Nẵng, Việt Nam"
+        }
+    }
+}
